@@ -385,4 +385,3 @@ export const updateUserProfile = async (userId: string, data: any) => {
         throw new Error("Failed to update user profile.");
     }
 };
-
