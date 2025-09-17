@@ -101,3 +101,22 @@ export const updateTest = async (testId: string, testData: any) => {
         throw new Error("Failed to update test.");
     }
 };
+
+export const getAllTests = async () => {
+    try {
+        const querySnapshot = await getDocs(collection(db, "tests"));
+        const tests = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                // Fallback for questions to ensure it's always an array
+                questions: data.questions || [], 
+            };
+        });
+        return tests;
+    } catch (e) {
+        console.error("Error getting documents: ", e);
+        throw new Error("Failed to fetch tests.");
+    }
+}

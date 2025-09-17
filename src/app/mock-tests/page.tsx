@@ -2,14 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Clock, HelpCircle, Search } from "lucide-react";
-import { mockTests } from "@/lib/mock-data";
+import { Clock, HelpCircle } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
+import { getAllTests } from "@/lib/firebase/firestore";
+import { MockTestFilters } from "@/components/mock-test-filters";
 
-export default function MockTestsPage() {
-  const subjects = Array.from(new Set(mockTests.map((test) => test.subject)));
+export default async function MockTestsPage() {
+  const tests = await getAllTests();
+  const subjects = Array.from(new Set(tests.map((test) => test.subject)));
 
   return (
     <div className="container py-12 md:py-16">
@@ -20,51 +20,22 @@ export default function MockTestsPage() {
         </p>
       </header>
 
-      <div className="mb-8 p-4 bg-secondary rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input placeholder="Search for a test..." className="pl-10" />
-          </div>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by subject" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Subjects</SelectItem>
-              {subjects.map((subject) => (
-                <SelectItem key={subject} value={subject.toLowerCase()}>{subject}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by access" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Access Levels</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="premium">Premium</SelectItem>
-              <SelectItem value="pro">Pro</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <MockTestFilters subjects={subjects} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockTests.map((test) => (
+        {tests.map((test) => (
           <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
             <CardHeader className="p-0 relative">
               <Image
-                src={test.image}
+                src={`https://picsum.photos/seed/${test.id}/400/225`}
                 alt={test.title}
                 width={400}
                 height={225}
                 className="w-full h-auto object-cover"
-                data-ai-hint={test.imageHint}
+                data-ai-hint={`${test.subject} abstract`}
               />
               <div className="absolute top-2 right-2">
-                <ContentBadge type={test.type} />
+                <ContentBadge type={test.access as "free" | "premium" | "pro"} />
               </div>
             </CardHeader>
             <CardContent className="flex-grow p-4">
@@ -73,7 +44,7 @@ export default function MockTestsPage() {
               <div className="flex items-center text-sm text-muted-foreground space-x-4">
                 <div className="flex items-center gap-1.5">
                   <HelpCircle className="w-4 h-4" />
-                  <span>{test.questions} Questions</span>
+                  <span>{test.questions.length} Questions</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
