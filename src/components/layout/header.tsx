@@ -118,7 +118,7 @@ const MainNav = ({ isMobile = false }: { isMobile?: boolean }) => {
 };
 
 export function Header() {
-  const { user, loading } = useAuth();
+  const { user, loading, logOut } = useAuth();
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -156,7 +156,7 @@ export function Header() {
                     </div>
                   )}
                   {!loading && user && (
-                     <Button onClick={() => {}} className="w-full">Log Out</Button>
+                     <Button onClick={logOut} className="w-full">Log Out</Button>
                   )}
                 </div>
               </div>
