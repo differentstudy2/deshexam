@@ -214,7 +214,7 @@ export default function PricingPage() {
                                         )}
                                     >
                                         {plan.bestseller && (
-                                            <Badge className="absolute -top-2 right-16 bg-yellow-400 text-yellow-900">Bestseller</Badge>
+                                            <Badge className="absolute -top-2 right-24 bg-yellow-400 text-yellow-900">Bestseller</Badge>
                                         )}
                                         {plan.discount && (
                                             <Badge className="absolute -top-2 right-2 bg-green-500 text-white">{plan.discount}% OFF</Badge>
@@ -302,5 +302,3 @@ export default function PricingPage() {
     </div>
   );
 }
-
-    
