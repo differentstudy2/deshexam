@@ -778,8 +778,35 @@ export const getCouponByCode = async (code: string) => {
     }
 }
 
+export const getCoupons = async () => {
+    try {
+        const q = query(collection(db, "coupons"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const coupons = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+                expiresAt: data.expiresAt?.toDate().toLocaleDateString() || 'N/A',
+            };
+        });
+        return coupons;
+    } catch (e) {
+        console.error("Error getting coupons: ", e);
+        throw new Error("Failed to fetch coupons.");
+    }
+}
+
 export const addCoupon = async (couponData: any) => {
     try {
+        // Convert expiresAt to Firestore Timestamp if it exists
+        if (couponData.expiresAt) {
+            couponData.expiresAt = new Date(couponData.expiresAt);
+        } else {
+            delete couponData.expiresAt;
+        }
+
         const docRef = await addDoc(collection(db, "coupons"), {
             ...couponData,
             code: couponData.code.toUpperCase(),

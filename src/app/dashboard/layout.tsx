@@ -25,6 +25,7 @@ import {
   Settings,
   BookUser,
   ClipboardList,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,6 +37,7 @@ const navItems = [
   { href: '/dashboard/all-questions', label: 'All Questions', icon: ClipboardList },
   { href: '/dashboard/my-results', label: 'My Results', icon: FileText },
   { href: '/dashboard/add-content', label: 'Add Content', icon: PlusCircle },
+  { href: '/dashboard/coupons', label: 'Coupons', icon: Tag },
   { href: '/dashboard/profile', label: 'Profile', icon: BookUser },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
