@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -20,13 +21,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { ContentBadge } from '@/components/content-badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -46,8 +48,14 @@ type Test = {
     id: string;
     title: string;
     subject: string;
+    testType: string;
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
+}
+
+function getUrlForTest(testType: string, testId: string) {
+    const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+    return `/${typeSlug}/${testId}`;
 }
 
 export default function MyContentPage() {
@@ -163,9 +171,13 @@ export default function MyContentPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                           <DropdownMenuItem asChild>
+                                <Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link href={`/dashboard/edit-test/${test.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(test)}>
                             <Trash2 className="mr-2 h-4 w-4"/>Delete
                           </DropdownMenuItem>
