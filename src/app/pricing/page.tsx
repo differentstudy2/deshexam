@@ -153,7 +153,7 @@ export default function PricingPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Left side: Benefits and Comparison */}
                         <div className="flex rounded-lg p-1">
-                            <div className="w-1/2 py-4 pr-4">
+                            <div className="w-1/2 py-4 pr-4 mt-8">
                                 <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
                                 <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -162,7 +162,7 @@ export default function PricingPage() {
                                 </div>
                             </div>
                             <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-blue-50 border border-blue-200')}>
-                                <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
+                                 <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
@@ -177,7 +177,7 @@ export default function PricingPage() {
                                 </div>
                             </div>
                             <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-blue-50 border border-blue-200')}>
-                                <h4 className="font-semibold mb-2 text-sm">Pass</h4>
+                               <h4 className="font-semibold mb-2 text-sm">Pass</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
