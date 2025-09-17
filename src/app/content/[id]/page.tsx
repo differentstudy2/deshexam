@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -43,12 +44,14 @@ export default function TestPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
+  const testId = params.id;
 
   useEffect(() => {
     const fetchTest = async () => {
+      if (!testId) return;
       try {
         setLoading(true);
-        const testData = await getTestById(params.id);
+        const testData = await getTestById(testId);
         setTest(testData as Test);
       } catch (error) {
         toast({
@@ -63,7 +66,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
     };
 
     fetchTest();
-  }, [params.id, toast, router]);
+  }, [testId, toast, router]);
   
   const handleAnswerChange = (questionIndex: number, answer: string) => {
     setAnswers(prev => ({ ...prev, [questionIndex]: answer }));

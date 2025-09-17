@@ -136,8 +136,7 @@ function ReviewDisplay() {
   );
 }
 
-export default function TestReviewPage() {
-  const params = useParams();
+export default function TestReviewPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
   const testId = params.id;
