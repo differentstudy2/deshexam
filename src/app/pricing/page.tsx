@@ -52,8 +52,8 @@ export default function PricingPage() {
     const originalPrice = selectedPlan ? selectedPlan.originalPrice : 0;
     const discount = originalPrice - price;
     const platformFee = 30;
-    const gst = (price + platformFee) * 0.18; // Example GST calculation
-    const total = price + platformFee;
+    const gst = (price + platformFee) * 0.18;
+    const total = price + platformFee + gst;
     
     const handlePayment = async () => {
         if (!user) {
@@ -280,14 +280,14 @@ export default function PricingPage() {
                                             <Separator className="bg-slate-600"/>
                                             <div className="flex justify-between font-bold text-lg">
                                                 <span>Total</span>
-                                                <span>₹{total}</span>
+                                                <span>₹{total.toFixed(2)}</span>
                                             </div>
                                         </div>
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
 
-                                <span className="font-bold text-xl">₹{total}</span>
+                                <span className="font-bold text-xl">₹{total.toFixed(2)}</span>
                             </div>
 
                             <Button onClick={handlePayment} disabled={isProcessingPayment} className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-white">
@@ -356,3 +356,5 @@ export default function PricingPage() {
 }
 
       
+
+    
