@@ -78,7 +78,7 @@ export default function DashboardPage() {
   }, [user]);
 
   const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
-      const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+      const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
       return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
   }
 
