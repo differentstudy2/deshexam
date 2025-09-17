@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -16,8 +17,10 @@ import {
   User,
   GoogleAuthProvider,
   signInWithPopup,
+  UserCredential,
 } from "firebase/auth";
 import { app } from "@/lib/firebase/client";
+import { updateUserProfile } from "@/lib/firebase/firestore";
 
 const auth = getAuth(app);
 
@@ -39,21 +42,42 @@ const AuthContext = createContext<AuthContextType>({
   logOut: async () => {},
 });
 
+const handleNewUser = async (credential: UserCredential) => {
+    const user = credential.user;
+    if (user) {
+        const userProfile = {
+            displayName: user.displayName || user.email?.split('@')[0] || 'New User',
+            email: user.email,
+            photoURL: user.photoURL,
+            createdAt: new Date(),
+            followers: [],
+            following: [],
+            followersCount: 0,
+            followingCount: 0,
+        };
+        await updateUserProfile(user.uid, userProfile);
+    }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const signUp = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  const signUp = async (email: string, password: string) => {
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    await handleNewUser(credential);
+    return credential;
   };
 
   const signIn = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    const credential = await signInWithPopup(auth, provider);
+    await handleNewUser(credential);
+    return credential;
   };
 
   const logOut = () => {

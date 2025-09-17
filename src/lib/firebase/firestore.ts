@@ -1,7 +1,8 @@
 
 
+
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export const addQuestion = async (questionData: any) => {
@@ -564,7 +565,17 @@ export const getUserProfile = async (userId: string) => {
     try {
         const userDocRef = doc(db, "users", userId);
         const userDoc = await getDoc(userDocRef);
-        return userDoc.exists() ? userDoc.data() : null;
+        if (!userDoc.exists()) return null;
+        
+        const userData = userDoc.data();
+        
+        return {
+            ...userData,
+            createdAt: userData.createdAt?.toDate() ?? new Date(),
+            followersCount: userData.followers?.length || 0,
+            followingCount: userData.following?.length || 0,
+        };
+
     } catch (error) {
         console.error("Error fetching user profile:", error);
         throw new Error("Failed to fetch user profile.");
@@ -579,5 +590,59 @@ export const updateUserProfile = async (userId: string, data: any) => {
     } catch (error) {
         console.error("Error updating user profile:", error);
         throw new Error("Failed to update user profile.");
+    }
+};
+
+export const toggleFollowUser = async (targetUserId: string) => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        throw new Error("You must be logged in to follow users.");
+    }
+    if (currentUser.uid === targetUserId) {
+        throw new Error("You cannot follow yourself.");
+    }
+
+    const currentUserRef = doc(db, "users", currentUser.uid);
+    const targetUserRef = doc(db, "users", targetUserId);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const currentUserDoc = await transaction.get(currentUserRef);
+            const targetUserDoc = await transaction.get(targetUserRef);
+
+            if (!currentUserDoc.exists() || !targetUserDoc.exists()) {
+                throw "User document not found.";
+            }
+
+            const currentUserData = currentUserDoc.data();
+            const isFollowing = currentUserData.following?.includes(targetUserId);
+
+            if (isFollowing) {
+                // Unfollow
+                transaction.update(currentUserRef, {
+                    following: arrayRemove(targetUserId),
+                    followingCount: increment(-1)
+                });
+                transaction.update(targetUserRef, {
+                    followers: arrayRemove(currentUser.uid),
+                    followersCount: increment(-1)
+                });
+            } else {
+                // Follow
+                transaction.update(currentUserRef, {
+                    following: arrayUnion(targetUserId),
+                    followingCount: increment(1)
+                });
+                transaction.update(targetUserRef, {
+                    followers: arrayUnion(currentUser.uid),
+                    followersCount: increment(1)
+                });
+            }
+        });
+    } catch (error) {
+        console.error("Follow transaction failed: ", error);
+        throw new Error("Failed to update follow status.");
     }
 };
