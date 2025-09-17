@@ -51,7 +51,11 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
+  board: z.string().optional(),
+  examType: z.string().optional(),
   subject: z.string().min(1, 'Please select or add a subject.'),
+  chapterNo: z.string().optional(),
+  chapterName: z.string().optional(),
   newSubject: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
@@ -109,7 +113,11 @@ export default function CreateTestPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
+      board: '',
+      examType: '',
       subject: '',
+      chapterNo: '',
+      chapterName: '',
       newSubject: '',
       testType: '',
       description: '',
@@ -148,11 +156,15 @@ export default function CreateTestPage() {
       form.reset({
         ...form.getValues(),
         title: '',
+        board: '',
+        examType: '',
+        subject: '',
+        chapterNo: '',
+        chapterName: '',
         description: '',
         duration: 60,
         access: 'free',
         questions: [],
-        subject: '',
         newSubject: '',
         difficulty: 'Medium',
       });
@@ -230,6 +242,35 @@ export default function CreateTestPage() {
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="board"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Board</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., CBSE, ICSE" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="examType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exam Type</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., NEET, JEE" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <FormField
                   control={form.control}
                   name="subject"
@@ -268,14 +309,27 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />
-                 <FormField
+                <FormField
                   control={form.control}
-                  name="duration"
+                  name="chapterNo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Duration (in minutes)</FormLabel>
+                      <FormLabel>Chapter No.</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input placeholder="e.g., 5" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="chapterName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Chapter Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Laws of Motion" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -300,7 +354,20 @@ export default function CreateTestPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Duration (in minutes)</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="access"

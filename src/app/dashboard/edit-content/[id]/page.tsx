@@ -51,7 +51,11 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
+  board: z.string().optional(),
+  examType: z.string().optional(),
   subject: z.string().min(1, 'Please select a subject.'),
+  chapterNo: z.string().optional(),
+  chapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
@@ -79,7 +83,11 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
+      board: '',
+      examType: '',
       subject: '',
+      chapterNo: '',
+      chapterName: '',
       testType: 'Mock Test',
       description: '',
       duration: 60,
@@ -185,7 +193,36 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="board"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Board</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., CBSE, ICSE" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="examType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exam Type</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., NEET, JEE" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="subject"
@@ -210,24 +247,28 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                     </FormItem>
                   )}
                 />
-                 <FormField
+                <FormField
                   control={form.control}
-                  name="testType"
+                  name="chapterNo"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a content type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                           {contentTypes.map((type) => (
-                                <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>
-                           ))}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Chapter No.</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., 5" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="chapterName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Chapter Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Laws of Motion" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -310,6 +351,29 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                   )}
                 />
               </div>
+
+               <FormField
+                  control={form.control}
+                  name="testType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Type</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a content type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                           {contentTypes.map((type) => (
+                                <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>
+                           ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
             </CardContent>
           </Card>
           
