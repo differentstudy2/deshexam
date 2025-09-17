@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/hooks/use-auth";
+import Script from "next/script";
 
 const fontBody = Inter({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
           <Footer />
         </AuthProvider>
         <Toaster />
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       </body>
     </html>
   );

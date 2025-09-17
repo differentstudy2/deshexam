@@ -6,16 +6,30 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info } from 'lucide-react';
+import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info, Loader2 } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { createRazorpayOrder } from '@/ai/flows/create-razorpay-order';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import Image from 'next/image';
+
+
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
 
 
 export default function PricingPage() {
+    const { toast } = useToast();
+    const { user } = useAuth();
     const [planType, setPlanType] = useState<'pro' | 'pass'>('pro');
     const [selectedDurationId, setSelectedDurationId] = useState(pricingData.plans.pro[1].id);
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     const currentPlans = pricingData.plans[planType];
     const selectedPlan = currentPlans.find(p => p.id === selectedDurationId);
@@ -26,6 +40,71 @@ export default function PricingPage() {
         const bestseller = newPlans.find(p => p.bestseller) || newPlans[0];
         setSelectedDurationId(bestseller.id);
     }, [planType]);
+    
+    const handlePayment = async () => {
+        if (!user) {
+            toast({
+                variant: 'destructive',
+                title: 'Authentication Error',
+                description: 'Please log in to make a purchase.',
+            });
+            return;
+        }
+
+        if (!selectedPlan) {
+            toast({
+                variant: 'destructive',
+                title: 'Selection Error',
+                description: 'Please select a plan.',
+            });
+            return;
+        }
+
+        setIsProcessingPayment(true);
+
+        try {
+            const order = await createRazorpayOrder({
+                amount: selectedPlan.price * 100, // amount in the smallest currency unit
+                currency: 'INR',
+            });
+
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                amount: order.amount,
+                currency: order.currency,
+                name: 'DeshExam',
+                description: `Purchase of ${selectedPlan.name}`,
+                order_id: order.id,
+                handler: async function (response: any) {
+                    // Here you would typically verify the payment signature on your backend
+                    toast({
+                        title: 'Payment Successful!',
+                        description: `Payment ID: ${response.razorpay_payment_id}`,
+                    });
+                },
+                prefill: {
+                    name: user.displayName || 'Test User',
+                    email: user.email,
+                },
+                theme: {
+                    color: '#16a34a', // Corresponds to primary green
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: 'destructive',
+                title: 'Payment Error',
+                description: 'Could not initialize payment. Please try again.',
+            });
+        } finally {
+            setIsProcessingPayment(false);
+        }
+    };
 
 
     const whyMustHave = [
@@ -81,8 +160,8 @@ export default function PricingPage() {
                                     ))}
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-primary/5 border border-primary/20')}>
-                                <p className="text-xs text-muted-foreground mb-4 pt-8">PASS PRO</p>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-blue-50 border border-blue-200')}>
+                                <Image src="https://testbook.com/assets/img/pass-new/pass-pro-light-icon.svg?v=05092023" alt="Pass Pro" width={80} height={20} className="mx-auto my-2"/>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
@@ -96,8 +175,8 @@ export default function PricingPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-primary/5 border border-primary/20')}>
-                                <p className="text-xs text-muted-foreground mb-4 pt-8">PASS</p>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-blue-50 border border-blue-200')}>
+                                <Image src="https://testbook.com/assets/img/pass-new/pass.svg?v=05092023" alt="Pass" width={50} height={20} className="mx-auto my-2"/>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
@@ -157,8 +236,8 @@ export default function PricingPage() {
                                 <span className="font-bold text-xl">₹{price}</span>
                             </div>
 
-                            <Button className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-white">
-                                Proceed To Payment
+                            <Button onClick={handlePayment} disabled={isProcessingPayment} className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-white">
+                                {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</> : 'Proceed To Payment'}
                             </Button>
                         </div>
                     </div>
@@ -221,5 +300,3 @@ export default function PricingPage() {
     </div>
   );
 }
-
-    
