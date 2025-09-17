@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
         source: '/practice-questions/:id*',
         destination: '/content/:id*',
       },
+      {
+        source: '/profile/:id*',
+        destination: '/profile/:id*',
+      },
     ];
   }
 };

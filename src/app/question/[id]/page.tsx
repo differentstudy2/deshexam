@@ -41,6 +41,7 @@ type Question = {
 type Comment = {
     id: string;
     text: string;
+    authorId: string;
     authorName: string;
     authorPhotoURL?: string;
     createdAt: Date;
@@ -248,10 +249,10 @@ export default function QuestionPage() {
             </CardContent>
             <CardFooter className="flex-col items-start gap-4">
               <div className="flex items-center gap-4">
-                <Button variant={userHasLiked ? "default" : "outline"} size="sm" onClick={() => handleVote('like')} disabled={isVoting || (!!user && userHasDisliked)}>
+                <Button variant={userHasLiked ? "default" : "outline"} size="sm" onClick={() => handleVote('like')} disabled={isVoting || (!!user && !!userHasDisliked)}>
                   <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
                 </Button>
-                <Button variant={userHasDisliked ? "destructive" : "outline"} size="sm" onClick={() => handleVote('dislike')} disabled={isVoting || (!!user && userHasLiked)}>
+                <Button variant={userHasDisliked ? "destructive" : "outline"} size="sm" onClick={() => handleVote('dislike')} disabled={isVoting || (!!user && !!userHasLiked)}>
                   <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
                 </Button>
               </div>
@@ -288,7 +289,7 @@ export default function QuestionPage() {
                             </Avatar>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="font-semibold">{comment.authorName}</span>
+                                    <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
                                     <span className="text-muted-foreground">
                                         {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
                                     </span>
