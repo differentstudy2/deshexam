@@ -284,8 +284,11 @@ export default function CreateTestPage() {
       form.setValue('exam', '');
       setExams([]);
       setIsAddingNewExam(false);
+
       if (value === 'add_new_exam_category') {
           setIsAddingNewExamCategory(true);
+          setIsAddingNewExam(true);
+          form.setValue('exam', 'add_new_exam');
       } else {
           setIsAddingNewExamCategory(false);
           const selectedExamCategory = examCategories.find(e => e.name === value);
@@ -553,7 +556,9 @@ export default function CreateTestPage() {
                                         <Input {...field} placeholder="Enter new exam name" />
                                     )}
                                 />
-                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExam(false); form.setValue('exam', ''); }}>Cancel</Button>
+                                {!isAddingNewExamCategory && (
+                                  <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExam(false); form.setValue('exam', ''); }}>Cancel</Button>
+                                )}
                              </div>
                         )}
                       <FormMessage />
