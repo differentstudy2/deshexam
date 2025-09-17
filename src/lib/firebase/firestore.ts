@@ -1,6 +1,6 @@
 "use client";
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, deleteDoc, doc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export const addTest = async (testData: any) => {
@@ -61,3 +61,35 @@ export const deleteTest = async (testId: string) => {
         throw new Error("Failed to delete test.");
     }
 }
+
+export const getTestById = async (testId: string) => {
+    if (!testId) {
+        throw new Error("Test ID is required to fetch a test.");
+    }
+    try {
+        const testDoc = await getDoc(doc(db, "tests", testId));
+        if (testDoc.exists()) {
+            return { id: testDoc.id, ...testDoc.data() };
+        } else {
+            throw new Error("No such document!");
+        }
+    } catch (e) {
+        console.error("Error getting document: ", e);
+        throw new Error("Failed to fetch test.");
+    }
+};
+
+export const updateTest = async (testId: string, testData: any) => {
+    if (!testId) {
+        throw new Error("Test ID is required to update a test.");
+    }
+    try {
+        await updateDoc(doc(db, "tests", testId), {
+            ...testData,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (e) {
+        console.error("Error updating document: ", e);
+        throw new Error("Failed to update test.");
+    }
+};
