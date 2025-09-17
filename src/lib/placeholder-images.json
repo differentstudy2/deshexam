@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "Students studying in a bright, modern library.",
+      "imageUrl": "https://picsum.photos/seed/hero/1920/1080",
+      "imageHint": "students library"
+    },
+    {
+      "id": "avatar-1",
+      "description": "A profile picture of a young woman.",
+      "imageUrl": "https://picsum.photos/seed/PriyaSharma/40/40",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-2",
+      "description": "A profile picture of a young man.",
+      "imageUrl": "https://picsum.photos/seed/RahulVerma/40/40",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-3",
+      "description": "A profile picture of a woman.",
+      "imageUrl": "https://picsum.photos/seed/AnjaliSingh/40/40",
+      "imageHint": "person face"
+    },
+    {
+      "id": "mock-test-physics",
+      "description": "Abstract representation of physics concepts.",
+      "imageUrl": "https://picsum.photos/seed/physics/400/225",
+      "imageHint": "physics abstract"
+    },
+    {
+      "id": "mock-test-chemistry",
+      "description": "Beakers and lab equipment.",
+      "imageUrl": "https://picsum.photos/seed/chemistry/400/225",
+      "imageHint": "chemistry lab"
+    },
+    {
+      "id": "mock-test-math",
+      "description": "Mathematical formulas on a chalkboard.",
+      "imageUrl": "https://picsum.photos/seed/math/400/225",
+      "imageHint": "math formula"
+    },
+    {
+      "id": "mock-test-biology",
+      "description": "A DNA helix structure.",
+      "imageUrl": "https://picsum.photos/seed/biology/400/225",
+      "imageHint": "biology dna"
+    }
+  ]
 }
