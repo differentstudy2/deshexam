@@ -74,53 +74,44 @@ export const mockTests: MockTest[] = [
   },
 ];
 
-export const pricingPlans = [
-    {
-        name: "Free",
-        price: "₹0",
-        description: "Get started with our basic features.",
-        features: [
-            "Access to all free quizzes",
-            "1 Free Mock Test",
-            "Limited Practice Questions",
-            "Community Support",
-        ],
-        cta: "Sign Up for Free",
-        type: "free" as const,
+export const pricingData = {
+    benefits: [
+        { id: "b1", name: "70,000+ Mock Test", pro: true, pass: true },
+        { id: "b2", name: "Unlimited Pro Live Test", pro: true, pass: false },
+        { id: "b3", name: "Unlimited Practice Pro Questions", pro: true, pass: false },
+        { id: "b4", name: "17,000+ Previous Year Papers", pro: true, pass: false },
+        { id: "b5", name: "Unlimited Re-Attempt made for All Tests", pro: true, pass: false },
+    ],
+    plans: [
+        { id: "plan_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1899, price: 599 },
+        { id: "plan_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1999, price: 649 },
+        { id: "plan_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 2499, price: 799 },
+    ]
+}
+
+export const faqData = [
+    { 
+        question: "What is Testbook Pass Pro?", 
+        answer: "Testbook Pass Pro is a premium subscription that gives you access to a vast library of mock tests, previous year papers, and live tests to help you prepare for various competitive exams." 
     },
-    {
-        name: "Premium",
-        price: "₹499",
-        billing: "one-time",
-        description: "Unlock premium tests and features.",
-        features: [
-            "Everything in Free, plus:",
-            "Access to all Premium Mock Tests",
-            "Download Test Reports (PDF)",
-            "Detailed Performance Analysis",
-            "Email Support",
-        ],
-        cta: "Go Premium",
-        type: "premium" as const,
+    { 
+        question: "When will my Pass Pro expire? Will I be able to access the Test Series after my Pass Pro expires?", 
+        answer: "Your Pass Pro subscription expires based on the validity period of the plan you choose (e.g., 31 days for Monthly plan). After expiry, you will lose access to the premium content. You can renew your subscription to continue." 
     },
-    {
-        name: "Pro",
-        price: "₹999",
-        billing: "/ month",
-        description: "Get the full DeshExam experience.",
-        features: [
-            "Everything in Premium, plus:",
-            "Access to all Pro Mock Tests",
-            "AI Learning Path Generator",
-            "Solved Textbook Assistant",
-            "Create Custom Tests",
-            "Priority Support",
-        ],
-        cta: "Start Pro Trial",
-        type: "pro" as const,
-        isPopular: true,
+    { 
+        question: "Will all of my enrolled Test Series be available during the Testbook Pass Pro validity period?", 
+        answer: "Yes, all Test Series included in the Pass Pro plan will be available to you throughout your subscription's validity period. You can attempt them multiple times to improve your score." 
+    },
+    { 
+        question: "How can I renew my Testbook Pass Pro?", 
+        answer: "You can renew your Pass Pro subscription directly from the pricing page. Simply select your desired plan and proceed to payment. Your new validity period will be added to your account." 
+    },
+    { 
+        question: "I do not have online payment activated. Can I use any other mode for payment?", 
+        answer: "We support a variety of payment methods, including credit/debit cards, net banking, and UPI. Please check the payment page for all available options. If you face any issues, our support team is ready to help." 
     },
 ];
+
 
 export const leaderboardData = [
     { rank: 1, name: "Aarav Sharma", score: 285, time: "45:12", avatar: "https://picsum.photos/seed/Aarav/40/40" },
