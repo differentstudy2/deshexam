@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
-import { getTestsByAuthor } from '@/lib/firebase/firestore';
+import { getTestsByAuthor, deleteTest } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -30,6 +31,16 @@ import {
 import { ContentBadge } from '@/components/content-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Test = {
     id: string;
@@ -44,6 +55,8 @@ export default function MyContentPage() {
   const { toast } = useToast();
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [testToDelete, setTestToDelete] = useState<Test | null>(null);
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -66,6 +79,32 @@ export default function MyContentPage() {
 
     fetchTests();
   }, [user, toast]);
+
+  const openDeleteDialog = (test: Test) => {
+    setTestToDelete(test);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!testToDelete) return;
+    try {
+      await deleteTest(testToDelete.id);
+      setTests(tests.filter(test => test.id !== testToDelete.id));
+      toast({
+        title: "Test Deleted",
+        description: `"${testToDelete.title}" has been deleted.`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: 'Error deleting test',
+        description: (error as Error).message,
+      });
+    } finally {
+        setIsDeleteDialogOpen(false);
+        setTestToDelete(null);
+    }
+  };
 
   return (
     <div>
@@ -124,8 +163,12 @@ export default function MyContentPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem><Pencil className="mr-2 h-4 w-4"/>Edit</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive"><Trash2 className="mr-2 h-4 w-4"/>Delete</DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/edit-test/${test.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(test)}>
+                            <Trash2 className="mr-2 h-4 w-4"/>Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -142,6 +185,22 @@ export default function MyContentPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the test
+              "{testToDelete?.title}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

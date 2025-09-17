@@ -1,6 +1,6 @@
 "use client";
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export const addTest = async (testData: any) => {
@@ -47,5 +47,17 @@ export const getTestsByAuthor = async (authorId: string) => {
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch tests.");
+    }
+}
+
+export const deleteTest = async (testId: string) => {
+    if (!testId) {
+        throw new Error("Test ID is required to delete a test.");
+    }
+    try {
+        await deleteDoc(doc(db, "tests", testId));
+    } catch (e) {
+        console.error("Error deleting document: ", e);
+        throw new Error("Failed to delete test.");
     }
 }
