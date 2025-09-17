@@ -1,4 +1,5 @@
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -720,5 +721,34 @@ export const toggleFollowUser = async (targetUserId: string) => {
     } catch (error) {
         console.error("Follow transaction failed: ", error);
         throw new Error("Failed to update follow status.");
+    }
+};
+
+export const sendMessage = async (recipientId: string, messageText: string) => {
+    const auth = getAuth();
+    const sender = auth.currentUser;
+
+    if (!sender) {
+        throw new Error("You must be logged in to send a message.");
+    }
+    if (!messageText.trim()) {
+        throw new Error("Message cannot be empty.");
+    }
+    if(sender.uid === recipientId) {
+        throw new Error("You cannot send a message to yourself.");
+    }
+
+    try {
+        const messagesCollection = collection(db, "messages");
+        await addDoc(messagesCollection, {
+            senderId: sender.uid,
+            recipientId: recipientId,
+            text: messageText,
+            createdAt: serverTimestamp(),
+            isRead: false,
+        });
+    } catch (error) {
+        console.error("Error sending message:", error);
+        throw new Error("Failed to send message.");
     }
 };

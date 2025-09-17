@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -15,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
+import { MessageDialog } from '@/components/feature/message-dialog';
 
 type UserProfile = {
   uid: string;
@@ -171,7 +173,7 @@ export default function UserProfilePage() {
       <div className="container mx-auto p-4 md:p-8">
         
         {/* Profile Header */}
-        <Card className="p-6 rounded-2xl shadow-sm bg-background/80 backdrop-blur-sm">
+        <Card className="p-6 rounded-2xl shadow-sm bg-card/80 backdrop-blur-sm">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <Avatar className="w-28 h-28 border-4 border-background outline outline-2 outline-gray-200">
                     <AvatarImage src={profile.photoURL || `https://picsum.photos/seed/${profile.uid}/112/112`} />
@@ -199,9 +201,7 @@ export default function UserProfilePage() {
                                 isFollowing ? <><UserCheck className="mr-2"/> Following</> : <><UserPlus className="mr-2"/> Follow</>
                             }
                         </Button>
-                        <Button variant="outline" className="w-full">
-                            <MessageSquare className="mr-2"/> Message
-                        </Button>
+                        <MessageDialog profile={profile} />
                     </div>
                 )}
             </div>
