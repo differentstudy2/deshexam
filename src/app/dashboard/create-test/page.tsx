@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -33,20 +33,30 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { mockTests } from '@/lib/mock-data';
+import { addTest } from '@/lib/firebase/firestore';
+import { PlusCircle, Trash2 } from 'lucide-react';
+
+const optionSchema = z.object({
+  text: z.string().min(1, 'Option text cannot be empty.'),
+});
+
+const questionSchema = z.object({
+  text: z.string().min(1, 'Question text cannot be empty.'),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  options: z.array(optionSchema).optional(),
+  correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
+});
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
   subject: z.string().min(1, 'Please select a subject.'),
   description: z.string().optional(),
-  questions: z.coerce
-    .number()
-    .int()
-    .positive('Number of questions must be positive.'),
   duration: z.coerce
     .number()
     .int()
     .positive('Duration must be a positive number of minutes.'),
   access: z.enum(['free', 'premium', 'pro']),
+  questions: z.array(questionSchema).min(1, 'Please add at least one question.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -61,20 +71,32 @@ export default function CreateTestPage() {
       title: '',
       subject: '',
       description: '',
-      questions: 50,
       duration: 60,
       access: 'free',
+      questions: [],
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'questions',
+  });
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    // Here you would typically send the data to your backend/API
-    console.log(data);
-    toast({
-      title: 'Test Created!',
-      description: `The test "${data.title}" has been successfully created.`,
-    });
-    form.reset();
+    try {
+      await addTest(data);
+      toast({
+        title: 'Test Created!',
+        description: `The test "${data.title}" has been successfully saved to Firestore.`,
+      });
+      form.reset();
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: 'Error Creating Test',
+        description: (error as Error).message,
+      });
+    }
   };
 
   return (
@@ -84,16 +106,16 @@ export default function CreateTestPage() {
         Fill out the form below to create a new mock test.
       </p>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Test Details</CardTitle>
-          <CardDescription>
-            Provide the essential information for your new test.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Details</CardTitle>
+              <CardDescription>
+                Provide the essential information for your new test.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <FormField
                 control={form.control}
                 name="title"
@@ -153,19 +175,6 @@ export default function CreateTestPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="questions"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Number of Questions</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
@@ -177,55 +186,170 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="access"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Access Level</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select access level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="free">Free</SelectItem>
+                          <SelectItem value="premium">Premium</SelectItem>
+                          <SelectItem value="pro">Pro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                       <FormDescription>
+                          Choose who can access this test.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+                <CardTitle>Questions</CardTitle>
+                <CardDescription>Add questions to your test.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                 {fields.map((question, index) => {
+                    const questionType = form.watch(`questions.${index}.type`);
+                    return (
+                        <Card key={question.id} className="p-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="font-semibold text-lg">Question {index + 1}</h4>
+                                <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
+                                    <Trash2 className="mr-2" />
+                                    Remove Question
+                                </Button>
+                            </div>
+                            <div className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name={`questions.${index}.text`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Question Text</FormLabel>
+                                            <FormControl>
+                                                <Textarea {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`questions.${index}.type`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Question Type</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                                    <SelectItem value="True/False">True/False</SelectItem>
+                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                {questionType === 'Multiple Choice' && (
+                                    <>
+                                        <FormLabel>Options</FormLabel>
+                                        <Controller
+                                            control={form.control}
+                                            name={`questions.${index}.correctAnswer`}
+                                            render={({ field }) => (
+                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                                                    {[0, 1, 2, 3].map(optionIndex => (
+                                                         <FormField
+                                                            key={optionIndex}
+                                                            control={form.control}
+                                                            name={`questions.${index}.options.${optionIndex}.text`}
+                                                            render={({ field: optionField }) => (
+                                                                <FormItem className="flex items-center gap-4">
+                                                                     <FormControl>
+                                                                        <RadioGroupItem value={optionField.value} />
+                                                                     </FormControl>
+                                                                    <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    ))}
+                                                </RadioGroup>
+                                            )}
+                                        />
+                                        <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
 
-              <FormField
-                control={form.control}
-                name="access"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Access Level</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="free" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Free</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="premium" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Premium</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="pro" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Pro</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                     <FormDescription>
-                        Choose who can access this test.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Creating..." : "Create Test"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                                    </>
+                                )}
+                                {questionType === 'True/False' && (
+                                     <FormField
+                                        control={form.control}
+                                        name={`questions.${index}.correctAnswer`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Correct Answer</FormLabel>
+                                                <FormControl>
+                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
+                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+                                {questionType === 'Short Answer' && (
+                                    <FormField
+                                        control={form.control}
+                                        name={`questions.${index}.correctAnswer`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Answer</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} placeholder="Enter the correct answer" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+                            </div>
+                        </Card>
+                    );
+                 })}
+            </CardContent>
+            <CardFooter>
+                 <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}
+                >
+                    <PlusCircle className="mr-2" />
+                    Add Question
+                </Button>
+            </CardFooter>
+          </Card>
+          
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Creating..." : "Create Test"}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
