@@ -87,7 +87,11 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
       try {
         setLoading(true);
         const testData = await getTestById(testId);
-        form.reset(testData as FormValues);
+        if (testData) {
+            form.reset(testData as FormValues);
+        } else {
+            throw new Error("Test not found");
+        }
       } catch (error) {
         toast({
           variant: "destructive",

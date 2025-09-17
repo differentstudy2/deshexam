@@ -69,7 +69,12 @@ export const getTestById = async (testId: string) => {
     try {
         const testDoc = await getDoc(doc(db, "tests", testId));
         if (testDoc.exists()) {
-            return { id: testDoc.id, ...testDoc.data() };
+            const data = testDoc.data();
+            // Ensure timestamp is converted correctly if it exists
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                data.createdAt = data.createdAt.toDate().toLocaleDateString();
+            }
+            return { id: testDoc.id, ...data };
         } else {
             throw new Error("No such document!");
         }
