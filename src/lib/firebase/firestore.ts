@@ -1,3 +1,4 @@
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -172,11 +173,10 @@ export const getSubmissionsByUserId = async (userId: string) => {
     try {
         const q = query(
             collection(db, "submissions"), 
-            where("userId", "==", userId),
-            orderBy("submittedAt", "desc")
+            where("userId", "==", userId)
         );
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => {
+        const submissions = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
@@ -184,6 +184,9 @@ export const getSubmissionsByUserId = async (userId: string) => {
                 submittedAt: data.submittedAt?.toDate() || new Date(),
             }
         });
+        // Sort on the client-side
+        submissions.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+        return submissions;
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch submissions.");
