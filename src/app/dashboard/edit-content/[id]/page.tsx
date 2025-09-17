@@ -37,7 +37,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -52,11 +52,11 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
-  board: z.string().min(1, 'Please select a board.'),
-  examCategory: z.string().min(1, 'Please select an exam category.'),
-  exam: z.string().min(1, 'Please select an exam.'),
-  subject: z.string().min(1, 'Please select a subject.'),
-  chapter: z.string().min(1, 'Please select a chapter.'),
+  board: z.string().min(1, 'Please select or add a board.'),
+  examCategory: z.string().min(1, 'Please select or add an exam category.'),
+  exam: z.string().min(1, 'Please select or add an exam.'),
+  subject: z.string().min(1, 'Please select or add a subject.'),
+  chapter: z.string().min(1, 'Please select or add a chapter.'),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newExamCategory: z.string().optional(),
@@ -82,9 +82,10 @@ type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
 
-export default function EditContentPage({ params }: { params: { id: string } }) {
+export default function EditContentPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const params = useParams();
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
@@ -92,7 +93,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-  const contentId = params.id;
+  const contentId = params.id as string;
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
@@ -792,4 +793,5 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     
 
     
+
 
