@@ -1,11 +1,30 @@
 
-
-
-
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+
+const generateUsername = async (displayName: string): Promise<string> => {
+    const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 30);
+    let username = baseUsername;
+    let attempts = 0;
+    
+    while (true) {
+        if (!username) { // handle case where displayName results in empty string
+            username = Math.random().toString(36).substring(2, 8);
+        }
+        const usernameRef = doc(db, "usernames", username);
+        const usernameDoc = await getDoc(usernameRef);
+        if (!usernameDoc.exists()) {
+            return username;
+        }
+        attempts++;
+        username = `${baseUsername}-${Math.random().toString(36).substring(2, 6)}`;
+        if (attempts > 5) {
+             throw new Error("Failed to generate a unique username.");
+        }
+    }
+};
+
 
 export const addQuestion = async (questionData: any) => {
     const auth = getAuth();
@@ -155,11 +174,13 @@ export const addComment = async (questionId: string, commentData: any) => {
     }
 
     try {
+        const userProfile = await getUserProfile(user.uid);
         const docRef = await addDoc(collection(db, "questions", questionId, "comments"), {
             ...commentData,
             authorId: user.uid,
-            authorName: user.displayName || user.email,
-            authorPhotoURL: user.photoURL,
+            authorName: userProfile?.displayName || user.email,
+            authorUsername: userProfile?.username,
+            authorPhotoURL: userProfile?.photoURL,
             createdAt: serverTimestamp(),
         });
         return docRef.id;
@@ -572,10 +593,9 @@ export const getUserProfile = async (userId: string) => {
         const userData = userDoc.data();
         
         return {
+            uid: userId,
             ...userData,
             createdAt: userData.createdAt?.toDate() ?? new Date(),
-            followersCount: userData.followers?.length || 0,
-            followingCount: userData.following?.length || 0,
         };
 
     } catch (error) {
@@ -584,11 +604,65 @@ export const getUserProfile = async (userId: string) => {
     }
 };
 
+export const getUserByUsername = async (username: string) => {
+    if (!username) return null;
+    try {
+        // Check if the passed value might be a UID instead of a username
+        if (username.length > 20 && !username.includes('-')) { // Simple heuristic for UID
+             return await getUserProfile(username);
+        }
+
+        const usernameRef = doc(db, "usernames", username);
+        const usernameDoc = await getDoc(usernameRef);
+
+        if (usernameDoc.exists()) {
+            const { uid } = usernameDoc.data();
+            return await getUserProfile(uid);
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching user by username:", error);
+        throw new Error("Failed to fetch user by username.");
+    }
+}
+
 export const updateUserProfile = async (userId: string, data: any) => {
     if (!userId) throw new Error("User ID is required to update a profile.");
+
+    const userDocRef = doc(db, "users", userId);
+    
     try {
-        const userDocRef = doc(db, "users", userId);
-        await setDoc(userDocRef, data, { merge: true });
+        await runTransaction(db, async (transaction) => {
+            const userDoc = await transaction.get(userDocRef);
+            const currentData = userDoc.data() || {};
+            const newData = { ...currentData, ...data };
+            
+            // Handle username change
+            if (data.displayName && (!currentData.username || data.displayName !== currentData.displayName)) {
+                const newUsername = await generateUsername(data.displayName);
+                newData.username = newUsername;
+
+                // Update username lookup
+                const newUsernameRef = doc(db, "usernames", newUsername);
+                transaction.set(newUsernameRef, { uid: userId });
+
+                // Delete old username lookup if it exists
+                if (currentData.username) {
+                    const oldUsernameRef = doc(db, "usernames", currentData.username);
+                    const oldUsernameDoc = await transaction.get(oldUsernameRef);
+                    if(oldUsernameDoc.exists()) {
+                        transaction.delete(oldUsernameRef);
+                    }
+                }
+            } else if (!currentData.username && currentData.displayName) {
+                 const newUsername = await generateUsername(currentData.displayName);
+                 newData.username = newUsername;
+                 const newUsernameRef = doc(db, "usernames", newUsername);
+                 transaction.set(newUsernameRef, { uid: userId });
+            }
+
+            transaction.set(userDocRef, newData, { merge: true });
+        });
     } catch (error) {
         console.error("Error updating user profile:", error);
         throw new Error("Failed to update user profile.");
