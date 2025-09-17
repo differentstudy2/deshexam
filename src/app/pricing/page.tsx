@@ -1,5 +1,4 @@
-
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
-import { DeshExamLogo } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -24,8 +22,6 @@ export default function PricingPage() {
     const price = selectedPlan ? selectedPlan.price : 0;
     
     useEffect(() => {
-        // When planType changes, update the selectedDurationId to a valid one in the new plan type.
-        // We default to the bestseller of the new plan type.
         const newPlans = pricingData.plans[planType];
         const bestseller = newPlans.find(p => p.bestseller) || newPlans[0];
         setSelectedDurationId(bestseller.id);
@@ -63,11 +59,10 @@ export default function PricingPage() {
   return (
     <div className="bg-secondary/30">
         <div className="container py-12 md:py-16">
-
             <Tabs defaultValue="pro" onValueChange={(value) => setPlanType(value as 'pro' | 'pass')} className="w-full max-w-sm mx-auto mb-4">
                  <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="pro">
-                        <span className="flex items-center gap-2">Pass Pro <Badge variant="outline" className="text-yellow-600 border-yellow-400 bg-yellow-100">Suggested</Badge></span>
+                        <span className="flex items-center gap-2">Pass Pro <Badge variant="suggested">Suggested</Badge></span>
                     </TabsTrigger>
                     <TabsTrigger value="pass">Pass</TabsTrigger>
                 </TabsList>
@@ -86,7 +81,7 @@ export default function PricingPage() {
                                     ))}
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-secondary')}>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-primary/5 border border-primary/20')}>
                                 <p className="text-xs text-muted-foreground mb-4 pt-8">PASS PRO</p>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -101,7 +96,7 @@ export default function PricingPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-secondary')}>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-primary/5 border border-primary/20')}>
                                 <p className="text-xs text-muted-foreground mb-4 pt-8">PASS</p>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -226,3 +221,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
+    
