@@ -86,12 +86,12 @@ export default function UserProfilePage() {
   }, [userId, toast]);
   
   const getUrlForContent = (testType: string, testId: string) => {
-    const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+    const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}`;
   }
   
   const getUrlForResults = (testType: string, testId: string, submissionId: string) => {
-    const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+    const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
   }
 
