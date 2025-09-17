@@ -54,8 +54,6 @@ const formSchema = z.object({
   board: z.string().min(1, 'Please select a board.'),
   examType: z.string().min(1, 'Please select an exam type.'),
   subject: z.string().min(1, 'Please select a subject.'),
-  chapterNo: z.string().optional(),
-  chapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
@@ -90,8 +88,6 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       board: '',
       examType: '',
       subject: '',
-      chapterNo: '',
-      chapterName: '',
       testType: 'Mock Test',
       description: '',
       duration: 60,
@@ -201,7 +197,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                 )}
               />
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="board"
@@ -250,9 +246,6 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                     </FormItem>
                   )}
                 />
-              </div>
-
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="subject"
@@ -273,32 +266,6 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="chapterNo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Chapter No.</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 5" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="chapterName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Chapter Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Laws of Motion" {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -545,5 +512,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
+    
 
     

@@ -54,8 +54,6 @@ const formSchema = z.object({
   board: z.string().min(1, 'Please select or add a board.'),
   examType: z.string().min(1, 'Please select or add an exam type.'),
   subject: z.string().min(1, 'Please select or add a subject.'),
-  chapterNo: z.string().optional(),
-  chapterName: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newExamType: z.string().optional(),
@@ -130,8 +128,6 @@ export default function CreateTestPage() {
       board: '',
       examType: '',
       subject: '',
-      chapterNo: '',
-      chapterName: '',
       newSubject: '',
       newBoard: '',
       newExamType: '',
@@ -189,8 +185,6 @@ export default function CreateTestPage() {
         board: '',
         examType: '',
         subject: '',
-        chapterNo: '',
-        chapterName: '',
         description: '',
         duration: 60,
         access: 'free',
@@ -291,7 +285,7 @@ export default function CreateTestPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="board"
@@ -368,9 +362,6 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <FormField
                   control={form.control}
                   name="subject"
@@ -405,32 +396,6 @@ export default function CreateTestPage() {
                                 <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewSubject(false); form.setValue('subject', ''); }}>Cancel</Button>
                              </div>
                         )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="chapterNo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Chapter No.</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 5" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="chapterName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Chapter Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Laws of Motion" {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -660,5 +625,7 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+    
 
     
