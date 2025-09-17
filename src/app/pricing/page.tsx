@@ -16,6 +16,12 @@ import { createRazorpayOrder } from '@/ai/flows/create-razorpay-order';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import Image from 'next/image';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 
 declare global {
@@ -42,6 +48,11 @@ export default function PricingPage() {
     const currentPlans = pricingData.plans[planType];
     const selectedPlan = currentPlans.find(p => p.id === selectedDurationId);
     const price = selectedPlan ? selectedPlan.price : 0;
+    const originalPrice = selectedPlan ? selectedPlan.originalPrice : 0;
+    const discount = originalPrice - price;
+    const platformFee = 30;
+    const gst = (price + platformFee) * 0.18; // Example GST calculation
+    const total = price + platformFee;
     
     const handlePayment = async () => {
         if (!user) {
@@ -66,7 +77,7 @@ export default function PricingPage() {
 
         try {
             const order = await createRazorpayOrder({
-                amount: selectedPlan.price * 100, // amount in the smallest currency unit
+                amount: total * 100, // amount in the smallest currency unit
                 currency: 'INR',
             });
 
@@ -234,8 +245,48 @@ export default function PricingPage() {
                             </RadioGroup>
 
                             <div className="flex justify-between items-center mt-6 py-4 border-t">
-                                <span className="font-semibold flex items-center gap-1">To Pay <Info className="w-4 h-4 text-muted-foreground"/></span>
-                                <span className="font-bold text-xl">₹{price}</span>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="font-semibold flex items-center gap-1 cursor-pointer">
+                                        To Pay <Info className="w-4 h-4 text-muted-foreground"/>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="bg-slate-800 text-white border-slate-800 p-0 rounded-lg shadow-lg">
+                                        <div className="p-4 space-y-2">
+                                            <div className="flex justify-between font-medium">
+                                                <span>{selectedPlan?.name}</span>
+                                                <span>₹{originalPrice}</span>
+                                            </div>
+                                            <Separator className="bg-slate-600"/>
+                                            <div className="flex justify-between">
+                                                <span>Total Cart Price</span>
+                                                <span>₹{originalPrice}</span>
+                                            </div>
+                                             <div className="flex justify-between text-green-400">
+                                                <span>Discounted Cost</span>
+                                                <span>- ₹{discount}</span>
+                                            </div>
+                                            <Separator className="bg-slate-600"/>
+                                             <div className="flex justify-between">
+                                                <span>Platform Fee</span>
+                                                <span>+ ₹{platformFee}</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs text-slate-400">
+                                                <span>Includes GST</span>
+                                                <span>(₹{gst.toFixed(2)})</span>
+                                            </div>
+                                            <Separator className="bg-slate-600"/>
+                                            <div className="flex justify-between font-bold text-lg">
+                                                <span>Total</span>
+                                                <span>₹{total}</span>
+                                            </div>
+                                        </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+
+                                <span className="font-bold text-xl">₹{total}</span>
                             </div>
 
                             <Button onClick={handlePayment} disabled={isProcessingPayment} className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-white">
@@ -302,3 +353,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
+      
