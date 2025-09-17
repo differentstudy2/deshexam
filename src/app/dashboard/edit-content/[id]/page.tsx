@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -51,8 +51,8 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
-  board: z.string().optional(),
-  examType: z.string().optional(),
+  board: z.string().min(1, 'Please select a board.'),
+  examType: z.string().min(1, 'Please select an exam type.'),
   subject: z.string().min(1, 'Please select a subject.'),
   chapterNo: z.string().optional(),
   chapterName: z.string().optional(),
@@ -70,12 +70,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
+type Board = { id: string, name: string };
+type ExamType = { id: string, name: string };
 
 export default function EditContentPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [examTypes, setExamTypes] = useState<ExamType[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const contentId = params.id;
 
@@ -102,14 +106,18 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       if (!contentId) return;
       try {
         setLoading(true);
-        const [contentData, subjectData, contentTypeData] = await Promise.all([
+        const [contentData, subjectData, contentTypeData, boardData, examTypeData] = await Promise.all([
             getContentById(contentId),
             getSubjects(),
-            getContentTypes()
+            getContentTypes(),
+            getBoards(),
+            getExamTypes()
         ]);
         
         setSubjects(subjectData);
         setContentTypes(contentTypeData);
+        setBoards(boardData);
+        setExamTypes(examTypeData);
 
         if (contentData) {
             form.reset(contentData as FormValues);
@@ -200,9 +208,20 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Board</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., CBSE, ICSE" {...field} />
-                      </FormControl>
+                       <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a board" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {boards.map((board) => (
+                            <SelectItem key={board.id} value={board.name}>
+                              {board.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -213,9 +232,20 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Exam Type</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., NEET, JEE" {...field} />
-                      </FormControl>
+                       <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select an exam type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {examTypes.map((exam) => (
+                            <SelectItem key={exam.id} value={exam.name}>
+                              {exam.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -223,11 +223,9 @@ export const addSubject = async (subjectName: string) => {
         throw new Error("Subject name cannot be empty.");
     }
     try {
-        // Check if subject already exists
         const q = query(collection(db, "subjects"), where("name", "==", subjectName));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
-            // Subject already exists, return the existing one's name or id
             console.log("Subject already exists.");
             return querySnapshot.docs[0].id;
         }
@@ -239,6 +237,74 @@ export const addSubject = async (subjectName: string) => {
     } catch (e) {
         console.error("Error adding subject: ", e);
         throw new Error("Failed to add subject.");
+    }
+};
+
+export const getBoards = async () => {
+    try {
+        const q = query(collection(db, "boards"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const boards = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return boards;
+    } catch (e) {
+        console.error("Error getting boards: ", e);
+        throw new Error("Failed to fetch boards.");
+    }
+};
+
+export const addBoard = async (boardName: string) => {
+    if (!boardName) {
+        throw new Error("Board name cannot be empty.");
+    }
+    try {
+        const q = query(collection(db, "boards"), where("name", "==", boardName));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            console.log("Board already exists.");
+            return querySnapshot.docs[0].id;
+        }
+        
+        const docRef = await addDoc(collection(db, "boards"), {
+            name: boardName,
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding board: ", e);
+        throw new Error("Failed to add board.");
+    }
+};
+
+export const getExamTypes = async () => {
+    try {
+        const q = query(collection(db, "examTypes"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const examTypes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return examTypes;
+    } catch (e) {
+        console.error("Error getting exam types: ", e);
+        throw new Error("Failed to fetch exam types.");
+    }
+};
+
+export const addExamType = async (examTypeName: string) => {
+    if (!examTypeName) {
+        throw new Error("Exam type name cannot be empty.");
+    }
+    try {
+        const q = query(collection(db, "examTypes"), where("name", "==", examTypeName));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            console.log("Exam type already exists.");
+            return querySnapshot.docs[0].id;
+        }
+        
+        const docRef = await addDoc(collection(db, "examTypes"), {
+            name: examTypeName,
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding exam type: ", e);
+        throw new Error("Failed to add exam type.");
     }
 };
 

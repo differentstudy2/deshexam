@@ -33,7 +33,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
@@ -51,12 +51,14 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
-  board: z.string().optional(),
-  examType: z.string().optional(),
+  board: z.string().min(1, 'Please select or add a board.'),
+  examType: z.string().min(1, 'Please select or add an exam type.'),
   subject: z.string().min(1, 'Please select or add a subject.'),
   chapterNo: z.string().optional(),
   chapterName: z.string().optional(),
   newSubject: z.string().optional(),
+  newBoard: z.string().optional(),
+  newExamType: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
@@ -71,13 +73,21 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
+type Board = { id: string, name: string };
+type ExamType = { id: string, name: string };
+
 
 export default function CreateTestPage() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [examTypes, setExamTypes] = useState<ExamType[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
+  const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
+  const [isAddingNewExamType, setIsAddingNewExamType] = useState(false);
+
 
   useEffect(() => {
     fetchFormData();
@@ -86,13 +96,17 @@ export default function CreateTestPage() {
   const fetchFormData = async () => {
     try {
       setLoadingData(true);
-      const [types, subjectData] = await Promise.all([
+      const [types, subjectData, boardData, examTypeData] = await Promise.all([
           getContentTypes(),
-          getSubjects()
+          getSubjects(),
+          getBoards(),
+          getExamTypes()
       ]);
       
       setContentTypes(types);
       setSubjects(subjectData);
+      setBoards(boardData);
+      setExamTypes(examTypeData);
 
       if (types.length > 0) {
           form.setValue('testType', types[0].name);
@@ -101,7 +115,7 @@ export default function CreateTestPage() {
       toast({
           variant: "destructive",
           title: "Error loading data",
-          description: "Could not load content types or subjects from the database."
+          description: "Could not load form data from the database."
       });
     } finally {
       setLoadingData(false);
@@ -119,6 +133,8 @@ export default function CreateTestPage() {
       chapterNo: '',
       chapterName: '',
       newSubject: '',
+      newBoard: '',
+      newExamType: '',
       testType: '',
       description: '',
       duration: 60,
@@ -139,20 +155,34 @@ export default function CreateTestPage() {
       if(data.subject === 'add_new_subject' && data.newSubject) {
         await addSubject(data.newSubject);
         subjectName = data.newSubject;
-        // Refetch subjects to include the new one in the list
-        fetchFormData();
         setIsAddingNewSubject(false);
       }
       
-      const contentToSave = { ...data, subject: subjectName };
-      delete (contentToSave as any).newSubject;
+      let boardName = data.board;
+      if(data.board === 'add_new_board' && data.newBoard) {
+        await addBoard(data.newBoard);
+        boardName = data.newBoard;
+        setIsAddingNewBoard(false);
+      }
 
+      let examTypeName = data.examType;
+      if(data.examType === 'add_new_exam_type' && data.newExamType) {
+        await addExamType(data.newExamType);
+        examTypeName = data.newExamType;
+        setIsAddingNewExamType(false);
+      }
+      
+      const contentToSave = { ...data, subject: subjectName, board: boardName, examType: examTypeName };
+      delete (contentToSave as any).newSubject;
+      delete (contentToSave as any).newBoard;
+      delete (contentToSave as any).newExamType;
 
       await addContent(contentToSave);
       toast({
         title: 'Content Created!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,
       });
+      fetchFormData();
       form.reset({
         ...form.getValues(),
         title: '',
@@ -166,6 +196,8 @@ export default function CreateTestPage() {
         access: 'free',
         questions: [],
         newSubject: '',
+        newBoard: '',
+        newExamType: '',
         difficulty: 'Medium',
       });
     } catch (error) {
@@ -187,6 +219,24 @@ export default function CreateTestPage() {
           setIsAddingNewSubject(true);
       } else {
           setIsAddingNewSubject(false);
+      }
+  }
+
+  const handleBoardChange = (value: string) => {
+      form.setValue('board', value);
+      if (value === 'add_new_board') {
+          setIsAddingNewBoard(true);
+      } else {
+          setIsAddingNewBoard(false);
+      }
+  }
+
+  const handleExamTypeChange = (value: string) => {
+      form.setValue('examType', value);
+      if (value === 'add_new_exam_type') {
+          setIsAddingNewExamType(true);
+      } else {
+          setIsAddingNewExamType(false);
       }
   }
 
@@ -248,9 +298,34 @@ export default function CreateTestPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Board</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., CBSE, ICSE" {...field} />
-                      </FormControl>
+                      {!isAddingNewBoard ? (
+                            <Select onValueChange={handleBoardChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a board" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {boards.map((board) => (
+                                    <SelectItem key={board.id} value={board.name}>
+                                    {board.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_board">Add new board...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newBoard"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new board name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewBoard(false); form.setValue('board', ''); }}>Cancel</Button>
+                             </div>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -261,9 +336,34 @@ export default function CreateTestPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Exam Type</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., NEET, JEE" {...field} />
-                      </FormControl>
+                      {!isAddingNewExamType ? (
+                            <Select onValueChange={handleExamTypeChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an exam type" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {examTypes.map((exam) => (
+                                    <SelectItem key={exam.id} value={exam.name}>
+                                    {exam.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_exam_type">Add new exam type...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newExamType"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new exam type name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExamType(false); form.setValue('examType', ''); }}>Cancel</Button>
+                             </div>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}
