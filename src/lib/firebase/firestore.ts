@@ -335,6 +335,33 @@ export const addChapter = async (subjectId: string, chapterData: { chapterNo: st
     }
 };
 
+export const getExamsByCategory = async (examTypeId: string) => {
+    if (!examTypeId) return [];
+    try {
+        const examsRef = collection(db, "examTypes", examTypeId, "exams");
+        const q = query(examsRef, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+    } catch (e) {
+        console.error("Error getting exams: ", e);
+        throw new Error("Failed to fetch exams.");
+    }
+};
+
+export const addExam = async (examTypeId: string, examData: { name: string }) => {
+    if (!examTypeId || !examData.name) {
+        throw new Error("Exam Type ID and Exam Name are required.");
+    }
+    try {
+        const examsRef = collection(db, "examTypes", examTypeId, "exams");
+        const docRef = await addDoc(examsRef, examData);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding exam: ", e);
+        throw new Error("Failed to add exam.");
+    }
+};
+
 
 export const getUserProfile = async (userId: string) => {
     if (!userId) return null;
@@ -358,3 +385,4 @@ export const updateUserProfile = async (userId: string, data: any) => {
         throw new Error("Failed to update user profile.");
     }
 };
+

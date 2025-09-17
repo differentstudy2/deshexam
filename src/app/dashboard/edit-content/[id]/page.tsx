@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -34,7 +35,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -52,12 +53,14 @@ const questionSchema = z.object({
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
   board: z.string().min(1, 'Please select a board.'),
-  examType: z.string().min(1, 'Please select an exam type.'),
+  examCategory: z.string().min(1, 'Please select an exam category.'),
+  exam: z.string().min(1, 'Please select an exam.'),
   subject: z.string().min(1, 'Please select a subject.'),
   chapter: z.string().min(1, 'Please select a chapter.'),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
-  newExamType: z.string().optional(),
+  newExamCategory: z.string().optional(),
+  newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
   newChapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
@@ -76,6 +79,7 @@ type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type ExamType = { id: string, name: string };
+type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
 
 export default function EditContentPage({ params }: { params: { id: string } }) {
@@ -84,13 +88,15 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
-  const [examTypes, setExamTypes] = useState<ExamType[]>([]);
+  const [examCategories, setExamCategories] = useState<ExamType[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const contentId = params.id;
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
-  const [isAddingNewExamType, setIsAddingNewExamType] = useState(false);
+  const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
+  const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
 
   const form = useForm<FormValues>({
@@ -98,7 +104,8 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     defaultValues: {
       title: '',
       board: '',
-      examType: '',
+      examCategory: '',
+      exam: '',
       subject: '',
       chapter: '',
       testType: 'Mock Test',
@@ -126,7 +133,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
         setSubjects(subjectData);
         setContentTypes(contentTypeData);
         setBoards(boardData);
-        setExamTypes(examTypeData);
+        setExamCategories(examTypeData);
 
         if (contentData) {
             form.reset(contentData as FormValues);
@@ -136,6 +143,14 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                   const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
                   setChapters(fetchedChapters);
                   form.setValue('chapter', contentData.chapter);
+              }
+            }
+             if (contentData.examCategory) {
+              const selectedExamCategory = examTypeData.find(e => e.name === contentData.examCategory);
+              if (selectedExamCategory) {
+                  const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
+                  setExams(fetchedExams);
+                  form.setValue('exam', contentData.exam);
               }
             }
         } else {
@@ -177,10 +192,18 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
           boardName = data.newBoard;
       }
   
-      let examTypeName = data.examType;
-      if (data.examType === 'add_new_exam_type' && data.newExamType) {
-          await addExamType(data.newExamType);
-          examTypeName = data.newExamType;
+      let examCategoryName = data.examCategory;
+      let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
+      if (data.examCategory === 'add_new_exam_category' && data.newExamCategory) {
+          const newExamCatId = await addExamType(data.newExamCategory);
+          examCategoryName = data.newExamCategory;
+          examCategoryId = newExamCatId;
+      }
+
+      let examName = data.exam;
+      if (data.exam === 'add_new_exam' && data.newExam && examCategoryId) {
+          await addExam(examCategoryId, { name: data.newExam });
+          examName = data.newExam;
       }
 
       let chapterName = data.chapter;
@@ -189,10 +212,11 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
         chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
       }
 
-      const contentToSave = { ...data, subject: subjectName, board: boardName, examType: examTypeName, chapter: chapterName };
+      const contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
       delete (contentToSave as any).newSubject;
       delete (contentToSave as any).newBoard;
-      delete (contentToSave as any).newExamType;
+      delete (contentToSave as any).newExamCategory;
+      delete (contentToSave as any).newExam;
       delete (contentToSave as any).newChapterNo;
       delete (contentToSave as any).newChapterName;
 
@@ -239,14 +263,33 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       }
   }
 
-  const handleExamTypeChange = (value: string) => {
-      form.setValue('examType', value);
-      if (value === 'add_new_exam_type') {
-          setIsAddingNewExamType(true);
+  const handleExamCategoryChange = async (value: string) => {
+      form.setValue('examCategory', value);
+      form.setValue('exam', '');
+      setExams([]);
+      setIsAddingNewExam(false);
+
+      if (value === 'add_new_exam_category') {
+          setIsAddingNewExamCategory(true);
       } else {
-          setIsAddingNewExamType(false);
+          setIsAddingNewExamCategory(false);
+          const selectedExamCategory = examCategories.find(e => e.name === value);
+          if (selectedExamCategory) {
+              const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
+              setExams(fetchedExams);
+          }
       }
   }
+
+  const handleExamChange = (value: string) => {
+    form.setValue('exam', value);
+    if (value === 'add_new_exam') {
+        setIsAddingNewExam(true);
+    } else {
+        setIsAddingNewExam(false);
+    }
+  };
+
 
    const handleChapterChange = (value: string) => {
     form.setValue('chapter', value);
@@ -301,7 +344,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                 )}
               />
 
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <FormField
                   control={form.control}
                   name="board"
@@ -334,44 +377,6 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                                     )}
                                 />
                                 <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewBoard(false); form.setValue('board', ''); }}>Cancel</Button>
-                             </div>
-                        )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="examType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Exam Type</FormLabel>
-                      {!isAddingNewExamType ? (
-                            <Select onValueChange={handleExamTypeChange} value={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select an exam type" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {examTypes.map((exam) => (
-                                    <SelectItem key={exam.id} value={exam.name}>
-                                    {exam.name}
-                                    </SelectItem>
-                                ))}
-                                 <SelectItem value="add_new_exam_type">Add new exam type...</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        ) : (
-                            <div className='space-y-2'>
-                                <FormField
-                                    control={form.control}
-                                    name="newExamType"
-                                    render={({ field }) => (
-                                        <Input {...field} placeholder="Enter new exam type name" />
-                                    )}
-                                />
-                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExamType(false); form.setValue('examType', ''); }}>Cancel</Button>
                              </div>
                         )}
                       <FormMessage />
@@ -452,6 +457,85 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                         </FormControl>
                     </FormItem>
                 )}
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField
+                  control={form.control}
+                  name="examCategory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exam Category</FormLabel>
+                      {!isAddingNewExamCategory ? (
+                            <Select onValueChange={handleExamCategoryChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an exam category" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {examCategories.map((exam) => (
+                                    <SelectItem key={exam.id} value={exam.name}>
+                                    {exam.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_exam_category">Add new exam category...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newExamCategory"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new exam category name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExamCategory(false); form.setValue('examCategory', ''); }}>Cancel</Button>
+                             </div>
+                        )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="exam"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exam</FormLabel>
+                      {!isAddingNewExam ? (
+                            <Select onValueChange={handleExamChange} value={field.value} disabled={!form.watch('examCategory') || form.watch('examCategory') === 'add_new_exam_category'}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an exam" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {exams.map((exam) => (
+                                    <SelectItem key={exam.id} value={exam.name}>
+                                    {exam.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_exam">Add new exam...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newExam"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new exam name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExam(false); form.setValue('exam', ''); }}>Cancel</Button>
+                             </div>
+                        )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField
@@ -698,3 +782,4 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     
 
     
+
