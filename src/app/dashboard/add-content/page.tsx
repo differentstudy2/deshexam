@@ -34,9 +34,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { mockTests } from '@/lib/mock-data';
-import { addContent } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { addContent, getContentTypes } from '@/lib/firebase/firestore';
+import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEffect, useState } from 'react';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -63,18 +64,42 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-type ContentType = 'Mock Test' | 'Quiz' | 'Practice Questions';
+type ContentType = { id: string, name: string };
 
 export default function CreateTestPage() {
   const { toast } = useToast();
   const subjects = Array.from(new Set(mockTests.map((test) => test.subject)));
+  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
+  const [loadingContentTypes, setLoadingContentTypes] = useState(true);
+
+  useEffect(() => {
+    const fetchContentTypes = async () => {
+      try {
+        setLoadingContentTypes(true);
+        const types = await getContentTypes();
+        setContentTypes(types);
+        if (types.length > 0) {
+            form.setValue('testType', types[0].name);
+        }
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error loading content types",
+            description: "Could not load content types from the database."
+        });
+      } finally {
+        setLoadingContentTypes(false);
+      }
+    };
+    fetchContentTypes();
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
       subject: '',
-      testType: 'Mock Test',
+      testType: '',
       description: '',
       duration: 60,
       access: 'free',
@@ -112,7 +137,16 @@ export default function CreateTestPage() {
   };
 
   const handleTabChange = (value: string) => {
-    form.setValue('testType', value as ContentType, { shouldValidate: true });
+    form.setValue('testType', value, { shouldValidate: true });
+  }
+
+  if (loadingContentTypes) {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <p className="ml-4 text-lg">Loading Content Types...</p>
+        </div>
+    )
   }
 
   return (
@@ -122,13 +156,15 @@ export default function CreateTestPage() {
         Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
       </p>
 
-      <Tabs defaultValue="Mock Test" className="w-full mb-6" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="Mock Test">Mock Test</TabsTrigger>
-          <TabsTrigger value="Quiz">Quiz</TabsTrigger>
-          <TabsTrigger value="Practice Questions">Practice Questions</TabsTrigger>
+    {contentTypes.length > 0 && (
+      <Tabs defaultValue={contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
+        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${contentTypes.length}, 1fr)`}}>
+          {contentTypes.map((type) => (
+            <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
+          ))}
         </TabsList>
       </Tabs>
+    )}
 
 
       <Form {...form}>

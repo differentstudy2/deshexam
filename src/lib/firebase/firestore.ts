@@ -102,7 +102,7 @@ export const updateContent = async (contentId: string, contentData: any) => {
     }
 };
 
-export const getAllContent = async (type?: 'Mock Test' | 'Quiz' | 'Practice Questions') => {
+export const getAllContent = async (type?: string) => {
     try {
         let q;
         if (type) {
@@ -190,5 +190,17 @@ export const getSubmissionsByUserId = async (userId: string) => {
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch submissions.");
+    }
+};
+
+export const getContentTypes = async () => {
+    try {
+        const q = query(collection(db, "contentTypes"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const contentTypes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return contentTypes;
+    } catch (e) {
+        console.error("Error getting content types: ", e);
+        throw new Error("Failed to fetch content types.");
     }
 };

@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
-import { getContentByAuthor, deleteContent } from '@/lib/firebase/firestore';
+import { getContentByAuthor, deleteContent, getContentTypes } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Eye, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,6 +53,8 @@ type Test = {
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
 }
+
+type ContentType = { id: string, name: string };
 
 function getUrlForTest(testType: string, testId: string) {
     const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
@@ -135,16 +137,19 @@ export default function MyContentPage() {
   const [loading, setLoading] = useState(true);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [testToDelete, setTestToDelete] = useState<Test | null>(null);
-
-  const contentTypes = ["All", "Mock Test", "Quiz", "Practice Questions"];
+  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
 
   useEffect(() => {
-    const fetchTests = async () => {
+    const fetchInitialData = async () => {
       if (user) {
         try {
           setLoading(true);
-          const userTests = await getContentByAuthor(user.uid);
+          const [userTests, types] = await Promise.all([
+            getContentByAuthor(user.uid),
+            getContentTypes()
+          ]);
           setTests(userTests as Test[]);
+          setContentTypes([{ id: 'all', name: 'All'}, ...types]);
         } catch (error) {
            toast({
             variant: "destructive",
@@ -157,7 +162,7 @@ export default function MyContentPage() {
       }
     };
 
-    fetchTests();
+    fetchInitialData();
   }, [user, toast]);
 
   const openDeleteDialog = (test: Test) => {
@@ -206,22 +211,28 @@ export default function MyContentPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+           {loading ? (
+             <div className="flex items-center justify-center min-h-[200px]">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+             </div>
+           ) : (
             <Tabs defaultValue="All">
                  <TabsList>
                     {contentTypes.map(type => (
-                        <TabsTrigger key={type} value={type}>{type}</TabsTrigger>
+                        <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
                     ))}
                 </TabsList>
                 {contentTypes.map(type => (
-                    <TabsContent key={type} value={type}>
+                    <TabsContent key={type.id} value={type.name}>
                         <ContentTable 
-                            tests={getFilteredTests(type)} 
+                            tests={getFilteredTests(type.name)} 
                             loading={loading}
                             openDeleteDialog={openDeleteDialog}
                         />
                     </TabsContent>
                 ))}
             </Tabs>
+           )}
         </CardContent>
       </Card>
       
