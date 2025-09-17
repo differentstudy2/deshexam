@@ -308,6 +308,34 @@ export const addExamType = async (examTypeName: string) => {
     }
 };
 
+export const getChaptersBySubjectId = async (subjectId: string) => {
+    if (!subjectId) return [];
+    try {
+        const chaptersRef = collection(db, "subjects", subjectId, "chapters");
+        const q = query(chaptersRef, orderBy("chapterNo"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { chapterNo: string, chapterName: string } }));
+    } catch (e) {
+        console.error("Error getting chapters: ", e);
+        throw new Error("Failed to fetch chapters.");
+    }
+};
+
+export const addChapter = async (subjectId: string, chapterData: { chapterNo: string, chapterName: string }) => {
+    if (!subjectId || !chapterData.chapterNo || !chapterData.chapterName) {
+        throw new Error("Subject ID, Chapter No, and Chapter Name are required.");
+    }
+    try {
+        const chaptersRef = collection(db, "subjects", subjectId, "chapters");
+        const docRef = await addDoc(chaptersRef, chapterData);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding chapter: ", e);
+        throw new Error("Failed to add chapter.");
+    }
+};
+
+
 export const getUserProfile = async (userId: string) => {
     if (!userId) return null;
     try {

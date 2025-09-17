@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -54,6 +54,12 @@ const formSchema = z.object({
   board: z.string().min(1, 'Please select a board.'),
   examType: z.string().min(1, 'Please select an exam type.'),
   subject: z.string().min(1, 'Please select a subject.'),
+  chapter: z.string().min(1, 'Please select a chapter.'),
+  newSubject: z.string().optional(),
+  newBoard: z.string().optional(),
+  newExamType: z.string().optional(),
+  newChapterNo: z.string().optional(),
+  newChapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
@@ -70,6 +76,7 @@ type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type ExamType = { id: string, name: string };
+type Chapter = { id: string; chapterNo: string; chapterName: string };
 
 export default function EditContentPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
@@ -78,8 +85,13 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [examTypes, setExamTypes] = useState<ExamType[]>([]);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const contentId = params.id;
+  const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
+  const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
+  const [isAddingNewExamType, setIsAddingNewExamType] = useState(false);
+  const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -88,6 +100,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       board: '',
       examType: '',
       subject: '',
+      chapter: '',
       testType: 'Mock Test',
       description: '',
       duration: 60,
@@ -117,6 +130,14 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
 
         if (contentData) {
             form.reset(contentData as FormValues);
+             if (contentData.subject) {
+              const selectedSubject = subjectData.find(s => s.name === contentData.subject);
+              if (selectedSubject) {
+                  const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+                  setChapters(fetchedChapters);
+                  form.setValue('chapter', contentData.chapter);
+              }
+            }
         } else {
             throw new Error("Content not found");
         }
@@ -142,7 +163,41 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      await updateContent(contentId, data);
+      let subjectName = data.subject;
+      let subjectId = subjects.find(s => s.name === data.subject)?.id;
+      if (data.subject === 'add_new_subject' && data.newSubject) {
+          const newSubId = await addSubject(data.newSubject);
+          subjectName = data.newSubject;
+          subjectId = newSubId;
+      }
+  
+      let boardName = data.board;
+      if (data.board === 'add_new_board' && data.newBoard) {
+          await addBoard(data.newBoard);
+          boardName = data.newBoard;
+      }
+  
+      let examTypeName = data.examType;
+      if (data.examType === 'add_new_exam_type' && data.newExamType) {
+          await addExamType(data.newExamType);
+          examTypeName = data.newExamType;
+      }
+
+      let chapterName = data.chapter;
+      if (data.chapter === 'add_new_chapter' && data.newChapterNo && data.newChapterName && subjectId) {
+        await addChapter(subjectId, { chapterNo: data.newChapterNo, chapterName: data.newChapterName });
+        chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
+      }
+
+      const contentToSave = { ...data, subject: subjectName, board: boardName, examType: examTypeName, chapter: chapterName };
+      delete (contentToSave as any).newSubject;
+      delete (contentToSave as any).newBoard;
+      delete (contentToSave as any).newExamType;
+      delete (contentToSave as any).newChapterNo;
+      delete (contentToSave as any).newChapterName;
+
+
+      await updateContent(contentId, contentToSave);
       toast({
         title: 'Content Updated!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully updated.`,
@@ -157,6 +212,52 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     }
   };
 
+  const handleSubjectChange = async (value: string) => {
+      form.setValue('subject', value);
+      form.setValue('chapter', '');
+      setChapters([]);
+      setIsAddingNewChapter(false);
+
+      if (value === 'add_new_subject') {
+          setIsAddingNewSubject(true);
+      } else {
+          setIsAddingNewSubject(false);
+          const selectedSubject = subjects.find(s => s.name === value);
+          if (selectedSubject) {
+              const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+              setChapters(fetchedChapters);
+          }
+      }
+  }
+
+  const handleBoardChange = (value: string) => {
+      form.setValue('board', value);
+      if (value === 'add_new_board') {
+          setIsAddingNewBoard(true);
+      } else {
+          setIsAddingNewBoard(false);
+      }
+  }
+
+  const handleExamTypeChange = (value: string) => {
+      form.setValue('examType', value);
+      if (value === 'add_new_exam_type') {
+          setIsAddingNewExamType(true);
+      } else {
+          setIsAddingNewExamType(false);
+      }
+  }
+
+   const handleChapterChange = (value: string) => {
+    form.setValue('chapter', value);
+    if (value === 'add_new_chapter') {
+      setIsAddingNewChapter(true);
+    } else {
+      setIsAddingNewChapter(false);
+    }
+  };
+
+
   if (loading) {
     return (
         <div className="flex items-center justify-center h-full">
@@ -165,6 +266,9 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
         </div>
     )
   }
+  
+  const selectedChapterValue = form.watch('chapter');
+  const selectedChapter = chapters.find(c => `${c.chapterNo}. ${c.chapterName}` === selectedChapterValue);
 
   return (
     <div>
@@ -198,26 +302,40 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
               />
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FormField
+                 <FormField
                   control={form.control}
                   name="board"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Board</FormLabel>
-                       <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a board" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {boards.map((board) => (
-                            <SelectItem key={board.id} value={board.name}>
-                              {board.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {!isAddingNewBoard ? (
+                            <Select onValueChange={handleBoardChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a board" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {boards.map((board) => (
+                                    <SelectItem key={board.id} value={board.name}>
+                                    {board.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_board">Add new board...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newBoard"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new board name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewBoard(false); form.setValue('board', ''); }}>Cancel</Button>
+                             </div>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -228,20 +346,34 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Exam Type</FormLabel>
-                       <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an exam type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {examTypes.map((exam) => (
-                            <SelectItem key={exam.id} value={exam.name}>
-                              {exam.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {!isAddingNewExamType ? (
+                            <Select onValueChange={handleExamTypeChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an exam type" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {examTypes.map((exam) => (
+                                    <SelectItem key={exam.id} value={exam.name}>
+                                    {exam.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_exam_type">Add new exam type...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newExamType"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new exam type name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewExamType(false); form.setValue('examType', ''); }}>Cancel</Button>
+                             </div>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -252,24 +384,74 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Subject</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a subject" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {subjects.map((subject) => (
-                            <SelectItem key={subject.id} value={subject.name}>
-                              {subject.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        {!isAddingNewSubject ? (
+                            <Select onValueChange={handleSubjectChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a subject" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {subjects.map((subject) => (
+                                    <SelectItem key={subject.id} value={subject.name}>
+                                    {subject.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_subject">Add new subject...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newSubject"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new subject name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewSubject(false); form.setValue('subject', ''); }}>Cancel</Button>
+                             </div>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="chapter"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Chapter</FormLabel>
+                        {!isAddingNewChapter ? (
+                            <Select onValueChange={handleChapterChange} value={field.value} disabled={!form.watch('subject') || form.watch('subject') === 'add_new_subject'}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {chapters.map(chap => <SelectItem key={chap.id} value={`${chap.chapterNo}. ${chap.chapterName}`}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}
+                                    <SelectItem value="add_new_chapter">Add new chapter...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField control={form.control} name="newChapterNo" render={({ field }) => (<Input {...field} placeholder="Chapter No." />)} />
+                                <FormField control={form.control} name="newChapterName" render={({ field }) => (<Input {...field} placeholder="Chapter Name" />)} />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewChapter(false); form.setValue('chapter', ''); }}>Cancel</Button>
+                            </div>
+                        )}
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 {selectedChapter && (
+                    <FormItem>
+                        <FormLabel>Chapter Name</FormLabel>
+                        <FormControl>
+                        <Input value={selectedChapter.chapterName} readOnly disabled />
+                        </FormControl>
+                    </FormItem>
+                )}
               </div>
 
               <FormField

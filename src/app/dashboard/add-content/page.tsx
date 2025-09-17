@@ -33,7 +33,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
@@ -54,9 +54,12 @@ const formSchema = z.object({
   board: z.string().min(1, 'Please select or add a board.'),
   examType: z.string().min(1, 'Please select or add an exam type.'),
   subject: z.string().min(1, 'Please select or add a subject.'),
+  chapter: z.string().min(1, 'Please select or add a chapter.'),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newExamType: z.string().optional(),
+  newChapterNo: z.string().optional(),
+  newChapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
@@ -73,18 +76,20 @@ type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type ExamType = { id: string, name: string };
-
+type Chapter = { id: string; chapterNo: string; chapterName: string };
 
 export default function CreateTestPage() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [examTypes, setExamTypes] = useState<ExamType[]>([]);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
   const [isAddingNewExamType, setIsAddingNewExamType] = useState(false);
+  const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
 
 
   useEffect(() => {
@@ -128,9 +133,12 @@ export default function CreateTestPage() {
       board: '',
       examType: '',
       subject: '',
+      chapter: '',
       newSubject: '',
       newBoard: '',
       newExamType: '',
+      newChapterNo: '',
+      newChapterName: '',
       testType: '',
       description: '',
       duration: 60,
@@ -148,9 +156,11 @@ export default function CreateTestPage() {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
       let subjectName = data.subject;
+      let subjectId = subjects.find(s => s.name === data.subject)?.id;
       if(data.subject === 'add_new_subject' && data.newSubject) {
-        await addSubject(data.newSubject);
+        const newSubId = await addSubject(data.newSubject);
         subjectName = data.newSubject;
+        subjectId = newSubId;
         setIsAddingNewSubject(false);
       }
       
@@ -167,11 +177,21 @@ export default function CreateTestPage() {
         examTypeName = data.newExamType;
         setIsAddingNewExamType(false);
       }
+
+      let chapterName = data.chapter;
+      if (data.chapter === 'add_new_chapter' && data.newChapterNo && data.newChapterName && subjectId) {
+        const newChapterId = await addChapter(subjectId, { chapterNo: data.newChapterNo, chapterName: data.newChapterName });
+        chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
+        setIsAddingNewChapter(false);
+      }
       
-      const contentToSave = { ...data, subject: subjectName, board: boardName, examType: examTypeName };
+      const contentToSave = { ...data, subject: subjectName, board: boardName, examType: examTypeName, chapter: chapterName };
       delete (contentToSave as any).newSubject;
       delete (contentToSave as any).newBoard;
       delete (contentToSave as any).newExamType;
+      delete (contentToSave as any).newChapterNo;
+      delete (contentToSave as any).newChapterName;
+
 
       await addContent(contentToSave);
       toast({
@@ -185,6 +205,7 @@ export default function CreateTestPage() {
         board: '',
         examType: '',
         subject: '',
+        chapter: '',
         description: '',
         duration: 60,
         access: 'free',
@@ -192,8 +213,11 @@ export default function CreateTestPage() {
         newSubject: '',
         newBoard: '',
         newExamType: '',
+        newChapterNo: '',
+        newChapterName: '',
         difficulty: 'Medium',
       });
+      setChapters([]);
     } catch (error) {
        toast({
         variant: "destructive",
@@ -207,12 +231,21 @@ export default function CreateTestPage() {
     form.setValue('testType', value, { shouldValidate: true });
   }
 
-  const handleSubjectChange = (value: string) => {
+  const handleSubjectChange = async (value: string) => {
       form.setValue('subject', value);
+      form.setValue('chapter', '');
+      setChapters([]);
+      setIsAddingNewChapter(false);
+
       if (value === 'add_new_subject') {
           setIsAddingNewSubject(true);
       } else {
           setIsAddingNewSubject(false);
+          const selectedSubject = subjects.find(s => s.name === value);
+          if (selectedSubject) {
+              const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+              setChapters(fetchedChapters);
+          }
       }
   }
 
@@ -234,6 +267,15 @@ export default function CreateTestPage() {
       }
   }
 
+   const handleChapterChange = (value: string) => {
+    form.setValue('chapter', value);
+    if (value === 'add_new_chapter') {
+      setIsAddingNewChapter(true);
+    } else {
+      setIsAddingNewChapter(false);
+    }
+  };
+
   if (loadingData) {
     return (
         <div className="flex items-center justify-center h-full">
@@ -242,6 +284,9 @@ export default function CreateTestPage() {
         </div>
     )
   }
+
+  const selectedChapterValue = form.watch('chapter');
+  const selectedChapter = chapters.find(c => `${c.chapterNo}. ${c.chapterName}` === selectedChapterValue);
 
   return (
     <div>
@@ -400,6 +445,42 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="chapter"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Chapter</FormLabel>
+                        {!isAddingNewChapter ? (
+                            <Select onValueChange={handleChapterChange} value={field.value} disabled={!form.watch('subject') || form.watch('subject') === 'add_new_subject'}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {chapters.map(chap => <SelectItem key={chap.id} value={`${chap.chapterNo}. ${chap.chapterName}`}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}
+                                    <SelectItem value="add_new_chapter">Add new chapter...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField control={form.control} name="newChapterNo" render={({ field }) => (<Input {...field} placeholder="Chapter No." />)} />
+                                <FormField control={form.control} name="newChapterName" render={({ field }) => (<Input {...field} placeholder="Chapter Name" />)} />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewChapter(false); form.setValue('chapter', ''); }}>Cancel</Button>
+                            </div>
+                        )}
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 {selectedChapter && (
+                    <FormItem>
+                        <FormLabel>Chapter Name</FormLabel>
+                        <FormControl>
+                        <Input value={selectedChapter.chapterName} readOnly disabled />
+                        </FormControl>
+                    </FormItem>
+                )}
               </div>
 
               <FormField
