@@ -58,6 +58,7 @@ const formSchema = z.object({
     .number()
     .int()
     .positive('Duration must be a positive number of minutes.'),
+  difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   access: z.enum(['free', 'premium', 'pro']),
   questions: z.array(questionSchema).min(1, 'Please add at least one question.'),
 });
@@ -82,6 +83,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       testType: 'Mock Test',
       description: '',
       duration: 60,
+      difficulty: 'Medium',
       access: 'free',
       questions: [],
     },
@@ -249,7 +251,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="duration"
@@ -281,9 +283,28 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                           <SelectItem value="pro">Pro</SelectItem>
                         </SelectContent>
                       </Select>
-                       <FormDescription>
-                          Choose who can access this content.
-                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Difficulty</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select difficulty" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Easy">Easy</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Hard">Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -430,3 +451,5 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
+    

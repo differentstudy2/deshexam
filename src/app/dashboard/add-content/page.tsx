@@ -59,6 +59,7 @@ const formSchema = z.object({
     .number()
     .int()
     .positive('Duration must be a positive number of minutes.'),
+  difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   access: z.enum(['free', 'premium', 'pro']),
   questions: z.array(questionSchema).min(1, 'Please add at least one question.'),
 });
@@ -113,6 +114,7 @@ export default function CreateTestPage() {
       testType: '',
       description: '',
       duration: 60,
+      difficulty: 'Medium',
       access: 'free',
       questions: [],
     },
@@ -152,6 +154,7 @@ export default function CreateTestPage() {
         questions: [],
         subject: '',
         newSubject: '',
+        difficulty: 'Medium',
       });
     } catch (error) {
        toast({
@@ -297,7 +300,7 @@ export default function CreateTestPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="access"
@@ -318,6 +321,31 @@ export default function CreateTestPage() {
                       </Select>
                        <FormDescription>
                           Choose who can access this content.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Difficulty Level</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a difficulty" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Easy">Easy</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Hard">Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                       <FormDescription>
+                          Set the difficulty level for this content.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -465,3 +493,5 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+    

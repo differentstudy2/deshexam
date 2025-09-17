@@ -1,8 +1,9 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, HelpCircle } from "lucide-react";
+import { Clock, HelpCircle, BarChart } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { getAllContent } from "@/lib/firebase/firestore";
 import { MockTestFilters } from "@/components/mock-test-filters";
@@ -55,6 +56,10 @@ export default async function QuizzesPage() {
                   <Clock className="w-4 h-4" />
                   <span>{quiz.duration} min</span>
                 </div>
+                 <div className="flex items-center gap-1.5">
+                  <BarChart className="w-4 h-4" />
+                  <span>{quiz.difficulty}</span>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="p-4 pt-0">
@@ -68,3 +73,5 @@ export default async function QuizzesPage() {
     </div>
   );
 }
+
+    
