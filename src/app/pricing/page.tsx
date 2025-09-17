@@ -140,7 +140,7 @@ export default function PricingPage() {
   return (
     <div className="bg-secondary/30">
         <div className="container py-12 md:py-16">
-            <Tabs defaultValue="pro" onValueChange={(value) => setPlanType(value as 'pro' | 'pass')} className="w-full max-w-sm mx-auto mb-4">
+            <Tabs value={planType} onValueChange={(value) => setPlanType(value as 'pro' | 'pass')} className="w-full max-w-sm mx-auto mb-4">
                  <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="pro">
                         <span className="flex items-center gap-2">Pass Pro <Badge variant="suggested">Suggested</Badge></span>
@@ -153,7 +153,7 @@ export default function PricingPage() {
                 <CardContent className="p-6 md:p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Left side: Benefits and Comparison */}
-                        <div className="flex rounded-lg p-1">
+                        <div className="flex p-1">
                             <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md rounded-lg mb-8">
                                 <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
                                 <div className="space-y-5">
@@ -162,7 +162,7 @@ export default function PricingPage() {
                                     ))}
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md", planType === 'pro' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
+                            <div onClick={() => setPlanType('pro')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pro' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
                                  <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -177,7 +177,7 @@ export default function PricingPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md", planType === 'pass' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
+                            <div onClick={() => setPlanType('pass')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pass' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
                                <h4 className="font-semibold mb-2 text-sm">Pass</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -302,3 +302,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
+    
