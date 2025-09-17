@@ -4,6 +4,45 @@ import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
+export const addQuestion = async (questionData: any) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        throw new Error("You must be logged in to create a question.");
+    }
+
+    try {
+        const docRef = await addDoc(collection(db, "questions"), {
+            ...questionData,
+            authorId: user.uid,
+            authorName: user.displayName || user.email,
+            createdAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding question document: ", e);
+        throw new Error("Failed to create question.");
+    }
+}
+
+export const getQuestionById = async (questionId: string) => {
+    if (!questionId) {
+        throw new Error("Question ID is required to fetch a question.");
+    }
+    try {
+        const questionDoc = await getDoc(doc(db, "questions", questionId));
+        if (questionDoc.exists()) {
+            return { id: questionDoc.id, ...questionDoc.data() };
+        } else {
+            return null;
+        }
+    } catch (e) {
+        console.error("Error getting document: ", e);
+        throw new Error("Failed to fetch question.");
+    }
+}
+
 export const addContent = async (contentData: any) => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -13,8 +52,14 @@ export const addContent = async (contentData: any) => {
     }
 
     try {
+        const questionsWithIds = await Promise.all(contentData.questions.map(async (question: any) => {
+            const questionId = await addQuestion(question);
+            return { ...question, id: questionId };
+        }));
+
         const docRef = await addDoc(collection(db, "content"), {
             ...contentData,
+            questions: questionsWithIds,
             authorId: user.uid,
             authorName: user.displayName || user.email,
             createdAt: serverTimestamp(),
@@ -93,8 +138,18 @@ export const updateContent = async (contentId: string, contentData: any) => {
         throw new Error("Content ID is required to update a content.");
     }
     try {
+        const questionsWithIds = await Promise.all(contentData.questions.map(async (question: any) => {
+            if (question.id) {
+                // Ideally, you would update the existing question document here
+                return question;
+            }
+            const questionId = await addQuestion(question);
+            return { ...question, id: questionId };
+        }));
+
         await updateDoc(doc(db, "content", contentId), {
             ...contentData,
+            questions: questionsWithIds,
             updatedAt: serverTimestamp(),
         });
     } catch (e) {

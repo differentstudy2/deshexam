@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById } from '@/lib/firebase/firestore';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
 type Option = { text: string; };
-type Question = { text: string; type: string; options?: Option[]; correctAnswer: string; };
+type Question = { id: string; text: string; type: string; options?: Option[]; correctAnswer: string; };
 type Test = { id: string; title: string; questions: Question[]; testType: string; };
 type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; };
 
@@ -112,7 +112,16 @@ function ReviewDisplay() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold">{index + 1}. {question.text}</p>
+                    <div className="flex justify-between items-start">
+                        <p className="font-semibold">{index + 1}. {question.text}</p>
+                        {question.id && (
+                             <Button asChild variant="ghost" size="sm">
+                                <Link href={`/question/${question.id}`} target="_blank">
+                                    <ExternalLink className="h-4 w-4 mr-2" /> View
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
                     <div className="mt-2 text-sm space-y-2">
                       <div className={cn("p-2 rounded-md", isCorrect ? "bg-green-100 dark:bg-green-900/20" : "bg-red-100 dark:bg-red-900/20")}>
                         <span className="font-medium">Your Answer: </span>

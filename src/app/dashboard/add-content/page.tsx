@@ -44,6 +44,7 @@ const optionSchema = z.object({
 });
 
 const questionSchema = z.object({
+  id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
   options: z.array(optionSchema).optional(),
@@ -790,7 +791,3 @@ export default function CreateTestPage() {
     </div>
   );
 }
-
-    
-
-    
