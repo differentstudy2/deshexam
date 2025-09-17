@@ -26,6 +26,25 @@ export const addQuestion = async (questionData: any) => {
     }
 }
 
+export const getAllQuestions = async () => {
+    try {
+        const q = query(collection(db, "questions"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+            };
+        });
+        return questions;
+    } catch (e) {
+        console.error("Error getting questions: ", e);
+        throw new Error("Failed to fetch questions.");
+    }
+}
+
 export const getQuestionById = async (questionId: string) => {
     if (!questionId) {
         throw new Error("Question ID is required to fetch a question.");

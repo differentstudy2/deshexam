@@ -24,6 +24,7 @@ import {
   PlusCircle,
   Settings,
   BookUser,
+  ClipboardList,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +33,7 @@ import { useAuth } from '@/hooks/use-auth';
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutGrid },
   { href: '/dashboard/my-content', label: 'My Content', icon: Library },
+  { href: '/dashboard/all-questions', label: 'All Questions', icon: ClipboardList },
   { href: '/dashboard/my-results', label: 'My Results', icon: FileText },
   { href: '/dashboard/add-content', label: 'Add Content', icon: PlusCircle },
   { href: '/dashboard/profile', label: 'Profile', icon: BookUser },
