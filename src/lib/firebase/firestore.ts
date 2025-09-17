@@ -216,3 +216,27 @@ export const getSubjects = async () => {
         throw new Error("Failed to fetch subjects.");
     }
 };
+
+export const addSubject = async (subjectName: string) => {
+    if (!subjectName) {
+        throw new Error("Subject name cannot be empty.");
+    }
+    try {
+        // Check if subject already exists
+        const q = query(collection(db, "subjects"), where("name", "==", subjectName));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            // Subject already exists, return the existing one's name or id
+            console.log("Subject already exists.");
+            return querySnapshot.docs[0].id;
+        }
+        
+        const docRef = await addDoc(collection(db, "subjects"), {
+            name: subjectName,
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding subject: ", e);
+        throw new Error("Failed to add subject.");
+    }
+};

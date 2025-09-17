@@ -33,7 +33,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects, addSubject } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
@@ -51,7 +51,8 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
-  subject: z.string().min(1, 'Please select a subject.'),
+  subject: z.string().min(1, 'Please select or add a subject.'),
+  newSubject: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
@@ -71,40 +72,44 @@ export default function CreateTestPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoadingData(true);
-        const [types, subjectData] = await Promise.all([
-            getContentTypes(),
-            getSubjects()
-        ]);
-        
-        setContentTypes(types);
-        setSubjects(subjectData);
-
-        if (types.length > 0) {
-            form.setValue('testType', types[0].name);
-        }
-      } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "Error loading data",
-            description: "Could not load content types or subjects from the database."
-        });
-      } finally {
-        setLoadingData(false);
-      }
-    };
-    fetchData();
+    fetchFormData();
   }, []);
+
+  const fetchFormData = async () => {
+    try {
+      setLoadingData(true);
+      const [types, subjectData] = await Promise.all([
+          getContentTypes(),
+          getSubjects()
+      ]);
+      
+      setContentTypes(types);
+      setSubjects(subjectData);
+
+      if (types.length > 0) {
+          form.setValue('testType', types[0].name);
+      }
+    } catch (error) {
+      toast({
+          variant: "destructive",
+          title: "Error loading data",
+          description: "Could not load content types or subjects from the database."
+      });
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
       subject: '',
+      newSubject: '',
       testType: '',
       description: '',
       duration: 60,
@@ -120,7 +125,20 @@ export default function CreateTestPage() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      await addContent(data);
+      let subjectName = data.subject;
+      if(data.subject === 'add_new_subject' && data.newSubject) {
+        await addSubject(data.newSubject);
+        subjectName = data.newSubject;
+        // Refetch subjects to include the new one in the list
+        fetchFormData();
+        setIsAddingNewSubject(false);
+      }
+      
+      const contentToSave = { ...data, subject: subjectName };
+      delete (contentToSave as any).newSubject;
+
+
+      await addContent(contentToSave);
       toast({
         title: 'Content Created!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,
@@ -132,6 +150,8 @@ export default function CreateTestPage() {
         duration: 60,
         access: 'free',
         questions: [],
+        subject: '',
+        newSubject: '',
       });
     } catch (error) {
        toast({
@@ -144,6 +164,15 @@ export default function CreateTestPage() {
 
   const handleTabChange = (value: string) => {
     form.setValue('testType', value, { shouldValidate: true });
+  }
+
+  const handleSubjectChange = (value: string) => {
+      form.setValue('subject', value);
+      if (value === 'add_new_subject') {
+          setIsAddingNewSubject(true);
+      } else {
+          setIsAddingNewSubject(false);
+      }
   }
 
   if (loadingData) {
@@ -204,20 +233,34 @@ export default function CreateTestPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Subject</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a subject" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {subjects.map((subject) => (
-                            <SelectItem key={subject.id} value={subject.name}>
-                              {subject.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        {!isAddingNewSubject ? (
+                            <Select onValueChange={handleSubjectChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a subject" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {subjects.map((subject) => (
+                                    <SelectItem key={subject.id} value={subject.name}>
+                                    {subject.name}
+                                    </SelectItem>
+                                ))}
+                                 <SelectItem value="add_new_subject">Add new subject...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className='space-y-2'>
+                                <FormField
+                                    control={form.control}
+                                    name="newSubject"
+                                    render={({ field }) => (
+                                        <Input {...field} placeholder="Enter new subject name" />
+                                    )}
+                                />
+                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewSubject(false); form.setValue('subject', ''); }}>Cancel</Button>
+                             </div>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}
