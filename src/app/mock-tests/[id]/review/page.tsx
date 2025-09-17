@@ -139,6 +139,7 @@ function ReviewDisplay() {
 export default function TestReviewPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
+  const testId = params.id;
 
   return (
     <div className="container py-12">
@@ -148,7 +149,7 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
             <p className="text-muted-foreground">Let's see how you did.</p>
         </div>
         <Button asChild variant="outline">
-            <Link href={`/mock-tests/${params.id}/results?submissionId=${submissionId}`}>
+            <Link href={`/mock-tests/${testId}/results?submissionId=${submissionId}`}>
                 <ArrowLeft className="mr-2 h-4 w-4"/>
                 Back to Results
             </Link>
@@ -160,4 +161,5 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
+
 
