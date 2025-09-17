@@ -161,7 +161,7 @@ export default function ProfilePage() {
                   <CardDescription>
                       Tell us about your academic background to personalize your experience.
                   </CardDescription>
-              </Header>
+              </CardHeader>
               <CardContent className="space-y-6">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
