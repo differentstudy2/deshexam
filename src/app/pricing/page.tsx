@@ -87,8 +87,7 @@ export default function PricingPage() {
                                 </div>
                             </div>
                             <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-secondary')}>
-                                <h4 className="font-semibold mb-2 flex items-center justify-center gap-1 text-sm"><DeshExamLogo/> Pro</h4>
-                                <p className="text-xs text-muted-foreground mb-4">PASS PRO</p>
+                                <p className="text-xs text-muted-foreground mb-4 pt-8">PASS PRO</p>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
@@ -103,8 +102,7 @@ export default function PricingPage() {
                                 </div>
                             </div>
                             <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-secondary')}>
-                                <h4 className="font-semibold mb-2 flex items-center justify-center gap-1 text-sm"><DeshExamLogo/></h4>
-                                <p className="text-xs text-muted-foreground mb-4">PASS</p>
+                                <p className="text-xs text-muted-foreground mb-4 pt-8">PASS</p>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
@@ -228,5 +226,3 @@ export default function PricingPage() {
     </div>
   );
 }
-
-    
