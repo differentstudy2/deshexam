@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getTestById } from '@/lib/firebase/firestore';
+import { getTestById, addTestSubmission } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -11,6 +11,7 @@ import { Loader2, Clock, HelpCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 type Option = {
   text: string;
@@ -20,6 +21,7 @@ type Question = {
   text: string;
   type: 'Multiple Choice' | 'True/False' | 'Short Answer';
   options?: Option[];
+  correctAnswer: string;
 };
 
 type Test = {
@@ -34,8 +36,11 @@ type Test = {
 export default function TestPage({ params }: { params: { id: string } }) {
   const [test, setTest] = useState<Test | null>(null);
   const [loading, setLoading] = useState(true);
+  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTest = async () => {
@@ -57,6 +62,69 @@ export default function TestPage({ params }: { params: { id: string } }) {
 
     fetchTest();
   }, [params.id, toast, router]);
+  
+  const handleAnswerChange = (questionIndex: number, answer: string) => {
+    setAnswers(prev => ({ ...prev, [questionIndex]: answer }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Not Logged In",
+            description: "You must be logged in to submit a test.",
+        });
+        return;
+    }
+
+    if (Object.keys(answers).length !== test?.questions.length) {
+        toast({
+            variant: "destructive",
+            title: "Incomplete Test",
+            description: "Please answer all questions before submitting.",
+        });
+        return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+        let score = 0;
+        test?.questions.forEach((question, index) => {
+            if (answers[index] === question.correctAnswer) {
+                score++;
+            }
+        });
+
+        const submissionData = {
+            testId: test?.id,
+            testTitle: test?.title,
+            answers,
+            score,
+            totalQuestions: test?.questions.length,
+        };
+
+        await addTestSubmission(submissionData);
+
+        toast({
+            title: "Test Submitted!",
+            description: "Your results have been recorded.",
+        });
+
+        router.push(`/mock-tests/${test?.id}/results?score=${score}&total=${test?.questions.length}`);
+
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Error submitting test',
+            description: (error as Error).message,
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -100,7 +168,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
         </div>
       </header>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="space-y-8">
           {test.questions.map((question, index) => (
             <Card key={index}>
@@ -110,7 +178,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
               </CardHeader>
               <CardContent>
                 {question.type === 'Multiple Choice' && question.options && (
-                  <RadioGroup className="space-y-2">
+                  <RadioGroup onValueChange={(value) => handleAnswerChange(index, value)} className="space-y-2">
                     {question.options.map((option, optIndex) => (
                       <div key={optIndex} className="flex items-center space-x-2">
                         <RadioGroupItem value={option.text} id={`q${index}-opt${optIndex}`} />
@@ -120,7 +188,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
                   </RadioGroup>
                 )}
                 {question.type === 'True/False' && (
-                  <RadioGroup className="flex space-x-4">
+                  <RadioGroup onValueChange={(value) => handleAnswerChange(index, value)} className="flex space-x-4">
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="True" id={`q${index}-true`} />
                       <Label htmlFor={`q${index}-true`}>True</Label>
@@ -132,14 +200,19 @@ export default function TestPage({ params }: { params: { id: string } }) {
                   </RadioGroup>
                 )}
                 {question.type === 'Short Answer' && (
-                  <Input placeholder="Your answer..." />
+                  <Input 
+                    placeholder="Your answer..." 
+                    onChange={(e) => handleAnswerChange(index, e.target.value)}
+                  />
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
         <div className="mt-8 flex justify-end">
-            <Button size="lg" type="submit">Submit Test</Button>
+            <Button size="lg" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
+            </Button>
         </div>
       </form>
     </div>

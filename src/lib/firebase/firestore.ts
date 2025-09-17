@@ -1,4 +1,5 @@
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -118,5 +119,26 @@ export const getAllTests = async () => {
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch tests.");
+    }
+}
+
+export const addTestSubmission = async (submissionData: any) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        throw new Error("You must be logged in to submit a test.");
+    }
+
+     try {
+        const docRef = await addDoc(collection(db, "submissions"), {
+            ...submissionData,
+            userId: user.uid,
+            submittedAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding document: ", e);
+        throw new Error("Failed to submit test results.");
     }
 }
