@@ -50,7 +50,7 @@ export default function PricingPage() {
     const selectedPlan = currentPlans.find(p => p.id === selectedDurationId);
     const price = selectedPlan ? selectedPlan.price : 0;
     const originalPrice = selectedPlan ? selectedPlan.originalPrice : 0;
-    const discount = originalPrice - price;
+    const discount = originalPrice > price ? originalPrice - price : 0;
     const platformFee = 30;
     const gst = (price + platformFee) * 0.18;
     const total = price + platformFee + gst;
@@ -165,7 +165,7 @@ export default function PricingPage() {
                 <CardContent className="p-6 md:p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Left side: Benefits and Comparison */}
-                        <div className="flex rounded-lg p-1">
+                        <div className="flex p-1">
                             <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md rounded-lg mb-8">
                                 <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
                                 <div className="space-y-5">
@@ -266,7 +266,7 @@ export default function PricingPage() {
                                             </div>
                                              <div className="flex justify-between text-green-400">
                                                 <span>Discounted Cost</span>
-                                                <span>- ₹{discount}</span>
+                                                <span>₹{price}</span>
                                             </div>
                                             <Separator className="bg-slate-600"/>
                                              <div className="flex justify-between">
@@ -274,8 +274,8 @@ export default function PricingPage() {
                                                 <span>+ ₹{platformFee}</span>
                                             </div>
                                             <div className="flex justify-between text-xs text-slate-400">
-                                                <span>Includes GST</span>
-                                                <span>(₹{gst.toFixed(2)})</span>
+                                                <span>GST (18%)</span>
+                                                <span>+ ₹{gst.toFixed(2)}</span>
                                             </div>
                                             <Separator className="bg-slate-600"/>
                                             <div className="flex justify-between font-bold text-lg">
