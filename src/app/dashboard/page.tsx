@@ -41,9 +41,11 @@ export default function DashboardPage() {
                 Welcome back! Here's a summary of your progress.
             </p>
         </div>
-        <Button>
+        <Button asChild>
+          <Link href="/dashboard/create-test">
             <PlusCircle className="mr-2"/>
             Create New Test
+          </Link>
         </Button>
       </div>
 
