@@ -1,6 +1,7 @@
 
+
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export const addContent = async (contentData: any) => {
@@ -238,5 +239,28 @@ export const addSubject = async (subjectName: string) => {
     } catch (e) {
         console.error("Error adding subject: ", e);
         throw new Error("Failed to add subject.");
+    }
+};
+
+export const getUserProfile = async (userId: string) => {
+    if (!userId) return null;
+    try {
+        const userDocRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userDocRef);
+        return userDoc.exists() ? userDoc.data() : null;
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        throw new Error("Failed to fetch user profile.");
+    }
+};
+
+export const updateUserProfile = async (userId: string, data: any) => {
+    if (!userId) throw new Error("User ID is required to update a profile.");
+    try {
+        const userDocRef = doc(db, "users", userId);
+        await setDoc(userDocRef, data, { merge: true });
+    } catch (error) {
+        console.error("Error updating user profile:", error);
+        throw new Error("Failed to update user profile.");
     }
 };
