@@ -1,3 +1,4 @@
+
 import { ChartConfig } from "@/components/ui/chart";
 
 export type MockTest = {
@@ -80,30 +81,30 @@ export const pricingData = {
         { id: "b2", name: "Unlimited Pro Live Test", pro: true, pass: false },
         { id: "b3", name: "Unlimited Practice Pro Questions", pro: true, pass: false },
         { id: "b4", name: "17,000+ Previous Year Papers", pro: true, pass: false },
-        { id: "b5", name: "Unlimited Re-Attempt made for All Tests", pro: true, pass: false },
+        { id: "b5", name: "Unlimited Re-Attempt mode for All Tests", pro: true, pass: false },
     ],
     plans: [
-        { id: "plan_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1899, price: 599 },
-        { id: "plan_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1999, price: 649 },
-        { id: "plan_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 2499, price: 799 },
+        { id: "plan_monthly", name: "Monthly Testbook Pass", validity: "31 Days", originalPrice: 899, price: 549, discount: 39, bestseller: false },
+        { id: "plan_yearly", name: "Yearly Testbook Pass", validity: "365 Days", originalPrice: 1399, price: 599, discount: 57, bestseller: true },
+        { id: "plan_18months", name: "18 Months Testbook Pass", validity: "548 Days", originalPrice: 1599, price: 749, discount: 53, bestseller: false },
     ]
 }
 
 export const faqData = [
     { 
-        question: "What is Testbook Pass Pro?", 
-        answer: "Testbook Pass Pro is a premium subscription that gives you access to a vast library of mock tests, previous year papers, and live tests to help you prepare for various competitive exams." 
+        question: "What is DeshExam Pass Pro?", 
+        answer: "DeshExam Pass Pro is a premium subscription that gives you access to a vast library of mock tests, previous year papers, and live tests to help you prepare for various competitive exams." 
     },
     { 
         question: "When will my Pass Pro expire? Will I be able to access the Test Series after my Pass Pro expires?", 
         answer: "Your Pass Pro subscription expires based on the validity period of the plan you choose (e.g., 31 days for Monthly plan). After expiry, you will lose access to the premium content. You can renew your subscription to continue." 
     },
     { 
-        question: "Will all of my enrolled Test Series be available during the Testbook Pass Pro validity period?", 
+        question: "Will all of my enrolled Test Series be available during the DeshExam Pass Pro validity period?", 
         answer: "Yes, all Test Series included in the Pass Pro plan will be available to you throughout your subscription's validity period. You can attempt them multiple times to improve your score." 
     },
     { 
-        question: "How can I renew my Testbook Pass Pro?", 
+        question: "How can I renew my DeshExam Pass Pro?", 
         answer: "You can renew your Pass Pro subscription directly from the pricing page. Simply select your desired plan and proceed to payment. Your new validity period will be added to your account." 
     },
     { 
@@ -149,3 +150,5 @@ export const chartConfig = {
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig;
+
+    

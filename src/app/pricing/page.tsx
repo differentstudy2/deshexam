@@ -7,16 +7,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat } from 'lucide-react';
+import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
 import { DeshExamLogo } from '@/components/icons';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 export default function PricingPage() {
-    const [selectedPlanId, setSelectedPlanId] = useState(pricingData.plans[0].id);
+    const [planType, setPlanType] = useState<'pro' | 'pass'>('pro');
+    const [selectedDurationId, setSelectedDurationId] = useState(pricingData.plans[1].id);
 
-    const selectedPlan = pricingData.plans.find(p => p.id === selectedPlanId);
+    const selectedPlan = pricingData.plans.find(p => p.id === selectedDurationId);
     const price = selectedPlan ? selectedPlan.price : 0;
 
     const whyMustHave = [
@@ -50,35 +53,47 @@ export default function PricingPage() {
   return (
     <div className="bg-secondary/30">
         <div className="container py-12 md:py-16">
+
+            <Tabs defaultValue="pro" className="w-full max-w-sm mx-auto mb-4">
+                 <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="pro">
+                        <span className="flex items-center gap-2">Pass Pro <Badge variant="outline" className="text-yellow-600 border-yellow-400 bg-yellow-100">Suggested</Badge></span>
+                    </TabsTrigger>
+                    <TabsTrigger value="pass">Pass</TabsTrigger>
+                </TabsList>
+            </Tabs>
+
             <Card className="w-full max-w-5xl mx-auto shadow-lg">
                 <CardContent className="p-6 md:p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Left side: Benefits and Comparison */}
-                        <div className="flex">
-                            <div className="w-1/2 pr-4 border-r">
-                                <h3 className="font-bold text-lg mb-6">Plan Benefits</h3>
+                        <div className="flex border rounded-lg p-1">
+                            <div className="w-1/2 py-4 pr-4">
+                                <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
                                 <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
-                                        <div key={benefit.id} className="text-sm h-10 flex items-center">{benefit.name}</div>
+                                        <div key={benefit.id} className="text-sm h-10 flex items-center pl-4">{benefit.name}</div>
                                     ))}
                                 </div>
                             </div>
-                            <div className="w-1/4 text-center">
-                                <h4 className="font-semibold mb-2 flex items-center justify-center gap-2"><DeshExamLogo/> Pro</h4>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-secondary')}>
+                                <h4 className="font-semibold mb-2 flex items-center justify-center gap-1 text-sm"><DeshExamLogo/> Pro</h4>
                                 <p className="text-xs text-muted-foreground mb-4">PASS PRO</p>
-                                <div className="space-y-5">
+                                 <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
                                             {benefit.pro ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
                                         </div>
                                     ))}
                                     <div className="h-10 flex items-center justify-center pt-2">
-                                        <div className="w-5 h-5 rounded-full border-2 border-yellow-500 bg-yellow-100"/>
+                                        <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
+                                            <RadioGroupItem value="pro" id="select-pro" />
+                                        </RadioGroup>
                                     </div>
                                 </div>
                             </div>
-                            <div className="w-1/4 text-center">
-                                <h4 className="font-semibold mb-2 flex items-center justify-center gap-2"><DeshExamLogo/></h4>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-secondary')}>
+                                <h4 className="font-semibold mb-2 flex items-center justify-center gap-1 text-sm"><DeshExamLogo/></h4>
                                 <p className="text-xs text-muted-foreground mb-4">PASS</p>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -86,8 +101,10 @@ export default function PricingPage() {
                                             {benefit.pass ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
                                         </div>
                                     ))}
-                                    <div className="h-10 flex items-center justify-center pt-2">
-                                         <div className="w-5 h-5 rounded-full border-2 border-gray-300 bg-gray-100"/>
+                                     <div className="h-10 flex items-center justify-center pt-2">
+                                        <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
+                                            <RadioGroupItem value="pass" id="select-pass" />
+                                        </RadioGroup>
                                     </div>
                                 </div>
                             </div>
@@ -99,19 +116,25 @@ export default function PricingPage() {
                                 <h3 className="font-bold text-lg">Special Offers for You!</h3>
                                 <Button variant="link" className="text-primary">Apply Coupon</Button>
                             </div>
-                            <h4 className="font-semibold text-md mb-4">Select your Pass Pro Plan</h4>
+                            <h4 className="font-semibold text-md mb-4">Select your Pass Plan</h4>
                             
-                             <RadioGroup value={selectedPlanId} onValueChange={setSelectedPlanId}>
+                             <RadioGroup value={selectedDurationId} onValueChange={setSelectedDurationId}>
                                 <div className="space-y-3">
                                 {pricingData.plans.map((plan) => (
                                     <Label 
                                         key={plan.id}
                                         htmlFor={plan.id}
                                         className={cn(
-                                            "flex items-center p-4 border rounded-lg cursor-pointer transition-all",
-                                            selectedPlanId === plan.id ? "border-primary bg-primary/5" : "border-border"
+                                            "flex items-center p-4 border rounded-lg cursor-pointer transition-all relative",
+                                            selectedDurationId === plan.id ? "border-primary bg-primary/5" : "border-border"
                                         )}
                                     >
+                                        {plan.bestseller && (
+                                            <Badge className="absolute -top-2 right-12 bg-yellow-400 text-yellow-900">Bestseller</Badge>
+                                        )}
+                                        {plan.discount && (
+                                            <Badge className="absolute -top-2 right-2 bg-green-500 text-white">{plan.discount}% OFF</Badge>
+                                        )}
                                         <RadioGroupItem value={plan.id} id={plan.id} className="mr-4"/>
                                         <div className="flex-grow">
                                             <p className="font-semibold">{plan.name}</p>
@@ -127,7 +150,7 @@ export default function PricingPage() {
                             </RadioGroup>
 
                             <div className="flex justify-between items-center mt-6 py-4 border-t">
-                                <span className="font-semibold">To Pay</span>
+                                <span className="font-semibold flex items-center gap-1">To Pay <Info className="w-4 h-4 text-muted-foreground"/></span>
                                 <span className="font-bold text-xl">₹{price}</span>
                             </div>
 
@@ -195,3 +218,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
+    
