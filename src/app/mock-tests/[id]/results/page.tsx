@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -9,19 +10,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Award, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Award, CheckCircle, XCircle, Loader2, FileQuestion } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { getSubmissionById, getTestById } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
 
-type Option = { text: string; };
-type Question = { text: string; type: string; options?: Option[]; correctAnswer: string; };
-type Test = { id: string; title: string; questions: Question[]; };
-type Submission = { id: string; score: number; totalQuestions: number; answers: { [key: string]: string } };
+type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string } };
+type Test = { id: string; title: string; };
 
 function ResultsDisplay() {
   const searchParams = useSearchParams();
@@ -49,8 +46,8 @@ function ResultsDisplay() {
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
           setSubmission(submissionData);
-          const testData = await getTestById(submissionData.testId) as Test;
-          setTest(testData);
+           const testData = await getTestById(submissionData.testId) as Test;
+           setTest(testData);
         } else {
           throw new Error("Submission not found.");
         }
@@ -89,7 +86,7 @@ function ResultsDisplay() {
     );
   }
 
-  const { score, totalQuestions, answers } = submission;
+  const { score, totalQuestions } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
   const correctAnswers = score;
   const incorrectAnswers = totalQuestions - score;
@@ -100,7 +97,7 @@ function ResultsDisplay() {
         <CardHeader className="text-center">
           <Award className="w-16 h-16 mx-auto mb-4 text-primary" />
           <CardTitle className="text-3xl">Congratulations!</CardTitle>
-          <CardDescription>You've completed the test.</CardDescription>
+          <CardDescription>You've completed the {test.title}.</CardDescription>
         </CardHeader>
         <CardContent className="p-6 text-center space-y-6">
           <div>
@@ -128,54 +125,20 @@ function ResultsDisplay() {
           </div>
           <div className="flex gap-4 justify-center pt-6">
             <Button asChild>
-              <Link href="/mock-tests">Back to Mock Tests</Link>
+              <Link href={`/mock-tests/${test.id}/review?submissionId=${submissionId}`}>
+                <FileQuestion className="mr-2"/>
+                Review Answers
+              </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href={`/mock-tests/${test.id}`}>Try Again</Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="max-w-4xl mx-auto mt-8">
-        <CardHeader>
-          <CardTitle>Review Your Answers</CardTitle>
-          <CardDescription>Check your answers below to see where you can improve.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {test.questions.map((question, index) => {
-            const userAnswer = answers[index];
-            const isCorrect = userAnswer === question.correctAnswer;
-            return (
-              <div key={index}>
-                <div className="flex items-start gap-4">
-                  <div>
-                    {isCorrect ? (
-                      <CheckCircle className="w-6 h-6 text-green-500" />
-                    ) : (
-                      <XCircle className="w-6 h-6 text-destructive" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold">{index + 1}. {question.text}</p>
-                    <div className="mt-2 text-sm space-y-2">
-                      <div className={cn("p-2 rounded-md", isCorrect ? "bg-green-100 dark:bg-green-900/20" : "bg-red-100 dark:bg-red-900/20")}>
-                        <span className="font-medium">Your Answer: </span>
-                        <span>{userAnswer || "No answer"}</span>
-                      </div>
-                      {!isCorrect && (
-                         <div className="p-2 rounded-md bg-gray-100 dark:bg-gray-800">
-                           <span className="font-medium">Correct Answer: </span>
-                           <span>{question.correctAnswer}</span>
-                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {index < test.questions.length -1 && <Separator className="mt-6" />}
-              </div>
-            );
-          })}
+           <div className="pt-4">
+                <Button variant="link" asChild>
+                    <Link href="/mock-tests">Back to Mock Tests</Link>
+                </Button>
+           </div>
         </CardContent>
       </Card>
     </>
