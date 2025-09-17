@@ -149,11 +149,27 @@ function ResultsDisplay() {
 }
 
 export default function TestResultsPage({ params }: { params: { id: string } }) {
+  const searchParams = useSearchParams();
+  const submissionId = searchParams.get('submissionId');
+  const [testType, setTestType] = useState('Test');
+  
+  useEffect(() => {
+    const getTestType = async () => {
+        if(submissionId) {
+            const sub = await getSubmissionById(submissionId);
+            if(sub) {
+                setTestType(sub.testType);
+            }
+        }
+    }
+    getTestType();
+  }, [submissionId]);
+
   return (
     <div className="container py-12">
       <header className="text-center mb-8">
-        <h1 className="font-headline text-4xl font-bold">Test Results</h1>
-        <p className="text-muted-foreground">Here's how you performed on the test.</p>
+        <h1 className="font-headline text-4xl font-bold">{testType} Results</h1>
+        <p className="text-muted-foreground">Here's how you performed on the {testType.toLowerCase()}.</p>
       </header>
       <Suspense fallback={<div className="text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto"/></div>}>
         <ResultsDisplay />

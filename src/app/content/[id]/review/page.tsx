@@ -2,7 +2,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import { Separator } from '@/components/ui/separator';
 type Option = { text: string; };
 type Question = { text: string; type: string; options?: Option[]; correctAnswer: string; };
 type Test = { id: string; title: string; questions: Question[]; testType: string; };
-type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string } };
+type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; };
 
 function ReviewDisplay() {
   const searchParams = useSearchParams();
@@ -136,7 +136,8 @@ function ReviewDisplay() {
   );
 }
 
-export default function TestReviewPage({ params }: { params: { id: string } }) {
+export default function TestReviewPage() {
+  const params = useParams();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
   const testId = params.id;
@@ -147,10 +148,7 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
           if (submissionId) {
               const sub = await getSubmissionById(submissionId);
               if (sub) {
-                  const test = await getTestById(sub.testId);
-                  if (test) {
-                      setTestType(test.testType.toLowerCase().replace(/\s+/g, '-'));
-                  }
+                setTestType(sub.testType.toLowerCase().replace(/\s+/g, '-'));
               }
           }
       }
