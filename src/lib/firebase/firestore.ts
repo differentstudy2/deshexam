@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export const addContent = async (contentData: any) => {
@@ -164,3 +164,28 @@ export const getSubmissionById = async (submissionId: string) => {
         throw new Error("Failed to fetch submission.");
     }
 }
+
+export const getSubmissionsByUserId = async (userId: string) => {
+    if (!userId) {
+        throw new Error("User ID is required to fetch submissions.");
+    }
+    try {
+        const q = query(
+            collection(db, "submissions"), 
+            where("userId", "==", userId),
+            orderBy("submittedAt", "desc")
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                submittedAt: data.submittedAt?.toDate() || new Date(),
+            }
+        });
+    } catch (e) {
+        console.error("Error getting documents: ", e);
+        throw new Error("Failed to fetch submissions.");
+    }
+};
