@@ -1,8 +1,9 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getQuestionById, updateQuestion, addComment, getComments } from '@/lib/firebase/firestore';
+import { getQuestionById, addComment, getComments, handleQuestionVote } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -17,6 +18,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 type Option = {
   text: string;
@@ -30,6 +32,8 @@ type Question = {
   correctAnswer: string;
   likes: number;
   dislikes: number;
+  likedBy: string[];
+  dislikedBy: string[];
   createdAt: Date;
   authorName: string;
 };
@@ -48,6 +52,7 @@ export default function QuestionPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
@@ -81,28 +86,63 @@ export default function QuestionPage() {
   }, [questionId, toast]);
 
   const handleVote = async (type: 'like' | 'dislike') => {
-    if (!question) return;
+    if (!user || !question) {
+        toast({ variant: "destructive", title: "Please log in to vote." });
+        return;
+    }
+    if (isVoting) return;
 
-    const currentLikes = question.likes || 0;
-    const currentDislikes = question.dislikes || 0;
+    setIsVoting(true);
+    
+    // Optimistic UI update
+    const originalQuestion = { ...question };
+    const hasLiked = question.likedBy?.includes(user.uid);
+    const hasDisliked = question.dislikedBy?.includes(user.uid);
 
-    const newCount = type === 'like' ? currentLikes + 1 : currentDislikes + 1;
-    const updateData = type === 'like' ? { likes: newCount } : { dislikes: newCount };
+    let newLikedBy = [...(question.likedBy || [])];
+    let newDislikedBy = [...(question.dislikedBy || [])];
 
-    setQuestion({ ...question, ...updateData });
+    if (type === 'like') {
+        if (hasLiked) {
+            newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+        } else {
+            newLikedBy.push(user.uid);
+            if (hasDisliked) {
+                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+            }
+        }
+    } else { // dislike
+        if (hasDisliked) {
+            newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+        } else {
+            newDislikedBy.push(user.uid);
+            if (hasLiked) {
+                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+            }
+        }
+    }
+
+    const updatedQuestion = {
+        ...question,
+        likedBy: newLikedBy,
+        dislikedBy: newDislikedBy,
+        likes: newLikedBy.length,
+        dislikes: newDislikedBy.length
+    };
+    setQuestion(updatedQuestion);
 
     try {
-        await updateQuestion(questionId, updateData);
+        await handleQuestionVote(questionId, type);
     } catch (error) {
+        // Revert UI on error
+        setQuestion(originalQuestion);
         toast({
           variant: "destructive",
           title: 'Error submitting vote',
           description: (error as Error).message,
         });
-        // Revert UI on error
-         const revertedCount = type === 'like' ? currentLikes : currentDislikes;
-         const revertedUpdate = type === 'like' ? { likes: revertedCount } : { dislikes: revertedCount };
-         setQuestion({ ...question, ...revertedUpdate });
+    } finally {
+        setIsVoting(false);
     }
   }
 
@@ -158,6 +198,9 @@ export default function QuestionPage() {
     );
   }
 
+  const userHasLiked = user && question.likedBy?.includes(user.uid);
+  const userHasDisliked = user && question.dislikedBy?.includes(user.uid);
+
   return (
     <div className="container py-12">
        <header className="mb-8">
@@ -205,10 +248,10 @@ export default function QuestionPage() {
             </CardContent>
             <CardFooter className="flex-col items-start gap-4">
               <div className="flex items-center gap-4">
-                <Button variant="outline" size="sm" onClick={() => handleVote('like')}>
+                <Button variant={userHasLiked ? "default" : "outline"} size="sm" onClick={() => handleVote('like')} disabled={isVoting || (!!user && userHasDisliked)}>
                   <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleVote('dislike')}>
+                <Button variant={userHasDisliked ? "destructive" : "outline"} size="sm" onClick={() => handleVote('dislike')} disabled={isVoting || (!!user && userHasLiked)}>
                   <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
                 </Button>
               </div>

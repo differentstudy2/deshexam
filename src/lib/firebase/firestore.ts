@@ -1,7 +1,7 @@
 
 
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export const addQuestion = async (questionData: any) => {
@@ -20,6 +20,8 @@ export const addQuestion = async (questionData: any) => {
             createdAt: serverTimestamp(),
             likes: 0,
             dislikes: 0,
+            likedBy: [],
+            dislikedBy: [],
         });
         return docRef.id;
     } catch (e) {
@@ -80,6 +82,66 @@ export const updateQuestion = async (questionId: string, data: any) => {
         throw new Error("Failed to update question.");
     }
 };
+
+export const handleQuestionVote = async (questionId: string, voteType: 'like' | 'dislike') => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+        throw new Error("You must be logged in to vote.");
+    }
+
+    const questionRef = doc(db, "questions", questionId);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const questionDoc = await transaction.get(questionRef);
+            if (!questionDoc.exists()) {
+                throw "Question does not exist!";
+            }
+
+            const data = questionDoc.data();
+            const likedBy = data.likedBy || [];
+            const dislikedBy = data.dislikedBy || [];
+
+            const hasLiked = likedBy.includes(user.uid);
+            const hasDisliked = dislikedBy.includes(user.uid);
+
+            let newLikedBy = [...likedBy];
+            let newDislikedBy = [...dislikedBy];
+
+            if (voteType === 'like') {
+                if (hasLiked) { // User is un-liking
+                    newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+                } else { // User is liking
+                    newLikedBy.push(user.uid);
+                    if (hasDisliked) { // If they previously disliked, remove dislike
+                        newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+                    }
+                }
+            } else if (voteType === 'dislike') {
+                if (hasDisliked) { // User is un-disliking
+                    newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+                } else { // User is disliking
+                    newDislikedBy.push(user.uid);
+                    if (hasLiked) { // If they previously liked, remove like
+                        newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+                    }
+                }
+            }
+            
+            transaction.update(questionRef, {
+                likedBy: newLikedBy,
+                dislikedBy: newDislikedBy,
+                likes: newLikedBy.length,
+                dislikes: newDislikedBy.length,
+            });
+        });
+    } catch (e) {
+        console.error("Vote transaction failed: ", e);
+        throw new Error("Failed to process your vote.");
+    }
+};
+
 
 export const addComment = async (questionId: string, commentData: any) => {
     const auth = getAuth();
