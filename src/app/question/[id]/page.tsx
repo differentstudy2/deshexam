@@ -83,7 +83,10 @@ export default function QuestionPage() {
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!question) return;
 
-    const newCount = type === 'like' ? question.likes + 1 : question.dislikes + 1;
+    const currentLikes = question.likes || 0;
+    const currentDislikes = question.dislikes || 0;
+
+    const newCount = type === 'like' ? currentLikes + 1 : currentDislikes + 1;
     const updateData = type === 'like' ? { likes: newCount } : { dislikes: newCount };
 
     setQuestion({ ...question, ...updateData });
@@ -97,7 +100,7 @@ export default function QuestionPage() {
           description: (error as Error).message,
         });
         // Revert UI on error
-         const revertedCount = type === 'like' ? question.likes : question.dislikes;
+         const revertedCount = type === 'like' ? currentLikes : currentDislikes;
          const revertedUpdate = type === 'like' ? { likes: revertedCount } : { dislikes: revertedCount };
          setQuestion({ ...question, ...revertedUpdate });
     }
@@ -203,10 +206,10 @@ export default function QuestionPage() {
             <CardFooter className="flex-col items-start gap-4">
               <div className="flex items-center gap-4">
                 <Button variant="outline" size="sm" onClick={() => handleVote('like')}>
-                  <ThumbsUp className="mr-2" /> Like ({question.likes})
+                  <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => handleVote('dislike')}>
-                  <ThumbsDown className="mr-2" /> Dislike ({question.dislikes})
+                  <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
                 </Button>
               </div>
             </CardFooter>
