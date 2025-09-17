@@ -10,10 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, ArrowLeft, Eye, Users, Award, MapPin, Calendar, Star, TrendingUp, BarChart, BadgeCheck, Play, Grid2x2, UserPlus, UserCheck, MessageSquare } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, Users, Calendar, BadgeCheck, UserPlus, UserCheck, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 
 type UserProfile = {
@@ -166,14 +165,14 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-secondary/50">
       <div className="container mx-auto p-4 md:p-8">
         
         {/* Profile Header */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/20 p-6 rounded-2xl">
+        <Card className="p-6 rounded-2xl shadow-sm">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <Avatar className="w-28 h-28 border-4 border-primary">
-              <AvatarImage src={profile.photoURL || `https://picsum.photos/seed/${profile.uid}/112/112`} />
+            <Avatar className="w-24 h-24 border-4 border-primary">
+              <AvatarImage src={profile.photoURL || `https://picsum.photos/seed/${profile.uid}/96/96`} />
               <AvatarFallback>{profile.displayName?.[0]}</AvatarFallback>
             </Avatar>
             <div className="text-center md:text-left flex-grow">
@@ -182,9 +181,9 @@ export default function UserProfilePage() {
                 <BadgeCheck className="text-primary w-6 h-6" />
               </div>
               <p className="text-muted-foreground">@{profile.username}</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2 justify-center md:justify-start">
-                  {profile.location && <div className="flex items-center gap-1.5"><MapPin size={16}/>{profile.location}</div>}
-                  <div className="flex items-center gap-1.5"><Calendar size={16}/>Joined on {new Date(profile.createdAt?.seconds * 1000).toLocaleDateString()}</div>
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-2 justify-center md:justify-start">
+                  <Calendar size={16}/>
+                  <span>Joined on {new Date(profile.createdAt?.seconds * 1000).toLocaleDateString()}</span>
               </div>
             </div>
              {currentUser && currentUser.uid !== profile.uid && (
@@ -202,19 +201,19 @@ export default function UserProfilePage() {
           </div>
           
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <Card className="bg-background/30 p-3">
+            <Card className="p-4">
               <p className="text-2xl font-bold">{submissions.length}</p>
               <p className="text-sm text-muted-foreground">Quizzes Taken</p>
             </Card>
-            <Card className="bg-background/30 p-3">
+            <Card className="p-4">
               <p className="text-2xl font-bold">{createdContent.length}</p>
               <p className="text-sm text-muted-foreground">Quizzes Created</p>
             </Card>
-            <Card className="bg-background/30 p-3">
+            <Card className="p-4">
               <p className="text-2xl font-bold">{profile.followersCount || 0}</p>
               <p className="text-sm text-muted-foreground">Followers</p>
             </Card>
-            <Card className="bg-background/30 p-3">
+            <Card className="p-4">
               <p className="text-2xl font-bold">{profile.followingCount || 0}</p>
               <p className="text-sm text-muted-foreground">Following</p>
             </Card>
@@ -224,7 +223,7 @@ export default function UserProfilePage() {
         {/* Main Content */}
         <div className="mt-8">
            <Tabs defaultValue="activity" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-card/50">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
               <TabsTrigger value="activity">Activity</TabsTrigger>
               <TabsTrigger value="quizzes_taken">Quizzes Taken</TabsTrigger>
               <TabsTrigger value="created_quizzes">Created Quizzes</TabsTrigger>
@@ -336,4 +335,3 @@ export default function UserProfilePage() {
     </div>
   );
 }
-
