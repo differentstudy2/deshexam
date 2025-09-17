@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Clock, HelpCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -35,7 +35,7 @@ type Test = {
   testType: string;
 };
 
-export default function TestPage({ params }: { params: { id: string } }) {
+export default function TestPage() {
   const [test, setTest] = useState<Test | null>(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
@@ -43,8 +43,9 @@ export default function TestPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
   const { user } = useAuth();
-  const testId = params.id;
+  const testId = params.id as string;
 
   useEffect(() => {
     const fetchTest = async () => {
