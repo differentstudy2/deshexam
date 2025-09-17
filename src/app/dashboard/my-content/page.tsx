@@ -175,7 +175,7 @@ export default function MyContentPage() {
                                 <Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                            </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/edit-test/${test.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
+                            <Link href={`/dashboard/edit-content/${test.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(test)}>
@@ -216,3 +216,5 @@ export default function MyContentPage() {
     </div>
   );
 }
+
+    
