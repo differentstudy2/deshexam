@@ -33,8 +33,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { mockTests } from '@/lib/mock-data';
-import { addContent, getContentTypes } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
@@ -65,33 +64,40 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
+type Subject = { id: string, name: string };
 
 export default function CreateTestPage() {
   const { toast } = useToast();
-  const subjects = Array.from(new Set(mockTests.map((test) => test.subject)));
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-  const [loadingContentTypes, setLoadingContentTypes] = useState(true);
+  const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
-    const fetchContentTypes = async () => {
+    const fetchData = async () => {
       try {
-        setLoadingContentTypes(true);
-        const types = await getContentTypes();
+        setLoadingData(true);
+        const [types, subjectData] = await Promise.all([
+            getContentTypes(),
+            getSubjects()
+        ]);
+        
         setContentTypes(types);
+        setSubjects(subjectData);
+
         if (types.length > 0) {
             form.setValue('testType', types[0].name);
         }
       } catch (error) {
         toast({
             variant: "destructive",
-            title: "Error loading content types",
-            description: "Could not load content types from the database."
+            title: "Error loading data",
+            description: "Could not load content types or subjects from the database."
         });
       } finally {
-        setLoadingContentTypes(false);
+        setLoadingData(false);
       }
     };
-    fetchContentTypes();
+    fetchData();
   }, []);
 
   const form = useForm<FormValues>({
@@ -140,11 +146,11 @@ export default function CreateTestPage() {
     form.setValue('testType', value, { shouldValidate: true });
   }
 
-  if (loadingContentTypes) {
+  if (loadingData) {
     return (
         <div className="flex items-center justify-center h-full">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            <p className="ml-4 text-lg">Loading Content Types...</p>
+            <p className="ml-4 text-lg">Loading Form Data...</p>
         </div>
     )
   }
@@ -206,8 +212,8 @@ export default function CreateTestPage() {
                         </FormControl>
                         <SelectContent>
                           {subjects.map((subject) => (
-                            <SelectItem key={subject} value={subject}>
-                              {subject}
+                            <SelectItem key={subject.id} value={subject.name}>
+                              {subject.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

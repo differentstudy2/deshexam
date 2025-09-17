@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -33,8 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { mockTests } from '@/lib/mock-data';
-import { getContentById, updateContent } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -63,12 +63,15 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type ContentType = { id: string, name: string };
+type Subject = { id: string, name: string };
 
 export default function EditContentPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const subjects = Array.from(new Set(mockTests.map((test) => test.subject)));
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const contentId = params.id;
 
   const form = useForm<FormValues>({
@@ -89,7 +92,15 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       if (!contentId) return;
       try {
         setLoading(true);
-        const contentData = await getContentById(contentId);
+        const [contentData, subjectData, contentTypeData] = await Promise.all([
+            getContentById(contentId),
+            getSubjects(),
+            getContentTypes()
+        ]);
+        
+        setSubjects(subjectData);
+        setContentTypes(contentTypeData);
+
         if (contentData) {
             form.reset(contentData as FormValues);
         } else {
@@ -187,8 +198,8 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                         </FormControl>
                         <SelectContent>
                           {subjects.map((subject) => (
-                            <SelectItem key={subject} value={subject}>
-                              {subject}
+                            <SelectItem key={subject.id} value={subject.name}>
+                              {subject.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -210,9 +221,9 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Mock Test">Mock Test</SelectItem>
-                          <SelectItem value="Quiz">Quiz</SelectItem>
-                           <SelectItem value="Practice Questions">Practice Questions</SelectItem>
+                           {contentTypes.map((type) => (
+                                <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>
+                           ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />

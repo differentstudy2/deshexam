@@ -204,3 +204,15 @@ export const getContentTypes = async () => {
         throw new Error("Failed to fetch content types.");
     }
 };
+
+export const getSubjects = async () => {
+    try {
+        const q = query(collection(db, "subjects"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const subjects = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return subjects;
+    } catch (e) {
+        console.error("Error getting subjects: ", e);
+        throw new Error("Failed to fetch subjects.");
+    }
+};
