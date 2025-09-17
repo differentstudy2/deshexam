@@ -32,13 +32,17 @@ export const getTestsByAuthor = async (authorId: string) => {
         throw new Error("Author ID is required to fetch tests.");
     }
     try {
-        const q = query(collection(db, "tests"), where("authorId", "==", authorId), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "tests"), where("authorId", "==", authorId));
         const querySnapshot = await getDocs(q);
         const tests = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
             createdAt: doc.data().createdAt?.toDate().toLocaleDateString(),
+            createdAtTimestamp: doc.data().createdAt?.toDate().getTime() || 0,
         }));
+        
+        tests.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
+
         return tests;
     } catch (e) {
         console.error("Error getting documents: ", e);
