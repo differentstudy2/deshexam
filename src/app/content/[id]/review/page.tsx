@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator';
 
 type Option = { text: string; };
 type Question = { text: string; type: string; options?: Option[]; correctAnswer: string; };
-type Test = { id: string; title: string; questions: Question[]; };
+type Test = { id: string; title: string; questions: Question[]; testType: string; };
 type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string } };
 
 function ReviewDisplay() {
@@ -83,7 +83,7 @@ function ReviewDisplay() {
         <h2 className="text-2xl font-bold">Review not found</h2>
         <p className="text-muted-foreground">We couldn't load the review for this test submission.</p>
         <Button asChild className="mt-4 mx-auto" variant="outline">
-          <Link href="/mock-tests">Back to Tests</Link>
+          <Link href="/content">Back to Content</Link>
         </Button>
       </div>
     );
@@ -140,6 +140,23 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
   const testId = params.id;
+  const [testType, setTestType] = useState('');
+
+  useEffect(() => {
+      const getTestType = async () => {
+          if (submissionId) {
+              const sub = await getSubmissionById(submissionId);
+              if (sub) {
+                  const test = await getTestById(sub.testId);
+                  if (test) {
+                      setTestType(test.testType.toLowerCase().replace(/\s+/g, '-'));
+                  }
+              }
+          }
+      }
+      getTestType();
+  }, [submissionId]);
+
 
   return (
     <div className="container py-12">
@@ -149,7 +166,7 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
             <p className="text-muted-foreground">Let's see how you did.</p>
         </div>
         <Button asChild variant="outline">
-            <Link href={`/mock-tests/${testId}/results?submissionId=${submissionId}`}>
+            <Link href={`/${testType}/${testId}/results?submissionId=${submissionId}`}>
                 <ArrowLeft className="mr-2 h-4 w-4"/>
                 Back to Results
             </Link>
@@ -161,5 +178,3 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
-
-

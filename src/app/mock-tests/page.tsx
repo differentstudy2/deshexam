@@ -7,6 +7,11 @@ import { ContentBadge } from "@/components/content-badge";
 import { getAllTests } from "@/lib/firebase/firestore";
 import { MockTestFilters } from "@/components/mock-test-filters";
 
+function getUrlForTest(testType: string, testId: string) {
+  const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+  return `/${typeSlug}/${testId}`;
+}
+
 export default async function MockTestsPage() {
   const tests = await getAllTests("Mock Test");
   const subjects = Array.from(new Set(tests.map((test) => test.subject)));
@@ -54,7 +59,7 @@ export default async function MockTestsPage() {
             </CardContent>
             <CardFooter className="p-4 pt-0">
               <Button asChild className="w-full">
-                <Link href={`/mock-tests/${test.id}`}>Start Test</Link>
+                <Link href={getUrlForTest(test.testType, test.id)}>Start Test</Link>
               </Button>
             </CardFooter>
           </Card>

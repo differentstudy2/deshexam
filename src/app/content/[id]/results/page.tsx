@@ -2,7 +2,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -17,13 +17,14 @@ import { Progress } from '@/components/ui/progress';
 import { getSubmissionById, getTestById } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
-type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string } };
-type Test = { id: string; title: string; };
+type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string };
+type Test = { id: string; title: string; testType: string; };
 
 function ResultsDisplay() {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
   const { toast } = useToast();
+  const pathname = usePathname();
 
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [test, setTest] = useState<Test | null>(null);
@@ -80,16 +81,18 @@ function ResultsDisplay() {
         <h2 className="text-2xl font-bold">Results not found</h2>
         <p className="text-muted-foreground">We couldn't load the results for this test.</p>
         <Button asChild className="mt-4 mx-auto" variant="outline">
-          <Link href="/mock-tests">Back to Tests</Link>
+          <Link href="/content">Back to Content</Link>
         </Button>
       </div>
     );
   }
 
-  const { score, totalQuestions } = submission;
+  const { score, totalQuestions, testType } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
   const correctAnswers = score;
   const incorrectAnswers = totalQuestions - score;
+  const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+  const contentBaseUrl = `/${typeSlug}`;
 
   return (
     <>
@@ -125,18 +128,18 @@ function ResultsDisplay() {
           </div>
           <div className="flex gap-4 justify-center pt-6">
             <Button asChild>
-              <Link href={`/mock-tests/${test.id}/review?submissionId=${submissionId}`}>
+              <Link href={`${contentBaseUrl}/${test.id}/review?submissionId=${submissionId}`}>
                 <FileQuestion className="mr-2"/>
                 Review Answers
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href={`/mock-tests/${test.id}`}>Try Again</Link>
+              <Link href={`${contentBaseUrl}/${test.id}`}>Try Again</Link>
             </Button>
           </div>
            <div className="pt-4">
                 <Button variant="link" asChild>
-                    <Link href="/mock-tests">Back to Mock Tests</Link>
+                    <Link href={contentBaseUrl}>Back to {test.testType}s</Link>
                 </Button>
            </div>
         </CardContent>

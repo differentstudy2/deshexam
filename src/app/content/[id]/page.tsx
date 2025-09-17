@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Clock, HelpCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -31,6 +31,7 @@ type Test = {
   description: string;
   duration: number;
   questions: Question[];
+  testType: string;
 };
 
 export default function TestPage({ params }: { params: { id: string } }) {
@@ -40,6 +41,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
           title: 'Error fetching test',
           description: (error as Error).message,
         });
-        router.push('/mock-tests');
+        router.push('/content');
       } finally {
         setLoading(false);
       }
@@ -103,6 +105,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
             answers,
             score,
             totalQuestions: test?.questions.length,
+            testType: test?.testType
         };
 
         const submissionId = await addTestSubmission(submissionData);
@@ -111,8 +114,9 @@ export default function TestPage({ params }: { params: { id: string } }) {
             title: "Test Submitted!",
             description: "Your results have been recorded.",
         });
-
-        router.push(`/mock-tests/${test?.id}/results?submissionId=${submissionId}`);
+        
+        const currentPath = pathname.split('/').slice(0,2).join('/');
+        router.push(`${currentPath}/${test?.id}/results?submissionId=${submissionId}`);
 
     } catch (error) {
         toast({
@@ -141,9 +145,9 @@ export default function TestPage({ params }: { params: { id: string } }) {
         <h2 className="text-2xl font-bold">Test not found</h2>
         <p className="text-muted-foreground">The test you are looking for does not exist.</p>
         <Button asChild className="mt-4 mx-auto" variant="outline">
-          <Link href="/mock-tests">
+          <Link href="/content">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Tests
+            Back to Content
           </Link>
         </Button>
       </div>

@@ -32,6 +32,11 @@ import Link from 'next/link';
 export default function DashboardPage() {
   const recentTests = mockTests.slice(0, 5);
 
+  const getUrlForTest = (testType: string, testId: string) => {
+      const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+      return `/${typeSlug}/${testId}/results`;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -145,7 +150,7 @@ export default function DashboardPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="sm">
-                        <Link href={`/mock-tests/${test.id}/results`}>
+                        <Link href={getUrlForTest('Mock Test', test.id)}>
                            <Eye className="mr-2 h-4 w-4" /> View
                         </Link>
                       </Button>

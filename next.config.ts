@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -30,6 +31,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/mock-test/:id*',
+        destination: '/content/:id*',
+      },
+      {
+        source: '/quiz/:id*',
+        destination: '/content/:id*',
+      },
+      {
+        source: '/practice-questions/:id*',
+        destination: '/content/:id*',
+      },
+    ];
+  }
 };
 
 export default nextConfig;

@@ -154,7 +154,8 @@ export const getSubmissionById = async (submissionId: string) => {
     try {
         const submissionDoc = await getDoc(doc(db, "submissions", submissionId));
         if (submissionDoc.exists()) {
-            return { id: submissionDoc.id, ...submissionDoc.data() };
+            const data = submissionDoc.data();
+            return { id: submissionDoc.id, ...data };
         } else {
             return null;
         }
