@@ -88,6 +88,7 @@ export default function UserProfilePage() {
 
         } else {
           toast({ variant: 'destructive', title: 'Profile not found' });
+          router.push('/');
         }
       } catch (error) {
         toast({
@@ -101,7 +102,7 @@ export default function UserProfilePage() {
     };
 
     fetchProfileData();
-  }, [username, toast, currentUser]);
+  }, [username, toast, currentUser, router]);
 
   const handleFollowToggle = async () => {
     if (!currentUser || !profile) {
@@ -191,7 +192,7 @@ export default function UserProfilePage() {
                         Quiz enthusiast and knowledge seeker. I love challenging myself with difficult quizzes!
                     </p>
                 </div>
-                {currentUser && currentUser.uid !== profile.uid && (
+                 {currentUser && currentUser.uid !== profile.uid && (
                     <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
                         <Button onClick={handleFollowToggle} disabled={isFollowLoading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                             {isFollowLoading ? <Loader2 className="animate-spin" /> : 
