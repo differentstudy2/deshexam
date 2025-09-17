@@ -83,10 +83,12 @@ export default function ProfilePage() {
       });
 
       // Update Firebase Auth profile
-      await updateAuthProfile(user, {
-        displayName: data.displayName,
-        photoURL: data.photoURL,
-      });
+      if (user.displayName !== data.displayName || user.photoURL !== data.photoURL) {
+          await updateAuthProfile(user, {
+            displayName: data.displayName,
+            photoURL: data.photoURL,
+          });
+      }
 
       toast({
         title: "Profile Updated",
@@ -121,19 +123,6 @@ export default function ProfilePage() {
                   <AvatarImage src={form.watch('photoURL') || `https://picsum.photos/seed/${user?.uid}/80/80`} />
                   <AvatarFallback>{user?.email?.[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <FormField
-                  control={form.control}
-                  name="photoURL"
-                  render={({ field }) => (
-                    <FormItem className="flex-grow">
-                      <FormLabel>Photo URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/photo.png" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <FormField
@@ -172,7 +161,7 @@ export default function ProfilePage() {
                   <CardDescription>
                       Tell us about your academic background to personalize your experience.
                   </CardDescription>
-              </CardHeader>
+              </Header>
               <CardContent className="space-y-6">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -226,4 +215,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
