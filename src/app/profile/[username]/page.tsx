@@ -10,10 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, ArrowLeft, Eye, Users, Calendar, BadgeCheck, UserPlus, UserCheck, MessageSquare } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, Users, Calendar, BadgeCheck, UserPlus, UserCheck, MessageSquare, MapPin, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/use-auth';
+import { Badge } from '@/components/ui/badge';
 
 type UserProfile = {
   uid: string;
@@ -165,59 +166,62 @@ export default function UserProfilePage() {
   }
 
   return (
-    <div className="bg-secondary/50">
+    <div className="bg-secondary/30">
       <div className="container mx-auto p-4 md:p-8">
         
         {/* Profile Header */}
-        <Card className="p-6 rounded-2xl shadow-sm">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <Avatar className="w-24 h-24 border-4 border-primary">
-              <AvatarImage src={profile.photoURL || `https://picsum.photos/seed/${profile.uid}/96/96`} />
-              <AvatarFallback>{profile.displayName?.[0]}</AvatarFallback>
-            </Avatar>
-            <div className="text-center md:text-left flex-grow">
-              <div className="flex items-center justify-center md:justify-start gap-2">
-                <h1 className="text-3xl font-bold font-headline">{profile.displayName}</h1>
-                <BadgeCheck className="text-primary w-6 h-6" />
-              </div>
-              <p className="text-muted-foreground">@{profile.username}</p>
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-2 justify-center md:justify-start">
-                  <Calendar size={16}/>
-                  <span>Joined on {new Date(profile.createdAt?.seconds * 1000).toLocaleDateString()}</span>
-              </div>
-            </div>
-             {currentUser && currentUser.uid !== profile.uid && (
-                <div className="flex gap-2 w-full sm:w-auto">
-                    <Button onClick={handleFollowToggle} disabled={isFollowLoading} className="w-full">
-                        {isFollowLoading ? <Loader2 className="animate-spin" /> : 
-                            isFollowing ? <><UserCheck className="mr-2"/> Following</> : <><UserPlus className="mr-2"/> Follow</>
-                        }
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                        <MessageSquare className="mr-2"/> Message
-                    </Button>
+        <Card className="p-6 rounded-2xl shadow-sm bg-background/80 backdrop-blur-sm">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                <Avatar className="w-28 h-28 border-4 border-background outline outline-2 outline-gray-200">
+                    <AvatarImage src={profile.photoURL || `https://picsum.photos/seed/${profile.uid}/112/112`} />
+                    <AvatarFallback>{profile.displayName?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-grow text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-2">
+                        <h1 className="text-2xl font-bold font-headline">{profile.displayName}</h1>
+                        <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                        <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-600"><Star className="w-3.5 h-3.5 mr-1" />Level 42</Badge>
+                    </div>
+                    <div className="text-muted-foreground text-sm mt-1 flex items-center justify-center md:justify-start gap-4">
+                        <span>@{profile.username}</span>
+                        <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> United States</span>
+                        <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Joined on {new Date(profile.createdAt?.seconds * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    <p className="mt-2 text-sm max-w-lg text-center md:text-left">
+                        Quiz enthusiast and knowledge seeker. I love challenging myself with difficult quizzes!
+                    </p>
                 </div>
-            )}
-          </div>
-          
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <Card className="p-4">
-              <p className="text-2xl font-bold">{submissions.length}</p>
-              <p className="text-sm text-muted-foreground">Quizzes Taken</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-2xl font-bold">{createdContent.length}</p>
-              <p className="text-sm text-muted-foreground">Quizzes Created</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-2xl font-bold">{profile.followersCount || 0}</p>
-              <p className="text-sm text-muted-foreground">Followers</p>
-            </Card>
-            <Card className="p-4">
-              <p className="text-2xl font-bold">{profile.followingCount || 0}</p>
-              <p className="text-sm text-muted-foreground">Following</p>
-            </Card>
-          </div>
+                {currentUser && currentUser.uid !== profile.uid && (
+                    <div className="flex gap-2 w-full sm:w-auto flex-shrink-0">
+                        <Button onClick={handleFollowToggle} disabled={isFollowLoading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                            {isFollowLoading ? <Loader2 className="animate-spin" /> : 
+                                isFollowing ? <><UserCheck className="mr-2"/> Following</> : <><UserPlus className="mr-2"/> Follow</>
+                            }
+                        </Button>
+                        <Button variant="outline" className="w-full">
+                            <MessageSquare className="mr-2"/> Message
+                        </Button>
+                    </div>
+                )}
+            </div>
+             <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                    <p className="text-2xl font-bold">{submissions.length}</p>
+                    <p className="text-sm text-muted-foreground">Quizzes Taken</p>
+                </div>
+                <div>
+                    <p className="text-2xl font-bold">{createdContent.length}</p>
+                    <p className="text-sm text-muted-foreground">Quizzes Created</p>
+                </div>
+                <div>
+                    <p className="text-2xl font-bold">{profile.followersCount || 0}</p>
+                    <p className="text-sm text-muted-foreground">Followers</p>
+                </div>
+                <div>
+                    <p className="text-2xl font-bold">{profile.followingCount || 0}</p>
+                    <p className="text-sm text-muted-foreground">Following</p>
+                </div>
+            </div>
         </Card>
 
         {/* Main Content */}
