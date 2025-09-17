@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -47,7 +48,7 @@ export default function DashboardPage() {
             </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/create-test">
+          <Link href="/dashboard/add-content">
             <PlusCircle className="mr-2"/>
             Add Content
           </Link>

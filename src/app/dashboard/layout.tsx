@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -32,7 +33,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutGrid },
   { href: '/dashboard/my-content', label: 'My Content', icon: Library },
   { href: '/dashboard/my-results', label: 'My Results', icon: FileText },
-  { href: '/dashboard/create-test', label: 'Add Content', icon: PlusCircle },
+  { href: '/dashboard/add-content', label: 'Add Content', icon: PlusCircle },
   { href: '/dashboard/profile', label: 'Profile', icon: BookUser },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
@@ -77,7 +78,7 @@ export default function DashboardLayout({
           <div className="flex-grow" />
           <div className="p-2">
              <Button asChild className="w-full">
-                <Link href="/dashboard/create-test">
+                <Link href="/dashboard/add-content">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Add Content
                 </Link>
