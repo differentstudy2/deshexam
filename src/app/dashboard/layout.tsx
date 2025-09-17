@@ -32,7 +32,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutGrid },
   { href: '/dashboard/my-content', label: 'My Content', icon: Library },
   { href: '/dashboard/my-results', label: 'My Results', icon: FileText },
-  { href: '/dashboard/create-test', label: 'Create Test', icon: PlusCircle },
+  { href: '/dashboard/create-test', label: 'Add Content', icon: PlusCircle },
   { href: '/dashboard/profile', label: 'Profile', icon: BookUser },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
@@ -79,7 +79,7 @@ export default function DashboardLayout({
              <Button asChild className="w-full">
                 <Link href="/dashboard/create-test">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Create New Test
+                  Add Content
                 </Link>
             </Button>
           </div>

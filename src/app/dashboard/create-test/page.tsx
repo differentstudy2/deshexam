@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -103,7 +104,7 @@ export default function CreateTestPage() {
 
   return (
     <div>
-      <h1 className="font-headline text-3xl font-bold">Create New Content</h1>
+      <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
       <p className="text-muted-foreground mb-6">
         Fill out the form below to create a new mock test, quiz, or practice questions.
       </p>
@@ -372,7 +373,7 @@ export default function CreateTestPage() {
           </Card>
           
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Creating..." : "Create Content"}
+            {form.formState.isSubmitting ? "Adding..." : "Add Content"}
           </Button>
         </form>
       </Form>
