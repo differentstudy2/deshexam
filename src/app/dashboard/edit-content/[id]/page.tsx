@@ -69,7 +69,6 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const subjects = Array.from(new Set(mockTests.map((test) => test.subject)));
-  const testId = params.id;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -88,7 +87,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
     const fetchTest = async () => {
       try {
         setLoading(true);
-        const testData = await getTestById(testId);
+        const testData = await getTestById(params.id);
         if (testData) {
             form.reset(testData as FormValues);
         } else {
@@ -106,7 +105,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
       }
     };
     fetchTest();
-  }, [testId, form, toast, router]);
+  }, [params.id, form, toast, router]);
 
 
   const { fields, append, remove } = useFieldArray({
@@ -116,7 +115,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      await updateTest(testId, data);
+      await updateTest(params.id, data);
       toast({
         title: 'Content Updated!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully updated.`,
