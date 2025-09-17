@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -17,10 +17,20 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function PricingPage() {
     const [planType, setPlanType] = useState<'pro' | 'pass'>('pro');
-    const [selectedDurationId, setSelectedDurationId] = useState(pricingData.plans[1].id);
+    const [selectedDurationId, setSelectedDurationId] = useState(pricingData.plans.pro[1].id);
 
-    const selectedPlan = pricingData.plans.find(p => p.id === selectedDurationId);
+    const currentPlans = pricingData.plans[planType];
+    const selectedPlan = currentPlans.find(p => p.id === selectedDurationId);
     const price = selectedPlan ? selectedPlan.price : 0;
+    
+    useEffect(() => {
+        // When planType changes, update the selectedDurationId to a valid one in the new plan type.
+        // We default to the bestseller of the new plan type.
+        const newPlans = pricingData.plans[planType];
+        const bestseller = newPlans.find(p => p.bestseller) || newPlans[0];
+        setSelectedDurationId(bestseller.id);
+    }, [planType]);
+
 
     const whyMustHave = [
         {
@@ -54,7 +64,7 @@ export default function PricingPage() {
     <div className="bg-secondary/30">
         <div className="container py-12 md:py-16">
 
-            <Tabs defaultValue="pro" className="w-full max-w-sm mx-auto mb-4">
+            <Tabs defaultValue="pro" onValueChange={(value) => setPlanType(value as 'pro' | 'pass')} className="w-full max-w-sm mx-auto mb-4">
                  <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="pro">
                         <span className="flex items-center gap-2">Pass Pro <Badge variant="outline" className="text-yellow-600 border-yellow-400 bg-yellow-100">Suggested</Badge></span>
@@ -116,11 +126,11 @@ export default function PricingPage() {
                                 <h3 className="font-bold text-lg">Special Offers for You!</h3>
                                 <Button variant="link" className="text-primary">Apply Coupon</Button>
                             </div>
-                            <h4 className="font-semibold text-md mb-4">Select your Pass Plan</h4>
+                            <h4 className="font-semibold text-md mb-4">Select your {planType === 'pro' ? 'Pass Pro' : 'Pass'} Plan</h4>
                             
                              <RadioGroup value={selectedDurationId} onValueChange={setSelectedDurationId}>
                                 <div className="space-y-3">
-                                {pricingData.plans.map((plan) => (
+                                {currentPlans.map((plan) => (
                                     <Label 
                                         key={plan.id}
                                         htmlFor={plan.id}

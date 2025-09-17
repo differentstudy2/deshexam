@@ -83,11 +83,18 @@ export const pricingData = {
         { id: "b4", name: "17,000+ Previous Year Papers", pro: true, pass: false },
         { id: "b5", name: "Unlimited Re-Attempt mode for All Tests", pro: true, pass: false },
     ],
-    plans: [
-        { id: "plan_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1199, price: 599, discount: null, bestseller: false },
-        { id: "plan_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1799, price: 649, discount: null, bestseller: true },
-        { id: "plan_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 1999, price: 799, discount: null, bestseller: false },
-    ]
+    plans: {
+        pro: [
+             { id: "pro_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1199, price: 599, discount: null, bestseller: false },
+             { id: "pro_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1799, price: 649, discount: 64, bestseller: true },
+             { id: "pro_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 1999, price: 799, discount: 60, bestseller: false },
+        ],
+        pass: [
+            { id: "pass_monthly", name: "Monthly Pass", validity: "31 Days", originalPrice: 599, price: 299, discount: 50, bestseller: false },
+            { id: "pass_yearly", name: "Yearly Pass", validity: "365 Days", originalPrice: 999, price: 349, discount: 65, bestseller: true },
+            { id: "pass_18months", name: "18 Months Pass", validity: "548 Days", originalPrice: 1299, price: 499, discount: 62, bestseller: false },
+        ]
+    }
 }
 
 export const faqData = [
