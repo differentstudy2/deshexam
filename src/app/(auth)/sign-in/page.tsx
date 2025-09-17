@@ -22,7 +22,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function SignInPage() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -39,6 +39,23 @@ export default function SignInPage() {
       toast({
         title: "Signed In",
         description: "Welcome back!",
+      });
+      router.push("/");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Sign In Failed",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      toast({
+        title: "Signed In",
+        description: "Welcome!",
       });
       router.push("/");
     } catch (error: any) {
@@ -102,7 +119,7 @@ export default function SignInPage() {
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? "Logging In..." : "Login"}
               </Button>
-              <Button variant="outline" className="w-full" type="button">
+              <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn}>
                 Login with Google
               </Button>
             </form>
