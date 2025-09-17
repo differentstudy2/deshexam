@@ -18,6 +18,8 @@ export const addQuestion = async (questionData: any) => {
             authorId: user.uid,
             authorName: user.displayName || user.email,
             createdAt: serverTimestamp(),
+            likes: 0,
+            dislikes: 0,
         });
         return docRef.id;
     } catch (e) {
@@ -52,7 +54,12 @@ export const getQuestionById = async (questionId: string) => {
     try {
         const questionDoc = await getDoc(doc(db, "questions", questionId));
         if (questionDoc.exists()) {
-            return { id: questionDoc.id, ...questionDoc.data() };
+             const data = questionDoc.data();
+            return {
+                id: questionDoc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate() ?? new Date(),
+            };
         } else {
             return null;
         }
@@ -61,6 +68,59 @@ export const getQuestionById = async (questionId: string) => {
         throw new Error("Failed to fetch question.");
     }
 }
+
+export const updateQuestion = async (questionId: string, data: any) => {
+    if (!questionId) {
+        throw new Error("Question ID is required to update a question.");
+    }
+    try {
+        await updateDoc(doc(db, "questions", questionId), data);
+    } catch (e) {
+        console.error("Error updating document: ", e);
+        throw new Error("Failed to update question.");
+    }
+};
+
+export const addComment = async (questionId: string, commentData: any) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        throw new Error("You must be logged in to comment.");
+    }
+
+    try {
+        const docRef = await addDoc(collection(db, "questions", questionId, "comments"), {
+            ...commentData,
+            authorId: user.uid,
+            authorName: user.displayName || user.email,
+            authorPhotoURL: user.photoURL,
+            createdAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding comment: ", e);
+        throw new Error("Failed to add comment.");
+    }
+};
+
+export const getComments = async (questionId: string) => {
+    try {
+        const q = query(collection(db, "questions", questionId, "comments"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate() ?? new Date(),
+            };
+        });
+    } catch (e) {
+        console.error("Error getting comments: ", e);
+        throw new Error("Failed to fetch comments.");
+    }
+};
 
 export const addContent = async (contentData: any) => {
     const auth = getAuth();
