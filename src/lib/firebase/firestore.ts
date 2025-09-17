@@ -1,5 +1,3 @@
-
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -103,15 +101,21 @@ export const updateTest = async (testId: string, testData: any) => {
     }
 };
 
-export const getAllTests = async () => {
+export const getAllTests = async (type?: 'Mock Test' | 'Quiz' | 'Practice Questions') => {
     try {
-        const querySnapshot = await getDocs(collection(db, "tests"));
+        let q;
+        if (type) {
+            q = query(collection(db, "tests"), where("testType", "==", type));
+        } else {
+            q = query(collection(db, "tests"));
+        }
+        
+        const querySnapshot = await getDocs(q);
         const tests = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
                 ...data,
-                // Fallback for questions to ensure it's always an array
                 questions: data.questions || [], 
             };
         });

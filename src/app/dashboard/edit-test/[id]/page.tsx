@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -52,6 +52,7 @@ const questionSchema = z.object({
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
   subject: z.string().min(1, 'Please select a subject.'),
+  testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
     .number()
@@ -75,6 +76,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
     defaultValues: {
       title: '',
       subject: '',
+      testType: 'Mock Test',
       description: '',
       duration: 60,
       access: 'free',
@@ -116,14 +118,14 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
     try {
       await updateTest(testId, data);
       toast({
-        title: 'Test Updated!',
-        description: `The test "${data.title}" has been successfully updated.`,
+        title: 'Content Updated!',
+        description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully updated.`,
       });
       router.push('/dashboard/my-content');
     } catch (error) {
        toast({
         variant: "destructive",
-        title: 'Error Updating Test',
+        title: 'Error Updating Content',
         description: (error as Error).message,
       });
     }
@@ -133,25 +135,25 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
     return (
         <div className="flex items-center justify-center h-full">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            <p className="ml-4 text-lg">Loading Test Editor...</p>
+            <p className="ml-4 text-lg">Loading Content Editor...</p>
         </div>
     )
   }
 
   return (
     <div>
-      <h1 className="font-headline text-3xl font-bold">Edit Test</h1>
+      <h1 className="font-headline text-3xl font-bold">Edit Content</h1>
       <p className="text-muted-foreground mb-6">
-        Modify the details of your mock test below.
+        Modify the details of your content below.
       </p>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>Test Details</CardTitle>
+              <CardTitle>Content Details</CardTitle>
               <CardDescription>
-                Provide the essential information for your test.
+                Provide the essential information for your content.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -160,7 +162,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Test Title</FormLabel>
+                    <FormLabel>Title</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., NEET Full Syllabus Physics - 2" {...field} />
                     </FormControl>
@@ -169,30 +171,54 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a subject" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {subjects.map((subject) => (
-                          <SelectItem key={subject} value={subject}>
-                            {subject}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a subject" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {subjects.map((subject) => (
+                            <SelectItem key={subject} value={subject}>
+                              {subject}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="testType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Type</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a content type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Mock Test">Mock Test</SelectItem>
+                          <SelectItem value="Quiz">Quiz</SelectItem>
+                           <SelectItem value="Practice Questions">Practice Questions</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -244,7 +270,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
                         </SelectContent>
                       </Select>
                        <FormDescription>
-                          Choose who can access this test.
+                          Choose who can access this content.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -257,7 +283,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
           <Card>
             <CardHeader>
                 <CardTitle>Questions</CardTitle>
-                <CardDescription>Add or modify questions for your test.</CardDescription>
+                <CardDescription>Add or modify questions for your content.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                  {fields.map((question, index) => {
@@ -385,7 +411,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
           </Card>
           
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Updating..." : "Update Test"}
+            {form.formState.isSubmitting ? "Updating..." : "Update Content"}
           </Button>
         </form>
       </Form>

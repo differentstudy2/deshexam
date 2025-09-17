@@ -50,6 +50,7 @@ const questionSchema = z.object({
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
   subject: z.string().min(1, 'Please select a subject.'),
+  testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   duration: z.coerce
     .number()
@@ -70,6 +71,7 @@ export default function CreateTestPage() {
     defaultValues: {
       title: '',
       subject: '',
+      testType: 'Mock Test',
       description: '',
       duration: 60,
       access: 'free',
@@ -86,14 +88,14 @@ export default function CreateTestPage() {
     try {
       await addTest(data);
       toast({
-        title: 'Test Created!',
-        description: `The test "${data.title}" has been successfully saved to Firestore.`,
+        title: 'Content Created!',
+        description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,
       });
       form.reset();
     } catch (error) {
        toast({
         variant: "destructive",
-        title: 'Error Creating Test',
+        title: 'Error Creating Content',
         description: (error as Error).message,
       });
     }
@@ -101,18 +103,18 @@ export default function CreateTestPage() {
 
   return (
     <div>
-      <h1 className="font-headline text-3xl font-bold">Create New Test</h1>
+      <h1 className="font-headline text-3xl font-bold">Create New Content</h1>
       <p className="text-muted-foreground mb-6">
-        Fill out the form below to create a new mock test.
+        Fill out the form below to create a new mock test, quiz, or practice questions.
       </p>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>Test Details</CardTitle>
+              <CardTitle>Content Details</CardTitle>
               <CardDescription>
-                Provide the essential information for your new test.
+                Provide the essential information for your new content.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -121,7 +123,7 @@ export default function CreateTestPage() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Test Title</FormLabel>
+                    <FormLabel>Title</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., NEET Full Syllabus Physics - 2" {...field} />
                     </FormControl>
@@ -130,30 +132,54 @@ export default function CreateTestPage() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a subject" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {subjects.map((subject) => (
-                          <SelectItem key={subject} value={subject}>
-                            {subject}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a subject" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {subjects.map((subject) => (
+                            <SelectItem key={subject} value={subject}>
+                              {subject}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="testType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a content type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Mock Test">Mock Test</SelectItem>
+                          <SelectItem value="Quiz">Quiz</SelectItem>
+                           <SelectItem value="Practice Questions">Practice Questions</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -205,7 +231,7 @@ export default function CreateTestPage() {
                         </SelectContent>
                       </Select>
                        <FormDescription>
-                          Choose who can access this test.
+                          Choose who can access this content.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -218,7 +244,7 @@ export default function CreateTestPage() {
           <Card>
             <CardHeader>
                 <CardTitle>Questions</CardTitle>
-                <CardDescription>Add questions to your test.</CardDescription>
+                <CardDescription>Add questions to your content.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                  {fields.map((question, index) => {
@@ -346,7 +372,7 @@ export default function CreateTestPage() {
           </Card>
           
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Creating..." : "Create Test"}
+            {form.formState.isSubmitting ? "Creating..." : "Create Content"}
           </Button>
         </form>
       </Form>

@@ -61,7 +61,7 @@ const UserNav = () => {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/profile">
+            <Link href="/dashboard/profile">
               <UserIcon className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </Link>
