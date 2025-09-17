@@ -84,9 +84,9 @@ export const pricingData = {
         { id: "b5", name: "Unlimited Re-Attempt mode for All Tests", pro: true, pass: false },
     ],
     plans: [
-        { id: "plan_monthly", name: "Monthly Testbook Pass", validity: "31 Days", originalPrice: 899, price: 549, discount: 39, bestseller: false },
-        { id: "plan_yearly", name: "Yearly Testbook Pass", validity: "365 Days", originalPrice: 1399, price: 599, discount: 57, bestseller: true },
-        { id: "plan_18months", name: "18 Months Testbook Pass", validity: "548 Days", originalPrice: 1599, price: 749, discount: 53, bestseller: false },
+        { id: "plan_monthly", name: "Monthly Pass Pro", validity: "31 Days", originalPrice: 1199, price: 599, discount: null, bestseller: false },
+        { id: "plan_yearly", name: "Yearly Pass Pro", validity: "365 Days", originalPrice: 1799, price: 649, discount: null, bestseller: true },
+        { id: "plan_18months", name: "18 Months Pass Pro", validity: "548 Days", originalPrice: 1999, price: 799, discount: null, bestseller: false },
     ]
 }
 
