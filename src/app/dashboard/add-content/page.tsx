@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { mockTests } from '@/lib/mock-data';
 import { addContent } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -62,6 +63,7 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type ContentType = 'Mock Test' | 'Quiz' | 'Practice Questions';
 
 export default function CreateTestPage() {
   const { toast } = useToast();
@@ -92,7 +94,14 @@ export default function CreateTestPage() {
         title: 'Content Created!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,
       });
-      form.reset();
+      form.reset({
+        ...form.getValues(),
+        title: '',
+        description: '',
+        duration: 60,
+        access: 'free',
+        questions: [],
+      });
     } catch (error) {
        toast({
         variant: "destructive",
@@ -102,12 +111,25 @@ export default function CreateTestPage() {
     }
   };
 
+  const handleTabChange = (value: string) => {
+    form.setValue('testType', value as ContentType, { shouldValidate: true });
+  }
+
   return (
     <div>
       <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
       <p className="text-muted-foreground mb-6">
-        Fill out the form below to create a new mock test, quiz, or practice questions.
+        Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
       </p>
+
+      <Tabs defaultValue="Mock Test" className="w-full mb-6" onValueChange={handleTabChange}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="Mock Test">Mock Test</TabsTrigger>
+          <TabsTrigger value="Quiz">Quiz</TabsTrigger>
+          <TabsTrigger value="Practice Questions">Practice Questions</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -160,22 +182,13 @@ export default function CreateTestPage() {
                 />
                  <FormField
                   control={form.control}
-                  name="testType"
+                  name="duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a content type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Mock Test">Mock Test</SelectItem>
-                          <SelectItem value="Quiz">Quiz</SelectItem>
-                           <SelectItem value="Practice Questions">Practice Questions</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Duration (in minutes)</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -199,20 +212,7 @@ export default function CreateTestPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="duration"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Duration (in minutes)</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="grid grid-cols-1">
                 <FormField
                   control={form.control}
                   name="access"
