@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getTestById, addTestSubmission } from '@/lib/firebase/firestore';
+import { getContentById, addTestSubmission } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -51,7 +51,7 @@ export default function TestPage({ params }: { params: { id: string } }) {
       if (!testId) return;
       try {
         setLoading(true);
-        const testData = await getTestById(testId);
+        const testData = await getContentById(testId);
         setTest(testData as Test);
       } catch (error) {
         toast({

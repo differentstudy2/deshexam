@@ -14,7 +14,7 @@ import { Award, CheckCircle, XCircle, Loader2, FileQuestion } from 'lucide-react
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { getSubmissionById, getTestById } from '@/lib/firebase/firestore';
+import { getSubmissionById, getContentById } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string };
@@ -47,7 +47,7 @@ function ResultsDisplay() {
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
           setSubmission(submissionData);
-           const testData = await getTestById(submissionData.testId) as Test;
+           const testData = await getContentById(submissionData.testId) as Test;
            setTest(testData);
         } else {
           throw new Error("Submission not found.");

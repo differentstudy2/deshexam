@@ -2,17 +2,17 @@ import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-export const addTest = async (testData: any) => {
+export const addContent = async (contentData: any) => {
     const auth = getAuth();
     const user = auth.currentUser;
 
     if (!user) {
-        throw new Error("You must be logged in to create a test.");
+        throw new Error("You must be logged in to create a content.");
     }
 
     try {
-        const docRef = await addDoc(collection(db, "tests"), {
-            ...testData,
+        const docRef = await addDoc(collection(db, "content"), {
+            ...contentData,
             authorId: user.uid,
             authorName: user.displayName || user.email,
             createdAt: serverTimestamp(),
@@ -22,18 +22,18 @@ export const addTest = async (testData: any) => {
         return docRef.id;
     } catch (e) {
         console.error("Error adding document: ", e);
-        throw new Error("Failed to create test.");
+        throw new Error("Failed to create content.");
     }
 };
 
-export const getTestsByAuthor = async (authorId: string) => {
+export const getContentByAuthor = async (authorId: string) => {
     if (!authorId) {
-        throw new Error("Author ID is required to fetch tests.");
+        throw new Error("Author ID is required to fetch content.");
     }
     try {
-        const q = query(collection(db, "tests"), where("authorId", "==", authorId));
+        const q = query(collection(db, "content"), where("authorId", "==", authorId));
         const querySnapshot = await getDocs(q);
-        const tests = querySnapshot.docs.map(doc => {
+        const contents = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
@@ -43,75 +43,75 @@ export const getTestsByAuthor = async (authorId: string) => {
             }
         });
         
-        tests.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
+        contents.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
 
-        return tests;
+        return contents;
     } catch (e) {
         console.error("Error getting documents: ", e);
-        throw new Error("Failed to fetch tests.");
+        throw new Error("Failed to fetch content.");
     }
 }
 
-export const deleteTest = async (testId: string) => {
-    if (!testId) {
-        throw new Error("Test ID is required to delete a test.");
+export const deleteContent = async (contentId: string) => {
+    if (!contentId) {
+        throw new Error("Content ID is required to delete a content.");
     }
     try {
-        await deleteDoc(doc(db, "tests", testId));
+        await deleteDoc(doc(db, "content", contentId));
     } catch (e) {
         console.error("Error deleting document: ", e);
-        throw new Error("Failed to delete test.");
+        throw new Error("Failed to delete content.");
     }
 }
 
-export const getTestById = async (testId: string) => {
-    if (!testId) {
-        throw new Error("Test ID is required to fetch a test.");
+export const getContentById = async (contentId: string) => {
+    if (!contentId) {
+        throw new Error("Content ID is required to fetch a content.");
     }
     try {
-        const testDoc = await getDoc(doc(db, "tests", testId));
-        if (testDoc.exists()) {
-            const data = testDoc.data();
+        const contentDoc = await getDoc(doc(db, "content", contentId));
+        if (contentDoc.exists()) {
+            const data = contentDoc.data();
             // Ensure timestamp is converted correctly if it exists
             if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 data.createdAt = data.createdAt.toDate().toLocaleDateString();
             }
-            return { id: testDoc.id, ...data };
+            return { id: contentDoc.id, ...data };
         } else {
             return null;
         }
     } catch (e) {
         console.error("Error getting document: ", e);
-        throw new Error("Failed to fetch test.");
+        throw new Error("Failed to fetch content.");
     }
 };
 
-export const updateTest = async (testId: string, testData: any) => {
-    if (!testId) {
-        throw new Error("Test ID is required to update a test.");
+export const updateContent = async (contentId: string, contentData: any) => {
+    if (!contentId) {
+        throw new Error("Content ID is required to update a content.");
     }
     try {
-        await updateDoc(doc(db, "tests", testId), {
-            ...testData,
+        await updateDoc(doc(db, "content", contentId), {
+            ...contentData,
             updatedAt: serverTimestamp(),
         });
     } catch (e) {
         console.error("Error updating document: ", e);
-        throw new Error("Failed to update test.");
+        throw new Error("Failed to update content.");
     }
 };
 
-export const getAllTests = async (type?: 'Mock Test' | 'Quiz' | 'Practice Questions') => {
+export const getAllContent = async (type?: 'Mock Test' | 'Quiz' | 'Practice Questions') => {
     try {
         let q;
         if (type) {
-            q = query(collection(db, "tests"), where("testType", "==", type));
+            q = query(collection(db, "content"), where("testType", "==", type));
         } else {
-            q = query(collection(db, "tests"));
+            q = query(collection(db, "content"));
         }
         
         const querySnapshot = await getDocs(q);
-        const tests = querySnapshot.docs.map(doc => {
+        const contents = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
@@ -119,10 +119,10 @@ export const getAllTests = async (type?: 'Mock Test' | 'Quiz' | 'Practice Questi
                 questions: data.questions || [], 
             };
         });
-        return tests;
+        return contents;
     } catch (e) {
         console.error("Error getting documents: ", e);
-        throw new Error("Failed to fetch tests.");
+        throw new Error("Failed to fetch content.");
     }
 }
 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, HelpCircle } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
-import { getAllTests } from "@/lib/firebase/firestore";
+import { getAllContent } from "@/lib/firebase/firestore";
 import { MockTestFilters } from "@/components/mock-test-filters";
 
 function getUrlForTest(testType: string, testId: string) {
@@ -13,7 +13,7 @@ function getUrlForTest(testType: string, testId: string) {
 }
 
 export default async function QuizzesPage() {
-  const quizzes = await getAllTests("Quiz");
+  const quizzes = await getAllContent("Quiz");
   const subjects = Array.from(new Set(quizzes.map((test) => test.subject)));
 
   return (

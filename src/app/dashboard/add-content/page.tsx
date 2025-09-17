@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -35,7 +34,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { mockTests } from '@/lib/mock-data';
-import { addTest } from '@/lib/firebase/firestore';
+import { addContent } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2 } from 'lucide-react';
 
 const optionSchema = z.object({
@@ -88,7 +87,7 @@ export default function CreateTestPage() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      await addTest(data);
+      await addContent(data);
       toast({
         title: 'Content Created!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,

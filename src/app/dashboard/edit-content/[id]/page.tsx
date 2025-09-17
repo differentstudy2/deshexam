@@ -34,7 +34,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { mockTests } from '@/lib/mock-data';
-import { getTestById, updateTest } from '@/lib/firebase/firestore';
+import { getContentById, updateContent } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -69,7 +69,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const subjects = Array.from(new Set(mockTests.map((test) => test.subject)));
-  const testId = params.id;
+  const contentId = params.id;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -85,20 +85,20 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
   });
 
   useEffect(() => {
-    const fetchTest = async () => {
-      if (!testId) return;
+    const fetchContent = async () => {
+      if (!contentId) return;
       try {
         setLoading(true);
-        const testData = await getTestById(testId);
-        if (testData) {
-            form.reset(testData as FormValues);
+        const contentData = await getContentById(contentId);
+        if (contentData) {
+            form.reset(contentData as FormValues);
         } else {
-            throw new Error("Test not found");
+            throw new Error("Content not found");
         }
       } catch (error) {
         toast({
           variant: "destructive",
-          title: 'Error fetching test data',
+          title: 'Error fetching content data',
           description: (error as Error).message,
         });
         router.push('/dashboard/my-content');
@@ -106,8 +106,8 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
         setLoading(false);
       }
     };
-    fetchTest();
-  }, [testId, form, toast, router]);
+    fetchContent();
+  }, [contentId, form, toast, router]);
 
 
   const { fields, append, remove } = useFieldArray({
@@ -117,7 +117,7 @@ export default function EditContentPage({ params }: { params: { id: string } }) 
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      await updateTest(testId, data);
+      await updateContent(contentId, data);
       toast({
         title: 'Content Updated!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully updated.`,

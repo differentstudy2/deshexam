@@ -13,7 +13,7 @@ import {
 import { CheckCircle, XCircle, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getSubmissionById, getTestById } from '@/lib/firebase/firestore';
+import { getSubmissionById, getContentById } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -49,7 +49,7 @@ function ReviewDisplay() {
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
           setSubmission(submissionData);
-          const testData = await getTestById(submissionData.testId) as Test;
+          const testData = await getContentById(submissionData.testId) as Test;
           setTest(testData);
         } else {
           throw new Error("Submission not found.");

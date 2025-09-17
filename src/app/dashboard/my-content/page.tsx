@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
-import { getTestsByAuthor, deleteTest } from '@/lib/firebase/firestore';
+import { getContentByAuthor, deleteContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -71,7 +71,7 @@ export default function MyContentPage() {
       if (user) {
         try {
           setLoading(true);
-          const userTests = await getTestsByAuthor(user.uid);
+          const userTests = await getContentByAuthor(user.uid);
           setTests(userTests as Test[]);
         } catch (error) {
            toast({
@@ -96,16 +96,16 @@ export default function MyContentPage() {
   const handleDelete = async () => {
     if (!testToDelete) return;
     try {
-      await deleteTest(testToDelete.id);
+      await deleteContent(testToDelete.id);
       setTests(tests.filter(test => test.id !== testToDelete.id));
       toast({
-        title: "Test Deleted",
+        title: "Content Deleted",
         description: `"${testToDelete.title}" has been deleted.`,
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: 'Error deleting test',
+        title: 'Error deleting content',
         description: (error as Error).message,
       });
     } finally {
@@ -123,9 +123,9 @@ export default function MyContentPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Tests</CardTitle>
+          <CardTitle>Your Content</CardTitle>
           <CardDescription>
-            Manage your created tests. You can edit or delete them.
+            Manage your created content. You can edit or delete them.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -189,7 +189,7 @@ export default function MyContentPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center h-24">
-                    You haven't created any tests yet.
+                    You haven't created any content yet.
                   </TableCell>
                 </TableRow>
               )}
@@ -203,7 +203,7 @@ export default function MyContentPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the test
+              This action cannot be undone. This will permanently delete the content
               "{testToDelete?.title}".
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -216,5 +216,3 @@ export default function MyContentPage() {
     </div>
   );
 }
-
-    
