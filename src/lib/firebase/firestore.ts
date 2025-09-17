@@ -80,7 +80,7 @@ export const getTestById = async (testId: string) => {
             }
             return { id: testDoc.id, ...data };
         } else {
-            throw new Error("No such document!");
+            return null;
         }
     } catch (e) {
         console.error("Error getting document: ", e);
@@ -140,5 +140,22 @@ export const addTestSubmission = async (submissionData: any) => {
     } catch (e) {
         console.error("Error adding document: ", e);
         throw new Error("Failed to submit test results.");
+    }
+}
+
+export const getSubmissionById = async (submissionId: string) => {
+    if (!submissionId) {
+        throw new Error("Submission ID is required to fetch a submission.");
+    }
+    try {
+        const submissionDoc = await getDoc(doc(db, "submissions", submissionId));
+        if (submissionDoc.exists()) {
+            return { id: submissionDoc.id, ...submissionDoc.data() };
+        } else {
+            return null;
+        }
+    } catch (e) {
+        console.error("Error getting document: ", e);
+        throw new Error("Failed to fetch submission.");
     }
 }

@@ -105,14 +105,14 @@ export default function TestPage({ params }: { params: { id: string } }) {
             totalQuestions: test?.questions.length,
         };
 
-        await addTestSubmission(submissionData);
+        const submissionId = await addTestSubmission(submissionData);
 
         toast({
             title: "Test Submitted!",
             description: "Your results have been recorded.",
         });
 
-        router.push(`/mock-tests/${test?.id}/results?score=${score}&total=${test?.questions.length}`);
+        router.push(`/mock-tests/${test?.id}/results?submissionId=${submissionId}`);
 
     } catch (error) {
         toast({
