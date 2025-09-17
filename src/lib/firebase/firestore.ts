@@ -34,12 +34,15 @@ export const getTestsByAuthor = async (authorId: string) => {
     try {
         const q = query(collection(db, "tests"), where("authorId", "==", authorId));
         const querySnapshot = await getDocs(q);
-        const tests = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate().toLocaleDateString(),
-            createdAtTimestamp: doc.data().createdAt?.toDate().getTime() || 0,
-        }));
+        const tests = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+                createdAtTimestamp: data.createdAt?.toDate().getTime() || 0,
+            }
+        });
         
         tests.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
 
