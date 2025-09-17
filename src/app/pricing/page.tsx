@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -161,7 +162,7 @@ export default function PricingPage() {
                                 </div>
                             </div>
                             <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pro' && 'bg-blue-50 border border-blue-200')}>
-                                <Image src="https://testbook.com/assets/img/pass-new/pass-pro-light-icon.svg?v=05092023" alt="Pass Pro" width={80} height={20} className="mx-auto my-2"/>
+                                <h4 className="font-bold text-lg my-2">Pass Pro</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
@@ -176,7 +177,7 @@ export default function PricingPage() {
                                 </div>
                             </div>
                             <div className={cn("w-1/4 text-center rounded-md p-2 transition-all", planType === 'pass' && 'bg-blue-50 border border-blue-200')}>
-                                <Image src="https://testbook.com/assets/img/pass-new/pass.svg?v=05092023" alt="Pass" width={50} height={20} className="mx-auto my-2"/>
+                                <h4 className="font-bold text-lg my-2">Pass</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
                                         <div key={benefit.id} className="h-10 flex items-center justify-center">
