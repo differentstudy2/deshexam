@@ -162,7 +162,7 @@ export default function PricingPage() {
                                     ))}
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md", planType === 'pro' && 'bg-blue-50 border border-blue-200')}>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md", planType === 'pro' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
                                  <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -177,7 +177,7 @@ export default function PricingPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md", planType === 'pass' && 'bg-blue-50 border border-blue-200')}>
+                            <div className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md", planType === 'pass' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
                                <h4 className="font-semibold mb-2 text-sm">Pass</h4>
                                  <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
