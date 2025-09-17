@@ -752,3 +752,43 @@ export const sendMessage = async (recipientId: string, messageText: string) => {
         throw new Error("Failed to send message.");
     }
 };
+
+export const getCouponByCode = async (code: string) => {
+    if (!code) return null;
+    try {
+        const q = query(collection(db, "coupons"), where("code", "==", code.toUpperCase()));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return null;
+        }
+        const couponDoc = querySnapshot.docs[0];
+        const couponData = couponDoc.data();
+
+        if (!couponData.isActive) return null;
+
+        if (couponData.expiresAt && couponData.expiresAt.toDate() < new Date()) {
+            return null;
+        }
+
+        return { id: couponDoc.id, ...couponData };
+
+    } catch (error) {
+        console.error("Error fetching coupon:", error);
+        throw new Error("Failed to validate coupon code.");
+    }
+}
+
+export const addCoupon = async (couponData: any) => {
+    try {
+        const docRef = await addDoc(collection(db, "coupons"), {
+            ...couponData,
+            code: couponData.code.toUpperCase(),
+            isActive: true,
+            createdAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch(e) {
+        console.error("Error adding coupon", e);
+        throw new Error("Failed to add coupon");
+    }
+}

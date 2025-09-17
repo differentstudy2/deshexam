@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info, Loader2, Tag } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +25,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Separator } from '@/components/ui/separator';
+import { getCouponByCode } from '@/lib/firebase/firestore';
 
 
 declare global {
@@ -31,6 +34,13 @@ declare global {
     }
 }
 
+type Coupon = {
+  id: string;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+};
+
 
 export default function PricingPage() {
     const { toast } = useToast();
@@ -38,23 +48,100 @@ export default function PricingPage() {
     const [planType, setPlanType] = useState<'pro' | 'pass'>('pro');
     const [selectedDurationId, setSelectedDurationId] = useState(pricingData.plans.pro[1].id);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+    const [couponDiscount, setCouponDiscount] = useState(0);
 
     
     useEffect(() => {
         const newPlans = pricingData.plans[planType];
         const bestseller = newPlans.find(p => p.bestseller) || newPlans[0];
         setSelectedDurationId(bestseller.id);
+        // Reset coupon when plan type changes
+        setAppliedCoupon(null);
+        setCouponCode('');
+        setCouponDiscount(0);
     }, [planType]);
+
+    useEffect(() => {
+        // Recalculate discount when selected plan changes
+        if(appliedCoupon) {
+            calculateCouponDiscount();
+        }
+    }, [selectedDurationId, appliedCoupon]);
 
     const currentPlans = pricingData.plans[planType];
     const selectedPlan = currentPlans.find(p => p.id === selectedDurationId);
+    
     const price = selectedPlan ? selectedPlan.price : 0;
     const originalPrice = selectedPlan ? selectedPlan.originalPrice : 0;
-    const discount = originalPrice > price ? originalPrice - price : 0;
-    const platformFee = 30;
-    const gst = (price + platformFee) * 0.18;
-    const total = price + platformFee + gst;
     
+    const platformFee = 30;
+    const priceAfterCoupon = price - couponDiscount;
+    const gst = (priceAfterCoupon + platformFee) * 0.18;
+    const total = priceAfterCoupon + platformFee + gst;
+    
+    const calculateCouponDiscount = () => {
+        if (!appliedCoupon || !selectedPlan) {
+            setCouponDiscount(0);
+            return;
+        };
+
+        let discount = 0;
+        if (appliedCoupon.discountType === 'percentage') {
+            discount = (selectedPlan.price * appliedCoupon.discountValue) / 100;
+        } else {
+            discount = appliedCoupon.discountValue;
+        }
+        // Ensure discount doesn't exceed the plan price
+        const finalDiscount = Math.min(discount, selectedPlan.price);
+        setCouponDiscount(finalDiscount);
+    }
+    
+    const handleApplyCoupon = async () => {
+        if (!couponCode) {
+            toast({
+                variant: 'destructive',
+                title: 'No Coupon Code',
+                description: 'Please enter a coupon code to apply.',
+            });
+            return;
+        }
+        try {
+            const couponData = await getCouponByCode(couponCode);
+            if (couponData) {
+                setAppliedCoupon(couponData as Coupon);
+                toast({
+                    title: 'Coupon Applied!',
+                    description: `Successfully applied coupon "${couponData.code}".`,
+                });
+            } else {
+                setAppliedCoupon(null);
+                setCouponDiscount(0);
+                toast({
+                    variant: 'destructive',
+                    title: 'Invalid Coupon',
+                    description: 'The coupon code is invalid or has expired.',
+                });
+            }
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Could not validate coupon. Please try again.',
+            });
+        }
+    };
+    
+    const removeCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode('');
+        setCouponDiscount(0);
+        toast({
+            title: 'Coupon Removed',
+        });
+    };
+
     const handlePayment = async () => {
         if (!user) {
             toast({
@@ -208,9 +295,27 @@ export default function PricingPage() {
 
                         {/* Right side: Plan selection and payment */}
                         <div>
-                             <div className="flex justify-between items-center mb-4">
+                            <div className="mb-4 space-y-2">
                                 <h3 className="font-bold text-lg">Special Offers for You!</h3>
-                                <Button variant="link" className="text-primary">Apply Coupon</Button>
+                                {appliedCoupon ? (
+                                     <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-lg">
+                                        <div className="flex items-center gap-2">
+                                            <Tag className="w-5 h-5 text-green-600"/>
+                                            <p className="text-sm font-semibold text-green-700">Coupon "{appliedCoupon.code}" applied!</p>
+                                        </div>
+                                        <Button variant="ghost" size="sm" onClick={removeCoupon} className="text-green-700 hover:text-green-800">Remove</Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <Input 
+                                            placeholder="Enter Coupon Code" 
+                                            className="h-9" 
+                                            value={couponCode} 
+                                            onChange={(e) => setCouponCode(e.target.value)}
+                                        />
+                                        <Button variant="outline" size="sm" onClick={handleApplyCoupon}>Apply</Button>
+                                    </div>
+                                )}
                             </div>
                             <h4 className="font-semibold text-md mb-4">Select your {planType === 'pro' ? 'Pass Pro' : 'Pass'} Plan</h4>
                             
@@ -260,21 +365,23 @@ export default function PricingPage() {
                                                 <span>₹{originalPrice}</span>
                                             </div>
                                             <Separator className="bg-slate-600"/>
-                                            <div className="flex justify-between">
-                                                <span>Total Cart Price</span>
-                                                <span>₹{originalPrice}</span>
-                                            </div>
-                                             <div className="flex justify-between text-green-400">
+                                            <div className="flex justify-between text-green-400">
                                                 <span>Discounted Cost</span>
-                                                <span>₹{price}</span>
+                                                <span>- ₹{(originalPrice - price).toFixed(2)}</span>
                                             </div>
+                                            {couponDiscount > 0 && (
+                                                <div className="flex justify-between text-green-400">
+                                                    <span>Coupon Discount</span>
+                                                    <span>- ₹{couponDiscount.toFixed(2)}</span>
+                                                </div>
+                                            )}
                                             <Separator className="bg-slate-600"/>
                                              <div className="flex justify-between">
                                                 <span>Platform Fee</span>
                                                 <span>+ ₹{platformFee}</span>
                                             </div>
                                             <div className="flex justify-between text-xs text-slate-400">
-                                                <span>GST (18%)</span>
+                                                <span>GST (18% on fees)</span>
                                                 <span>+ ₹{gst.toFixed(2)}</span>
                                             </div>
                                             <Separator className="bg-slate-600"/>
@@ -354,3 +461,4 @@ export default function PricingPage() {
     </div>
   );
 }
+
