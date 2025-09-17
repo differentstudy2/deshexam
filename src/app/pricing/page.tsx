@@ -153,7 +153,7 @@ export default function PricingPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Left side: Benefits and Comparison */}
                         <div className="flex rounded-lg p-1">
-                            <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md">
+                            <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md rounded-lg mb-8">
                                 <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
                                 <div className="space-y-5">
                                     {pricingData.benefits.map(benefit => (
@@ -301,3 +301,5 @@ export default function PricingPage() {
     </div>
   );
 }
+
+    
