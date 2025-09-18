@@ -1,11 +1,12 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   "apiKey": "AIzaSyAzSss2t5UoydcGRh4CJ41VvE4x-t0Ikrc",
   "authDomain": "studio-8356746366-699c1.firebaseapp.com",
   "projectId": "studio-8356746366-699c1",
-  "storageBucket": "studio-8356746366-699c1.firebasestorage.app",
+  "storageBucket": "studio-8356746366-699c1.appspot.com",
   "messagingSenderId": "643911224795",
   "appId": "1:643911224795:web:ea10a865635776d4932bfe",
   "measurementId": ""
@@ -14,5 +15,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-export { app, db };
+export { app, db, storage };

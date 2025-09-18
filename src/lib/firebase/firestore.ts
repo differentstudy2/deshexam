@@ -216,21 +216,28 @@ export const addContent = async (contentData: any) => {
     if (!user) {
         throw new Error("You must be logged in to create a content.");
     }
+     const { featureImage, ...restOfContentData } = contentData;
 
     try {
-        const questionsWithIds = await Promise.all(contentData.questions.map(async (question: any) => {
+        const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
             const questionId = await addQuestion(question);
             return { ...question, id: questionId };
         }));
 
-        const docRef = await addDoc(collection(db, "content"), {
-            ...contentData,
+        const finalContentData = {
+            ...restOfContentData,
             questions: questionsWithIds,
             authorId: user.uid,
             authorName: user.displayName || user.email,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
-        });
+        };
+
+        if(featureImage){
+            finalContentData.featureImage = featureImage;
+        }
+
+        const docRef = await addDoc(collection(db, "content"), finalContentData);
         console.log("Document written with ID: ", docRef.id);
         return docRef.id;
     } catch (e) {
@@ -303,8 +310,11 @@ export const updateContent = async (contentId: string, contentData: any) => {
     if (!contentId) {
         throw new Error("Content ID is required to update a content.");
     }
+
+    const { featureImage, ...restOfContentData } = contentData;
+
     try {
-        const questionsWithIds = await Promise.all(contentData.questions.map(async (question: any) => {
+        const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
             if (question.id) {
                 // Ideally, you would update the existing question document here
                 return question;
@@ -313,11 +323,18 @@ export const updateContent = async (contentId: string, contentData: any) => {
             return { ...question, id: questionId };
         }));
 
-        await updateDoc(doc(db, "content", contentId), {
-            ...contentData,
+         const finalContentData: any = {
+            ...restOfContentData,
             questions: questionsWithIds,
             updatedAt: serverTimestamp(),
-        });
+        };
+
+        if(featureImage) {
+            finalContentData.featureImage = featureImage;
+        }
+
+
+        await updateDoc(doc(db, "content", contentId), finalContentData);
     } catch (e) {
         console.error("Error updating document: ", e);
         throw new Error("Failed to update content.");
@@ -584,7 +601,7 @@ export const addExam = async (examTypeId: string, examData: { name: string }) =>
 };
 
 
-export const getUserProfile = async (userId: string) => {
+export const getUserProfile = async (userId: string): Promise<any> => {
     if (!userId) return null;
     try {
         const userDocRef = doc(db, "users", userId);
@@ -638,6 +655,10 @@ export const updateUserProfile = async (userId: string, data: any) => {
             const currentData = userDoc.data() || {};
             const newData = { ...currentData, ...data };
             
+            if (!userDoc.exists()) {
+                newData.role = 'user'; // Default role
+            }
+
             // Handle username change
             if (data.displayName && (!currentData.username || data.displayName !== currentData.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
@@ -662,7 +683,11 @@ export const updateUserProfile = async (userId: string, data: any) => {
                  transaction.set(newUsernameRef, { uid: userId });
             }
 
-            transaction.set(userDocRef, newData, { merge: true });
+            if(userDoc.exists()) {
+                transaction.update(userDocRef, newData);
+            } else {
+                transaction.set(userDocRef, newData);
+            }
         });
     } catch (error) {
         console.error("Error updating user profile:", error);
@@ -819,3 +844,26 @@ export const addCoupon = async (couponData: any) => {
         throw new Error("Failed to add coupon");
     }
 }
+
+export const uploadFile = async (file: File) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+        throw new Error("You must be logged in to upload files.");
+    }
+
+    console.log("Uploading file:", file);
+
+    const { getStorage, ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
+    const storage = getStorage();
+    const storageRef = ref(storage, `feature_images/${user.uid}/${Date.now()}_${file.name}`);
+
+    try {
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        return downloadURL;
+    } catch (error) {
+        console.error("File upload error:", error);
+        throw new Error("Failed to upload file.");
+    }
+};
