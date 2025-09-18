@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { ScoreCircle } from '@/components/feature/score-circle';
 
 type Option = { text: string; explanation?: string; };
 type MatchingOptions = { columnA: string[]; columnB: string[]; };
@@ -104,31 +105,32 @@ function ReviewDisplay() {
           {test.questions.map((question, index) => {
             const userAnswer = answers[index];
             let isCorrect = false;
+            let matchingScore = 0;
+            let totalPairs = 0;
 
             if (question.type === 'Matching') {
-                const correctAnswers = question.correctAnswer;
-                const userAnswers = userAnswer;
-                let allMatch = true;
-                if(!userAnswers || Object.keys(userAnswers).length !== correctAnswers.length) {
-                    allMatch = false;
-                } else {
-                    for(const pair of correctAnswers) {
-                        if (userAnswers[pair.a] !== pair.b) {
-                            allMatch = false;
-                            break;
+                totalPairs = question.correctAnswer.length;
+                if (userAnswer && totalPairs > 0) {
+                    for(const pair of question.correctAnswer) {
+                        if (userAnswer[pair.a] === pair.b) {
+                            matchingScore++;
                         }
                     }
                 }
-                isCorrect = allMatch;
+                isCorrect = matchingScore === totalPairs;
             } else {
                 isCorrect = userAnswer === question.correctAnswer;
             }
+            
+            const matchingPercentage = totalPairs > 0 ? (matchingScore / totalPairs) * 100 : 0;
             
             return (
               <div key={index}>
                 <div className="flex items-start gap-4">
                   <div>
-                    {isCorrect ? (
+                    {question.type === 'Matching' ? (
+                       <ScoreCircle score={matchingPercentage} />
+                    ) : isCorrect ? (
                       <CheckCircle className="w-6 h-6 text-green-500" />
                     ) : (
                       <XCircle className="w-6 h-6 text-destructive" />
