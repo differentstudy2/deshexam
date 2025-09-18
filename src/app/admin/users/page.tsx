@@ -293,7 +293,7 @@ export default function ManageUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-4">
                 <div className="relative flex-grow">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search by name or email..." className="pl-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
@@ -353,100 +353,102 @@ export default function ManageUsersPage() {
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                   <TableHead padding="checkbox" className="w-12">
-                        <Checkbox
-                           checked={isAllSelected}
-                           onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                           aria-label="Select all"
-                         />
-                   </TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead className="hidden md:table-cell">Role</TableHead>
-                  <TableHead className="hidden lg:table-cell">Subscription</TableHead>
-                  <TableHead className="hidden lg:table-cell">Created At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.uid} data-state={selectedUsers.includes(user.uid) && "selected"}>
-                     <TableCell padding="checkbox">
-                        <Checkbox
-                           checked={selectedUsers.includes(user.uid)}
-                           onCheckedChange={() => handleSelectUser(user.uid)}
-                           aria-label="Select user"
-                         />
-                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="w-9 h-9">
-                           <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${user.uid}/40/40`} />
-                           <AvatarFallback>{user.displayName?.[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{user.displayName}</div>
-                          <div className="text-sm text-muted-foreground">{user.email}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                        {user.role === 'admin' ? <ShieldCheck className="mr-1.5" /> : <User className="mr-1.5" />}
-                        {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      {user.subscriptionPlan ? (
-                        <div className="flex items-center font-medium">
-                           {user.subscriptionPlan === 'pro' ? 
-                             <Crown className="mr-1.5 h-4 w-4 text-yellow-500" /> : 
-                             <Gem className="mr-1.5 h-4 w-4 text-blue-500" />
-                           }
-                           {user.subscriptionPlan === 'pro' ? 'Pass Pro' : 'Pass'}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">None</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">{user.createdAt}</TableCell>
-                    <TableCell className="text-right">
-                       {user.uid !== currentUser?.uid && (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                {user.role === 'admin' ? (
-                                    <DropdownMenuItem onClick={() => openConfirmationDialog(user, 'role', 'user')}>
-                                        <UserCog className="mr-2"/> Remove Admin
-                                    </DropdownMenuItem>
-                                ) : (
-                                    <DropdownMenuItem onClick={() => openConfirmationDialog(user, 'role', 'admin')}>
-                                        <Shield className="mr-2"/> Make Admin
-                                    </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem onClick={() => openSubscriptionDialog(user)}>
-                                    <Crown className="mr-2"/> Manage Subscription
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive" onClick={() => openConfirmationDialog(user, 'delete')}>
-                                    <Trash2 className="mr-2"/> Delete User
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                       )}
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">
+                          <Checkbox
+                            checked={isAllSelected}
+                            onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                            aria-label="Select all"
+                          />
+                    </TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead className="hidden md:table-cell">Role</TableHead>
+                    <TableHead className="hidden lg:table-cell">Subscription</TableHead>
+                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.uid} data-state={selectedUsers.includes(user.uid) && "selected"}>
+                      <TableCell>
+                          <Checkbox
+                            checked={selectedUsers.includes(user.uid)}
+                            onCheckedChange={() => handleSelectUser(user.uid)}
+                            aria-label="Select user"
+                          />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-9 h-9">
+                            <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${user.uid}/40/40`} />
+                            <AvatarFallback>{user.displayName?.[0]}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{user.displayName}</div>
+                            <div className="text-sm text-muted-foreground break-all">{user.email}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                          {user.role === 'admin' ? <ShieldCheck className="mr-1.5" /> : <User className="mr-1.5" />}
+                          {user.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <div className="flex items-center font-medium">
+                          {user.subscriptionPlan === 'pro' ? 
+                            <Crown className="mr-1.5 h-4 w-4 text-yellow-500" /> : 
+                            user.subscriptionPlan === 'pass' ?
+                            <Gem className="mr-1.5 h-4 w-4 text-blue-500" /> : null
+                          }
+                          {user.subscriptionPlan ? 
+                            (user.subscriptionPlan === 'pro' ? 'Pass Pro' : 'Pass') : 
+                            <span className="text-muted-foreground">None</span>
+                          }
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">{user.createdAt}</TableCell>
+                      <TableCell className="text-right">
+                        {user.uid !== currentUser?.uid && (
+                          <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                  <Button size="icon" variant="ghost">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                      <span className="sr-only">Toggle menu</span>
+                                  </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                  {user.role === 'admin' ? (
+                                      <DropdownMenuItem onClick={() => openConfirmationDialog(user, 'role', 'user')}>
+                                          <UserCog className="mr-2"/> Remove Admin
+                                      </DropdownMenuItem>
+                                  ) : (
+                                      <DropdownMenuItem onClick={() => openConfirmationDialog(user, 'role', 'admin')}>
+                                          <Shield className="mr-2"/> Make Admin
+                                      </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuItem onClick={() => openSubscriptionDialog(user)}>
+                                      <Crown className="mr-2"/> Manage Subscription
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-destructive" onClick={() => openConfirmationDialog(user, 'delete')}>
+                                      <Trash2 className="mr-2"/> Delete User
+                                  </DropdownMenuItem>
+                              </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -55,16 +55,16 @@ export default function AdminDashboardPage() {
                     <CardTitle>Quick Actions</CardTitle>
                     <CardDescription>Perform common administrative tasks.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-4">
-                    <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary w-full md:w-auto text-center">
+                <CardContent className="flex flex-col sm:flex-row flex-wrap gap-4">
+                    <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
                         <Users className="mx-auto mb-2" />
                         <span>Manage Users</span>
                     </Link>
-                     <Link href="/admin/content" className="p-4 border rounded-lg hover:bg-secondary w-full md:w-auto text-center">
+                     <Link href="/admin/content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
                         <FileText className="mx-auto mb-2" />
                         <span>Manage Content</span>
                     </Link>
-                    <Link href="/dashboard/add-content" className="p-4 border rounded-lg hover:bg-secondary w-full md:w-auto text-center">
+                    <Link href="/dashboard/add-content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
                         <FileText className="mx-auto mb-2" />
                         <span>Add New Content</span>
                     </Link>
