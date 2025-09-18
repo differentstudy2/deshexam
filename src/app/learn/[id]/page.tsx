@@ -2,9 +2,9 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getContentById, addComment, getComments } from '@/lib/firebase/firestore';
-import { Loader2, ArrowLeft, User, Calendar, MessageSquare, Star } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { getContentById, addComment, getComments, handleCommentVote } from '@/lib/firebase/firestore';
+import { Loader2, ArrowLeft, User, Calendar, MessageSquare, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -39,6 +39,10 @@ type Comment = {
     authorPhotoURL?: string;
     createdAt: Date;
     rating?: number;
+    likes: number;
+    dislikes: number;
+    likedBy: string[];
+    dislikedBy: string[];
 }
 
 export default function LearnArticlePage() {
@@ -54,6 +58,7 @@ export default function LearnArticlePage() {
   const params = useParams();
   const articleId = params.id as string;
   const { user } = useAuth();
+  const [isVoting, setIsVoting] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     const fetchArticleAndComments = async () => {
@@ -85,6 +90,11 @@ export default function LearnArticlePage() {
 
     fetchArticleAndComments();
   }, [articleId, toast, router]);
+  
+  const userHasCommented = useMemo(() => {
+    if (!user) return false;
+    return comments.some(comment => comment.authorId === user.uid);
+  }, [comments, user]);
 
     const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,12 +106,17 @@ export default function LearnArticlePage() {
 
     setIsSubmittingComment(true);
     try {
-        await addComment('content', articleId, { text: newComment, rating });
+        const commentData: { text: string; rating?: number } = { text: newComment };
+        if (!userHasCommented) {
+            commentData.rating = rating;
+        }
+
+        await addComment('content', articleId, commentData);
         setNewComment('');
         setRating(4);
         const updatedComments = await getComments('content', articleId);
         setComments(updatedComments as Comment[]);
-        toast({ title: "Comment and rating posted!" });
+        toast({ title: "Comment posted!" });
     } catch (error) {
          toast({
           variant: "destructive",
@@ -110,6 +125,72 @@ export default function LearnArticlePage() {
         });
     } finally {
         setIsSubmittingComment(false);
+    }
+  }
+
+  const handleVote = async (commentId: string, voteType: 'like' | 'dislike') => {
+    if (!user) {
+        toast({ variant: "destructive", title: "Please log in to vote." });
+        return;
+    }
+    if (isVoting[commentId]) return;
+
+    setIsVoting(prev => ({...prev, [commentId]: true}));
+    
+    const originalComments = [...comments];
+    const commentIndex = comments.findIndex(c => c.id === commentId);
+    if(commentIndex === -1) return;
+
+    const commentToUpdate = { ...comments[commentIndex] };
+    const hasLiked = commentToUpdate.likedBy?.includes(user.uid);
+    const hasDisliked = commentToUpdate.dislikedBy?.includes(user.uid);
+
+    let newLikedBy = [...(commentToUpdate.likedBy || [])];
+    let newDislikedBy = [...(commentToUpdate.dislikedBy || [])];
+
+    if (voteType === 'like') {
+        if (hasLiked) {
+            newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+        } else {
+            newLikedBy.push(user.uid);
+            if (hasDisliked) {
+                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+            }
+        }
+    } else { // dislike
+        if (hasDisliked) {
+            newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+        } else {
+            newDislikedBy.push(user.uid);
+            if (hasLiked) {
+                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+            }
+        }
+    }
+
+    const updatedComment = {
+        ...commentToUpdate,
+        likedBy: newLikedBy,
+        dislikedBy: newDislikedBy,
+        likes: newLikedBy.length,
+        dislikes: newDislikedBy.length
+    };
+    
+    const newComments = [...comments];
+    newComments[commentIndex] = updatedComment;
+    setComments(newComments);
+
+    try {
+        await handleCommentVote('content', articleId, commentId, voteType);
+    } catch (error) {
+        setComments(originalComments);
+        toast({
+          variant: "destructive",
+          title: 'Error submitting vote',
+          description: (error as Error).message,
+        });
+    } finally {
+        setIsVoting(prev => ({...prev, [commentId]: false}));
     }
   }
 
@@ -223,15 +304,17 @@ export default function LearnArticlePage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleCommentSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="font-medium">Your Rating</label>
-                            <StarRating 
-                                rating={hoverRating || rating} 
-                                interactive={true}
-                                onRate={setRating}
-                                onHover={setHoverRating}
-                            />
-                        </div>
+                        {!userHasCommented && (
+                            <div className="space-y-2">
+                                <label className="font-medium">Your Rating</label>
+                                <StarRating 
+                                    rating={hoverRating || rating} 
+                                    interactive={true}
+                                    onRate={setRating}
+                                    onHover={setHoverRating}
+                                />
+                            </div>
+                        )}
                         <Textarea 
                             placeholder={user ? "Write a comment..." : "Please log in to write a comment."}
                             value={newComment}
@@ -246,7 +329,10 @@ export default function LearnArticlePage() {
                     </form>
                     <Separator className="my-6" />
                     <div className="space-y-6">
-                        {comments.length > 0 ? comments.map(comment => (
+                        {comments.length > 0 ? comments.map(comment => {
+                            const userHasLiked = user && comment.likedBy?.includes(user.uid);
+                            const userHasDisliked = user && comment.dislikedBy?.includes(user.uid);
+                            return (
                             <div key={comment.id} className="flex items-start gap-4">
                                 <Avatar>
                                 <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
@@ -263,9 +349,18 @@ export default function LearnArticlePage() {
                                         {comment.rating && <StarRating rating={comment.rating} />}
                                     </div>
                                     <p className="text-foreground mt-1">{comment.text}</p>
+                                    <div className="flex items-center gap-4 mt-2">
+                                        <Button variant="ghost" size="sm" onClick={() => handleVote(comment.id, 'like')} disabled={isVoting[comment.id]}>
+                                            <ThumbsUp className={cn("mr-2 h-4 w-4", userHasLiked && "fill-current")} /> {comment.likes || 0}
+                                        </Button>
+                                        <Button variant="ghost" size="sm" onClick={() => handleVote(comment.id, 'dislike')} disabled={isVoting[comment.id]}>
+                                            <ThumbsDown className={cn("mr-2 h-4 w-4", userHasDisliked && "fill-current")} /> {comment.dislikes || 0}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        )) : (
+                            )
+                        }) : (
                             <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
                         )}
                     </div>
@@ -276,5 +371,6 @@ export default function LearnArticlePage() {
     </div>
   );
 }
+
 
 

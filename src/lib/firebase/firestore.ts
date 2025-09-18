@@ -200,6 +200,10 @@ export const addComment = async (collectionName: 'questions' | 'content', docume
             authorUsername: userProfile?.username,
             authorPhotoURL: userProfile?.photoURL,
             createdAt: serverTimestamp(),
+            likes: 0,
+            dislikes: 0,
+            likedBy: [],
+            dislikedBy: [],
         };
 
         if (commentData.rating === undefined) {
@@ -229,6 +233,58 @@ export const getComments = async (collectionName: 'questions' | 'content', docum
     } catch (e) {
         console.error("Error getting comments: ", e);
         throw new Error("Failed to fetch comments.");
+    }
+};
+
+export const handleCommentVote = async (collectionName: 'questions' | 'content', documentId: string, commentId: string, voteType: 'like' | 'dislike') => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+        throw new Error("You must be logged in to vote.");
+    }
+
+    const commentRef = doc(db, collectionName, documentId, "comments", commentId);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const commentDoc = await transaction.get(commentRef);
+            if (!commentDoc.exists()) {
+                throw "Comment does not exist!";
+            }
+
+            const data = commentDoc.data();
+            const hasLiked = data.likedBy?.includes(user.uid);
+            const hasDisliked = data.dislikedBy?.includes(user.uid);
+
+            let updateData: any = {};
+
+            if (voteType === 'like') {
+                if (hasLiked) {
+                    updateData = { likedBy: arrayRemove(user.uid), likes: increment(-1) };
+                } else {
+                    updateData = { likedBy: arrayUnion(user.uid), likes: increment(1) };
+                    if (hasDisliked) {
+                        updateData.dislikedBy = arrayRemove(user.uid);
+                        updateData.dislikes = increment(-1);
+                    }
+                }
+            } else if (voteType === 'dislike') {
+                if (hasDisliked) {
+                    updateData = { dislikedBy: arrayRemove(user.uid), dislikes: increment(-1) };
+                } else {
+                    updateData = { dislikedBy: arrayUnion(user.uid), dislikes: increment(1) };
+                    if (hasLiked) {
+                        updateData.likedBy = arrayRemove(user.uid);
+                        updateData.likes = increment(-1);
+                    }
+                }
+            }
+            
+            transaction.update(commentRef, updateData);
+        });
+    } catch (e) {
+        console.error("Comment vote transaction failed: ", e);
+        throw new Error("Failed to process your vote on the comment.");
     }
 };
 
