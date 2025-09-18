@@ -311,10 +311,13 @@ export const updateContent = async (contentId: string, contentData: any) => {
         throw new Error("Content ID is required to update a content.");
     }
 
-    const { featureImage, ...restOfContentData } = contentData;
+    const contentRef = doc(db, "content", contentId);
+    
+    // If questions are part of the update, handle them separately
+    if (contentData.questions) {
+        const { questions, ...restOfContentData } = contentData;
 
-    try {
-        const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
+        const questionsWithIds = await Promise.all(questions.map(async (question: any) => {
             if (question.id) {
                 // Ideally, you would update the existing question document here
                 return question;
@@ -323,21 +326,29 @@ export const updateContent = async (contentId: string, contentData: any) => {
             return { ...question, id: questionId };
         }));
 
-         const finalContentData: any = {
+        const finalContentData = {
             ...restOfContentData,
             questions: questionsWithIds,
             updatedAt: serverTimestamp(),
         };
-
-        if(featureImage) {
-            finalContentData.featureImage = featureImage;
+        
+        try {
+            await updateDoc(contentRef, finalContentData);
+        } catch(e) {
+            console.error("Error updating document with questions: ", e);
+            throw new Error("Failed to update content with questions.");
         }
-
-
-        await updateDoc(doc(db, "content", contentId), finalContentData);
-    } catch (e) {
-        console.error("Error updating document: ", e);
-        throw new Error("Failed to update content.");
+    } else {
+        // If it's a simple field update (like access level)
+        try {
+            await updateDoc(contentRef, {
+                ...contentData,
+                updatedAt: serverTimestamp(),
+            });
+        } catch (e) {
+            console.error("Error updating document: ", e);
+            throw new Error("Failed to update content.");
+        }
     }
 };
 
@@ -946,5 +957,3 @@ export const updateUserSubscription = async (userId: string, plan: 'pro' | 'pass
         throw new Error("Failed to update user subscription.");
     }
 }
-
-    

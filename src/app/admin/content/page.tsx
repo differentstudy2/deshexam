@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -28,6 +28,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -63,6 +66,7 @@ type Content = {
 
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
+type BulkAction = { type: 'delete' } | { type: 'access', value: 'free' | 'premium' | 'pro' } | null;
 
 function getUrlForTest(testType: string, testId: string) {
     const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
@@ -188,8 +192,9 @@ export default function ManageContentPage() {
   const { toast } = useToast();
   const [allContent, setAllContent] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [contentToDelete, setContentToDelete] = useState<Content | null>(null);
+  const [bulkAction, setBulkAction] = useState<BulkAction>(null);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -241,10 +246,15 @@ export default function ManageContentPage() {
   }, [allContent, activeTab, searchQuery, subjectFilter, accessFilter]);
 
 
-  const openDeleteDialog = (item: Content | null) => {
+  const openDeleteDialog = (item: Content) => {
     setContentToDelete(item);
-    setIsDeleteDialogOpen(true);
+    setIsAlertDialogOpen(true);
   };
+  
+  const openBulkActionDialog = (action: BulkAction) => {
+    setBulkAction(action);
+    setIsAlertDialogOpen(true);
+  }
 
   const handleSelectContent = (id: string) => {
     setSelectedContent(prev => prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]);
@@ -260,16 +270,30 @@ export default function ManageContentPage() {
 
   const isAllSelected = selectedContent.length > 0 && selectedContent.length === filteredContent.length;
 
-  const handleDelete = async () => {
-    const idsToDelete = contentToDelete ? [contentToDelete.id] : selectedContent;
-    if (idsToDelete.length === 0) return;
+  const handleConfirmAction = async () => {
+    if(contentToDelete) { // Single delete
+        await handleDelete([contentToDelete.id]);
+    } else if (bulkAction) { // Bulk actions
+        if(bulkAction.type === 'delete') {
+            await handleDelete(selectedContent);
+        } else if (bulkAction.type === 'access') {
+            await handleBulkUpdate({ access: bulkAction.value });
+        }
+    }
+    
+    setIsAlertDialogOpen(false);
+    setContentToDelete(null);
+    setBulkAction(null);
+    setSelectedContent([]);
+  };
 
+  const handleDelete = async (ids: string[]) => {
     try {
-      await Promise.all(idsToDelete.map(id => deleteContent(id)));
-      setAllContent(allContent.filter(item => !idsToDelete.includes(item.id)));
+      await Promise.all(ids.map(id => deleteContent(id)));
+      setAllContent(allContent.filter(item => !ids.includes(item.id)));
       toast({
         title: "Content Deleted",
-        description: `${idsToDelete.length} item(s) have been deleted.`,
+        description: `${ids.length} item(s) have been deleted.`,
       });
     } catch (error) {
       toast({
@@ -277,12 +301,46 @@ export default function ManageContentPage() {
         title: 'Error deleting content',
         description: (error as Error).message,
       });
-    } finally {
-        setIsDeleteDialogOpen(false);
-        setContentToDelete(null);
-        setSelectedContent([]);
     }
   };
+
+  const handleBulkUpdate = async (updateData: { [key: string]: any }) => {
+    try {
+        await Promise.all(selectedContent.map(id => updateContent(id, updateData)));
+        
+        // Optimistically update UI or refetch data
+        setAllContent(allContent.map(item => 
+            selectedContent.includes(item.id) ? { ...item, ...updateData } : item
+        ));
+        
+        toast({
+            title: 'Bulk Update Successful',
+            description: `Updated ${selectedContent.length} items.`,
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Bulk update failed',
+            description: (error as Error).message,
+        });
+    }
+  }
+  
+  const getAlertDialogDescription = () => {
+      if (contentToDelete) {
+          return `This action cannot be undone. This will permanently delete "${contentToDelete.title}".`;
+      }
+      if (bulkAction) {
+          if (bulkAction.type === 'delete') {
+              return `This action cannot be undone. This will permanently delete ${selectedContent.length} item(s).`;
+          }
+          if (bulkAction.type === 'access') {
+              return `This will change the access level for ${selectedContent.length} item(s) to "${bulkAction.value}".`;
+          }
+      }
+      return 'This action cannot be undone.';
+  };
+
 
   return (
     <div className="space-y-6">
@@ -327,10 +385,29 @@ export default function ManageContentPage() {
                     </SelectContent>
                 </Select>
                  {selectedContent.length > 0 && (
-                    <Button variant="destructive" className="w-full sm:w-auto" onClick={() => openDeleteDialog(null)}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete ({selectedContent.length})
-                    </Button>
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="w-full sm:w-auto">
+                                Bulk Actions ({selectedContent.length}) <Filter className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuLabel>Modify Selected</DropdownMenuLabel>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Change Access Level</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'free' })}>Free</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'premium' })}>Premium</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'pro' })}>Pro</DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete' })}>
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Selected
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                  )}
             </div>
            {loading ? (
@@ -362,18 +439,17 @@ export default function ManageContentPage() {
         </CardContent>
       </Card>
       
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete {" "}
-              {contentToDelete ? `"${contentToDelete.title}"` : `${selectedContent.length} item(s)`}.
+              {getAlertDialogDescription()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={() => { setContentToDelete(null); setBulkAction(null); }}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmAction} className="bg-destructive hover:bg-destructive/90">Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
