@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { getAllUsers, setUserRole, deleteUser, updateUserSubscription } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Shield, ShieldCheck, User, UserCog, MoreHorizontal, Trash2, Crown, Gem } from 'lucide-react';
+import { Loader2, Shield, ShieldCheck, User, UserCog, MoreHorizontal, Trash2, Crown, Gem, Search, Filter } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   AlertDialog,
@@ -40,6 +40,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -57,6 +60,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 type UserProfile = {
   uid: string;
@@ -77,9 +82,15 @@ export default function ManageUsersPage() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isSubscriptionDialogOpen, setIsSubscriptionDialogOpen] = useState(false);
   const [userToModify, setUserToModify] = useState<UserProfile | null>(null);
-  const [actionType, setActionType] = useState<'role' | 'delete' | 'subscription' | null>(null);
+  const [actionType, setActionType] = useState<'role' | 'delete' | 'subscription' | 'bulk' | null>(null);
   const [newRole, setNewRole] = useState<'admin' | 'user' | null>(null);
   const [newSubscriptionPlan, setNewSubscriptionPlan] = useState<'pro' | 'pass' | 'none' | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [subscriptionFilter, setSubscriptionFilter] = useState('all');
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  
+  const isBulkAction = actionType === 'bulk';
 
   const fetchUsers = async () => {
     try {
@@ -101,6 +112,31 @@ export default function ManageUsersPage() {
     fetchUsers();
   }, [toast]);
 
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+      const matchesSubscription = subscriptionFilter === 'all' || 
+                                  (subscriptionFilter === 'none' && !user.subscriptionPlan) ||
+                                  user.subscriptionPlan === subscriptionFilter;
+      return matchesSearch && matchesRole && matchesSubscription;
+    });
+  }, [users, searchQuery, roleFilter, subscriptionFilter]);
+  
+  const handleSelectUser = (userId: string) => {
+    setSelectedUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+        setSelectedUsers(filteredUsers.map(u => u.uid));
+    } else {
+        setSelectedUsers([]);
+    }
+  }
+  
+  const isAllSelected = selectedUsers.length > 0 && selectedUsers.length === filteredUsers.length;
+
   const openConfirmationDialog = (user: UserProfile, type: 'role' | 'delete', data?: any) => {
     setUserToModify(user);
     setActionType(type);
@@ -117,18 +153,32 @@ export default function ManageUsersPage() {
     setIsSubscriptionDialogOpen(true);
   };
 
-  const handleConfirm = async () => {
-    if (!userToModify) return;
+  const openBulkActionDialog = (type: 'role' | 'subscription', data: any) => {
+    setActionType('bulk');
+    if (type === 'role') {
+        setNewRole(data);
+    } else if (type === 'subscription') {
+        setNewSubscriptionPlan(data);
+    }
+    setIsAlertOpen(true);
+  };
 
-    if (actionType === 'role' && newRole) {
-      await handleRoleChange(userToModify, newRole);
-    } else if (actionType === 'delete') {
-      await handleDeleteUser(userToModify);
+
+  const handleConfirm = async () => {
+    if (isBulkAction) {
+        await handleBulkUpdate();
+    } else if (userToModify) {
+        if (actionType === 'role' && newRole) {
+          await handleRoleChange(userToModify, newRole);
+        } else if (actionType === 'delete') {
+          await handleDeleteUser(userToModify);
+        }
     }
     
     setIsAlertOpen(false);
     setUserToModify(null);
     setActionType(null);
+    setSelectedUsers([]);
   };
   
   const handleRoleChange = async (user: UserProfile, role: 'admin' | 'user') => {
@@ -186,8 +236,39 @@ export default function ManageUsersPage() {
         setActionType(null);
     }
   };
+
+  const handleBulkUpdate = async () => {
+    const promises = selectedUsers.map(uid => {
+      if (newRole) {
+        return setUserRole(uid, newRole);
+      }
+      if (newSubscriptionPlan) {
+        return updateUserSubscription(uid, newSubscriptionPlan === 'none' ? null : newSubscriptionPlan);
+      }
+      return Promise.resolve();
+    });
+
+    try {
+      await Promise.all(promises);
+      toast({
+        title: 'Bulk Update Successful',
+        description: `Updated ${selectedUsers.length} users.`
+      });
+      fetchUsers();
+    } catch (error) {
+       toast({
+        variant: 'destructive',
+        title: 'Bulk Update Failed',
+        description: (error as Error).message,
+      });
+    }
+  };
   
   const getAlertDescription = () => {
+    if(isBulkAction) {
+        if(newRole) return `You are about to change the role for ${selectedUsers.length} users to ${newRole}.`;
+        if(newSubscriptionPlan) return `You are about to change the subscription for ${selectedUsers.length} users to ${newSubscriptionPlan === 'none' ? 'None' : newSubscriptionPlan}.`;
+    }
     if(!userToModify) return '';
     if(actionType === 'role') return `You are about to change the role for ${userToModify.displayName} to ${newRole}.`;
     if(actionType === 'delete') return `This will permanently delete ${userToModify.displayName} and all their data. This action cannot be undone.`;
@@ -212,6 +293,61 @@ export default function ManageUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                <div className="relative flex-grow">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search by name or email..." className="pl-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                </div>
+                 <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Filter by role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Roles</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
+                    </SelectContent>
+                </Select>
+                 <Select value={subscriptionFilter} onValueChange={setSubscriptionFilter}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Filter by subscription" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Subscriptions</SelectItem>
+                        <SelectItem value="pro">Pass Pro</SelectItem>
+                        <SelectItem value="pass">Pass</SelectItem>
+                         <SelectItem value="none">None</SelectItem>
+                    </SelectContent>
+                </Select>
+                 {selectedUsers.length > 0 && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="w-full sm:w-auto">
+                          Bulk Actions ({selectedUsers.length})
+                          <Filter className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                         <DropdownMenuSub>
+                           <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
+                           <DropdownMenuSubContent>
+                               <DropdownMenuItem onClick={() => openBulkActionDialog('role', 'admin')}>Admin</DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => openBulkActionDialog('role', 'user')}>User</DropdownMenuItem>
+                           </DropdownMenuSubContent>
+                         </DropdownMenuSub>
+                          <DropdownMenuSub>
+                           <DropdownMenuSubTrigger>Set Subscription</DropdownMenuSubTrigger>
+                           <DropdownMenuSubContent>
+                               <DropdownMenuItem onClick={() => openBulkActionDialog('subscription', 'pro')}>Pass Pro</DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => openBulkActionDialog('subscription', 'pass')}>Pass</DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => openBulkActionDialog('subscription', 'none')}>None</DropdownMenuItem>
+                           </DropdownMenuSubContent>
+                         </DropdownMenuSub>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                 )}
+            </div>
+
           {loading ? (
             <div className="flex items-center justify-center min-h-[200px]">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -220,6 +356,13 @@ export default function ManageUsersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                   <TableHead padding="checkbox" className="w-12">
+                        <Checkbox
+                           checked={isAllSelected}
+                           onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                           aria-label="Select all"
+                         />
+                   </TableHead>
                   <TableHead>User</TableHead>
                   <TableHead className="hidden md:table-cell">Role</TableHead>
                   <TableHead className="hidden lg:table-cell">Subscription</TableHead>
@@ -228,8 +371,15 @@ export default function ManageUsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.uid}>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.uid} data-state={selectedUsers.includes(user.uid) && "selected"}>
+                     <TableCell padding="checkbox">
+                        <Checkbox
+                           checked={selectedUsers.includes(user.uid)}
+                           onCheckedChange={() => handleSelectUser(user.uid)}
+                           aria-label="Select user"
+                         />
+                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="w-9 h-9">
