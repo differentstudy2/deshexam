@@ -145,7 +145,12 @@ export default function CreateTestPage() {
       setExamCategories(examTypeData);
 
       if (types.length > 0 && !form.getValues('testType')) {
+        const mockTestType = types.find(t => t.name === 'Mock Test');
+        if (mockTestType) {
+          form.setValue('testType', mockTestType.name);
+        } else {
           form.setValue('testType', types[0].name);
+        }
       }
     } catch (error) {
       toast({
@@ -174,7 +179,7 @@ export default function CreateTestPage() {
       newExam: '',
       newChapterNo: '',
       newChapterName: '',
-      testType: '',
+      testType: 'Mock Test',
       description: '',
       duration: 0,
       difficulty: 'Medium',
