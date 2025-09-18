@@ -867,3 +867,35 @@ export const uploadFile = async (file: File) => {
         throw new Error("Failed to upload file.");
     }
 };
+
+export const getAllUsers = async () => {
+    try {
+        const usersCollection = collection(db, "users");
+        const querySnapshot = await getDocs(usersCollection);
+        const users = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                uid: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toLocaleDateString() || 'N/A',
+            };
+        });
+        return users;
+    } catch (error) {
+        console.error("Error getting all users: ", error);
+        throw new Error("Failed to fetch users.");
+    }
+};
+
+export const setUserRole = async (userId: string, role: 'admin' | 'user') => {
+    if (!userId || !role) {
+        throw new Error("User ID and role are required.");
+    }
+    try {
+        const userDocRef = doc(db, "users", userId);
+        await updateDoc(userDocRef, { role });
+    } catch (error) {
+        console.error("Error updating user role: ", error);
+        throw new Error("Failed to update user role.");
+    }
+};
