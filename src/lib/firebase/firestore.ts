@@ -34,10 +34,15 @@ export const addQuestion = async (questionData: any) => {
     if (!user) {
         throw new Error("You must be logged in to create a question.");
     }
+    
+    const dataToSave = {
+        ...questionData,
+        explanation: questionData.explanation || '', // Ensure explanation is not undefined
+    };
 
     try {
         const docRef = await addDoc(collection(db, "questions"), {
-            ...questionData,
+            ...dataToSave,
             authorId: user.uid,
             authorName: user.displayName || user.email,
             createdAt: serverTimestamp(),
