@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const navLinks = [
   { href: "/mock-tests", label: "Mock Tests" },
   { href: "/quizzes", label: "Quizzes" },
+  { href: "/learn", label: "Learn" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/pricing", label: "Pricing" },
 ];
@@ -167,3 +168,5 @@ export function Header() {
     </header>
   );
 }
+
+    

@@ -61,6 +61,7 @@ const questionSchema = z.object({
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
+  explanation: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -78,15 +79,16 @@ const formSchema = z.object({
   newChapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
+  body: z.string().optional(),
   duration: z.coerce
     .number()
     .int()
-    .positive('Duration must be a positive number of minutes.'),
-  difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+    .positive('Duration must be a positive number of minutes.').optional(),
+  difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
   access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
-  questions: z.array(questionSchema).min(1, 'Please add at least one question.'),
+  questions: z.array(questionSchema).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -125,9 +127,38 @@ export default function CreateTestPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      board: '',
+      examCategory: '',
+      exam: '',
+      subject: '',
+      chapter: '',
+      newSubject: '',
+      newBoard: '',
+      newExamCategory: '',
+      newExam: '',
+      newChapterNo: '',
+      newChapterName: '',
+      testType: 'Mock Test',
+      description: '',
+      body: '',
+      duration: 0,
+      difficulty: 'Medium',
+      access: 'free',
+      price: undefined,
+      subscriptionPlan: 'pass',
+      questions: [],
+    },
+  });
+
   useEffect(() => {
     fetchFormData();
   }, []);
+  
+  const currentTestType = form.watch('testType');
 
   const fetchFormData = async () => {
     try {
@@ -164,32 +195,6 @@ export default function CreateTestPage() {
   };
 
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      board: '',
-      examCategory: '',
-      exam: '',
-      subject: '',
-      chapter: '',
-      newSubject: '',
-      newBoard: '',
-      newExamCategory: '',
-      newExam: '',
-      newChapterNo: '',
-      newChapterName: '',
-      testType: 'Mock Test',
-      description: '',
-      duration: 0,
-      difficulty: 'Medium',
-      access: 'free',
-      price: undefined,
-      subscriptionPlan: 'pass',
-      questions: [],
-    },
-  });
-  
   const aiForm = useForm<AIGeneratorFormValues>({
     resolver: zodResolver(aiGeneratorFormSchema),
     defaultValues: {
@@ -207,9 +212,11 @@ export default function CreateTestPage() {
 
   const questions = form.watch('questions');
   useEffect(() => {
-    const numberOfQuestions = questions.length;
-    form.setValue('duration', numberOfQuestions, { shouldValidate: true });
-  }, [questions.length, form]);
+    if (currentTestType !== 'Learn') {
+        const numberOfQuestions = questions?.length || 0;
+        form.setValue('duration', numberOfQuestions, { shouldValidate: true });
+    }
+  }, [questions, currentTestType, form]);
 
   const handleFormSubmit = async (data: FormValues, resetType: 'full' | 'partial') => {
     try {
@@ -252,13 +259,21 @@ export default function CreateTestPage() {
         setIsAddingNewChapter(false);
       }
       
-      const contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
-      delete (contentToSave as any).newSubject;
-      delete (contentToSave as any).newBoard;
-      delete (contentToSave as any).newExamCategory;
-      delete (contentToSave as any).newExam;
-      delete (contentToSave as any).newChapterNo;
-      delete (contentToSave as any).newChapterName;
+      const contentToSave: any = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
+      if (contentToSave.testType === 'Learn') {
+        delete contentToSave.questions;
+        delete contentToSave.duration;
+        delete contentToSave.difficulty;
+      } else {
+        delete contentToSave.body;
+      }
+
+      delete contentToSave.newSubject;
+      delete contentToSave.newBoard;
+      delete contentToSave.newExamCategory;
+      delete contentToSave.newExam;
+      delete contentToSave.newChapterNo;
+      delete contentToSave.newChapterName;
 
 
       await addContent(contentToSave);
@@ -277,6 +292,7 @@ export default function CreateTestPage() {
             subject: '',
             chapter: '',
             description: '',
+            body: '',
             duration: 0,
             access: 'free',
             price: undefined,
@@ -297,6 +313,7 @@ export default function CreateTestPage() {
             ...form.getValues(),
             title: '',
             description: '',
+            body: '',
             duration: 0,
             access: 'free',
             price: undefined,
@@ -462,133 +479,135 @@ export default function CreateTestPage() {
                     Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
                 </p>
             </div>
-            <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Generate with AI
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-xl">
-                <DialogHeader>
-                  <DialogTitle>Generate Content with AI</DialogTitle>
-                  <DialogDescription>
-                    Describe the content you want to create, and Gemini will generate a draft for you.
-                  </DialogDescription>
-                </DialogHeader>
-                <Form {...aiForm}>
-                   <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
-                        <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="topic">From Topic</TabsTrigger>
-                                <TabsTrigger value="text">From Text</TabsTrigger>
-                                <TabsTrigger value="file">From File</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="topic" className="pt-4">
-                                <FormField
-                                    control={aiForm.control}
-                                    name="source"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Topic</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TabsContent>
-                             <TabsContent value="text" className="pt-4">
-                                <FormField
-                                    control={aiForm.control}
-                                    name="source"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Paste Text</FormLabel>
-                                            <FormControl>
-                                                <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TabsContent>
-                            <TabsContent value="file" className="pt-4">
-                                <FormItem>
-                                    <FormLabel>Upload File</FormLabel>
-                                    <FormControl>
-                                        <div 
-                                            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        >
-                                            <div className="space-y-1 text-center">
-                                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                                <div className="flex text-sm text-muted-foreground">
-                                                    <p className="pl-1">
-                                                        {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'}
+            {currentTestType !== 'Learn' && (
+                <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate with AI
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-xl">
+                    <DialogHeader>
+                    <DialogTitle>Generate Content with AI</DialogTitle>
+                    <DialogDescription>
+                        Describe the content you want to create, and Gemini will generate a draft for you.
+                    </DialogDescription>
+                    </DialogHeader>
+                    <Form {...aiForm}>
+                    <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                            <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
+                                <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="topic">From Topic</TabsTrigger>
+                                    <TabsTrigger value="text">From Text</TabsTrigger>
+                                    <TabsTrigger value="file">From File</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="topic" className="pt-4">
+                                    <FormField
+                                        control={aiForm.control}
+                                        name="source"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Topic</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </TabsContent>
+                                <TabsContent value="text" className="pt-4">
+                                    <FormField
+                                        control={aiForm.control}
+                                        name="source"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Paste Text</FormLabel>
+                                                <FormControl>
+                                                    <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </TabsContent>
+                                <TabsContent value="file" className="pt-4">
+                                    <FormItem>
+                                        <FormLabel>Upload File</FormLabel>
+                                        <FormControl>
+                                            <div 
+                                                className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
+                                                onClick={() => fileInputRef.current?.click()}
+                                            >
+                                                <div className="space-y-1 text-center">
+                                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                    <div className="flex text-sm text-muted-foreground">
+                                                        <p className="pl-1">
+                                                            {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'}
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                    {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'}
                                                     </p>
                                                 </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                  {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'}
-                                                </p>
                                             </div>
-                                        </div>
-                                    </FormControl>
-                                    <Input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                        accept=".txt"
-                                    />
-                                    <FormMessage />
-                                </FormItem>
-                            </TabsContent>
-                        </Tabs>
-
-                         <div className="grid grid-cols-2 gap-4">
-                             <FormField
-                                control={aiForm.control}
-                                name="numQuestions"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Number of Questions</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
                                         </FormControl>
+                                        <Input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                            accept=".txt"
+                                        />
                                         <FormMessage />
                                     </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={aiForm.control}
-                                name="difficulty"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Difficulty</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="Easy">Easy</SelectItem>
-                                                <SelectItem value="Medium">Medium</SelectItem>
-                                                <SelectItem value="Hard">Hard</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" disabled={isGenerating}>
-                                {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
-                            </Button>
-                        </DialogFooter>
-                   </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
+                                </TabsContent>
+                            </Tabs>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                    control={aiForm.control}
+                                    name="numQuestions"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Number of Questions</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={aiForm.control}
+                                    name="difficulty"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Difficulty</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="Easy">Easy</SelectItem>
+                                                    <SelectItem value="Medium">Medium</SelectItem>
+                                                    <SelectItem value="Hard">Hard</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" disabled={isGenerating}>
+                                    {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
+                                </Button>
+                            </DialogFooter>
+                    </form>
+                    </Form>
+                </DialogContent>
+                </Dialog>
+            )}
         </div>
 
 
@@ -828,10 +847,10 @@ export default function CreateTestPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Description / Summary</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Provide a brief description of the test content."
+                        placeholder="Provide a brief description of the content."
                         {...field}
                       />
                     </FormControl>
@@ -840,260 +859,298 @@ export default function CreateTestPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+              {currentTestType === 'Learn' && (
                 <FormField
                   control={form.control}
-                  name="duration"
+                  name="body"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Duration (in minutes)</FormLabel>
+                      <FormLabel>Content Body</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} readOnly disabled />
+                        <Textarea
+                          placeholder="Write your article content here. You can use Markdown for formatting."
+                          {...field}
+                          className="min-h-[300px]"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="difficulty"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Difficulty Level</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+              )}
+
+              {currentTestType !== 'Learn' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+                  <FormField
+                    control={form.control}
+                    name="duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Duration (in minutes)</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a difficulty" />
-                          </SelectTrigger>
+                          <Input type="number" {...field} readOnly disabled />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Easy">Easy</SelectItem>
-                          <SelectItem value="Medium">Medium</SelectItem>
-                          <SelectItem value="Hard">Hard</SelectItem>
-                        </SelectContent>
-                      </Select>
-                       <FormDescription>
-                          Set the difficulty level for this content.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className='space-y-2'>
-                    <FormField
-                      control={form.control}
-                      name="access"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Access Level</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select access level" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="free">Free</SelectItem>
-                              <SelectItem value="premium">Paid (Premium)</SelectItem>
-                              <SelectItem value="pro">Subscription (Pro)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                           <FormDescription>
-                              Choose who can access this content.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="difficulty"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Difficulty Level</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value ?? 'Medium'}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a difficulty" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Easy">Easy</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Hard">Hard</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                            Set the difficulty level for this content.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className='space-y-2'>
+                      <FormField
+                        control={form.control}
+                        name="access"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Access Level</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select access level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="free">Free</SelectItem>
+                                <SelectItem value="premium">Paid (Premium)</SelectItem>
+                                <SelectItem value="pro">Subscription (Pro)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                                Choose who can access this content.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {accessLevel === 'premium' && (
+                          <FormField
+                              control={form.control}
+                              name="price"
+                              render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Price (INR)</FormLabel>
+                                      <FormControl>
+                                          <Input
+                                            type="number"
+                                            placeholder="e.g., 199"
+                                            {...field}
+                                            value={field.value ?? ''}
+                                          />
+                                      </FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
                       )}
-                    />
-                    {accessLevel === 'premium' && (
-                        <FormField
-                            control={form.control}
-                            name="price"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Price (INR)</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                          type="number"
-                                          placeholder="e.g., 199"
-                                          {...field}
-                                          value={field.value ?? ''}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
-                    {accessLevel === 'pro' && (
-                        <FormField
-                            control={form.control}
-                            name="subscriptionPlan"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Subscription Plan</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a plan" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="pass">Pass</SelectItem>
-                                            <SelectItem value="pro">Pass Pro</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
+                      {accessLevel === 'pro' && (
+                          <FormField
+                              control={form.control}
+                              name="subscriptionPlan"
+                              render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Subscription Plan</FormLabel>
+                                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                          <FormControl>
+                                              <SelectTrigger>
+                                                  <SelectValue placeholder="Select a plan" />
+                                              </SelectTrigger>
+                                          </FormControl>
+                                          <SelectContent>
+                                              <SelectItem value="pass">Pass</SelectItem>
+                                              <SelectItem value="pro">Pass Pro</SelectItem>
+                                          </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+                  </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader>
-                <CardTitle>Questions</CardTitle>
-                <CardDescription>Add questions to your content.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                 {fields.map((question, index) => {
-                    const questionType = form.watch(`questions.${index}.type`);
-                    return (
-                        <Card key={question.id} className="p-4">
-                            <div className="flex justify-between items-center mb-4 gap-4">
-                                <h4 className="font-semibold text-lg whitespace-nowrap">Question {index + 1}</h4>
-                                <FormField
-                                    control={form.control}
-                                    name={`questions.${index}.type`}
-                                    render={({ field }) => (
-                                        <FormItem className="w-full">
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                                    <SelectItem value="True/False">True/False</SelectItem>
-                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name={`questions.${index}.marks`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Input type="number" placeholder="Marks" className="w-24" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Remove
-                                </Button>
-                            </div>
-                            <div className="space-y-4">
-                                <FormField
-                                    control={form.control}
-                                    name={`questions.${index}.text`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Question Text</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                
-                                {questionType === 'Multiple Choice' && (
-                                    <>
-                                        <FormLabel>Options</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name={`questions.${index}.correctAnswer`}
-                                            render={({ field }) => (
-                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {[0, 1, 2, 3].map(optionIndex => (
-                                                         <FormField
-                                                            key={optionIndex}
-                                                            control={form.control}
-                                                            name={`questions.${index}.options.${optionIndex}.text`}
-                                                            render={({ field: optionField }) => (
-                                                                <FormItem className="flex items-center gap-4">
-                                                                     <FormControl>
-                                                                        <RadioGroupItem value={optionField.value} />
-                                                                     </FormControl>
-                                                                    <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    ))}
-                                                </RadioGroup>
-                                            )}
-                                        />
-                                        <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
+          {currentTestType !== 'Learn' && (
+            <Card>
+              <CardHeader>
+                  <CardTitle>Questions</CardTitle>
+                  <CardDescription>Add questions to your content.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                  {fields.map((question, index) => {
+                      const questionType = form.watch(`questions.${index}.type`);
+                      return (
+                          <Card key={question.id} className="p-4">
+                              <div className="flex justify-between items-center mb-4 gap-4">
+                                  <h4 className="font-semibold text-lg whitespace-nowrap">Question {index + 1}</h4>
+                                  <FormField
+                                      control={form.control}
+                                      name={`questions.${index}.type`}
+                                      render={({ field }) => (
+                                          <FormItem className="w-full">
+                                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                  <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
+                                                  <SelectContent>
+                                                      <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                                      <SelectItem value="True/False">True/False</SelectItem>
+                                                      <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                  </SelectContent>
+                                              </Select>
+                                              <FormMessage />
+                                          </FormItem>
+                                      )}
+                                  />
+                                  <FormField
+                                      control={form.control}
+                                      name={`questions.${index}.marks`}
+                                      render={({ field }) => (
+                                          <FormItem>
+                                              <FormControl>
+                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} />
+                                              </FormControl>
+                                              <FormMessage />
+                                          </FormItem>
+                                      )}
+                                  />
+                                  <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Remove
+                                  </Button>
+                              </div>
+                              <div className="space-y-4">
+                                  <FormField
+                                      control={form.control}
+                                      name={`questions.${index}.text`}
+                                      render={({ field }) => (
+                                          <FormItem>
+                                              <FormLabel>Question Text</FormLabel>
+                                              <FormControl>
+                                                  <Input {...field} />
+                                              </FormControl>
+                                              <FormMessage />
+                                          </FormItem>
+                                      )}
+                                  />
+                                  
+                                  {questionType === 'Multiple Choice' && (
+                                      <>
+                                          <FormLabel>Options</FormLabel>
+                                          <Controller
+                                              control={form.control}
+                                              name={`questions.${index}.correctAnswer`}
+                                              render={({ field }) => (
+                                                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                      {[0, 1, 2, 3].map(optionIndex => (
+                                                          <FormField
+                                                              key={optionIndex}
+                                                              control={form.control}
+                                                              name={`questions.${index}.options.${optionIndex}.text`}
+                                                              render={({ field: optionField }) => (
+                                                                  <FormItem className="flex items-center gap-4">
+                                                                      <FormControl>
+                                                                          <RadioGroupItem value={optionField.value} />
+                                                                      </FormControl>
+                                                                      <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                                      <FormMessage />
+                                                                  </FormItem>
+                                                              )}
+                                                          />
+                                                      ))}
+                                                  </RadioGroup>
+                                              )}
+                                          />
+                                          <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
 
-                                    </>
-                                )}
-                                {questionType === 'True/False' && (
-                                     <FormField
-                                        control={form.control}
-                                        name={`questions.${index}.correctAnswer`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Correct Answer</FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
-                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
-                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-                                {questionType === 'Short Answer' && (
-                                    <FormField
-                                        control={form.control}
-                                        name={`questions.${index}.correctAnswer`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Answer</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} placeholder="Enter the correct answer" />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-                            </div>
-                        </Card>
-                    );
-                 })}
-            </CardContent>
-            <CardFooter>
-                 <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}
-                >
-                    <PlusCircle className="mr-2" />
-                    Add Question
-                </Button>
-            </CardFooter>
-          </Card>
+                                      </>
+                                  )}
+                                  {questionType === 'True/False' && (
+                                      <FormField
+                                          control={form.control}
+                                          name={`questions.${index}.correctAnswer`}
+                                          render={({ field }) => (
+                                              <FormItem>
+                                                  <FormLabel>Correct Answer</FormLabel>
+                                                  <FormControl>
+                                                      <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                                                          <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
+                                                          <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
+                                                      </RadioGroup>
+                                                  </FormControl>
+                                                  <FormMessage />
+                                              </FormItem>
+                                          )}
+                                      />
+                                  )}
+                                  {questionType === 'Short Answer' && (
+                                      <FormField
+                                          control={form.control}
+                                          name={`questions.${index}.correctAnswer`}
+                                          render={({ field }) => (
+                                              <FormItem>
+                                                  <FormLabel>Answer</FormLabel>
+                                                  <FormControl>
+                                                      <Input {...field} placeholder="Enter the correct answer" />
+                                                  </FormControl>
+                                                  <FormMessage />
+                                              </FormItem>
+                                          )}
+                                      />
+                                  )}
+
+                                  <FormField
+                                      control={form.control}
+                                      name={`questions.${index}.explanation`}
+                                      render={({ field }) => (
+                                          <FormItem>
+                                              <FormLabel>Explanation</FormLabel>
+                                              <FormControl>
+                                                  <Textarea {...field} placeholder="Explain why the correct answer is right." />
+                                              </FormControl>
+                                              <FormMessage />
+                                          </FormItem>
+                                      )}
+                                  />
+                              </div>
+                          </Card>
+                      );
+                  })}
+              </CardContent>
+              <CardFooter>
+                  <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}
+                  >
+                      <PlusCircle className="mr-2" />
+                      Add Question
+                  </Button>
+              </CardFooter>
+            </Card>
+          )}
           
            <div className="flex items-center gap-4">
                 <Button 
@@ -1118,3 +1175,5 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+    

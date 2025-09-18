@@ -231,19 +231,21 @@ export const addContent = async (contentData: any) => {
      const { featureImage, ...restOfContentData } = contentData;
 
     try {
-        const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
-            const questionId = await addQuestion(question);
-            return { ...question, id: questionId };
-        }));
-
-        const finalContentData: any = {
+        let finalContentData: any = {
             ...restOfContentData,
-            questions: questionsWithIds,
             authorId: user.uid,
             authorName: user.displayName || user.email,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
         };
+        
+        if (contentData.testType !== 'Learn' && restOfContentData.questions) {
+            const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
+                const questionId = await addQuestion(question);
+                return { ...question, id: questionId };
+            }));
+            finalContentData.questions = questionsWithIds;
+        }
 
         if(featureImage){
             finalContentData.featureImage = featureImage;
@@ -1000,4 +1002,5 @@ export const updateUserSubscription = async (userIds: string[], plan: 'pro' | 'p
     }
 }
 
+    
     
