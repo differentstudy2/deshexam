@@ -11,12 +11,12 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const AILearnContentGeneratorInputSchema = z.object({
+const AILearnContentGeneratorInputSchema = z.object({
   topic: z.string().describe('The topic for the article.'),
 });
 export type AILearnContentGeneratorInput = z.infer<typeof AILearnContentGeneratorInputSchema>;
 
-export const AILearnContentGeneratorOutputSchema = z.object({
+const AILearnContentGeneratorOutputSchema = z.object({
   title: z.string().describe('A suitable title for the generated article.'),
   description: z.string().describe('A brief, engaging summary of the article.'),
   body: z.string().describe('The full content of the article, written in Markdown format.'),
