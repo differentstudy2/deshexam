@@ -1234,6 +1234,11 @@ export default function CreateTestPage() {
                                               <FormControl>
                                                   <Input {...field} />
                                               </FormControl>
+                                               {questionType === 'Fill in the Blank' && (
+                                                <FormDescription>
+                                                    Use "____" (four underscores) to indicate where the blank should be.
+                                                </FormDescription>
+                                                )}
                                               <FormMessage />
                                           </FormItem>
                                       )}
