@@ -17,7 +17,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -170,7 +169,6 @@ export default function EditArticlePage() {
                     <FormControl>
                       <Input placeholder="e.g., Science, History, Technology" {...field} />
                     </FormControl>
-                     <FormDescription>A category to help organize your articles.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -201,14 +199,11 @@ export default function EditArticlePage() {
                       <FormLabel>Content Body</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Write your article content here. You can use Markdown for formatting."
+                          placeholder="Write your article content here."
                           {...field}
                           className="min-h-[400px]"
                         />
                       </FormControl>
-                       <FormDescription>
-                        Use Markdown for headings (`# H1`), lists (`- item`), bold (`**bold**`), etc.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
