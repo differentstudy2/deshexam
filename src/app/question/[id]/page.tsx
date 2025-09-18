@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
+import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -24,12 +24,18 @@ type Option = {
   text: string;
 };
 
+type MatchingOptions = {
+    columnA: string[];
+    columnB: string[];
+}
+
 type Question = {
   id: string;
   text: string;
-  type: 'Multiple Choice' | 'True/False' | 'Short Answer';
+  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Matching';
   options?: Option[];
-  correctAnswer: string;
+  matchingOptions?: MatchingOptions;
+  correctAnswer: any;
   likes: number;
   dislikes: number;
   likedBy: string[];
@@ -245,14 +251,59 @@ export default function QuestionPage() {
                       <p className="text-lg p-2 bg-secondary rounded-md mt-1">{question.correctAnswer}</p>
                   </div>
               )}
+               {question.type === 'Matching' && question.matchingOptions && (
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-8">
+                            <div>
+                                <h4 className="font-bold text-center mb-2">Column A</h4>
+                                <div className="space-y-2">
+                                {question.matchingOptions.columnA.map((item, index) => (
+                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">{item}</div>
+                                ))}
+                                </div>
+                            </div>
+                             <div>
+                                <h4 className="font-bold text-center mb-2">Column B</h4>
+                                <div className="space-y-2">
+                                {question.matchingOptions.columnB.map((item, index) => (
+                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">{item}</div>
+                                ))}
+                                </div>
+                            </div>
+                        </div>
+                         <div>
+                            <h4 className="font-bold mb-2">Correct Answer</h4>
+                            <div className="space-y-2">
+                                {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair, index) => (
+                                    <div key={index} className="flex items-center justify-center gap-2 p-2 border rounded-md bg-green-50 dark:bg-green-900/20">
+                                        <span className="font-medium">{pair.a}</span>
+                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                        <span className="font-medium">{pair.b}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </CardContent>
             <CardFooter className="flex-col items-start gap-4">
               <div className="flex items-center gap-4">
-                <Button variant={userHasLiked ? "default" : "outline"} size="sm" onClick={() => handleVote('like')} disabled={isVoting || (!!user && !!userHasDisliked)}>
-                  <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
+                <Button 
+                    variant={userHasLiked ? "default" : "outline"}
+                    size="sm" 
+                    onClick={() => handleVote('like')} 
+                    disabled={isVoting}
+                    className={cn(userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
+                >
+                    <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
                 </Button>
-                <Button variant={userHasDisliked ? "destructive" : "outline"} size="sm" onClick={() => handleVote('dislike')} disabled={isVoting || (!!user && !!userHasLiked)}>
-                  <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
+                <Button 
+                    variant={userHasDisliked ? "destructive" : "outline"} 
+                    size="sm" 
+                    onClick={() => handleVote('dislike')} 
+                    disabled={isVoting}
+                >
+                    <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
                 </Button>
               </div>
             </CardFooter>
