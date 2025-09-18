@@ -154,7 +154,7 @@ function ReviewDisplay() {
                     
                     <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Duration:</strong> <span className="text-foreground">{test.duration} min</span></div>
                     <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Difficulty:</strong> <span className="text-foreground">{test.difficulty}</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Score:</strong> <span className="text-foreground">{score}/{totalQuestions} ({percentage}%)</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Type:</strong> <span className="text-foreground">{test.testType}</span></div>
                     
                     <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submission.submittedAt.toLocaleDateString()}</span></div>
                      <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submission.submittedAt.toLocaleTimeString()}</span></div>
@@ -365,11 +365,3 @@ export default function TestReviewPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
