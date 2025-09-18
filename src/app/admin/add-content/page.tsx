@@ -77,7 +77,7 @@ const formSchema = z.object({
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
-  newChapterName: z.string().optional(),
+  newChapterName: z_string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   body: z.string().optional(),
@@ -233,61 +233,64 @@ export default function CreateTestPage() {
 
   const handleFormSubmit = async (data: FormValues, resetType: 'full' | 'partial') => {
     try {
-      let subjectName = data.subject;
-      let subjectId = subjects.find(s => s.name === data.subject)?.id;
-      if(data.subject === 'add_new_subject' && data.newSubject) {
-        const newSubId = await addSubject(data.newSubject);
-        subjectName = data.newSubject;
-        subjectId = newSubId;
-        setIsAddingNewSubject(false);
-      }
-      
-      let boardName = data.board;
-      if(data.board === 'add_new_board' && data.newBoard) {
-        await addBoard(data.newBoard);
-        boardName = data.newBoard;
-        setIsAddingNewBoard(false);
-      }
+      let contentToSave: any;
 
-      let examCategoryName = data.examCategory;
-      let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
-      if(data.examCategory === 'add_new_exam_category' && data.newExamCategory) {
-        const newExamCatId = await addExamType(data.newExamCategory);
-        examCategoryName = data.newExamCategory;
-        examCategoryId = newExamCatId;
-        setIsAddingNewExamCategory(false);
-      }
-      
-      let examName = data.exam;
-      if(data.exam === 'add_new_exam' && data.newExam && examCategoryId) {
-        await addExam(examCategoryId, { name: data.newExam });
-        examName = data.newExam;
-        setIsAddingNewExam(false);
-      }
-
-      let chapterName = data.chapter;
-      if (data.chapter === 'add_new_chapter' && data.newChapterNo && data.newChapterName && subjectId) {
-        await addChapter(subjectId, { chapterNo: data.newChapterNo, chapterName: data.newChapterName });
-        chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
-        setIsAddingNewChapter(false);
-      }
-      
-      const contentToSave: any = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
-      
       if (data.testType === 'Learn') {
-        delete contentToSave.questions;
-        delete contentToSave.duration;
-        delete contentToSave.difficulty;
+        contentToSave = {
+          title: data.title,
+          description: data.description,
+          body: data.body,
+          testType: data.testType,
+        };
       } else {
-        delete contentToSave.body;
-      }
+        let subjectName = data.subject;
+        let subjectId = subjects.find(s => s.name === data.subject)?.id;
+        if(data.subject === 'add_new_subject' && data.newSubject) {
+          const newSubId = await addSubject(data.newSubject);
+          subjectName = data.newSubject;
+          subjectId = newSubId;
+          setIsAddingNewSubject(false);
+        }
+        
+        let boardName = data.board;
+        if(data.board === 'add_new_board' && data.newBoard) {
+          await addBoard(data.newBoard);
+          boardName = data.newBoard;
+          setIsAddingNewBoard(false);
+        }
 
-      delete contentToSave.newSubject;
-      delete contentToSave.newBoard;
-      delete contentToSave.newExamCategory;
-      delete contentToSave.newExam;
-      delete contentToSave.newChapterNo;
-      delete contentToSave.newChapterName;
+        let examCategoryName = data.examCategory;
+        let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
+        if(data.examCategory === 'add_new_exam_category' && data.newExamCategory) {
+          const newExamCatId = await addExamType(data.newExamCategory);
+          examCategoryName = data.newExamCategory;
+          examCategoryId = newExamCatId;
+          setIsAddingNewExamCategory(false);
+        }
+        
+        let examName = data.exam;
+        if(data.exam === 'add_new_exam' && data.newExam && examCategoryId) {
+          await addExam(examCategoryId, { name: data.newExam });
+          examName = data.newExam;
+          setIsAddingNewExam(false);
+        }
+
+        let chapterName = data.chapter;
+        if (data.chapter === 'add_new_chapter' && data.newChapterNo && data.newChapterName && subjectId) {
+          await addChapter(subjectId, { chapterNo: data.newChapterNo, chapterName: data.newChapterName });
+          chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
+          setIsAddingNewChapter(false);
+        }
+        
+        contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
+        delete contentToSave.body;
+        delete contentToSave.newSubject;
+        delete contentToSave.newBoard;
+        delete contentToSave.newExamCategory;
+        delete contentToSave.newExam;
+        delete contentToSave.newChapterNo;
+        delete contentToSave.newChapterName;
+      }
 
 
       await addContent(contentToSave);
