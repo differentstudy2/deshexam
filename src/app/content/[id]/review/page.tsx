@@ -216,37 +216,28 @@ function ReviewDisplay() {
                             </>
                          )}
                          {question.type === 'Matching' && (
-                             <div className="space-y-3">
-                                {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => {
-                                    const userMatch = userAnswer ? userAnswer[pair.a] : '';
-                                    const isPairCorrect = userMatch === pair.b;
-                                    return (
-                                        <div key={pairIndex} className="p-3 border rounded-lg">
-                                            <div className="flex items-center gap-2">
-                                                {isPairCorrect ? (
-                                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                                ) : (
-                                                    <XCircle className="w-5 h-5 text-destructive flex-shrink-0" />
-                                                )}
-                                                <div className="flex items-center text-sm">
-                                                    <span>{pair.a}</span>
-                                                    <GripVertical className="h-4 w-4 mx-1 text-muted-foreground" />
-                                                    <span>{userMatch || <span className="text-muted-foreground italic">No selection</span>}</span>
-                                                </div>
-                                                <Badge variant="secondary" className="ml-auto">Your Answer</Badge>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 className="font-semibold mb-2 text-center">Your Answer</h4>
+                                    <div className="space-y-2">
+                                        {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => (
+                                            <div key={pairIndex} className="p-3 border rounded-lg bg-secondary">
+                                                {pair.a} <span className="font-mono mx-2 text-muted-foreground">::</span> {userAnswer?.[pair.a] || <span className="italic text-muted-foreground">No Answer</span>}
                                             </div>
-                                            {!isPairCorrect && (
-                                                <div className="flex items-center gap-2 mt-2 pl-7 text-sm">
-                                                    <span>{pair.a}</span>
-                                                    <GripVertical className="h-4 w-4 mx-1 text-muted-foreground" />
-                                                    <span className="font-semibold">{pair.b}</span>
-                                                    <Badge variant="outline" className="ml-auto">Correct Answer</Badge>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )
-                                })}
-                             </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold mb-2 text-center">Correct Answer</h4>
+                                    <div className="space-y-2">
+                                        {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => (
+                                            <div key={pairIndex} className="p-3 border rounded-lg bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                                                {pair.a} <span className="font-mono mx-2">::</span> {pair.b}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                          )}
                      </div>
                       {question.explanation && (
@@ -306,3 +297,4 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
