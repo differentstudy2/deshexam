@@ -11,12 +11,12 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const AIDescriptionGeneratorInputSchema = z.object({
+const AIDescriptionGeneratorInputSchema = z.object({
   source: z.string().describe('The title or topic for which to generate a description.'),
 });
 export type AIDescriptionGeneratorInput = z.infer<typeof AIDescriptionGeneratorInputSchema>;
 
-export const AIDescriptionGeneratorOutputSchema = z.object({
+const AIDescriptionGeneratorOutputSchema = z.object({
   description: z.string().describe('A brief and engaging description for the content.'),
 });
 export type AIDescriptionGeneratorOutput = z.infer<typeof AIDescriptionGeneratorOutputSchema>;
