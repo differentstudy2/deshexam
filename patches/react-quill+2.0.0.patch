@@ -1,31 +1,44 @@
-diff --git a/node_modules/react-quill/lib/component.js b/node_modules/react-quill/lib/component.js
-index 72605e5..6d376c7 100644
---- a/node_modules/react-quill/lib/component.js
-+++ b/node_modules/react-quill/lib/component.js
-@@ -216,7 +216,7 @@
- 	},
- 
- 	getEditor: function getEditor() {
--		return this.quill;
-+		return this.quill
+diff --git a/node_modules/react-quill/lib/index.js b/node_modules/react-quill/lib/index.js
+index 2a759e6..2937a0c 100644
+--- a/node_modules/react-quill/lib/index.js
++++ b/node_modules/react-quill/lib/index.js
+@@ -1072,7 +1072,7 @@
  	},
  
  	getEditingArea: function getEditingArea() {
-@@ -484,7 +484,7 @@
+-		return _reactDom2.default.findDOMNode(this.editingArea);
++		return this.editingArea.current;
  	},
  
- 	focus: function focus() {
--		this.quill.focus();
-+		this.quill.focus()
- 	},
+ 	getEditor: function getEditor() {
+diff --git a/node_modules/react-quill/lib/mixin.js b/node_modules/react-quill/lib/mixin.js
+index 9e55b6c..9d123d4 100644
+--- a/node_modules/react-quill/lib/mixin.js
++++ b/node_modules/react-quill/lib/mixin.js
+@@ -1,4 +1,4 @@
+-import ReactDOM from 'react-dom';
++'use strict';
+ import Quill from 'quill';
  
- 	blur: function blur() {
-@@ -492,7 +492,7 @@
- 	},
+ /*
+@@ -37,7 +37,7 @@
+   },
  
- 	getEditorNode: function getEditorNode() {
--		return ReactDOM.findDOMNode(this.editingArea);
-+		return this.editingArea.current
- 	}
+   getEditingArea: function getEditingArea() {
+-    return ReactDOM.findDOMNode(this.editingArea);
++    return this.quill.root;
+   },
  
- });
+   getEditor: function getEditor() {
+diff --git a/node_modules/react-quill/package.json b/node_modules/react-quill/package.json
+index 3647313..c8c12a7 100644
+--- a/node_modules/react-quill/package.json
++++ b/node_modules/react-quill/package.json
+@@ -9,6 +9,7 @@
+   "main": "lib/index.js",
+   "style": "dist/quill.snow.css",
+   "files": [
++    "react-quill.js",
+     "dist/",
+     "lib/"
+   ],
