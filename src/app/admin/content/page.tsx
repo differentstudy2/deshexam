@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -917,7 +918,7 @@ export default function ManageContentPage() {
                             control={questionForm.control}
                             name="correctAnswer"
                             render={({ field }) => (
-                                <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-2">
+                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {optionFields.map((option, optionIndex) => (
                                         <FormField
                                             key={option.id}

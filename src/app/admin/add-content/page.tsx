@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -723,7 +724,7 @@ export default function CreateTestPage() {
                                             control={form.control}
                                             name={`questions.${index}.correctAnswer`}
                                             render={({ field }) => (
-                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                     {[0, 1, 2, 3].map(optionIndex => (
                                                          <FormField
                                                             key={optionIndex}
