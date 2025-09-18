@@ -183,7 +183,7 @@ export const handleQuestionVote = async (questionId: string, voteType: 'like' | 
 };
 
 
-export const addComment = async (collectionName: 'questions' | 'content', documentId: string, commentData: { text: string, rating?: number }) => {
+export const addComment = async (collectionName: 'questions' | 'content', documentId: string, commentData: { text: string; rating?: number; parentId?: string | null; }) => {
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -209,6 +209,9 @@ export const addComment = async (collectionName: 'questions' | 'content', docume
         if (commentData.rating === undefined) {
             delete dataToSave.rating;
         }
+        if (!commentData.parentId) {
+            dataToSave.parentId = null;
+        }
 
         const docRef = await addDoc(collection(db, collectionName, documentId, "comments"), dataToSave);
         return docRef.id;
@@ -220,7 +223,7 @@ export const addComment = async (collectionName: 'questions' | 'content', docume
 
 export const getComments = async (collectionName: 'questions' | 'content', documentId: string) => {
     try {
-        const q = query(collection(db, collectionName, documentId, "comments"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, collectionName, documentId, "comments"), orderBy("createdAt", "asc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => {
             const data = doc.data();

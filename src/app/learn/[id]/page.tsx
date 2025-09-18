@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { getContentById, addComment, getComments, handleCommentVote } from '@/lib/firebase/firestore';
-import { Loader2, ArrowLeft, User, Calendar, MessageSquare, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, MessageSquare, Star, ThumbsUp, ThumbsDown, CornerDownRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -43,6 +43,8 @@ type Comment = {
     dislikes: number;
     likedBy: string[];
     dislikedBy: string[];
+    parentId: string | null;
+    replies?: Comment[];
 }
 
 export default function LearnArticlePage() {
@@ -53,6 +55,9 @@ export default function LearnArticlePage() {
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
@@ -60,34 +65,34 @@ export default function LearnArticlePage() {
   const { user } = useAuth();
   const [isVoting, setIsVoting] = useState<{[key: string]: boolean}>({});
 
-  useEffect(() => {
-    const fetchArticleAndComments = async () => {
-      if (!articleId) return;
-      try {
-        setLoading(true);
-        const [articleData, commentsData] = await Promise.all([
-            getContentById(articleId),
-            getComments('content', articleId)
-        ]);
+  const fetchArticleAndComments = async () => {
+    if (!articleId) return;
+    try {
+      setLoading(true);
+      const [articleData, commentsData] = await Promise.all([
+          getContentById(articleId),
+          getComments('content', articleId)
+      ]);
 
-        if (articleData && articleData.testType === 'Learn') {
-          setArticle(articleData as Article);
-          setComments(commentsData as Comment[]);
-        } else {
-          throw new Error("Article not found or is not a 'Learn' type content.");
-        }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: 'Error fetching article',
-          description: (error as Error).message,
-        });
-        router.push('/learn');
-      } finally {
-        setLoading(false);
+      if (articleData && articleData.testType === 'Learn') {
+        setArticle(articleData as Article);
+        setComments(commentsData as Comment[]);
+      } else {
+        throw new Error("Article not found or is not a 'Learn' type content.");
       }
-    };
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: 'Error fetching article',
+        description: (error as Error).message,
+      });
+      router.push('/learn');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchArticleAndComments();
   }, [articleId, toast, router]);
   
@@ -96,27 +101,34 @@ export default function LearnArticlePage() {
     return comments.some(comment => comment.authorId === user.uid);
   }, [comments, user]);
 
-    const handleCommentSubmit = async (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent, parentId: string | null = null) => {
     e.preventDefault();
     if (!user) {
         toast({ variant: "destructive", title: "Please log in to comment." });
         return;
     }
-    if (!newComment.trim()) return;
+    const text = parentId ? replyText : newComment;
+    if (!text.trim()) return;
 
     setIsSubmittingComment(true);
     try {
-        const commentData: { text: string; rating?: number } = { text: newComment };
-        if (!userHasCommented) {
+        const commentData: { text: string; rating?: number; parentId?: string | null } = { 
+          text,
+          parentId
+        };
+        if (!parentId && !userHasCommented) {
             commentData.rating = rating;
         }
 
         await addComment('content', articleId, commentData);
         setNewComment('');
+        setReplyText('');
+        setReplyingTo(null);
         setRating(4);
+        
         const updatedComments = await getComments('content', articleId);
         setComments(updatedComments as Comment[]);
-        toast({ title: "Comment posted!" });
+        toast({ title: parentId ? "Reply posted!" : "Comment posted!" });
     } catch (error) {
          toast({
           variant: "destructive",
@@ -137,53 +149,10 @@ export default function LearnArticlePage() {
 
     setIsVoting(prev => ({...prev, [commentId]: true}));
     
-    const originalComments = [...comments];
-    const commentIndex = comments.findIndex(c => c.id === commentId);
-    if(commentIndex === -1) return;
-
-    const commentToUpdate = { ...comments[commentIndex] };
-    const hasLiked = commentToUpdate.likedBy?.includes(user.uid);
-    const hasDisliked = commentToUpdate.dislikedBy?.includes(user.uid);
-
-    let newLikedBy = [...(commentToUpdate.likedBy || [])];
-    let newDislikedBy = [...(commentToUpdate.dislikedBy || [])];
-
-    if (voteType === 'like') {
-        if (hasLiked) {
-            newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-        } else {
-            newLikedBy.push(user.uid);
-            if (hasDisliked) {
-                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-            }
-        }
-    } else { // dislike
-        if (hasDisliked) {
-            newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-        } else {
-            newDislikedBy.push(user.uid);
-            if (hasLiked) {
-                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-            }
-        }
-    }
-
-    const updatedComment = {
-        ...commentToUpdate,
-        likedBy: newLikedBy,
-        dislikedBy: newDislikedBy,
-        likes: newLikedBy.length,
-        dislikes: newDislikedBy.length
-    };
-    
-    const newComments = [...comments];
-    newComments[commentIndex] = updatedComment;
-    setComments(newComments);
-
     try {
         await handleCommentVote('content', articleId, commentId, voteType);
+        fetchArticleAndComments(); // Refetch to get updated votes
     } catch (error) {
-        setComments(originalComments);
         toast({
           variant: "destructive",
           title: 'Error submitting vote',
@@ -193,6 +162,25 @@ export default function LearnArticlePage() {
         setIsVoting(prev => ({...prev, [commentId]: false}));
     }
   }
+
+  const nestedComments = useMemo(() => {
+    const commentMap: { [key: string]: Comment & { replies: Comment[] } } = {};
+    const topLevelComments: (Comment & { replies: Comment[] })[] = [];
+
+    comments.forEach(comment => {
+        commentMap[comment.id] = { ...comment, replies: [] };
+    });
+
+    comments.forEach(comment => {
+        if (comment.parentId && commentMap[comment.parentId]) {
+            commentMap[comment.parentId].replies.push(commentMap[comment.id]);
+        } else {
+            topLevelComments.push(commentMap[comment.id]);
+        }
+    });
+
+    return topLevelComments;
+  }, [comments]);
 
 
   if (loading) {
@@ -243,6 +231,66 @@ export default function LearnArticlePage() {
     const averageRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
     const totalRatings = ratings.length;
 
+
+  const renderComment = (comment: Comment, isReply: boolean = false) => {
+    const userHasLiked = user && comment.likedBy?.includes(user.uid);
+    const userHasDisliked = user && comment.dislikedBy?.includes(user.uid);
+    return (
+      <div key={comment.id} className={cn("flex items-start gap-4", isReply && "mt-4")}>
+          <Avatar>
+            <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
+            <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+              <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                      <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
+                      <span className="text-muted-foreground">
+                          {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
+                      </span>
+                  </div>
+                  {comment.rating && <StarRating rating={comment.rating} />}
+              </div>
+              <p className="text-foreground mt-1">{comment.text}</p>
+              <div className="flex items-center gap-1 mt-2">
+                  <Button variant="ghost" size="sm" onClick={() => handleVote(comment.id, 'like')} disabled={isVoting[comment.id]}>
+                      <ThumbsUp className={cn("mr-2 h-4 w-4", userHasLiked && "fill-current")} /> {comment.likes || 0}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleVote(comment.id, 'dislike')} disabled={isVoting[comment.id]}>
+                      <ThumbsDown className={cn("mr-2 h-4 w-4", userHasDisliked && "fill-current")} /> {comment.dislikes || 0}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}>
+                      <CornerDownRight className="mr-2 h-4 w-4" /> Reply
+                  </Button>
+              </div>
+
+              {replyingTo === comment.id && (
+                  <form onSubmit={(e) => handleCommentSubmit(e, comment.id)} className="mt-4 space-y-2">
+                      <Textarea 
+                          placeholder={`Replying to ${comment.authorName}...`}
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          disabled={isSubmittingComment}
+                          className="h-20"
+                      />
+                      <div className="flex justify-end gap-2">
+                           <Button type="button" variant="ghost" size="sm" onClick={() => setReplyingTo(null)}>Cancel</Button>
+                           <Button type="submit" size="sm" disabled={isSubmittingComment || !replyText.trim()}>
+                            {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Reply"}
+                           </Button>
+                      </div>
+                  </form>
+              )}
+
+              {comment.replies && comment.replies.length > 0 && (
+                  <div className="mt-4 pl-4 border-l-2">
+                      {comment.replies.map(reply => renderComment(reply, true))}
+                  </div>
+              )}
+          </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-12">
@@ -303,7 +351,7 @@ export default function LearnArticlePage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleCommentSubmit} className="space-y-4">
+                    <form onSubmit={(e) => handleCommentSubmit(e)} className="space-y-4">
                         {!userHasCommented && (
                             <div className="space-y-2">
                                 <label className="font-medium">Your Rating</label>
@@ -329,38 +377,7 @@ export default function LearnArticlePage() {
                     </form>
                     <Separator className="my-6" />
                     <div className="space-y-6">
-                        {comments.length > 0 ? comments.map(comment => {
-                            const userHasLiked = user && comment.likedBy?.includes(user.uid);
-                            const userHasDisliked = user && comment.dislikedBy?.includes(user.uid);
-                            return (
-                            <div key={comment.id} className="flex items-start gap-4">
-                                <Avatar>
-                                <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
-                                    <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-sm">
-                                            <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
-                                            <span className="text-muted-foreground">
-                                                {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
-                                            </span>
-                                        </div>
-                                        {comment.rating && <StarRating rating={comment.rating} />}
-                                    </div>
-                                    <p className="text-foreground mt-1">{comment.text}</p>
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <Button variant="ghost" size="sm" onClick={() => handleVote(comment.id, 'like')} disabled={isVoting[comment.id]}>
-                                            <ThumbsUp className={cn("mr-2 h-4 w-4", userHasLiked && "fill-current")} /> {comment.likes || 0}
-                                        </Button>
-                                        <Button variant="ghost" size="sm" onClick={() => handleVote(comment.id, 'dislike')} disabled={isVoting[comment.id]}>
-                                            <ThumbsDown className={cn("mr-2 h-4 w-4", userHasDisliked && "fill-current")} /> {comment.dislikes || 0}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                            )
-                        }) : (
+                        {nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
                             <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
                         )}
                     </div>
@@ -371,6 +388,7 @@ export default function LearnArticlePage() {
     </div>
   );
 }
+
 
 
 
