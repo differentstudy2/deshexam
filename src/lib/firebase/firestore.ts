@@ -772,42 +772,42 @@ export const updateUserProfile = async (userId: string, data: any) => {
     if (!userId) throw new Error("User ID is required to update a profile.");
 
     const userDocRef = doc(db, "users", userId);
-    
+
     try {
         await runTransaction(db, async (transaction) => {
+            // First, perform all reads
             const userDoc = await transaction.get(userDocRef);
             const currentData = userDoc.data() || {};
-            const newData = { ...currentData, ...data };
+            const isUsernameChanging = data.displayName && data.displayName !== currentData.displayName;
             
+            let oldUsernameRef: any;
+            if (isUsernameChanging && currentData.username) {
+                oldUsernameRef = doc(db, "usernames", currentData.username);
+                // This read is necessary to check for existence before deleting
+                await transaction.get(oldUsernameRef); 
+            }
+
+            // Now, perform all writes
+            const newData = { ...currentData, ...data };
             if (!userDoc.exists()) {
                 newData.role = 'user'; // Default role
             }
 
-            // Handle username change
-            if (data.displayName && (!currentData.username || data.displayName !== currentData.displayName)) {
+            if (isUsernameChanging || (!currentData.username && data.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
                 newData.username = newUsername;
-
-                // Update username lookup
+                
+                // Set new username mapping
                 const newUsernameRef = doc(db, "usernames", newUsername);
                 transaction.set(newUsernameRef, { uid: userId });
 
-                // Delete old username lookup if it exists
-                if (currentData.username) {
-                    const oldUsernameRef = doc(db, "usernames", currentData.username);
-                    const oldUsernameDoc = await transaction.get(oldUsernameRef);
-                    if(oldUsernameDoc.exists()) {
-                        transaction.delete(oldUsernameRef);
-                    }
+                // Delete old username mapping if it existed
+                if (oldUsernameRef) {
+                    transaction.delete(oldUsernameRef);
                 }
-            } else if (!currentData.username && currentData.displayName) {
-                 const newUsername = await generateUsername(currentData.displayName);
-                 newData.username = newUsername;
-                 const newUsernameRef = doc(db, "usernames", newUsername);
-                 transaction.set(newUsernameRef, { uid: userId });
             }
-
-            if(userDoc.exists()) {
+            
+            if (userDoc.exists()) {
                 transaction.update(userDocRef, newData);
             } else {
                 transaction.set(userDocRef, newData);
