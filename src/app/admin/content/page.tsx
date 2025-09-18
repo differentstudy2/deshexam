@@ -45,6 +45,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -93,7 +102,7 @@ type BulkAction =
     | { type: 'examCategory', value: string }
     | { type: 'exam', value: string }
     | { type: 'delete-questions' }
-    | { type: 'add-questions-to-content', contentId: string, contentTitle: string }
+    | { type: 'add-questions-to-content', contentIds: string[] }
     | null;
 
 function getUrlForTest(testType: string, testId: string) {
@@ -298,6 +307,7 @@ export default function ManageContentPage() {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+  const [isQuestionDialogOpwn, setIsQuestionDialogOpen] = useState(false);
   const [contentToDelete, setContentToDelete] = useState<Content | null>(null);
   const [bulkAction, setBulkAction] = useState<BulkAction>(null);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
@@ -312,6 +322,7 @@ export default function ManageContentPage() {
   const [accessFilter, setAccessFilter] = useState('all');
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [dialogSelectedContent, setDialogSelectedContent] = useState<string[]>([]);
   
   const allTabs = useMemo(() => {
     const baseTabs = [{ id: 'all', name: 'All' }, ...contentTypes];
@@ -403,7 +414,11 @@ export default function ManageContentPage() {
   
   const openBulkActionDialog = (action: BulkAction) => {
     setBulkAction(action);
-    setIsAlertDialogOpen(true);
+    if(action?.type === 'add-questions-to-content') {
+        setIsQuestionDialogOpen(true);
+    } else {
+        setIsAlertDialogOpen(true);
+    }
   }
 
   const handleSelectContent = (id: string) => {
@@ -455,17 +470,18 @@ export default function ManageContentPage() {
             await handleBulkUpdate({ examCategory: bulkAction.value });
         } else if (bulkAction.type === 'exam') {
             await handleBulkUpdate({ exam: bulkAction.value });
-        } else if (bulkAction.type === 'add-questions-to-content') {
-            const questionsToAdd = allQuestions.filter(q => selectedQuestions.includes(q.id));
-            await handleAddQuestionsToContent(bulkAction.contentId, questionsToAdd);
+        } else if (bulkAction.type === 'add-questions-to-content' && bulkAction.contentIds) {
+            await handleAddQuestionsToContent(bulkAction.contentIds, selectedQuestions);
         }
     }
     
     setIsAlertDialogOpen(false);
+    setIsQuestionDialogOpen(false);
     setContentToDelete(null);
     setBulkAction(null);
     setSelectedContent([]);
     setSelectedQuestions([]);
+    setDialogSelectedContent([]);
   };
 
   const handleDeleteContent = async (ids: string[]) => {
@@ -524,13 +540,15 @@ export default function ManageContentPage() {
     }
   }
 
-  const handleAddQuestionsToContent = async (contentId: string, questions: Question[]) => {
+  const handleAddQuestionsToContent = async (contentIds: string[], questionIds: string[]) => {
     try {
-      await addQuestionsToContent(contentId, questions);
-      toast({
-        title: "Questions Added",
-        description: `${questions.length} questions have been added to the selected content.`,
-      });
+        const questionsToAdd = allQuestions.filter(q => questionIds.includes(q.id));
+        await Promise.all(contentIds.map(id => addQuestionsToContent(id, questionsToAdd)));
+      
+        toast({
+            title: "Questions Added",
+            description: `${questionIds.length} questions have been added to ${contentIds.length} content item(s).`,
+        });
     } catch (error) {
        toast({
         variant: "destructive",
@@ -554,7 +572,6 @@ export default function ManageContentPage() {
             'chapter': `This will change the chapter for ${selectedContent.length} item(s) to "${(bulkAction as any).value}".`,
             'examCategory': `This will change the exam category for ${selectedContent.length} item(s) to "${examTypes.find(e => e.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
             'exam': `This will change the exam for ${selectedContent.length} item(s) to "${exams.find(e => e.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
-            'add-questions-to-content': `This will add ${selectedQuestions.length} question(s) to "${(bulkAction as any).contentTitle}".`,
           }
           if (bulkAction.type in actionTextMap) {
             return actionTextMap[bulkAction.type];
@@ -680,16 +697,9 @@ export default function ManageContentPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                              <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
-                              <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Add to Content</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    {allContent.map(c => (
-                                        <DropdownMenuItem key={c.id} onClick={() => openBulkActionDialog({ type: 'add-questions-to-content', contentId: c.id, contentTitle: c.title })}>
-                                            {c.title}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
+                              <DropdownMenuItem onClick={() => setIsQuestionDialogOpen(true)}>
+                                Add to Content
+                              </DropdownMenuItem>
                             <DropdownMenuSeparator />
                              <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete-questions' })}>
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -753,6 +763,47 @@ export default function ManageContentPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isQuestionDialogOpwn} onOpenChange={setIsQuestionDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Questions to Content</DialogTitle>
+            <DialogDescription>
+                Select one or more content items to add the {selectedQuestions.length} selected questions to.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[300px] my-4">
+            <div className="space-y-2 p-1">
+                {allContent.map(c => (
+                    <div key={c.id} className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary">
+                        <Checkbox
+                            id={`content-${c.id}`}
+                            checked={dialogSelectedContent.includes(c.id)}
+                            onCheckedChange={() => {
+                                setDialogSelectedContent(prev => 
+                                    prev.includes(c.id)
+                                    ? prev.filter(id => id !== c.id)
+                                    : [...prev, c.id]
+                                );
+                            }}
+                        />
+                        <label htmlFor={`content-${c.id}`} className="flex-grow cursor-pointer">{c.title}</label>
+                    </div>
+                ))}
+            </div>
+          </ScrollArea>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => { setIsQuestionDialogOpen(false); setDialogSelectedContent([]); }}>Cancel</Button>
+            <Button onClick={() => {
+                handleConfirmAction();
+            }}
+            disabled={dialogSelectedContent.length === 0}
+            >
+                Add Questions
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
