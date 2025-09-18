@@ -45,7 +45,7 @@ export default function LearnArticlePage() {
   const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(4);
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -98,7 +98,7 @@ export default function LearnArticlePage() {
     try {
         await addComment('content', articleId, { text: newComment, rating });
         setNewComment('');
-        setRating(0);
+        setRating(4);
         const updatedComments = await getComments('content', articleId);
         setComments(updatedComments as Comment[]);
         toast({ title: "Comment and rating posted!" });
@@ -157,6 +157,10 @@ export default function LearnArticlePage() {
         </div>
     );
   };
+  
+    const ratings = comments.filter(c => c.rating && c.rating > 0).map(c => c.rating!);
+    const averageRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
+    const totalRatings = ratings.length;
 
 
   return (
@@ -172,7 +176,7 @@ export default function LearnArticlePage() {
                 <p className="text-primary font-semibold">{article.subject}</p>
                 <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter mt-1">{article.title}</h1>
                 <p className="text-muted-foreground text-lg mt-3">{article.description}</p>
-                <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-4">
+                <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-4 flex-wrap">
                     <div className="flex items-center gap-2">
                       <Avatar className="w-6 h-6">
                         <AvatarImage src={`https://picsum.photos/seed/${article.authorId}/24/24`} />
@@ -184,6 +188,13 @@ export default function LearnArticlePage() {
                       <Calendar className="w-4 h-4" />
                       <span>Published on {article.createdAt}</span>
                     </div>
+                     {totalRatings > 0 && (
+                        <div className="flex items-center gap-1.5">
+                           <Star className="w-4 h-4 text-yellow-500" />
+                           <span className="font-semibold text-foreground">{averageRating.toFixed(1)}</span>
+                           <span>({totalRatings} ratings)</span>
+                        </div>
+                    )}
                 </div>
             </header>
 
@@ -265,4 +276,5 @@ export default function LearnArticlePage() {
     </div>
   );
 }
+
 
