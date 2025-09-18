@@ -120,9 +120,10 @@ export default function LearnArticlePage() {
                 priority
             />
 
-            <div className="prose dark:prose-invert lg:prose-xl max-w-none whitespace-pre-wrap">
-              {article.body}
-            </div>
+            <div 
+              className="prose dark:prose-invert lg:prose-xl max-w-none"
+              dangerouslySetInnerHTML={{ __html: article.body }}
+            />
         </div>
     </div>
   );
