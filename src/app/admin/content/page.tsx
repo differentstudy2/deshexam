@@ -152,104 +152,113 @@ const ContentTable = ({
     onSelect: (id: string) => void,
     onSelectAll: (checked: boolean) => void,
     isAllSelected: boolean
-}) => (
-    <div className="overflow-x-auto">
-        <Table>
-            <TableHeader>
-                <TableRow>
-                <TableHead className="w-12">
-                    <Checkbox
-                        checked={isAllSelected}
-                        onCheckedChange={(checked) => onSelectAll(Boolean(checked))}
-                        aria-label="Select all"
-                    />
-                </TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead className="hidden md:table-cell">Author</TableHead>
-                <TableHead className="hidden md:table-cell">Type</TableHead>
-                <TableHead className="hidden md:table-cell">Access</TableHead>
-                <TableHead className="hidden lg:table-cell">Created At</TableHead>
-                <TableHead>
-                    <span className="sr-only">Actions</span>
-                </TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                        <TableCell><Skeleton className="h-5 w-5" /></TableCell>
-                        <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                        <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                        <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
-                        <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
-                        <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                        <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
-                    </TableRow>
-                ))
-                ) : content.length > 0 ? (
-                content.map((item) => (
-                    <TableRow key={item.id} data-state={selectedContent.includes(item.id) && "selected"}>
-                     <TableCell>
+}) => {
+    const getEditUrl = (item: Content) => {
+        if (item.testType === 'Learn') {
+            return `/admin/edit-article/${item.id}`;
+        }
+        return `/dashboard/edit-content/${item.id}`;
+    }
+
+    return (
+        <div className="overflow-x-auto">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead className="w-12">
                         <Checkbox
-                            checked={selectedContent.includes(item.id)}
-                            onCheckedChange={() => onSelect(item.id)}
-                            aria-label={`Select ${item.title}`}
+                            checked={isAllSelected}
+                            onCheckedChange={(checked) => onSelectAll(Boolean(checked))}
+                            aria-label="Select all"
                         />
-                      </TableCell>
-                    <TableCell className="font-medium">{item.title}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                        <div className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6">
-                                <AvatarImage src={`https://picsum.photos/seed/${item.authorId}/24/24`} />
-                                <AvatarFallback>{item.authorName?.[0]}</AvatarFallback>
-                            </Avatar>
-                            <span>{item.authorName}</span>
-                        </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                        <Badge variant="secondary">{item.testType}</Badge>
-                    </TableCell>
-                     <TableCell className="hidden md:table-cell">
-                        <ContentBadge type={item.access} />
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">{item.createdAt}</TableCell>
-                    <TableCell>
-                        <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem asChild>
-                                <Link href={getUrlForTest(item.testType, item.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/edit-content/${item.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(item)}>
-                            <Trash2 className="mr-2 h-4 w-4"/>Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                        </DropdownMenu>
-                    </TableCell>
+                    </TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead className="hidden md:table-cell">Author</TableHead>
+                    <TableHead className="hidden md:table-cell">Type</TableHead>
+                    <TableHead className="hidden md:table-cell">Access</TableHead>
+                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                    <TableHead>
+                        <span className="sr-only">Actions</span>
+                    </TableHead>
                     </TableRow>
-                ))
-                ) : (
-                <TableRow>
-                    <TableCell colSpan={7} className="text-center h-24">
-                    No content found matching your criteria.
-                    </TableCell>
-                </TableRow>
-                )}
-            </TableBody>
-        </Table>
-    </div>
-);
+                </TableHeader>
+                <TableBody>
+                    {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-5" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
+                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+                        </TableRow>
+                    ))
+                    ) : content.length > 0 ? (
+                    content.map((item) => (
+                        <TableRow key={item.id} data-state={selectedContent.includes(item.id) && "selected"}>
+                         <TableCell>
+                            <Checkbox
+                                checked={selectedContent.includes(item.id)}
+                                onCheckedChange={() => onSelect(item.id)}
+                                aria-label={`Select ${item.title}`}
+                            />
+                          </TableCell>
+                        <TableCell className="font-medium">{item.title}</TableCell>
+                        <TableCell className="hidden md:table-cell">
+                            <div className="flex items-center gap-2">
+                                <Avatar className="w-6 h-6">
+                                    <AvatarImage src={`https://picsum.photos/seed/${item.authorId}/24/24`} />
+                                    <AvatarFallback>{item.authorName?.[0]}</AvatarFallback>
+                                </Avatar>
+                                <span>{item.authorName}</span>
+                            </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                            <Badge variant="secondary">{item.testType}</Badge>
+                        </TableCell>
+                         <TableCell className="hidden md:table-cell">
+                            <ContentBadge type={item.access} />
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">{item.createdAt}</TableCell>
+                        <TableCell>
+                            <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button aria-haspopup="true" size="icon" variant="ghost">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem asChild>
+                                    <Link href={getUrlForTest(item.testType, item.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                <Link href={getEditUrl(item)}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => openDeleteDialog(item)}>
+                                <Trash2 className="mr-2 h-4 w-4"/>Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                            </DropdownMenu>
+                        </TableCell>
+                        </TableRow>
+                    ))
+                    ) : (
+                    <TableRow>
+                        <TableCell colSpan={7} className="text-center h-24">
+                        No content found matching your criteria.
+                        </TableCell>
+                    </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    );
+};
 
 const QuestionsTable = ({ 
     questions, 
@@ -1002,5 +1011,3 @@ export default function ManageContentPage() {
     </div>
   );
 }
-
-    
