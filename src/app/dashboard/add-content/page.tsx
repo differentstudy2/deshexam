@@ -35,7 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 
@@ -118,7 +118,7 @@ export default function CreateTestPage() {
       setBoards(boardData);
       setExamCategories(examTypeData);
 
-      if (types.length > 0) {
+      if (types.length > 0 && !form.getValues('testType')) {
           form.setValue('testType', types[0].name);
       }
     } catch (error) {
@@ -162,7 +162,7 @@ export default function CreateTestPage() {
     name: 'questions',
   });
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+  const handleFormSubmit = async (data: FormValues, resetType: 'full' | 'partial') => {
     try {
       let subjectName = data.subject;
       let subjectId = subjects.find(s => s.name === data.subject)?.id;
@@ -217,29 +217,44 @@ export default function CreateTestPage() {
         title: 'Content Created!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,
       });
+      
+      if (resetType === 'full') {
+         form.reset({
+            ...form.getValues(),
+            title: '',
+            board: '',
+            examCategory: '',
+            exam: '',
+            subject: '',
+            chapter: '',
+            description: '',
+            duration: 60,
+            access: 'free',
+            questions: [],
+            newSubject: '',
+            newBoard: '',
+            newExamCategory: '',
+            newExam: '',
+            newChapterNo: '',
+            newChapterName: '',
+            difficulty: 'Medium',
+        });
+        setChapters([]);
+        setExams([]);
+      } else { // partial reset
+         form.reset({
+            ...form.getValues(),
+            title: '',
+            description: '',
+            duration: 60,
+            access: 'free',
+            questions: [],
+            difficulty: 'Medium',
+         });
+      }
+      
       fetchFormData();
-      form.reset({
-        ...form.getValues(),
-        title: '',
-        board: '',
-        examCategory: '',
-        exam: '',
-        subject: '',
-        chapter: '',
-        description: '',
-        duration: 60,
-        access: 'free',
-        questions: [],
-        newSubject: '',
-        newBoard: '',
-        newExamCategory: '',
-        newExam: '',
-        newChapterNo: '',
-        newChapterName: '',
-        difficulty: 'Medium',
-      });
-      setChapters([]);
-      setExams([]);
+
     } catch (error) {
        toast({
         variant: "destructive",
@@ -247,7 +262,7 @@ export default function CreateTestPage() {
         description: (error as Error).message,
       });
     }
-  };
+  }
 
   const handleTabChange = (value: string) => {
     form.setValue('testType', value, { shouldValidate: true });
@@ -338,7 +353,7 @@ export default function CreateTestPage() {
       </p>
 
     {contentTypes.length > 0 && (
-      <Tabs defaultValue={contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
+      <Tabs defaultValue={form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
         <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${contentTypes.length}, 1fr)`}}>
           {contentTypes.map((type) => (
             <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
@@ -349,7 +364,7 @@ export default function CreateTestPage() {
 
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form className="space-y-8">
           <Card>
             <CardHeader>
               <CardTitle>Content Details</CardTitle>
@@ -783,9 +798,24 @@ export default function CreateTestPage() {
             </CardFooter>
           </Card>
           
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Adding..." : "Add Content"}
-          </Button>
+           <div className="flex items-center gap-4">
+                <Button 
+                    type="button" 
+                    onClick={form.handleSubmit(data => handleFormSubmit(data, 'full'))} 
+                    disabled={form.formState.isSubmitting}
+                >
+                    {form.formState.isSubmitting ? "Adding..." : "Add Content"}
+                </Button>
+                <Button 
+                    type="button" 
+                    variant="secondary"
+                    onClick={form.handleSubmit(data => handleFormSubmit(data, 'partial'))} 
+                    disabled={form.formState.isSubmitting}
+                >
+                    <Save className="mr-2 h-4 w-4"/>
+                    {form.formState.isSubmitting ? "Saving..." : "Save and Add Another"}
+                </Button>
+           </div>
         </form>
       </Form>
     </div>
