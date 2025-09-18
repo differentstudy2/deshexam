@@ -106,27 +106,45 @@ function ResultsDisplay() {
     <>
       <Card className="max-w-2xl mx-auto">
         <CardHeader className="text-center items-center">
-           <Avatar className="h-20 w-20 mb-4">
-              <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/80/80`} />
-              <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
-            </Avatar>
-            <CardTitle className="text-3xl">{student?.displayName}</CardTitle>
-          <CardDescription>You've completed the {test.title}.</CardDescription>
-           { (student?.school || student?.classGrade || student?.targetExam) && (
-              <div className="text-sm text-muted-foreground flex flex-wrap justify-center items-center gap-x-4 gap-y-1 pt-2">
-                {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
-                {student.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
-                {student.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
-              </div>
-            )}
+             <div className="flex w-full justify-between items-center">
+                 <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20">
+                        <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/80/80`} />
+                        <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                         <CardTitle className="text-2xl text-left">{student?.displayName}</CardTitle>
+                         { (student?.school || student?.classGrade || student?.targetExam) && (
+                            <div className="text-sm text-muted-foreground flex flex-wrap justify-start items-center gap-x-4 gap-y-1 pt-2">
+                                {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                                {student.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                                {student.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+                            </div>
+                        )}
+                    </div>
+                 </div>
+                 
+                 <div className="flex items-center gap-4">
+                    <div className="text-right">
+                        <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
+                        <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                         <p className="text-5xl font-bold flex items-center justify-center gap-2">
+                            <Award className="w-12 h-12 text-primary" />
+                            {percentage}%
+                        </p>
+                         <div className="text-xs font-semibold text-muted-foreground mt-1">Your Score</div>
+                    </div>
+                </div>
+            </div>
+          <CardDescription className="pt-4">You've completed the {test.title}.</CardDescription>
         </CardHeader>
         <CardContent className="p-6 text-center space-y-6">
           <Separator />
           <div>
-            <p className="text-muted-foreground text-sm">Your Score</p>
-            <p className="text-5xl font-bold flex items-center justify-center gap-2">
-                <Award className="w-12 h-12 text-primary" />
-                {percentage}%
+             <p className="text-lg text-muted-foreground">
+                You got <span className="font-bold text-green-600">{correctAnswers}</span> correct and <span className="font-bold text-destructive">{incorrectAnswers}</span> incorrect.
             </p>
           </div>
           <Progress value={percentage} className="w-full h-3" />

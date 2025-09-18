@@ -111,10 +111,23 @@ function ReviewDisplay() {
       <>
         <Card className="max-w-4xl mx-auto mb-8 relative">
              <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle>Review Summary</CardTitle>
-                        <CardDescription>A summary of the test submission and student details.</CardDescription>
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                         <Avatar className="h-16 w-16">
+                            <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
+                            <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                            <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                                {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                                {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                                {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+                            </div>
+                        </div>
                     </div>
                     <div className="flex items-center gap-6">
                         <div className="text-right">
@@ -128,24 +141,7 @@ function ReviewDisplay() {
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
-                        <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
-                        <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <div className="flex items-center gap-2">
-                           <h3 className="text-lg font-semibold">{student?.displayName}</h3>
-                           <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
-                        </div>
-                         <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
-                          {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
-                          {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
-                          {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
-                        </div>
-                    </div>
-                </div>
+            <CardContent className="space-y-4 pt-0">
                 <Separator />
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground col-span-2 md:col-span-5"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
@@ -369,6 +365,7 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
 
