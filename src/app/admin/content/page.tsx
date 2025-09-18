@@ -93,6 +93,7 @@ const questionFormSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
 });
@@ -106,6 +107,7 @@ type Question = {
     createdAt: string;
     subject: string;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer';
+    marks: number;
     options?: {text: string}[];
     correctAnswer: string;
 };
@@ -907,6 +909,19 @@ export default function ManageContentPage() {
                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
                                 </SelectContent>
                             </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={questionForm.control}
+                    name="marks"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Marks</FormLabel>
+                            <FormControl>
+                                <Input type="number" {...field} />
+                            </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}

@@ -47,6 +47,7 @@ const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
 });
@@ -731,6 +732,18 @@ export default function EditContentPage() {
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name={`questions.${index}.marks`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input type="number" placeholder="Marks" className="w-24" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Remove
@@ -824,7 +837,7 @@ export default function EditContentPage() {
                  <Button
                     type="button"
                     variant="outline"
-                    onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}
+                    onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}
                 >
                     <PlusCircle className="mr-2" />
                     Add Question
