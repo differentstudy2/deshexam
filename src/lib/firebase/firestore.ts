@@ -236,7 +236,7 @@ export const addContent = async (contentData: any) => {
             return { ...question, id: questionId };
         }));
 
-        const finalContentData = {
+        const finalContentData: any = {
             ...restOfContentData,
             questions: questionsWithIds,
             authorId: user.uid,
@@ -247,6 +247,10 @@ export const addContent = async (contentData: any) => {
 
         if(featureImage){
             finalContentData.featureImage = featureImage;
+        }
+
+        if (finalContentData.price === undefined || finalContentData.price === null) {
+            delete finalContentData.price;
         }
 
         const docRef = await addDoc(collection(db, "content"), finalContentData);
@@ -338,11 +342,15 @@ export const updateContent = async (contentId: string, contentData: any) => {
             return { ...question, id: questionId };
         }));
 
-        const finalContentData = {
+        const finalContentData: any = {
             ...restOfContentData,
             questions: questionsWithIds,
             updatedAt: serverTimestamp(),
         };
+
+        if (finalContentData.price === undefined || finalContentData.price === null) {
+            delete finalContentData.price;
+        }
         
         try {
             await updateDoc(contentRef, finalContentData);
@@ -351,10 +359,15 @@ export const updateContent = async (contentId: string, contentData: any) => {
             throw new Error("Failed to update content with questions.");
         }
     } else {
+        const updateData = { ...contentData };
+        if (updateData.price === undefined || updateData.price === null) {
+            delete updateData.price;
+        }
+
         // If it's a simple field update (like access level)
         try {
             await updateDoc(contentRef, {
-                ...contentData,
+                ...updateData,
                 updatedAt: serverTimestamp(),
             });
         } catch (e) {
@@ -986,3 +999,5 @@ export const updateUserSubscription = async (userIds: string[], plan: 'pro' | 'p
         throw new Error("Failed to update user subscription.");
     }
 }
+
+    
