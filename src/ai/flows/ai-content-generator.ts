@@ -19,7 +19,7 @@ const QuestionSchema = z.object({
   correctAnswer: z.string().describe('The correct answer for the question.'),
 });
 
-export const AIContentGeneratorInputSchema = z.object({
+const AIContentGeneratorInputSchema = z.object({
   topic: z.string().describe('The main topic or subject for the content to be generated.'),
   contentType: z.string().describe('The type of content to generate (e.g., "Mock Test", "Quiz").'),
   numQuestions: z.number().int().positive().describe('The number of questions to generate.'),
@@ -27,7 +27,7 @@ export const AIContentGeneratorInputSchema = z.object({
 });
 export type AIContentGeneratorInput = z.infer<typeof AIContentGeneratorInputSchema>;
 
-export const AIContentGeneratorOutputSchema = z.object({
+const AIContentGeneratorOutputSchema = z.object({
   title: z.string().describe('A suitable title for the generated content.'),
   description: z.string().describe('A brief description of the content.'),
   questions: z.array(QuestionSchema).describe('An array of generated questions.'),
