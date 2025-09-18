@@ -36,29 +36,31 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2 } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Sparkles } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
+  explanation: z.string().optional(),
 });
 
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
-  marks: z.coerce.number().int().positive('Marks must be a positive number.'),
+  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
+  explanation: z.string().optional(),
 });
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
-  board: z.string().min(1, 'Please select or add a board.'),
-  examCategory: z.string().min(1, 'Please select or add an exam category.'),
-  exam: z.string().min(1, 'Please select or add an exam.'),
-  subject: z.string().min(1, 'Please select or add a subject.'),
-  chapter: z.string().min(1, 'Please select or add a chapter.'),
+  board: z.string().optional(),
+  examCategory: z.string().optional(),
+  exam: z.string().optional(),
+  subject: z.string().optional(),
+  chapter: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newExamCategory: z.string().optional(),
@@ -70,12 +72,12 @@ const formSchema = z.object({
   duration: z.coerce
     .number()
     .int()
-    .positive('Duration must be a positive number of minutes.'),
-  difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+    .positive('Duration must be a positive number of minutes.').optional(),
+  difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
   access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
-  questions: z.array(questionSchema).min(1, 'Please add at least one question.'),
+  questions: z.array(questionSchema).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -130,11 +132,17 @@ export default function EditContentPage() {
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'questions',
+  });
+
   const questions = form.watch('questions');
   useEffect(() => {
-    const numberOfQuestions = questions.length;
+    const numberOfQuestions = questions?.length || 0;
     form.setValue('duration', numberOfQuestions, { shouldValidate: true });
-  }, [questions, form.setValue]);
+  }, [questions, form]);
+
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -181,7 +189,7 @@ export default function EditContentPage() {
           title: 'Error fetching content data',
           description: (error as Error).message,
         });
-        router.push('/dashboard/my-content');
+        router.push('/admin/content');
       } finally {
         setLoading(false);
       }
@@ -189,11 +197,6 @@ export default function EditContentPage() {
     fetchContent();
   }, [contentId, form, toast, router]);
 
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'questions',
-  });
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
@@ -243,7 +246,7 @@ export default function EditContentPage() {
       await updateContent(contentId, contentToSave);
       toast({
         title: 'Content Updated!',
-        description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully updated.`,
+        description: `The ${data.testType?.toLowerCase()} "${data.title}" has been successfully updated.`,
       });
       router.push('/admin/content');
     } catch (error) {
@@ -772,54 +775,87 @@ export default function EditContentPage() {
                                 />
                                 
                                 {questionType === 'Multiple Choice' && (
-                                    <>
-                                        <FormLabel>Options</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name={`questions.${index}.correctAnswer`}
-                                            render={({ field }) => (
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {[0, 1, 2, 3].map(optionIndex => (
-                                                         <FormField
-                                                            key={optionIndex}
-                                                            control={form.control}
-                                                            name={`questions.${index}.options.${optionIndex}.text`}
-                                                            render={({ field: optionField }) => (
-                                                                <FormItem className="flex items-center gap-4">
-                                                                     <FormControl>
-                                                                        <RadioGroupItem value={optionField.value} />
-                                                                     </FormControl>
-                                                                    <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    ))}
-                                                </RadioGroup>
-                                            )}
-                                        />
-                                        <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
+                                      <div className="space-y-4">
+                                          <FormLabel>Options</FormLabel>
+                                          <Controller
+                                              control={form.control}
+                                              name={`questions.${index}.correctAnswer`}
+                                              render={({ field }) => (
+                                                  <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                      {[0, 1, 2, 3].map(optionIndex => (
+                                                          <div key={optionIndex} className="flex items-start gap-4">
+                                                              <FormControl>
+                                                                  <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" />
+                                                              </FormControl>
+                                                              <div className="space-y-2 flex-1">
+                                                                  <FormField
+                                                                      control={form.control}
+                                                                      name={`questions.${index}.options.${optionIndex}.text`}
+                                                                      render={({ field: optionField }) => (
+                                                                          <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                                      )}
+                                                                  />
+                                                                  <FormField
+                                                                      control={form.control}
+                                                                      name={`questions.${index}.options.${optionIndex}.explanation`}
+                                                                      render={({ field: explanationField }) => (
+                                                                          <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
+                                                                      )}
+                                                                  />
+                                                              </div>
+                                                          </div>
+                                                      ))}
+                                                  </RadioGroup>
+                                              )}
+                                          />
+                                          <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
 
-                                    </>
-                                )}
-                                {questionType === 'True/False' && (
-                                     <FormField
-                                        control={form.control}
-                                        name={`questions.${index}.correctAnswer`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Correct Answer</FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
-                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
-                                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
+                                      </div>
+                                  )}
+                                  {questionType === 'True/False' && (
+                                      <div className='space-y-4'>
+                                          <FormField
+                                              control={form.control}
+                                              name={`questions.${index}.correctAnswer`}
+                                              render={({ field }) => (
+                                                  <FormItem>
+                                                      <FormLabel>Correct Answer</FormLabel>
+                                                      <FormControl>
+                                                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                                                              <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
+                                                              <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
+                                                          </RadioGroup>
+                                                      </FormControl>
+                                                      <FormMessage />
+                                                  </FormItem>
+                                              )}
+                                          />
+                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                               <FormField
+                                                  control={form.control}
+                                                  name={`questions.${index}.options.0.explanation`}
+                                                  render={({ field }) => (
+                                                      <FormItem>
+                                                          <FormLabel>Explanation for "True"</FormLabel>
+                                                          <FormControl><Textarea placeholder="Explain why it's true..." {...field} /></FormControl>
+                                                          <FormMessage />
+                                                      </FormItem>
+                                                  )}
+                                              />
+                                               <FormField
+                                                  control={form.control}
+                                                  name={`questions.${index}.options.1.explanation`}
+                                                  render={({ field }) => (
+                                                      <FormItem>
+                                                          <FormLabel>Explanation for "False"</FormLabel>
+                                                          <FormControl><Textarea placeholder="Explain why it's false..." {...field} /></FormControl>
+                                                          <FormMessage />
+                                                      </FormItem>
+                                                  )}
+                                              />
+                                          </div>
+                                      </div>
+                                  )}
                                 {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                     <FormField
                                         control={form.control}
@@ -844,7 +880,7 @@ export default function EditContentPage() {
                  <Button
                     type="button"
                     variant="outline"
-                    onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}
+                    onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], correctAnswer: '', explanation: '' })}
                 >
                     <PlusCircle className="mr-2" />
                     Add Question
