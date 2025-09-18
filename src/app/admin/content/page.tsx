@@ -3,14 +3,18 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion, addQuestionsToContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion, addQuestionsToContent, updateQuestion } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -61,6 +65,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ContentBadge } from '@/components/content-badge';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
 type Content = {
@@ -78,12 +85,29 @@ type Content = {
     chapter: string;
 }
 
+const optionSchema = z.object({
+  text: z.string().min(1, 'Option text cannot be empty.'),
+});
+
+const questionFormSchema = z.object({
+  id: z.string().optional(),
+  text: z.string().min(1, 'Question text cannot be empty.'),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  options: z.array(optionSchema).optional(),
+  correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
+});
+
+type QuestionFormValues = z.infer<typeof questionFormSchema>;
+
 type Question = {
     id: string;
     text: string;
     authorName: string;
     createdAt: string;
     subject: string;
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer';
+    options?: {text: string}[];
+    correctAnswer: string;
 };
 
 type ContentType = { id: string, name: string };
@@ -231,14 +255,16 @@ const QuestionsTable = ({
     selectedQuestions,
     onSelectQuestion,
     onSelectAllQuestions,
-    isAllQuestionsSelected
+    isAllQuestionsSelected,
+    onEditQuestion
 }: { 
     questions: Question[], 
     loading: boolean,
     selectedQuestions: string[],
     onSelectQuestion: (id: string) => void,
     onSelectAllQuestions: (checked: boolean) => void,
-    isAllQuestionsSelected: boolean
+    isAllQuestionsSelected: boolean,
+    onEditQuestion: (question: Question) => void
 }) => (
      <div className="overflow-x-auto">
         <Table>
@@ -285,9 +311,14 @@ const QuestionsTable = ({
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
                             <TableCell className="text-right">
-                                <Button asChild variant="outline" size="sm">
-                                    <Link href={`/question/${question.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
-                                </Button>
+                                <div className="flex gap-2 justify-end">
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href={`/question/${question.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => onEditQuestion(question)}>
+                                        <Pencil className="mr-2 h-4 w-4"/>Edit
+                                    </Button>
+                                </div>
                             </TableCell>
                         </TableRow>
                     ))
@@ -324,6 +355,41 @@ export default function ManageContentPage() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [dialogSelectedContent, setDialogSelectedContent] = useState<string[]>([]);
   
+  const [isEditQuestionDialogOpen, setIsEditQuestionDialogOpen] = useState(false);
+  const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
+  
+  const questionForm = useForm<QuestionFormValues>({
+    resolver: zodResolver(questionFormSchema),
+  });
+
+  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
+    control: questionForm.control,
+    name: 'options',
+  });
+
+  const openEditQuestionDialog = (question: Question) => {
+    setQuestionToEdit(question);
+    questionForm.reset(question);
+    setIsEditQuestionDialogOpen(true);
+  };
+  
+  const handleEditQuestionSubmit = async (data: QuestionFormValues) => {
+    if (!questionToEdit) return;
+    try {
+        await updateQuestion(questionToEdit.id, data);
+        toast({ title: 'Question updated successfully!' });
+        setAllQuestions(prev => prev.map(q => q.id === questionToEdit.id ? { ...q, ...data } : q));
+        setIsEditQuestionDialogOpen(false);
+        setQuestionToEdit(null);
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Error updating question',
+            description: (error as Error).message,
+        });
+    }
+  };
+
   const allTabs = useMemo(() => {
     const baseTabs = [{ id: 'all', name: 'All' }, ...contentTypes];
     const hasQuestionsTab = baseTabs.some(tab => tab.name.toLowerCase() === 'questions');
@@ -730,6 +796,7 @@ export default function ManageContentPage() {
                                 onSelectQuestion={handleSelectQuestion}
                                 onSelectAllQuestions={handleSelectAllQuestions}
                                 isAllQuestionsSelected={isAllQuestionsSelected}
+                                onEditQuestion={openEditQuestionDialog}
                              />
                         ) : (
                            <ContentTable 
@@ -804,6 +871,120 @@ export default function ManageContentPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      <Dialog open={isEditQuestionDialogOpen} onOpenChange={setIsEditQuestionDialogOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Question</DialogTitle>
+            <DialogDescription>Modify the question details below.</DialogDescription>
+          </DialogHeader>
+          <Form {...questionForm}>
+            <form onSubmit={questionForm.handleSubmit(handleEditQuestionSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
+                <FormField
+                    control={questionForm.control}
+                    name="text"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Question Text</FormLabel>
+                            <FormControl>
+                                <Textarea {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={questionForm.control}
+                    name="type"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Question Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                    <SelectItem value="True/False">True/False</SelectItem>
+                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                {questionForm.watch('type') === 'Multiple Choice' && (
+                     <>
+                        <FormLabel>Options</FormLabel>
+                        <Controller
+                            control={questionForm.control}
+                            name="correctAnswer"
+                            render={({ field }) => (
+                                <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-2">
+                                    {optionFields.map((option, optionIndex) => (
+                                        <FormField
+                                            key={option.id}
+                                            control={questionForm.control}
+                                            name={`options.${optionIndex}.text`}
+                                            render={({ field: optionField }) => (
+                                                <FormItem className="flex items-center gap-4">
+                                                        <FormControl>
+                                                        <RadioGroupItem value={optionField.value} />
+                                                        </FormControl>
+                                                    <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            )}
+                        />
+                        <FormMessage>{questionForm.formState.errors.correctAnswer?.message}</FormMessage>
+                    </>
+                )}
+                 {questionForm.watch('type') === 'True/False' && (
+                     <FormField
+                        control={questionForm.control}
+                        name="correctAnswer"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Correct Answer</FormLabel>
+                                <FormControl>
+                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
+                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
+                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
+                 {questionForm.watch('type') === 'Short Answer' && (
+                    <FormField
+                        control={questionForm.control}
+                        name="correctAnswer"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Answer</FormLabel>
+                                <FormControl>
+                                    <Input {...field} placeholder="Enter the correct answer" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
+              <DialogFooter className="pt-4">
+                <Button variant="ghost" onClick={() => setIsEditQuestionDialogOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={questionForm.formState.isSubmitting}>
+                    {questionForm.formState.isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Changes'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
