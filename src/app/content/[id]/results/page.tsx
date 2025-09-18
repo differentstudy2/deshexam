@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -10,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School } from 'lucide-react';
+import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -18,9 +19,11 @@ import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebas
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { ScoreCircle } from '@/components/feature/score-circle';
+import { Badge } from '@/components/ui/badge';
 
-type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string };
-type Test = { id: string; title: string; testType: string; };
+type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; submittedAt: any;};
+type Test = { id: string; title: string; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
 
 
@@ -50,6 +53,9 @@ function ResultsDisplay() {
         setLoading(true);
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
+          if (submissionData.submittedAt && typeof submissionData.submittedAt.toDate === 'function') {
+            submissionData.submittedAt = submissionData.submittedAt.toDate();
+          }
           setSubmission(submissionData);
            const [testData, studentData] = await Promise.all([
              getContentById(submissionData.testId) as Promise<Test>,
@@ -83,7 +89,7 @@ function ResultsDisplay() {
     );
   }
 
-  if (!submission || !test) {
+  if (!submission || !test || !student) {
     return (
       <div className="text-center min-h-[400px] flex flex-col justify-center">
         <h2 className="text-2xl font-bold">Results not found</h2>
@@ -97,91 +103,78 @@ function ResultsDisplay() {
 
   const { score, totalQuestions, testType } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
-  const correctAnswers = score;
-  const incorrectAnswers = totalQuestions - score;
   const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
   const contentBaseUrl = `/${typeSlug}`;
 
   return (
     <>
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader className="text-center items-center">
-             <div className="flex w-full justify-between items-center">
-                 <div className="flex items-center gap-4">
-                    <Avatar className="h-20 w-20">
-                        <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/80/80`} />
+      <Card className="max-w-4xl mx-auto">
+         <CardHeader>
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                     <Avatar className="h-16 w-16">
+                        <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                         <CardTitle className="text-2xl text-left">{student?.displayName}</CardTitle>
-                         { (student?.school || student?.classGrade || student?.targetExam) && (
-                            <div className="text-sm text-muted-foreground flex flex-wrap justify-start items-center gap-x-4 gap-y-1 pt-2">
-                                {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
-                                {student.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
-                                {student.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
-                            </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                        <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                            {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                            {student.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                            {student.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+                        </div>
                     </div>
-                 </div>
-                 
-                 <div className="flex items-center gap-4">
+                </div>
+                <div className="flex items-center gap-6">
                     <div className="text-right">
                         <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
                         <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
                     </div>
                     <div className="flex flex-col items-center">
-                         <p className="text-5xl font-bold flex items-center justify-center gap-2">
-                            <Award className="w-12 h-12 text-primary" />
-                            {percentage}%
-                        </p>
-                         <div className="text-xs font-semibold text-muted-foreground mt-1">Your Score</div>
+                        <ScoreCircle score={percentage} size={60} strokeWidth={5}/>
+                        <span className="text-xs font-semibold text-muted-foreground mt-1">Your Score</span>
                     </div>
                 </div>
             </div>
-          <CardDescription className="pt-4">You've completed the {test.title}.</CardDescription>
         </CardHeader>
-        <CardContent className="p-6 text-center space-y-6">
-          <Separator />
-          <div>
-             <p className="text-lg text-muted-foreground">
-                You got <span className="font-bold text-green-600">{correctAnswers}</span> correct and <span className="font-bold text-destructive">{incorrectAnswers}</span> incorrect.
-            </p>
-          </div>
-          <Progress value={percentage} className="w-full h-3" />
-          <div className="flex justify-around pt-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold">{totalQuestions}</p>
-              <p className="text-muted-foreground">Total Questions</p>
+        <CardContent className="space-y-4 pt-0">
+            <Separator />
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
+                {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
+
+                <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Exam:</strong> <span className="text-foreground">{test.exam}</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{totalQuestions}</span></div>
+                
+                <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Duration:</strong> <span className="text-foreground">{test.duration} min</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Difficulty:</strong> <span className="text-foreground">{test.difficulty}</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Type:</strong> <span className="text-foreground">{test.testType}</span></div>
+                
+                <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submission.submittedAt.toLocaleDateString()}</span></div>
+                 <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submission.submittedAt.toLocaleTimeString()}</span></div>
             </div>
-            <div className="text-center text-green-600">
-              <p className="text-2xl font-bold flex items-center justify-center gap-2">
-                <CheckCircle /> {correctAnswers}
-              </p>
-              <p className="text-muted-foreground">Correct</p>
-            </div>
-            <div className="text-center text-destructive">
-              <p className="text-2xl font-bold flex items-center justify-center gap-2">
-                <XCircle /> {incorrectAnswers}
-              </p>
-              <p className="text-muted-foreground">Incorrect</p>
-            </div>
-          </div>
-          <div className="flex gap-4 justify-center pt-6">
-            <Button asChild>
-              <Link href={`${contentBaseUrl}/${test.id}/review?submissionId=${submissionId}`}>
-                <FileQuestion className="mr-2"/>
-                Review Answers
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href={`${contentBaseUrl}/${test.id}`}>Try Again</Link>
-            </Button>
-          </div>
-           <div className="pt-4">
-                <Button variant="link" asChild>
-                    <Link href={contentBaseUrl}>Back to {test.testType}s</Link>
+            <Separator />
+             <div className="flex gap-4 justify-center pt-2">
+                <Button asChild>
+                <Link href={`${contentBaseUrl}/${test.id}/review?submissionId=${submissionId}`}>
+                    <FileQuestion className="mr-2"/>
+                    Review Answers
+                </Link>
                 </Button>
-           </div>
+                <Button variant="outline" asChild>
+                <Link href={`${contentBaseUrl}/${test.id}`}>Try Again</Link>
+                </Button>
+            </div>
+            <div className="pt-2 text-center">
+                    <Button variant="link" asChild>
+                        <Link href={contentBaseUrl}>Back to {test.testType}s</Link>
+                    </Button>
+            </div>
         </CardContent>
       </Card>
     </>
