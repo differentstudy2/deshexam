@@ -103,7 +103,7 @@ function ReviewDisplay() {
 
   const { answers, score, totalQuestions, submittedAt } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
-  const submissionDate = submittedAt ? format(submittedAt.toDate(), "PPP") : 'N/A';
+  const submissionDate = submittedAt ? format(submittedAt.toDate(), "MMM d, yyyy, h:mm a") : 'N/A';
 
   return (
       <>
@@ -120,7 +120,7 @@ function ReviewDisplay() {
                     </Avatar>
                     <div>
                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
-                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                         <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
                           {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
                           {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
                           {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
@@ -343,5 +343,3 @@ export default function TestReviewPage() {
     </div>
   );
 }
-
-    
