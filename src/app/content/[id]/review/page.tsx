@@ -56,6 +56,9 @@ function ReviewDisplay() {
         setLoading(true);
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
+          if (submissionData.submittedAt && typeof submissionData.submittedAt.toDate === 'function') {
+            submissionData.submittedAt = submissionData.submittedAt.toDate();
+          }
           setSubmission(submissionData);
           const [testData, studentData] = await Promise.all([
              getContentById(submissionData.testId) as Promise<Test>,
@@ -347,6 +350,7 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
 
