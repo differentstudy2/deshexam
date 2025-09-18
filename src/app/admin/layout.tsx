@@ -22,6 +22,7 @@ import {
   Users,
   Settings,
   ShieldCheck,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,6 +36,7 @@ const navItems = [
   { href: '/admin', label: 'Admin Overview', icon: ShieldCheck },
   { href: '/admin/users', label: 'Manage Users', icon: Users },
   { href: '/admin/content', label: 'Manage Content', icon: Library },
+  { href: '/admin/coupons', label: 'Manage Coupons', icon: Tag },
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
 ];
 
