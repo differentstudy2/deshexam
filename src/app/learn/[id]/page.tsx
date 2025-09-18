@@ -242,14 +242,14 @@ export default function LearnArticlePage() {
             <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col items-start">
                   <div className="flex items-center gap-2 text-sm">
                       <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
                       <span className="text-muted-foreground">
                           {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
                       </span>
                   </div>
-                  {comment.rating && <StarRating rating={comment.rating} />}
+                   {comment.rating && <StarRating rating={comment.rating} />}
               </div>
               <p className="text-foreground mt-1">{comment.text}</p>
               <div className="flex items-center gap-1 mt-2">
@@ -388,6 +388,7 @@ export default function LearnArticlePage() {
     </div>
   );
 }
+
 
 
 
