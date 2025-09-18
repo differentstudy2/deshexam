@@ -1,9 +1,10 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { getContentById, addComment, getComments } from '@/lib/firebase/firestore';
-import { Loader2, ArrowLeft, User, Calendar, MessageSquare } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, MessageSquare, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 
 type Article = {
@@ -36,12 +38,15 @@ type Comment = {
     authorName: string;
     authorPhotoURL?: string;
     createdAt: Date;
+    rating?: number;
 }
 
 export default function LearnArticlePage() {
   const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -91,11 +96,12 @@ export default function LearnArticlePage() {
 
     setIsSubmittingComment(true);
     try {
-        await addComment('content', articleId, { text: newComment });
+        await addComment('content', articleId, { text: newComment, rating });
         setNewComment('');
+        setRating(0);
         const updatedComments = await getComments('content', articleId);
         setComments(updatedComments as Comment[]);
-        toast({ title: "Comment posted!" });
+        toast({ title: "Comment and rating posted!" });
     } catch (error) {
          toast({
           variant: "destructive",
@@ -131,6 +137,27 @@ export default function LearnArticlePage() {
       </div>
     );
   }
+  
+  const StarRating = ({ rating, interactive = false, onRate, onHover }: { rating: number, interactive?: boolean, onRate?: (rate: number) => void, onHover?: (rate: number) => void }) => {
+    const stars = Array.from({ length: 5 }, (_, i) => i + 1);
+    return (
+        <div className="flex items-center" onMouseLeave={() => onHover && onHover(0)}>
+            {stars.map(star => (
+                <Star
+                    key={star}
+                    className={cn(
+                        "w-5 h-5",
+                        star <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300",
+                        interactive && "cursor-pointer"
+                    )}
+                    onClick={() => interactive && onRate && onRate(star)}
+                    onMouseEnter={() => interactive && onHover && onHover(star)}
+                />
+            ))}
+        </div>
+    );
+  };
+
 
   return (
     <div className="container py-12">
@@ -185,6 +212,15 @@ export default function LearnArticlePage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleCommentSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="font-medium">Your Rating</label>
+                            <StarRating 
+                                rating={hoverRating || rating} 
+                                interactive={true}
+                                onRate={setRating}
+                                onHover={setHoverRating}
+                            />
+                        </div>
                         <Textarea 
                             placeholder={user ? "Write a comment..." : "Please log in to write a comment."}
                             value={newComment}
@@ -206,11 +242,14 @@ export default function LearnArticlePage() {
                                     <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
-                                        <span className="text-muted-foreground">
-                                            {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
-                                        </span>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
+                                            <span className="text-muted-foreground">
+                                                {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
+                                            </span>
+                                        </div>
+                                        {comment.rating && <StarRating rating={comment.rating} />}
                                     </div>
                                     <p className="text-foreground mt-1">{comment.text}</p>
                                 </div>

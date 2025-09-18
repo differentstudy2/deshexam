@@ -183,7 +183,7 @@ export const handleQuestionVote = async (questionId: string, voteType: 'like' | 
 };
 
 
-export const addComment = async (collectionName: 'questions' | 'content', documentId: string, commentData: any) => {
+export const addComment = async (collectionName: 'questions' | 'content', documentId: string, commentData: { text: string, rating?: number }) => {
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -193,14 +193,20 @@ export const addComment = async (collectionName: 'questions' | 'content', docume
 
     try {
         const userProfile = await getUserProfile(user.uid);
-        const docRef = await addDoc(collection(db, collectionName, documentId, "comments"), {
+        const dataToSave: any = {
             ...commentData,
             authorId: user.uid,
             authorName: userProfile?.displayName || user.email,
             authorUsername: userProfile?.username,
             authorPhotoURL: userProfile?.photoURL,
             createdAt: serverTimestamp(),
-        });
+        };
+
+        if (commentData.rating === undefined) {
+            delete dataToSave.rating;
+        }
+
+        const docRef = await addDoc(collection(db, collectionName, documentId, "comments"), dataToSave);
         return docRef.id;
     } catch (e) {
         console.error("Error adding comment: ", e);
