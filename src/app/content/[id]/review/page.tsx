@@ -401,10 +401,21 @@ function ReviewDisplay() {
                             </div>
                         )}
                          <div className="mt-4 flex items-center gap-2">
-                            <Button variant={userHasLiked ? "default" : "outline"} size="sm" onClick={() => handleVote(question.id, 'like')} disabled={isVoting[question.id] || (!!user && !!userHasDisliked)}>
+                            <Button 
+                                variant={userHasLiked ? "default" : "outline"}
+                                size="sm" 
+                                onClick={() => handleVote(question.id, 'like')} 
+                                disabled={isVoting[question.id]}
+                                className={cn(userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
+                            >
                                 <ThumbsUp className="mr-2 h-4 w-4" /> Like ({question.likes || 0})
                             </Button>
-                            <Button variant={userHasDisliked ? "destructive" : "outline"} size="sm" onClick={() => handleVote(question.id, 'dislike')} disabled={isVoting[question.id] || (!!user && !!userHasLiked)}>
+                            <Button 
+                                variant={userHasDisliked ? "destructive" : "outline"} 
+                                size="sm" 
+                                onClick={() => handleVote(question.id, 'dislike')} 
+                                disabled={isVoting[question.id]}
+                            >
                                 <ThumbsDown className="mr-2 h-4 w-4" /> Dislike ({question.dislikes || 0})
                             </Button>
                         </div>
@@ -460,5 +471,6 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
