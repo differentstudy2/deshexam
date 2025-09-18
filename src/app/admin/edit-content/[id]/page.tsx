@@ -48,7 +48,7 @@ import {
 } from '@/components/ui/dialog';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 
 const optionSchema = z.object({
@@ -1191,3 +1191,5 @@ export default function EditContentPage() {
   );
 }
  
+
+    
