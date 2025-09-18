@@ -15,8 +15,9 @@ const QuestionSchema = z.object({
   text: z.string().describe('The text of the question.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']).describe('The type of the question.'),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
-  options: z.array(z.object({ text: z.string() })).optional().describe('An array of options for Multiple Choice questions.'),
+  options: z.array(z.object({ text: z.string(), explanation: z.string().optional() })).optional().describe('An array of options for Multiple Choice questions, each with text and an optional explanation.'),
   correctAnswer: z.string().describe('The correct answer for the question.'),
+  explanation: z.string().optional().describe('A general explanation for the correct answer.'),
 });
 
 const AIContentGeneratorInputSchema = z.object({
@@ -65,8 +66,9 @@ For each question, provide:
 - The question text.
 - The question type (either 'Multiple Choice', 'True/False', or 'Short Answer').
 - The marks for the question (default to 1).
-- For 'Multiple Choice' questions, provide exactly 4 options.
+- For 'Multiple Choice' questions, provide exactly 4 options. For each option, provide the option text and a brief explanation as to why that option is correct or incorrect.
 - The correct answer.
+- A general explanation for the correct answer.
 
 Ensure the generated content is accurate and relevant to the provided source.
 The questions should be diverse and test different aspects of the topic.

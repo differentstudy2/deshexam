@@ -18,8 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
-type Option = { text: string; };
-type Question = { id: string; text: string; type: string; options?: Option[]; correctAnswer: string; };
+type Option = { text: string; explanation?: string; };
+type Question = { id: string; text: string; type: string; options?: Option[]; correctAnswer: string; explanation?: string; };
 type Test = { id: string; title: string; questions: Question[]; testType: string; };
 type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; };
 
@@ -122,18 +122,37 @@ function ReviewDisplay() {
                             </Button>
                         )}
                     </div>
-                    <div className="mt-2 text-sm space-y-2">
-                      <div className={cn("p-2 rounded-md", isCorrect ? "bg-green-100 dark:bg-green-900/20" : "bg-red-100 dark:bg-red-900/20")}>
-                        <span className="font-medium">Your Answer: </span>
-                        <span>{userAnswer || "No answer"}</span>
-                      </div>
-                      {!isCorrect && (
-                         <div className="p-2 rounded-md bg-gray-100 dark:bg-gray-800">
-                           <span className="font-medium">Correct Answer: </span>
-                           <span>{question.correctAnswer}</span>
+                     <div className="mt-4 space-y-2">
+                        {question.options?.map((option, optIndex) => {
+                            const isUserAnswer = userAnswer === option.text;
+                            const isCorrectAnswer = question.correctAnswer === option.text;
+
+                            return (
+                                <div key={optIndex} className={cn(
+                                    "p-3 rounded-lg border",
+                                    isUserAnswer && !isCorrectAnswer && "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800",
+                                    isCorrectAnswer && "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                )}>
+                                    <div className="flex items-center">
+                                       <span className="font-medium">{option.text}</span>
+                                       {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
+                                       {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-2">Correct Answer</Badge>}
+                                    </div>
+                                    {option.explanation && (
+                                        <p className="text-xs text-muted-foreground mt-1 pl-2 border-l-2 ml-1">
+                                            {option.explanation}
+                                        </p>
+                                    )}
+                                </div>
+                            )
+                        })}
+                     </div>
+                      {question.explanation && (
+                         <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800">
+                           <h4 className="font-semibold text-sm mb-1">General Explanation</h4>
+                           <p className="text-sm">{question.explanation}</p>
                          </div>
                       )}
-                    </div>
                   </div>
                 </div>
                 {index < test.questions.length -1 && <Separator className="mt-6" />}

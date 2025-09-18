@@ -54,6 +54,7 @@ import { generateDescription } from '@/ai/flows/ai-description-generator';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
+  explanation: z.string().optional(),
 });
 
 const questionSchema = z.object({
@@ -1194,7 +1195,7 @@ export default function CreateTestPage() {
                                   />
                                   
                                   {questionType === 'Multiple Choice' && (
-                                      <>
+                                      <div className="space-y-4">
                                           <FormLabel>Options</FormLabel>
                                           <Controller
                                               control={form.control}
@@ -1202,27 +1203,34 @@ export default function CreateTestPage() {
                                               render={({ field }) => (
                                                   <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                       {[0, 1, 2, 3].map(optionIndex => (
-                                                          <FormField
-                                                              key={optionIndex}
-                                                              control={form.control}
-                                                              name={`questions.${index}.options.${optionIndex}.text`}
-                                                              render={({ field: optionField }) => (
-                                                                  <FormItem className="flex items-center gap-4">
-                                                                      <FormControl>
-                                                                          <RadioGroupItem value={optionField.value} />
-                                                                      </FormControl>
-                                                                      <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                                      <FormMessage />
-                                                                  </FormItem>
-                                                              )}
-                                                          />
+                                                          <div key={optionIndex} className="space-y-2">
+                                                              <div className="flex items-center gap-4">
+                                                                  <FormControl>
+                                                                      <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} />
+                                                                  </FormControl>
+                                                                  <FormField
+                                                                      control={form.control}
+                                                                      name={`questions.${index}.options.${optionIndex}.text`}
+                                                                      render={({ field: optionField }) => (
+                                                                          <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                                      )}
+                                                                  />
+                                                              </div>
+                                                              <FormField
+                                                                  control={form.control}
+                                                                  name={`questions.${index}.options.${optionIndex}.explanation`}
+                                                                  render={({ field: explanationField }) => (
+                                                                      <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} className="ml-8" />
+                                                                  )}
+                                                              />
+                                                          </div>
                                                       ))}
                                                   </RadioGroup>
                                               )}
                                           />
                                           <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
 
-                                      </>
+                                      </div>
                                   )}
                                   {questionType === 'True/False' && (
                                       <FormField
@@ -1263,7 +1271,7 @@ export default function CreateTestPage() {
                                       name={`questions.${index}.explanation`}
                                       render={({ field }) => (
                                           <FormItem>
-                                              <FormLabel>Explanation</FormLabel>
+                                              <FormLabel>General Explanation</FormLabel>
                                               <FormControl>
                                                   <Textarea {...field} placeholder="Explain why the correct answer is right." />
                                               </FormControl>
@@ -1280,7 +1288,7 @@ export default function CreateTestPage() {
                   <Button
                       type="button"
                       variant="outline"
-                      onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}
+                      onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], correctAnswer: '', explanation: '' })}
                   >
                       <PlusCircle className="mr-2" />
                       Add Question

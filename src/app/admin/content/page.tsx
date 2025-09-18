@@ -87,6 +87,7 @@ type Content = {
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
+  explanation: z.string().optional(),
 });
 
 const questionFormSchema = z.object({
@@ -108,7 +109,7 @@ type Question = {
     subject: string;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer';
     marks: number;
-    options?: {text: string}[];
+    options?: {text: string, explanation?: string}[];
     correctAnswer: string;
 };
 
@@ -373,7 +374,7 @@ export default function ManageContentPage() {
     resolver: zodResolver(questionFormSchema),
   });
 
-  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
+  const { fields: optionFields, append: appendOption, remove: removeOption, replace: replaceOptions } = useFieldArray({
     control: questionForm.control,
     name: 'options',
   });
@@ -381,6 +382,7 @@ export default function ManageContentPage() {
   const openEditQuestionDialog = (question: Question) => {
     setQuestionToEdit(question);
     questionForm.reset(question);
+    replaceOptions(question.options || []);
     setIsEditQuestionDialogOpen(true);
   };
   
@@ -936,7 +938,7 @@ export default function ManageContentPage() {
                     )}
                 />
                 {questionForm.watch('type') === 'Multiple Choice' && (
-                     <>
+                     <div className="space-y-4">
                         <FormLabel>Options</FormLabel>
                         <Controller
                             control={questionForm.control}
@@ -944,26 +946,33 @@ export default function ManageContentPage() {
                             render={({ field }) => (
                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {optionFields.map((option, optionIndex) => (
-                                        <FormField
-                                            key={option.id}
-                                            control={questionForm.control}
-                                            name={`options.${optionIndex}.text`}
-                                            render={({ field: optionField }) => (
-                                                <FormItem className="flex items-center gap-4">
-                                                        <FormControl>
-                                                        <RadioGroupItem value={optionField.value} />
-                                                        </FormControl>
-                                                    <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                         <div key={option.id} className="space-y-2">
+                                            <div className="flex items-center gap-4">
+                                                <FormControl>
+                                                    <RadioGroupItem value={questionForm.getValues(`options.${optionIndex}.text`)} />
+                                                </FormControl>
+                                                <FormField
+                                                    control={questionForm.control}
+                                                    name={`options.${optionIndex}.text`}
+                                                    render={({ field: optionField }) => (
+                                                        <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                    )}
+                                                />
+                                            </div>
+                                            <FormField
+                                                control={questionForm.control}
+                                                name={`options.${optionIndex}.explanation`}
+                                                render={({ field: explanationField }) => (
+                                                    <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} className="ml-8" />
+                                                )}
+                                            />
+                                        </div>
                                     ))}
                                 </RadioGroup>
                             )}
                         />
                         <FormMessage>{questionForm.formState.errors.correctAnswer?.message}</FormMessage>
-                    </>
+                    </div>
                 )}
                  {questionForm.watch('type') === 'True/False' && (
                      <FormField
