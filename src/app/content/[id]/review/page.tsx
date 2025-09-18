@@ -11,21 +11,34 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebase/firestore';
+import { getSubmissionById, getContentById, getUserProfile, handleQuestionVote } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/hooks/use-auth';
 
 
 type Option = { text: string; explanation?: string; };
 type MatchingOptions = { columnA: string[]; columnB: string[]; };
-type Question = { id: string; text: string; type: string; options?: Option[]; matchingOptions?: MatchingOptions; correctAnswer: any; explanation?: string; };
+type Question = { 
+  id: string; 
+  text: string; 
+  type: string; 
+  options?: Option[]; 
+  matchingOptions?: MatchingOptions; 
+  correctAnswer: any; 
+  explanation?: string; 
+  likes: number;
+  dislikes: number;
+  likedBy: string[];
+  dislikedBy: string[];
+};
 type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: any }, testType: string; submittedAt: any; };
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
@@ -34,11 +47,13 @@ function ReviewDisplay() {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [test, setTest] = useState<Test | null>(null);
   const [student, setStudent] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isVoting, setIsVoting] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     if (!submissionId) {
@@ -83,6 +98,76 @@ function ReviewDisplay() {
     fetchData();
   }, [submissionId, toast]);
 
+    const handleVote = async (questionId: string, voteType: 'like' | 'dislike') => {
+        if (!user) {
+            toast({ variant: "destructive", title: "Please log in to vote." });
+            return;
+        }
+        if (isVoting[questionId] || !test) return;
+
+        setIsVoting(prev => ({...prev, [questionId]: true}));
+        
+        const originalTest = { ...test };
+        const questionIndex = test.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) {
+            setIsVoting(prev => ({...prev, [questionId]: false}));
+            return;
+        }
+
+        const questionToUpdate = { ...test.questions[questionIndex] };
+        
+        const hasLiked = questionToUpdate.likedBy?.includes(user.uid);
+        const hasDisliked = questionToUpdate.dislikedBy?.includes(user.uid);
+        let newLikedBy = [...(questionToUpdate.likedBy || [])];
+        let newDislikedBy = [...(questionToUpdate.dislikedBy || [])];
+
+        if (voteType === 'like') {
+            if (hasLiked) {
+                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+            } else {
+                newLikedBy.push(user.uid);
+                if (hasDisliked) {
+                    newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+                }
+            }
+        } else {
+            if (hasDisliked) {
+                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+            } else {
+                newDislikedBy.push(user.uid);
+                if (hasLiked) {
+                    newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+                }
+            }
+        }
+
+        const updatedQuestion = {
+            ...questionToUpdate,
+            likedBy: newLikedBy,
+            dislikedBy: newDislikedBy,
+            likes: newLikedBy.length,
+            dislikes: newDislikedBy.length
+        };
+        
+        const updatedQuestions = [...test.questions];
+        updatedQuestions[questionIndex] = updatedQuestion;
+        setTest({ ...test, questions: updatedQuestions });
+
+        try {
+            await handleQuestionVote(questionId, voteType);
+        } catch (error) {
+            setTest(originalTest);
+            toast({
+              variant: "destructive",
+              title: 'Error submitting vote',
+              description: (error as Error).message,
+            });
+        } finally {
+            setIsVoting(prev => ({...prev, [questionId]: false}));
+        }
+  }
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -111,7 +196,7 @@ function ReviewDisplay() {
       <>
         <Card className="max-w-4xl mx-auto mb-8 relative">
              <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
                          <Avatar className="h-16 w-16">
                             <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
@@ -143,7 +228,7 @@ function ReviewDisplay() {
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
                 <Separator />
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
                     {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
 
@@ -189,6 +274,8 @@ function ReviewDisplay() {
                 }
                 
                 const matchingPercentage = totalPairs > 0 ? (matchingScore / totalPairs) * 100 : 0;
+                const userHasLiked = user && question.likedBy?.includes(user.uid);
+                const userHasDisliked = user && question.dislikedBy?.includes(user.uid);
                 
                 return (
                 <div key={index}>
@@ -313,6 +400,14 @@ function ReviewDisplay() {
                             <p className="text-sm">{question.explanation}</p>
                             </div>
                         )}
+                         <div className="mt-4 flex items-center gap-2">
+                            <Button variant={userHasLiked ? "default" : "outline"} size="sm" onClick={() => handleVote(question.id, 'like')} disabled={isVoting[question.id] || (!!user && !!userHasDisliked)}>
+                                <ThumbsUp className="mr-2 h-4 w-4" /> Like ({question.likes || 0})
+                            </Button>
+                            <Button variant={userHasDisliked ? "destructive" : "outline"} size="sm" onClick={() => handleVote(question.id, 'dislike')} disabled={isVoting[question.id] || (!!user && !!userHasLiked)}>
+                                <ThumbsDown className="mr-2 h-4 w-4" /> Dislike ({question.dislikes || 0})
+                            </Button>
+                        </div>
                     </div>
                     </div>
                     {index < test.questions.length -1 && <Separator className="mt-6" />}
@@ -365,4 +460,5 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
