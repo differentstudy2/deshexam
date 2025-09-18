@@ -23,6 +23,8 @@ import {
   Settings,
   ShieldCheck,
   Tag,
+  PlusCircle,
+  FilePlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,6 +38,8 @@ const navItems = [
   { href: '/admin', label: 'Admin Overview', icon: ShieldCheck },
   { href: '/admin/users', label: 'Manage Users', icon: Users },
   { href: '/admin/content', label: 'Manage Content', icon: Library },
+  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: PlusCircle },
+  { href: '/admin/add-article', label: 'Add Article', icon: FilePlus },
   { href: '/admin/coupons', label: 'Manage Coupons', icon: Tag },
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
 ];
