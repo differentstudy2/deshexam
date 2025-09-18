@@ -2,14 +2,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getContentById } from '@/lib/firebase/firestore';
-import { Loader2, ArrowLeft, User, Calendar } from 'lucide-react';
+import { getContentById, addComment, getComments } from '@/lib/firebase/firestore';
+import { Loader2, ArrowLeft, User, Calendar, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/use-auth';
+import { formatDistanceToNow } from 'date-fns';
 
 
 type Article = {
@@ -24,22 +29,40 @@ type Article = {
   testType: string;
 };
 
+type Comment = {
+    id: string;
+    text: string;
+    authorId: string;
+    authorName: string;
+    authorPhotoURL?: string;
+    createdAt: Date;
+}
+
 export default function LearnArticlePage() {
   const [article, setArticle] = useState<Article | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
   const articleId = params.id as string;
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    const fetchArticleAndComments = async () => {
       if (!articleId) return;
       try {
         setLoading(true);
-        const articleData = await getContentById(articleId);
+        const [articleData, commentsData] = await Promise.all([
+            getContentById(articleId),
+            getComments('content', articleId)
+        ]);
+
         if (articleData && articleData.testType === 'Learn') {
           setArticle(articleData as Article);
+          setComments(commentsData as Comment[]);
         } else {
           throw new Error("Article not found or is not a 'Learn' type content.");
         }
@@ -55,8 +78,35 @@ export default function LearnArticlePage() {
       }
     };
 
-    fetchArticle();
+    fetchArticleAndComments();
   }, [articleId, toast, router]);
+
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+        toast({ variant: "destructive", title: "Please log in to comment." });
+        return;
+    }
+    if (!newComment.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+        await addComment('content', articleId, { text: newComment });
+        setNewComment('');
+        const updatedComments = await getComments('content', articleId);
+        setComments(updatedComments as Comment[]);
+        toast({ title: "Comment posted!" });
+    } catch (error) {
+         toast({
+          variant: "destructive",
+          title: 'Error posting comment',
+          description: (error as Error).message,
+        });
+    } finally {
+        setIsSubmittingComment(false);
+    }
+  }
+
 
   if (loading) {
     return (
@@ -124,7 +174,56 @@ export default function LearnArticlePage() {
               className="prose dark:prose-invert lg:prose-xl max-w-none"
               dangerouslySetInnerHTML={{ __html: article.body }}
             />
+
+            <Separator className="my-12" />
+
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                    <MessageSquare /> Comments ({comments.length})
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleCommentSubmit} className="space-y-4">
+                        <Textarea 
+                            placeholder={user ? "Write a comment..." : "Please log in to write a comment."}
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            disabled={!user || isSubmittingComment}
+                        />
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
+                                {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Comment"}
+                            </Button>
+                        </div>
+                    </form>
+                    <Separator className="my-6" />
+                    <div className="space-y-6">
+                        {comments.length > 0 ? comments.map(comment => (
+                            <div key={comment.id} className="flex items-start gap-4">
+                                <Avatar>
+                                <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
+                                    <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
+                                        <span className="text-muted-foreground">
+                                            {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
+                                        </span>
+                                    </div>
+                                    <p className="text-foreground mt-1">{comment.text}</p>
+                                </div>
+                            </div>
+                        )) : (
+                            <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
         </div>
     </div>
   );
 }
+

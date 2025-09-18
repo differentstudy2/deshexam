@@ -1,4 +1,5 @@
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -182,7 +183,7 @@ export const handleQuestionVote = async (questionId: string, voteType: 'like' | 
 };
 
 
-export const addComment = async (questionId: string, commentData: any) => {
+export const addComment = async (collectionName: 'questions' | 'content', documentId: string, commentData: any) => {
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -192,7 +193,7 @@ export const addComment = async (questionId: string, commentData: any) => {
 
     try {
         const userProfile = await getUserProfile(user.uid);
-        const docRef = await addDoc(collection(db, "questions", questionId, "comments"), {
+        const docRef = await addDoc(collection(db, collectionName, documentId, "comments"), {
             ...commentData,
             authorId: user.uid,
             authorName: userProfile?.displayName || user.email,
@@ -207,9 +208,9 @@ export const addComment = async (questionId: string, commentData: any) => {
     }
 };
 
-export const getComments = async (questionId: string) => {
+export const getComments = async (collectionName: 'questions' | 'content', documentId: string) => {
     try {
-        const q = query(collection(db, "questions", questionId, "comments"), orderBy("createdAt", "desc"));
+        const q = query(collection(db, collectionName, documentId, "comments"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => {
             const data = doc.data();

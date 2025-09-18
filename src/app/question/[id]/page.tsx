@@ -68,7 +68,7 @@ export default function QuestionPage() {
         setLoading(true);
         const [questionData, commentsData] = await Promise.all([
           getQuestionById(questionId),
-          getComments(questionId),
+          getComments('questions', questionId),
         ]);
         setQuestion(questionData as Question);
         setComments(commentsData as Comment[]);
@@ -157,11 +157,10 @@ export default function QuestionPage() {
 
     setIsSubmittingComment(true);
     try {
-        const commentData = { text: newComment };
-        await addComment(questionId, commentData);
+        await addComment('questions', questionId, { text: newComment });
         setNewComment('');
         // Refetch comments to show the new one
-        const updatedComments = await getComments(questionId);
+        const updatedComments = await getComments('questions', questionId);
         setComments(updatedComments as Comment[]);
         toast({ title: "Comment posted!" });
     } catch (error) {
