@@ -1,9 +1,10 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -91,6 +92,7 @@ type BulkAction =
     | { type: 'chapter', value: string }
     | { type: 'examCategory', value: string }
     | { type: 'exam', value: string }
+    | { type: 'delete-questions' }
     | null;
 
 function getUrlForTest(testType: string, testId: string) {
@@ -213,11 +215,32 @@ const ContentTable = ({
     </div>
 );
 
-const QuestionsTable = ({ questions, loading }: { questions: Question[], loading: boolean }) => (
+const QuestionsTable = ({ 
+    questions, 
+    loading,
+    selectedQuestions,
+    onSelectQuestion,
+    onSelectAllQuestions,
+    isAllQuestionsSelected
+}: { 
+    questions: Question[], 
+    loading: boolean,
+    selectedQuestions: string[],
+    onSelectQuestion: (id: string) => void,
+    onSelectAllQuestions: (checked: boolean) => void,
+    isAllQuestionsSelected: boolean
+}) => (
      <div className="overflow-x-auto">
         <Table>
             <TableHeader>
                 <TableRow>
+                    <TableHead className="w-12">
+                         <Checkbox
+                            checked={isAllQuestionsSelected}
+                            onCheckedChange={(checked) => onSelectAllQuestions(Boolean(checked))}
+                            aria-label="Select all questions"
+                        />
+                    </TableHead>
                     <TableHead className="w-[60%]">Question Text</TableHead>
                     <TableHead className="hidden md:table-cell">Author</TableHead>
                     <TableHead className="hidden md:table-cell">Subject</TableHead>
@@ -229,6 +252,7 @@ const QuestionsTable = ({ questions, loading }: { questions: Question[], loading
                 {loading ? (
                     Array.from({ length: 5 }).map((_, i) => (
                         <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-5" /></TableCell>
                             <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                              <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
@@ -238,7 +262,14 @@ const QuestionsTable = ({ questions, loading }: { questions: Question[], loading
                     ))
                 ) : questions.length > 0 ? (
                     questions.map((question) => (
-                        <TableRow key={question.id}>
+                        <TableRow key={question.id} data-state={selectedQuestions.includes(question.id) && "selected"}>
+                             <TableCell>
+                                <Checkbox
+                                    checked={selectedQuestions.includes(question.id)}
+                                    onCheckedChange={() => onSelectQuestion(question.id)}
+                                    aria-label={`Select question ${question.id}`}
+                                />
+                            </TableCell>
                             <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
                             <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
@@ -252,7 +283,7 @@ const QuestionsTable = ({ questions, loading }: { questions: Question[], loading
                     ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center">No questions found.</TableCell>
+                        <TableCell colSpan={6} className="h-24 text-center">No questions found.</TableCell>
                     </TableRow>
                 )}
             </TableBody>
@@ -279,14 +310,15 @@ export default function ManageContentPage() {
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [accessFilter, setAccessFilter] = useState('all');
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   
   const allTabs = useMemo(() => {
-    const hasQuestionsTab = contentTypes.some(type => type.name === 'Questions');
-    const tabs = [{ id: 'all', name: 'All' }, ...contentTypes];
+    const baseTabs = [{ id: 'all', name: 'All' }, ...contentTypes];
+    const hasQuestionsTab = baseTabs.some(tab => tab.name.toLowerCase() === 'questions');
     if (!hasQuestionsTab) {
-      tabs.push({ id: 'questions', name: 'Questions' });
+      baseTabs.push({ id: 'questions', name: 'Questions' });
     }
-    return tabs;
+    return baseTabs;
   }, [contentTypes]);
 
   const fetchInitialData = async () => {
@@ -377,7 +409,7 @@ export default function ManageContentPage() {
     setSelectedContent(prev => prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]);
   }
 
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAllContent = (checked: boolean) => {
     if (checked) {
         setSelectedContent(filteredContent.map(c => c.id));
     } else {
@@ -385,14 +417,31 @@ export default function ManageContentPage() {
     }
   }
 
-  const isAllSelected = selectedContent.length > 0 && selectedContent.length === filteredContent.length;
+  const isAllContentSelected = selectedContent.length > 0 && selectedContent.length === filteredContent.length;
+
+  const handleSelectQuestion = (id: string) => {
+    setSelectedQuestions(prev => prev.includes(id) ? prev.filter(qid => qid !== id) : [...prev, id]);
+  }
+
+  const handleSelectAllQuestions = (checked: boolean) => {
+    if (checked) {
+        setSelectedQuestions(filteredQuestions.map(q => q.id));
+    } else {
+        setSelectedQuestions([]);
+    }
+  }
+
+  const isAllQuestionsSelected = selectedQuestions.length > 0 && selectedQuestions.length === filteredQuestions.length;
+
 
   const handleConfirmAction = async () => {
-    if(contentToDelete) { // Single delete
-        await handleDelete([contentToDelete.id]);
+    if(contentToDelete) { // Single content delete
+        await handleDeleteContent([contentToDelete.id]);
     } else if (bulkAction) { // Bulk actions
-        if(bulkAction.type === 'delete') {
-            await handleDelete(selectedContent);
+        if (bulkAction.type === 'delete') {
+            await handleDeleteContent(selectedContent);
+        } else if (bulkAction.type === 'delete-questions') {
+            await handleDeleteQuestions(selectedQuestions);
         } else if (bulkAction.type === 'access') {
             await handleBulkUpdate({ access: bulkAction.value });
         } else if (bulkAction.type === 'board') {
@@ -412,9 +461,10 @@ export default function ManageContentPage() {
     setContentToDelete(null);
     setBulkAction(null);
     setSelectedContent([]);
+    setSelectedQuestions([]);
   };
 
-  const handleDelete = async (ids: string[]) => {
+  const handleDeleteContent = async (ids: string[]) => {
     try {
       await Promise.all(ids.map(id => deleteContent(id)));
       setAllContent(allContent.filter(item => !ids.includes(item.id)));
@@ -426,6 +476,23 @@ export default function ManageContentPage() {
       toast({
         variant: "destructive",
         title: 'Error deleting content',
+        description: (error as Error).message,
+      });
+    }
+  };
+
+  const handleDeleteQuestions = async (ids: string[]) => {
+    try {
+      await Promise.all(ids.map(id => deleteQuestion(id)));
+      setAllQuestions(allQuestions.filter(item => !ids.includes(item.id)));
+      toast({
+        title: "Question(s) Deleted",
+        description: `${ids.length} question(s) have been deleted.`,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: 'Error deleting questions',
         description: (error as Error).message,
       });
     }
@@ -458,17 +525,18 @@ export default function ManageContentPage() {
           return `This action cannot be undone. This will permanently delete "${contentToDelete.title}".`;
       }
       if (bulkAction) {
-          const actionTextMap = {
-            delete: `This will permanently delete ${selectedContent.length} item(s).`,
-            access: `This will change the access level for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
-            board: `This will change the board for ${selectedContent.length} item(s) to "${boards.find(b => b.name === bulkAction.value)?.name || bulkAction.value}".`,
-            subject: `This will change the subject for ${selectedContent.length} item(s) to "${subjects.find(s => s.name === bulkAction.value)?.name || bulkAction.value}".`,
-            chapter: `This will change the chapter for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
-            examCategory: `This will change the exam category for ${selectedContent.length} item(s) to "${examTypes.find(e => e.name === bulkAction.value)?.name || bulkAction.value}".`,
-            exam: `This will change the exam for ${selectedContent.length} item(s) to "${exams.find(e => e.name === bulkAction.value)?.name || bulkAction.value}".`,
+          const actionTextMap: { [key: string]: string } = {
+            'delete': `This will permanently delete ${selectedContent.length} item(s).`,
+            'delete-questions': `This will permanently delete ${selectedQuestions.length} question(s).`,
+            'access': `This will change the access level for ${selectedContent.length} item(s) to "${(bulkAction as any).value}".`,
+            'board': `This will change the board for ${selectedContent.length} item(s) to "${boards.find(b => b.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
+            'subject': `This will change the subject for ${selectedContent.length} item(s) to "${subjects.find(s => s.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
+            'chapter': `This will change the chapter for ${selectedContent.length} item(s) to "${(bulkAction as any).value}".`,
+            'examCategory': `This will change the exam category for ${selectedContent.length} item(s) to "${examTypes.find(e => e.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
+            'exam': `This will change the exam for ${selectedContent.length} item(s) to "${exams.find(e => e.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
           }
           if (bulkAction.type in actionTextMap) {
-            return actionTextMap[bulkAction.type as keyof typeof actionTextMap];
+            return actionTextMap[bulkAction.type];
           }
       }
       return 'This action cannot be undone.';
@@ -582,6 +650,22 @@ export default function ManageContentPage() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                  )}
+                 {selectedQuestions.length > 0 && activeTab === 'Questions' && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="w-full sm:w-auto">
+                                Bulk Actions ({selectedQuestions.length}) <Filter className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                             <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
+                             <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete-questions' })}>
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Selected
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                 )}
             </div>
            {loading ? (
              <div className="flex items-center justify-center min-h-[200px]">
@@ -597,16 +681,23 @@ export default function ManageContentPage() {
                 {allTabs.map(type => (
                     <TabsContent key={type.id} value={type.name}>
                         {type.name === 'Questions' ? (
-                            <QuestionsTable questions={filteredQuestions} loading={loading} />
+                            <QuestionsTable 
+                                questions={filteredQuestions} 
+                                loading={loading}
+                                selectedQuestions={selectedQuestions}
+                                onSelectQuestion={handleSelectQuestion}
+                                onSelectAllQuestions={handleSelectAllQuestions}
+                                isAllQuestionsSelected={isAllQuestionsSelected}
+                             />
                         ) : (
                            <ContentTable 
-                                content={filteredContent}
+                                content={filteredContent.filter(c => activeTab === 'All' || c.testType === type.name)}
                                 loading={loading}
                                 openDeleteDialog={openDeleteDialog}
                                 selectedContent={selectedContent}
                                 onSelect={handleSelectContent}
-                                onSelectAll={handleSelectAll}
-                                isAllSelected={isAllSelected}
+                                onSelectAll={handleSelectAllContent}
+                                isAllSelected={isAllContentSelected}
                             />
                         )}
                     </TabsContent>
@@ -633,5 +724,3 @@ export default function ManageContentPage() {
     </div>
   );
 }
-
-    

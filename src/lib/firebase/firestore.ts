@@ -94,6 +94,18 @@ export const getQuestionById = async (questionId: string) => {
     }
 }
 
+export const deleteQuestion = async (questionId: string) => {
+    if (!questionId) {
+        throw new Error("Question ID is required for deletion.");
+    }
+    try {
+        await deleteDoc(doc(db, "questions", questionId));
+    } catch (e) {
+        console.error("Error deleting question:", e);
+        throw new Error("Failed to delete question.");
+    }
+};
+
 export const updateQuestion = async (questionId: string, data: any) => {
     if (!questionId) {
         throw new Error("Question ID is required to update a question.");
