@@ -16,13 +16,13 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { addContent } from '@/lib/firebase/firestore';
 import { Loader2, Sparkles } from 'lucide-react';
@@ -37,6 +37,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { generateLearnContent, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
+import RichTextEditor from '@/components/rich-text-editor';
 
 
 const formSchema = z.object({
@@ -224,10 +225,7 @@ export default function AddArticlePage() {
                   <FormItem>
                     <FormLabel>Summary / Description</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Provide a brief, one-paragraph summary of the article."
-                        {...field}
-                      />
+                       <Input placeholder="Provide a brief, one-paragraph summary of the article." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -241,10 +239,9 @@ export default function AddArticlePage() {
                     <FormItem>
                       <FormLabel>Content Body</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Write your article content here."
-                          className="min-h-[250px]"
-                          {...field}
+                        <RichTextEditor
+                            value={field.value}
+                            onChange={field.onChange}
                         />
                       </FormControl>
                       <FormMessage />

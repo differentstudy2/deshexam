@@ -23,11 +23,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent } from '@/lib/firebase/firestore';
 import { Loader2, Save } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
+import RichTextEditor from '@/components/rich-text-editor';
 
 
 const formSchema = z.object({
@@ -182,7 +182,7 @@ export default function EditArticlePage() {
                   <FormItem>
                     <FormLabel>Summary / Description</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <Input
                         placeholder="Provide a brief, one-paragraph summary of the article."
                         {...field}
                       />
@@ -199,10 +199,9 @@ export default function EditArticlePage() {
                     <FormItem>
                       <FormLabel>Content Body</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Write your article content here."
-                          className="min-h-[250px]"
-                          {...field}
+                        <RichTextEditor
+                            value={field.value}
+                            onChange={field.onChange}
                         />
                       </FormControl>
                       <FormMessage />
