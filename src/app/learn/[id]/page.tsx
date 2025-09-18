@@ -319,7 +319,7 @@ export default function LearnArticlePage() {
                     </div>
                      {totalRatings > 0 && (
                         <div className="flex items-center gap-1.5">
-                           <Star className="w-4 h-4 text-yellow-500" />
+                           <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                            <span className="font-semibold text-foreground">{averageRating.toFixed(1)}</span>
                            <span>({totalRatings} ratings)</span>
                         </div>
@@ -388,6 +388,7 @@ export default function LearnArticlePage() {
     </div>
   );
 }
+
 
 
 
