@@ -1246,11 +1246,11 @@ export default function CreateTestPage() {
                                               render={({ field }) => (
                                                   <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                       {[0, 1, 2, 3].map(optionIndex => (
-                                                          <div key={optionIndex} className="space-y-2">
-                                                              <div className="flex items-center gap-4">
-                                                                  <FormControl>
-                                                                      <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} />
-                                                                  </FormControl>
+                                                          <div key={optionIndex} className="flex items-start gap-4">
+                                                              <FormControl>
+                                                                  <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" />
+                                                              </FormControl>
+                                                              <div className="space-y-2 flex-1">
                                                                   <FormField
                                                                       control={form.control}
                                                                       name={`questions.${index}.options.${optionIndex}.text`}
@@ -1258,14 +1258,14 @@ export default function CreateTestPage() {
                                                                           <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
                                                                       )}
                                                                   />
+                                                                  <FormField
+                                                                      control={form.control}
+                                                                      name={`questions.${index}.options.${optionIndex}.explanation`}
+                                                                      render={({ field: explanationField }) => (
+                                                                          <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
+                                                                      )}
+                                                                  />
                                                               </div>
-                                                              <FormField
-                                                                  control={form.control}
-                                                                  name={`questions.${index}.options.${optionIndex}.explanation`}
-                                                                  render={({ field: explanationField }) => (
-                                                                      <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} className="ml-8" />
-                                                                  )}
-                                                              />
                                                           </div>
                                                       ))}
                                                   </RadioGroup>
