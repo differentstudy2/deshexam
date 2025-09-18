@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion, addQuestionsToContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -93,6 +93,7 @@ type BulkAction =
     | { type: 'examCategory', value: string }
     | { type: 'exam', value: string }
     | { type: 'delete-questions' }
+    | { type: 'add-questions-to-content', contentId: string, contentTitle: string }
     | null;
 
 function getUrlForTest(testType: string, testId: string) {
@@ -454,6 +455,9 @@ export default function ManageContentPage() {
             await handleBulkUpdate({ examCategory: bulkAction.value });
         } else if (bulkAction.type === 'exam') {
             await handleBulkUpdate({ exam: bulkAction.value });
+        } else if (bulkAction.type === 'add-questions-to-content') {
+            const questionsToAdd = allQuestions.filter(q => selectedQuestions.includes(q.id));
+            await handleAddQuestionsToContent(bulkAction.contentId, questionsToAdd);
         }
     }
     
@@ -519,6 +523,22 @@ export default function ManageContentPage() {
         });
     }
   }
+
+  const handleAddQuestionsToContent = async (contentId: string, questions: Question[]) => {
+    try {
+      await addQuestionsToContent(contentId, questions);
+      toast({
+        title: "Questions Added",
+        description: `${questions.length} questions have been added to the selected content.`,
+      });
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: 'Error adding questions',
+        description: (error as Error).message,
+      });
+    }
+  };
   
   const getAlertDialogDescription = () => {
       if (contentToDelete) {
@@ -534,6 +554,7 @@ export default function ManageContentPage() {
             'chapter': `This will change the chapter for ${selectedContent.length} item(s) to "${(bulkAction as any).value}".`,
             'examCategory': `This will change the exam category for ${selectedContent.length} item(s) to "${examTypes.find(e => e.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
             'exam': `This will change the exam for ${selectedContent.length} item(s) to "${exams.find(e => e.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
+            'add-questions-to-content': `This will add ${selectedQuestions.length} question(s) to "${(bulkAction as any).contentTitle}".`,
           }
           if (bulkAction.type in actionTextMap) {
             return actionTextMap[bulkAction.type];
@@ -659,6 +680,17 @@ export default function ManageContentPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                              <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
+                              <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Add to Content</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    {allContent.map(c => (
+                                        <DropdownMenuItem key={c.id} onClick={() => openBulkActionDialog({ type: 'add-questions-to-content', contentId: c.id, contentTitle: c.title })}>
+                                            {c.title}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSeparator />
                              <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete-questions' })}>
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Delete Selected

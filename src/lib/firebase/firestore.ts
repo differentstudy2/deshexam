@@ -364,6 +364,21 @@ export const updateContent = async (contentId: string, contentData: any) => {
     }
 };
 
+export const addQuestionsToContent = async (contentId: string, questionsToAdd: any[]) => {
+    if (!contentId || !questionsToAdd || questionsToAdd.length === 0) {
+        throw new Error("Content ID and questions are required.");
+    }
+    const contentRef = doc(db, "content", contentId);
+    try {
+        await updateDoc(contentRef, {
+            questions: arrayUnion(...questionsToAdd)
+        });
+    } catch (e) {
+        console.error("Error adding questions to content: ", e);
+        throw new Error("Failed to add questions to content.");
+    }
+};
+
 export const getAllContent = async (type?: string) => {
     try {
         let q;
