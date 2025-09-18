@@ -19,13 +19,15 @@ const QuestionSchema = z.object({
   correctAnswer: z.string().describe('The correct answer for the question.'),
 });
 
-export type AIContentGeneratorInput = z.infer<typeof AIContentGeneratorInputSchema>;
 const AIContentGeneratorInputSchema = z.object({
-  topic: z.string().describe('The main topic or subject for the content to be generated.'),
   contentType: z.string().describe('The type of content to generate (e.g., "Mock Test", "Quiz").'),
   numQuestions: z.number().int().positive().describe('The number of questions to generate.'),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('The difficulty level of the questions.'),
+  sourceType: z.enum(['topic', 'text']).describe('The source of the content to be generated.'),
+  source: z.string().describe('The source topic or text content.'),
 });
+export type AIContentGeneratorInput = z.infer<typeof AIContentGeneratorInputSchema>;
+
 
 export type AIContentGeneratorOutput = z.infer<typeof AIContentGeneratorOutputSchema>;
 const AIContentGeneratorOutputSchema = z.object({
@@ -42,13 +44,23 @@ const prompt = ai.definePrompt({
   name: 'aiContentGeneratorPrompt',
   input: { schema: AIContentGeneratorInputSchema },
   output: { schema: AIContentGeneratorOutputSchema },
-  prompt: `You are an expert at creating educational content. Your task is to generate a {{contentType}} about "{{topic}}".
+  prompt: `You are an expert at creating educational content. Your task is to generate a {{contentType}} based on the provided source.
 
 The content should have the following properties:
 - Number of questions: {{numQuestions}}
 - Difficulty level: {{difficulty}}
 
-Please generate a title, a description, and the specified number of questions.
+{{#if (eq sourceType 'topic')}}
+The topic for the content is "{{source}}".
+{{else}}
+The source text for the content is:
+---
+{{source}}
+---
+{{/if}}
+
+
+Please generate a suitable title, a brief description, and the specified number of questions based on the source.
 For each question, provide:
 - The question text.
 - The question type (either 'Multiple Choice', 'True/False', or 'Short Answer').
@@ -56,7 +68,7 @@ For each question, provide:
 - For 'Multiple Choice' questions, provide exactly 4 options.
 - The correct answer.
 
-Ensure the generated content is accurate and relevant to the topic.
+Ensure the generated content is accurate and relevant to the provided source.
 The questions should be diverse and test different aspects of the topic.
 `,
 });
