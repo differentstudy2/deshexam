@@ -661,11 +661,28 @@ export default function EditContentPage() {
                     const questionType = form.watch(`questions.${index}.type`);
                     return (
                         <Card key={question.id} className="p-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <h4 className="font-semibold text-lg">Question {index + 1}</h4>
+                            <div className="flex justify-between items-center mb-4 gap-4">
+                                <h4 className="font-semibold text-lg whitespace-nowrap">Question {index + 1}</h4>
+                                 <FormField
+                                    control={form.control}
+                                    name={`questions.${index}.type`}
+                                    render={({ field }) => (
+                                        <FormItem className="w-full">
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                                    <SelectItem value="True/False">True/False</SelectItem>
+                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
-                                    <Trash2 className="mr-2" />
-                                    Remove Question
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Remove
                                 </Button>
                             </div>
                             <div className="space-y-4">
@@ -682,24 +699,7 @@ export default function EditContentPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name={`questions.${index}.type`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Question Type</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                                    <SelectItem value="True/False">True/False</SelectItem>
-                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                
                                 {questionType === 'Multiple Choice' && (
                                     <>
                                         <FormLabel>Options</FormLabel>
@@ -789,5 +789,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
-    
