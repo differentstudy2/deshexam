@@ -28,6 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent } from '@/lib/firebase/firestore';
 import { Loader2, Save } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
+import RichTextEditor from '@/components/rich-text-editor';
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
@@ -198,11 +199,7 @@ export default function EditArticlePage() {
                     <FormItem>
                       <FormLabel>Content Body</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Write your article content here."
-                          {...field}
-                          className="min-h-[400px]"
-                        />
+                        <RichTextEditor {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

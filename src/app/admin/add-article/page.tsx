@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { addContent } from '@/lib/firebase/firestore';
-import { Loader2, Save, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import {
   Dialog,
@@ -36,8 +36,8 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { generateLearnContent, AILearnContentGeneratorInput, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
-
+import { generateLearnContent, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
+import RichTextEditor from '@/components/rich-text-editor';
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
@@ -241,11 +241,7 @@ export default function AddArticlePage() {
                     <FormItem>
                       <FormLabel>Content Body</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Write your article content here."
-                          {...field}
-                          className="min-h-[400px]"
-                        />
+                        <RichTextEditor {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

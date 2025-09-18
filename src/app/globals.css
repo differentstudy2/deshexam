@@ -65,3 +65,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.ql-editor {
+    min-height: 250px;
+}

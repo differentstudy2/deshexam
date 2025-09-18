@@ -3,16 +3,15 @@
 
 import { useEffect, useState } from 'react';
 import { getContentById } from '@/lib/firebase/firestore';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, BookOpen } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
-import ReactMarkdown from 'react-markdown';
+import { Button } from '@/components/ui/button';
+import "react-quill/dist/quill.snow.css";
+
 
 type Article = {
   id: string;
@@ -122,9 +121,9 @@ export default function LearnArticlePage() {
                 priority
             />
 
-            <article className="prose dark:prose-invert lg:prose-xl max-w-none">
-                <ReactMarkdown>{article.body}</ReactMarkdown>
-            </article>
+            <div className="prose dark:prose-invert lg:prose-xl max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: article.body }} />
+            </div>
         </div>
     </div>
   );
