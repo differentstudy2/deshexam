@@ -36,7 +36,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Dialog,
@@ -113,6 +113,43 @@ type Board = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
+
+const MatchingPairsField = ({ control, questionIndex }: { control: any, questionIndex: number }) => {
+  const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
+      control: control,
+      name: `questions.${questionIndex}.correctAnswer` as any,
+  });
+
+  return (
+      <div className='space-y-4'>
+        <FormLabel>Matching Pairs</FormLabel>
+        <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
+          <div>Column A</div>
+          <div></div>
+          <div>Column B</div>
+        </div>
+        {matchingPairFields.map((pair, pairIndex) => (
+          <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
+              <FormField
+                  control={control}
+                  name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`}
+                  render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />}
+              />
+              <GripVertical className="h-5 w-5 text-muted-foreground"/>
+              <FormField
+                  control={control}
+                  name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`}
+                  render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />}
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4"/></Button>
+          </div>
+        ))}
+        <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', b: '' })}>
+            <PlusCircle className="mr-2 h-4 w-4"/> Add Pair
+        </Button>
+      </div>
+  );
+};
 
 export default function EditContentPage() {
   const { toast } = useToast();
@@ -870,10 +907,6 @@ export default function EditContentPage() {
             <CardContent className="space-y-6">
                  {fields.map((question, index) => {
                     const questionType = form.watch(`questions.${index}.type`);
-                    const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
-                        control: form.control,
-                        name: `questions.${index}.correctAnswer` as any,
-                    });
                     return (
                         <Card key={question.id} className="p-4">
                             <div className="flex justify-between items-center mb-4 gap-4">
@@ -1022,33 +1055,7 @@ export default function EditContentPage() {
                                       </div>
                                   )}
                                 {questionType === 'Matching' && (
-                                    <div className='space-y-4'>
-                                    <FormLabel>Matching Pairs</FormLabel>
-                                    <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
-                                        <div>Column A</div>
-                                        <div></div>
-                                        <div>Column B</div>
-                                    </div>
-                                        {matchingPairFields.map((pair, pairIndex) => (
-                                        <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
-                                            <FormField
-                                                control={form.control}
-                                                name={`questions.${index}.correctAnswer.${pairIndex}.a`}
-                                                render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />}
-                                            />
-                                            <GripVertical className="h-5 w-5 text-muted-foreground"/>
-                                                <FormField
-                                                control={form.control}
-                                                name={`questions.${index}.correctAnswer.${pairIndex}.b`}
-                                                render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />}
-                                            />
-                                            <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4"/></Button>
-                                        </div>
-                                    ))}
-                                        <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', b: '' })}>
-                                            <PlusCircle className="mr-2 h-4 w-4"/> Add Pair
-                                        </Button>
-                                    </div>
+                                    <MatchingPairsField control={form.control} questionIndex={index} />
                                 )}
                                 {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                     <FormField
@@ -1243,11 +1250,18 @@ export default function EditContentPage() {
             </CardFooter>
           </Card>
           
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Updating..." : "Update Content"}
-          </Button>
+           <div className="flex items-center gap-4">
+                <Button 
+                    type="submit" 
+                    disabled={form.formState.isSubmitting}
+                >
+                    <Save className="mr-2 h-4 w-4"/>
+                    {form.formState.isSubmitting ? "Updating..." : "Update Content"}
+                </Button>
+           </div>
         </form>
       </Form>
     </div>
   );
 }
+
