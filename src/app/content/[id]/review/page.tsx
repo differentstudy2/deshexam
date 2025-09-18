@@ -129,7 +129,7 @@ function ReviewDisplay() {
                 <div className="flex items-start gap-4">
                   <div>
                     {question.type === 'Matching' ? (
-                       <ScoreCircle score={matchingPercentage} />
+                       <ScoreCircle score={matchingPercentage} size={36} />
                     ) : isCorrect ? (
                       <CheckCircle className="w-6 h-6 text-green-500" />
                     ) : (
@@ -298,5 +298,6 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 

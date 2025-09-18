@@ -42,7 +42,7 @@ export const ScoreCircle = ({ score, className, size = 24, strokeWidth = 3 }: Sc
           cy={size / 2}
         />
       </svg>
-      <span className={cn("text-xs font-semibold", colorClass, size < 24 && 'text-[10px]')}>
+       <span className={cn("text-xs font-semibold", colorClass, size >= 36 && 'text-sm')}>
         {Math.round(score)}%
       </span>
     </div>
