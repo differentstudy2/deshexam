@@ -64,7 +64,7 @@ export default function AdminDashboardPage() {
                         <FileText className="mx-auto mb-2" />
                         <span>Manage Content</span>
                     </Link>
-                    <Link href="/dashboard/add-content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
+                    <Link href="/admin/add-content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
                         <PlusCircle className="mx-auto mb-2" />
                         <span>Add New Content</span>
                     </Link>
