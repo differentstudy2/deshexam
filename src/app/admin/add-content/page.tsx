@@ -50,6 +50,7 @@ import {
 import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
 import { generateLearnContent, AILearnContentGeneratorInput, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
+import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 
 
 const optionSchema = z.object({
@@ -134,6 +135,7 @@ export default function CreateTestPage() {
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [generatorMode, setGeneratorMode] = useState<'full' | 'questions'>('full');
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -360,22 +362,36 @@ export default function CreateTestPage() {
   const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
     setIsGenerating(true);
     try {
-        const input: AIContentGeneratorInput = {
-            ...aiData,
-            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
-            contentType: form.getValues('testType') || 'Mock Test',
-        };
-        const result: AIContentGeneratorOutput = await generateContent(input);
+        if(generatorMode === 'questions') {
+            const input: AIQuestionGeneratorInput = {
+                ...aiData,
+                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+            };
+            const result: AIQuestionGeneratorOutput = await generateQuestions(input);
+            append(result.questions);
+            toast({
+                title: 'Questions Added!',
+                description: `${result.questions.length} new questions have been added.`,
+            });
 
-        form.setValue('title', result.title);
-        form.setValue('description', result.description);
-        form.setValue('difficulty', aiData.difficulty);
-        replace(result.questions);
+        } else { // full generation
+            const input: AIContentGeneratorInput = {
+                ...aiData,
+                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                contentType: form.getValues('testType') || 'Mock Test',
+            };
+            const result: AIContentGeneratorOutput = await generateContent(input);
 
-        toast({
-            title: 'Content Generated!',
-            description: `AI has created a draft for "${result.title}".`,
-        });
+            form.setValue('title', result.title);
+            form.setValue('description', result.description);
+            form.setValue('difficulty', aiData.difficulty);
+            replace(result.questions);
+
+            toast({
+                title: 'Content Generated!',
+                description: `AI has created a draft for "${result.title}".`,
+            });
+        }
         setIsGeneratorOpen(false);
 
     } catch (error) {
@@ -548,11 +564,17 @@ export default function CreateTestPage() {
   const selectedChapterValue = form.watch('chapter');
   const selectedChapter = chapters.find(c => `${c.chapterNo}. ${c.chapterName}` === selectedChapterValue);
   
-  const AIGeneratorDialog = ({ children }: { children: React.ReactNode }) => {
+  const AIGeneratorDialog = ({ children, mode }: { children: React.ReactNode, mode: 'full' | 'questions' }) => {
+    
+    const openGenerator = () => {
+        setGeneratorMode(mode);
+        setIsGeneratorOpen(true);
+    }
+
     if (currentTestType === 'Learn') {
         return (
              <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
-                <DialogTrigger asChild>
+                <DialogTrigger asChild onClick={openGenerator}>
                     {children}
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -591,14 +613,14 @@ export default function CreateTestPage() {
     
     return (
          <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger asChild onClick={openGenerator}>
                 {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
-                <DialogTitle>Generate Content with AI</DialogTitle>
+                <DialogTitle>{mode === 'full' ? 'Generate Content with AI' : 'Generate Questions with AI'}</DialogTitle>
                 <DialogDescription>
-                    Describe the content you want to create, and Gemini will generate a draft for you.
+                    {mode === 'full' ? 'Describe the content you want to create, and Gemini will generate a draft for you.' : 'Generate a set of questions to add to your content.'}
                 </DialogDescription>
                 </DialogHeader>
                 <Form {...aiForm}>
@@ -745,7 +767,7 @@ export default function CreateTestPage() {
                     Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
                 </p>
             </div>
-            <AIGeneratorDialog>
+            <AIGeneratorDialog mode="full">
                 <Button variant="outline">
                     <Sparkles className="mr-2 h-4 w-4" />
                     {currentTestType === 'Learn' ? 'Generate Article with AI' : 'Generate with AI'}
@@ -1314,7 +1336,7 @@ export default function CreateTestPage() {
                       <PlusCircle className="mr-2" />
                       Add Question
                   </Button>
-                  <AIGeneratorDialog>
+                  <AIGeneratorDialog mode="questions">
                       <Button type="button" variant="outline">
                         <Sparkles className="mr-2 h-4 w-4" />
                         Add Questions with AI
