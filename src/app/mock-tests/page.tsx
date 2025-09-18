@@ -15,7 +15,7 @@ function getUrlForTest(testType: string, testId: string) {
 
 export default async function MockTestsPage() {
   const tests = await getAllContent("Mock Test");
-  const subjects = Array.from(new Set(tests.map((test) => test.subject)));
+  const subjects = Array.from(new Set(tests.map((test) => test.subject))).filter(Boolean) as string[];
 
   return (
     <div className="container py-12 md:py-16">
