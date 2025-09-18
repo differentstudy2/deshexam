@@ -628,8 +628,8 @@ export default function CreateTestPage() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="free">Free</SelectItem>
-                          <SelectItem value="premium">Premium</SelectItem>
-                          <SelectItem value="pro">Pro</SelectItem>
+                          <SelectItem value="premium">Paid (Premium)</SelectItem>
+                          <SelectItem value="pro">Subscription (Pro)</SelectItem>
                         </SelectContent>
                       </Select>
                        <FormDescription>
@@ -821,3 +821,5 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+    

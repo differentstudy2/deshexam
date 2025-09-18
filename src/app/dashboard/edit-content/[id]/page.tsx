@@ -595,8 +595,8 @@ export default function EditContentPage() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="free">Free</SelectItem>
-                          <SelectItem value="premium">Premium</SelectItem>
-                          <SelectItem value="pro">Pro</SelectItem>
+                          <SelectItem value="premium">Paid (Premium)</SelectItem>
+                          <SelectItem value="pro">Subscription (Pro)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -790,3 +790,5 @@ export default function EditContentPage() {
     </div>
   );
 }
+
+    
