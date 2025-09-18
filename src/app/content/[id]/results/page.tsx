@@ -10,24 +10,28 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Award, CheckCircle, XCircle, Loader2, FileQuestion } from 'lucide-react';
+import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { getSubmissionById, getContentById } from '@/lib/firebase/firestore';
+import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 
-type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string };
+type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string };
 type Test = { id: string; title: string; testType: string; };
+type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
+
 
 function ResultsDisplay() {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
   const { toast } = useToast();
-  const pathname = usePathname();
 
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [test, setTest] = useState<Test | null>(null);
+  const [student, setStudent] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,8 +51,12 @@ function ResultsDisplay() {
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
           setSubmission(submissionData);
-           const testData = await getContentById(submissionData.testId) as Test;
+           const [testData, studentData] = await Promise.all([
+             getContentById(submissionData.testId) as Promise<Test>,
+             getUserProfile(submissionData.userId) as Promise<UserProfile>
+           ]);
            setTest(testData);
+           setStudent(studentData);
         } else {
           throw new Error("Submission not found.");
         }
@@ -97,15 +105,29 @@ function ResultsDisplay() {
   return (
     <>
       <Card className="max-w-2xl mx-auto">
-        <CardHeader className="text-center">
-          <Award className="w-16 h-16 mx-auto mb-4 text-primary" />
-          <CardTitle className="text-3xl">Congratulations!</CardTitle>
+        <CardHeader className="text-center items-center">
+           <Avatar className="h-20 w-20 mb-4">
+              <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/80/80`} />
+              <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
+            </Avatar>
+            <CardTitle className="text-3xl">{student?.displayName}</CardTitle>
           <CardDescription>You've completed the {test.title}.</CardDescription>
+           { (student?.school || student?.classGrade || student?.targetExam) && (
+              <div className="text-sm text-muted-foreground flex flex-wrap justify-center items-center gap-x-4 gap-y-1 pt-2">
+                {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                {student.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                {student.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+              </div>
+            )}
         </CardHeader>
         <CardContent className="p-6 text-center space-y-6">
+          <Separator />
           <div>
             <p className="text-muted-foreground text-sm">Your Score</p>
-            <p className="text-5xl font-bold">{percentage}%</p>
+            <p className="text-5xl font-bold flex items-center justify-center gap-2">
+                <Award className="w-12 h-12 text-primary" />
+                {percentage}%
+            </p>
           </div>
           <Progress value={percentage} className="w-full h-3" />
           <div className="flex justify-around pt-4">
