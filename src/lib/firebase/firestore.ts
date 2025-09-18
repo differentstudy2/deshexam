@@ -878,6 +878,7 @@ export const getAllUsers = async () => {
                 uid: doc.id,
                 ...data,
                 createdAt: data.createdAt?.toDate().toLocaleDateString() || 'N/A',
+                subscriptionExpiresAt: data.subscriptionExpiresAt?.toDate().toLocaleDateString() || 'N/A',
             };
         });
         return users;
@@ -899,3 +900,51 @@ export const setUserRole = async (userId: string, role: 'admin' | 'user') => {
         throw new Error("Failed to update user role.");
     }
 };
+
+export const deleteUser = async (userId: string) => {
+    if (!userId) {
+        throw new Error("User ID is required to delete a user.");
+    }
+    // This is a placeholder. Deleting a user from Auth requires a backend (e.g., Cloud Function).
+    // This function will only delete the user's Firestore document.
+    try {
+        const userDocRef = doc(db, "users", userId);
+        await deleteDoc(userDocRef);
+        // Also delete the username mapping
+        const usernameQuery = query(collection(db, "usernames"), where("uid", "==", userId));
+        const usernameSnapshot = await getDocs(usernameQuery);
+        if(!usernameSnapshot.empty){
+            const usernameDocRef = usernameSnapshot.docs[0].ref;
+            await deleteDoc(usernameDocRef);
+        }
+    } catch (error) {
+        console.error("Error deleting user document: ", error);
+        throw new Error("Failed to delete user data.");
+    }
+};
+
+export const updateUserSubscription = async (userId: string, plan: 'pro' | 'pass' | null) => {
+    if (!userId) {
+        throw new Error("User ID is required.");
+    }
+    try {
+        const userDocRef = doc(db, "users", userId);
+        let updateData: any = { subscriptionPlan: plan };
+        
+        if (plan) {
+            const expiresAt = new Date();
+            expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Example: 1 year subscription
+            updateData.subscriptionExpiresAt = expiresAt;
+        } else {
+            updateData.subscriptionExpiresAt = null;
+        }
+
+        await updateDoc(userDocRef, updateData);
+
+    } catch (error) {
+        console.error("Error updating subscription: ", error);
+        throw new Error("Failed to update user subscription.");
+    }
+}
+
+    

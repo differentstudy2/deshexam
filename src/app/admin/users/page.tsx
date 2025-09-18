@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAllUsers, setUserRole } from '@/lib/firebase/firestore';
+import { getAllUsers, setUserRole, deleteUser, updateUserSubscription } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import {
   Card,
@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Shield, ShieldCheck, User, UserCog } from 'lucide-react';
+import { Loader2, Shield, ShieldCheck, User, UserCog, MoreHorizontal, Trash2, Crown, Gem } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   AlertDialog,
@@ -33,6 +33,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
 
 type UserProfile = {
@@ -42,6 +65,8 @@ type UserProfile = {
   photoURL?: string;
   role?: 'admin' | 'user';
   createdAt: string;
+  subscriptionPlan?: 'pro' | 'pass';
+  subscriptionExpiresAt?: string;
 };
 
 export default function ManageUsersPage() {
@@ -50,8 +75,11 @@ export default function ManageUsersPage() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [isSubscriptionDialogOpen, setIsSubscriptionDialogOpen] = useState(false);
+  const [userToModify, setUserToModify] = useState<UserProfile | null>(null);
+  const [actionType, setActionType] = useState<'role' | 'delete' | 'subscription' | null>(null);
   const [newRole, setNewRole] = useState<'admin' | 'user' | null>(null);
+  const [newSubscriptionPlan, setNewSubscriptionPlan] = useState<'pro' | 'pass' | 'none' | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -73,42 +101,106 @@ export default function ManageUsersPage() {
     fetchUsers();
   }, [toast]);
 
-  const openConfirmationDialog = (user: UserProfile, role: 'admin' | 'user') => {
-    setSelectedUser(user);
-    setNewRole(role);
+  const openConfirmationDialog = (user: UserProfile, type: 'role' | 'delete', data?: any) => {
+    setUserToModify(user);
+    setActionType(type);
+    if (type === 'role' && data) {
+      setNewRole(data);
+    }
     setIsAlertOpen(true);
   };
+  
+  const openSubscriptionDialog = (user: UserProfile) => {
+    setUserToModify(user);
+    setNewSubscriptionPlan(user.subscriptionPlan || 'none');
+    setActionType('subscription');
+    setIsSubscriptionDialogOpen(true);
+  };
 
-  const handleRoleChange = async () => {
-    if (!selectedUser || !newRole) return;
+  const handleConfirm = async () => {
+    if (!userToModify) return;
+
+    if (actionType === 'role' && newRole) {
+      await handleRoleChange(userToModify, newRole);
+    } else if (actionType === 'delete') {
+      await handleDeleteUser(userToModify);
+    }
     
+    setIsAlertOpen(false);
+    setUserToModify(null);
+    setActionType(null);
+  };
+  
+  const handleRoleChange = async (user: UserProfile, role: 'admin' | 'user') => {
     try {
-      await setUserRole(selectedUser.uid, newRole);
+      await setUserRole(user.uid, role);
       toast({
         title: "Role Updated",
-        description: `${selectedUser.displayName}'s role has been changed to ${newRole}.`,
+        description: `${user.displayName}'s role has been changed to ${role}.`,
       });
-      // Refresh user list
       fetchUsers();
     } catch (error) {
-      toast({
+       toast({
         variant: "destructive",
         title: "Error updating role",
         description: (error as Error).message,
       });
-    } finally {
-      setIsAlertOpen(false);
-      setSelectedUser(null);
-      setNewRole(null);
     }
   };
+  
+  const handleDeleteUser = async (user: UserProfile) => {
+      try {
+        await deleteUser(user.uid);
+        toast({
+            title: "User Deleted",
+            description: `${user.displayName} has been permanently deleted.`,
+        });
+        fetchUsers();
+      } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Error deleting user",
+            description: (error as Error).message,
+        });
+      }
+  };
+  
+  const handleSubscriptionUpdate = async () => {
+    if (!userToModify || newSubscriptionPlan === null) return;
+    try {
+      await updateUserSubscription(userToModify.uid, newSubscriptionPlan === 'none' ? null : newSubscriptionPlan);
+      toast({
+        title: "Subscription Updated",
+        description: `${userToModify.displayName}'s subscription has been updated.`,
+      });
+      fetchUsers();
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Error updating subscription",
+        description: (error as Error).message,
+      });
+    } finally {
+        setIsSubscriptionDialogOpen(false);
+        setUserToModify(null);
+        setActionType(null);
+    }
+  };
+  
+  const getAlertDescription = () => {
+    if(!userToModify) return '';
+    if(actionType === 'role') return `You are about to change the role for ${userToModify.displayName} to ${newRole}.`;
+    if(actionType === 'delete') return `This will permanently delete ${userToModify.displayName} and all their data. This action cannot be undone.`;
+    return '';
+  }
+
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-headline text-3xl font-bold">Manage Users</h1>
         <p className="text-muted-foreground">
-          View and manage user roles across the platform.
+          View and manage user roles and subscriptions across the platform.
         </p>
       </div>
 
@@ -130,8 +222,9 @@ export default function ManageUsersPage() {
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead className="hidden md:table-cell">Role</TableHead>
+                  <TableHead className="hidden lg:table-cell">Subscription</TableHead>
                   <TableHead className="hidden lg:table-cell">Created At</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,20 +248,46 @@ export default function ManageUsersPage() {
                         {user.role}
                       </Badge>
                     </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      {user.subscriptionPlan ? (
+                        <Badge variant={user.subscriptionPlan === 'pro' ? "suggested" : "outline"}>
+                           {user.subscriptionPlan === 'pro' ? <Crown className="mr-1.5" /> : <Gem className="mr-1.5" />}
+                           {user.subscriptionPlan.charAt(0).toUpperCase() + user.subscriptionPlan.slice(1)}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">None</Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="hidden lg:table-cell">{user.createdAt}</TableCell>
                     <TableCell className="text-right">
                        {user.uid !== currentUser?.uid && (
-                        user.role === 'admin' ? (
-                            <Button variant="outline" size="sm" onClick={() => openConfirmationDialog(user, 'user')}>
-                                <UserCog className="mr-2" />
-                                Remove Admin
-                            </Button>
-                        ) : (
-                            <Button variant="outline" size="sm" onClick={() => openConfirmationDialog(user, 'admin')}>
-                                <Shield className="mr-2" />
-                                Make Admin
-                            </Button>
-                        )
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="ghost">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                {user.role === 'admin' ? (
+                                    <DropdownMenuItem onClick={() => openConfirmationDialog(user, 'role', 'user')}>
+                                        <UserCog className="mr-2"/> Remove Admin
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem onClick={() => openConfirmationDialog(user, 'role', 'admin')}>
+                                        <Shield className="mr-2"/> Make Admin
+                                    </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => openSubscriptionDialog(user)}>
+                                    <Crown className="mr-2"/> Manage Subscription
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => openConfirmationDialog(user, 'delete')}>
+                                    <Trash2 className="mr-2"/> Delete User
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                        )}
                     </TableCell>
                   </TableRow>
@@ -183,16 +302,43 @@ export default function ManageUsersPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You are about to change the role for {selectedUser?.displayName} to {newRole}.
-            </AlertDialogDescription>
+            <AlertDialogDescription>{getAlertDescription()}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRoleChange}>Confirm</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirm}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+       <Dialog open={isSubscriptionDialogOpen} onOpenChange={setIsSubscriptionDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Manage Subscription for {userToModify?.displayName}</DialogTitle>
+              <DialogDescription>
+                Upgrade or change the user's subscription plan. This will take effect immediately.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+               <Select onValueChange={(val) => setNewSubscriptionPlan(val as any)} defaultValue={userToModify?.subscriptionPlan || 'none'}>
+                <SelectTrigger>
+                    <SelectValue placeholder="Select a plan" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="pass">Pass</SelectItem>
+                    <SelectItem value="pro">Pass Pro</SelectItem>
+                </SelectContent>
+                </Select>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsSubscriptionDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleSubscriptionUpdate}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }
+
+    
