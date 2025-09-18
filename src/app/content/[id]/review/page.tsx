@@ -110,14 +110,22 @@ function ReviewDisplay() {
   return (
       <>
         <Card className="max-w-4xl mx-auto mb-8 relative">
-            <CardHeader>
-                <CardTitle>Review Summary</CardTitle>
-                <CardDescription>A summary of the test submission and student details.</CardDescription>
-                <div className="absolute top-4 right-4">
-                  <div className="flex flex-col items-center">
-                     <ScoreCircle score={percentage} size={60} strokeWidth={5}/>
-                     <span className="text-xs font-semibold text-muted-foreground mt-1">Your Score</span>
-                  </div>
+             <CardHeader>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle>Review Summary</CardTitle>
+                        <CardDescription>A summary of the test submission and student details.</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <div className="text-right">
+                            <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
+                            <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <ScoreCircle score={percentage} size={60} strokeWidth={5}/>
+                            <span className="text-xs font-semibold text-muted-foreground mt-1">Your Score</span>
+                        </div>
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -361,6 +369,7 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
 
