@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -693,7 +692,7 @@ export default function CreateTestPage() {
                                         <FormItem>
                                             <FormLabel>Question Text</FormLabel>
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -821,3 +820,5 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+    

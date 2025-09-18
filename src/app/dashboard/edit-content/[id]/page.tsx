@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -677,7 +676,7 @@ export default function EditContentPage() {
                                         <FormItem>
                                             <FormLabel>Question Text</FormLabel>
                                             <FormControl>
-                                                <Textarea {...field} />
+                                                <Input {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -790,3 +789,5 @@ export default function EditContentPage() {
     </div>
   );
 }
+
+    
