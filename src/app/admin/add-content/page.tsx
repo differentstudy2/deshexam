@@ -35,9 +35,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
+
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -86,6 +97,14 @@ type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
 
+const aiGeneratorFormSchema = z.object({
+    topic: z.string().min(3, 'Topic must be at least 3 characters.'),
+    numQuestions: z.coerce.number().int().min(1).max(20),
+    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+});
+type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
+
+
 export default function CreateTestPage() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -100,6 +119,8 @@ export default function CreateTestPage() {
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
 
 
   useEffect(() => {
@@ -161,14 +182,23 @@ export default function CreateTestPage() {
       questions: [],
     },
   });
+  
+  const aiForm = useForm<AIGeneratorFormValues>({
+    resolver: zodResolver(aiGeneratorFormSchema),
+    defaultValues: {
+      topic: '',
+      numQuestions: 5,
+      difficulty: 'Medium',
+    },
+  });
 
   const questions = form.watch('questions');
   useEffect(() => {
     const numberOfQuestions = questions.length;
     form.setValue('duration', numberOfQuestions, { shouldValidate: true });
-  }, [questions, form.setValue]);
+  }, [questions.length, form.setValue]);
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'questions',
   });
@@ -279,6 +309,38 @@ export default function CreateTestPage() {
     }
   }
 
+  const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
+    setIsGenerating(true);
+    try {
+      const input: AIContentGeneratorInput = {
+        ...aiData,
+        contentType: form.getValues('testType') || 'Mock Test',
+      };
+      const result: AIContentGeneratorOutput = await generateContent(input);
+      
+      form.setValue('title', result.title);
+      form.setValue('description', result.description);
+      form.setValue('difficulty', aiData.difficulty);
+      replace(result.questions);
+
+      toast({
+        title: 'Content Generated!',
+        description: `AI has created a draft for "${result.title}".`,
+      });
+      setIsGeneratorOpen(false);
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: 'AI Generation Failed',
+        description: (error as Error).message,
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+
   const handleTabChange = (value: string) => {
     form.setValue('testType', value, { shouldValidate: true });
   }
@@ -364,10 +426,86 @@ export default function CreateTestPage() {
 
   return (
     <div>
-      <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
-      <p className="text-muted-foreground mb-6">
-        Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
-      </p>
+        <div className="flex justify-between items-center mb-6">
+            <div>
+                <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
+                <p className="text-muted-foreground">
+                    Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
+                </p>
+            </div>
+            <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generate with AI
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Generate Content with AI</DialogTitle>
+                  <DialogDescription>
+                    Describe the content you want to create, and Gemini will generate a draft for you.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...aiForm}>
+                   <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                     <FormField
+                        control={aiForm.control}
+                        name="topic"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Topic</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                         <div className="grid grid-cols-2 gap-4">
+                             <FormField
+                                control={aiForm.control}
+                                name="numQuestions"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Number of Questions</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={aiForm.control}
+                                name="difficulty"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Difficulty</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Easy">Easy</SelectItem>
+                                                <SelectItem value="Medium">Medium</SelectItem>
+                                                <SelectItem value="Hard">Hard</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit" disabled={isGenerating}>
+                                {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
+                            </Button>
+                        </DialogFooter>
+                   </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+        </div>
+
 
     {contentTypes.length > 0 && (
       <Tabs defaultValue={form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
