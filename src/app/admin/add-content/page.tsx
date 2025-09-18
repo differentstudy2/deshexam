@@ -77,7 +77,7 @@ const formSchema = z.object({
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
-  newChapterName: z_string().optional(),
+  newChapterName: z.string().optional(),
   testType: z.string().min(1, 'Please select a content type.'),
   description: z.string().optional(),
   body: z.string().optional(),
