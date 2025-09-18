@@ -1,0 +1,31 @@
+diff --git a/node_modules/react-quill/lib/component.js b/node_modules/react-quill/lib/component.js
+index 72605e5..6d376c7 100644
+--- a/node_modules/react-quill/lib/component.js
++++ b/node_modules/react-quill/lib/component.js
+@@ -216,7 +216,7 @@
+ 	},
+ 
+ 	getEditor: function getEditor() {
+-		return this.quill;
++		return this.quill
+ 	},
+ 
+ 	getEditingArea: function getEditingArea() {
+@@ -484,7 +484,7 @@
+ 	},
+ 
+ 	focus: function focus() {
+-		this.quill.focus();
++		this.quill.focus()
+ 	},
+ 
+ 	blur: function blur() {
+@@ -492,7 +492,7 @@
+ 	},
+ 
+ 	getEditorNode: function getEditorNode() {
+-		return ReactDOM.findDOMNode(this.editingArea);
++		return this.editingArea.current
+ 	}
+ 
+ });
