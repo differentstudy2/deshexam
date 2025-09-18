@@ -168,7 +168,7 @@ const ContentTable = ({
         if (item.testType === 'Learn') {
             return `/admin/edit-article/${item.id}`;
         }
-        return `/dashboard/edit-content/${item.id}`;
+        return `/admin/edit-content/${item.id}`;
     }
 
     return (

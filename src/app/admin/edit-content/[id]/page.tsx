@@ -46,7 +46,7 @@ const optionSchema = z.object({
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
   marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
@@ -245,7 +245,7 @@ export default function EditContentPage() {
         title: 'Content Updated!',
         description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully updated.`,
       });
-      router.push('/dashboard/my-content');
+      router.push('/admin/content');
     } catch (error) {
        toast({
         variant: "destructive",
@@ -732,6 +732,7 @@ export default function EditContentPage() {
                                                     <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                                     <SelectItem value="True/False">True/False</SelectItem>
                                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                     <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -819,7 +820,7 @@ export default function EditContentPage() {
                                         )}
                                     />
                                 )}
-                                {questionType === 'Short Answer' && (
+                                {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                     <FormField
                                         control={form.control}
                                         name={`questions.${index}.correctAnswer`}
