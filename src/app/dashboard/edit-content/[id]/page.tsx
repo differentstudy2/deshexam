@@ -123,6 +123,7 @@ export default function EditContentPage() {
       duration: 60,
       difficulty: 'Medium',
       access: 'free',
+      price: undefined,
       subscriptionPlan: 'pass',
       questions: [],
     },
@@ -638,7 +639,12 @@ export default function EditContentPage() {
                                 <FormItem>
                                     <FormLabel>Price (INR)</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="e.g., 199" {...field} />
+                                      <Input
+                                        type="number"
+                                        placeholder="e.g., 199"
+                                        {...field}
+                                        value={field.value ?? ''}
+                                      />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -834,5 +840,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
-    
