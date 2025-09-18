@@ -273,7 +273,8 @@ export default function CreateTestPage() {
       }
       
       const contentToSave: any = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
-      if (contentToSave.testType === 'Learn') {
+      
+      if (data.testType === 'Learn') {
         delete contentToSave.questions;
         delete contentToSave.duration;
         delete contentToSave.difficulty;
