@@ -934,23 +934,25 @@ export const deleteUser = async (userId: string) => {
     }
 };
 
-export const updateUserSubscription = async (userId: string, plan: 'pro' | 'pass' | null) => {
-    if (!userId) {
-        throw new Error("User ID is required.");
+export const updateUserSubscription = async (userIds: string[], plan: 'pro' | 'pass' | null) => {
+    if (!userIds || userIds.length === 0) {
+        throw new Error("User ID(s) are required.");
     }
     try {
-        const userDocRef = doc(db, "users", userId);
-        let updateData: any = { subscriptionPlan: plan };
-        
-        if (plan) {
-            const expiresAt = new Date();
-            expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Example: 1 year subscription
-            updateData.subscriptionExpiresAt = expiresAt;
-        } else {
-            updateData.subscriptionExpiresAt = null;
-        }
-
-        await updateDoc(userDocRef, updateData);
+        const promises = userIds.map(userId => {
+            const userDocRef = doc(db, "users", userId);
+            let updateData: any = { subscriptionPlan: plan };
+            
+            if (plan) {
+                const expiresAt = new Date();
+                expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Example: 1 year subscription
+                updateData.subscriptionExpiresAt = expiresAt;
+            } else {
+                updateData.subscriptionExpiresAt = null;
+            }
+            return updateDoc(userDocRef, updateData);
+        });
+        await Promise.all(promises);
 
     } catch (error) {
         console.error("Error updating subscription: ", error);

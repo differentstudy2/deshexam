@@ -124,7 +124,7 @@ export default function ManageUsersPage() {
   }, [users, searchQuery, roleFilter, subscriptionFilter]);
   
   const handleSelectUser = (userId: string) => {
-    setSelectedUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
+    setSelectedUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, id]);
   }
 
   const handleSelectAll = (checked: boolean) => {
@@ -153,13 +153,14 @@ export default function ManageUsersPage() {
     setIsSubscriptionDialogOpen(true);
   };
 
-  const openBulkActionDialog = (type: 'role' | 'subscription', data: any) => {
+  const openBulkActionDialog = (type: 'role' | 'subscription' | 'delete', data?: any) => {
     setActionType('bulk');
     if (type === 'role') {
         setNewRole(data);
     } else if (type === 'subscription') {
         setNewSubscriptionPlan(data);
     }
+    // For delete, data is not needed.
     setIsAlertOpen(true);
   };
 
@@ -169,24 +170,26 @@ export default function ManageUsersPage() {
         await handleBulkUpdate();
     } else if (userToModify) {
         if (actionType === 'role' && newRole) {
-          await handleRoleChange(userToModify, newRole);
+          await handleRoleChange([userToModify], newRole);
         } else if (actionType === 'delete') {
-          await handleDeleteUser(userToModify);
+          await handleDeleteUser([userToModify]);
         }
     }
     
     setIsAlertOpen(false);
     setUserToModify(null);
     setActionType(null);
+    setNewRole(null);
+    setNewSubscriptionPlan(null);
     setSelectedUsers([]);
   };
   
-  const handleRoleChange = async (user: UserProfile, role: 'admin' | 'user') => {
+  const handleRoleChange = async (usersToUpdate: UserProfile[], role: 'admin' | 'user') => {
     try {
-      await setUserRole(user.uid, role);
+      await Promise.all(usersToUpdate.map(u => setUserRole(u.uid, role)));
       toast({
-        title: "Role Updated",
-        description: `${user.displayName}'s role has been changed to ${role}.`,
+        title: "Role(s) Updated",
+        description: `${usersToUpdate.length} user role(s) have been changed to ${role}.`,
       });
       fetchUsers();
     } catch (error) {
@@ -198,18 +201,18 @@ export default function ManageUsersPage() {
     }
   };
   
-  const handleDeleteUser = async (user: UserProfile) => {
+  const handleDeleteUser = async (usersToDelete: UserProfile[]) => {
       try {
-        await deleteUser(user.uid);
+        await Promise.all(usersToDelete.map(u => deleteUser(u.uid)));
         toast({
-            title: "User Deleted",
-            description: `${user.displayName} has been permanently deleted.`,
+            title: "User(s) Deleted",
+            description: `${usersToDelete.length} user(s) have been permanently deleted.`,
         });
         fetchUsers();
       } catch (error) {
           toast({
             variant: "destructive",
-            title: "Error deleting user",
+            title: "Error deleting user(s)",
             description: (error as Error).message,
         });
       }
@@ -218,7 +221,7 @@ export default function ManageUsersPage() {
   const handleSubscriptionUpdate = async () => {
     if (!userToModify || newSubscriptionPlan === null) return;
     try {
-      await updateUserSubscription(userToModify.uid, newSubscriptionPlan === 'none' ? null : newSubscriptionPlan);
+      await updateUserSubscription([userToModify.uid], newSubscriptionPlan === 'none' ? null : newSubscriptionPlan);
       toast({
         title: "Subscription Updated",
         description: `${userToModify.displayName}'s subscription has been updated.`,
@@ -238,29 +241,26 @@ export default function ManageUsersPage() {
   };
 
   const handleBulkUpdate = async () => {
-    const promises = selectedUsers.map(uid => {
-      if (newRole) {
-        return setUserRole(uid, newRole);
-      }
-      if (newSubscriptionPlan) {
-        return updateUserSubscription(uid, newSubscriptionPlan === 'none' ? null : newSubscriptionPlan);
-      }
-      return Promise.resolve();
-    });
-
-    try {
-      await Promise.all(promises);
-      toast({
-        title: 'Bulk Update Successful',
-        description: `Updated ${selectedUsers.length} users.`
-      });
-      fetchUsers();
-    } catch (error) {
-       toast({
-        variant: 'destructive',
-        title: 'Bulk Update Failed',
-        description: (error as Error).message,
-      });
+    if (newRole) {
+        await handleRoleChange(selectedUsers.map(uid => users.find(u => u.uid === uid)!), newRole);
+    } else if (newSubscriptionPlan) {
+        try {
+            await updateUserSubscription(selectedUsers, newSubscriptionPlan === 'none' ? null : newSubscriptionPlan);
+            toast({
+                title: 'Bulk Update Successful',
+                description: `Updated subscription for ${selectedUsers.length} users.`
+            });
+            fetchUsers();
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Bulk Update Failed',
+                description: (error as Error).message,
+            });
+        }
+    } else { // It's a delete action
+        const usersToDelete = users.filter(u => selectedUsers.includes(u.uid));
+        await handleDeleteUser(usersToDelete);
     }
   };
   
@@ -268,6 +268,7 @@ export default function ManageUsersPage() {
     if(isBulkAction) {
         if(newRole) return `You are about to change the role for ${selectedUsers.length} users to ${newRole}.`;
         if(newSubscriptionPlan) return `You are about to change the subscription for ${selectedUsers.length} users to ${newSubscriptionPlan === 'none' ? 'None' : newSubscriptionPlan}.`;
+        return `This will permanently delete ${selectedUsers.length} user(s) and all their data. This action cannot be undone.`;
     }
     if(!userToModify) return '';
     if(actionType === 'role') return `You are about to change the role for ${userToModify.displayName} to ${newRole}.`;
@@ -328,6 +329,7 @@ export default function ManageUsersPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                         <DropdownMenuLabel>Modify Selected</DropdownMenuLabel>
                          <DropdownMenuSub>
                            <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
                            <DropdownMenuSubContent>
@@ -343,6 +345,11 @@ export default function ManageUsersPage() {
                                <DropdownMenuItem onClick={() => openBulkActionDialog('subscription', 'none')}>None</DropdownMenuItem>
                            </DropdownMenuSubContent>
                          </DropdownMenuSub>
+                         <DropdownMenuSeparator />
+                         <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog('delete')}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Selected
+                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                  )}
@@ -399,15 +406,12 @@ export default function ManageUsersPage() {
                           {user.role}
                         </Badge>
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell">
+                       <TableCell className="hidden lg:table-cell">
                         <div className="flex items-center font-medium">
                           {user.subscriptionPlan === 'pro' ? 
-                            <Crown className="mr-1.5 h-4 w-4 text-yellow-500" /> : 
+                            <><Crown className="mr-1.5 h-4 w-4 text-yellow-500" />Pass Pro</> : 
                             user.subscriptionPlan === 'pass' ?
-                            <Gem className="mr-1.5 h-4 w-4 text-blue-500" /> : null
-                          }
-                          {user.subscriptionPlan ? 
-                            (user.subscriptionPlan === 'pro' ? 'Pass Pro' : 'Pass') : 
+                            <><Gem className="mr-1.5 h-4 w-4 text-blue-500" />Pass</> : 
                             <span className="text-muted-foreground">None</span>
                           }
                         </div>
