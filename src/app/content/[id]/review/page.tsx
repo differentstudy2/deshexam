@@ -144,7 +144,8 @@ function ReviewDisplay() {
             <CardContent className="space-y-4 pt-0">
                 <Separator />
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground col-span-2 md:col-span-5"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
+                    {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
 
                     <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>
                     <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>
@@ -364,3 +365,4 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
