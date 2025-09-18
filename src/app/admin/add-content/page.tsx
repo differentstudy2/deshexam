@@ -61,7 +61,7 @@ const optionSchema = z.object({
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
@@ -109,7 +109,7 @@ const aiGeneratorFormSchema = z.object({
     source: z.string().min(3, 'Source must be at least 3 characters.'),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Any']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Any']),
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
@@ -740,6 +740,7 @@ export default function CreateTestPage() {
                                             <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                             <SelectItem value="True/False">True/False</SelectItem>
                                             <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                            <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -1199,6 +1200,7 @@ export default function CreateTestPage() {
                                                       <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                                       <SelectItem value="True/False">True/False</SelectItem>
                                                       <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                      <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                                   </SelectContent>
                                               </Select>
                                               <FormMessage />
@@ -1319,7 +1321,7 @@ export default function CreateTestPage() {
                                           </div>
                                       </div>
                                   )}
-                                  {questionType === 'Short Answer' && (
+                                  {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                       <FormField
                                           control={form.control}
                                           name={`questions.${index}.correctAnswer`}

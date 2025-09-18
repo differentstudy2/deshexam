@@ -20,7 +20,7 @@ type Option = {
 
 type Question = {
   text: string;
-  type: 'Multiple Choice' | 'True/False' | 'Short Answer';
+  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank';
   options?: Option[];
   correctAnswer: string;
 };
@@ -207,7 +207,7 @@ export default function TestPage() {
                     </div>
                   </RadioGroup>
                 )}
-                {question.type === 'Short Answer' && (
+                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
                   <Input 
                     placeholder="Your answer..." 
                     onChange={(e) => handleAnswerChange(index, e.target.value)}

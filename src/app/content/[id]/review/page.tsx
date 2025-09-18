@@ -175,7 +175,7 @@ function ReviewDisplay() {
                                 })}
                             </>
                          )}
-                         {question.type === 'Short Answer' && (
+                         {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
                             <>
                                <div className="p-3 rounded-lg border bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800">
                                    <div className="flex items-center">

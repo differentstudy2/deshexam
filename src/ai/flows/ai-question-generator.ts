@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 const QuestionSchema = z.object({
   text: z.string().describe('The text of the question.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']).describe('The type of the question.'),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']).describe('The type of the question.'),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(z.object({ text: z.string(), explanation: z.string().optional() })).optional().describe('An array of options for Multiple Choice or True/False questions, each with text and an optional explanation.'),
   correctAnswer: z.string().describe('The correct answer for the question. For Multiple Choice questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options.'),
@@ -25,7 +25,7 @@ const AIQuestionGeneratorInputSchema = z.object({
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('The difficulty level of the questions.'),
   sourceType: z.enum(['topic', 'text']).describe('The source of the content to be generated.'),
   source: z.string().describe('The source topic or text content.'),
-  questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Any']).optional().describe('The specific type of question to generate.'),
+  questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Any']).optional().describe('The specific type of question to generate.'),
 });
 export type AIQuestionGeneratorInput = z.infer<typeof AIQuestionGeneratorInputSchema>;
 
@@ -64,13 +64,13 @@ The source text for the questions is:
 
 Please generate only the specified number of questions based on the source. Do not generate a title or description.
 For each question, provide:
-- The question text.
+- The question text. For "Fill in the Blank" questions, use "____" to indicate the blank.
 - The question type. If a specific Question Type is provided above (and is not 'Any'), all questions MUST be of that type. Otherwise, you can mix the types.
 - The marks for the question (default to 1).
 - For 'Multiple Choice' questions, provide exactly 4 options. For each option, provide the option text and a brief explanation. The explanation should explicitly state why the option is correct or incorrect. For example: "This is correct because..." or "This is incorrect because...".
 - For 'True/False' questions, provide an options array with two items: one for 'True' and one for 'False'. Each should have an explanation stating why the statement is true or false.
 - The correct answer. For 'Multiple Choice' questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options. For 'True/False', it must be either 'True' or 'False'.
-- A general explanation for the correct answer that summarizes the main concept. For True/False, explain why the statement is true or false.
+- A general explanation for the correct answer that summarizes the main concept. For True/False, explain why the statement is true or false. For Fill in the Blank, explain the concept behind the answer.
 
 Ensure the generated questions are accurate and relevant to the provided source.
 The questions should be diverse and test different aspects of the topic.

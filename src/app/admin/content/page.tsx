@@ -94,7 +94,7 @@ const optionSchema = z.object({
 const questionFormSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
   marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
@@ -108,7 +108,7 @@ type Question = {
     authorName: string;
     createdAt: string;
     subject: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank';
     marks: number;
     options?: {text: string, explanation?: string}[];
     correctAnswer: string;
@@ -119,7 +119,7 @@ const aiGeneratorFormSchema = z.object({
     source: z.string().min(3, 'Source must be at least 3 characters.'),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Any']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Any']),
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
@@ -895,7 +895,7 @@ export default function ManageContentPage() {
                                     <FormField control={aiForm.control} name="numQuestions" render={({ field }) => ( <FormItem> <FormLabel>Number of Questions</FormLabel> <FormControl> <Input type="number" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
                                     <FormField control={aiForm.control} name="difficulty" render={({ field }) => ( <FormItem> <FormLabel>Difficulty</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Easy">Easy</SelectItem> <SelectItem value="Medium">Medium</SelectItem> <SelectItem value="Hard">Hard</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
                                 </div>
-                                <FormField control={aiForm.control} name="questionType" render={({ field }) => ( <FormItem> <FormLabel>Question Type</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Any">Any</SelectItem> <SelectItem value="Multiple Choice">Multiple Choice</SelectItem> <SelectItem value="True/False">True/False</SelectItem> <SelectItem value="Short Answer">Short Answer</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                                <FormField control={aiForm.control} name="questionType" render={({ field }) => ( <FormItem> <FormLabel>Question Type</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Any">Any</SelectItem> <SelectItem value="Multiple Choice">Multiple Choice</SelectItem> <SelectItem value="True/False">True/False</SelectItem> <SelectItem value="Short Answer">Short Answer</SelectItem> <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
                                 <DialogFooter> <Button type="submit" disabled={isGenerating}> {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"} </Button> </DialogFooter>
                             </form>
                             </Form>
@@ -1053,6 +1053,7 @@ export default function ManageContentPage() {
                                     <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                     <SelectItem value="True/False">True/False</SelectItem>
                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                    <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />
@@ -1127,7 +1128,7 @@ export default function ManageContentPage() {
                         )}
                     />
                 )}
-                 {questionForm.watch('type') === 'Short Answer' && (
+                 {(questionForm.watch('type') === 'Short Answer' || questionForm.watch('type') === 'Fill in the Blank') && (
                     <FormField
                         control={questionForm.control}
                         name="correctAnswer"
