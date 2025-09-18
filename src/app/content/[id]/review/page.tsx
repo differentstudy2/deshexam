@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebase/firestore';
@@ -26,7 +26,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 type Option = { text: string; explanation?: string; };
 type MatchingOptions = { columnA: string[]; columnB: string[]; };
 type Question = { id: string; text: string; type: string; options?: Option[]; matchingOptions?: MatchingOptions; correctAnswer: any; explanation?: string; };
-type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; exam: string; };
+type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: any }, testType: string; submittedAt: any; };
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
 
@@ -139,13 +139,21 @@ function ReviewDisplay() {
                     </div>
                 </div>
                 <Separator />
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground col-span-2 md:col-span-5"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
+
                     <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>
                     <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>
+                    {test.chapter && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
                     <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Exam:</strong> <span className="text-foreground">{test.exam}</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Score:</strong> <span className="text-foreground">{score}/{totalQuestions}</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><User className="w-4 h-4"/> <strong>Student:</strong> <span className="text-foreground">{student?.displayName}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{totalQuestions}</span></div>
+                    
+                    <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Duration:</strong> <span className="text-foreground">{test.duration} min</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Difficulty:</strong> <span className="text-foreground">{test.difficulty}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Score:</strong> <span className="text-foreground">{score}/{totalQuestions} ({percentage}%)</span></div>
+                    
                     <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submission.submittedAt.toLocaleDateString()}</span></div>
+                     <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submission.submittedAt.toLocaleTimeString()}</span></div>
                 </div>
             </CardContent>
         </Card>
@@ -353,6 +361,7 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
 
