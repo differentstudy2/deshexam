@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/dialog';
 import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
 import { generateLearnContent, AILearnContentGeneratorInput, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
+import { generateDescription } from '@/ai/flows/ai-description-generator';
 
 
 const optionSchema = z.object({
@@ -131,6 +132,7 @@ export default function CreateTestPage() {
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
@@ -380,6 +382,36 @@ export default function CreateTestPage() {
       });
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleAIDescriptionGenerate = async () => {
+    const title = form.getValues('title');
+    if (!title) {
+        toast({
+            variant: "destructive",
+            title: 'Title is required',
+            description: 'Please enter a title before generating a description.',
+        });
+        return;
+    }
+
+    setIsGeneratingDesc(true);
+    try {
+        const result = await generateDescription({ source: title });
+        form.setValue('description', result.description);
+        toast({
+            title: 'Description Generated!',
+            description: 'AI has created a description for you.',
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+        });
+    } finally {
+        setIsGeneratingDesc(false);
     }
   };
 
@@ -940,7 +972,19 @@ export default function CreateTestPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description / Summary</FormLabel>
+                    <div className="flex justify-between items-center">
+                        <FormLabel>Description / Summary</FormLabel>
+                        <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={handleAIDescriptionGenerate}
+                            disabled={isGeneratingDesc || !form.getValues('title')}
+                        >
+                            {isGeneratingDesc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            Generate with AI
+                        </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         placeholder="Provide a brief description of the content."
@@ -1268,3 +1312,4 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
