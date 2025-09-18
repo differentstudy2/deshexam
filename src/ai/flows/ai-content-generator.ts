@@ -21,7 +21,7 @@ const QuestionSchema = z.object({
 
 const AIContentGeneratorInputSchema = z.object({
   contentType: z.string().describe('The type of content to generate (e.g., "Mock Test", "Quiz").'),
-  numQuestions: z.number().int().positive().describe('The number of questions to generate.'),
+  numQuestions: z.number().int().min(1).describe('The number of questions to generate.'),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('The difficulty level of the questions.'),
   sourceType: z.enum(['topic', 'text']).describe('The source of the content to be generated.'),
   source: z.string().describe('The source topic or text content.'),
@@ -50,7 +50,7 @@ The content should have the following properties:
 - Number of questions: {{numQuestions}}
 - Difficulty level: {{difficulty}}
 
-{{#if (eq sourceType 'topic')}}
+{{#if isTopic}}
 The topic for the content is "{{source}}".
 {{else}}
 The source text for the content is:
@@ -80,7 +80,8 @@ const generateContentFlow = ai.defineFlow(
     outputSchema: AIContentGeneratorOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    const isTopic = input.sourceType === 'topic';
+    const { output } = await prompt({ ...input, isTopic });
     return output!;
   }
 );
