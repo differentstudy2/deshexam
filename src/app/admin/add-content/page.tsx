@@ -35,7 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef } from 'react';
 import {
@@ -58,13 +58,22 @@ const optionSchema = z.object({
   explanation: z.string().optional(),
 });
 
+const matchingOptionSchema = z.object({
+    a: z.string().min(1, 'Column A item cannot be empty.'),
+    b: z.string().min(1, 'Column B item cannot be empty.'),
+});
+
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
-  correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
+  matchingOptions: z.object({
+      columnA: z.array(z.string()),
+      columnB: z.array(z.string()),
+  }).optional(),
+  correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
 });
 
@@ -109,7 +118,7 @@ const aiGeneratorFormSchema = z.object({
     source: z.string().min(3, 'Source must be at least 3 characters.'),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Any']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
@@ -231,6 +240,12 @@ export default function CreateTestPage() {
     name: 'questions',
   });
 
+  const { fields: matchingFields, append: appendMatching, remove: removeMatching } = useFieldArray({
+    control: form.control,
+    name: 'questions' as any, // This is a bit of a hack for nested field arrays
+  });
+
+
   const questions = form.watch('questions');
   useEffect(() => {
     if (currentTestType !== 'Learn') {
@@ -290,7 +305,23 @@ export default function CreateTestPage() {
           setIsAddingNewChapter(false);
         }
         
-        contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName };
+        // Process matching questions
+        const processedQuestions = data.questions?.map(q => {
+            if (q.type === 'Matching' && q.correctAnswer) {
+                const correctAnswer = q.correctAnswer as { a: string, b: string }[];
+                const columnA = correctAnswer.map(pair => pair.a);
+                const columnB = correctAnswer.map(pair => pair.b);
+                 // Simple shuffle for column B
+                for (let i = columnB.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
+                }
+                return { ...q, matchingOptions: { columnA, columnB } };
+            }
+            return q;
+        });
+        
+        contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
         delete contentToSave.body;
         delete contentToSave.newSubject;
         delete contentToSave.newBoard;
@@ -741,6 +772,7 @@ export default function CreateTestPage() {
                                             <SelectItem value="True/False">True/False</SelectItem>
                                             <SelectItem value="Short Answer">Short Answer</SelectItem>
                                             <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                            <SelectItem value="Matching">Matching</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -1185,6 +1217,11 @@ export default function CreateTestPage() {
               <CardContent className="space-y-6">
                   {fields.map((question, index) => {
                       const questionType = form.watch(`questions.${index}.type`);
+                       const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
+                          control: form.control,
+                          name: `questions.${index}.correctAnswer` as any,
+                      });
+
                       return (
                           <Card key={question.id} className="p-4">
                               <div className="flex justify-between items-center mb-4 gap-4">
@@ -1201,6 +1238,7 @@ export default function CreateTestPage() {
                                                       <SelectItem value="True/False">True/False</SelectItem>
                                                       <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                       <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                                      <SelectItem value="Matching">Matching</SelectItem>
                                                   </SelectContent>
                                               </Select>
                                               <FormMessage />
@@ -1239,6 +1277,11 @@ export default function CreateTestPage() {
                                                     Use "____" (four underscores) to indicate where the blank should be.
                                                 </FormDescription>
                                                 )}
+                                                {questionType === 'Matching' && (
+                                                <FormDescription>
+                                                    Provide the instruction for matching, e.g., "Match Column A with Column B".
+                                                </FormDescription>
+                                                )}
                                               <FormMessage />
                                           </FormItem>
                                       )}
@@ -1257,7 +1300,7 @@ export default function CreateTestPage() {
                                                               <FormControl>
                                                                   <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" />
                                                               </FormControl>
-                                                              <div className="space-y-2 flex-1">
+                                                               <div className="space-y-2 flex-1">
                                                                   <FormField
                                                                       control={form.control}
                                                                       name={`questions.${index}.options.${optionIndex}.text`}
@@ -1324,6 +1367,35 @@ export default function CreateTestPage() {
                                                   )}
                                               />
                                           </div>
+                                      </div>
+                                  )}
+                                  {questionType === 'Matching' && (
+                                      <div className='space-y-4'>
+                                        <FormLabel>Matching Pairs</FormLabel>
+                                        <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
+                                          <div>Column A</div>
+                                          <div></div>
+                                          <div>Column B</div>
+                                        </div>
+                                         {matchingPairFields.map((pair, pairIndex) => (
+                                          <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
+                                              <FormField
+                                                  control={form.control}
+                                                  name={`questions.${index}.correctAnswer.${pairIndex}.a`}
+                                                  render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />}
+                                              />
+                                              <GripVertical className="h-5 w-5 text-muted-foreground"/>
+                                               <FormField
+                                                  control={form.control}
+                                                  name={`questions.${index}.correctAnswer.${pairIndex}.b`}
+                                                  render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />}
+                                              />
+                                              <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4"/></Button>
+                                          </div>
+                                        ))}
+                                         <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', b: '' })}>
+                                              <PlusCircle className="mr-2 h-4 w-4"/> Add Pair
+                                          </Button>
                                       </div>
                                   )}
                                   {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -10,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById } from '@/lib/firebase/firestore';
@@ -20,9 +21,10 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 
 type Option = { text: string; explanation?: string; };
-type Question = { id: string; text: string; type: string; options?: Option[]; correctAnswer: string; explanation?: string; };
+type MatchingOptions = { columnA: string[]; columnB: string[]; };
+type Question = { id: string; text: string; type: string; options?: Option[]; matchingOptions?: MatchingOptions; correctAnswer: any; explanation?: string; };
 type Test = { id: string; title: string; questions: Question[]; testType: string; };
-type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; };
+type Submission = { id: string; testId: string; score: number; totalQuestions: number; answers: { [key: string]: any }, testType: string; };
 
 function ReviewDisplay() {
   const searchParams = useSearchParams();
@@ -101,7 +103,27 @@ function ReviewDisplay() {
         <CardContent className="space-y-6">
           {test.questions.map((question, index) => {
             const userAnswer = answers[index];
-            const isCorrect = userAnswer === question.correctAnswer;
+            let isCorrect = false;
+
+            if (question.type === 'Matching') {
+                const correctAnswers = question.correctAnswer;
+                const userAnswers = userAnswer;
+                let allMatch = true;
+                if(!userAnswers || Object.keys(userAnswers).length !== correctAnswers.length) {
+                    allMatch = false;
+                } else {
+                    for(const pair of correctAnswers) {
+                        if (userAnswers[pair.a] !== pair.b) {
+                            allMatch = false;
+                            break;
+                        }
+                    }
+                }
+                isCorrect = allMatch;
+            } else {
+                isCorrect = userAnswer === question.correctAnswer;
+            }
+            
             return (
               <div key={index}>
                 <div className="flex items-start gap-4">
@@ -152,7 +174,7 @@ function ReviewDisplay() {
                                 {['True', 'False'].map((tf, tfIndex) => {
                                     const isUserAnswer = userAnswer === tf;
                                     const isCorrectAnswer = question.correctAnswer === tf;
-                                    const option = question.options?.find(o => o.text === tf) ?? { text: tf };
+                                    const option = question.options?.find(o => o.text === tf) ?? { text: tf, explanation: (question.options as any)?.[tfIndex]?.explanation };
                                     
                                     return (
                                         <div key={tfIndex} className={cn(
@@ -190,6 +212,32 @@ function ReviewDisplay() {
                                    </div>
                                </div>
                             </>
+                         )}
+                         {question.type === 'Matching' && (
+                             <div className="space-y-2">
+                                <div className="grid grid-cols-[1fr_1fr] gap-4 font-semibold">
+                                    <div className="text-center">Your Answer</div>
+                                    <div className="text-center">Correct Answer</div>
+                                </div>
+                                {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => {
+                                    const userMatch = userAnswer ? userAnswer[pair.a] : '';
+                                    const isPairCorrect = userMatch === pair.b;
+                                    return (
+                                        <div key={pairIndex} className="grid grid-cols-[1fr_1fr] gap-4">
+                                            <div className="flex items-center justify-center p-2 border rounded-md">
+                                                <span>{pair.a}</span>
+                                                <GripVertical className="h-4 w-4 mx-2 text-muted-foreground" />
+                                                <span>{userMatch}</span>
+                                            </div>
+                                            <div className="flex items-center justify-center p-2 border rounded-md bg-green-100/60 dark:bg-green-900/20">
+                                                <span>{pair.a}</span>
+                                                 <GripVertical className="h-4 w-4 mx-2 text-muted-foreground" />
+                                                <span>{pair.b}</span>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                             </div>
                          )}
                      </div>
                       {question.explanation && (

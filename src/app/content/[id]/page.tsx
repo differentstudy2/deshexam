@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,21 +9,28 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Option = {
   text: string;
 };
 
+type MatchingOptions = {
+    columnA: string[];
+    columnB: string[];
+}
+
 type Question = {
   text: string;
-  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank';
+  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
   options?: Option[];
-  correctAnswer: string;
+  matchingOptions?: MatchingOptions;
+  correctAnswer: any;
 };
 
 type Test = {
@@ -38,7 +46,7 @@ type Test = {
 export default function TestPage() {
   const [test, setTest] = useState<Test | null>(null);
   const [loading, setLoading] = useState(true);
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [answers, setAnswers] = useState<{ [key: number]: any }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -73,6 +81,16 @@ export default function TestPage() {
     setAnswers(prev => ({ ...prev, [questionIndex]: answer }));
   };
 
+  const handleMatchingAnswerChange = (questionIndex: number, columnAItem: string, columnBItem: string) => {
+    setAnswers(prev => {
+        const newAnswers = { ...prev };
+        const currentMatchingAnswers = newAnswers[questionIndex] || {};
+        currentMatchingAnswers[columnAItem] = columnBItem;
+        newAnswers[questionIndex] = currentMatchingAnswers;
+        return newAnswers;
+    });
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) {
@@ -98,8 +116,27 @@ export default function TestPage() {
     try {
         let score = 0;
         test?.questions.forEach((question, index) => {
-            if (answers[index] === question.correctAnswer) {
-                score++;
+            if (question.type === 'Matching') {
+                const correctAnswers = question.correctAnswer;
+                const userAnswers = answers[index];
+                let allMatch = true;
+                if(Object.keys(userAnswers).length !== correctAnswers.length) {
+                    allMatch = false;
+                } else {
+                    for(const pair of correctAnswers) {
+                        if (userAnswers[pair.a] !== pair.b) {
+                            allMatch = false;
+                            break;
+                        }
+                    }
+                }
+                if (allMatch) {
+                    score++;
+                }
+            } else {
+                 if (answers[index] === question.correctAnswer) {
+                    score++;
+                }
             }
         });
 
@@ -212,6 +249,31 @@ export default function TestPage() {
                     placeholder="Your answer..." 
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
                   />
+                )}
+                {question.type === 'Matching' && question.matchingOptions && (
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                            <div className="font-bold text-center">Column A</div>
+                            <div></div>
+                            <div className="font-bold text-center">Column B</div>
+                        </div>
+                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                <div className="p-3 border rounded-md text-center bg-secondary">{itemA}</div>
+                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                <Select onValueChange={(value) => handleMatchingAnswerChange(index, itemA, value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a match" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                            <SelectItem key={bIndex} value={itemB}>{itemB}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        ))}
+                    </div>
                 )}
               </CardContent>
             </Card>
