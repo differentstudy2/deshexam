@@ -37,7 +37,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { generateLearnContent, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
-import RichTextEditor from '@/components/rich-text-editor';
+
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
@@ -241,7 +241,11 @@ export default function AddArticlePage() {
                     <FormItem>
                       <FormLabel>Content Body</FormLabel>
                       <FormControl>
-                        <RichTextEditor {...field} />
+                        <Textarea
+                          placeholder="Write your article content here."
+                          className="min-h-[250px]"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

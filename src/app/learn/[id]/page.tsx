@@ -10,7 +10,6 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Plate, PlateProvider } from '@udecode/plate-common';
 
 
 type Article = {
@@ -83,8 +82,6 @@ export default function LearnArticlePage() {
     );
   }
 
-  const initialBodyValue = article.body ? JSON.parse(article.body) : [{ type: 'p', children: [{ text: '' }] }];
-
   return (
     <div className="container py-12">
         <div className="max-w-4xl mx-auto">
@@ -123,10 +120,8 @@ export default function LearnArticlePage() {
                 priority
             />
 
-            <div className="prose dark:prose-invert lg:prose-xl max-w-none">
-              <PlateProvider initialValue={initialBodyValue}>
-                <Plate readOnly />
-              </PlateProvider>
+            <div className="prose dark:prose-invert lg:prose-xl max-w-none whitespace-pre-wrap">
+              {article.body}
             </div>
         </div>
     </div>
