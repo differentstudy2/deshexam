@@ -215,28 +215,29 @@ function ReviewDisplay() {
                                </div>
                             </>
                          )}
-                         {question.type === 'Matching' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h4 className="font-semibold mb-2 text-center">Your Answer</h4>
-                                    <div className="space-y-2">
-                                        {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => (
-                                            <div key={pairIndex} className="p-3 border rounded-lg bg-secondary">
-                                                {pair.a} <span className="font-mono mx-2 text-muted-foreground">::</span> {userAnswer?.[pair.a] || <span className="italic text-muted-foreground">No Answer</span>}
+                         {question.type === 'Matching' && question.correctAnswer && (
+                            <div className="space-y-2">
+                                {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => {
+                                    const userMatchedB = userAnswer?.[pair.a];
+                                    const isPairCorrect = userMatchedB === pair.b;
+                                    return (
+                                        <div key={pairIndex} className={cn("p-3 border rounded-lg", isPairCorrect ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20')}>
+                                            <div className="flex items-center gap-2">
+                                                {isPairCorrect ? <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" /> : <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />}
+                                                <span className="font-semibold">{pair.a}</span>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                <span>{userMatchedB || <i className="text-muted-foreground">No answer</i>}</span>
+                                                {isPairCorrect ? <Badge variant="outline" className="bg-white">Correct</Badge> : <Badge variant="destructive">Incorrect</Badge>}
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold mb-2 text-center">Correct Answer</h4>
-                                    <div className="space-y-2">
-                                        {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => (
-                                            <div key={pairIndex} className="p-3 border rounded-lg bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                                                {pair.a} <span className="font-mono mx-2">::</span> {pair.b}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                            {!isPairCorrect && (
+                                                <div className="mt-2 pl-7 text-sm">
+                                                    <span className="font-semibold">Correct Answer: </span>
+                                                    <span className="text-green-700 dark:text-green-400 font-medium">{pair.b}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                             </div>
                          )}
                      </div>
@@ -297,4 +298,5 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
