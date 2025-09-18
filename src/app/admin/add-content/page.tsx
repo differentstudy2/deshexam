@@ -548,15 +548,12 @@ export default function CreateTestPage() {
   const selectedChapterValue = form.watch('chapter');
   const selectedChapter = chapters.find(c => `${c.chapterNo}. ${c.chapterName}` === selectedChapterValue);
   
-  const AIGeneratorDialog = () => {
+  const AIGeneratorDialog = ({ children }: { children: React.ReactNode }) => {
     if (currentTestType === 'Learn') {
         return (
              <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Article with AI
-                    </Button>
+                    {children}
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                      <DialogHeader>
@@ -595,10 +592,7 @@ export default function CreateTestPage() {
     return (
          <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
-                <Sparkles className="mr-2 h-4 w-4" />
-                Generate with AI
-                </Button>
+                {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
@@ -751,7 +745,12 @@ export default function CreateTestPage() {
                     Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
                 </p>
             </div>
-            <AIGeneratorDialog />
+            <AIGeneratorDialog>
+                <Button variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    {currentTestType === 'Learn' ? 'Generate Article with AI' : 'Generate with AI'}
+                </Button>
+            </AIGeneratorDialog>
         </div>
 
 
@@ -1306,7 +1305,7 @@ export default function CreateTestPage() {
                       );
                   })}
               </CardContent>
-              <CardFooter>
+              <CardFooter className="gap-4">
                   <Button
                       type="button"
                       variant="outline"
@@ -1315,6 +1314,12 @@ export default function CreateTestPage() {
                       <PlusCircle className="mr-2" />
                       Add Question
                   </Button>
+                  <AIGeneratorDialog>
+                      <Button type="button" variant="outline">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Add Questions with AI
+                      </Button>
+                  </AIGeneratorDialog>
               </CardFooter>
             </Card>
           )}
