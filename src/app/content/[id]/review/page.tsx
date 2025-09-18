@@ -126,10 +126,10 @@ function ReviewDisplay() {
                 </div>
                 <Separator />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Exam:</strong> <span className="text-foreground">{test.exam}</span></div>
+                    {test.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>}
+                    {test.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>}
+                    {test.chapter && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
+                    {test.exam && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Exam:</strong> <span className="text-foreground">{test.exam}</span></div>}
                     <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Score:</strong> <span className="text-foreground">{score}/{totalQuestions} ({percentage}%)</span></div>
                     <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submissionDate}</span></div>
                 </div>
@@ -339,6 +339,7 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
 
