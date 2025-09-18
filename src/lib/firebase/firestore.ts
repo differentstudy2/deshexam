@@ -1,5 +1,4 @@
 
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -414,7 +413,8 @@ export const getAllContent = async (type?: string) => {
             return {
                 id: doc.id,
                 ...data,
-                questions: data.questions || [], 
+                questions: data.questions || [],
+                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
             };
         });
         return contents;
