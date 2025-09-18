@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -10,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, Clock, BarChart3, Star, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebase/firestore';
@@ -26,7 +27,7 @@ import { format } from 'date-fns';
 type Option = { text: string; explanation?: string; };
 type MatchingOptions = { columnA: string[]; columnB: string[]; };
 type Question = { id: string; text: string; type: string; options?: Option[]; matchingOptions?: MatchingOptions; correctAnswer: any; explanation?: string; };
-type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; chapter: string; exam: string; };
+type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; chapter: string; exam: string; duration: number; difficulty: string; };
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: any }, testType: string; submittedAt: any; };
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
 
@@ -103,7 +104,8 @@ function ReviewDisplay() {
 
   const { answers, score, totalQuestions, submittedAt } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
-  const submissionDate = submittedAt ? format(submittedAt.toDate(), "MMM d, yyyy, h:mm a") : 'N/A';
+  const submissionDate = submittedAt ? format(submittedAt.toDate(), "MMM d, yyyy") : null;
+  const submissionTime = submittedAt ? format(submittedAt.toDate(), "h:mm a") : null;
 
   return (
       <>
@@ -128,14 +130,18 @@ function ReviewDisplay() {
                     </div>
                 </div>
                 <Separator />
-                 <div className="text-sm text-muted-foreground font-medium mb-2">{test.title}</div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground col-span-2 md:col-span-4"><FileText className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
                     {test.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>}
                     {test.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>}
                     {test.chapter && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
                     {test.exam && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Exam:</strong> <span className="text-foreground">{test.exam}</span></div>}
-                    <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Score:</strong> <span className="text-foreground">{score}/{totalQuestions} ({percentage}%)</span></div>
-                    <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submissionDate}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><BarChart3 className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{totalQuestions}</span></div>
+                    <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Duration:</strong> <span className="text-foreground">{test.duration} min</span></div>
+                    {test.difficulty && <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Difficulty:</strong> <span className="text-foreground">{test.difficulty}</span></div>}
+                    <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Score:</strong> <span className="text-foreground">{score}/{totalQuestions} ({percentage}%)</span></div>
+                    {submissionDate && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submissionDate}</span></div>}
+                    {submissionTime && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submissionTime}</span></div>}
                 </div>
             </CardContent>
         </Card>
@@ -173,7 +179,7 @@ function ReviewDisplay() {
                     <div className="flex items-start gap-4">
                     <div>
                         {question.type === 'Matching' ? (
-                        <ScoreCircle score={matchingPercentage} size={36} />
+                        <ScoreCircle score={matchingPercentage} size={36} strokeWidth={3} />
                         ) : isCorrect ? (
                         <CheckCircle className="w-6 h-6 text-green-500" />
                         ) : (
