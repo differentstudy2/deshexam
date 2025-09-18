@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -67,6 +67,14 @@ type Content = {
     exam: string;
     chapter: string;
 }
+
+type Question = {
+    id: string;
+    text: string;
+    authorName: string;
+    createdAt: string;
+    subject: string;
+};
 
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
@@ -205,9 +213,57 @@ const ContentTable = ({
     </div>
 );
 
+const QuestionsTable = ({ questions, loading }: { questions: Question[], loading: boolean }) => (
+     <div className="overflow-x-auto">
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead className="w-[60%]">Question Text</TableHead>
+                    <TableHead className="hidden md:table-cell">Author</TableHead>
+                    <TableHead className="hidden md:table-cell">Subject</TableHead>
+                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                        </TableRow>
+                    ))
+                ) : questions.length > 0 ? (
+                    questions.map((question) => (
+                        <TableRow key={question.id}>
+                            <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
+                            <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
+                            <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
+                            <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
+                            <TableCell className="text-right">
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={`/question/${question.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center">No questions found.</TableCell>
+                    </TableRow>
+                )}
+            </TableBody>
+        </Table>
+    </div>
+);
+
 export default function ManageContentPage() {
   const { toast } = useToast();
   const [allContent, setAllContent] = useState<Content[]>([]);
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [contentToDelete, setContentToDelete] = useState<Content | null>(null);
@@ -223,16 +279,21 @@ export default function ManageContentPage() {
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [accessFilter, setAccessFilter] = useState('all');
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
+  
+  const allTabs = useMemo(() => {
+    return [{ id: 'all', name: 'All' }, ...contentTypes, { id: 'questions', name: 'Questions' }];
+  }, [contentTypes]);
 
   const fetchInitialData = async () => {
       try {
         setLoading(true);
-        const [content, types, subjectData, boardData, examTypeData] = await Promise.all([
+        const [content, types, subjectData, boardData, examTypeData, questionData] = await Promise.all([
           getAllContent(),
           getContentTypes(),
           getSubjects(),
           getBoards(),
           getExamTypes(),
+          getAllQuestions(),
         ]);
         
         const formattedContent = content.map(c => ({
@@ -241,7 +302,8 @@ export default function ManageContentPage() {
         })) as Content[];
 
         setAllContent(formattedContent);
-        setContentTypes([{ id: 'all', name: 'All'}, ...types]);
+        setAllQuestions(questionData as Question[]);
+        setContentTypes(types);
         setSubjects(subjectData);
         setBoards(boardData);
         setExamTypes(examTypeData);
@@ -286,6 +348,14 @@ export default function ManageContentPage() {
         return matchesTab && matchesSearch && matchesSubject && matchesAccess;
     });
   }, [allContent, activeTab, searchQuery, subjectFilter, accessFilter]);
+
+  const filteredQuestions = useMemo(() => {
+    return allQuestions.filter(item => {
+        const matchesSearch = item.text.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSubject = subjectFilter === 'all' || item.subject === subjectFilter;
+        return matchesSearch && matchesSubject;
+    });
+  }, [allQuestions, searchQuery, subjectFilter]);
 
 
   const openDeleteDialog = (item: Content) => {
@@ -386,11 +456,11 @@ export default function ManageContentPage() {
           const actionTextMap = {
             delete: `This will permanently delete ${selectedContent.length} item(s).`,
             access: `This will change the access level for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
-            board: `This will change the board for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
-            subject: `This will change the subject for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            board: `This will change the board for ${selectedContent.length} item(s) to "${boards.find(b => b.name === bulkAction.value)?.name || bulkAction.value}".`,
+            subject: `This will change the subject for ${selectedContent.length} item(s) to "${subjects.find(s => s.name === bulkAction.value)?.name || bulkAction.value}".`,
             chapter: `This will change the chapter for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
-            examCategory: `This will change the exam category for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
-            exam: `This will change the exam for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            examCategory: `This will change the exam category for ${selectedContent.length} item(s) to "${examTypes.find(e => e.name === bulkAction.value)?.name || bulkAction.value}".`,
+            exam: `This will change the exam for ${selectedContent.length} item(s) to "${exams.find(e => e.name === bulkAction.value)?.name || bulkAction.value}".`,
           }
           if (bulkAction.type in actionTextMap) {
             return actionTextMap[bulkAction.type as keyof typeof actionTextMap];
@@ -431,7 +501,7 @@ export default function ManageContentPage() {
                         {subjects.map(sub => <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>)}
                     </SelectContent>
                 </Select>
-                 <Select value={accessFilter} onValueChange={setAccessFilter}>
+                 <Select value={accessFilter} onValueChange={setAccessFilter} disabled={activeTab === 'Questions'}>
                     <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Filter by access" />
                     </SelectTrigger>
@@ -442,7 +512,7 @@ export default function ManageContentPage() {
                         <SelectItem value="pro">Pro</SelectItem>
                     </SelectContent>
                 </Select>
-                 {selectedContent.length > 0 && (
+                 {selectedContent.length > 0 && activeTab !== 'Questions' && (
                      <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="w-full sm:w-auto">
@@ -514,22 +584,26 @@ export default function ManageContentPage() {
              </div>
            ) : (
             <Tabs defaultValue="All" onValueChange={setActiveTab}>
-                 <TabsList className="flex-wrap h-auto">
-                    {contentTypes.map(type => (
+                 <TabsList className="flex-wrap h-auto justify-start">
+                    {allTabs.map(type => (
                         <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
                     ))}
                 </TabsList>
-                {contentTypes.map(type => (
+                {allTabs.map(type => (
                     <TabsContent key={type.id} value={type.name}>
-                        <ContentTable 
-                            content={filteredContent}
-                            loading={loading}
-                            openDeleteDialog={openDeleteDialog}
-                            selectedContent={selectedContent}
-                            onSelect={handleSelectContent}
-                            onSelectAll={handleSelectAll}
-                            isAllSelected={isAllSelected}
-                        />
+                        {type.name === 'Questions' ? (
+                            <QuestionsTable questions={filteredQuestions} loading={loading} />
+                        ) : (
+                           <ContentTable 
+                                content={filteredContent}
+                                loading={loading}
+                                openDeleteDialog={openDeleteDialog}
+                                selectedContent={selectedContent}
+                                onSelect={handleSelectContent}
+                                onSelectAll={handleSelectAll}
+                                isAllSelected={isAllSelected}
+                            />
+                        )}
                     </TabsContent>
                 ))}
             </Tabs>
@@ -554,3 +628,5 @@ export default function ManageContentPage() {
     </div>
   );
 }
+
+    
