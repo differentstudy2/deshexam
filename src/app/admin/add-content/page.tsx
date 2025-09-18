@@ -281,8 +281,13 @@ export default function CreateTestPage() {
   const questions = form.watch('questions');
   useEffect(() => {
     if (currentTestType !== 'Learn') {
-        const numberOfQuestions = questions?.length || 0;
-        form.setValue('duration', numberOfQuestions, { shouldValidate: true });
+        const totalMarks = questions?.reduce((total, q) => {
+            if (q.type === 'Matching') {
+                return total + (q.correctAnswer?.length || q.marks || 1);
+            }
+            return total + (q.marks || 1);
+        }, 0) || 0;
+        form.setValue('duration', totalMarks, { shouldValidate: true });
     }
   }, [questions, currentTestType, form]);
 
@@ -348,7 +353,7 @@ export default function CreateTestPage() {
                     const j = Math.floor(Math.random() * (i + 1));
                     [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
                 }
-                return { ...q, matchingOptions: { columnA, columnB } };
+                return { ...q, matchingOptions: { columnA, columnB }, marks: correctAnswer.length };
             }
             return q;
         });
@@ -1132,7 +1137,7 @@ export default function CreateTestPage() {
                     name="duration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration (in minutes)</FormLabel>
+                        <FormLabel>Duration / Total Marks</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} readOnly disabled />
                         </FormControl>
@@ -1279,7 +1284,7 @@ export default function CreateTestPage() {
                                       render={({ field }) => (
                                           <FormItem>
                                               <FormControl>
-                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} />
+                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} disabled={questionType === 'Matching'} />
                                               </FormControl>
                                               <FormMessage />
                                           </FormItem>

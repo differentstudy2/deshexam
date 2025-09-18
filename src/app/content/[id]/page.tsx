@@ -31,6 +31,7 @@ type Question = {
   options?: Option[];
   matchingOptions?: MatchingOptions;
   correctAnswer: any;
+  marks: number;
 };
 
 type Test = {
@@ -119,19 +120,12 @@ export default function TestPage() {
             if (question.type === 'Matching') {
                 const correctAnswers = question.correctAnswer;
                 const userAnswers = answers[index];
-                let allMatch = true;
-                if(!userAnswers || Object.keys(userAnswers).length !== correctAnswers.length) {
-                    allMatch = false;
-                } else {
-                    for(const pair of correctAnswers) {
-                        if (userAnswers[pair.a] !== pair.b) {
-                            allMatch = false;
-                            break;
+                if (userAnswers) {
+                    for (const pair of correctAnswers) {
+                        if (userAnswers[pair.a] === pair.b) {
+                            score++;
                         }
                     }
-                }
-                if (allMatch) {
-                    score++;
                 }
             } else {
                  if (answers[index] === question.correctAnswer) {
@@ -139,13 +133,21 @@ export default function TestPage() {
                 }
             }
         });
+        
+        const totalQuestions = test?.questions.reduce((total, q) => {
+            if (q.type === 'Matching') {
+                return total + (q.correctAnswer?.length || 1);
+            }
+            return total + 1;
+        }, 0) || 0;
+
 
         const submissionData = {
             testId: test?.id,
             testTitle: test?.title,
             answers,
             score,
-            totalQuestions: test?.questions.length,
+            totalQuestions: totalQuestions,
             testType: test?.testType
         };
 
@@ -288,5 +290,3 @@ export default function TestPage() {
     </div>
   );
 }
-
-    

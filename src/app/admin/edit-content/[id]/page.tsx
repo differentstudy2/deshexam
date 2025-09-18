@@ -133,13 +133,13 @@ const MatchingPairsField = ({ control, questionIndex }: { control: any, question
               <FormField
                   control={control}
                   name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`}
-                  render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />}
+                  render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} value={field.value ?? ''} />}
               />
               <GripVertical className="h-5 w-5 text-muted-foreground"/>
               <FormField
                   control={control}
                   name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`}
-                  render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />}
+                  render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} value={field.value ?? ''} />}
               />
               <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4"/></Button>
           </div>
@@ -219,8 +219,13 @@ export default function EditContentPage() {
 
   const questions = form.watch('questions');
   useEffect(() => {
-    const numberOfQuestions = questions?.length || 0;
-    form.setValue('duration', numberOfQuestions, { shouldValidate: true });
+    const totalMarks = questions?.reduce((total, q) => {
+        if (q.type === 'Matching') {
+            return total + (q.correctAnswer?.length || q.marks || 1);
+        }
+        return total + (q.marks || 1);
+    }, 0) || 0;
+    form.setValue('duration', totalMarks, { shouldValidate: true });
   }, [questions, form]);
 
 
@@ -325,7 +330,7 @@ export default function EditContentPage() {
                     const j = Math.floor(Math.random() * (i + 1));
                     [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
                 }
-                return { ...q, matchingOptions: { columnA, columnB } };
+                return { ...q, matchingOptions: { columnA, columnB }, marks: correctAnswer.length };
             }
             return q;
         });
@@ -775,7 +780,7 @@ export default function EditContentPage() {
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Duration (in minutes)</FormLabel>
+                      <FormLabel>Duration / Total Marks</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} readOnly disabled />
                       </FormControl>
@@ -936,7 +941,7 @@ export default function EditContentPage() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <Input type="number" placeholder="Marks" className="w-24" {...field} />
+                                                <Input type="number" placeholder="Marks" className="w-24" {...field} disabled={questionType === 'Matching'} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -1103,6 +1108,9 @@ export default function EditContentPage() {
                             correctAnswer: '', 
                             explanation: '' 
                         };
+                         if (newQuestion.type === 'Matching') {
+                            newQuestion.correctAnswer = [{ a: '', b: '' }];
+                        }
                         append(newQuestion);
                     }}
                 >
