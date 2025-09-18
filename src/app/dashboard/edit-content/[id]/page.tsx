@@ -72,6 +72,8 @@ const formSchema = z.object({
     .positive('Duration must be a positive number of minutes.'),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   access: z.enum(['free', 'premium', 'pro']),
+  price: z.coerce.number().optional(),
+  subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).min(1, 'Please add at least one question.'),
 });
 
@@ -310,6 +312,7 @@ export default function EditContentPage() {
     }
   };
 
+  const accessLevel = form.watch('access');
 
   if (loading) {
     return (
@@ -567,7 +570,7 @@ export default function EditContentPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                 <FormField
                   control={form.control}
                   name="duration"
@@ -582,28 +585,6 @@ export default function EditContentPage() {
                   )}
                 />
                 <FormField
-                  control={form.control}
-                  name="access"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Access Level</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select access level" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="free">Free</SelectItem>
-                          <SelectItem value="premium">Paid (Premium)</SelectItem>
-                          <SelectItem value="pro">Subscription (Pro)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
                   control={form.control}
                   name="difficulty"
                   render={({ field }) => (
@@ -625,6 +606,68 @@ export default function EditContentPage() {
                     </FormItem>
                   )}
                 />
+                <div className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="access"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Access Level</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select access level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="free">Free</SelectItem>
+                              <SelectItem value="premium">Paid (Premium)</SelectItem>
+                              <SelectItem value="pro">Subscription (Pro)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {accessLevel === 'premium' && (
+                        <FormField
+                            control={form.control}
+                            name="price"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Price (INR)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" placeholder="e.g., 199" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+                    {accessLevel === 'pro' && (
+                        <FormField
+                            control={form.control}
+                            name="subscriptionPlan"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Subscription Plan</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a plan" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="pass">Pass</SelectItem>
+                                            <SelectItem value="pro">Pass Pro</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+                </div>
               </div>
 
                <FormField
