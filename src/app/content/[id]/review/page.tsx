@@ -330,7 +330,7 @@ export default function TestReviewPage() {
 
 
   return (
-    <div className="container py-12">
+    <div className="container py-12 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
         <div>
             <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
@@ -349,4 +349,5 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
