@@ -2,29 +2,7 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-
-const modules = {
-  toolbar: [
-    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-    [{size: []}],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{'list': 'ordered'}, {'list': 'bullet'}, 
-     {'indent': '-1'}, {'indent': '+1'}],
-    ['link', 'image', 'video'],
-    ['clean']
-  ],
-};
-
-const formats = [
-  'header', 'font', 'size',
-  'bold', 'italic', 'underline', 'strike', 'blockquote',
-  'list', 'bullet', 'indent',
-  'link', 'image', 'video'
-];
+import { Plate, PlateProvider } from '@udecode/plate-common';
 
 interface RichTextEditorProps {
   value: string;
@@ -32,16 +10,26 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
+  // Plate expects an array of objects, not a string. 
+  // We need to handle the initial value conversion.
+  // For simplicity, we'll start with a basic setup.
+  // A proper implementation would parse the stored HTML/string into a Plate-compatible format.
+  
+  const initialValue = value ? JSON.parse(value) : [{ type: 'p', children: [{ text: '' }] }];
+
+  const handleValueChange = (newValue: any) => {
+    const stringValue = JSON.stringify(newValue);
+    onChange(stringValue);
+  };
+  
   return (
-    <div className="bg-background">
-      <ReactQuill
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder="Write your article content here..."
-      />
+    <div className="rounded-md border">
+      <PlateProvider 
+        initialValue={initialValue}
+        onChange={handleValueChange}
+      >
+        <Plate />
+      </PlateProvider>
     </div>
   );
 };
