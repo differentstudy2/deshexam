@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
 
 type Article = {
   id: string;
@@ -122,11 +123,9 @@ export default function LearnArticlePage() {
             />
 
             <article className="prose dark:prose-invert lg:prose-xl max-w-none">
-                <p>{article.body}</p>
+                <ReactMarkdown>{article.body}</ReactMarkdown>
             </article>
         </div>
     </div>
   );
 }
-
-    
