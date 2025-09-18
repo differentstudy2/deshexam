@@ -19,7 +19,7 @@ export type AILearnContentGeneratorInput = z.infer<typeof AILearnContentGenerato
 const AILearnContentGeneratorOutputSchema = z.object({
   title: z.string().describe('A suitable title for the generated article.'),
   description: z.string().describe('A brief, engaging summary of the article.'),
-  body: z.string().describe('The full content of the article, written in Markdown format.'),
+  body: z.string().describe('The full content of the article, written in plain text.'),
 });
 export type AILearnContentGeneratorOutput = z.infer<typeof AILearnContentGeneratorOutputSchema>;
 
@@ -38,7 +38,7 @@ The article should be well-structured, easy to understand, and suitable for stud
 Please generate the following:
 1.  A compelling and SEO-friendly title for the article.
 2.  A short, one-paragraph description or summary to be used as a meta description.
-3.  The full body of the article in Markdown format. Use headings, lists, bold text, and other Markdown features to make the content readable and organized.
+3.  The full body of the article as plain text. Do not use Markdown or any other formatting.
 
 Ensure the content is accurate, informative, and well-written.
 `,
