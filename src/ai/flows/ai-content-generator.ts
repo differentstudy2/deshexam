@@ -14,25 +14,25 @@ import { z } from 'genkit';
 const QuestionSchema = z.object({
   text: z.string().describe('The text of the question.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']).describe('The type of the question.'),
-  marks: z.number().int().positive().describe('The marks allocated for the question.'),
+  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(z.object({ text: z.string() })).optional().describe('An array of options for Multiple Choice questions.'),
   correctAnswer: z.string().describe('The correct answer for the question.'),
 });
 
+export type AIContentGeneratorInput = z.infer<typeof AIContentGeneratorInputSchema>;
 const AIContentGeneratorInputSchema = z.object({
   topic: z.string().describe('The main topic or subject for the content to be generated.'),
   contentType: z.string().describe('The type of content to generate (e.g., "Mock Test", "Quiz").'),
   numQuestions: z.number().int().positive().describe('The number of questions to generate.'),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('The difficulty level of the questions.'),
 });
-export type AIContentGeneratorInput = z.infer<typeof AIContentGeneratorInputSchema>;
 
+export type AIContentGeneratorOutput = z.infer<typeof AIContentGeneratorOutputSchema>;
 const AIContentGeneratorOutputSchema = z.object({
   title: z.string().describe('A suitable title for the generated content.'),
   description: z.string().describe('A brief description of the content.'),
   questions: z.array(QuestionSchema).describe('An array of generated questions.'),
 });
-export type AIContentGeneratorOutput = z.infer<typeof AIContentGeneratorOutputSchema>;
 
 export async function generateContent(input: AIContentGeneratorInput): Promise<AIContentGeneratorOutput> {
   return generateContentFlow(input);
