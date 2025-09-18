@@ -128,6 +128,44 @@ const aiLearnGeneratorFormSchema = z.object({
 type AILearnGeneratorFormValues = z.infer<typeof aiLearnGeneratorFormSchema>;
 
 
+const MatchingPairsField = ({ control, questionIndex }: { control: any, questionIndex: number }) => {
+    const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
+        control: control,
+        name: `questions.${questionIndex}.correctAnswer` as any,
+    });
+
+    return (
+        <div className='space-y-4'>
+            <FormLabel>Matching Pairs</FormLabel>
+            <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
+                <div>Column A</div>
+                <div></div>
+                <div>Column B</div>
+            </div>
+            {matchingPairFields.map((pair, pairIndex) => (
+                <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
+                    <FormField
+                        control={control}
+                        name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`}
+                        render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />}
+                    />
+                    <GripVertical className="h-5 w-5 text-muted-foreground" />
+                    <FormField
+                        control={control}
+                        name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`}
+                        render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />}
+                    />
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', b: '' })}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Pair
+            </Button>
+        </div>
+    );
+};
+
+
 export default function CreateTestPage() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -239,12 +277,6 @@ export default function CreateTestPage() {
     control: form.control,
     name: 'questions',
   });
-
-  const { fields: matchingFields, append: appendMatching, remove: removeMatching } = useFieldArray({
-    control: form.control,
-    name: 'questions' as any, // This is a bit of a hack for nested field arrays
-  });
-
 
   const questions = form.watch('questions');
   useEffect(() => {
@@ -1217,10 +1249,6 @@ export default function CreateTestPage() {
               <CardContent className="space-y-6">
                   {fields.map((question, index) => {
                       const questionType = form.watch(`questions.${index}.type`);
-                       const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
-                          control: form.control,
-                          name: `questions.${index}.correctAnswer` as any,
-                      });
 
                       return (
                           <Card key={question.id} className="p-4">
@@ -1370,33 +1398,7 @@ export default function CreateTestPage() {
                                       </div>
                                   )}
                                   {questionType === 'Matching' && (
-                                      <div className='space-y-4'>
-                                        <FormLabel>Matching Pairs</FormLabel>
-                                        <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
-                                          <div>Column A</div>
-                                          <div></div>
-                                          <div>Column B</div>
-                                        </div>
-                                         {matchingPairFields.map((pair, pairIndex) => (
-                                          <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
-                                              <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.correctAnswer.${pairIndex}.a`}
-                                                  render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />}
-                                              />
-                                              <GripVertical className="h-5 w-5 text-muted-foreground"/>
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.correctAnswer.${pairIndex}.b`}
-                                                  render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />}
-                                              />
-                                              <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4"/></Button>
-                                          </div>
-                                        ))}
-                                         <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', b: '' })}>
-                                              <PlusCircle className="mr-2 h-4 w-4"/> Add Pair
-                                          </Button>
-                                      </div>
+                                    <MatchingPairsField control={form.control} questionIndex={index} />
                                   )}
                                   {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                       <FormField
