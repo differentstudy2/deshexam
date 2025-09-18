@@ -120,7 +120,7 @@ export default function TestPage() {
                 const correctAnswers = question.correctAnswer;
                 const userAnswers = answers[index];
                 let allMatch = true;
-                if(Object.keys(userAnswers).length !== correctAnswers.length) {
+                if(!userAnswers || Object.keys(userAnswers).length !== correctAnswers.length) {
                     allMatch = false;
                 } else {
                     for(const pair of correctAnswers) {
@@ -288,3 +288,5 @@ export default function TestPage() {
     </div>
   );
 }
+
+    
