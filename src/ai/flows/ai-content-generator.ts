@@ -52,7 +52,7 @@ The content should have the following properties:
 - Number of questions: {{numQuestions}}
 - Difficulty level: {{difficulty}}
 {{#if questionType}}
-- Question Type: {{#if (eq questionType "Any")}}Any (Mix of types){{else}}{{questionType}}{{/if}}
+- Question Type: {{questionType}}
 {{/if}}
 
 {{#if isTopic}}
@@ -68,7 +68,7 @@ The source text for the content is:
 Please generate a suitable title, a brief description, and the specified number of questions based on the source.
 For each question, provide:
 - The question text.
-- The question type. {{#if (ne questionType "Any")}}The type of all questions MUST be '{{questionType}}'.{{else}}The type can be 'Multiple Choice', 'True/False', or 'Short Answer'.{{/if}}
+- The question type. If a specific Question Type is provided above (and is not 'Any'), all questions MUST be of that type. Otherwise, you can mix the types.
 - The marks for the question (default to 1).
 - For 'Multiple Choice' questions, provide exactly 4 options. For each option, provide the option text and a brief explanation. The explanation should explicitly state why the option is correct or incorrect. For example: "This is correct because..." or "This is incorrect because...".
 - The correct answer. For 'Multiple Choice' questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options.
