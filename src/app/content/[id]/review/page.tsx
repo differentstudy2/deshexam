@@ -124,7 +124,7 @@ function ReviewDisplay() {
                         )}
                     </div>
                      <div className="mt-4 space-y-2">
-                        {question.options?.map((option, optIndex) => {
+                        {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => {
                             const isUserAnswer = userAnswer === option.text;
                             const isCorrectAnswer = question.correctAnswer === option.text;
 
@@ -147,6 +147,22 @@ function ReviewDisplay() {
                                 </div>
                             )
                         })}
+                         {(question.type === 'True/False' || question.type === 'Short Answer') && (
+                            <>
+                               <div className="p-3 rounded-lg border bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+                                   <div className="flex items-center">
+                                      <span className="font-medium">{userAnswer}</span>
+                                      <Badge variant="secondary" className="ml-2">Your Answer</Badge>
+                                   </div>
+                               </div>
+                                <div className="p-3 rounded-lg border bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                                   <div className="flex items-center">
+                                      <span className="font-medium">{question.correctAnswer}</span>
+                                      <Badge variant="outline" className="ml-2">Correct Answer</Badge>
+                                   </div>
+                               </div>
+                            </>
+                         )}
                      </div>
                       {question.explanation && (
                          <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800">

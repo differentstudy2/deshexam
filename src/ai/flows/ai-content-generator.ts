@@ -72,7 +72,7 @@ For each question, provide:
 - The marks for the question (default to 1).
 - For 'Multiple Choice' questions, provide exactly 4 options. For each option, provide the option text and a brief explanation. The explanation should explicitly state why the option is correct or incorrect. For example: "This is correct because..." or "This is incorrect because...".
 - The correct answer. For 'Multiple Choice' questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options.
-- A general explanation for the correct answer that summarizes the main concept.
+- A general explanation for the correct answer that summarizes the main concept. For True/False, explain why the statement is true or false.
 
 Ensure the generated content is accurate and relevant to the provided source.
 The questions should be diverse and test different aspects of the topic.
@@ -91,4 +91,5 @@ const generateContentFlow = ai.defineFlow(
     return output!;
   }
 );
+
 
