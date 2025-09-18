@@ -16,7 +16,7 @@ const QuestionSchema = z.object({
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']).describe('The type of the question.'),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(z.object({ text: z.string(), explanation: z.string().optional() })).optional().describe('An array of options for Multiple Choice questions, each with text and an optional explanation.'),
-  correctAnswer: z.string().describe('The correct answer for the question.'),
+  correctAnswer: z.string().describe('The correct answer for the question. For Multiple Choice questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options.'),
   explanation: z.string().optional().describe('A general explanation for the correct answer.'),
 });
 
@@ -67,7 +67,7 @@ For each question, provide:
 - The question type (either 'Multiple Choice', 'True/False', or 'Short Answer').
 - The marks for the question (default to 1).
 - For 'Multiple Choice' questions, provide exactly 4 options. For each option, provide the option text and a brief explanation. The explanation should explicitly state why the option is correct or incorrect. For example: "This is correct because..." or "This is incorrect because...".
-- The correct answer.
+- The correct answer. For 'Multiple Choice' questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options.
 - A general explanation for the correct answer that summarizes the main concept.
 
 Ensure the generated content is accurate and relevant to the provided source.
@@ -87,3 +87,4 @@ const generateContentFlow = ai.defineFlow(
     return output!;
   }
 );
+
