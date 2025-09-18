@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Plate, PlateProvider } from '@udecode/plate-common';
+import { Plate } from '@udecode/plate-common';
 
 interface RichTextEditorProps {
   value: string;
@@ -11,10 +11,6 @@ interface RichTextEditorProps {
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   // Plate expects an array of objects, not a string. 
-  // We need to handle the initial value conversion.
-  // For simplicity, we'll start with a basic setup.
-  // A proper implementation would parse the stored HTML/string into a Plate-compatible format.
-  
   const initialValue = value ? JSON.parse(value) : [{ type: 'p', children: [{ text: '' }] }];
 
   const handleValueChange = (newValue: any) => {
@@ -24,12 +20,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   
   return (
     <div className="rounded-md border">
-      <PlateProvider 
+      <Plate
         initialValue={initialValue}
         onChange={handleValueChange}
-      >
-        <Plate />
-      </PlateProvider>
+      />
     </div>
   );
 };
