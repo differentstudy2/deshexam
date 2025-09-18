@@ -67,11 +67,11 @@ const questionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.'),
-  board: z.string().min(1, 'Please select or add a board.').optional(),
-  examCategory: z.string().min(1, 'Please select or add an exam category.').optional(),
-  exam: z.string().min(1, 'Please select or add an exam.').optional(),
-  subject: z.string().min(1, 'Please select or add a subject.').optional(),
-  chapter: z.string().min(1, 'Please select or add a chapter.').optional(),
+  board: z.string().optional(),
+  examCategory: z.string().optional(),
+  exam: z.string().optional(),
+  subject: z.string().optional(),
+  chapter: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newExamCategory: z.string().optional(),
@@ -90,7 +90,29 @@ const formSchema = z.object({
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).optional(),
+}).superRefine((data, ctx) => {
+    if (data.testType !== 'Learn') {
+        if (!data.board) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add a board.", path: ["board"] });
+        }
+        if (!data.examCategory) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add an exam category.", path: ["examCategory"] });
+        }
+        if (!data.exam) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add an exam.", path: ["exam"] });
+        }
+        if (!data.subject) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add a subject.", path: ["subject"] });
+        }
+        if (!data.chapter) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add a chapter.", path: ["chapter"] });
+        }
+        if (!data.questions || data.questions.length === 0) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please add at least one question.", path: ["questions"] });
+        }
+    }
 });
+
 
 type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
@@ -408,6 +430,7 @@ export default function CreateTestPage() {
 
   const handleTabChange = (value: string) => {
     form.setValue('testType', value, { shouldValidate: true });
+    form.trigger(); // Trigger validation after changing type
   }
 
   const handleSubjectChange = async (value: string) => {
