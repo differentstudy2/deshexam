@@ -106,11 +106,11 @@ export default function DashboardPage() {
             </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/add-content">
-            <PlusCircle className="mr-2"/>
-            Add Content
-          </Link>
-        </Button>
+            <Link href="/mock-tests">
+              <PlusCircle className="mr-2"/>
+              Take a Test
+            </Link>
+          </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

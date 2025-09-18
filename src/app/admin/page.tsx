@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, FileText, BarChart2, Activity } from 'lucide-react';
+import { Users, FileText, BarChart2, Activity, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
@@ -65,7 +65,7 @@ export default function AdminDashboardPage() {
                         <span>Manage Content</span>
                     </Link>
                     <Link href="/dashboard/add-content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
-                        <FileText className="mx-auto mb-2" />
+                        <PlusCircle className="mx-auto mb-2" />
                         <span>Add New Content</span>
                     </Link>
                 </CardContent>

@@ -35,7 +35,6 @@ const navItems = [
   { href: '/dashboard/my-content', label: 'My Content', icon: Library },
   { href: '/dashboard/all-questions', label: 'All Questions', icon: ClipboardList },
   { href: '/dashboard/my-results', label: 'My Results', icon: FileText },
-  { href: '/dashboard/add-content', label: 'Add Content', icon: PlusCircle },
   { href: '/dashboard/profile', label: 'Profile', icon: BookUser },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
@@ -77,15 +76,6 @@ export default function DashboardLayout({
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-          <div className="flex-grow" />
-          <div className="p-2">
-             <Button asChild className="w-full">
-                <Link href="/dashboard/add-content">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Content
-                </Link>
-            </Button>
-          </div>
         </SidebarContent>
         <SidebarFooter>
             <div className="flex items-center gap-2">
