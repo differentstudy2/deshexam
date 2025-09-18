@@ -250,12 +250,15 @@ export default function ManageUsersPage() {
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
                       {user.subscriptionPlan ? (
-                        <Badge variant={user.subscriptionPlan === 'pro' ? "suggested" : "outline"}>
-                           {user.subscriptionPlan === 'pro' ? <Crown className="mr-1.5" /> : <Gem className="mr-1.5" />}
+                        <div className="flex items-center font-medium">
+                           {user.subscriptionPlan === 'pro' ? 
+                             <Crown className="mr-1.5 h-4 w-4 text-yellow-500" /> : 
+                             <Gem className="mr-1.5 h-4 w-4 text-blue-500" />
+                           }
                            {user.subscriptionPlan === 'pro' ? 'Pass Pro' : 'Pass'}
-                        </Badge>
+                        </div>
                       ) : (
-                        <Badge variant="secondary">None</Badge>
+                        <span className="text-muted-foreground">None</span>
                       )}
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">{user.createdAt}</TableCell>
