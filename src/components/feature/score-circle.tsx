@@ -18,7 +18,7 @@ export const ScoreCircle = ({ score, className, size = 24, strokeWidth = 3 }: Sc
   const colorClass = score <= 33 ? 'text-destructive' : score <= 66 ? 'text-yellow-500' : 'text-green-500';
 
   return (
-    <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>
+    <div className={cn("relative flex items-center justify-center p-0.5", className)} style={{ width: size, height: size }}>
       <svg className="absolute top-0 left-0" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <circle
           className="text-gray-200 dark:text-gray-700"
@@ -42,7 +42,12 @@ export const ScoreCircle = ({ score, className, size = 24, strokeWidth = 3 }: Sc
           cy={size / 2}
         />
       </svg>
-       <span className={cn("text-xs font-semibold", colorClass, size >= 36 && 'text-sm')}>
+       <span className={cn("font-semibold", colorClass, {
+           'text-xs': size < 36,
+           'text-sm': size >= 36,
+           'text-[0.6rem]': size < 36 && score === 100,
+           'text-[0.7rem]': size >= 36 && score === 100
+       })}>
         {Math.round(score)}%
       </span>
     </div>
