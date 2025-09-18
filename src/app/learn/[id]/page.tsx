@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -235,6 +234,11 @@ export default function LearnArticlePage() {
   const renderComment = (comment: Comment, isReply: boolean = false) => {
     const userHasLiked = user && comment.likedBy?.includes(user.uid);
     const userHasDisliked = user && comment.dislikedBy?.includes(user.uid);
+
+    // Find the user's root comment with a rating for this article
+    const userRootComment = comments.find(c => c.authorId === comment.authorId && !c.parentId && c.rating);
+    const displayRating = userRootComment?.rating;
+
     return (
       <div key={comment.id} className={cn("flex items-start gap-4", isReply && "mt-4")}>
           <Avatar>
@@ -242,14 +246,14 @@ export default function LearnArticlePage() {
             <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-              <div className="flex flex-col items-start">
+              <div className="flex flex-col items-start gap-1">
                   <div className="flex items-center gap-2 text-sm">
                       <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
                       <span className="text-muted-foreground">
                           {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
                       </span>
                   </div>
-                   {comment.rating && <StarRating rating={comment.rating} />}
+                   {displayRating && <StarRating rating={displayRating} />}
               </div>
               <p className="text-foreground mt-1">{comment.text}</p>
               <div className="flex items-center gap-1 mt-2">
@@ -389,8 +393,4 @@ export default function LearnArticlePage() {
   );
 }
 
-
-
-
-
-
+    
