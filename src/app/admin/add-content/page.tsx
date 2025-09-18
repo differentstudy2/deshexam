@@ -108,6 +108,7 @@ const aiGeneratorFormSchema = z.object({
     source: z.string().min(3, 'Source must be at least 3 characters.'),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Any']),
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
@@ -212,6 +213,7 @@ export default function CreateTestPage() {
       source: '',
       numQuestions: 5,
       difficulty: 'Medium',
+      questionType: 'Any',
     },
   });
   
@@ -360,6 +362,7 @@ export default function CreateTestPage() {
     try {
         const input: AIContentGeneratorInput = {
             ...aiData,
+            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
             contentType: form.getValues('testType') || 'Mock Test',
         };
         const result: AIContentGeneratorOutput = await generateContent(input);
@@ -708,6 +711,25 @@ export default function CreateTestPage() {
                                 )}
                             />
                         </div>
+                        <FormField
+                            control={aiForm.control}
+                            name="questionType"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Question Type</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Any">Any</SelectItem>
+                                            <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                            <SelectItem value="True/False">True/False</SelectItem>
+                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <DialogFooter>
                             <Button type="submit" disabled={isGenerating}>
                                 {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
@@ -1320,4 +1342,3 @@ export default function CreateTestPage() {
     </div>
   );
 }
-

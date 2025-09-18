@@ -9,7 +9,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const QuestionSchema = z.object({
   text: z.string().describe('The text of the question.'),
@@ -26,6 +26,7 @@ const AIContentGeneratorInputSchema = z.object({
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('The difficulty level of the questions.'),
   sourceType: z.enum(['topic', 'text']).describe('The source of the content to be generated.'),
   source: z.string().describe('The source topic or text content.'),
+  questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Any']).optional().describe('The specific type of question to generate.'),
 });
 export type AIContentGeneratorInput = z.infer<typeof AIContentGeneratorInputSchema>;
 
@@ -50,6 +51,9 @@ const prompt = ai.definePrompt({
 The content should have the following properties:
 - Number of questions: {{numQuestions}}
 - Difficulty level: {{difficulty}}
+{{#if questionType}}
+- Question Type: {{#if (eq questionType "Any")}}Any (Mix of types){{else}}{{questionType}}{{/if}}
+{{/if}}
 
 {{#if isTopic}}
 The topic for the content is "{{source}}".
@@ -64,7 +68,7 @@ The source text for the content is:
 Please generate a suitable title, a brief description, and the specified number of questions based on the source.
 For each question, provide:
 - The question text.
-- The question type (either 'Multiple Choice', 'True/False', or 'Short Answer').
+- The question type. {{#if (ne questionType "Any")}}The type of all questions MUST be '{{questionType}}'.{{else}}The type can be 'Multiple Choice', 'True/False', or 'Short Answer'.{{/if}}
 - The marks for the question (default to 1).
 - For 'Multiple Choice' questions, provide exactly 4 options. For each option, provide the option text and a brief explanation. The explanation should explicitly state why the option is correct or incorrect. For example: "This is correct because..." or "This is incorrect because...".
 - The correct answer. For 'Multiple Choice' questions, this value MUST be an exact, case-sensitive match to the text of one of the provided options.
@@ -87,4 +91,3 @@ const generateContentFlow = ai.defineFlow(
     return output!;
   }
 );
-
