@@ -121,7 +121,7 @@ export default function EditContentPage() {
       newChapterName: '',
       testType: 'Mock Test',
       description: '',
-      duration: 60,
+      duration: 0,
       difficulty: 'Medium',
       access: 'free',
       price: undefined,
@@ -129,6 +129,12 @@ export default function EditContentPage() {
       questions: [],
     },
   });
+
+  const questions = form.watch('questions');
+  useEffect(() => {
+    const numberOfQuestions = questions.length;
+    form.setValue('duration', numberOfQuestions, { shouldValidate: true });
+  }, [questions, form.setValue]);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -581,7 +587,7 @@ export default function EditContentPage() {
                     <FormItem>
                       <FormLabel>Duration (in minutes)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" {...field} readOnly disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

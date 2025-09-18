@@ -153,7 +153,7 @@ export default function CreateTestPage() {
       newChapterName: '',
       testType: '',
       description: '',
-      duration: 60,
+      duration: 0,
       difficulty: 'Medium',
       access: 'free',
       price: undefined,
@@ -161,6 +161,12 @@ export default function CreateTestPage() {
       questions: [],
     },
   });
+
+  const questions = form.watch('questions');
+  useEffect(() => {
+    const numberOfQuestions = questions.length;
+    form.setValue('duration', numberOfQuestions, { shouldValidate: true });
+  }, [questions, form.setValue]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -233,7 +239,7 @@ export default function CreateTestPage() {
             subject: '',
             chapter: '',
             description: '',
-            duration: 60,
+            duration: 0,
             access: 'free',
             price: undefined,
             subscriptionPlan: 'pass',
@@ -253,7 +259,7 @@ export default function CreateTestPage() {
             ...form.getValues(),
             title: '',
             description: '',
-            duration: 60,
+            duration: 0,
             access: 'free',
             price: undefined,
             subscriptionPlan: 'pass',
@@ -619,7 +625,7 @@ export default function CreateTestPage() {
                     <FormItem>
                       <FormLabel>Duration (in minutes)</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" {...field} readOnly disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
