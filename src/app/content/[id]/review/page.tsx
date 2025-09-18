@@ -17,6 +17,7 @@ import { getSubmissionById, getContentById } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 
 type Option = { text: string; explanation?: string; };
 type Question = { id: string; text: string; type: string; options?: Option[]; correctAnswer: string; explanation?: string; };
