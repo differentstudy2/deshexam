@@ -66,7 +66,7 @@ const questionSchema = z.object({
 });
 
 const formSchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters.'),
+  title: z.string().optional(),
   board: z.string().optional(),
   examCategory: z.string().optional(),
   exam: z.string().optional(),
@@ -78,7 +78,7 @@ const formSchema = z.object({
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
   newChapterName: z.string().optional(),
-  testType: z.string().min(1, 'Please select a content type.'),
+  testType: z.string().optional(),
   description: z.string().optional(),
   body: z.string().optional(),
   duration: z.coerce
@@ -90,27 +90,6 @@ const formSchema = z.object({
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).optional(),
-}).superRefine((data, ctx) => {
-    if (data.testType !== 'Learn') {
-        if (!data.board) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add a board.", path: ["board"] });
-        }
-        if (!data.examCategory) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add an exam category.", path: ["examCategory"] });
-        }
-        if (!data.exam) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add an exam.", path: ["exam"] });
-        }
-        if (!data.subject) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add a subject.", path: ["subject"] });
-        }
-        if (!data.chapter) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please select or add a chapter.", path: ["chapter"] });
-        }
-        if (!data.questions || data.questions.length === 0) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Please add at least one question.", path: ["questions"] });
-        }
-    }
 });
 
 
@@ -318,7 +297,7 @@ export default function CreateTestPage() {
       await addContent(contentToSave);
       toast({
         title: 'Content Created!',
-        description: `The ${data.testType.toLowerCase()} "${data.title}" has been successfully saved.`,
+        description: `The ${data.testType?.toLowerCase()} "${data.title}" has been successfully saved.`,
       });
       
       if (resetType === 'full') {
