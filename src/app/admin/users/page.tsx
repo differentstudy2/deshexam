@@ -252,7 +252,7 @@ export default function ManageUsersPage() {
                       {user.subscriptionPlan ? (
                         <Badge variant={user.subscriptionPlan === 'pro' ? "suggested" : "outline"}>
                            {user.subscriptionPlan === 'pro' ? <Crown className="mr-1.5" /> : <Gem className="mr-1.5" />}
-                           {user.subscriptionPlan.charAt(0).toUpperCase() + user.subscriptionPlan.slice(1)}
+                           {user.subscriptionPlan === 'pro' ? 'Pass Pro' : 'Pass'}
                         </Badge>
                       ) : (
                         <Badge variant="secondary">None</Badge>
@@ -341,4 +341,5 @@ export default function ManageUsersPage() {
   );
 }
 
+    
     
