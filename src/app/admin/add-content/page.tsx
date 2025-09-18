@@ -1276,22 +1276,48 @@ export default function CreateTestPage() {
                                       </div>
                                   )}
                                   {questionType === 'True/False' && (
-                                      <FormField
-                                          control={form.control}
-                                          name={`questions.${index}.correctAnswer`}
-                                          render={({ field }) => (
-                                              <FormItem>
-                                                  <FormLabel>Correct Answer</FormLabel>
-                                                  <FormControl>
-                                                      <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
-                                                          <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
-                                                          <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
-                                                      </RadioGroup>
-                                                  </FormControl>
-                                                  <FormMessage />
-                                              </FormItem>
-                                          )}
-                                      />
+                                      <div className='space-y-4'>
+                                          <FormField
+                                              control={form.control}
+                                              name={`questions.${index}.correctAnswer`}
+                                              render={({ field }) => (
+                                                  <FormItem>
+                                                      <FormLabel>Correct Answer</FormLabel>
+                                                      <FormControl>
+                                                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                                                              <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
+                                                              <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
+                                                          </RadioGroup>
+                                                      </FormControl>
+                                                      <FormMessage />
+                                                  </FormItem>
+                                              )}
+                                          />
+                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                               <FormField
+                                                  control={form.control}
+                                                  name={`questions.${index}.options.0.explanation`}
+                                                  render={({ field }) => (
+                                                      <FormItem>
+                                                          <FormLabel>Explanation for "True"</FormLabel>
+                                                          <FormControl><Textarea placeholder="Explain why it's true..." {...field} /></FormControl>
+                                                          <FormMessage />
+                                                      </FormItem>
+                                                  )}
+                                              />
+                                               <FormField
+                                                  control={form.control}
+                                                  name={`questions.${index}.options.1.explanation`}
+                                                  render={({ field }) => (
+                                                      <FormItem>
+                                                          <FormLabel>Explanation for "False"</FormLabel>
+                                                          <FormControl><Textarea placeholder="Explain why it's false..." {...field} /></FormControl>
+                                                          <FormMessage />
+                                                      </FormItem>
+                                                  )}
+                                              />
+                                          </div>
+                                      </div>
                                   )}
                                   {questionType === 'Short Answer' && (
                                       <FormField

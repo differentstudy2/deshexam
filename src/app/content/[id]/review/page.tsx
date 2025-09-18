@@ -147,7 +147,35 @@ function ReviewDisplay() {
                                 </div>
                             )
                         })}
-                         {(question.type === 'True/False' || question.type === 'Short Answer') && (
+                         {question.type === 'True/False' && (
+                             <>
+                                {['True', 'False'].map((tf, tfIndex) => {
+                                    const isUserAnswer = userAnswer === tf;
+                                    const isCorrectAnswer = question.correctAnswer === tf;
+                                    const option = question.options?.find(o => o.text === tf) ?? { text: tf };
+                                    
+                                    return (
+                                        <div key={tfIndex} className={cn(
+                                            "p-3 rounded-lg border",
+                                            isUserAnswer && !isCorrectAnswer && "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800",
+                                            isCorrectAnswer && "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                        )}>
+                                            <div className="flex items-center">
+                                                <span className="font-medium">{option.text}</span>
+                                                {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
+                                                {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-2">Correct Answer</Badge>}
+                                            </div>
+                                            {option.explanation && (
+                                                <p className="text-xs text-muted-foreground mt-1 pl-2 border-l-2 ml-1">
+                                                    {option.explanation}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </>
+                         )}
+                         {question.type === 'Short Answer' && (
                             <>
                                <div className="p-3 rounded-lg border bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800">
                                    <div className="flex items-center">
