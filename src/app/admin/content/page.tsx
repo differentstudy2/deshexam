@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -62,11 +62,28 @@ type Content = {
     createdAt: string;
     authorId: string;
     authorName: string;
+    board: string;
+    examCategory: string;
+    exam: string;
+    chapter: string;
 }
 
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
-type BulkAction = { type: 'delete' } | { type: 'access', value: 'free' | 'premium' | 'pro' } | null;
+type Board = { id: string, name: string };
+type ExamType = { id: string, name: string };
+type Exam = { id: string, name: string };
+type Chapter = { id: string, chapterNo: string, chapterName: string };
+
+type BulkAction = 
+    | { type: 'delete' } 
+    | { type: 'access', value: 'free' | 'premium' | 'pro' }
+    | { type: 'board', value: string }
+    | { type: 'subject', value: string }
+    | { type: 'chapter', value: string }
+    | { type: 'examCategory', value: string }
+    | { type: 'exam', value: string }
+    | null;
 
 function getUrlForTest(testType: string, testId: string) {
     const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
@@ -197,6 +214,10 @@ export default function ManageContentPage() {
   const [bulkAction, setBulkAction] = useState<BulkAction>(null);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [examTypes, setExamTypes] = useState<ExamType[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('All');
   const [subjectFilter, setSubjectFilter] = useState('all');
@@ -206,10 +227,12 @@ export default function ManageContentPage() {
   const fetchInitialData = async () => {
       try {
         setLoading(true);
-        const [content, types, subjectData] = await Promise.all([
+        const [content, types, subjectData, boardData, examTypeData] = await Promise.all([
           getAllContent(),
           getContentTypes(),
           getSubjects(),
+          getBoards(),
+          getExamTypes(),
         ]);
         
         const formattedContent = content.map(c => ({
@@ -220,6 +243,9 @@ export default function ManageContentPage() {
         setAllContent(formattedContent);
         setContentTypes([{ id: 'all', name: 'All'}, ...types]);
         setSubjects(subjectData);
+        setBoards(boardData);
+        setExamTypes(examTypeData);
+
       } catch (error) {
          toast({
           variant: "destructive",
@@ -234,6 +260,22 @@ export default function ManageContentPage() {
   useEffect(() => {
     fetchInitialData();
   }, [toast]);
+  
+  useEffect(() => {
+    const fetchDependentData = async () => {
+        if (subjects.length > 0) {
+            const allChapters = await Promise.all(subjects.map(s => getChaptersBySubjectId(s.id)));
+            setChapters(allChapters.flat());
+        }
+        if (examTypes.length > 0) {
+            const allExams = await Promise.all(examTypes.map(e => getExamsByCategory(e.id)));
+            setExams(allExams.flat());
+        }
+    };
+    if (subjects.length > 0 && examTypes.length > 0) {
+        fetchDependentData();
+    }
+  }, [subjects, examTypes]);
 
   const filteredContent = useMemo(() => {
     return allContent.filter(item => {
@@ -278,6 +320,16 @@ export default function ManageContentPage() {
             await handleDelete(selectedContent);
         } else if (bulkAction.type === 'access') {
             await handleBulkUpdate({ access: bulkAction.value });
+        } else if (bulkAction.type === 'board') {
+            await handleBulkUpdate({ board: bulkAction.value });
+        } else if (bulkAction.type === 'subject') {
+            await handleBulkUpdate({ subject: bulkAction.value });
+        } else if (bulkAction.type === 'chapter') {
+            await handleBulkUpdate({ chapter: bulkAction.value });
+        } else if (bulkAction.type === 'examCategory') {
+            await handleBulkUpdate({ examCategory: bulkAction.value });
+        } else if (bulkAction.type === 'exam') {
+            await handleBulkUpdate({ exam: bulkAction.value });
         }
     }
     
@@ -331,11 +383,17 @@ export default function ManageContentPage() {
           return `This action cannot be undone. This will permanently delete "${contentToDelete.title}".`;
       }
       if (bulkAction) {
-          if (bulkAction.type === 'delete') {
-              return `This action cannot be undone. This will permanently delete ${selectedContent.length} item(s).`;
+          const actionTextMap = {
+            delete: `This will permanently delete ${selectedContent.length} item(s).`,
+            access: `This will change the access level for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            board: `This will change the board for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            subject: `This will change the subject for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            chapter: `This will change the chapter for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            examCategory: `This will change the exam category for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
+            exam: `This will change the exam for ${selectedContent.length} item(s) to "${bulkAction.value}".`,
           }
-          if (bulkAction.type === 'access') {
-              return `This will change the access level for ${selectedContent.length} item(s) to "${bulkAction.value}".`;
+          if (bulkAction.type in actionTextMap) {
+            return actionTextMap[bulkAction.type as keyof typeof actionTextMap];
           }
       }
       return 'This action cannot be undone.';
@@ -393,6 +451,46 @@ export default function ManageContentPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuLabel>Modify Selected</DropdownMenuLabel>
+                             <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Change Board</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    {boards.map(b => (
+                                        <DropdownMenuItem key={b.id} onClick={() => openBulkActionDialog({ type: 'board', value: b.name })}>{b.name}</DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                             <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Change Subject</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    {subjects.map(s => (
+                                        <DropdownMenuItem key={s.id} onClick={() => openBulkActionDialog({ type: 'subject', value: s.name })}>{s.name}</DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Change Chapter</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                     {chapters.map(c => (
+                                        <DropdownMenuItem key={c.id} onClick={() => openBulkActionDialog({ type: 'chapter', value: `${c.chapterNo}. ${c.chapterName}` })}>{c.chapterNo}. {c.chapterName}</DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                             <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Change Exam Category</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    {examTypes.map(et => (
+                                        <DropdownMenuItem key={et.id} onClick={() => openBulkActionDialog({ type: 'examCategory', value: et.name })}>{et.name}</DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                             <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>Change Exam</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    {exams.map(e => (
+                                        <DropdownMenuItem key={e.id} onClick={() => openBulkActionDialog({ type: 'exam', value: e.name })}>{e.name}</DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger>Change Access Level</DropdownMenuSubTrigger>
                                 <DropdownMenuSubContent>
