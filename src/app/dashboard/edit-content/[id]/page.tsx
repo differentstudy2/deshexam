@@ -123,6 +123,7 @@ export default function EditContentPage() {
       duration: 60,
       difficulty: 'Medium',
       access: 'free',
+      subscriptionPlan: 'pass',
       questions: [],
     },
   });

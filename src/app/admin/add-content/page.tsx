@@ -155,6 +155,7 @@ export default function CreateTestPage() {
       duration: 60,
       difficulty: 'Medium',
       access: 'free',
+      subscriptionPlan: 'pass',
       questions: [],
     },
   });
@@ -233,7 +234,7 @@ export default function CreateTestPage() {
             duration: 60,
             access: 'free',
             price: undefined,
-            subscriptionPlan: undefined,
+            subscriptionPlan: 'pass',
             questions: [],
             newSubject: '',
             newBoard: '',
@@ -253,7 +254,7 @@ export default function CreateTestPage() {
             duration: 60,
             access: 'free',
             price: undefined,
-            subscriptionPlan: undefined,
+            subscriptionPlan: 'pass',
             questions: [],
             difficulty: 'Medium',
          });
