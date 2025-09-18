@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebase/firestore';
@@ -29,7 +28,7 @@ type MatchingOptions = { columnA: string[]; columnB: string[]; };
 type Question = { id: string; text: string; type: string; options?: Option[]; matchingOptions?: MatchingOptions; correctAnswer: any; explanation?: string; };
 type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; chapter: string; exam: string; };
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: any }, testType: string; submittedAt: any; };
-type UserProfile = { uid: string; displayName: string; photoURL?: string; };
+type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
 
 function ReviewDisplay() {
   const searchParams = useSearchParams();
@@ -121,10 +120,15 @@ function ReviewDisplay() {
                     </Avatar>
                     <div>
                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
-                        <p className="text-sm text-muted-foreground">{test.title}</p>
+                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                          {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                          {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                          {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+                        </div>
                     </div>
                 </div>
                 <Separator />
+                 <div className="text-sm text-muted-foreground font-medium mb-2">{test.title}</div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     {test.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>}
                     {test.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>}
@@ -271,7 +275,7 @@ function ReviewDisplay() {
                                                 </div>
                                                 {!isPairCorrect && (
                                                     <div className="mt-2 pl-7 text-sm">
-                                                        <span className="font-semibold">Correct Answer: </span>
+                                                        <span className="font-semibold">Correct Answer: </span> 
                                                         <span className="text-green-700 dark:text-green-400 font-medium">{pair.b}</span>
                                                     </div>
                                                 )}
@@ -340,7 +344,4 @@ export default function TestReviewPage() {
   );
 }
 
-
-
-
-
+    
