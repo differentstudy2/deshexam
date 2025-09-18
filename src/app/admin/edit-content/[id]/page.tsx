@@ -1094,7 +1094,17 @@ export default function EditContentPage() {
                  <Button
                     type="button"
                     variant="outline"
-                    onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], correctAnswer: '', explanation: '' })}
+                    onClick={() => {
+                        const newQuestion: any = { 
+                            text: '', 
+                            type: 'Multiple Choice', 
+                            marks: 1, 
+                            options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
+                            correctAnswer: '', 
+                            explanation: '' 
+                        };
+                        append(newQuestion);
+                    }}
                 >
                     <PlusCircle className="mr-2" />
                     Add Question
@@ -1264,4 +1274,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-

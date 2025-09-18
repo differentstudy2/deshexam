@@ -1436,7 +1436,20 @@ export default function CreateTestPage() {
                   <Button
                       type="button"
                       variant="outline"
-                      onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], correctAnswer: '', explanation: '' })}
+                      onClick={() => {
+                        const newQuestion: any = { 
+                            text: '', 
+                            type: 'Multiple Choice', 
+                            marks: 1, 
+                            options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
+                            correctAnswer: '', 
+                            explanation: '' 
+                        };
+                        if (newQuestion.type === 'Matching') {
+                            newQuestion.correctAnswer = [{ a: '', b: '' }];
+                        }
+                        append(newQuestion);
+                    }}
                   >
                       <PlusCircle className="mr-2" />
                       Add Question
