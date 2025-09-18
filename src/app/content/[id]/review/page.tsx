@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById, getUserProfile } from '@/lib/firebase/firestore';
@@ -127,7 +127,10 @@ function ReviewDisplay() {
                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                        <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                        <div className="flex items-center gap-2">
+                           <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                           <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                        </div>
                          <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
                           {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
                           {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
@@ -350,6 +353,7 @@ export default function TestReviewPage() {
     </div>
   );
 }
+
 
 
 
