@@ -281,7 +281,12 @@ export default function ManageContentPage() {
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
   
   const allTabs = useMemo(() => {
-    return [{ id: 'all', name: 'All' }, ...contentTypes, { id: 'questions', name: 'Questions' }];
+    const hasQuestionsTab = contentTypes.some(type => type.name === 'Questions');
+    const tabs = [{ id: 'all', name: 'All' }, ...contentTypes];
+    if (!hasQuestionsTab) {
+      tabs.push({ id: 'questions', name: 'Questions' });
+    }
+    return tabs;
   }, [contentTypes]);
 
   const fetchInitialData = async () => {
