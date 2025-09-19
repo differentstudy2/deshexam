@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/hooks/use-auth";
 import Script from "next/script";
+import { ThemeProvider } from "@/components/layout/theme-provider";
 
 const fontBody = Inter({
   subsets: ["latin"],
@@ -30,15 +31,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={cn("antialiased", fontBody.variable, fontHeadline.variable)}>
-        <AuthProvider>
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-        </AuthProvider>
-        <Toaster />
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+          <AuthProvider>
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+          </AuthProvider>
+          <Toaster />
+          <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+        </ThemeProvider>
       </body>
     </html>
   );

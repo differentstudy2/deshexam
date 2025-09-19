@@ -19,6 +19,7 @@ import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeToggle } from "./theme-toggle";
 
 const navLinks = [
   { href: "/features", label: "Features" },
@@ -130,7 +131,8 @@ export function Header() {
           <DeshExamLogo />
         </Link>
         <MainNav />
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <ThemeToggle />
           <UserNav />
           <Sheet>
             <SheetTrigger asChild>
