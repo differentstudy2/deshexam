@@ -330,8 +330,8 @@ export default function CreateTestPage() {
     enableSubjectMetafield: true,
     enableBoardMetafield: true,
     enableClassMetafield: true,
-    enableExamCategoryMetafield: true,
     enableStateMetafield: true,
+    enableExamCategoryMetafield: true,
     enableExamMetafield: true,
     enableChapterMetafield: true,
     defaultBoard: '',
@@ -713,7 +713,11 @@ export default function CreateTestPage() {
             form.setValue('title', result.title);
             form.setValue('description', result.description);
             form.setValue('difficulty', aiData.difficulty);
-            replace(result.questions);
+            replace(result.questions.map(q => ({
+                ...q,
+                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+                explanation: q.explanation || ''
+            })));
 
             toast({
                 title: 'Content Generated!',
@@ -1708,7 +1712,12 @@ export default function CreateTestPage() {
                                               control={form.control}
                                               name={`questions.${index}.correctAnswer`}
                                               render={({ field }) => (
-                                                  <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                  <RadioGroup 
+                                                    key={`${question.id}-${field.value}`} // Force re-render
+                                                    onValueChange={field.onChange} 
+                                                    value={field.value} 
+                                                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                                  >
                                                       {[0, 1, 2, 3].map(optionIndex => (
                                                           <div key={optionIndex} className="flex items-start gap-4">
                                                               <FormControl>
@@ -1853,7 +1862,7 @@ export default function CreateTestPage() {
                       <CollapsibleContent>
                         <Card className="mt-4 p-4">
                            <Form {...aiForm}>
-                            <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                            <form onSubmit={aiForm.handleSubmit((data) => handleAIGenerate({ ...data, ...aiForm.getValues() }))} className="space-y-4">
                                 <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
                                     <TabsList className="grid w-full grid-cols-3">
                                         <TabsTrigger value="topic">From Topic</TabsTrigger>
