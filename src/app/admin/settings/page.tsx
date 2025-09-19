@@ -35,6 +35,10 @@ import {
     addClass,
     updateClass,
     deleteClass,
+    getStates,
+    addState,
+    updateState,
+    deleteState,
     getExamTypes,
     addExamType,
     updateExamType,
@@ -89,6 +93,7 @@ const settingsSchema = z.object({
     enableBoardMetafield: z.boolean(),
     enableClassMetafield: z.boolean(),
     enableExamCategoryMetafield: z.boolean(),
+    enableStateMetafield: z.boolean(),
     enableExamMetafield: z.boolean(),
     enableChapterMetafield: z.boolean(),
 });
@@ -98,7 +103,7 @@ type ContentSummary = { [key: string]: number; };
 type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
 
 const aiGeneratorSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class']),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State']),
   topic: z.string().min(3, "Topic must be at least 3 characters."),
   count: z.coerce.number().int().min(1).max(20),
 });
@@ -332,6 +337,7 @@ export default function AdminSettingsPage() {
   const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
   const [boards, setBoards] = useState<MetafieldItem[]>([]);
   const [classes, setClasses] = useState<MetafieldItem[]>([]);
+  const [states, setStates] = useState<MetafieldItem[]>([]);
   const [examTypes, setExamTypes] = useState<MetafieldItem[]>([]);
   
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
@@ -355,6 +361,7 @@ export default function AdminSettingsPage() {
         enableBoardMetafield: true,
         enableClassMetafield: true,
         enableExamCategoryMetafield: true,
+        enableStateMetafield: true,
         enableExamMetafield: true,
         enableChapterMetafield: true,
     },
@@ -373,12 +380,13 @@ export default function AdminSettingsPage() {
   const fetchInitialData = useCallback(async () => {
     try {
         setLoading(true);
-        const [settings, allContent, subjectData, boardData, classData, examTypeData] = await Promise.all([
+        const [settings, allContent, subjectData, boardData, classData, stateData, examTypeData] = await Promise.all([
             getSettings(),
             getAllContent(),
             getSubjects(),
             getBoards(),
             getClasses(),
+            getStates(),
             getExamTypes(),
         ]);
 
@@ -399,6 +407,7 @@ export default function AdminSettingsPage() {
         setSubjects(subjectData);
         setBoards(boardData);
         setClasses(classData);
+        setStates(stateData);
         setExamTypes(examTypeData);
 
     } catch (error) {
@@ -463,6 +472,7 @@ export default function AdminSettingsPage() {
           'Board': addBoard,
           'Exam Category': addExamType,
           'Class': addClass,
+          'State': addState,
       };
 
       const addFunc = addFunctionMap[type];
@@ -488,12 +498,17 @@ export default function AdminSettingsPage() {
 
   }
 
-  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class') => {
-      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses } as const;
-      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass };
-      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass };
-      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass };
-      const getFunc = type === 'subject' ? getSubjects : type === 'board' ? getBoards : type === 'class' ? getClasses : getExamTypes;
+  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class' | 'state') => {
+      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses, state: setStates } as const;
+      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass, state: addState };
+      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass, state: updateState };
+      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass, state: deleteState };
+      
+      const getFunc = type === 'subject' ? getSubjects 
+          : type === 'board' ? getBoards 
+          : type === 'class' ? getClasses 
+          : type === 'state' ? getStates
+          : getExamTypes;
       
       const setState = stateSetterMap[type];
 
@@ -507,6 +522,7 @@ export default function AdminSettingsPage() {
   const subjectHandlers = createMetafieldHandlers('subject');
   const boardHandlers = createMetafieldHandlers('board');
   const classHandlers = createMetafieldHandlers('class');
+  const stateHandlers = createMetafieldHandlers('state');
   const examTypeHandlers = createMetafieldHandlers('examType');
 
     const chapterHandlers = {
@@ -709,6 +725,7 @@ export default function AdminSettingsPage() {
                                                                 <SelectItem value="Subject">Subject</SelectItem>
                                                                 <SelectItem value="Board">Board</SelectItem>
                                                                 <SelectItem value="Class">Class</SelectItem>
+                                                                <SelectItem value="State">State</SelectItem>
                                                                 <SelectItem value="Exam Category">Exam Category</SelectItem>
                                                             </SelectContent>
                                                         </Select>
@@ -754,6 +771,62 @@ export default function AdminSettingsPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableBoardMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Boards</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="Boards"
+                                        items={boards}
+                                        onAdd={boardHandlers.onAdd}
+                                        onUpdate={boardHandlers.onUpdate}
+                                        onDelete={boardHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                             <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableClassMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Classes</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="Classes"
+                                        items={classes}
+                                        onAdd={classHandlers.onAdd}
+                                        onUpdate={classHandlers.onUpdate}
+                                        onDelete={classHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+
                             <Card>
                                 <CardHeader>
                                     <FormField
@@ -839,6 +912,34 @@ export default function AdminSettingsPage() {
                                     />
                                 </CardContent>
                             </Card>
+
+                             <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableStateMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">States</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="States"
+                                        items={states}
+                                        onAdd={stateHandlers.onAdd}
+                                        onUpdate={stateHandlers.onUpdate}
+                                        onDelete={stateHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
                             
                             <Card>
                                 <CardHeader>
@@ -870,61 +971,6 @@ export default function AdminSettingsPage() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <FormField
-                                        control={form.control}
-                                        name="enableBoardMetafield"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center justify-between">
-                                                <div className="space-y-0.5">
-                                                    <FormLabel className="text-base">Boards</FormLabel>
-                                                </div>
-                                                <FormControl>
-                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardHeader>
-                                <CardContent>
-                                    <MetafieldManager 
-                                        title="Boards"
-                                        items={boards}
-                                        onAdd={boardHandlers.onAdd}
-                                        onUpdate={boardHandlers.onUpdate}
-                                        onDelete={boardHandlers.onDelete}
-                                    />
-                                </CardContent>
-                            </Card>
-
-                             <Card>
-                                <CardHeader>
-                                    <FormField
-                                        control={form.control}
-                                        name="enableClassMetafield"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center justify-between">
-                                                <div className="space-y-0.5">
-                                                    <FormLabel className="text-base">Classes</FormLabel>
-                                                </div>
-                                                <FormControl>
-                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardHeader>
-                                <CardContent>
-                                    <MetafieldManager 
-                                        title="Classes"
-                                        items={classes}
-                                        onAdd={classHandlers.onAdd}
-                                        onUpdate={classHandlers.onUpdate}
-                                        onDelete={classHandlers.onDelete}
-                                    />
-                                </CardContent>
-                            </Card>
                         </CardContent>
                     </Card>
                 )}
