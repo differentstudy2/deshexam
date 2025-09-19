@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -58,6 +58,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 const settingsSchema = z.object({
     siteName: z.string().min(1, "Site name is required."),
@@ -302,6 +303,7 @@ const DependentMetafieldManager = ({
 export default function AdminSettingsPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('general');
   const [contentSummary, setContentSummary] = useState<ContentSummary | null>(null);
   const [totalContent, setTotalContent] = useState(0);
 
@@ -392,11 +394,13 @@ export default function AdminSettingsPage() {
   };
 
   const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType') => {
-      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes };
+      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes } as const;
       const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType };
       const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType };
       const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType };
       const getFunc = type === 'subject' ? getSubjects : type === 'board' ? getBoards : getExamTypes;
+      
+      const setState = stateSetterMap[type];
 
       return {
           onAdd: async (name: string) => { await addFuncMap[type](name); setState(await getFunc()); },
@@ -415,6 +419,14 @@ export default function AdminSettingsPage() {
     const examHandlers = {
         onAdd: addExam, onUpdate: updateExam, onDelete: deleteExam,
     };
+
+    const settingTabs = [
+        { id: 'general', label: 'General', icon: Settings },
+        { id: 'api', label: 'API Keys', icon: KeyRound },
+        { id: 'users', label: 'User Management', icon: Users },
+        { id: 'metafields', label: 'Content Metafields', icon: LayoutTemplate },
+        { id: 'questionTypes', label: 'Question Types', icon: Type },
+    ];
   
   if (loading) {
     return (
@@ -435,423 +447,418 @@ export default function AdminSettingsPage() {
       </div>
 
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSave)} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-            <Card>
-            <CardHeader>
-                <CardTitle>General</CardTitle>
-                <CardDescription>
-                Basic information about your site.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <FormField
-                control={form.control}
-                name="siteName"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Site Name</FormLabel>
-                    <FormControl>
-                        <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="siteDescription"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Site Description</FormLabel>
-                    <FormControl>
-                        <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-            </CardContent>
-            </Card>
-            
-            <Card>
-            <CardHeader>
-                <CardTitle>API Keys</CardTitle>
-                <CardDescription>
-                Manage API keys for third-party services. These are stored securely on the server.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <FormField
-                control={form.control}
-                name="razorpayKeyId"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Razorpay Key ID</FormLabel>
-                    <FormControl>
-                        <Input type="password" placeholder="••••••••••••••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-                <FormField
-                control={form.control}
-                name="razorpayKeySecret"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Razorpay Key Secret</FormLabel>
-                    <FormControl>
-                        <Input type="password" placeholder="••••••••••••••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-                />
-            </CardContent>
-            </Card>
-
-            <Card>
-            <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>
-                Control how users interact with your site.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <FormField
-                control={form.control}
-                name="allowRegistrations"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                        Allow New User Registrations
-                        </FormLabel>
-                        <FormDescription>
-                        Toggle whether new users can sign up for an account.
-                        </FormDescription>
-                    </div>
-                    <FormControl>
-                        <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        />
-                    </FormControl>
-                    </FormItem>
-                )}
-                />
-            </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Content Metafield Settings</CardTitle>
-                    <CardDescription>
-                    Control which data fields are available and manage their options.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSave)}>
+        <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] lg:grid-cols-[220px_1fr] gap-8">
+            {/* Sidebar */}
+            <aside>
+                <nav className="flex flex-col space-y-1">
+                    {settingTabs.map(tab => (
+                        <Button 
+                            key={tab.id}
+                            variant="ghost" 
+                            className={cn(
+                                "w-full justify-start gap-2",
+                                activeTab === tab.id && "bg-secondary text-secondary-foreground"
+                            )}
+                            onClick={() => setActiveTab(tab.id)}
+                        >
+                            <tab.icon className="h-4 w-4" />
+                            {tab.label}
+                        </Button>
+                    ))}
+                </nav>
+            </aside>
+            {/* Content */}
+            <div className="space-y-6">
+                {activeTab === 'general' && (
                     <Card>
                         <CardHeader>
+                            <CardTitle>General</CardTitle>
+                            <CardDescription>
+                            Basic information about your site.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <FormField
+                            control={form.control}
+                            name="siteName"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Site Name</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="siteDescription"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Site Description</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {activeTab === 'api' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>API Keys</CardTitle>
+                            <CardDescription>
+                            Manage API keys for third-party services. These are stored securely on the server.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <FormField
+                            control={form.control}
+                            name="razorpayKeyId"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Razorpay Key ID</FormLabel>
+                                <FormControl>
+                                    <Input type="password" placeholder="••••••••••••••••••••" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="razorpayKeySecret"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Razorpay Key Secret</FormLabel>
+                                <FormControl>
+                                    <Input type="password" placeholder="••••••••••••••••••••" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {activeTab === 'users' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>User Management</CardTitle>
+                            <CardDescription>
+                            Control how users interact with your site.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <FormField
+                            control={form.control}
+                            name="allowRegistrations"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                <div className="space-y-0.5">
+                                    <FormLabel className="text-base">
+                                    Allow New User Registrations
+                                    </FormLabel>
+                                    <FormDescription>
+                                    Toggle whether new users can sign up for an account.
+                                    </FormDescription>
+                                </div>
+                                <FormControl>
+                                    <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {activeTab === 'metafields' && (
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Content Metafield Settings</CardTitle>
+                            <CardDescription>
+                            Control which data fields are available and manage their options.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableSubjectMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                            <div className="space-y-0.5">
+                                                <FormLabel className="text-base">Subjects</FormLabel>
+                                            </div>
+                                            <FormControl>
+                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                            </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="Subjects"
+                                        items={subjects}
+                                        onAdd={subjectHandlers.onAdd}
+                                        onUpdate={subjectHandlers.onUpdate}
+                                        onDelete={subjectHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+                            
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableChapterMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Chapters</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <DependentMetafieldManager
+                                        parentTitle="Subjects"
+                                        childTitle="Chapters"
+                                        parentItems={subjects}
+                                        fetchChildren={getChaptersBySubjectId}
+                                        onAdd={chapterHandlers.onAdd}
+                                        onUpdate={chapterHandlers.onUpdate}
+                                        onDelete={chapterHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableExamCategoryMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Exam Categories</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="Exam Categories"
+                                        items={examTypes}
+                                        onAdd={examTypeHandlers.onAdd}
+                                        onUpdate={examTypeHandlers.onUpdate}
+                                        onDelete={examTypeHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+                            
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableExamMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Exams</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <DependentMetafieldManager
+                                        parentTitle="Exam Categories"
+                                        childTitle="Exams"
+                                        parentItems={examTypes}
+                                        fetchChildren={getExamsByCategory}
+                                        onAdd={examHandlers.onAdd}
+                                        onUpdate={examHandlers.onUpdate}
+                                        onDelete={examHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableBoardMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Boards</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="Boards"
+                                        items={boards}
+                                        onAdd={boardHandlers.onAdd}
+                                        onUpdate={boardHandlers.onUpdate}
+                                        onDelete={boardHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {activeTab === 'questionTypes' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Question Type Settings</CardTitle>
+                            <CardDescription>
+                            Enable or disable specific question types site-wide.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                             <FormField
                                 control={form.control}
-                                name="enableSubjectMetafield"
+                                name="enableMultipleChoice"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between">
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                                     <div className="space-y-0.5">
-                                        <FormLabel className="text-base">Subjects</FormLabel>
+                                        <FormLabel className="text-base">Enable Multiple Choice Questions</FormLabel>
+                                        <FormDescription>
+                                            Allow creation of 'Multiple Choice' type questions.
+                                        </FormDescription>
                                     </div>
                                     <FormControl>
-                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
                                     </FormControl>
                                     </FormItem>
                                 )}
                             />
-                        </CardHeader>
-                        <CardContent>
-                            <MetafieldManager 
-                                title="Subjects"
-                                items={subjects}
-                                onAdd={subjectHandlers.onAdd}
-                                onUpdate={subjectHandlers.onUpdate}
-                                onDelete={subjectHandlers.onDelete}
-                            />
-                        </CardContent>
-                    </Card>
-                    
-                    <Card>
-                        <CardHeader>
                             <FormField
                                 control={form.control}
-                                name="enableChapterMetafield"
+                                name="enableTrueFalse"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Chapters</FormLabel>
-                                        </div>
-                                        <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="text-base">Enable True/False Questions</FormLabel>
+                                        <FormDescription>
+                                            Allow creation of 'True/False' type questions.
+                                        </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
                                     </FormItem>
                                 )}
                             />
-                        </CardHeader>
-                        <CardContent>
-                            <DependentMetafieldManager
-                                parentTitle="Subjects"
-                                childTitle="Chapters"
-                                parentItems={subjects}
-                                fetchChildren={getChaptersBySubjectId}
-                                onAdd={chapterHandlers.onAdd}
-                                onUpdate={chapterHandlers.onUpdate}
-                                onDelete={chapterHandlers.onDelete}
-                            />
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
                             <FormField
                                 control={form.control}
-                                name="enableExamCategoryMetafield"
+                                name="enableShortAnswer"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Exam Categories</FormLabel>
-                                        </div>
-                                        <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="text-base">Enable Short Answer Questions</FormLabel>
+                                        <FormDescription>
+                                        Allow creation of 'Short Answer' questions.
+                                        </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
                                     </FormItem>
                                 )}
                             />
-                        </CardHeader>
-                        <CardContent>
-                             <MetafieldManager 
-                                title="Exam Categories"
-                                items={examTypes}
-                                onAdd={examTypeHandlers.onAdd}
-                                onUpdate={examTypeHandlers.onUpdate}
-                                onDelete={examTypeHandlers.onDelete}
-                            />
-                        </CardContent>
-                    </Card>
-                    
-                    <Card>
-                        <CardHeader>
                             <FormField
                                 control={form.control}
-                                name="enableExamMetafield"
+                                name="enableFillInTheBlank"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Exams</FormLabel>
-                                        </div>
-                                        <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="text-base">Enable Fill in the Blank Questions</FormLabel>
+                                        <FormDescription>
+                                        Allow creation of 'Fill in the Blank' questions.
+                                        </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
                                     </FormItem>
                                 )}
                             />
-                        </CardHeader>
-                        <CardContent>
-                            <DependentMetafieldManager
-                                parentTitle="Exam Categories"
-                                childTitle="Exams"
-                                parentItems={examTypes}
-                                fetchChildren={getExamsByCategory}
-                                onAdd={examHandlers.onAdd}
-                                onUpdate={examHandlers.onUpdate}
-                                onDelete={examHandlers.onDelete}
-                            />
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                             <FormField
+                            <FormField
                                 control={form.control}
-                                name="enableBoardMetafield"
+                                name="enableMatching"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between">
-                                        <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Boards</FormLabel>
-                                        </div>
-                                        <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                        </FormControl>
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                    <div className="space-y-0.5">
+                                        <FormLabel className="text-base">Enable Matching Questions</FormLabel>
+                                        <FormDescription>
+                                            Allow creation of 'Matching' type questions in the content editor.
+                                        </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
                                     </FormItem>
                                 )}
                             />
-                        </CardHeader>
-                        <CardContent>
-                            <MetafieldManager 
-                                title="Boards"
-                                items={boards}
-                                onAdd={boardHandlers.onAdd}
-                                onUpdate={boardHandlers.onUpdate}
-                                onDelete={boardHandlers.onDelete}
-                            />
                         </CardContent>
                     </Card>
-                </CardContent>
-            </Card>
+                )}
 
-            <Card>
-            <CardHeader>
-                <CardTitle>Question Type Settings</CardTitle>
-                <CardDescription>
-                Enable or disable specific question types site-wide.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <FormField
-                    control={form.control}
-                    name="enableMultipleChoice"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Enable Multiple Choice Questions</FormLabel>
-                            <FormDescription>
-                                Allow creation of 'Multiple Choice' type questions.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="enableTrueFalse"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Enable True/False Questions</FormLabel>
-                            <FormDescription>
-                                Allow creation of 'True/False' type questions.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="enableShortAnswer"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Enable Short Answer Questions</FormLabel>
-                            <FormDescription>
-                            Allow creation of 'Short Answer' questions.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="enableFillInTheBlank"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Enable Fill in the Blank Questions</FormLabel>
-                            <FormDescription>
-                            Allow creation of 'Fill in the Blank' questions.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="enableMatching"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                            <FormLabel className="text-base">Enable Matching Questions</FormLabel>
-                            <FormDescription>
-                                Allow creation of 'Matching' type questions in the content editor.
-                            </FormDescription>
-                        </div>
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        </FormItem>
-                    )}
-                />
-            </CardContent>
-            </Card>
-            
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full lg:w-auto">
-                <Save className="mr-2 h-4 w-4" />
-                {form.formState.isSubmitting ? "Saving..." : "Save All Settings"}
-            </Button>
-        </div>
-        <div className="lg:col-span-1 space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Content Summary</CardTitle>
-                    <CardDescription>A quick overview of your site's content.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {contentSummary ? (
-                        <ul className="space-y-2 text-sm">
-                            <li className="flex justify-between items-center font-semibold">
-                                <span>Total Content</span>
-                                <span>{totalContent}</span>
-                            </li>
-                             <li className="flex justify-between items-center">
-                                <span>Mock Tests</span>
-                                <span>{contentSummary['Mock Test'] || 0}</span>
-                            </li>
-                             <li className="flex justify-between items-center">
-                                <span>Quizzes</span>
-                                <span>{contentSummary['Quiz'] || 0}</span>
-                            </li>
-                             <li className="flex justify-between items-center">
-                                <span>Learn Articles</span>
-                                <span>{contentSummary['Learn'] || 0}</span>
-                            </li>
-                             <li className="flex justify-between items-center">
-                                <span>Practice Questions</span>
-                                <span>{contentSummary['Practice Questions'] || 0}</span>
-                            </li>
-                        </ul>
-                    ) : <p className="text-sm text-muted-foreground">No content found.</p>}
-                </CardContent>
-                <CardFooter>
-                    <Button variant="outline" asChild className="w-full">
-                        <Link href="/admin/content"><Library className="mr-2 h-4 w-4"/>Manage Content</Link>
+                <div className="col-span-full">
+                    <Button type="submit" disabled={form.formState.isSubmitting}>
+                        <Save className="mr-2 h-4 w-4" />
+                        {form.formState.isSubmitting ? "Saving..." : "Save All Settings"}
                     </Button>
-                </CardFooter>
-            </Card>
+                </div>
+            </div>
         </div>
       </form>
     </Form>
