@@ -421,48 +421,22 @@ export const getContentById = async (contentId: string) => {
 
 export const updateContent = async (contentId: string, contentData: any) => {
     if (!contentId) {
-        throw new Error("Content ID is required to update a content.");
+        throw new Error("Content ID is required to update content.");
     }
 
     const contentRef = doc(db, "content", contentId);
     const cleanedData = cleanDataForFirebase(contentData);
     
-    // If questions are part of the update, handle them separately
-    if (cleanedData.questions) {
-        const { questions, ...restOfContentData } = cleanedData;
+    const finalContentData = {
+        ...cleanedData,
+        updatedAt: serverTimestamp(),
+    };
 
-        const questionsWithIds = await Promise.all(questions.map(async (question: any) => {
-            if (question.id) {
-                // Ideally, you would update the existing question document here
-                return question;
-            }
-            const questionId = await addQuestion(question);
-            return { ...question, id: questionId };
-        }));
-
-        const finalContentData: any = {
-            ...restOfContentData,
-            questions: questionsWithIds,
-            updatedAt: serverTimestamp(),
-        };
-        
-        try {
-            await updateDoc(contentRef, finalContentData);
-        } catch(e) {
-            console.error("Error updating document with questions: ", e);
-            throw new Error("Failed to update content with questions.");
-        }
-    } else {
-        // If it's a simple field update (like access level)
-        try {
-            await updateDoc(contentRef, {
-                ...cleanedData,
-                updatedAt: serverTimestamp(),
-            });
-        } catch (e) {
-            console.error("Error updating document: ", e);
-            throw new Error("Failed to update content.");
-        }
+    try {
+        await updateDoc(contentRef, finalContentData);
+    } catch (e) {
+        console.error("Error updating document: ", e);
+        throw new Error("Failed to update content.");
     }
 };
 
@@ -1359,6 +1333,7 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 
 
