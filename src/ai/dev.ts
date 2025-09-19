@@ -11,4 +11,5 @@ import '@/ai/flows/ai-learn-content-generator.ts';
 import '@/ai/flows/ai-description-generator.ts';
 import '@/ai/flows/ai-question-generator.ts';
 import '@/ai/flows/ai-image-generator.ts';
+import '@/ai/flows/ai-metadata-generator.ts';
 

@@ -11,13 +11,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -45,7 +44,6 @@ import {
     updateExam,
     deleteExam
 } from '@/lib/firebase/firestore';
-import Link from 'next/link';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,9 +54,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { generateMetadata, AIMetadataGeneratorInput, AIMetadataGeneratorOutput } from '@/ai/flows/ai-metadata-generator';
+import { Badge } from '@/components/ui/badge';
 
 const settingsSchema = z.object({
     siteName: z.string().min(1, "Site name is required."),
@@ -81,6 +90,13 @@ const settingsSchema = z.object({
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 type ContentSummary = { [key: string]: number; };
 type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
+
+const aiGeneratorSchema = z.object({
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category']),
+  topic: z.string().min(3, "Topic must be at least 3 characters."),
+  count: z.coerce.number().int().min(1).max(20),
+});
+type AIGeneratorValues = z.infer<typeof aiGeneratorSchema>;
 
 const MetafieldManager = ({
     title,
@@ -310,6 +326,10 @@ export default function AdminSettingsPage() {
   const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
   const [boards, setBoards] = useState<MetafieldItem[]>([]);
   const [examTypes, setExamTypes] = useState<MetafieldItem[]>([]);
+  
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedItems, setGeneratedItems] = useState<string[]>([]);
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -331,6 +351,16 @@ export default function AdminSettingsPage() {
         enableChapterMetafield: true,
     },
   });
+
+  const aiForm = useForm<AIGeneratorValues>({
+    resolver: zodResolver(aiGeneratorSchema),
+    defaultValues: {
+        metafieldType: 'Subject',
+        topic: '',
+        count: 10,
+    }
+  });
+
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -392,6 +422,60 @@ export default function AdminSettingsPage() {
         });
     }
   };
+  
+  const handleAIGenerate: SubmitHandler<AIGeneratorValues> = async (data) => {
+      setIsGenerating(true);
+      setGeneratedItems([]);
+      try {
+          const result: AIMetadataGeneratorOutput = await generateMetadata(data);
+          setGeneratedItems(result.items);
+          toast({
+              title: "Suggestions Generated!",
+              description: "Review the generated items below."
+          });
+      } catch (error) {
+          toast({
+              variant: "destructive",
+              title: "AI Generation Failed",
+              description: (error as Error).message,
+          });
+      } finally {
+          setIsGenerating(false);
+      }
+  }
+
+  const handleAddGeneratedItems = async () => {
+      const type = aiForm.getValues('metafieldType');
+      if (generatedItems.length === 0) return;
+      
+      const addFunctionMap = {
+          'Subject': addSubject,
+          'Board': addBoard,
+          'Exam Category': addExamType,
+      };
+
+      const addFunc = addFunctionMap[type];
+
+      try {
+          await Promise.all(generatedItems.map(item => addFunc(item)));
+          toast({
+              title: 'Items Added!',
+              description: `${generatedItems.length} new ${type.toLowerCase()} items have been added.`,
+          });
+          // Refresh data
+          await fetchInitialData();
+          setGeneratedItems([]);
+          setIsAIGeneratorOpen(false);
+          aiForm.reset();
+      } catch (error) {
+           toast({
+              variant: "destructive",
+              title: `Error Adding ${type} Items`,
+              description: (error as Error).message,
+          });
+      }
+
+  }
 
   const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType') => {
       const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes } as const;
@@ -426,6 +510,7 @@ export default function AdminSettingsPage() {
         { id: 'users', label: 'User Management', icon: Users },
         { id: 'metafields', label: 'Content Metafields', icon: LayoutTemplate },
         { id: 'questionTypes', label: 'Question Types', icon: Type },
+        { id: 'content', label: 'Content Details', icon: Library },
     ];
   
   if (loading) {
@@ -455,6 +540,7 @@ export default function AdminSettingsPage() {
                     {settingTabs.map(tab => (
                         <Button 
                             key={tab.id}
+                            type="button"
                             variant="ghost" 
                             className={cn(
                                 "w-full justify-start gap-2",
@@ -583,12 +669,75 @@ export default function AdminSettingsPage() {
                     </Card>
                 )}
 
-                {activeTab === 'metafields' && (
+                 {activeTab === 'metafields' && (
                      <Card>
                         <CardHeader>
                             <CardTitle>Content Metafield Settings</CardTitle>
-                            <CardDescription>
-                            Control which data fields are available and manage their options.
+                            <CardDescription className="flex justify-between items-center">
+                               <span>Control which data fields are available and manage their options.</span>
+                               <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
+                                   <DialogTrigger asChild>
+                                       <Button variant="outline" size="sm"><Sparkles className="mr-2 h-4 w-4" /> Generate with AI</Button>
+                                   </DialogTrigger>
+                                   <DialogContent className="sm:max-w-md">
+                                        <DialogHeader>
+                                            <DialogTitle>Generate Metadata with AI</DialogTitle>
+                                            <DialogDescription>
+                                                Select a metadata type, provide a topic, and let Gemini generate a list of items for you to add.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <Form {...aiForm}>
+                                            <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                                                <FormField control={aiForm.control} name="metafieldType" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Metadata Type</FormLabel>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="Subject">Subject</SelectItem>
+                                                                <SelectItem value="Board">Board</SelectItem>
+                                                                <SelectItem value="Exam Category">Exam Category</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                                <FormField control={aiForm.control} name="topic" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Topic</FormLabel>
+                                                        <FormControl><Input placeholder="e.g., High School Science" {...field} /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                                 <FormField control={aiForm.control} name="count" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Number of Items to Generate</FormLabel>
+                                                        <FormControl><Input type="number" {...field} /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                                <DialogFooter>
+                                                    <Button type="submit" disabled={isGenerating}>
+                                                        {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : <><BrainCircuit className="mr-2 h-4 w-4"/>Generate</>}
+                                                    </Button>
+                                                </DialogFooter>
+                                            </form>
+                                        </Form>
+                                        {generatedItems.length > 0 && (
+                                            <div className="space-y-4 pt-4 border-t">
+                                                <h4 className="font-medium">Generated Items</h4>
+                                                <ScrollArea className="h-40 rounded-md border">
+                                                    <div className="p-4 space-y-1">
+                                                        {generatedItems.map((item, index) => <Badge key={index} variant="secondary">{item}</Badge>)}
+                                                    </div>
+                                                </ScrollArea>
+                                                <Button onClick={handleAddGeneratedItems} className="w-full">
+                                                    <PlusCircle className="mr-2 h-4 w-4"/> Add {generatedItems.length} Items
+                                                </Button>
+                                            </div>
+                                        )}
+                                   </DialogContent>
+                               </Dialog>
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
@@ -851,6 +1000,34 @@ export default function AdminSettingsPage() {
                         </CardContent>
                     </Card>
                 )}
+
+                 {activeTab === 'content' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Content Details</CardTitle>
+                            <CardDescription>
+                                A summary of the content on your site.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {contentSummary ? (
+                                <ul className="space-y-2">
+                                    <li className="flex justify-between font-semibold">
+                                        <span>Total Content Items</span>
+                                        <span>{totalContent}</span>
+                                    </li>
+                                    {Object.entries(contentSummary).map(([type, count]) => (
+                                        <li key={type} className="flex justify-between border-t pt-2">
+                                            <span className="text-muted-foreground">{type}</span>
+                                            <span>{count}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : <p>No content has been created yet.</p>}
+                        </CardContent>
+                    </Card>
+                )}
+
 
                 <div className="col-span-full">
                     <Button type="submit" disabled={form.formState.isSubmitting}>
