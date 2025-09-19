@@ -295,12 +295,16 @@ export default function CreateTestPage() {
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [questionTypeSettings, setQuestionTypeSettings] = useState({
+  const [settings, setSettings] = useState({
     enableMatching: true,
     enableMultipleChoice: true,
     enableTrueFalse: true,
     enableShortAnswer: true,
     enableFillInTheBlank: true,
+    enableBoardMetafield: true,
+    enableExamCategoryMetafield: true,
+    enableExamMetafield: true,
+    enableChapterMetafield: true,
   });
 
 
@@ -340,7 +344,7 @@ export default function CreateTestPage() {
   const fetchFormData = async () => {
     try {
       setLoadingData(true);
-      const [types, subjectData, boardData, examTypeData, settings] = await Promise.all([
+      const [types, subjectData, boardData, examTypeData, siteSettings] = await Promise.all([
           getContentTypes(),
           getSubjects(),
           getBoards(),
@@ -353,13 +357,17 @@ export default function CreateTestPage() {
       setBoards(boardData);
       setExamCategories(examTypeData);
 
-      if (settings) {
-        setQuestionTypeSettings({
-            enableMatching: settings.enableMatching ?? true,
-            enableMultipleChoice: settings.enableMultipleChoice ?? true,
-            enableTrueFalse: settings.enableTrueFalse ?? true,
-            enableShortAnswer: settings.enableShortAnswer ?? true,
-            enableFillInTheBlank: settings.enableFillInTheBlank ?? true,
+      if (siteSettings) {
+        setSettings({
+            enableMatching: siteSettings.enableMatching ?? true,
+            enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
+            enableTrueFalse: siteSettings.enableTrueFalse ?? true,
+            enableShortAnswer: siteSettings.enableShortAnswer ?? true,
+            enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
+            enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
+            enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
+            enableExamMetafield: siteSettings.enableExamMetafield ?? true,
+            enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
         });
       }
 
@@ -933,11 +941,11 @@ export default function CreateTestPage() {
                                         <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="Any">Any</SelectItem>
-                                            {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
-                                            {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
-                                            {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
-                                            {questionTypeSettings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
-                                            {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
+                                            {settings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
+                                            {settings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
+                                            {settings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
+                                            {settings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                            {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -1012,7 +1020,7 @@ export default function CreateTestPage() {
             {currentTestType !== 'Learn' && (
                 <>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                {settings.enableBoardMetafield && <FormField
                   control={form.control}
                   name="board"
                   render={({ field }) => (
@@ -1049,7 +1057,7 @@ export default function CreateTestPage() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                />}
                  <FormField
                   control={form.control}
                   name="subject"
@@ -1091,7 +1099,7 @@ export default function CreateTestPage() {
               </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+                {settings.enableChapterMetafield && <FormField
                     control={form.control}
                     name="chapter"
                     render={({ field }) => (
@@ -1115,7 +1123,7 @@ export default function CreateTestPage() {
                         <FormMessage />
                         </FormItem>
                     )}
-                />
+                />}
                  {selectedChapter && (
                     <FormItem>
                         <FormLabel>Chapter Name</FormLabel>
@@ -1127,7 +1135,7 @@ export default function CreateTestPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <FormField
+                 {settings.enableExamCategoryMetafield && <FormField
                   control={form.control}
                   name="examCategory"
                   render={({ field }) => (
@@ -1164,8 +1172,8 @@ export default function CreateTestPage() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-                 <FormField
+                />}
+                 {settings.enableExamMetafield && <FormField
                   control={form.control}
                   name="exam"
                   render={({ field }) => (
@@ -1204,7 +1212,7 @@ export default function CreateTestPage() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                />}
               </div>
               </>
             )}
@@ -1395,11 +1403,11 @@ export default function CreateTestPage() {
                                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                   <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
                                                   <SelectContent>
-                                                      {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
-                                                      {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
-                                                      {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
-                                                      {questionTypeSettings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
-                                                      {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
+                                                      {settings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
+                                                      {settings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
+                                                      {settings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
+                                                      {settings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                                      {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                                   </SelectContent>
                                               </Select>
                                               <FormMessage />
