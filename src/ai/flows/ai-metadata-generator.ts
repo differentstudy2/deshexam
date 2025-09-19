@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const AIMetadataGeneratorInputSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category']).describe('The type of metadata to generate.'),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State']).describe('The type of metadata to generate.'),
   topic: z.string().describe('The high-level topic or category to generate items for (e.g., "Indian Competitive Exams", "High School Science").'),
   count: z.number().int().min(1).max(20).describe('The number of items to generate.'),
 });
