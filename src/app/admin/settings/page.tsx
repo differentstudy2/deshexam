@@ -14,8 +14,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminSettingsPage() {
+  const { toast } = useToast();
+
+  const handleSave = () => {
+    toast({
+      title: 'Settings Saved!',
+      description: 'Your changes have been successfully saved.',
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -43,7 +53,7 @@ export default function AdminSettingsPage() {
           </div>
         </CardContent>
         <CardFooter className="border-t px-6 py-4">
-          <Button><Save className="mr-2"/>Save Changes</Button>
+          <Button onClick={handleSave}><Save className="mr-2"/>Save Changes</Button>
         </CardFooter>
       </Card>
       
@@ -65,7 +75,7 @@ export default function AdminSettingsPage() {
           </div>
         </CardContent>
          <CardFooter className="border-t px-6 py-4">
-          <Button><Save className="mr-2"/>Save API Keys</Button>
+          <Button onClick={handleSave}><Save className="mr-2"/>Save API Keys</Button>
         </CardFooter>
       </Card>
 
@@ -88,7 +98,7 @@ export default function AdminSettingsPage() {
           </div>
         </CardContent>
          <CardFooter className="border-t px-6 py-4">
-          <Button><Save className="mr-2"/>Save Settings</Button>
+          <Button onClick={handleSave}><Save className="mr-2"/>Save Settings</Button>
         </CardFooter>
       </Card>
 
@@ -111,7 +121,7 @@ export default function AdminSettingsPage() {
           </div>
         </CardContent>
          <CardFooter className="border-t px-6 py-4">
-          <Button><Save className="mr-2"/>Save Settings</Button>
+          <Button onClick={handleSave}><Save className="mr-2"/>Save Settings</Button>
         </CardFooter>
       </Card>
     </div>
