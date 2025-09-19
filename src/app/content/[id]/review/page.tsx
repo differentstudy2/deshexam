@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -72,9 +73,6 @@ function ReviewDisplay() {
         setLoading(true);
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
-          if (submissionData.submittedAt && typeof submissionData.submittedAt.toDate === 'function') {
-            submissionData.submittedAt = submissionData.submittedAt.toDate();
-          }
           setSubmission(submissionData);
           const [testData, studentData] = await Promise.all([
              getContentById(submissionData.testId) as Promise<Test>,
@@ -192,6 +190,7 @@ function ReviewDisplay() {
 
   const { answers, score, totalQuestions } = submission;
   const percentage = Math.round((totalQuestions > 0 ? (score / totalQuestions) * 100 : 0));
+  const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
   return (
       <>
@@ -242,8 +241,12 @@ function ReviewDisplay() {
                     {test.difficulty && <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Difficulty:</strong> <span className="text-foreground">{test.difficulty}</span></div>}
                     {test.testType && <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Type:</strong> <span className="text-foreground">{test.testType}</span></div>}
                     
-                    {submission.submittedAt && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{new Date(submission.submittedAt).toLocaleDateString()}</span></div>}
-                    {submission.submittedAt && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{new Date(submission.submittedAt).toLocaleTimeString()}</span></div>}
+                    {submittedAtDate && submittedAtDate.toString() !== 'Invalid Date' && (
+                        <>
+                            <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submittedAtDate.toLocaleDateString()}</span></div>
+                            <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submittedAtDate.toLocaleTimeString()}</span></div>
+                        </>
+                    )}
                 </div>
             </CardContent>
         </Card>

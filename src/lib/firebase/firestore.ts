@@ -521,7 +521,11 @@ export const getSubmissionById = async (submissionId: string) => {
         const submissionDoc = await getDoc(doc(db, "submissions", submissionId));
         if (submissionDoc.exists()) {
             const data = submissionDoc.data();
-            return { id: submissionDoc.id, ...data };
+             return { 
+                id: submissionDoc.id, 
+                ...data,
+                submittedAt: data.submittedAt?.toDate() ?? new Date(),
+            };
         } else {
             return null;
         }
@@ -1308,6 +1312,7 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 
 

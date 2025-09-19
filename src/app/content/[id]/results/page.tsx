@@ -53,9 +53,6 @@ function ResultsDisplay() {
         setLoading(true);
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
-          if (submissionData.submittedAt && typeof submissionData.submittedAt.toDate === 'function') {
-            submissionData.submittedAt = submissionData.submittedAt.toDate();
-          }
           setSubmission(submissionData);
            const [testData, studentData] = await Promise.all([
              getContentById(submissionData.testId) as Promise<Test>,
@@ -105,7 +102,7 @@ function ResultsDisplay() {
   const percentage = Math.round((score / totalQuestions) * 100);
   const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
   const contentBaseUrl = `/${typeSlug}`;
-  const submittedAtDate = new Date(submission.submittedAt);
+  const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
 
   return (
@@ -157,8 +154,12 @@ function ResultsDisplay() {
                 {test.difficulty && <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Difficulty:</strong> <span className="text-foreground">{test.difficulty}</span></div>}
                 {test.testType && <div className="flex items-center gap-2 text-muted-foreground"><Star className="w-4 h-4"/> <strong>Type:</strong> <span className="text-foreground">{test.testType}</span></div>}
                 
-                {submission.submittedAt && <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submittedAtDate.toLocaleDateString()}</span></div>}
-                {submission.submittedAt && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submittedAtDate.toLocaleTimeString()}</span></div>}
+                {submittedAtDate && submittedAtDate.toString() !== 'Invalid Date' && (
+                    <>
+                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submittedAtDate.toLocaleDateString()}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submittedAtDate.toLocaleTimeString()}</span></div>
+                    </>
+                )}
             </div>
             <Separator />
              <div className="flex gap-4 justify-center pt-2">
