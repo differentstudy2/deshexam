@@ -50,7 +50,7 @@ import {
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateImage } from '@/ai/flows/ai-image-generator';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 
@@ -1481,3 +1481,4 @@ export default function EditContentPage() {
     </div>
   );
 }
+
