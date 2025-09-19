@@ -35,7 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef } from 'react';
 import {
@@ -47,6 +47,10 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
 import { generateLearnContent, AILearnContentGeneratorInput, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
@@ -110,6 +114,7 @@ const formSchema = z.object({
   access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
+  publishedAt: z.date().optional(),
   questions: z.array(questionSchema).optional(),
 });
 
@@ -364,6 +369,7 @@ export default function CreateTestPage() {
       difficulty: 'Medium',
       access: 'free',
       price: undefined,
+      publishedAt: new Date(),
       subscriptionPlan: 'pass',
       questions: [],
     },
@@ -514,6 +520,7 @@ export default function CreateTestPage() {
           description: data.description,
           body: data.body,
           testType: data.testType,
+          publishedAt: data.publishedAt || new Date(),
         };
       } else {
         let subjectName = data.subject;
@@ -620,6 +627,7 @@ export default function CreateTestPage() {
             duration: 0,
             access: 'free',
             price: undefined,
+            publishedAt: new Date(),
             subscriptionPlan: 'pass',
             questions: [],
             newSubject: '',
@@ -643,6 +651,7 @@ export default function CreateTestPage() {
             duration: 0,
             access: 'free',
             price: undefined,
+            publishedAt: new Date(),
             subscriptionPlan: 'pass',
             questions: [],
             difficulty: 'Medium',
@@ -1503,6 +1512,44 @@ export default function CreateTestPage() {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="publishedAt"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                        <FormLabel>Publish Date</FormLabel>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                                >
+                                {field.value ? (
+                                    format(field.value, "PPP")
+                                ) : (
+                                    <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                            />
+                            </PopoverContent>
+                        </Popover>
+                         <FormMessage />
+                        </FormItem>
+                    )}
+                />
                   <div className='space-y-2'>
                       <FormField
                         control={form.control}
@@ -1827,4 +1874,3 @@ export default function CreateTestPage() {
     </div>
   );
 }
-

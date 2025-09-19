@@ -341,7 +341,7 @@ export const addContent = async (contentData: any) => {
             ...restOfContentData,
             authorId: user.uid,
             authorName: user.displayName || user.email,
-            createdAt: serverTimestamp(),
+            createdAt: contentData.publishedAt ? new Date(contentData.publishedAt) : serverTimestamp(),
             updatedAt: serverTimestamp(),
         };
         
@@ -356,6 +356,7 @@ export const addContent = async (contentData: any) => {
         if(featureImage){
             finalContentData.featureImage = featureImage;
         }
+        delete finalContentData.publishedAt;
 
         const docRef = await addDoc(collection(db, "content"), finalContentData);
         console.log("Document written with ID: ", docRef.id);
