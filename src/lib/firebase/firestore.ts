@@ -79,10 +79,20 @@ export const getAllQuestions = async () => {
         const querySnapshot = await getDocs(q);
         const questions = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            const createdAt = data.createdAt;
+            let formattedDate = 'N/A';
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                formattedDate = createdAt.toDate().toLocaleDateString();
+            } else if (createdAt) {
+                const d = new Date(createdAt);
+                if (!isNaN(d.getTime())) {
+                    formattedDate = d.toLocaleDateString();
+                }
+            }
             return {
                 id: doc.id,
                 ...data,
-                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+                createdAt: formattedDate,
             };
         });
         return questions;
@@ -1349,6 +1359,7 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 
 
