@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -20,6 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const navLinks = [
+  { href: "/features", label: "Features" },
   { href: "/mock-tests", label: "Mock Tests" },
   { href: "/quizzes", label: "Quizzes" },
   { href: "/learn", label: "Learn" },
