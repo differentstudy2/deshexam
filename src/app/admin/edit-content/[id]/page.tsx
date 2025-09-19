@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -35,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -78,6 +77,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty.'),
   board: z.string().optional(),
   class: z.string().optional(),
+  state: z.string().optional(),
   examCategory: z.string().optional(),
   exam: z.string().optional(),
   subject: z.string().optional(),
@@ -85,6 +85,7 @@ const formSchema = z.object({
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newClass: z.string().optional(),
+  newState: z.string().optional(),
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
@@ -116,6 +117,7 @@ type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type Class = { id: string, name: string };
+type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
@@ -277,6 +279,7 @@ export default function EditContentPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
+  const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -285,6 +288,7 @@ export default function EditContentPage() {
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
   const [isAddingNewClass, setIsAddingNewClass] = useState(false);
+  const [isAddingNewState, setIsAddingNewState] = useState(false);
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
@@ -303,6 +307,7 @@ export default function EditContentPage() {
     enableSubjectMetafield: true,
     enableBoardMetafield: true,
     enableClassMetafield: true,
+    enableStateMetafield: true,
     enableExamCategoryMetafield: true,
     enableExamMetafield: true,
     enableChapterMetafield: true,
@@ -314,6 +319,7 @@ export default function EditContentPage() {
       title: '',
       board: '',
       class: '',
+      state: '',
       examCategory: '',
       exam: '',
       subject: '',
@@ -321,6 +327,7 @@ export default function EditContentPage() {
       newSubject: '',
       newBoard: '',
       newClass: '',
+      newState: '',
       newExamCategory: '',
       newExam: '',
       newChapterNo: '',
@@ -370,12 +377,13 @@ export default function EditContentPage() {
       if (!contentId) return;
       try {
         setLoading(true);
-        const [contentData, subjectData, contentTypeData, boardData, classData, examTypeData, siteSettings] = await Promise.all([
+        const [contentData, subjectData, contentTypeData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
             getContentById(contentId),
             getSubjects(),
             getContentTypes(),
             getBoards(),
             getClasses(),
+            getStates(),
             getExamTypes(),
             getSettings()
         ]);
@@ -384,6 +392,7 @@ export default function EditContentPage() {
         setContentTypes(contentTypeData);
         setBoards(boardData);
         setClasses(classData);
+        setStates(stateData);
         setExamCategories(examTypeData);
 
         if (siteSettings) {
@@ -396,6 +405,7 @@ export default function EditContentPage() {
                 enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
                 enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
                 enableClassMetafield: siteSettings.enableClassMetafield ?? true,
+                enableStateMetafield: siteSettings.enableStateMetafield ?? true,
                 enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
                 enableExamMetafield: siteSettings.enableExamMetafield ?? true,
                 enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
@@ -459,6 +469,12 @@ export default function EditContentPage() {
           await addClass(data.newClass);
           className = data.newClass;
       }
+      
+      let stateName = data.state;
+      if (data.state === 'add_new_state' && data.newState) {
+          await addState(data.newState);
+          stateName = data.newState;
+      }
   
       let examCategoryName = data.examCategory;
       let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
@@ -496,10 +512,11 @@ export default function EditContentPage() {
           return q;
       });
 
-      const contentToSave = { ...data, subject: subjectName, board: boardName, class: className, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
+      const contentToSave = { ...data, subject: subjectName, board: boardName, class: className, state: stateName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
       delete (contentToSave as any).newSubject;
       delete (contentToSave as any).newBoard;
       delete (contentToSave as any).newClass;
+      delete (contentToSave as any).newState;
       delete (contentToSave as any).newExamCategory;
       delete (contentToSave as any).newExam;
       delete (contentToSave as any).newChapterNo;
@@ -633,6 +650,15 @@ export default function EditContentPage() {
           setIsAddingNewClass(true);
       } else {
           setIsAddingNewClass(false);
+      }
+  }
+  
+    const handleStateChange = (value: string) => {
+      form.setValue('state', value);
+      if (value === 'add_new_state') {
+          setIsAddingNewState(true);
+      } else {
+          setIsAddingNewState(false);
       }
   }
 
@@ -794,6 +820,44 @@ export default function EditContentPage() {
                         </FormItem>
                     )}
                 />}
+                {settings.enableStateMetafield && <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>State</FormLabel>
+                        {!isAddingNewState ? (
+                                <Select onValueChange={handleStateChange} value={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a state" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {states.map((s) => (
+                                        <SelectItem key={s.id} value={s.name}>
+                                        {s.name}
+                                        </SelectItem>
+                                    ))}
+                                    <SelectItem value="add_new_state">Add new state...</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <div className='space-y-2'>
+                                    <FormField
+                                        control={form.control}
+                                        name="newState"
+                                        render={({ field }) => (
+                                            <Input {...field} placeholder="Enter new state name" />
+                                        )}
+                                    />
+                                    <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewState(false); form.setValue('state', ''); }}>Cancel</Button>
+                                </div>
+                            )}
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1299,19 +1363,20 @@ export default function EditContentPage() {
                     type="button"
                     variant="outline"
                     onClick={() => {
-                        const newQuestion: any = { 
-                            text: '', 
-                            type: 'Multiple Choice', 
-                            marks: 1, 
-                            options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
-                            correctAnswer: '', 
-                            explanation: '' 
-                        };
-                         if (newQuestion.type === 'Matching') {
-                            newQuestion.correctAnswer = [{ a: '', aImage: '', b: '', bImage: '' }];
-                        }
-                        append(newQuestion);
-                    }}
+                        append({
+                          text: '',
+                          type: 'Multiple Choice',
+                          marks: 1,
+                          options: [
+                            { text: '', explanation: '' },
+                            { text: '', explanation: '' },
+                            { text: '', explanation: '' },
+                            { text: '', explanation: '' },
+                          ],
+                          correctAnswer: '',
+                          explanation: '',
+                        });
+                      }}
                 >
                     <PlusCircle className="mr-2" />
                     Add Question
@@ -1482,3 +1547,4 @@ export default function EditContentPage() {
   );
 }
 
+    
