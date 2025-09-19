@@ -99,7 +99,8 @@ const questionFormSchema = z.object({
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
   marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
-  correctAnswer: z.string().min(1, 'Please specify the correct answer.'),
+  correctAnswer: z.string().optional(),
+  explanation: z.string().optional(),
 });
 
 type QuestionFormValues = z.infer<typeof questionFormSchema>;
@@ -113,7 +114,8 @@ type Question = {
     type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank';
     marks: number;
     options?: {text: string, explanation?: string}[];
-    correctAnswer: string;
+    correctAnswer?: string;
+    explanation?: string;
 };
 
 const aiGeneratorFormSchema = z.object({
@@ -1098,6 +1100,19 @@ export default function ManageContentPage() {
                         </FormItem>
                     )}
                 />
+                 <FormField
+                    control={questionForm.control}
+                    name="explanation"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Explanation</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder="Explain why the correct answer is right." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <FormField
                     control={questionForm.control}
                     name="marks"
@@ -1122,7 +1137,7 @@ export default function ManageContentPage() {
                                     {optionFields.map((option, optionIndex) => (
                                          <div key={option.id} className="flex items-start gap-4">
                                             <FormControl>
-                                                <RadioGroupItem value={questionForm.getValues(`options.${optionIndex}.text`)} className="mt-2.5" />
+                                                <RadioGroupItem value={questionForm.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}`} className="mt-2.5" />
                                             </FormControl>
                                             <div className="space-y-2 flex-1">
                                                 <FormField
@@ -1194,4 +1209,5 @@ export default function ManageContentPage() {
     </div>
   );
 }
+
 
