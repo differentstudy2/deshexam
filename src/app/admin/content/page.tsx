@@ -25,7 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Trash2, Eye, Loader2, Search, Filter, Sparkles, Upload } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Eye, Loader2, Search, Filter, Sparkles, Upload, FilePlus, BookPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,6 +70,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { generateContent, AIContentGeneratorInput } from '@/ai/flows/ai-content-generator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 
 type Content = {
@@ -78,7 +79,7 @@ type Content = {
     subject: string;
     testType: string;
     access: 'free' | 'premium' | 'pro';
-    createdAt: string;
+    publishedAt: string;
     authorId: string;
     authorName: string;
     board: string;
@@ -233,7 +234,7 @@ const ContentTable = ({
                          <TableCell className="hidden md:table-cell">
                             <ContentBadge type={item.access} />
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell">{item.createdAt}</TableCell>
+                        <TableCell className="hidden lg:table-cell">{item.publishedAt}</TableCell>
                         <TableCell>
                             <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -449,10 +450,22 @@ export default function ManageContentPage() {
           getAllQuestions(),
         ]);
         
-        const formattedContent = content.map(c => ({
-            ...c,
-            createdAt: c.createdAt ? new Date(c.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'
-        })) as Content[];
+        const formattedContent = content.map((c: any) => {
+            let pubDate = 'N/A';
+            const dateField = c.publishedAt || c.createdAt;
+            if (dateField && typeof dateField.toDate === 'function') {
+                pubDate = dateField.toDate().toLocaleDateString();
+            } else if (dateField) {
+                const d = new Date(dateField);
+                if (!isNaN(d.getTime())) {
+                    pubDate = d.toLocaleDateString();
+                }
+            }
+            return {
+                ...c,
+                publishedAt: pubDate
+            } as Content;
+        });
 
         setAllContent(formattedContent);
         setAllQuestions(questionData as Question[]);
@@ -741,11 +754,21 @@ export default function ManageContentPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-headline text-3xl font-bold">Manage Content</h1>
-        <p className="text-muted-foreground">
-          View and manage all content across the platform.
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+            <h1 className="font-headline text-3xl font-bold">Manage Content</h1>
+            <p className="text-muted-foreground">
+            View and manage all content across the platform.
+            </p>
+        </div>
+         <div className="flex gap-2">
+            <Button asChild variant="outline">
+                <Link href="/admin/add-article"><BookPlus className="mr-2"/>Add Article</Link>
+            </Button>
+            <Button asChild>
+                <Link href="/admin/add-content"><FilePlus className="mr-2"/>Add Quiz/Test</Link>
+            </Button>
+        </div>
       </div>
 
       <Card>
@@ -846,83 +869,6 @@ export default function ManageContentPage() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                  )}
-                 {activeTab === 'Questions' && (
-                     <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline">
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            Generate Questions with AI
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-xl">
-                            <DialogHeader>
-                                <DialogTitle>Generate Questions with AI</DialogTitle>
-                                <DialogDescription>
-                                    Describe the content you want to create, and Gemini will generate questions for you.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <Form {...aiForm}>
-                            <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
-                                <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
-                                    <TabsList className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="topic">From Topic</TabsTrigger>
-                                        <TabsTrigger value="text">From Text</TabsTrigger>
-                                        <TabsTrigger value="file">From File</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="topic" className="pt-4">
-                                        <FormField control={aiForm.control} name="source" render={({ field }) => ( <FormItem> <FormLabel>Topic</FormLabel> <FormControl> <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                                    </TabsContent>
-                                    <TabsContent value="text" className="pt-4">
-                                        <FormField control={aiForm.control} name="source" render={({ field }) => ( <FormItem> <FormLabel>Paste Text</FormLabel> <FormControl> <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /> </FormControl> <FormMessage /> </FormItem> )}/>
-                                    </TabsContent>
-                                    <TabsContent value="file" className="pt-4">
-                                        <FormItem>
-                                            <FormLabel>Upload File</FormLabel>
-                                            <FormControl>
-                                                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                                    <div className="space-y-1 text-center">
-                                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                                        <div className="flex text-sm text-muted-foreground"> <p className="pl-1"> {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'} </p> </div>
-                                                        <p className="text-xs text-muted-foreground"> {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'} </p>
-                                                    </div>
-                                                </div>
-                                            </FormControl>
-                                            <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt"/>
-                                            <FormMessage />
-                                        </FormItem>
-                                    </TabsContent>
-                                </Tabs>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField control={aiForm.control} name="numQuestions" render={({ field }) => ( <FormItem> <FormLabel>Number of Questions</FormLabel> <FormControl> <Input type="number" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                                    <FormField control={aiForm.control} name="difficulty" render={({ field }) => ( <FormItem> <FormLabel>Difficulty</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Easy">Easy</SelectItem> <SelectItem value="Medium">Medium</SelectItem> <SelectItem value="Hard">Hard</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
-                                </div>
-                                <FormField control={aiForm.control} name="questionType" render={({ field }) => ( <FormItem> <FormLabel>Question Type</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Any">Any</SelectItem> <SelectItem value="Multiple Choice">Multiple Choice</SelectItem> <SelectItem value="True/False">True/False</SelectItem> <SelectItem value="Short Answer">Short Answer</SelectItem> <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
-                                <DialogFooter> <Button type="submit" disabled={isGenerating}> {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"} </Button> </DialogFooter>
-                            </form>
-                            </Form>
-                        </DialogContent>
-                    </Dialog>
-                 )}
-                 {selectedQuestions.length > 0 && activeTab === 'Questions' && (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full sm:w-auto">
-                                Bulk Actions ({selectedQuestions.length}) <Filter className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                             <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => setIsQuestionDialogOpen(true)}>
-                                Add to Content
-                              </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                             <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete-questions' })}>
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Selected
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                 )}
             </div>
            {loading ? (
              <div className="flex items-center justify-center min-h-[200px]">
@@ -938,15 +884,102 @@ export default function ManageContentPage() {
                 {allTabs.map(type => (
                     <TabsContent key={type.id} value={type.name}>
                         {type.name === 'Questions' ? (
-                            <QuestionsTable 
-                                questions={filteredQuestions} 
-                                loading={loading}
-                                selectedQuestions={selectedQuestions}
-                                onSelectQuestion={handleSelectQuestion}
-                                onSelectAllQuestions={handleSelectAllQuestions}
-                                isAllQuestionsSelected={isAllQuestionsSelected}
-                                onEditQuestion={openEditQuestionDialog}
-                             />
+                            <Collapsible>
+                                <div className="flex items-center justify-end mb-4">
+                                     <CollapsibleTrigger asChild>
+                                        <Button variant="outline" type="button">
+                                        <Sparkles className="mr-2 h-4 w-4" />
+                                        Generate Questions with AI
+                                        </Button>
+                                    </CollapsibleTrigger>
+                                </div>
+                                <CollapsibleContent>
+                                    <Card className="mb-4">
+                                        <CardHeader>
+                                            <CardTitle>Generate Questions</CardTitle>
+                                            <CardDescription>Generate a set of questions to add to the question bank.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <Form {...aiForm}>
+                                                <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                                                    <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
+                                                        <TabsList className="grid w-full grid-cols-3">
+                                                            <TabsTrigger value="topic">From Topic</TabsTrigger>
+                                                            <TabsTrigger value="text">From Text</TabsTrigger>
+                                                            <TabsTrigger value="file">From File</TabsTrigger>
+                                                        </TabsList>
+                                                        <TabsContent value="topic" className="pt-4">
+                                                            <FormField control={aiForm.control} name="source" render={({ field }) => ( <FormItem> <FormLabel>Topic</FormLabel> <FormControl> <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
+                                                        </TabsContent>
+                                                        <TabsContent value="text" className="pt-4">
+                                                            <FormField control={aiForm.control} name="source" render={({ field }) => ( <FormItem> <FormLabel>Paste Text</FormLabel> <FormControl> <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /> </FormControl> <FormMessage /> </FormItem> )}/>
+                                                        </TabsContent>
+                                                        <TabsContent value="file" className="pt-4">
+                                                            <FormItem>
+                                                                <FormLabel>Upload File</FormLabel>
+                                                                <FormControl>
+                                                                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                                                        <div className="space-y-1 text-center">
+                                                                            <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                                            <div className="flex text-sm text-muted-foreground">
+                                                                                <p className="pl-1">
+                                                                                    {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'}
+                                                                                </p>
+                                                                            </div>
+                                                                            <p className="text-xs text-muted-foreground">
+                                                                                {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </FormControl>
+                                                                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt"/>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        </TabsContent>
+                                                    </Tabs>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <FormField control={aiForm.control} name="numQuestions" render={({ field }) => ( <FormItem> <FormLabel>Number of Questions</FormLabel> <FormControl> <Input type="number" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
+                                                        <FormField control={aiForm.control} name="difficulty" render={({ field }) => ( <FormItem> <FormLabel>Difficulty</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Easy">Easy</SelectItem> <SelectItem value="Medium">Medium</SelectItem> <SelectItem value="Hard">Hard</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                                                    </div>
+                                                    <FormField control={aiForm.control} name="questionType" render={({ field }) => ( <FormItem> <FormLabel>Question Type</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Any">Any</SelectItem> <SelectItem value="Multiple Choice">Multiple Choice</SelectItem> <SelectItem value="True/False">True/False</SelectItem> <SelectItem value="Short Answer">Short Answer</SelectItem> <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                                                    <DialogFooter> <Button type="submit" disabled={isGenerating}> {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"} </Button> </DialogFooter>
+                                                </form>
+                                            </Form>
+                                        </CardContent>
+                                    </Card>
+                                </CollapsibleContent>
+                                <QuestionsTable 
+                                    questions={filteredQuestions} 
+                                    loading={loading}
+                                    selectedQuestions={selectedQuestions}
+                                    onSelectQuestion={handleSelectQuestion}
+                                    onSelectAllQuestions={handleSelectAllQuestions}
+                                    isAllQuestionsSelected={isAllQuestionsSelected}
+                                    onEditQuestion={openEditQuestionDialog}
+                                />
+                                {selectedQuestions.length > 0 && (
+                                     <div className="flex items-center space-x-2 mt-4">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" className="w-full sm:w-auto">
+                                                    Bulk Actions ({selectedQuestions.length}) <Filter className="ml-2 h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => setIsQuestionDialogOpen(true)}>
+                                                    Add to Content
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete-questions' })}>
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete Selected
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                )}
+                            </Collapsible>
                         ) : (
                            <ContentTable 
                                 content={filteredContent.filter(c => activeTab === 'All' || c.testType === type.name)}
