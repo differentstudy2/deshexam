@@ -126,10 +126,20 @@ type Chapter = { id: string; chapterNo: string; chapterName: string };
 
 const aiGeneratorFormSchema = z.object({
     sourceType: z.enum(['topic', 'text', 'file']),
-    source: z.string().min(3, 'Source must be at least 3 characters.'),
+    sourceTopic: z.string().optional(),
+    sourceText: z.string().optional(),
+    sourceFile: z.string().optional(),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
     questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
+}).refine(data => {
+    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
+    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
+    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
+    return false;
+}, {
+    message: 'Source content must be at least 3 characters.',
+    path: ['sourceTopic'], 
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
@@ -460,7 +470,9 @@ export default function CreateTestPage() {
     resolver: zodResolver(aiGeneratorFormSchema),
     defaultValues: {
       sourceType: 'topic',
-      source: '',
+      sourceTopic: '',
+      sourceText: '',
+      sourceFile: '',
       numQuestions: 5,
       difficulty: 'Medium',
       questionType: 'Any',
@@ -651,22 +663,39 @@ export default function CreateTestPage() {
   const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
     setIsGenerating(true);
     try {
-        if(generatorMode === 'questions') {
-            const input: AIQuestionGeneratorInput = {
-                ...aiData,
-                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
-            };
+        const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
+                     : aiData.sourceType === 'text' ? aiData.sourceText
+                     : aiData.sourceFile;
+
+        if (!source || source.length < 3) {
+            toast({
+                variant: "destructive",
+                title: 'AI Generation Failed',
+                description: 'Source content must be at least 3 characters.',
+            });
+            setIsGenerating(false);
+            return;
+        }
+
+        const commonInput = {
+            numQuestions: aiData.numQuestions,
+            difficulty: aiData.difficulty,
+            questionType: aiData.questionType,
+            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+            source: source,
+        };
+
+        if (generatorMode === 'questions') {
+            const input: AIQuestionGeneratorInput = commonInput;
             const result: AIQuestionGeneratorOutput = await generateQuestions(input);
             append(result.questions);
             toast({
                 title: 'Questions Added!',
                 description: `${result.questions.length} new questions have been added.`,
             });
-
         } else { // full generation
             const input: AIContentGeneratorInput = {
-                ...aiData,
-                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                ...commonInput,
                 contentType: form.getValues('testType') || 'Mock Test',
             };
             const result: AIContentGeneratorOutput = await generateContent(input);
@@ -843,8 +872,8 @@ export default function CreateTestPage() {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const text = e.target?.result as string;
-                aiForm.setValue('source', text, { shouldValidate: true });
-                aiForm.setValue('sourceType', 'text');
+                aiForm.setValue('sourceFile', text, { shouldValidate: true });
+                aiForm.setValue('sourceType', 'file');
             };
             reader.readAsText(file);
         } else {
@@ -938,7 +967,7 @@ export default function CreateTestPage() {
                             <TabsContent value="topic" className="pt-4">
                                 <FormField
                                     control={aiForm.control}
-                                    name="source"
+                                    name="sourceTopic"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Topic</FormLabel>
@@ -953,7 +982,7 @@ export default function CreateTestPage() {
                             <TabsContent value="text" className="pt-4">
                                 <FormField
                                     control={aiForm.control}
-                                    name="source"
+                                    name="sourceText"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Paste Text</FormLabel>
@@ -977,11 +1006,11 @@ export default function CreateTestPage() {
                                                 <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                                 <div className="flex text-sm text-muted-foreground">
                                                     <p className="pl-1">
-                                                        {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'}
+                                                        {aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}
                                                     </p>
                                                 </div>
                                                 <p className="text-xs text-muted-foreground">
-                                                {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'}
+                                                {aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}
                                                 </p>
                                             </div>
                                         </div>
@@ -1798,3 +1827,4 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
