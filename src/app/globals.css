@@ -70,3 +70,8 @@ body {
 .ql-editor {
     min-height: 250px;
 }
+
+.h-full {
+    height: 100%;
+    margin-top: 3rem;
+}
