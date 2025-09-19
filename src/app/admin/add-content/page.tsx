@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef } from 'react';
@@ -86,13 +86,15 @@ const formSchema = z.object({
   title: z.string().optional(),
   board: z.string().optional(),
   class: z.string().optional(),
-  examCategory: z.string().optional(),
-  exam: z.string().optional(),
   subject: z.string().optional(),
   chapter: z.string().optional(),
+  examCategory: z.string().optional(),
+  state: z.string().optional(),
+  exam: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newClass: z.string().optional(),
+  newState: z.string().optional(),
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
@@ -117,6 +119,7 @@ type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type Class = { id: string, name: string };
+type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
@@ -283,6 +286,7 @@ export default function CreateTestPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
+  const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -291,6 +295,7 @@ export default function CreateTestPage() {
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
   const [isAddingNewClass, setIsAddingNewClass] = useState(false);
+  const [isAddingNewState, setIsAddingNewState] = useState(false);
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
@@ -310,6 +315,7 @@ export default function CreateTestPage() {
     enableBoardMetafield: true,
     enableClassMetafield: true,
     enableExamCategoryMetafield: true,
+    enableStateMetafield: true,
     enableExamMetafield: true,
     enableChapterMetafield: true,
   });
@@ -321,13 +327,15 @@ export default function CreateTestPage() {
       title: '',
       board: '',
       class: '',
-      examCategory: '',
-      exam: '',
       subject: '',
       chapter: '',
+      examCategory: '',
+      state: '',
+      exam: '',
       newSubject: '',
       newBoard: '',
       newClass: '',
+      newState: '',
       newExamCategory: '',
       newExam: '',
       newChapterNo: '',
@@ -353,11 +361,12 @@ export default function CreateTestPage() {
   const fetchFormData = async () => {
     try {
       setLoadingData(true);
-      const [types, subjectData, boardData, classData, examTypeData, siteSettings] = await Promise.all([
+      const [types, subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
           getContentTypes(),
           getSubjects(),
           getBoards(),
           getClasses(),
+          getStates(),
           getExamTypes(),
           getSettings()
       ]);
@@ -366,6 +375,7 @@ export default function CreateTestPage() {
       setSubjects(subjectData);
       setBoards(boardData);
       setClasses(classData);
+      setStates(stateData);
       setExamCategories(examTypeData);
 
       if (siteSettings) {
@@ -379,6 +389,7 @@ export default function CreateTestPage() {
             enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
             enableClassMetafield: siteSettings.enableClassMetafield ?? true,
             enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
+            enableStateMetafield: siteSettings.enableStateMetafield ?? true,
             enableExamMetafield: siteSettings.enableExamMetafield ?? true,
             enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
         });
@@ -474,6 +485,13 @@ export default function CreateTestPage() {
           className = data.newClass;
           setIsAddingNewClass(false);
         }
+        
+        let stateName = data.state;
+        if(data.state === 'add_new_state' && data.newState) {
+            await addState(data.newState);
+            stateName = data.newState;
+            setIsAddingNewState(false);
+        }
 
         let examCategoryName = data.examCategory;
         let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
@@ -514,11 +532,12 @@ export default function CreateTestPage() {
             return q;
         });
         
-        contentToSave = { ...data, subject: subjectName, board: boardName, class: className, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
+        contentToSave = { ...data, subject: subjectName, board: boardName, class: className, state: stateName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
         delete contentToSave.body;
         delete contentToSave.newSubject;
         delete contentToSave.newBoard;
         delete contentToSave.newClass;
+        delete contentToSave.newState;
         delete contentToSave.newExamCategory;
         delete contentToSave.newExam;
         delete contentToSave.newChapterNo;
@@ -538,10 +557,11 @@ export default function CreateTestPage() {
             title: '',
             board: '',
             class: '',
-            examCategory: '',
-            exam: '',
             subject: '',
             chapter: '',
+            examCategory: '',
+            state: '',
+            exam: '',
             description: '',
             body: '',
             duration: 0,
@@ -552,6 +572,7 @@ export default function CreateTestPage() {
             newSubject: '',
             newBoard: '',
             newClass: '',
+            newState: '',
             newExamCategory: '',
             newExam: '',
             newChapterNo: '',
@@ -726,6 +747,15 @@ export default function CreateTestPage() {
           setIsAddingNewClass(false);
       }
   }
+
+  const handleStateChange = (value: string) => {
+    form.setValue('state', value);
+    if (value === 'add_new_state') {
+        setIsAddingNewState(true);
+    } else {
+        setIsAddingNewState(false);
+    }
+  };
 
   const handleExamCategoryChange = async (value: string) => {
       form.setValue('examCategory', value);
@@ -1126,7 +1156,8 @@ export default function CreateTestPage() {
                     )}
                     />}
                 </div>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  {settings.enableSubjectMetafield && <FormField
                   control={form.control}
                   name="subject"
@@ -1192,7 +1223,7 @@ export default function CreateTestPage() {
                 />}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  {settings.enableExamCategoryMetafield && <FormField
                   control={form.control}
                   name="examCategory"
@@ -1231,6 +1262,44 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />}
+                 {settings.enableStateMetafield && <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>State</FormLabel>
+                        {!isAddingNewState ? (
+                                <Select onValueChange={handleStateChange} value={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a state" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {states.map((s) => (
+                                        <SelectItem key={s.id} value={s.name}>
+                                        {s.name}
+                                        </SelectItem>
+                                    ))}
+                                    <SelectItem value="add_new_state">Add new state...</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <div className='space-y-2'>
+                                    <FormField
+                                        control={form.control}
+                                        name="newState"
+                                        render={({ field }) => (
+                                            <Input {...field} placeholder="Enter new state name" />
+                                        )}
+                                    />
+                                    <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewState(false); form.setValue('state', ''); }}>Cancel</Button>
+                                </div>
+                            )}
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />}
                  {settings.enableExamMetafield && <FormField
                   control={form.control}
                   name="exam"

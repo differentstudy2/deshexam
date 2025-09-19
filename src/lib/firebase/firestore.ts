@@ -3,6 +3,8 @@
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 const generateUsername = async (displayName: string): Promise<string> => {
     const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 30);
@@ -731,6 +733,61 @@ export const deleteClass = async (id: string) => {
     }
 };
 
+export const getStates = async () => {
+    try {
+        const q = query(collection(db, "states"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const states = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return states;
+    } catch (e) {
+        console.error("Error getting states: ", e);
+        throw new Error("Failed to fetch states.");
+    }
+};
+
+export const addState = async (stateName: string) => {
+    if (!stateName) {
+        throw new Error("State name cannot be empty.");
+    }
+    try {
+        const q = query(collection(db, "states"), where("name", "==", stateName));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            console.log("State already exists.");
+            return querySnapshot.docs[0].id;
+        }
+        
+        const docRef = await addDoc(collection(db, "states"), {
+            name: stateName,
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding state: ", e);
+        throw new Error("Failed to add state.");
+    }
+};
+
+export const updateState = async (id: string, name: string) => {
+    if (!id || !name) throw new Error("ID and name are required.");
+    try {
+        await updateDoc(doc(db, "states", id), { name });
+    } catch (e) {
+        console.error("Error updating state: ", e);
+        throw new Error("Failed to update state.");
+    }
+};
+
+export const deleteState = async (id: string) => {
+    if (!id) throw new Error("ID is required.");
+    try {
+        await deleteDoc(doc(db, "states", id));
+    } catch (e) {
+        console.error("Error deleting state: ", e);
+        throw new Error("Failed to delete state.");
+    }
+};
+
+
 export const getExamTypes = async () => {
     try {
         const q = query(collection(db, "examTypes"), orderBy("name"));
@@ -1124,18 +1181,15 @@ export const addCoupon = async (couponData: any) => {
     }
 }
 
-export const uploadFile = async (file: File) => {
+export const uploadFile = async (file: File): Promise<string> => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) {
         throw new Error("You must be logged in to upload files.");
     }
 
-    console.log("Uploading file:", file);
-
-    const { getStorage, ref, uploadBytes, getDownloadURL } = await import("firebase/storage");
     const storage = getStorage();
-    const storageRef = ref(storage, `feature_images/${user.uid}/${Date.now()}_${file.name}`);
+    const storageRef = ref(storage, `uploads/${user.uid}/${Date.now()}_${file.name}`);
 
     try {
         const snapshot = await uploadBytes(storageRef, file);
@@ -1254,6 +1308,7 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 
 
