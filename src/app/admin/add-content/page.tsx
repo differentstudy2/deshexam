@@ -294,7 +294,13 @@ export default function CreateTestPage() {
   const [generatorMode, setGeneratorMode] = useState<'full' | 'questions'>('full');
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isMatchingEnabled, setIsMatchingEnabled] = useState(true);
+  
+  const [questionTypeSettings, setQuestionTypeSettings] = useState({
+    enableMatching: true,
+    enableMultipleChoice: true,
+    enableTrueFalse: true,
+    enableShortAnswer: true,
+  });
 
 
   const form = useForm<FormValues>({
@@ -346,8 +352,13 @@ export default function CreateTestPage() {
       setBoards(boardData);
       setExamCategories(examTypeData);
 
-      if (settings && typeof settings.enableMatching === 'boolean') {
-        setIsMatchingEnabled(settings.enableMatching);
+      if (settings) {
+        setQuestionTypeSettings({
+            enableMatching: settings.enableMatching ?? true,
+            enableMultipleChoice: settings.enableMultipleChoice ?? true,
+            enableTrueFalse: settings.enableTrueFalse ?? true,
+            enableShortAnswer: settings.enableShortAnswer ?? true,
+        });
       }
 
       if (types.length > 0 && !form.getValues('testType')) {
@@ -920,11 +931,11 @@ export default function CreateTestPage() {
                                         <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="Any">Any</SelectItem>
-                                            <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                            <SelectItem value="True/False">True/False</SelectItem>
-                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                            <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                            {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
+                                            {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
+                                            {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
+                                            {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
+                                            {questionTypeSettings.enableShortAnswer && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                            {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -1382,11 +1393,11 @@ export default function CreateTestPage() {
                                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                   <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
                                                   <SelectContent>
-                                                      <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                                      <SelectItem value="True/False">True/False</SelectItem>
-                                                      <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                                      <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                      {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
+                                                      {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
+                                                      {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
+                                                      {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
+                                                      {questionTypeSettings.enableShortAnswer && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                                      {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                                   </SelectContent>
                                               </Select>
                                               <FormMessage />

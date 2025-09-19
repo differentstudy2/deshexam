@@ -28,6 +28,9 @@ const settingsSchema = z.object({
     razorpayKeySecret: z.string().optional(),
     allowRegistrations: z.boolean(),
     enableMatching: z.boolean(),
+    enableMultipleChoice: z.boolean(),
+    enableTrueFalse: z.boolean(),
+    enableShortAnswer: z.boolean(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -45,6 +48,9 @@ export default function AdminSettingsPage() {
         razorpayKeySecret: "",
         allowRegistrations: true,
         enableMatching: true,
+        enableMultipleChoice: true,
+        enableTrueFalse: true,
+        enableShortAnswer: true,
     },
   });
 
@@ -220,7 +226,67 @@ export default function AdminSettingsPage() {
               Control features related to content creation.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <FormField
+                control={form.control}
+                name="enableMultipleChoice"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                        <FormLabel className="text-base">Enable Multiple Choice Questions</FormLabel>
+                        <FormDescription>
+                            Allow creation of 'Multiple Choice' type questions.
+                        </FormDescription>
+                    </div>
+                    <FormControl>
+                        <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
+                    </FormControl>
+                    </FormItem>
+                )}
+            />
+             <FormField
+                control={form.control}
+                name="enableTrueFalse"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                        <FormLabel className="text-base">Enable True/False Questions</FormLabel>
+                        <FormDescription>
+                            Allow creation of 'True/False' type questions.
+                        </FormDescription>
+                    </div>
+                    <FormControl>
+                        <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
+                    </FormControl>
+                    </FormItem>
+                )}
+            />
+             <FormField
+                control={form.control}
+                name="enableShortAnswer"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                        <FormLabel className="text-base">Enable Short Answer Questions</FormLabel>
+                        <FormDescription>
+                           Allow creation of 'Short Answer' and 'Fill in the Blank' questions.
+                        </FormDescription>
+                    </div>
+                    <FormControl>
+                        <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
+                    </FormControl>
+                    </FormItem>
+                )}
+            />
             <FormField
                 control={form.control}
                 name="enableMatching"

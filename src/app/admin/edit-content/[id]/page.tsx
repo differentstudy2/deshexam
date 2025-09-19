@@ -288,7 +288,13 @@ export default function EditContentPage() {
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isMatchingEnabled, setIsMatchingEnabled] = useState(true);
+
+  const [questionTypeSettings, setQuestionTypeSettings] = useState({
+    enableMatching: true,
+    enableMultipleChoice: true,
+    enableTrueFalse: true,
+    enableShortAnswer: true,
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -364,8 +370,13 @@ export default function EditContentPage() {
         setBoards(boardData);
         setExamCategories(examTypeData);
 
-        if (settings && typeof settings.enableMatching === 'boolean') {
-          setIsMatchingEnabled(settings.enableMatching);
+        if (settings) {
+            setQuestionTypeSettings({
+                enableMatching: settings.enableMatching ?? true,
+                enableMultipleChoice: settings.enableMultipleChoice ?? true,
+                enableTrueFalse: settings.enableTrueFalse ?? true,
+                enableShortAnswer: settings.enableShortAnswer ?? true,
+            });
         }
 
         if (contentData) {
@@ -1045,11 +1056,11 @@ export default function EditContentPage() {
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                                    <SelectItem value="True/False">True/False</SelectItem>
-                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                                     <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                     {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
+                                                    {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
+                                                    {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
+                                                    {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
+                                                    {questionTypeSettings.enableShortAnswer && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                                    {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -1370,7 +1381,7 @@ export default function EditContentPage() {
                                                     <SelectItem value="True/False">True/False</SelectItem>
                                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                     <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                    {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
+                                                    {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
