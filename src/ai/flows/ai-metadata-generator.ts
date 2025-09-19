@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const AIMetadataGeneratorInputSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State']).describe('The type of metadata to generate.'),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State', 'Chapter', 'Exam']).describe('The type of metadata to generate.'),
   topic: z.string().describe('The high-level topic or category to generate items for (e.g., "Indian Competitive Exams", "High School Science").'),
   count: z.number().int().min(1).max(20).describe('The number of items to generate.'),
 });
@@ -37,6 +37,7 @@ Generate a list of {{count}} {{metafieldType}} names related to the topic: "{{to
 
 For example, if the metafield type is "Subject" and the topic is "High School Science", you might generate: ["Physics", "Chemistry", "Biology", "Mathematics", "Computer Science"].
 If the metafield type is "Exam Category" and the topic is "Indian Government Jobs", you might generate: ["UPSC", "SSC", "Banking", "Railways", "State PSC"].
+If the metafield type is "Chapter" and the topic is "Physics", you might generate: ["Units and Measurements", "Motion in a Straight Line", "Laws of Motion", "Work, Energy and Power"].
 
 Return ONLY the list of generated item names. Do not include any other information.
 `,

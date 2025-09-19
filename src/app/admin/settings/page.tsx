@@ -110,9 +110,10 @@ type ContentSummary = { [key: string]: number; };
 type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
 
 const aiGeneratorSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State']),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State', 'Chapter', 'Exam']),
   topic: z.string().min(3, "Topic must be at least 3 characters."),
   count: z.coerce.number().int().min(1).max(20),
+  parentId: z.string().optional(),
 });
 type AIGeneratorValues = z.infer<typeof aiGeneratorSchema>;
 
@@ -407,6 +408,7 @@ export default function AdminSettingsPage() {
         count: 10,
     }
   });
+  const aiMetafieldType = aiForm.watch('metafieldType');
 
 
   const fetchInitialData = useCallback(async () => {
@@ -478,7 +480,19 @@ export default function AdminSettingsPage() {
       setIsGenerating(true);
       setGeneratedItems([]);
       try {
-          const result: AIMetadataGeneratorOutput = await generateMetadata(data as AIMetadataGeneratorInput);
+          const input: AIMetadataGeneratorInput = {
+              metafieldType: data.metafieldType,
+              count: data.count,
+              topic: data.topic,
+          };
+           if (data.parentId) {
+               const parentCollection = data.metafieldType === 'Chapter' ? subjects : examTypes;
+               const parent = parentCollection.find(p => p.id === data.parentId);
+               if (parent) {
+                   input.topic = parent.name!;
+               }
+           }
+          const result: AIMetadataGeneratorOutput = await generateMetadata(input);
           setGeneratedItems(result.items);
           toast({
               title: "Suggestions Generated!",
@@ -496,7 +510,7 @@ export default function AdminSettingsPage() {
   }
 
   const handleAddGeneratedItems = async () => {
-      const type = aiForm.getValues('metafieldType');
+      const { metafieldType, parentId } = aiForm.getValues();
       if (generatedItems.length === 0) return;
       
       const addFunctionMap = {
@@ -505,15 +519,27 @@ export default function AdminSettingsPage() {
           'Exam Category': addExamType,
           'Class': addClass,
           'State': addState,
+          'Chapter': (item: string) => addChapter(parentId!, { chapterNo: '1', chapterName: item }), // Dummy chapter no
+          'Exam': (item: string) => addExam(parentId!, { name: item }),
       };
 
-      const addFunc = addFunctionMap[type];
+      const addFunc = addFunctionMap[metafieldType];
 
       try {
-          await Promise.all(generatedItems.map(item => addFunc(item)));
+          for (const item of generatedItems) {
+            if (metafieldType === 'Chapter') {
+                const parts = item.split(/[\.:\s]+/, 2);
+                const chapterNo = parts.length > 1 ? parts[0] : 'N/A';
+                const chapterName = parts.length > 1 ? parts.slice(1).join(' ').trim() : item;
+                await addChapter(parentId!, { chapterNo, chapterName });
+            } else {
+                 await addFunc(item);
+            }
+          }
+          
           toast({
               title: 'Items Added!',
-              description: `${generatedItems.length} new ${type.toLowerCase()} items have been added.`,
+              description: `${generatedItems.length} new ${metafieldType.toLowerCase()} items have been added.`,
           });
           // Refresh data
           await fetchInitialData();
@@ -523,11 +549,10 @@ export default function AdminSettingsPage() {
       } catch (error) {
            toast({
               variant: "destructive",
-              title: `Error Adding ${type} Items`,
+              title: `Error Adding ${metafieldType} Items`,
               description: (error as Error).message,
           });
       }
-
   }
 
   const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class' | 'state') => {
@@ -751,7 +776,7 @@ export default function AdminSettingsPage() {
                                                 <FormField control={aiForm.control} name="metafieldType" render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>Metadata Type</FormLabel>
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <Select onValueChange={(value) => { field.onChange(value); aiForm.setValue('parentId', undefined); }} defaultValue={field.value}>
                                                             <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                                             <SelectContent>
                                                                 <SelectItem value="Subject">Subject</SelectItem>
@@ -759,15 +784,36 @@ export default function AdminSettingsPage() {
                                                                 <SelectItem value="Class">Class</SelectItem>
                                                                 <SelectItem value="State">State</SelectItem>
                                                                 <SelectItem value="Exam Category">Exam Category</SelectItem>
+                                                                <SelectItem value="Chapter">Chapter</SelectItem>
+                                                                <SelectItem value="Exam">Exam</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )} />
+
+                                                { (aiMetafieldType === 'Chapter' || aiMetafieldType === 'Exam') && (
+                                                    <FormField control={aiForm.control} name="parentId" render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>{aiMetafieldType === 'Chapter' ? 'Parent Subject' : 'Parent Exam Category'}</FormLabel>
+                                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder={`Select a ${aiMetafieldType === 'Chapter' ? 'Subject' : 'Category'}`} /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {(aiMetafieldType === 'Chapter' ? subjects : examTypes).map(item => (
+                                                                        <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )} />
+                                                )}
+
                                                 <FormField control={aiForm.control} name="topic" render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Topic</FormLabel>
-                                                        <FormControl><Input placeholder="e.g., High School Science" {...field} /></FormControl>
+                                                        <FormLabel>Topic / Keywords</FormLabel>
+                                                        <FormControl><Input placeholder={aiMetafieldType === 'Chapter' ? `e.g., 'Introduction to Physics'` : `e.g., 'High School Science'`} {...field} />
+                                                        </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )} />
@@ -862,6 +908,36 @@ export default function AdminSettingsPage() {
                                     />
                                 </CardContent>
                             </Card>
+                            
+                             <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableStateMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">States</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="States"
+                                        items={states}
+                                        onAdd={stateHandlers.onAdd}
+                                        onUpdate={stateHandlers.onUpdate}
+                                        onDelete={stateHandlers.onDelete}
+                                        defaultValue={form.watch('defaultState')}
+                                        onSetDefault={(value) => form.setValue('defaultState', value)}
+                                    />
+                                </CardContent>
+                            </Card>
 
                             <Card>
                                 <CardHeader>
@@ -951,36 +1027,6 @@ export default function AdminSettingsPage() {
                                         onDelete={examTypeHandlers.onDelete}
                                         defaultValue={form.watch('defaultExamCategory')}
                                         onSetDefault={(value) => form.setValue('defaultExamCategory', value)}
-                                    />
-                                </CardContent>
-                            </Card>
-
-                             <Card>
-                                <CardHeader>
-                                    <FormField
-                                        control={form.control}
-                                        name="enableStateMetafield"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-center justify-between">
-                                                <div className="space-y-0.5">
-                                                    <FormLabel className="text-base">States</FormLabel>
-                                                </div>
-                                                <FormControl>
-                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardHeader>
-                                <CardContent>
-                                    <MetafieldManager 
-                                        title="States"
-                                        items={states}
-                                        onAdd={stateHandlers.onAdd}
-                                        onUpdate={stateHandlers.onUpdate}
-                                        onDelete={stateHandlers.onDelete}
-                                        defaultValue={form.watch('defaultState')}
-                                        onSetDefault={(value) => form.setValue('defaultState', value)}
                                     />
                                 </CardContent>
                             </Card>
