@@ -255,39 +255,48 @@ export default function AdminSettingsPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>Content Settings</CardTitle>
+                    <CardTitle>Content Metafield Settings</CardTitle>
                     <CardDescription>
-                    Control features related to content creation.
+                    Control which data fields are available during content creation.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                     <FormField control={form.control} name="enableSubjectMetafield" render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Subject' Field</FormLabel> <FormDescription>Show the 'Subject' selection during content creation.</FormDescription></div>
-                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
-                    <FormField control={form.control} name="enableBoardMetafield" render={({ field }) => (
+                    <div className="p-4 border rounded-lg">
+                        <FormField control={form.control} name="enableSubjectMetafield" render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between">
+                            <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Subject' Field</FormLabel> <FormDescription>Show the 'Subject' selection during content creation.</FormDescription></div>
+                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                            </FormItem>
+                        )} />
+                         <div className="pl-8 mt-4">
+                             <FormField control={form.control} name="enableChapterMetafield" render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
+                                <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Chapter' Field</FormLabel> <FormDescription>Show the 'Chapter' selection within a Subject.</FormDescription></div>
+                                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={!form.watch('enableSubjectMetafield')}/></FormControl>
+                                </FormItem>
+                            )} />
+                         </div>
+                    </div>
+
+                    <div className="p-4 border rounded-lg">
+                        <FormField control={form.control} name="enableExamCategoryMetafield" render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between">
+                            <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Exam Category' Field</FormLabel> <FormDescription>Show the 'Exam Category' selection.</FormDescription></div>
+                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                            </FormItem>
+                        )} />
+                        <div className="pl-8 mt-4">
+                             <FormField control={form.control} name="enableExamMetafield" render={({ field }) => (
+                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
+                                <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Exam' Field</FormLabel> <FormDescription>Show the 'Exam' selection within a category.</FormDescription></div>
+                                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={!form.watch('enableExamCategoryMetafield')} /></FormControl>
+                                </FormItem>
+                            )} />
+                        </div>
+                    </div>
+                     <FormField control={form.control} name="enableBoardMetafield" render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Board' Field</FormLabel> <FormDescription>Show the 'Board' selection during content creation.</FormDescription></div>
-                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
-                    <FormField control={form.control} name="enableExamCategoryMetafield" render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Exam Category' Field</FormLabel> <FormDescription>Show 'Exam Category' during content creation.</FormDescription></div>
-                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
-                    <FormField control={form.control} name="enableExamMetafield" render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Exam' Field</FormLabel> <FormDescription>Show the 'Exam' selection during content creation.</FormDescription></div>
-                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
-                    <FormField control={form.control} name="enableChapterMetafield" render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Chapter' Field</FormLabel> <FormDescription>Show the 'Chapter' selection during content creation.</FormDescription></div>
                         <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                         </FormItem>
                     )} />
@@ -454,3 +463,5 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+    
