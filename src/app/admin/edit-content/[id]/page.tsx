@@ -49,7 +49,8 @@ import {
 } from '@/components/ui/dialog';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Image from 'next/image';
 
 
 const optionSchema = z.object({
@@ -64,8 +65,8 @@ const questionSchema = z.object({
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
-    columnA: z.array(z.string()),
-    columnB: z.array(z.string()),
+    columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
+    columnB: z.array(z.object({ text: z.string(), image: z.string().optional() })),
   }).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
@@ -129,22 +130,43 @@ const MatchingPairsField = ({ control, questionIndex }: { control: any, question
           <div>Column B</div>
         </div>
         {matchingPairFields.map((pair, pairIndex) => (
-          <div key={pair.id} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
-              <FormField
-                  control={control}
-                  name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`}
-                  render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} value={field.value ?? ''} />}
-              />
-              <GripVertical className="h-5 w-5 text-muted-foreground"/>
-              <FormField
-                  control={control}
-                  name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`}
-                  render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} value={field.value ?? ''} />}
-              />
-              <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4"/></Button>
+          <div key={pair.id} className="p-4 border rounded-lg space-y-3">
+              <div className="flex justify-between items-center">
+                  <FormLabel className="text-sm">Pair {pairIndex + 1}</FormLabel>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+              </div>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
+                  <div className="space-y-2">
+                        <FormField
+                          control={control}
+                          name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`}
+                          render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} value={field.value ?? ''} />}
+                      />
+                      <FormField
+                          control={control}
+                          name={`questions.${questionIndex}.correctAnswer.${pairIndex}.aImage`}
+                          render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Image URL`} value={field.value ?? ''} />}
+                      />
+                  </div>
+                  <div className="pt-2">
+                      <GripVertical className="h-5 w-5 text-muted-foreground"/>
+                  </div>
+                   <div className="space-y-2">
+                        <FormField
+                          control={control}
+                          name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`}
+                          render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} value={field.value ?? ''} />}
+                      />
+                      <FormField
+                          control={control}
+                          name={`questions.${questionIndex}.correctAnswer.${pairIndex}.bImage`}
+                          render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Image URL`} value={field.value ?? ''} />}
+                      />
+                  </div>
+              </div>
           </div>
         ))}
-        <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', b: '' })}>
+        <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', aImage: '', b: '', bImage: '' })}>
             <PlusCircle className="mr-2 h-4 w-4"/> Add Pair
         </Button>
       </div>
@@ -319,21 +341,21 @@ export default function EditContentPage() {
         chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
       }
       
-        // Process matching questions
-        const processedQuestions = data.questions?.map(q => {
-            if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
-                const correctAnswer = q.correctAnswer as { a: string, b: string }[];
-                const columnA = correctAnswer.map(pair => pair.a);
-                const columnB = correctAnswer.map(pair => pair.b);
-                 // Simple shuffle for column B
-                for (let i = columnB.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
-                }
-                return { ...q, matchingOptions: { columnA, columnB }, marks: correctAnswer.length };
-            }
-            return q;
-        });
+      // Process matching questions
+      const processedQuestions = data.questions?.map(q => {
+          if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
+              const correctAnswer = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+              const columnA = correctAnswer.map(pair => ({ text: pair.a, image: pair.aImage }));
+              let columnB = correctAnswer.map(pair => ({ text: pair.b, image: pair.bImage }));
+              // Simple shuffle for column B
+              for (let i = columnB.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
+              }
+              return { ...q, matchingOptions: { columnA, columnB }, marks: correctAnswer.length };
+          }
+          return q;
+      });
 
       const contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
       delete (contentToSave as any).newSubject;
@@ -1109,7 +1131,7 @@ export default function EditContentPage() {
                             explanation: '' 
                         };
                          if (newQuestion.type === 'Matching') {
-                            newQuestion.correctAnswer = [{ a: '', b: '' }];
+                            newQuestion.correctAnswer = [{ a: '', aImage: '', b: '', bImage: '' }];
                         }
                         append(newQuestion);
                     }}

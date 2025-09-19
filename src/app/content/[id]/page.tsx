@@ -15,14 +15,20 @@ import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 
 type Option = {
   text: string;
 };
 
+type MatchingItem = {
+    text: string;
+    image?: string;
+}
+
 type MatchingOptions = {
-    columnA: string[];
-    columnB: string[];
+    columnA: MatchingItem[];
+    columnB: MatchingItem[];
 }
 
 type Question = {
@@ -120,7 +126,7 @@ export default function TestPage() {
             if (question.type === 'Matching') {
                 const correctAnswers = question.correctAnswer;
                 const userAnswers = answers[index];
-                if (userAnswers) {
+                if (userAnswers && Array.isArray(correctAnswers)) {
                     for (const pair of correctAnswers) {
                         if (userAnswers[pair.a] === pair.b) {
                             score++;
@@ -261,15 +267,23 @@ export default function TestPage() {
                         </div>
                         {question.matchingOptions.columnA.map((itemA, itemIndex) => (
                             <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                <div className="p-3 border rounded-md text-center bg-secondary">{itemA}</div>
+                                <div className="p-3 border rounded-md text-center bg-secondary">
+                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                    {itemA.text}
+                                </div>
                                 <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                <Select onValueChange={(value) => handleMatchingAnswerChange(index, itemA, value)}>
+                                <Select onValueChange={(value) => handleMatchingAnswerChange(index, itemA.text, value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a match" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                            <SelectItem key={bIndex} value={itemB}>{itemB}</SelectItem>
+                                            <SelectItem key={bIndex} value={itemB.text}>
+                                                <div className="flex items-center gap-2">
+                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                    <span>{itemB.text}</span>
+                                                </div>
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

@@ -22,10 +22,12 @@ import { Badge } from '@/components/ui/badge';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
+import Image from 'next/image';
 
 
 type Option = { text: string; explanation?: string; };
-type MatchingOptions = { columnA: string[]; columnB: string[]; };
+type MatchingItem = { text: string; image?: string; };
+type MatchingOptions = { columnA: MatchingItem[]; columnB: MatchingItem[]; };
 type Question = { 
   id: string; 
   text: string; 
@@ -261,7 +263,7 @@ function ReviewDisplay() {
 
                 if (question.type === 'Matching') {
                     totalPairs = question.correctAnswer.length;
-                    if (userAnswer && totalPairs > 0) {
+                    if (userAnswer && totalPairs > 0 && Array.isArray(question.correctAnswer)) {
                         for(const pair of question.correctAnswer) {
                             if (userAnswer[pair.a] === pair.b) {
                                 matchingScore++;
@@ -370,22 +372,34 @@ function ReviewDisplay() {
                             )}
                             {question.type === 'Matching' && question.correctAnswer && (
                                 <div className="space-y-2">
-                                    {question.correctAnswer.map((pair: {a: string, b: string}, pairIndex: number) => {
+                                    {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => {
                                         const userMatchedB = userAnswer?.[pair.a];
+                                        const correctBItem = test?.questions[index].matchingOptions?.columnB.find(item => item.text === pair.b);
+                                        const userMatchedItem = test?.questions[index].matchingOptions?.columnB.find(item => item.text === userMatchedB);
                                         const isPairCorrect = userMatchedB === pair.b;
+                                        
                                         return (
                                             <div key={pairIndex} className={cn("p-3 border rounded-lg", isPairCorrect ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20')}>
                                                 <div className="flex items-center gap-2">
                                                     {isPairCorrect ? <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" /> : <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />}
-                                                    <span className="font-semibold">{pair.a}</span>
+                                                    <div className="flex flex-col items-center">
+                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.a}</span>
+                                                    </div>
                                                     <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                    <span>{userMatchedB || <i className="text-muted-foreground">No answer</i>}</span>
+                                                    <div className="flex flex-col items-center">
+                                                         {userMatchedItem?.image && <Image src={userMatchedItem.image} alt={userMatchedItem.text} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                        <span>{userMatchedB || <i className="text-muted-foreground">No answer</i>}</span>
+                                                    </div>
                                                     {isPairCorrect ? <Badge variant="outline" className="bg-white">Correct</Badge> : <Badge variant="destructive">Incorrect</Badge>}
                                                 </div>
                                                 {!isPairCorrect && (
-                                                    <div className="mt-2 pl-7 text-sm">
+                                                    <div className="mt-2 pl-7 text-sm flex items-center gap-2">
                                                         <span className="font-semibold">Correct Answer: </span> 
-                                                        <span className="text-green-700 dark:text-green-400 font-medium">{pair.b}</span>
+                                                        <div className="flex flex-col items-center text-green-700 dark:text-green-400">
+                                                            {correctBItem?.image && <Image src={correctBItem.image} alt={correctBItem.text} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                            <span className="font-medium">{pair.b}</span>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
@@ -471,6 +485,3 @@ export default function TestReviewPage() {
     </div>
   );
 }
-
-
-

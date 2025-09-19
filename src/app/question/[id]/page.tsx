@@ -19,14 +19,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type Option = {
   text: string;
 };
 
+type MatchingItem = {
+    text: string;
+    image?: string;
+};
+
 type MatchingOptions = {
-    columnA: string[];
-    columnB: string[];
+    columnA: MatchingItem[];
+    columnB: MatchingItem[];
 }
 
 type Question = {
@@ -258,7 +264,10 @@ export default function QuestionPage() {
                                 <h4 className="font-bold text-center mb-2">Column A</h4>
                                 <div className="space-y-2">
                                 {question.matchingOptions.columnA.map((item, index) => (
-                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">{item}</div>
+                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">
+                                      {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md object-cover" />}
+                                      {item.text}
+                                    </div>
                                 ))}
                                 </div>
                             </div>
@@ -266,7 +275,10 @@ export default function QuestionPage() {
                                 <h4 className="font-bold text-center mb-2">Column B</h4>
                                 <div className="space-y-2">
                                 {question.matchingOptions.columnB.map((item, index) => (
-                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">{item}</div>
+                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">
+                                      {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md object-cover" />}
+                                      {item.text}
+                                    </div>
                                 ))}
                                 </div>
                             </div>
@@ -276,9 +288,15 @@ export default function QuestionPage() {
                             <div className="space-y-2">
                                 {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair, index) => (
                                     <div key={index} className="flex items-center justify-center gap-2 p-2 border rounded-md bg-green-50 dark:bg-green-900/20">
-                                        <span className="font-medium">{pair.a}</span>
+                                        <div className="flex-1 text-center">
+                                          {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={80} height={80} className="mx-auto mb-2 rounded-md object-cover" />}
+                                          <span className="font-medium">{pair.a}</span>
+                                        </div>
                                         <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                        <span className="font-medium">{pair.b}</span>
+                                        <div className="flex-1 text-center">
+                                          {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={80} height={80} className="mx-auto mb-2 rounded-md object-cover" />}
+                                          <span className="font-medium">{pair.b}</span>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -363,5 +381,3 @@ export default function QuestionPage() {
     </div>
   );
 }
-
-    
