@@ -288,6 +288,7 @@ export default function EditContentPage() {
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isMatchingEnabled, setIsMatchingEnabled] = useState(true);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -1043,7 +1044,7 @@ export default function EditContentPage() {
                                                     <SelectItem value="True/False">True/False</SelectItem>
                                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                      <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                     <SelectItem value="Matching">Matching</SelectItem>
+                                                     {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -1364,7 +1365,7 @@ export default function EditContentPage() {
                                                     <SelectItem value="True/False">True/False</SelectItem>
                                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                     <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                    <SelectItem value="Matching">Matching</SelectItem>
+                                                    {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />

@@ -79,12 +79,35 @@ export default function AdminSettingsPage() {
         <CardContent>
            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <div>
-                  <Label>Allow New User Registrations</Label>
+                  <Label htmlFor="allow-registrations">Allow New User Registrations</Label>
                   <p className="text-sm text-muted-foreground">
                       Toggle whether new users can sign up for an account.
                   </p>
               </div>
               <Switch id="allow-registrations" defaultChecked />
+          </div>
+        </CardContent>
+         <CardFooter className="border-t px-6 py-4">
+          <Button><Save className="mr-2"/>Save Settings</Button>
+        </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Content Settings</CardTitle>
+          <CardDescription>
+            Control features related to content creation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div>
+                  <Label htmlFor="enable-matching">Enable Matching Questions</Label>
+                  <p className="text-sm text-muted-foreground">
+                      Allow creation of 'Matching' type questions in the content editor.
+                  </p>
+              </div>
+              <Switch id="enable-matching" defaultChecked />
           </div>
         </CardContent>
          <CardFooter className="border-t px-6 py-4">

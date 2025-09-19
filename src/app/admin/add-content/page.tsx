@@ -294,6 +294,7 @@ export default function CreateTestPage() {
   const [generatorMode, setGeneratorMode] = useState<'full' | 'questions'>('full');
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isMatchingEnabled, setIsMatchingEnabled] = useState(true);
 
 
   const form = useForm<FormValues>({
@@ -608,7 +609,7 @@ export default function CreateTestPage() {
             description: (error as Error).message,
         });
     } finally {
-        setIsGeneratingDesc(false);
+      setIsGeneratingDesc(false);
     }
   };
 
@@ -918,7 +919,7 @@ export default function CreateTestPage() {
                                             <SelectItem value="True/False">True/False</SelectItem>
                                             <SelectItem value="Short Answer">Short Answer</SelectItem>
                                             <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                            <SelectItem value="Matching">Matching</SelectItem>
+                                            {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -1380,7 +1381,7 @@ export default function CreateTestPage() {
                                                       <SelectItem value="True/False">True/False</SelectItem>
                                                       <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                       <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                      <SelectItem value="Matching">Matching</SelectItem>
+                                                      {isMatchingEnabled && <SelectItem value="Matching">Matching</SelectItem>}
                                                   </SelectContent>
                                               </Select>
                                               <FormMessage />
