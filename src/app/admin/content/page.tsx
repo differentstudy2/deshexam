@@ -188,7 +188,7 @@ const ContentTable = ({
                     <TableHead className="hidden md:table-cell">Author</TableHead>
                     <TableHead className="hidden md:table-cell">Type</TableHead>
                     <TableHead className="hidden md:table-cell">Access</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                    <TableHead className="hidden lg:table-cell">Published At</TableHead>
                     <TableHead>
                         <span className="sr-only">Actions</span>
                     </TableHead>
