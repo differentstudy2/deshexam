@@ -110,10 +110,20 @@ export const getQuestionById = async (questionId: string) => {
         const questionDoc = await getDoc(doc(db, "questions", questionId));
         if (questionDoc.exists()) {
              const data = questionDoc.data();
+             const createdAt = data.createdAt;
+             let formattedDate = new Date();
+             if (createdAt && typeof createdAt.toDate === 'function') {
+                 formattedDate = createdAt.toDate();
+             } else if (createdAt) {
+                 const d = new Date(createdAt);
+                 if (!isNaN(d.getTime())) {
+                     formattedDate = d;
+                 }
+             }
             return {
                 id: questionDoc.id,
                 ...data,
-                createdAt: data.createdAt?.toDate() ?? new Date(),
+                createdAt: formattedDate,
             };
         } else {
             return null;
@@ -1344,3 +1354,6 @@ export const updateSettings = async (data: any) => {
 
 
 
+
+
+    
