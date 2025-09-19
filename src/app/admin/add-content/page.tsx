@@ -196,7 +196,7 @@ const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlCha
                                 <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
                             </div>
                         </div>
-                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/png, image/jpeg, image/gif" />
                         {isUploading && <div className="mt-2 flex items-center justify-center"><Loader2 className="animate-spin" /> Uploading...</div>}
                     </TabsContent>
                     <TabsContent value="url" className="pt-4 space-y-2">
