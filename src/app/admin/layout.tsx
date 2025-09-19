@@ -23,8 +23,8 @@ import {
   Settings,
   ShieldCheck,
   Tag,
-  PlusCircle,
   FilePlus,
+  BookPlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -33,13 +33,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const navItems = [
   { href: '/admin', label: 'Admin Overview', icon: ShieldCheck },
   { href: '/admin/users', label: 'Manage Users', icon: Users },
   { href: '/admin/content', label: 'Manage Content', icon: Library },
-  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: PlusCircle },
-  { href: '/admin/add-article', label: 'Add Article', icon: FilePlus },
+  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: FilePlus },
+  { href: '/admin/add-article', label: 'Add Article', icon: BookPlus },
   { href: '/admin/coupons', label: 'Manage Coupons', icon: Tag },
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
 ];
@@ -96,32 +97,34 @@ export default function AdminLayout({
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu className="mt-6">
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === item.href}
-                  tooltip={{
-                    children: item.label,
-                  }}
-                >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-             <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                    <Link href="/dashboard">
-                        <LayoutGrid />
-                        <span>User Dashboard</span>
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+            <ScrollArea className="h-full">
+                <SidebarMenu>
+                    {navItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        tooltip={{
+                            children: item.label,
+                        }}
+                        >
+                        <Link href={item.href}>
+                            <item.icon />
+                            <span>{item.label}</span>
+                        </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                            <Link href="/dashboard">
+                                <LayoutGrid />
+                                <span>User Dashboard</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </ScrollArea>
         </SidebarContent>
         <SidebarFooter>
             <div className="flex items-center gap-2">
