@@ -35,7 +35,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -350,18 +350,23 @@ export default function EditContentPage() {
       if (!contentId) return;
       try {
         setLoading(true);
-        const [contentData, subjectData, contentTypeData, boardData, examTypeData] = await Promise.all([
+        const [contentData, subjectData, contentTypeData, boardData, examTypeData, settings] = await Promise.all([
             getContentById(contentId),
             getSubjects(),
             getContentTypes(),
             getBoards(),
-            getExamTypes()
+            getExamTypes(),
+            getSettings()
         ]);
         
         setSubjects(subjectData);
         setContentTypes(contentTypeData);
         setBoards(boardData);
         setExamCategories(examTypeData);
+
+        if (settings && typeof settings.enableMatching === 'boolean') {
+          setIsMatchingEnabled(settings.enableMatching);
+        }
 
         if (contentData) {
             form.reset(contentData as FormValues);

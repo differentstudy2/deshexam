@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef } from 'react';
@@ -333,17 +333,22 @@ export default function CreateTestPage() {
   const fetchFormData = async () => {
     try {
       setLoadingData(true);
-      const [types, subjectData, boardData, examTypeData] = await Promise.all([
+      const [types, subjectData, boardData, examTypeData, settings] = await Promise.all([
           getContentTypes(),
           getSubjects(),
           getBoards(),
-          getExamTypes()
+          getExamTypes(),
+          getSettings()
       ]);
       
       setContentTypes(types);
       setSubjects(subjectData);
       setBoards(boardData);
       setExamCategories(examTypeData);
+
+      if (settings && typeof settings.enableMatching === 'boolean') {
+        setIsMatchingEnabled(settings.enableMatching);
+      }
 
       if (types.length > 0 && !form.getValues('testType')) {
         const mockTestType = types.find(t => t.name === 'Mock Test');
