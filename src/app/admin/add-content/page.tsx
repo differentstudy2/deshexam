@@ -300,6 +300,7 @@ export default function CreateTestPage() {
     enableMultipleChoice: true,
     enableTrueFalse: true,
     enableShortAnswer: true,
+    enableFillInTheBlank: true,
   });
 
 
@@ -358,6 +359,7 @@ export default function CreateTestPage() {
             enableMultipleChoice: settings.enableMultipleChoice ?? true,
             enableTrueFalse: settings.enableTrueFalse ?? true,
             enableShortAnswer: settings.enableShortAnswer ?? true,
+            enableFillInTheBlank: settings.enableFillInTheBlank ?? true,
         });
       }
 
@@ -934,7 +936,7 @@ export default function CreateTestPage() {
                                             {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
                                             {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
                                             {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
-                                            {questionTypeSettings.enableShortAnswer && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                            {questionTypeSettings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
                                             {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                         </SelectContent>
                                     </Select>
@@ -1396,7 +1398,7 @@ export default function CreateTestPage() {
                                                       {questionTypeSettings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
                                                       {questionTypeSettings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
                                                       {questionTypeSettings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
-                                                      {questionTypeSettings.enableShortAnswer && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
+                                                      {questionTypeSettings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
                                                       {questionTypeSettings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                                   </SelectContent>
                                               </Select>
@@ -1620,3 +1622,5 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+    

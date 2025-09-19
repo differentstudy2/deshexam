@@ -31,6 +31,7 @@ const settingsSchema = z.object({
     enableMultipleChoice: z.boolean(),
     enableTrueFalse: z.boolean(),
     enableShortAnswer: z.boolean(),
+    enableFillInTheBlank: z.boolean(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -51,6 +52,7 @@ export default function AdminSettingsPage() {
         enableMultipleChoice: true,
         enableTrueFalse: true,
         enableShortAnswer: true,
+        enableFillInTheBlank: true,
     },
   });
 
@@ -275,7 +277,27 @@ export default function AdminSettingsPage() {
                     <div className="space-y-0.5">
                         <FormLabel className="text-base">Enable Short Answer Questions</FormLabel>
                         <FormDescription>
-                           Allow creation of 'Short Answer' and 'Fill in the Blank' questions.
+                           Allow creation of 'Short Answer' questions.
+                        </FormDescription>
+                    </div>
+                    <FormControl>
+                        <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
+                    </FormControl>
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="enableFillInTheBlank"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                        <FormLabel className="text-base">Enable Fill in the Blank Questions</FormLabel>
+                        <FormDescription>
+                           Allow creation of 'Fill in the Blank' questions.
                         </FormDescription>
                     </div>
                     <FormControl>
@@ -319,3 +341,5 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+    
