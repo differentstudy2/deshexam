@@ -758,6 +758,26 @@ export const addChapter = async (subjectId: string, chapterData: { chapterNo: st
     }
 };
 
+export const updateChapter = async (subjectId: string, chapterId: string, data: { chapterNo: string, chapterName: string }) => {
+    if (!subjectId || !chapterId || !data) throw new Error("IDs and data are required.");
+    try {
+        await updateDoc(doc(db, "subjects", subjectId, "chapters", chapterId), data);
+    } catch (e) {
+        console.error("Error updating chapter: ", e);
+        throw new Error("Failed to update chapter.");
+    }
+};
+
+export const deleteChapter = async (subjectId: string, chapterId: string) => {
+    if (!subjectId || !chapterId) throw new Error("IDs are required.");
+    try {
+        await deleteDoc(doc(db, "subjects", subjectId, "chapters", chapterId));
+    } catch (e) {
+        console.error("Error deleting chapter: ", e);
+        throw new Error("Failed to delete chapter.");
+    }
+};
+
 export const getExamsByCategory = async (examTypeId: string) => {
     if (!examTypeId) return [];
     try {
@@ -782,6 +802,26 @@ export const addExam = async (examTypeId: string, examData: { name: string }) =>
     } catch (e) {
         console.error("Error adding exam: ", e);
         throw new Error("Failed to add exam.");
+    }
+};
+
+export const updateExam = async (examTypeId: string, examId: string, data: { name: string }) => {
+    if (!examTypeId || !examId || !data) throw new Error("IDs and data are required.");
+    try {
+        await updateDoc(doc(db, "examTypes", examTypeId, "exams", examId), data);
+    } catch (e) {
+        console.error("Error updating exam: ", e);
+        throw new Error("Failed to update exam.");
+    }
+};
+
+export const deleteExam = async (examTypeId: string, examId: string) => {
+    if (!examTypeId || !examId) throw new Error("IDs are required.");
+    try {
+        await deleteDoc(doc(db, "examTypes", examTypeId, "exams", examId));
+    } catch (e) {
+        console.error("Error deleting exam: ", e);
+        throw new Error("Failed to delete exam.");
     }
 };
 
@@ -1160,4 +1200,5 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 

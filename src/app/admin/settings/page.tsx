@@ -36,6 +36,14 @@ import {
     addExamType,
     updateExamType,
     deleteExamType,
+    getChaptersBySubjectId,
+    addChapter,
+    updateChapter,
+    deleteChapter,
+    getExamsByCategory,
+    addExam,
+    updateExam,
+    deleteExam
 } from '@/lib/firebase/firestore';
 import Link from 'next/link';
 import {
@@ -49,6 +57,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const settingsSchema = z.object({
     siteName: z.string().min(1, "Site name is required."),
@@ -70,25 +79,23 @@ const settingsSchema = z.object({
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 type ContentSummary = { [key: string]: number; };
-type MetafieldItem = { id: string; name: string; };
+type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
 
 const MetafieldManager = ({
     title,
-    description,
     items,
     onAdd,
     onUpdate,
     onDelete,
 } : {
     title: string;
-    description: string;
     items: MetafieldItem[];
     onAdd: (name: string) => Promise<void>;
     onUpdate: (id: string, name: string) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
 }) => {
     const [newItemName, setNewItemName] = useState('');
-    const [editingItem, setEditingItem] = useState<{ id: string, name: string } | null>(null);
+    const [editingItem, setEditingItem] = useState<MetafieldItem | null>(null);
     const [isAdding, setIsAdding] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
@@ -101,7 +108,7 @@ const MetafieldManager = ({
     };
     
     const handleUpdate = async () => {
-        if (!editingItem || !editingItem.name.trim()) return;
+        if (!editingItem || !editingItem.name?.trim()) return;
         await onUpdate(editingItem.id, editingItem.name);
         setEditingItem(null);
     };
@@ -166,6 +173,131 @@ const MetafieldManager = ({
         </div>
     )
 }
+
+const DependentMetafieldManager = ({
+    parentTitle,
+    childTitle,
+    parentItems,
+    fetchChildren,
+    onAdd,
+    onUpdate,
+    onDelete,
+}: {
+    parentTitle: string;
+    childTitle: string;
+    parentItems: MetafieldItem[];
+    fetchChildren: (parentId: string) => Promise<MetafieldItem[]>;
+    onAdd: (parentId: string, data: any) => Promise<void>;
+    onUpdate: (parentId: string, childId: string, data: any) => Promise<void>;
+    onDelete: (parentId: string, childId: string) => Promise<void>;
+}) => {
+    const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
+    const [children, setChildren] = useState<MetafieldItem[]>([]);
+    const [loadingChildren, setLoadingChildren] = useState(false);
+    
+    const [newItemData, setNewItemData] = useState<any>({});
+    const [editingItem, setEditingItem] = useState<MetafieldItem | null>(null);
+    const [isAdding, setIsAdding] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+    
+    const handleParentChange = async (parentId: string) => {
+        setSelectedParentId(parentId);
+        if (parentId) {
+            setLoadingChildren(true);
+            const fetchedChildren = await fetchChildren(parentId);
+            setChildren(fetchedChildren);
+            setLoadingChildren(false);
+        } else {
+            setChildren([]);
+        }
+    };
+
+    const handleAdd = async () => {
+        if (!selectedParentId) return;
+        const requiredFields = childTitle === 'Chapters' ? ['chapterNo', 'chapterName'] : ['name'];
+        if (requiredFields.some(field => !newItemData[field]?.trim())) return;
+
+        setIsAdding(true);
+        await onAdd(selectedParentId, newItemData);
+        setNewItemData({});
+        await handleParentChange(selectedParentId);
+        setIsAdding(false);
+    };
+
+    const handleUpdate = async () => {
+        if (!selectedParentId || !editingItem) return;
+        await onUpdate(selectedParentId, editingItem.id, editingItem);
+        setEditingItem(null);
+        await handleParentChange(selectedParentId);
+    };
+    
+    const handleDelete = async () => {
+        if (!selectedParentId || !itemToDelete) return;
+        await onDelete(selectedParentId, itemToDelete);
+        setItemToDelete(null);
+        await handleParentChange(selectedParentId);
+    };
+    
+    const isChapter = childTitle === 'Chapters';
+
+    return (
+        <div className="space-y-4">
+            <Select onValueChange={handleParentChange}>
+                <SelectTrigger><SelectValue placeholder={`Select a ${parentTitle.slice(0, -1)}`} /></SelectTrigger>
+                <SelectContent>
+                    {parentItems.map(item => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}
+                </SelectContent>
+            </Select>
+
+            {selectedParentId && (
+                <>
+                    <div className="flex gap-2">
+                        {isChapter ? (
+                            <>
+                                <Input value={newItemData.chapterNo || ''} onChange={(e) => setNewItemData({...newItemData, chapterNo: e.target.value})} placeholder="No." className="w-20" disabled={isAdding} />
+                                <Input value={newItemData.chapterName || ''} onChange={(e) => setNewItemData({...newItemData, chapterName: e.target.value})} placeholder="New Chapter Name" disabled={isAdding} />
+                            </>
+                        ) : (
+                            <Input value={newItemData.name || ''} onChange={(e) => setNewItemData({name: e.target.value})} placeholder={`New ${childTitle.slice(0, -1)} Name`} disabled={isAdding} />
+                        )}
+                        <Button onClick={handleAdd} disabled={isAdding || (isChapter ? (!newItemData.chapterNo || !newItemData.chapterName) : !newItemData.name)}>{isAdding ? <Loader2 className="animate-spin" /> : <PlusCircle />}</Button>
+                    </div>
+
+                    <ScrollArea className="h-60 rounded-md border">
+                        <div className="p-4 space-y-2">
+                            {loadingChildren ? <Loader2 className="mx-auto animate-spin" /> : children.map(item => (
+                                <div key={item.id} className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary">
+                                    {editingItem?.id === item.id ? (
+                                        isChapter ? (
+                                            <>
+                                                <Input value={editingItem.chapterNo} onChange={(e) => setEditingItem({...editingItem, chapterNo: e.target.value})} className="w-20" />
+                                                <Input value={editingItem.chapterName} onChange={(e) => setEditingItem({...editingItem, chapterName: e.target.value})} onBlur={handleUpdate} onKeyDown={(e) => e.key === 'Enter' && handleUpdate()} autoFocus />
+                                            </>
+                                        ) : (
+                                            <Input value={editingItem.name} onChange={(e) => setEditingItem({...editingItem, name: e.target.value})} onBlur={handleUpdate} onKeyDown={(e) => e.key === 'Enter' && handleUpdate()} autoFocus />
+                                        )
+                                    ) : (
+                                        <span className="flex-grow">{isChapter ? `${item.chapterNo}. ${item.chapterName}` : item.name}</span>
+                                    )}
+                                    <Button variant="ghost" size="sm" onClick={() => setEditingItem(item)}><Edit className="w-4 h-4" /></Button>
+                                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setItemToDelete(item.id)}><Trash2 className="w-4 h-4" /></Button>
+                                </div>
+                            ))}
+                            {!loadingChildren && children.length === 0 && <p className="text-center text-sm text-muted-foreground">No items added yet.</p>}
+                        </div>
+                    </ScrollArea>
+                </>
+            )}
+            <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction></AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
+    )
+}
+
 
 export default function AdminSettingsPage() {
   const { toast } = useToast();
@@ -259,53 +391,30 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const createMetafieldHandlers = (
-      type: 'subject' | 'board' | 'examType'
-  ) => {
-      const stateSetterMap = {
-          subject: setSubjects,
-          board: setBoards,
-          examType: setExamTypes,
-      };
-      const addFuncMap = {
-          subject: addSubject,
-          board: addBoard,
-          examType: addExamType,
-      };
-       const updateFuncMap = {
-          subject: updateSubject,
-          board: updateBoard,
-          examType: updateExamType,
-      };
-       const deleteFuncMap = {
-          subject: deleteSubject,
-          board: deleteBoard,
-          examType: deleteExamType,
-      };
-      
-      const setState = stateSetterMap[type];
+  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType') => {
+      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes };
+      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType };
+      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType };
+      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType };
       const getFunc = type === 'subject' ? getSubjects : type === 'board' ? getBoards : getExamTypes;
 
       return {
-          onAdd: async (name: string) => {
-              await addFuncMap[type](name);
-              const items = await getFunc();
-              setState(items);
-          },
-          onUpdate: async (id: string, name: string) => {
-              await updateFuncMap[type](id, name);
-              setState(prev => prev.map(item => item.id === id ? { ...item, name } : item));
-          },
-          onDelete: async (id: string) => {
-              await deleteFuncMap[type](id);
-              setState(prev => prev.filter(item => item.id !== id));
-          }
+          onAdd: async (name: string) => { await addFuncMap[type](name); setState(await getFunc()); },
+          onUpdate: async (id: string, name: string) => { await updateFuncMap[type](id, name); setState(await getFunc()); },
+          onDelete: async (id: string) => { await deleteFuncMap[type](id); setState(await getFunc()); }
       };
   };
 
   const subjectHandlers = createMetafieldHandlers('subject');
   const boardHandlers = createMetafieldHandlers('board');
   const examTypeHandlers = createMetafieldHandlers('examType');
+
+    const chapterHandlers = {
+        onAdd: addChapter, onUpdate: updateChapter, onDelete: deleteChapter,
+    };
+    const examHandlers = {
+        onAdd: addExam, onUpdate: updateExam, onDelete: deleteExam,
+    };
   
   if (loading) {
     return (
@@ -452,7 +561,6 @@ export default function AdminSettingsPage() {
                                     <FormItem className="flex flex-row items-center justify-between">
                                     <div className="space-y-0.5">
                                         <FormLabel className="text-base">Subjects</FormLabel>
-                                        <FormDescription>Manage the available subjects.</FormDescription>
                                     </div>
                                     <FormControl>
                                         <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -464,26 +572,40 @@ export default function AdminSettingsPage() {
                         <CardContent>
                             <MetafieldManager 
                                 title="Subjects"
-                                description="Add, edit, or delete subjects."
                                 items={subjects}
                                 onAdd={subjectHandlers.onAdd}
                                 onUpdate={subjectHandlers.onUpdate}
                                 onDelete={subjectHandlers.onDelete}
                             />
-                             <FormField
+                        </CardContent>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader>
+                            <FormField
                                 control={form.control}
                                 name="enableChapterMetafield"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mt-4">
+                                    <FormItem className="flex flex-row items-center justify-between">
                                         <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Enable 'Chapter' Field</FormLabel>
-                                            <FormDescription>Show this metafield during content creation.</FormDescription>
+                                            <FormLabel className="text-base">Chapters</FormLabel>
                                         </div>
                                         <FormControl>
                                             <Switch checked={field.value} onCheckedChange={field.onChange} />
                                         </FormControl>
                                     </FormItem>
                                 )}
+                            />
+                        </CardHeader>
+                        <CardContent>
+                            <DependentMetafieldManager
+                                parentTitle="Subjects"
+                                childTitle="Chapters"
+                                parentItems={subjects}
+                                fetchChildren={getChaptersBySubjectId}
+                                onAdd={chapterHandlers.onAdd}
+                                onUpdate={chapterHandlers.onUpdate}
+                                onDelete={chapterHandlers.onDelete}
                             />
                         </CardContent>
                     </Card>
@@ -497,7 +619,6 @@ export default function AdminSettingsPage() {
                                     <FormItem className="flex flex-row items-center justify-between">
                                         <div className="space-y-0.5">
                                             <FormLabel className="text-base">Exam Categories</FormLabel>
-                                            <FormDescription>Manage the available exam categories.</FormDescription>
                                         </div>
                                         <FormControl>
                                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -509,26 +630,40 @@ export default function AdminSettingsPage() {
                         <CardContent>
                              <MetafieldManager 
                                 title="Exam Categories"
-                                description="Add, edit, or delete exam categories."
                                 items={examTypes}
                                 onAdd={examTypeHandlers.onAdd}
                                 onUpdate={examTypeHandlers.onUpdate}
                                 onDelete={examTypeHandlers.onDelete}
                             />
+                        </CardContent>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader>
                             <FormField
                                 control={form.control}
                                 name="enableExamMetafield"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 mt-4">
+                                    <FormItem className="flex flex-row items-center justify-between">
                                         <div className="space-y-0.5">
-                                            <FormLabel className="text-base">Enable 'Exam' Field</FormLabel>
-                                            <FormDescription>Show this metafield during content creation.</FormDescription>
+                                            <FormLabel className="text-base">Exams</FormLabel>
                                         </div>
                                         <FormControl>
                                             <Switch checked={field.value} onCheckedChange={field.onChange} />
                                         </FormControl>
                                     </FormItem>
                                 )}
+                            />
+                        </CardHeader>
+                        <CardContent>
+                            <DependentMetafieldManager
+                                parentTitle="Exam Categories"
+                                childTitle="Exams"
+                                parentItems={examTypes}
+                                fetchChildren={getExamsByCategory}
+                                onAdd={examHandlers.onAdd}
+                                onUpdate={examHandlers.onUpdate}
+                                onDelete={examHandlers.onDelete}
                             />
                         </CardContent>
                     </Card>
@@ -542,7 +677,6 @@ export default function AdminSettingsPage() {
                                     <FormItem className="flex flex-row items-center justify-between">
                                         <div className="space-y-0.5">
                                             <FormLabel className="text-base">Boards</FormLabel>
-                                            <FormDescription>Manage the available boards.</FormDescription>
                                         </div>
                                         <FormControl>
                                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -554,7 +688,6 @@ export default function AdminSettingsPage() {
                         <CardContent>
                             <MetafieldManager 
                                 title="Boards"
-                                description="Add, edit, or delete boards."
                                 items={boards}
                                 onAdd={boardHandlers.onAdd}
                                 onUpdate={boardHandlers.onUpdate}
@@ -725,6 +858,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-
-    
-
