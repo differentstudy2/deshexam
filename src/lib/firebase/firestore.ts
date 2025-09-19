@@ -28,6 +28,22 @@ const generateUsername = async (displayName: string): Promise<string> => {
     }
 };
 
+const cleanDataForFirebase = (data: any): any => {
+    if (Array.isArray(data)) {
+        return data.map(item => cleanDataForFirebase(item));
+    }
+    if (data !== null && typeof data === 'object') {
+        const cleanedData: { [key: string]: any } = {};
+        for (const key in data) {
+            const value = data[key];
+            if (value !== undefined && value !== null) {
+                cleanedData[key] = cleanDataForFirebase(value);
+            }
+        }
+        return cleanedData;
+    }
+    return data;
+};
 
 export const addQuestion = async (questionData: any) => {
     const auth = getAuth();
@@ -37,22 +53,19 @@ export const addQuestion = async (questionData: any) => {
         throw new Error("You must be logged in to create a question.");
     }
     
-    const dataToSave = {
+    const dataToSave = cleanDataForFirebase({
         ...questionData,
-        explanation: questionData.explanation || '', // Ensure explanation is not undefined
-    };
+        authorId: user.uid,
+        authorName: user.displayName || user.email,
+        createdAt: serverTimestamp(),
+        likes: 0,
+        dislikes: 0,
+        likedBy: [],
+        dislikedBy: [],
+    });
 
     try {
-        const docRef = await addDoc(collection(db, "questions"), {
-            ...dataToSave,
-            authorId: user.uid,
-            authorName: user.displayName || user.email,
-            createdAt: serverTimestamp(),
-            likes: 0,
-            dislikes: 0,
-            likedBy: [],
-            dislikedBy: [],
-        });
+        const docRef = await addDoc(collection(db, "questions"), dataToSave);
         return docRef.id;
     } catch (e) {
         console.error("Error adding question document: ", e);
@@ -300,7 +313,8 @@ export const addContent = async (contentData: any) => {
     if (!user) {
         throw new Error("You must be logged in to create a content.");
     }
-     const { featureImage, ...restOfContentData } = contentData;
+    const cleanedContent = cleanDataForFirebase(contentData);
+    const { featureImage, ...restOfContentData } = cleanedContent;
 
     try {
         let finalContentData: any = {
@@ -321,10 +335,6 @@ export const addContent = async (contentData: any) => {
 
         if(featureImage){
             finalContentData.featureImage = featureImage;
-        }
-
-        if (finalContentData.price === undefined || finalContentData.price === null) {
-            delete finalContentData.price;
         }
 
         const docRef = await addDoc(collection(db, "content"), finalContentData);
@@ -383,8 +393,11 @@ export const getContentById = async (contentId: string) => {
         if (contentDoc.exists()) {
             const data = contentDoc.data();
             // Ensure timestamp is converted correctly if it exists
-            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
-                data.createdAt = data.createdAt.toDate().toLocaleDateString();
+            const createdAt = data.createdAt;
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                data.createdAt = createdAt.toDate().toLocaleDateString();
+            } else if (createdAt) {
+                data.createdAt = new Date(createdAt).toLocaleDateString();
             }
             return { id: contentDoc.id, ...data };
         } else {
@@ -402,10 +415,11 @@ export const updateContent = async (contentId: string, contentData: any) => {
     }
 
     const contentRef = doc(db, "content", contentId);
+    const cleanedData = cleanDataForFirebase(contentData);
     
     // If questions are part of the update, handle them separately
-    if (contentData.questions) {
-        const { questions, ...restOfContentData } = contentData;
+    if (cleanedData.questions) {
+        const { questions, ...restOfContentData } = cleanedData;
 
         const questionsWithIds = await Promise.all(questions.map(async (question: any) => {
             if (question.id) {
@@ -421,10 +435,6 @@ export const updateContent = async (contentId: string, contentData: any) => {
             questions: questionsWithIds,
             updatedAt: serverTimestamp(),
         };
-
-        if (finalContentData.price === undefined || finalContentData.price === null) {
-            delete finalContentData.price;
-        }
         
         try {
             await updateDoc(contentRef, finalContentData);
@@ -433,15 +443,10 @@ export const updateContent = async (contentId: string, contentData: any) => {
             throw new Error("Failed to update content with questions.");
         }
     } else {
-        const updateData = { ...contentData };
-        if (updateData.price === undefined || updateData.price === null) {
-            delete updateData.price;
-        }
-
         // If it's a simple field update (like access level)
         try {
             await updateDoc(contentRef, {
-                ...updateData,
+                ...cleanedData,
                 updatedAt: serverTimestamp(),
             });
         } catch (e) {
@@ -478,11 +483,22 @@ export const getAllContent = async (type?: string) => {
         const querySnapshot = await getDocs(q);
         const contents = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            const createdAt = data.createdAt;
+            let formattedDate = new Date().toLocaleDateString();
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                formattedDate = createdAt.toDate().toLocaleDateString();
+            } else if (createdAt) {
+                // Fallback for when it might be a string or number
+                const d = new Date(createdAt);
+                if (!isNaN(d.getTime())) {
+                    formattedDate = d.toLocaleDateString();
+                }
+            }
             return {
                 id: doc.id,
                 ...data,
                 questions: data.questions || [],
-                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+                createdAt: formattedDate,
             };
         });
         return contents;
@@ -521,10 +537,20 @@ export const getSubmissionById = async (submissionId: string) => {
         const submissionDoc = await getDoc(doc(db, "submissions", submissionId));
         if (submissionDoc.exists()) {
             const data = submissionDoc.data();
+            const submittedAt = data.submittedAt;
+            let formattedDate = new Date();
+            if (submittedAt && typeof submittedAt.toDate === 'function') {
+                formattedDate = submittedAt.toDate();
+            } else if (submittedAt) {
+                const d = new Date(submittedAt);
+                if (!isNaN(d.getTime())) {
+                    formattedDate = d;
+                }
+            }
              return { 
                 id: submissionDoc.id, 
                 ...data,
-                submittedAt: data.submittedAt?.toDate() ?? new Date(),
+                submittedAt: formattedDate,
             };
         } else {
             return null;
@@ -547,10 +573,20 @@ export const getSubmissionsByUserId = async (userId: string) => {
         const querySnapshot = await getDocs(q);
         const submissions = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            const submittedAt = data.submittedAt;
+            let formattedDate = new Date();
+            if (submittedAt && typeof submittedAt.toDate === 'function') {
+                formattedDate = submittedAt.toDate();
+            } else if (submittedAt) {
+                const d = new Date(submittedAt);
+                if (!isNaN(d.getTime())) {
+                    formattedDate = d;
+                }
+            }
             return {
                 id: doc.id,
                 ...data,
-                submittedAt: data.submittedAt?.toDate() || new Date(),
+                submittedAt: formattedDate,
             }
         });
         // Sort on the client-side
@@ -1302,7 +1338,8 @@ export const getSettings = async () => {
 export const updateSettings = async (data: any) => {
     try {
         const settingsRef = doc(db, "settings", "global");
-        await setDoc(settingsRef, data, { merge: true });
+        const cleanedData = cleanDataForFirebase(data);
+        await setDoc(settingsRef, cleanedData, { merge: true });
     } catch (error) {
         console.error("Error updating settings:", error);
         throw new Error("Failed to save site settings.");
@@ -1312,6 +1349,7 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 
 
