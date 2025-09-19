@@ -14,11 +14,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Save } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getSettings, updateSettings } from '@/lib/firebase/firestore';
 
 const settingsSchema = z.object({
     siteName: z.string().min(1, "Site name is required."),
@@ -33,6 +34,7 @@ type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export default function AdminSettingsPage() {
   const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -46,23 +48,52 @@ export default function AdminSettingsPage() {
     },
   });
 
-  // In a real app, you would fetch these values from a database.
   useEffect(() => {
-    // Here you would fetch settings from Firestore and reset the form
-    // For example:
-    // const settings = await getSettings();
-    // form.reset(settings);
-  }, [form]);
+    const fetchSettings = async () => {
+        try {
+            setLoading(true);
+            const settings = await getSettings();
+            if (settings) {
+                form.reset(settings);
+            }
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to load settings',
+                description: (error as Error).message,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchSettings();
+  }, [form, toast]);
 
 
-  const handleSave: SubmitHandler<SettingsFormValues> = (data) => {
-    // In a real app, you'd save `data` to your database here.
-    console.log("Saving settings:", data);
-    toast({
-      title: 'Settings Saved!',
-      description: 'Your changes have been successfully saved.',
-    });
+  const handleSave: SubmitHandler<SettingsFormValues> = async (data) => {
+    try {
+        await updateSettings(data);
+        toast({
+            title: 'Settings Saved!',
+            description: 'Your changes have been successfully saved to the database.',
+        });
+    } catch (error) {
+         toast({
+            variant: "destructive",
+            title: 'Error Saving Settings',
+            description: (error as Error).message,
+        });
+    }
   };
+  
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="ml-4 text-lg">Loading Settings...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -92,6 +123,7 @@ export default function AdminSettingsPage() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -104,13 +136,11 @@ export default function AdminSettingsPage() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                   <FormMessage />
                 </FormItem>
               )}
             />
           </CardContent>
-          <CardFooter className="border-t px-6 py-4">
-            <Button type="submit"><Save className="mr-2"/>Save Changes</Button>
-          </CardFooter>
         </Card>
         
         <Card>
@@ -130,6 +160,7 @@ export default function AdminSettingsPage() {
                   <FormControl>
                     <Input type="password" placeholder="••••••••••••••••••••" {...field} />
                   </FormControl>
+                   <FormMessage />
                 </FormItem>
               )}
             />
@@ -142,13 +173,11 @@ export default function AdminSettingsPage() {
                   <FormControl>
                     <Input type="password" placeholder="••••••••••••••••••••" {...field} />
                   </FormControl>
+                   <FormMessage />
                 </FormItem>
               )}
             />
           </CardContent>
-           <CardFooter className="border-t px-6 py-4">
-            <Button type="submit"><Save className="mr-2"/>Save API Keys</Button>
-          </CardFooter>
         </Card>
 
         <Card>
@@ -182,9 +211,6 @@ export default function AdminSettingsPage() {
               )}
             />
           </CardContent>
-           <CardFooter className="border-t px-6 py-4">
-            <Button type="submit"><Save className="mr-2"/>Save Settings</Button>
-          </CardFooter>
         </Card>
 
         <Card>
@@ -216,10 +242,12 @@ export default function AdminSettingsPage() {
                 )}
             />
           </CardContent>
-           <CardFooter className="border-t px-6 py-4">
-            <Button type="submit"><Save className="mr-2"/>Save Settings</Button>
-          </CardFooter>
         </Card>
+        
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+            <Save className="mr-2 h-4 w-4" />
+            {form.formState.isSubmitting ? "Saving..." : "Save All Settings"}
+        </Button>
       </form>
     </Form>
     </div>

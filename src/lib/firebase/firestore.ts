@@ -1073,6 +1073,28 @@ export const updateUserSubscription = async (userIds: string[], plan: 'pro' | 'p
     }
 }
 
+export const getSettings = async () => {
+    try {
+        const settingsDoc = await getDoc(doc(db, "settings", "global"));
+        if (settingsDoc.exists()) {
+            return settingsDoc.data();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching settings:", error);
+        throw new Error("Failed to fetch site settings.");
+    }
+}
+
+export const updateSettings = async (data: any) => {
+    try {
+        const settingsRef = doc(db, "settings", "global");
+        await setDoc(settingsRef, data, { merge: true });
+    } catch (error) {
+        console.error("Error updating settings:", error);
+        throw new Error("Failed to save site settings.");
+    }
+}
     
     
 
