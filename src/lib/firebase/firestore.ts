@@ -677,6 +677,60 @@ export const deleteBoard = async (id: string) => {
     }
 };
 
+export const getClasses = async () => {
+    try {
+        const q = query(collection(db, "classes"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const classes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return classes;
+    } catch (e) {
+        console.error("Error getting classes: ", e);
+        throw new Error("Failed to fetch classes.");
+    }
+};
+
+export const addClass = async (className: string) => {
+    if (!className) {
+        throw new Error("Class name cannot be empty.");
+    }
+    try {
+        const q = query(collection(db, "classes"), where("name", "==", className));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+            console.log("Class already exists.");
+            return querySnapshot.docs[0].id;
+        }
+        
+        const docRef = await addDoc(collection(db, "classes"), {
+            name: className,
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding class: ", e);
+        throw new Error("Failed to add class.");
+    }
+};
+
+export const updateClass = async (id: string, name: string) => {
+    if (!id || !name) throw new Error("ID and name are required.");
+    try {
+        await updateDoc(doc(db, "classes", id), { name });
+    } catch (e) {
+        console.error("Error updating class: ", e);
+        throw new Error("Failed to update class.");
+    }
+};
+
+export const deleteClass = async (id: string) => {
+    if (!id) throw new Error("ID is required.");
+    try {
+        await deleteDoc(doc(db, "classes", id));
+    } catch (e) {
+        console.error("Error deleting class: ", e);
+        throw new Error("Failed to delete class.");
+    }
+};
+
 export const getExamTypes = async () => {
     try {
         const q = query(collection(db, "examTypes"), orderBy("name"));
@@ -1200,5 +1254,6 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 

@@ -31,6 +31,10 @@ import {
     addBoard,
     updateBoard,
     deleteBoard,
+    getClasses,
+    addClass,
+    updateClass,
+    deleteClass,
     getExamTypes,
     addExamType,
     updateExamType,
@@ -66,7 +70,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { generateMetadata, AIMetadataGeneratorInput, AIMetadataGeneratorOutput } from '@/ai/flows/ai-metadata-generator';
+import { generateMetadata } from '@/ai/flows/ai-metadata-generator';
+import type { AIMetadataGeneratorOutput, AIMetadataGeneratorInput } from '@/ai/flows/ai-metadata-generator';
 import { Badge } from '@/components/ui/badge';
 
 const settingsSchema = z.object({
@@ -82,6 +87,7 @@ const settingsSchema = z.object({
     enableFillInTheBlank: z.boolean(),
     enableSubjectMetafield: z.boolean(),
     enableBoardMetafield: z.boolean(),
+    enableClassMetafield: z.boolean(),
     enableExamCategoryMetafield: z.boolean(),
     enableExamMetafield: z.boolean(),
     enableChapterMetafield: z.boolean(),
@@ -92,7 +98,7 @@ type ContentSummary = { [key: string]: number; };
 type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
 
 const aiGeneratorSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category']),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class']),
   topic: z.string().min(3, "Topic must be at least 3 characters."),
   count: z.coerce.number().int().min(1).max(20),
 });
@@ -325,6 +331,7 @@ export default function AdminSettingsPage() {
 
   const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
   const [boards, setBoards] = useState<MetafieldItem[]>([]);
+  const [classes, setClasses] = useState<MetafieldItem[]>([]);
   const [examTypes, setExamTypes] = useState<MetafieldItem[]>([]);
   
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
@@ -346,6 +353,7 @@ export default function AdminSettingsPage() {
         enableFillInTheBlank: true,
         enableSubjectMetafield: true,
         enableBoardMetafield: true,
+        enableClassMetafield: true,
         enableExamCategoryMetafield: true,
         enableExamMetafield: true,
         enableChapterMetafield: true,
@@ -365,11 +373,12 @@ export default function AdminSettingsPage() {
   const fetchInitialData = useCallback(async () => {
     try {
         setLoading(true);
-        const [settings, allContent, subjectData, boardData, examTypeData] = await Promise.all([
+        const [settings, allContent, subjectData, boardData, classData, examTypeData] = await Promise.all([
             getSettings(),
             getAllContent(),
             getSubjects(),
             getBoards(),
+            getClasses(),
             getExamTypes(),
         ]);
 
@@ -389,6 +398,7 @@ export default function AdminSettingsPage() {
         
         setSubjects(subjectData);
         setBoards(boardData);
+        setClasses(classData);
         setExamTypes(examTypeData);
 
     } catch (error) {
@@ -427,7 +437,7 @@ export default function AdminSettingsPage() {
       setIsGenerating(true);
       setGeneratedItems([]);
       try {
-          const result: AIMetadataGeneratorOutput = await generateMetadata(data);
+          const result: AIMetadataGeneratorOutput = await generateMetadata(data as AIMetadataGeneratorInput);
           setGeneratedItems(result.items);
           toast({
               title: "Suggestions Generated!",
@@ -452,6 +462,7 @@ export default function AdminSettingsPage() {
           'Subject': addSubject,
           'Board': addBoard,
           'Exam Category': addExamType,
+          'Class': addClass,
       };
 
       const addFunc = addFunctionMap[type];
@@ -477,12 +488,12 @@ export default function AdminSettingsPage() {
 
   }
 
-  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType') => {
-      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes } as const;
-      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType };
-      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType };
-      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType };
-      const getFunc = type === 'subject' ? getSubjects : type === 'board' ? getBoards : getExamTypes;
+  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class') => {
+      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses } as const;
+      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass };
+      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass };
+      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass };
+      const getFunc = type === 'subject' ? getSubjects : type === 'board' ? getBoards : type === 'class' ? getClasses : getExamTypes;
       
       const setState = stateSetterMap[type];
 
@@ -495,6 +506,7 @@ export default function AdminSettingsPage() {
 
   const subjectHandlers = createMetafieldHandlers('subject');
   const boardHandlers = createMetafieldHandlers('board');
+  const classHandlers = createMetafieldHandlers('class');
   const examTypeHandlers = createMetafieldHandlers('examType');
 
     const chapterHandlers = {
@@ -696,6 +708,7 @@ export default function AdminSettingsPage() {
                                                             <SelectContent>
                                                                 <SelectItem value="Subject">Subject</SelectItem>
                                                                 <SelectItem value="Board">Board</SelectItem>
+                                                                <SelectItem value="Class">Class</SelectItem>
                                                                 <SelectItem value="Exam Category">Exam Category</SelectItem>
                                                             </SelectContent>
                                                         </Select>
@@ -881,6 +894,34 @@ export default function AdminSettingsPage() {
                                         onAdd={boardHandlers.onAdd}
                                         onUpdate={boardHandlers.onUpdate}
                                         onDelete={boardHandlers.onDelete}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                             <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableClassMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Classes</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    <MetafieldManager 
+                                        title="Classes"
+                                        items={classes}
+                                        onAdd={classHandlers.onAdd}
+                                        onUpdate={classHandlers.onUpdate}
+                                        onDelete={classHandlers.onDelete}
                                     />
                                 </CardContent>
                             </Card>

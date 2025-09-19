@@ -35,7 +35,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -77,12 +77,14 @@ const questionSchema = z.object({
 const formSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty.'),
   board: z.string().optional(),
+  class: z.string().optional(),
   examCategory: z.string().optional(),
   exam: z.string().optional(),
   subject: z.string().optional(),
   chapter: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
+  newClass: z.string().optional(),
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
@@ -113,6 +115,7 @@ type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
+type Class = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
@@ -273,6 +276,7 @@ export default function EditContentPage() {
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -280,6 +284,7 @@ export default function EditContentPage() {
   const contentId = params.id as string;
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
+  const [isAddingNewClass, setIsAddingNewClass] = useState(false);
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
@@ -297,6 +302,7 @@ export default function EditContentPage() {
     enableFillInTheBlank: true,
     enableSubjectMetafield: true,
     enableBoardMetafield: true,
+    enableClassMetafield: true,
     enableExamCategoryMetafield: true,
     enableExamMetafield: true,
     enableChapterMetafield: true,
@@ -307,12 +313,14 @@ export default function EditContentPage() {
     defaultValues: {
       title: '',
       board: '',
+      class: '',
       examCategory: '',
       exam: '',
       subject: '',
       chapter: '',
       newSubject: '',
       newBoard: '',
+      newClass: '',
       newExamCategory: '',
       newExam: '',
       newChapterNo: '',
@@ -362,11 +370,12 @@ export default function EditContentPage() {
       if (!contentId) return;
       try {
         setLoading(true);
-        const [contentData, subjectData, contentTypeData, boardData, examTypeData, siteSettings] = await Promise.all([
+        const [contentData, subjectData, contentTypeData, boardData, classData, examTypeData, siteSettings] = await Promise.all([
             getContentById(contentId),
             getSubjects(),
             getContentTypes(),
             getBoards(),
+            getClasses(),
             getExamTypes(),
             getSettings()
         ]);
@@ -374,6 +383,7 @@ export default function EditContentPage() {
         setSubjects(subjectData);
         setContentTypes(contentTypeData);
         setBoards(boardData);
+        setClasses(classData);
         setExamCategories(examTypeData);
 
         if (siteSettings) {
@@ -385,6 +395,7 @@ export default function EditContentPage() {
                 enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
                 enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
                 enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
+                enableClassMetafield: siteSettings.enableClassMetafield ?? true,
                 enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
                 enableExamMetafield: siteSettings.enableExamMetafield ?? true,
                 enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
@@ -442,6 +453,12 @@ export default function EditContentPage() {
           await addBoard(data.newBoard);
           boardName = data.newBoard;
       }
+      
+      let className = data.class;
+      if (data.class === 'add_new_class' && data.newClass) {
+          await addClass(data.newClass);
+          className = data.newClass;
+      }
   
       let examCategoryName = data.examCategory;
       let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
@@ -479,9 +496,10 @@ export default function EditContentPage() {
           return q;
       });
 
-      const contentToSave = { ...data, subject: subjectName, board: boardName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
+      const contentToSave = { ...data, subject: subjectName, board: boardName, class: className, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
       delete (contentToSave as any).newSubject;
       delete (contentToSave as any).newBoard;
+      delete (contentToSave as any).newClass;
       delete (contentToSave as any).newExamCategory;
       delete (contentToSave as any).newExam;
       delete (contentToSave as any).newChapterNo;
@@ -608,6 +626,15 @@ export default function EditContentPage() {
           setIsAddingNewBoard(false);
       }
   }
+  
+  const handleClassChange = (value: string) => {
+      form.setValue('class', value);
+      if (value === 'add_new_class') {
+          setIsAddingNewClass(true);
+      } else {
+          setIsAddingNewClass(false);
+      }
+  }
 
   const handleExamCategoryChange = async (value: string) => {
       form.setValue('examCategory', value);
@@ -690,44 +717,85 @@ export default function EditContentPage() {
                 )}
               />
 
-              {settings.enableBoardMetafield && <FormField
-                  control={form.control}
-                  name="board"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Board</FormLabel>
-                      {!isAddingNewBoard ? (
-                            <Select onValueChange={handleBoardChange} value={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a board" />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                {boards.map((board) => (
-                                    <SelectItem key={board.id} value={board.name}>
-                                    {board.name}
-                                    </SelectItem>
-                                ))}
-                                 <SelectItem value="add_new_board">Add new board...</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        ) : (
-                            <div className='space-y-2'>
-                                <FormField
-                                    control={form.control}
-                                    name="newBoard"
-                                    render={({ field }) => (
-                                        <Input {...field} placeholder="Enter new board name" />
-                                    )}
-                                />
-                                <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewBoard(false); form.setValue('board', ''); }}>Cancel</Button>
-                             </div>
-                        )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {settings.enableBoardMetafield && <FormField
+                    control={form.control}
+                    name="board"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Board</FormLabel>
+                        {!isAddingNewBoard ? (
+                                <Select onValueChange={handleBoardChange} value={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a board" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {boards.map((board) => (
+                                        <SelectItem key={board.id} value={board.name}>
+                                        {board.name}
+                                        </SelectItem>
+                                    ))}
+                                    <SelectItem value="add_new_board">Add new board...</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <div className='space-y-2'>
+                                    <FormField
+                                        control={form.control}
+                                        name="newBoard"
+                                        render={({ field }) => (
+                                            <Input {...field} placeholder="Enter new board name" />
+                                        )}
+                                    />
+                                    <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewBoard(false); form.setValue('board', ''); }}>Cancel</Button>
+                                </div>
+                            )}
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />}
+                {settings.enableClassMetafield && <FormField
+                    control={form.control}
+                    name="class"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Class</FormLabel>
+                        {!isAddingNewClass ? (
+                                <Select onValueChange={handleClassChange} value={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a class" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {classes.map((c) => (
+                                        <SelectItem key={c.id} value={c.name}>
+                                        {c.name}
+                                        </SelectItem>
+                                    ))}
+                                    <SelectItem value="add_new_class">Add new class...</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <div className='space-y-2'>
+                                    <FormField
+                                        control={form.control}
+                                        name="newClass"
+                                        render={({ field }) => (
+                                            <Input {...field} placeholder="Enter new class name" />
+                                        )}
+                                    />
+                                    <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewClass(false); form.setValue('class', ''); }}>Cancel</Button>
+                                </div>
+                            )}
+                        <FormMessage />
+                        </FormItem>
+                    )}
                 />}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {settings.enableSubjectMetafield && <FormField
                   control={form.control}
