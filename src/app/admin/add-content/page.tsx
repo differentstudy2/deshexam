@@ -58,6 +58,7 @@ import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput 
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 
 const optionSchema = z.object({
@@ -315,7 +316,7 @@ export default function CreateTestPage() {
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
   const [generatorMode, setGeneratorMode] = useState<'full' | 'questions'>('full');
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -520,7 +521,7 @@ export default function CreateTestPage() {
           description: data.description,
           body: data.body,
           testType: data.testType,
-          publishedAt: data.publishedAt || new Date(),
+          createdAt: data.publishedAt || new Date(),
         };
       } else {
         let subjectName = data.subject;
@@ -719,7 +720,7 @@ export default function CreateTestPage() {
                 description: `AI has created a draft for "${result.title}".`,
             });
         }
-        setIsGeneratorOpen(false);
+        setIsAiGeneratorOpen(false);
 
     } catch (error) {
       toast({
@@ -773,7 +774,7 @@ export default function CreateTestPage() {
             title: 'Article Generated!',
             description: `AI has created a draft for "${result.title}".`,
         });
-        setIsGeneratorOpen(false);
+        setIsAiGeneratorOpen(false);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -910,12 +911,12 @@ export default function CreateTestPage() {
     
     const openGenerator = () => {
         setGeneratorMode(mode);
-        setIsGeneratorOpen(true);
+        setIsAiGeneratorOpen(true);
     }
 
     if (currentTestType === 'Learn') {
         return (
-             <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
+             <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
                 <DialogTrigger asChild onClick={openGenerator}>
                     {children}
                 </DialogTrigger>
@@ -954,7 +955,7 @@ export default function CreateTestPage() {
     }
     
     return (
-         <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
+         <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
             <DialogTrigger asChild onClick={openGenerator}>
                 {children}
             </DialogTrigger>
@@ -1111,7 +1112,7 @@ export default function CreateTestPage() {
                     Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
                 </p>
             </div>
-            <AIGeneratorDialog mode="full">
+             <AIGeneratorDialog mode="full">
                 <Button variant="outline">
                     <Sparkles className="mr-2 h-4 w-4" />
                     {currentTestType === 'Learn' ? 'Generate Article with AI' : 'Generate with AI'}
@@ -1747,7 +1748,7 @@ export default function CreateTestPage() {
                                                   <FormItem>
                                                       <FormLabel>Correct Answer</FormLabel>
                                                       <FormControl>
-                                                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
+                                                          <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
                                                               <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
                                                               <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
                                                           </RadioGroup>
@@ -1819,7 +1820,8 @@ export default function CreateTestPage() {
                       );
                   })}
               </CardContent>
-              <CardFooter className="gap-4">
+              <CardFooter>
+                <div className="flex flex-wrap gap-4">
                   <Button
                       type="button"
                       variant="outline"
@@ -1839,14 +1841,66 @@ export default function CreateTestPage() {
                     }}
                   >
                       <PlusCircle className="mr-2" />
-                      Add Question
+                      Add Question Manually
                   </Button>
-                  <AIGeneratorDialog mode="questions">
-                      <Button type="button" variant="outline">
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Add Questions with AI
-                      </Button>
-                  </AIGeneratorDialog>
+                  <Collapsible>
+                      <CollapsibleTrigger asChild>
+                         <Button type="button" variant="outline">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Add Questions with AI
+                         </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <Card className="mt-4 p-4">
+                           <Form {...aiForm}>
+                            <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                                <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
+                                    <TabsList className="grid w-full grid-cols-3">
+                                        <TabsTrigger value="topic">From Topic</TabsTrigger>
+                                        <TabsTrigger value="text">From Text</TabsTrigger>
+                                        <TabsTrigger value="file">From File</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="topic" className="pt-4">
+                                         <FormField control={aiForm.control} name="sourceTopic" render={({ field }) => ( <FormItem> <FormLabel>Topic</FormLabel> <FormControl> <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
+                                    </TabsContent>
+                                    <TabsContent value="text" className="pt-4">
+                                         <FormField control={aiForm.control} name="sourceText" render={({ field }) => ( <FormItem> <FormLabel>Paste Text</FormLabel> <FormControl> <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /> </FormControl> <FormMessage /> </FormItem> )}/>
+                                    </TabsContent>
+                                    <TabsContent value="file" className="pt-4">
+                                        <FormItem>
+                                            <FormLabel>Upload File</FormLabel>
+                                            <FormControl>
+                                                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                                    <div className="space-y-1 text-center">
+                                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                        <p>{aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}</p>
+                                                        <p className="text-xs text-muted-foreground">{aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}</p>
+                                                    </div>
+                                                </div>
+                                            </FormControl>
+                                            <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt"/>
+                                            <FormMessage />
+                                        </FormItem>
+                                    </TabsContent>
+                                </Tabs>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField control={aiForm.control} name="numQuestions" render={({ field }) => ( <FormItem> <FormLabel>Number of Questions</FormLabel> <FormControl> <Input type="number" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
+                                    <FormField control={aiForm.control} name="difficulty" render={({ field }) => ( <FormItem> <FormLabel>Difficulty</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Easy">Easy</SelectItem> <SelectItem value="Medium">Medium</SelectItem> <SelectItem value="Hard">Hard</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                                </div>
+                                <FormField control={aiForm.control} name="questionType" render={({ field }) => ( <FormItem> <FormLabel>Question Type</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Any">Any</SelectItem> {settings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>} {settings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>} {settings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>} {settings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>} {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>} </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
+                                
+                                <DialogFooter>
+                                    <Button type="submit" disabled={isGenerating}>
+                                        {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                           </Form>
+                        </Card>
+                      </CollapsibleContent>
+                  </Collapsible>
+                </div>
               </CardFooter>
             </Card>
           )}
