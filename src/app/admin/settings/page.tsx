@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -16,11 +17,38 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState, useMemo } from 'react';
-import { getSettings, updateSettings, getAllContent } from '@/lib/firebase/firestore';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { 
+    getSettings, 
+    updateSettings, 
+    getAllContent, 
+    getSubjects, 
+    addSubject, 
+    updateSubject, 
+    deleteSubject,
+    getBoards,
+    addBoard,
+    updateBoard,
+    deleteBoard,
+    getExamTypes,
+    addExamType,
+    updateExamType,
+    deleteExamType,
+} from '@/lib/firebase/firestore';
 import Link from 'next/link';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const settingsSchema = z.object({
     siteName: z.string().min(1, "Site name is required."),
@@ -41,8 +69,121 @@ const settingsSchema = z.object({
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
-type ContentSummary = {
-    [key: string]: number;
+type ContentSummary = { [key: string]: number; };
+type MetafieldItem = { id: string; name: string; };
+
+const MetafieldManager = ({
+    title,
+    description,
+    items,
+    onAdd,
+    onUpdate,
+    onDelete,
+    enableField,
+    onToggleField
+} : {
+    title: string;
+    description: string;
+    items: MetafieldItem[];
+    onAdd: (name: string) => Promise<void>;
+    onUpdate: (id: string, name: string) => Promise<void>;
+    onDelete: (id: string) => Promise<void>;
+    enableField: boolean;
+    onToggleField: (enabled: boolean) => void;
+}) => {
+    const [newItemName, setNewItemName] = useState('');
+    const [editingItem, setEditingItem] = useState<{ id: string, name: string } | null>(null);
+    const [isAdding, setIsAdding] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+
+    const handleAdd = async () => {
+        if (!newItemName.trim()) return;
+        setIsAdding(true);
+        await onAdd(newItemName);
+        setNewItemName('');
+        setIsAdding(false);
+    };
+    
+    const handleUpdate = async () => {
+        if (!editingItem || !editingItem.name.trim()) return;
+        await onUpdate(editingItem.id, editingItem.name);
+        setEditingItem(null);
+    };
+
+    const handleDelete = async () => {
+        if (!itemToDelete) return;
+        await onDelete(itemToDelete);
+        setItemToDelete(null);
+    }
+    
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4">
+                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                            <FormLabel className="text-base">Enable '{title}' Field</FormLabel>
+                            <FormDescription>Show this metafield during content creation.</FormDescription>
+                        </div>
+                        <Switch checked={enableField} onCheckedChange={onToggleField} />
+                    </div>
+                    
+                    <div className="flex gap-2">
+                        <Input 
+                            value={newItemName}
+                            onChange={(e) => setNewItemName(e.target.value)}
+                            placeholder={`New ${title.slice(0, -1)} Name`}
+                            disabled={isAdding}
+                        />
+                        <Button onClick={handleAdd} disabled={isAdding || !newItemName.trim()}>
+                            {isAdding ? <Loader2 className="animate-spin" /> : <PlusCircle />}
+                        </Button>
+                    </div>
+
+                    <ScrollArea className="h-60 rounded-md border">
+                        <div className="p-4 space-y-2">
+                            {items.map(item => (
+                                <div key={item.id} className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary">
+                                    {editingItem?.id === item.id ? (
+                                        <Input 
+                                            value={editingItem.name} 
+                                            onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                                            onBlur={handleUpdate}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                                            autoFocus
+                                        />
+                                    ) : (
+                                        <span className="flex-grow">{item.name}</span>
+                                    )}
+                                    <Button variant="ghost" size="sm" onClick={() => setEditingItem(item)}><Edit className="w-4 h-4" /></Button>
+                                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setItemToDelete(item.id)}><Trash2 className="w-4 h-4" /></Button>
+                                </div>
+                            ))}
+                            {items.length === 0 && <p className="text-center text-sm text-muted-foreground">No items added yet.</p>}
+                        </div>
+                    </ScrollArea>
+                </div>
+            </CardContent>
+             <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete the item. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </Card>
+    )
 }
 
 export default function AdminSettingsPage() {
@@ -50,6 +191,10 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [contentSummary, setContentSummary] = useState<ContentSummary | null>(null);
   const [totalContent, setTotalContent] = useState(0);
+
+  const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
+  const [boards, setBoards] = useState<MetafieldItem[]>([]);
+  const [examTypes, setExamTypes] = useState<MetafieldItem[]>([]);
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -72,41 +217,49 @@ export default function AdminSettingsPage() {
     },
   });
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-        try {
-            setLoading(true);
-            const [settings, allContent] = await Promise.all([
-                getSettings(),
-                getAllContent()
-            ]);
+  const fetchInitialData = useCallback(async () => {
+    try {
+        setLoading(true);
+        const [settings, allContent, subjectData, boardData, examTypeData] = await Promise.all([
+            getSettings(),
+            getAllContent(),
+            getSubjects(),
+            getBoards(),
+            getExamTypes(),
+        ]);
 
-            if (settings) {
-                form.reset(settings);
-            }
-            
-            if (allContent) {
-                const summary = allContent.reduce((acc: ContentSummary, item: any) => {
-                    const type = item.testType || 'Unknown';
-                    acc[type] = (acc[type] || 0) + 1;
-                    return acc;
-                }, {});
-                setContentSummary(summary);
-                setTotalContent(allContent.length);
-            }
-
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Failed to load page data',
-                description: (error as Error).message,
-            });
-        } finally {
-            setLoading(false);
+        if (settings) {
+            form.reset(settings);
         }
-    };
-    fetchInitialData();
+        
+        if (allContent) {
+            const summary = allContent.reduce((acc: ContentSummary, item: any) => {
+                const type = item.testType || 'Unknown';
+                acc[type] = (acc[type] || 0) + 1;
+                return acc;
+            }, {});
+            setContentSummary(summary);
+            setTotalContent(allContent.length);
+        }
+        
+        setSubjects(subjectData);
+        setBoards(boardData);
+        setExamTypes(examTypeData);
+
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Failed to load page data',
+            description: (error as Error).message,
+        });
+    } finally {
+        setLoading(false);
+    }
   }, [form, toast]);
+  
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
 
   const handleSave: SubmitHandler<SettingsFormValues> = async (data) => {
@@ -124,6 +277,53 @@ export default function AdminSettingsPage() {
         });
     }
   };
+
+  const createMetafieldHandlers = (
+      type: 'subject' | 'board' | 'examType'
+  ) => {
+      const stateSetterMap = {
+          subject: setSubjects,
+          board: setBoards,
+          examType: setExamTypes,
+      };
+      const addFuncMap = {
+          subject: addSubject,
+          board: addBoard,
+          examType: addExamType,
+      };
+       const updateFuncMap = {
+          subject: updateSubject,
+          board: updateBoard,
+          examType: updateExamType,
+      };
+       const deleteFuncMap = {
+          subject: deleteSubject,
+          board: deleteBoard,
+          examType: deleteExamType,
+      };
+      
+      const setState = stateSetterMap[type];
+
+      return {
+          onAdd: async (name: string) => {
+              await addFuncMap[type](name);
+              const items = await (type === 'subject' ? getSubjects() : type === 'board' ? getBoards() : getExamTypes());
+              setState(items);
+          },
+          onUpdate: async (id: string, name: string) => {
+              await updateFuncMap[type](id, name);
+              setState(prev => prev.map(item => item.id === id ? { ...item, name } : item));
+          },
+          onDelete: async (id: string) => {
+              await deleteFuncMap[type](id);
+              setState(prev => prev.filter(item => item.id !== id));
+          }
+      };
+  };
+
+  const subjectHandlers = createMetafieldHandlers('subject');
+  const boardHandlers = createMetafieldHandlers('board');
+  const examTypeHandlers = createMetafieldHandlers('examType');
   
   if (loading) {
     return (
@@ -253,53 +453,44 @@ export default function AdminSettingsPage() {
             </CardContent>
             </Card>
 
-             <Card>
+            <Card>
                 <CardHeader>
                     <CardTitle>Content Metafield Settings</CardTitle>
                     <CardDescription>
-                    Control which data fields are available during content creation.
+                    Control which data fields are available and manage their options.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="p-4 border rounded-lg">
-                        <FormField control={form.control} name="enableSubjectMetafield" render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between">
-                            <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Subject' Field</FormLabel> <FormDescription>Show the 'Subject' selection during content creation.</FormDescription></div>
-                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                            </FormItem>
-                        )} />
-                         <div className="pl-8 mt-4">
-                             <FormField control={form.control} name="enableChapterMetafield" render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
-                                <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Chapter' Field</FormLabel> <FormDescription>Show the 'Chapter' selection within a Subject.</FormDescription></div>
-                                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={!form.watch('enableSubjectMetafield')}/></FormControl>
-                                </FormItem>
-                            )} />
-                         </div>
-                    </div>
-
-                    <div className="p-4 border rounded-lg">
-                        <FormField control={form.control} name="enableExamCategoryMetafield" render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between">
-                            <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Exam Category' Field</FormLabel> <FormDescription>Show the 'Exam Category' selection.</FormDescription></div>
-                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                            </FormItem>
-                        )} />
-                        <div className="pl-8 mt-4">
-                             <FormField control={form.control} name="enableExamMetafield" render={({ field }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-secondary/50">
-                                <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Exam' Field</FormLabel> <FormDescription>Show the 'Exam' selection within a category.</FormDescription></div>
-                                <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={!form.watch('enableExamCategoryMetafield')} /></FormControl>
-                                </FormItem>
-                            )} />
-                        </div>
-                    </div>
-                     <FormField control={form.control} name="enableBoardMetafield" render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Board' Field</FormLabel> <FormDescription>Show the 'Board' selection during content creation.</FormDescription></div>
-                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                        </FormItem>
-                    )} />
+                    <MetafieldManager 
+                        title="Subjects"
+                        description="Manage the available subjects."
+                        items={subjects}
+                        onAdd={subjectHandlers.onAdd}
+                        onUpdate={subjectHandlers.onUpdate}
+                        onDelete={subjectHandlers.onDelete}
+                        enableField={form.watch('enableSubjectMetafield')}
+                        onToggleField={(checked) => form.setValue('enableSubjectMetafield', checked)}
+                    />
+                    <MetafieldManager 
+                        title="Boards"
+                        description="Manage the available boards."
+                        items={boards}
+                        onAdd={boardHandlers.onAdd}
+                        onUpdate={boardHandlers.onUpdate}
+                        onDelete={boardHandlers.onDelete}
+                        enableField={form.watch('enableBoardMetafield')}
+                        onToggleField={(checked) => form.setValue('enableBoardMetafield', checked)}
+                    />
+                    <MetafieldManager 
+                        title="Exam Categories"
+                        description="Manage the available exam categories."
+                        items={examTypes}
+                        onAdd={examTypeHandlers.onAdd}
+                        onUpdate={examTypeHandlers.onUpdate}
+                        onDelete={examTypeHandlers.onDelete}
+                        enableField={form.watch('enableExamCategoryMetafield')}
+                        onToggleField={(checked) => form.setValue('enableExamCategoryMetafield', checked)}
+                    />
                 </CardContent>
             </Card>
 

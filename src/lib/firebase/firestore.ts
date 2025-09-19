@@ -602,6 +602,27 @@ export const addSubject = async (subjectName: string) => {
     }
 };
 
+export const updateSubject = async (id: string, name: string) => {
+    if (!id || !name) throw new Error("ID and name are required.");
+    try {
+        await updateDoc(doc(db, "subjects", id), { name });
+    } catch (e) {
+        console.error("Error updating subject: ", e);
+        throw new Error("Failed to update subject.");
+    }
+};
+
+export const deleteSubject = async (id: string) => {
+    if (!id) throw new Error("ID is required.");
+    try {
+        await deleteDoc(doc(db, "subjects", id));
+    } catch (e) {
+        console.error("Error deleting subject: ", e);
+        throw new Error("Failed to delete subject.");
+    }
+};
+
+
 export const getBoards = async () => {
     try {
         const q = query(collection(db, "boards"), orderBy("name"));
@@ -636,6 +657,26 @@ export const addBoard = async (boardName: string) => {
     }
 };
 
+export const updateBoard = async (id: string, name: string) => {
+    if (!id || !name) throw new Error("ID and name are required.");
+    try {
+        await updateDoc(doc(db, "boards", id), { name });
+    } catch (e) {
+        console.error("Error updating board: ", e);
+        throw new Error("Failed to update board.");
+    }
+};
+
+export const deleteBoard = async (id: string) => {
+    if (!id) throw new Error("ID is required.");
+    try {
+        await deleteDoc(doc(db, "boards", id));
+    } catch (e) {
+        console.error("Error deleting board: ", e);
+        throw new Error("Failed to delete board.");
+    }
+};
+
 export const getExamTypes = async () => {
     try {
         const q = query(collection(db, "examTypes"), orderBy("name"));
@@ -667,6 +708,26 @@ export const addExamType = async (examTypeName: string) => {
     } catch (e) {
         console.error("Error adding exam type: ", e);
         throw new Error("Failed to add exam type.");
+    }
+};
+
+export const updateExamType = async (id: string, name: string) => {
+    if (!id || !name) throw new Error("ID and name are required.");
+    try {
+        await updateDoc(doc(db, "examTypes", id), { name });
+    } catch (e) {
+        console.error("Error updating exam type: ", e);
+        throw new Error("Failed to update exam type.");
+    }
+};
+
+export const deleteExamType = async (id: string) => {
+    if (!id) throw new Error("ID is required.");
+    try {
+        await deleteDoc(doc(db, "examTypes", id));
+    } catch (e) {
+        console.error("Error deleting exam type: ", e);
+        throw new Error("Failed to delete exam type.");
     }
 };
 
@@ -1099,3 +1160,4 @@ export const updateSettings = async (data: any) => {
     
 
     
+
