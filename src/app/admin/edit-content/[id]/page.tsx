@@ -657,9 +657,6 @@ export default function EditContentPage() {
     )
   }
   
-  const selectedChapterValue = form.watch('chapter');
-  const selectedChapter = chapters.find(c => `${c.chapterNo}. ${c.chapterName}` === selectedChapterValue);
-
   return (
     <div>
       <h1 className="font-headline text-3xl font-bold">Edit Content</h1>
@@ -691,8 +688,7 @@ export default function EditContentPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 {settings.enableBoardMetafield && <FormField
+              {settings.enableBoardMetafield && <FormField
                   control={form.control}
                   name="board"
                   render={({ field }) => (
@@ -730,6 +726,7 @@ export default function EditContentPage() {
                     </FormItem>
                   )}
                 />}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="subject"
@@ -768,9 +765,7 @@ export default function EditContentPage() {
                     </FormItem>
                   )}
                 />
-              </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {settings.enableChapterMetafield && <FormField
                     control={form.control}
                     name="chapter"
@@ -796,14 +791,6 @@ export default function EditContentPage() {
                         </FormItem>
                     )}
                 />}
-                 {selectedChapter && (
-                    <FormItem>
-                        <FormLabel>Chapter Name</FormLabel>
-                        <FormControl>
-                        <Input value={selectedChapter.chapterName} readOnly disabled />
-                        </FormControl>
-                    </FormItem>
-                )}
               </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

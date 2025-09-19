@@ -764,9 +764,6 @@ export default function CreateTestPage() {
         </div>
     )
   }
-
-  const selectedChapterValue = form.watch('chapter');
-  const selectedChapter = chapters.find(c => `${c.chapterNo}. ${c.chapterName}` === selectedChapterValue);
   
   const AIGeneratorDialog = ({ children, mode }: { children: React.ReactNode, mode: 'full' | 'questions' }) => {
     
@@ -1019,7 +1016,6 @@ export default function CreateTestPage() {
                 
             {currentTestType !== 'Learn' && (
                 <>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {settings.enableBoardMetafield && <FormField
                   control={form.control}
                   name="board"
@@ -1058,6 +1054,7 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <FormField
                   control={form.control}
                   name="subject"
@@ -1096,9 +1093,6 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />
-              </div>
-
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {settings.enableChapterMetafield && <FormField
                     control={form.control}
                     name="chapter"
@@ -1124,14 +1118,6 @@ export default function CreateTestPage() {
                         </FormItem>
                     )}
                 />}
-                 {selectedChapter && (
-                    <FormItem>
-                        <FormLabel>Chapter Name</FormLabel>
-                        <FormControl>
-                        <Input value={selectedChapter.chapterName} readOnly disabled />
-                        </FormControl>
-                    </FormItem>
-                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
