@@ -318,6 +318,13 @@ export default function CreateTestPage() {
     enableStateMetafield: true,
     enableExamMetafield: true,
     enableChapterMetafield: true,
+    defaultBoard: '',
+    defaultClass: '',
+    defaultSubject: '',
+    defaultChapter: '',
+    defaultExamCategory: '',
+    defaultState: '',
+    defaultExam: '',
   });
 
 
@@ -392,7 +399,41 @@ export default function CreateTestPage() {
             enableStateMetafield: siteSettings.enableStateMetafield ?? true,
             enableExamMetafield: siteSettings.enableExamMetafield ?? true,
             enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
+            defaultBoard: siteSettings.defaultBoard ?? '',
+            defaultClass: siteSettings.defaultClass ?? '',
+            defaultSubject: siteSettings.defaultSubject ?? '',
+            defaultChapter: siteSettings.defaultChapter ?? '',
+            defaultExamCategory: siteSettings.defaultExamCategory ?? '',
+            defaultState: siteSettings.defaultState ?? '',
+            defaultExam: siteSettings.defaultExam ?? '',
         });
+
+        // Set default form values from settings
+        form.reset({
+            ...form.getValues(),
+            board: siteSettings.defaultBoard ?? '',
+            class: siteSettings.defaultClass ?? '',
+            subject: siteSettings.defaultSubject ?? '',
+            examCategory: siteSettings.defaultExamCategory ?? '',
+            state: siteSettings.defaultState ?? '',
+        });
+
+         if (siteSettings.defaultSubject) {
+            const selectedSubject = subjectData.find(s => s.name === siteSettings.defaultSubject);
+            if (selectedSubject) {
+                const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+                setChapters(fetchedChapters);
+                form.setValue('chapter', siteSettings.defaultChapter ?? '');
+            }
+        }
+        if (siteSettings.defaultExamCategory) {
+            const selectedExamCategory = examTypeData.find(e => e.name === siteSettings.defaultExamCategory);
+            if (selectedExamCategory) {
+                const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
+                setExams(fetchedExams);
+                form.setValue('exam', siteSettings.defaultExam ?? '');
+            }
+        }
       }
 
       if (types.length > 0 && !form.getValues('testType')) {
@@ -555,13 +596,13 @@ export default function CreateTestPage() {
          form.reset({
             ...form.getValues(),
             title: '',
-            board: '',
-            class: '',
-            subject: '',
-            chapter: '',
-            examCategory: '',
-            state: '',
-            exam: '',
+            board: settings.defaultBoard || '',
+            class: settings.defaultClass || '',
+            subject: settings.defaultSubject || '',
+            chapter: '', // Reset chapter as it depends on subject
+            examCategory: settings.defaultExamCategory || '',
+            state: settings.defaultState || '',
+            exam: '', // Reset exam as it depends on category
             description: '',
             body: '',
             duration: 0,
@@ -579,8 +620,8 @@ export default function CreateTestPage() {
             newChapterName: '',
             difficulty: 'Medium',
         });
-        setChapters([]);
-        setExams([]);
+        if (!settings.defaultSubject) setChapters([]);
+        if (!settings.defaultExamCategory) setExams([]);
       } else { // partial reset
          form.reset({
             ...form.getValues(),

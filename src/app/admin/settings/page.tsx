@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -96,6 +96,13 @@ const settingsSchema = z.object({
     enableStateMetafield: z.boolean(),
     enableExamMetafield: z.boolean(),
     enableChapterMetafield: z.boolean(),
+    defaultBoard: z.string().optional(),
+    defaultClass: z.string().optional(),
+    defaultSubject: z.string().optional(),
+    defaultChapter: z.string().optional(),
+    defaultExamCategory: z.string().optional(),
+    defaultState: z.string().optional(),
+    defaultExam: z.string().optional(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -115,12 +122,16 @@ const MetafieldManager = ({
     onAdd,
     onUpdate,
     onDelete,
+    defaultValue,
+    onSetDefault,
 } : {
     title: string;
     items: MetafieldItem[];
     onAdd: (name: string) => Promise<void>;
     onUpdate: (id: string, name: string) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
+    defaultValue?: string;
+    onSetDefault: (name: string) => void;
 }) => {
     const [newItemName, setNewItemName] = useState('');
     const [editingItem, setEditingItem] = useState<MetafieldItem | null>(null);
@@ -176,6 +187,9 @@ const MetafieldManager = ({
                             ) : (
                                 <span className="flex-grow">{item.name}</span>
                             )}
+                            <Button variant="ghost" size="sm" onClick={() => onSetDefault(item.name!)} title="Set as default">
+                                <Star className={cn("w-4 h-4", defaultValue === item.name ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground")} />
+                            </Button>
                             <Button variant="ghost" size="sm" onClick={() => setEditingItem(item)}><Edit className="w-4 h-4" /></Button>
                             <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setItemToDelete(item.id)}><Trash2 className="w-4 h-4" /></Button>
                         </div>
@@ -210,6 +224,8 @@ const DependentMetafieldManager = ({
     onAdd,
     onUpdate,
     onDelete,
+    defaultValue,
+    onSetDefault,
 }: {
     parentTitle: string;
     childTitle: string;
@@ -218,6 +234,8 @@ const DependentMetafieldManager = ({
     onAdd: (parentId: string, data: any) => Promise<void>;
     onUpdate: (parentId: string, childId: string, data: any) => Promise<void>;
     onDelete: (parentId: string, childId: string) => Promise<void>;
+    defaultValue?: string;
+    onSetDefault: (name: string) => void;
 }) => {
     const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
     const [children, setChildren] = useState<MetafieldItem[]>([]);
@@ -268,6 +286,10 @@ const DependentMetafieldManager = ({
     
     const isChapter = childTitle === 'Chapters';
 
+    const getFullItemName = (item: MetafieldItem) => {
+        return isChapter ? `${item.chapterNo}. ${item.chapterName}` : item.name!;
+    };
+
     return (
         <div className="space-y-4">
             <Select onValueChange={handleParentChange}>
@@ -305,8 +327,11 @@ const DependentMetafieldManager = ({
                                             <Input value={editingItem.name} onChange={(e) => setEditingItem({...editingItem, name: e.target.value})} onBlur={handleUpdate} onKeyDown={(e) => e.key === 'Enter' && handleUpdate()} autoFocus />
                                         )
                                     ) : (
-                                        <span className="flex-grow">{isChapter ? `${item.chapterNo}. ${item.chapterName}` : item.name}</span>
+                                        <span className="flex-grow">{getFullItemName(item)}</span>
                                     )}
+                                    <Button variant="ghost" size="sm" onClick={() => onSetDefault(getFullItemName(item))} title="Set as default">
+                                        <Star className={cn("w-4 h-4", defaultValue === getFullItemName(item) ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground")} />
+                                    </Button>
                                     <Button variant="ghost" size="sm" onClick={() => setEditingItem(item)}><Edit className="w-4 h-4" /></Button>
                                     <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setItemToDelete(item.id)}><Trash2 className="w-4 h-4" /></Button>
                                 </div>
@@ -364,6 +389,13 @@ export default function AdminSettingsPage() {
         enableStateMetafield: true,
         enableExamMetafield: true,
         enableChapterMetafield: true,
+        defaultBoard: '',
+        defaultClass: '',
+        defaultSubject: '',
+        defaultChapter: '',
+        defaultExamCategory: '',
+        defaultState: '',
+        defaultExam: '',
     },
   });
 
@@ -795,6 +827,8 @@ export default function AdminSettingsPage() {
                                         onAdd={boardHandlers.onAdd}
                                         onUpdate={boardHandlers.onUpdate}
                                         onDelete={boardHandlers.onDelete}
+                                        defaultValue={form.watch('defaultBoard')}
+                                        onSetDefault={(value) => form.setValue('defaultBoard', value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -823,6 +857,8 @@ export default function AdminSettingsPage() {
                                         onAdd={classHandlers.onAdd}
                                         onUpdate={classHandlers.onUpdate}
                                         onDelete={classHandlers.onDelete}
+                                        defaultValue={form.watch('defaultClass')}
+                                        onSetDefault={(value) => form.setValue('defaultClass', value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -851,6 +887,8 @@ export default function AdminSettingsPage() {
                                         onAdd={subjectHandlers.onAdd}
                                         onUpdate={subjectHandlers.onUpdate}
                                         onDelete={subjectHandlers.onDelete}
+                                        defaultValue={form.watch('defaultSubject')}
+                                        onSetDefault={(value) => form.setValue('defaultSubject', value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -881,6 +919,8 @@ export default function AdminSettingsPage() {
                                         onAdd={chapterHandlers.onAdd}
                                         onUpdate={chapterHandlers.onUpdate}
                                         onDelete={chapterHandlers.onDelete}
+                                        defaultValue={form.watch('defaultChapter')}
+                                        onSetDefault={(value) => form.setValue('defaultChapter', value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -909,6 +949,8 @@ export default function AdminSettingsPage() {
                                         onAdd={examTypeHandlers.onAdd}
                                         onUpdate={examTypeHandlers.onUpdate}
                                         onDelete={examTypeHandlers.onDelete}
+                                        defaultValue={form.watch('defaultExamCategory')}
+                                        onSetDefault={(value) => form.setValue('defaultExamCategory', value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -937,6 +979,8 @@ export default function AdminSettingsPage() {
                                         onAdd={stateHandlers.onAdd}
                                         onUpdate={stateHandlers.onUpdate}
                                         onDelete={stateHandlers.onDelete}
+                                        defaultValue={form.watch('defaultState')}
+                                        onSetDefault={(value) => form.setValue('defaultState', value)}
                                     />
                                 </CardContent>
                             </Card>
@@ -967,6 +1011,8 @@ export default function AdminSettingsPage() {
                                         onAdd={examHandlers.onAdd}
                                         onUpdate={examHandlers.onUpdate}
                                         onDelete={examHandlers.onDelete}
+                                        defaultValue={form.watch('defaultExam')}
+                                        onSetDefault={(value) => form.setValue('defaultExam', value)}
                                     />
                                 </CardContent>
                             </Card>
