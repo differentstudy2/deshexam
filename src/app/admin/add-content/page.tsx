@@ -53,6 +53,7 @@ import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import Image from 'next/image';
+import { Label } from '@/components/ui/label';
 
 
 const optionSchema = z.object({

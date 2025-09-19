@@ -52,6 +52,7 @@ import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
+import { Label } from '@/components/ui/label';
 
 
 const optionSchema = z.object({
