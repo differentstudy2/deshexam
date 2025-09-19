@@ -33,6 +33,7 @@ const settingsSchema = z.object({
     enableTrueFalse: z.boolean(),
     enableShortAnswer: z.boolean(),
     enableFillInTheBlank: z.boolean(),
+    enableSubjectMetafield: z.boolean(),
     enableBoardMetafield: z.boolean(),
     enableExamCategoryMetafield: z.boolean(),
     enableExamMetafield: z.boolean(),
@@ -63,6 +64,7 @@ export default function AdminSettingsPage() {
         enableTrueFalse: true,
         enableShortAnswer: true,
         enableFillInTheBlank: true,
+        enableSubjectMetafield: true,
         enableBoardMetafield: true,
         enableExamCategoryMetafield: true,
         enableExamMetafield: true,
@@ -259,6 +261,12 @@ export default function AdminSettingsPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                     <FormField control={form.control} name="enableSubjectMetafield" render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Subject' Field</FormLabel> <FormDescription>Show the 'Subject' selection during content creation.</FormDescription></div>
+                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                        </FormItem>
+                    )} />
                     <FormField control={form.control} name="enableBoardMetafield" render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5"> <FormLabel className="text-base">Enable 'Board' Field</FormLabel> <FormDescription>Show the 'Board' selection during content creation.</FormDescription></div>
@@ -446,4 +454,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-

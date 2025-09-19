@@ -301,6 +301,7 @@ export default function CreateTestPage() {
     enableTrueFalse: true,
     enableShortAnswer: true,
     enableFillInTheBlank: true,
+    enableSubjectMetafield: true,
     enableBoardMetafield: true,
     enableExamCategoryMetafield: true,
     enableExamMetafield: true,
@@ -364,6 +365,7 @@ export default function CreateTestPage() {
             enableTrueFalse: siteSettings.enableTrueFalse ?? true,
             enableShortAnswer: siteSettings.enableShortAnswer ?? true,
             enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
+            enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
             enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
             enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
             enableExamMetafield: siteSettings.enableExamMetafield ?? true,
@@ -1055,7 +1057,7 @@ export default function CreateTestPage() {
                   )}
                 />}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <FormField
+                 {settings.enableSubjectMetafield && <FormField
                   control={form.control}
                   name="subject"
                   render={({ field }) => (
@@ -1092,7 +1094,7 @@ export default function CreateTestPage() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                />}
                 {settings.enableChapterMetafield && <FormField
                     control={form.control}
                     name="chapter"
@@ -1616,5 +1618,3 @@ export default function CreateTestPage() {
     </div>
   );
 }
-
-    
