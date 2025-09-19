@@ -218,14 +218,14 @@ const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlCha
 };
 
 
-const MatchingPairsField = ({ control, questionIndex }: { control: any, questionIndex: number }) => {
+const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
     const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
         control: control,
         name: `questions.${questionIndex}.correctAnswer` as any,
     });
 
     const handleImageUrlChange = (pairIndex: number, field: 'aImage' | 'bImage', url: string) => {
-        control.setValue(`questions.${questionIndex}.correctAnswer.${pairIndex}.${field}`, url);
+        setValue(`questions.${questionIndex}.correctAnswer.${pairIndex}.${field}`, url);
     };
 
     return (
@@ -1512,7 +1512,7 @@ export default function CreateTestPage() {
                                       </div>
                                   )}
                                   {questionType === 'Matching' && (
-                                    <MatchingPairsField control={form.control} questionIndex={index} />
+                                    <MatchingPairsField control={form.control} questionIndex={index} setValue={form.setValue} />
                                   )}
                                   {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                       <FormField
