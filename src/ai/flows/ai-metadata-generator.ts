@@ -11,14 +11,14 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-export const AIMetadataGeneratorInputSchema = z.object({
+const AIMetadataGeneratorInputSchema = z.object({
   metafieldType: z.enum(['Subject', 'Board', 'Exam Category']).describe('The type of metadata to generate.'),
   topic: z.string().describe('The high-level topic or category to generate items for (e.g., "Indian Competitive Exams", "High School Science").'),
   count: z.number().int().min(1).max(20).describe('The number of items to generate.'),
 });
 export type AIMetadataGeneratorInput = z.infer<typeof AIMetadataGeneratorInputSchema>;
 
-export const AIMetadataGeneratorOutputSchema = z.object({
+const AIMetadataGeneratorOutputSchema = z.object({
   items: z.array(z.string()).describe('An array of generated metadata item names.'),
 });
 export type AIMetadataGeneratorOutput = z.infer<typeof AIMetadataGeneratorOutputSchema>;
