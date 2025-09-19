@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,8 +13,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { getUserProfile, updateUserProfile } from '@/lib/firebase/firestore';
+import { getUserProfile, updateUserProfile, uploadFile } from '@/lib/firebase/firestore';
 import { updateProfile as updateAuthProfile } from 'firebase/auth';
+import { Upload, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, "Display name must be at least 2 characters."),
@@ -30,6 +32,8 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 export default function ProfilePage() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -67,6 +71,29 @@ export default function ProfilePage() {
       fetchProfile();
     }
   }, [user, form]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        setIsUploading(true);
+        try {
+            const downloadURL = await uploadFile(file);
+            form.setValue('photoURL', downloadURL, { shouldDirty: true });
+             toast({
+                title: 'Image Uploaded',
+                description: 'Your new profile picture is ready. Click "Save Changes" to apply it.',
+            });
+        } catch (error) {
+           toast({
+            variant: "destructive",
+            title: 'Upload Failed',
+            description: (error as Error).message,
+           });
+        } finally {
+            setIsUploading(false);
+        }
+    }
+  };
 
   const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
     if (!user) return;
@@ -118,11 +145,28 @@ export default function ProfilePage() {
               <CardDescription>Update your photo and personal details here.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={form.watch('photoURL') || `https://picsum.photos/seed/${user?.uid}/80/80`} />
+              <div className="flex items-center gap-6">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={form.watch('photoURL') || `https://picsum.photos/seed/${user?.uid}/96/96`} />
                   <AvatarFallback>{user?.email?.[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
+                <div>
+                  <Button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                    {isUploading ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Uploading...</>
+                    ) : (
+                        <><Upload className="mr-2 h-4 w-4"/> Upload New Photo</>
+                    )}
+                  </Button>
+                  <Input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/png, image/jpeg, image/gif"
+                    onChange={handleFileChange}
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">Recommended size: 200x200px. PNG, JPG, GIF accepted.</p>
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <FormField
@@ -207,7 +251,7 @@ export default function ProfilePage() {
               </CardContent>
           </Card>
 
-          <Button type="submit" disabled={form.formState.isSubmitting}>
+          <Button type="submit" disabled={form.formState.isSubmitting || isUploading}>
             {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </form>
