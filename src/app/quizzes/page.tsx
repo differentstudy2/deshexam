@@ -45,21 +45,27 @@ export default async function QuizzesPage() {
               </div>
             </CardHeader>
             <CardContent className="flex-grow p-4">
-              <p className="text-sm font-medium text-primary">{quiz.subject}</p>
+              {quiz.subject && <p className="text-sm font-medium text-primary">{quiz.subject}</p>}
               <CardTitle className="font-headline text-lg mt-1 mb-2 leading-tight">{quiz.title}</CardTitle>
               <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                <div className="flex items-center gap-1.5">
-                  <HelpCircle className="w-4 h-4" />
-                  <span>{quiz.questions.length} Questions</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" />
-                  <span>{quiz.duration} min</span>
-                </div>
-                 <div className="flex items-center gap-1.5">
-                  <BarChart className="w-4 h-4" />
-                  <span>{quiz.difficulty}</span>
-                </div>
+                {quiz.questions?.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <HelpCircle className="w-4 h-4" />
+                    <span>{quiz.questions.length} Questions</span>
+                  </div>
+                )}
+                {quiz.duration > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4" />
+                    <span>{quiz.duration} min</span>
+                  </div>
+                )}
+                {quiz.difficulty && (
+                  <div className="flex items-center gap-1.5">
+                    <BarChart className="w-4 h-4" />
+                    <span>{quiz.difficulty}</span>
+                  </div>
+                )}
               </div>
             </CardContent>
             <CardFooter className="p-4 pt-0">
@@ -73,5 +79,3 @@ export default async function QuizzesPage() {
     </div>
   );
 }
-
-    
