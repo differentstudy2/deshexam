@@ -484,11 +484,11 @@ export const getAllContent = async (type?: string) => {
         const contents = querySnapshot.docs.map(doc => {
             const data = doc.data();
             const createdAt = data.createdAt;
-            let formattedDate = new Date().toLocaleDateString();
+            let formattedDate = 'N/A';
             if (createdAt && typeof createdAt.toDate === 'function') {
                 formattedDate = createdAt.toDate().toLocaleDateString();
             } else if (createdAt) {
-                // Fallback for when it might be a string or number
+                // Fallback for when it might be a string or number from previous incorrect saves
                 const d = new Date(createdAt);
                 if (!isNaN(d.getTime())) {
                     formattedDate = d.toLocaleDateString();
@@ -1349,6 +1349,7 @@ export const updateSettings = async (data: any) => {
     
 
     
+
 
 
 
