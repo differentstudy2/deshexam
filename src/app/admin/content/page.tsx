@@ -456,9 +456,13 @@ export default function ManageContentPage() {
             if (dateField && typeof dateField.toDate === 'function') {
                 pubDate = dateField.toDate().toLocaleDateString();
             } else if (dateField) {
-                const d = new Date(dateField);
-                if (!isNaN(d.getTime())) {
-                    pubDate = d.toLocaleDateString();
+                try {
+                    const d = new Date(dateField);
+                    if (!isNaN(d.getTime())) {
+                        pubDate = d.toLocaleDateString();
+                    }
+                } catch(e) {
+                    // Ignore invalid date strings
                 }
             }
             return {
@@ -1190,3 +1194,4 @@ export default function ManageContentPage() {
     </div>
   );
 }
+
