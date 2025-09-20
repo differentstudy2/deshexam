@@ -25,6 +25,9 @@ import {
   Tag,
   FilePlus,
   BookPlus,
+  DollarSign,
+  Bell,
+  Flag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -43,6 +46,9 @@ const navItems = [
   { href: '/admin/add-content', label: 'Add Quiz/Test', icon: FilePlus },
   { href: '/admin/add-article', label: 'Add Article', icon: BookPlus },
   { href: '/admin/coupons', label: 'Manage Coupons', icon: Tag },
+  { href: '/admin/earning', label: 'Earning', icon: DollarSign },
+  { href: '/admin/push-notification', label: 'Push Notification', icon: Bell },
+  { href: '/admin/reports', label: 'Reports & Contact', icon: Flag },
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
 ];
 
