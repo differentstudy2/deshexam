@@ -196,26 +196,26 @@ function ReviewDisplay() {
       <>
         <Card className="max-w-4xl mx-auto mb-8 relative">
              <CardHeader>
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                    <div className="flex flex-col md:flex-row items-center gap-4">
                          <Avatar className="h-16 w-16">
                             <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                             <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-center md:justify-start gap-2">
                             <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                             </div>
-                            <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                            <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
                                 {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
                                 {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
                                 {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="text-right">
+                    <div className="flex items-center gap-6 mt-4 md:mt-0">
+                        <div className="text-center md:text-right">
                             <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
                             <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
                         </div>
@@ -228,7 +228,7 @@ function ReviewDisplay() {
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
                 <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
                     {test.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>}
                     {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
 
@@ -471,7 +471,7 @@ export default function TestReviewPage() {
 
 
   return (
-    <div className="container py-8 sm:py-12 px-0 sm:px-4 max-w-4xl">
+    <div className="container py-8 sm:py-12 md:max-w-4xl">
        <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8 px-4 sm:px-0">
         <div>
             <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
@@ -494,3 +494,4 @@ export default function TestReviewPage() {
     
 
     
+
