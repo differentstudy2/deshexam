@@ -113,7 +113,7 @@ export default function DashboardPage() {
           </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
         {loading ? (
            Array.from({ length: 2 }).map((_, i) => (
              <Card key={i}>
@@ -122,7 +122,6 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <Skeleton className="h-8 w-1/2 mb-2"/>
-                <Skeleton className="h-3 w-1/4"/>
               </CardContent>
             </Card>
            ))
@@ -143,7 +142,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Performance Over Time</CardTitle>
