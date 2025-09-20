@@ -99,7 +99,7 @@ export default function AdminLayout({
         </SidebarHeader>
         <SidebarContent>
             <ScrollArea className="h-full">
-                <SidebarMenu>
+                <SidebarMenu className="mt-6">
                     {navItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
