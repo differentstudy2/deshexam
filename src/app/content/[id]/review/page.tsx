@@ -469,7 +469,7 @@ export default function TestReviewPage() {
 
   return (
     <div className="container py-12 max-w-4xl">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8">
         <div>
             <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
             <p className="text-muted-foreground">Let's see how you did.</p>
@@ -489,3 +489,4 @@ export default function TestReviewPage() {
 }
 
     
+
