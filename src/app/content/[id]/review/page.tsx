@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -14,7 +13,7 @@ import {
 import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getSubmissionById, getContentById, getUserProfile, handleQuestionVote } from '@/lib/firebase/firestore';
+import { getSubmissionById, getContentById, getUserProfile, handleCommentVote } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -329,7 +328,7 @@ function ReviewDisplay() {
                                 )
                             })}
                             {question.type === 'True/False' && (
-                                <>
+                                <div className="space-y-3">
                                     {['True', 'False'].map((tf, tfIndex) => {
                                         const isUserAnswer = userAnswer === tf;
                                         const isCorrectAnswer = question.correctAnswer === tf;
@@ -338,39 +337,42 @@ function ReviewDisplay() {
                                         return (
                                             <div key={tfIndex} className={cn(
                                                 "p-3 rounded-lg border",
-                                                isUserAnswer && !isCorrectAnswer && "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800",
-                                                isCorrectAnswer && "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                                isCorrectAnswer ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" :
+                                                isUserAnswer ? "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800" : ""
                                             )}>
-                                                <div className="flex items-center">
+                                                <div className="flex items-center gap-2">
+                                                    {isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-600" /> : isUserAnswer ? <XCircle className="w-5 h-5 text-red-600" /> : <div className="w-5 h-5"/>}
                                                     <span className="font-medium">{option.text}</span>
-                                                    {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
-                                                    {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-2">Correct Answer</Badge>}
+                                                    {isUserAnswer && <Badge variant="secondary" className="ml-auto">Your Answer</Badge>}
+                                                    {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-auto">Correct</Badge>}
                                                 </div>
                                                 {option.explanation && (
-                                                    <p className="text-xs text-muted-foreground mt-1 pl-2 border-l-2 ml-1">
+                                                    <p className="text-sm text-muted-foreground mt-2 pl-7">
                                                         {option.explanation}
                                                     </p>
                                                 )}
                                             </div>
                                         )
                                     })}
-                                </>
+                                </div>
                             )}
                             {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                                <>
+                                <div className="space-y-3">
                                 <div className="p-3 rounded-lg border bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
+                                        <XCircle className="w-5 h-5 text-red-600" />
                                         <span className="font-medium">{userAnswer}</span>
-                                        <Badge variant="secondary" className="ml-2">Your Answer</Badge>
+                                        <Badge variant="destructive" className="ml-auto">Your Answer</Badge>
                                     </div>
                                 </div>
                                     <div className="p-3 rounded-lg border bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle className="w-5 h-5 text-green-600" />
                                         <span className="font-medium">{question.correctAnswer}</span>
-                                        <Badge variant="outline" className="ml-2">Correct Answer</Badge>
+                                        <Badge variant="outline" className="ml-auto">Correct Answer</Badge>
                                     </div>
                                 </div>
-                                </>
+                                </div>
                             )}
                             {question.type === 'Matching' && question.correctAnswer && (
                                 <div className="space-y-2">
@@ -469,7 +471,7 @@ export default function TestReviewPage() {
 
   return (
     <div className="container py-12 max-w-4xl">
-      <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8">
+       <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8">
         <div>
             <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
             <p className="text-muted-foreground">Let's see how you did.</p>
@@ -490,3 +492,4 @@ export default function TestReviewPage() {
 
     
 
+    
