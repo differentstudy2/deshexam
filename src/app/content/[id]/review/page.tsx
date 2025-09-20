@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -470,8 +471,8 @@ export default function TestReviewPage() {
 
 
   return (
-    <div className="container py-12 max-w-4xl">
-       <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8">
+    <div className="container py-8 sm:py-12 px-0 sm:px-4 max-w-4xl">
+       <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8 px-4 sm:px-0">
         <div>
             <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
             <p className="text-muted-foreground">Let's see how you did.</p>
