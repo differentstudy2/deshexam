@@ -675,7 +675,8 @@ export default function CreateTestPage() {
     try {
         const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
                      : aiData.sourceType === 'text' ? aiData.sourceText
-                     : aiData.sourceFile;
+                     : aiData.sourceFile || null;
+
 
         if (!source || source.length < 3) {
             toast({
@@ -1109,7 +1110,7 @@ export default function CreateTestPage() {
 
   return (
     <div>
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
                 <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
                 <p className="text-muted-foreground">
@@ -1830,7 +1831,7 @@ export default function CreateTestPage() {
                   })}
               </CardContent>
               <CardFooter>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Button
                       type="button"
                       variant="outline"
