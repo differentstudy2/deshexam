@@ -92,8 +92,8 @@ export default function DashboardPage() {
   }));
   
   const dashboardStats = [
-    { title: "Tests Taken", value: submissions.length, icon: <FileText/> },
-    { title: "Average Score", value: `${averageScore}%`, icon: <BarChart2/> },
+    { title: "Tests Taken", value: submissions.length, icon: <FileText/>, description: "Total tests completed" },
+    { title: "Average Score", value: `${averageScore}%`, icon: <BarChart2/>, description: "Your average across all tests" },
   ];
 
   return (
@@ -122,6 +122,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <Skeleton className="h-8 w-1/2 mb-2"/>
+                <Skeleton className="h-3 w-3/4"/>
               </CardContent>
             </Card>
            ))
@@ -136,6 +137,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
+                 <p className="text-xs text-muted-foreground">{stat.description}</p>
               </CardContent>
             </Card>
           ))
