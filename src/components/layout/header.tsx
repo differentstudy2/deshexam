@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,13 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "./theme-toggle";
+import { getUserProfile } from "@/lib/firebase/firestore";
 
 const navLinks = [
   { href: "/features", label: "Features" },
@@ -30,8 +32,25 @@ const navLinks = [
   { href: "/pricing", label: "Pricing" },
 ];
 
+type UserProfile = {
+  role?: 'admin' | 'user';
+};
+
 const UserNav = () => {
   const { user, loading, logOut } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const userProfile = await getUserProfile(user.uid);
+        setProfile(userProfile);
+      } else {
+        setProfile(null);
+      }
+    };
+    fetchProfile();
+  }, [user]);
 
   if (loading) {
     return <Skeleton className="h-9 w-9 rounded-full" />;
@@ -58,6 +77,14 @@ const UserNav = () => {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          {profile?.role === 'admin' && (
+            <DropdownMenuItem asChild>
+              <Link href="/admin">
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                <span>Admin</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild>
             <Link href="/dashboard">
               <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -142,12 +169,13 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
+               <SheetHeader className="border-b pb-4">
+                 <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+                 <Link href="/" className="flex items-center space-x-2">
+                   <DeshExamLogo />
+                 </Link>
+               </SheetHeader>
               <div className="flex flex-col h-full">
-                <div className="border-b pb-4">
-                  <Link href="/" className="flex items-center space-x-2">
-                    <DeshExamLogo />
-                  </Link>
-                </div>
                 <MainNav isMobile />
                 <div className="mt-auto border-t pt-4">
                   {!loading && !user && (
@@ -172,5 +200,3 @@ export function Header() {
     </header>
   );
 }
-
-    
