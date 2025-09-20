@@ -145,7 +145,7 @@ export default function ProfilePage() {
               <CardDescription>Update your photo and personal details here.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col md:flex-row items-center text-center md:text-left md:items-start gap-6">
                 <Avatar className="h-24 w-24">
                   <AvatarImage src={form.watch('photoURL') || `https://picsum.photos/seed/${user?.uid}/96/96`} />
                   <AvatarFallback>{user?.email?.[0].toUpperCase()}</AvatarFallback>
