@@ -1040,7 +1040,7 @@ export default function CreateTestPage() {
                             </TabsContent>
                         </Tabs>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={aiForm.control}
                                 name="numQuestions"
@@ -1108,7 +1108,7 @@ export default function CreateTestPage() {
 
   return (
     <div>
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
             <div>
                 <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
                 <p className="text-muted-foreground">
@@ -1116,7 +1116,7 @@ export default function CreateTestPage() {
                 </p>
             </div>
              <AIGeneratorDialog mode="full">
-                <Button variant="outline">
+                <Button variant="outline" className="w-full md:w-auto">
                     <Sparkles className="mr-2 h-4 w-4" />
                     {currentTestType === 'Learn' ? 'Generate Article with AI' : 'Generate with AI'}
                 </Button>
