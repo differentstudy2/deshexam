@@ -12,10 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, BarChart, ShoppingCart } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -24,12 +23,12 @@ import { ThemeToggle } from "./theme-toggle";
 import { getUserProfile } from "@/lib/firebase/firestore";
 
 const navLinks = [
-  { href: "/features", label: "Features" },
-  { href: "/mock-tests", label: "Mock Tests" },
-  { href: "/quizzes", label: "Quizzes" },
-  { href: "/learn", label: "Learn" },
-  { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/pricing", label: "Pricing" },
+    { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
+    { href: "/mock-tests", label: "Mock Tests", icon: <BookOpen className="h-5 w-5" /> },
+    { href: "/quizzes", label: "Quizzes", icon: <Gem className="h-5 w-5" /> },
+    { href: "/learn", label: "Learn", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { href: "/leaderboard", label: "Leaderboard", icon: <Trophy className="h-5 w-5" /> },
+    { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
 ];
 
 type UserProfile = {
@@ -121,16 +120,17 @@ const UserNav = () => {
 
 const MainNav = ({ isMobile = false }: { isMobile?: boolean }) => {
   const pathname = usePathname();
-  const NavLink = ({ href, label }: { href: string; label: string }) => (
+  const NavLink = ({ href, label, icon }: { href: string; label: string, icon?: React.ReactNode }) => (
     <Link
       href={href}
       className={cn(
-        "transition-colors hover:text-primary",
+        "transition-colors hover:text-primary flex items-center gap-4",
         pathname === href ? "text-primary font-medium" : "text-muted-foreground",
         isMobile && "text-lg py-2"
       )}
     >
-      {label}
+      {isMobile && icon}
+      <span>{label}</span>
     </Link>
   );
 
