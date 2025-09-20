@@ -15,13 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, BarChart, ShoppingCart } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "./theme-toggle";
 import { getUserProfile } from "@/lib/firebase/firestore";
+import { ScrollArea } from "../ui/scroll-area";
 
 const navLinks = [
     { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
@@ -169,16 +170,18 @@ export function Header() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
-               <SheetHeader className="border-b pb-4">
+            <SheetContent side="left" className="p-0">
+               <SheetHeader className="border-b p-4">
                  <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                  <Link href="/" className="flex items-center space-x-2">
                    <DeshExamLogo />
                  </Link>
                </SheetHeader>
-              <div className="flex flex-col h-full">
-                <MainNav isMobile />
-                <div className="mt-auto border-t pt-4">
+              <div className="flex flex-col h-[calc(100%-4.5rem)]">
+                <ScrollArea className="flex-1 p-4">
+                    <MainNav isMobile />
+                </ScrollArea>
+                <div className="mt-auto border-t p-4">
                   {!loading && !user && (
                     <div className="flex flex-col gap-2">
                       <Button variant="ghost" asChild>
