@@ -21,14 +21,17 @@ import {
   LayoutGrid,
   Library,
   FileText,
-  PlusCircle,
   Settings,
   BookUser,
   ClipboardList,
+  ShieldCheck,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
+import { useEffect, useState } from 'react';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutGrid },
@@ -39,13 +42,28 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
+type UserProfile = {
+  role?: 'admin' | 'user';
+};
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, logOut } = useAuth();
+  const { user, loading } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const userProfile = await getUserProfile(user.uid);
+        setProfile(userProfile);
+      }
+    };
+    fetchProfile();
+  }, [user]);
 
   return (
     <SidebarProvider>
@@ -58,24 +76,47 @@ export default function DashboardLayout({
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu className="mt-6">
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === item.href}
-                  tooltip={{
-                    children: item.label,
-                  }}
-                >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+           <ScrollArea className="h-full">
+                <SidebarMenu className="mt-6">
+                    {navItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        className={cn(
+                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                            "hover:bg-primary/10 hover:text-primary",
+                            pathname === item.href && "bg-primary/20 text-primary font-semibold border-l-4 border-primary"
+                        )}
+                        tooltip={{
+                            children: item.label,
+                        }}
+                        >
+                        <Link href={item.href}>
+                            <item.icon className="h-5 w-5" />
+                            <span>{item.label}</span>
+                        </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    ))}
+                    {profile?.role === 'admin' && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton 
+                            asChild
+                            className={cn(
+                                "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                                "hover:bg-secondary/80"
+                            )}
+                            >
+                                <Link href="/admin">
+                                    <ShieldCheck />
+                                    <span>Admin Dashboard</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
+                </SidebarMenu>
+            </ScrollArea>
         </SidebarContent>
         <SidebarFooter>
             <div className="flex items-center gap-2">
