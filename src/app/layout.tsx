@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+
+"use client";
+
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -10,6 +12,7 @@ import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
+import { usePathname } from "next/navigation";
 
 const fontBody = Inter({
   subsets: ["latin"],
@@ -22,16 +25,14 @@ const fontHeadline = Poppins({
   variable: "--font-headline",
 });
 
-export const metadata: Metadata = {
-  title: "DeshExam",
-  description: "Your ultimate destination for mock tests, quizzes, and personalized learning paths.",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const showFooter = !pathname.startsWith('/admin') && !pathname.startsWith('/dashboard') && !pathname.startsWith('/sign-in') && !pathname.startsWith('/sign-up');
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("antialiased", fontBody.variable, fontHeadline.variable)}>
@@ -43,9 +44,11 @@ export default function RootLayout({
         >
           <AuthProvider>
             <AuthDialogProvider>
-              <Header />
-              <main className="min-h-screen">{children}</main>
-              <Footer />
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-grow">{children}</main>
+                {showFooter && <Footer />}
+              </div>
               <AuthDialog />
             </AuthDialogProvider>
           </AuthProvider>
