@@ -51,14 +51,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
-import { generateLearnContent, AILearnContentGeneratorInput, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
-import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
+import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import Link from 'next/link';
 
 
 const optionSchema = z.object({
@@ -149,10 +148,6 @@ const aiGeneratorFormSchema = z.object({
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
-const aiLearnGeneratorFormSchema = z.object({
-  topic: z.string().min(5, 'Topic must be at least 5 characters.'),
-});
-type AILearnGeneratorFormValues = z.infer<typeof aiLearnGeneratorFormSchema>;
 
 const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlChange: (url: string) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -316,7 +311,6 @@ export default function CreateTestPage() {
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -375,9 +369,42 @@ export default function CreateTestPage() {
     },
   });
 
+  const { fields, append, remove, replace } = useFieldArray({
+    control: form.control,
+    name: 'questions',
+  });
+
   useEffect(() => {
+    // Check for AI generated content in session storage
+    const aiContentRaw = sessionStorage.getItem('aiGeneratedContent');
+    if (aiContentRaw) {
+      try {
+        const aiContent = JSON.parse(aiContentRaw);
+        form.setValue('title', aiContent.title);
+        form.setValue('description', aiContent.description);
+        form.setValue('difficulty', aiContent.difficulty);
+        replace(aiContent.questions.map((q: any) => ({
+            ...q,
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            explanation: q.explanation || ''
+        })));
+        toast({
+            title: 'Content Loaded!',
+            description: 'AI-generated content has been populated into the form.',
+        });
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Failed to load AI content',
+            description: 'The stored AI content was corrupted.',
+        });
+      } finally {
+          sessionStorage.removeItem('aiGeneratedContent');
+      }
+    }
+
     fetchFormData();
-  }, []);
+  }, [form, replace, toast]);
   
   const currentTestType = form.watch('testType');
 
@@ -424,30 +451,35 @@ export default function CreateTestPage() {
             defaultExam: siteSettings.defaultExam ?? '',
         });
 
-        // Set default form values from settings
+        // Set default form values from settings, but only if they haven't been set by AI content
+        const currentValues = form.getValues();
         form.reset({
-            ...form.getValues(),
-            board: siteSettings.defaultBoard ?? '',
-            class: siteSettings.defaultClass ?? '',
-            subject: siteSettings.defaultSubject ?? '',
-            examCategory: siteSettings.defaultExamCategory ?? '',
-            state: siteSettings.defaultState ?? '',
+            ...currentValues,
+            board: currentValues.board || siteSettings.defaultBoard || '',
+            class: currentValues.class || siteSettings.defaultClass || '',
+            subject: currentValues.subject || siteSettings.defaultSubject || '',
+            examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
+            state: currentValues.state || siteSettings.defaultState || '',
         });
 
-         if (siteSettings.defaultSubject) {
-            const selectedSubject = subjectData.find(s => s.name === siteSettings.defaultSubject);
+         if (form.getValues('subject')) {
+            const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
             if (selectedSubject) {
                 const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
                 setChapters(fetchedChapters);
-                form.setValue('chapter', siteSettings.defaultChapter ?? '');
+                if (siteSettings.defaultChapter && !form.getValues('chapter')) {
+                  form.setValue('chapter', siteSettings.defaultChapter);
+                }
             }
         }
-        if (siteSettings.defaultExamCategory) {
-            const selectedExamCategory = examTypeData.find(e => e.name === siteSettings.defaultExamCategory);
+        if (form.getValues('examCategory')) {
+            const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
             if (selectedExamCategory) {
                 const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
                 setExams(fetchedExams);
-                form.setValue('exam', siteSettings.defaultExam ?? '');
+                 if (siteSettings.defaultExam && !form.getValues('exam')) {
+                  form.setValue('exam', siteSettings.defaultExam);
+                }
             }
         }
       }
@@ -485,18 +517,6 @@ export default function CreateTestPage() {
     },
   });
   
-  const aiLearnForm = useForm<AILearnGeneratorFormValues>({
-    resolver: zodResolver(aiLearnGeneratorFormSchema),
-    defaultValues: {
-      topic: '',
-    },
-  });
-
-  const { fields, append, remove, replace } = useFieldArray({
-    control: form.control,
-    name: 'questions',
-  });
-
   const questions = form.watch('questions');
   useEffect(() => {
     if (currentTestType !== 'Learn') {
@@ -669,60 +689,6 @@ export default function CreateTestPage() {
     }
   }
 
-  const handleAIGenerateFull = async (aiData: AIGeneratorFormValues) => {
-    setIsGenerating(true);
-    try {
-        const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
-                     : aiData.sourceType === 'text' ? aiData.sourceText
-                     : aiData.sourceFile || null;
-
-        if (!source || source.length < 3) {
-            toast({
-                variant: "destructive",
-                title: 'AI Generation Failed',
-                description: 'Source content must be at least 3 characters.',
-            });
-            setIsGenerating(false);
-            return;
-        }
-
-        const input: AIContentGeneratorInput = {
-            numQuestions: aiData.numQuestions,
-            difficulty: aiData.difficulty,
-            questionType: aiData.questionType,
-            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
-            source: source,
-            contentType: form.getValues('testType') || 'Mock Test',
-        };
-        const result: AIContentGeneratorOutput = await generateContent(input);
-
-        form.setValue('title', result.title);
-        form.setValue('description', result.description);
-        form.setValue('difficulty', aiData.difficulty);
-        replace(result.questions.map(q => ({
-            ...q,
-            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
-            explanation: q.explanation || ''
-        })));
-
-        toast({
-            title: 'Content Generated!',
-            description: `AI has created a draft for "${result.title}".`,
-        });
-        
-        setIsAiGeneratorOpen(false);
-
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: 'AI Generation Failed',
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-  
   const handleAIAddQuestions = async (aiData: AIGeneratorFormValues) => {
     setIsGenerating(true);
     try {
@@ -763,7 +729,7 @@ export default function CreateTestPage() {
         description: (error as Error).message,
       });
     } finally {
-        setIsGenerating(false);
+      setIsGenerating(false);
     }
   }
 
@@ -796,30 +762,6 @@ export default function CreateTestPage() {
       setIsGeneratingDesc(false);
     }
   };
-
-  const handleAILearnGenerate = async (aiData: AILearnGeneratorFormValues) => {
-    setIsGenerating(true);
-    try {
-        const result: AILearnContentGeneratorOutput = await generateLearnContent(aiData);
-        form.setValue('title', result.title);
-        form.setValue('description', result.description);
-        form.setValue('body', result.body);
-        toast({
-            title: 'Article Generated!',
-            description: `AI has created a draft for "${result.title}".`,
-        });
-        setIsAiGeneratorOpen(false);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: 'AI Generation Failed',
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  }
-
 
   const handleTabChange = (value: string) => {
     form.setValue('testType', value, { shouldValidate: true });
@@ -941,202 +883,6 @@ export default function CreateTestPage() {
     )
   }
   
-  const FullContentAIGenerator = () => {
-    
-    if (currentTestType === 'Learn') {
-        return (
-             <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
-                <DialogTrigger asChild>
-                     <Button variant="outline" className="w-full md:w-auto">
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Generate Article with AI
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                     <DialogHeader>
-                        <DialogTitle>Generate Article with AI</DialogTitle>
-                        <DialogDescription>
-                            Enter a topic and Gemini will write a draft article for you.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <Form {...aiLearnForm}>
-                        <form onSubmit={aiLearnForm.handleSubmit(handleAILearnGenerate)} className="space-y-4">
-                             <FormField
-                                control={aiLearnForm.control}
-                                name="topic"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Article Topic</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="e.g., 'The Future of Renewable Energy'" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                             <DialogFooter>
-                                <Button type="submit" disabled={isGenerating}>
-                                    {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </Form>
-                </DialogContent>
-             </Dialog>
-        );
-    }
-    
-    return (
-         <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="w-full md:w-auto">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate with AI
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-xl">
-                <DialogHeader>
-                <DialogTitle>Generate Content with AI</DialogTitle>
-                <DialogDescription>
-                    Describe the content you want to create, and Gemini will generate a draft for you.
-                </DialogDescription>
-                </DialogHeader>
-                <Form {...aiForm}>
-                <form onSubmit={aiForm.handleSubmit(handleAIGenerateFull)} className="space-y-4">
-                        <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="topic">From Topic</TabsTrigger>
-                                <TabsTrigger value="text">From Text</TabsTrigger>
-                                <TabsTrigger value="file">From File</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="topic" className="pt-4">
-                                <FormField
-                                    control={aiForm.control}
-                                    name="sourceTopic"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Topic</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TabsContent>
-                            <TabsContent value="text" className="pt-4">
-                                <FormField
-                                    control={aiForm.control}
-                                    name="sourceText"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Paste Text</FormLabel>
-                                            <FormControl>
-                                                <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </TabsContent>
-                            <TabsContent value="file" className="pt-4">
-                                <FormItem>
-                                    <FormLabel>Upload File</FormLabel>
-                                    <FormControl>
-                                        <div 
-                                            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        >
-                                            <div className="space-y-1 text-center">
-                                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                                <div className="flex text-sm text-muted-foreground">
-                                                    <p className="pl-1">
-                                                        {aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}
-                                                    </p>
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                {aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </FormControl>
-                                    <Input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                        accept=".txt"
-                                    />
-                                    <FormMessage />
-                                </FormItem>
-                            </TabsContent>
-                        </Tabs>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormField
-                                control={aiForm.control}
-                                name="numQuestions"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Number of Questions</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={aiForm.control}
-                                name="difficulty"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Difficulty</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="Easy">Easy</SelectItem>
-                                                <SelectItem value="Medium">Medium</SelectItem>
-                                                <SelectItem value="Hard">Hard</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <FormField
-                            control={aiForm.control}
-                            name="questionType"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Question Type</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="Any">Any</SelectItem>
-                                            {settings.enableMultipleChoice && <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>}
-                                            {settings.enableTrueFalse && <SelectItem value="True/False">True/False</SelectItem>}
-                                            {settings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
-                                            {settings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
-                                            {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <DialogFooter>
-                            <Button type="submit" disabled={isGenerating}>
-                                {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
-                            </Button>
-                        </DialogFooter>
-                </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
-    );
-  }
 
   return (
     <div>
@@ -1147,7 +893,12 @@ export default function CreateTestPage() {
                     Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
                 </p>
             </div>
-             <FullContentAIGenerator />
+             <Button asChild variant="outline" className="w-full md:w-auto">
+                <Link href="/admin/add-content/ai-content">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate with AI
+                </Link>
+            </Button>
         </div>
 
 
