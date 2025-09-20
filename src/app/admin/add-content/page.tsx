@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -1126,7 +1127,7 @@ export default function CreateTestPage() {
 
     {contentTypes.length > 0 && (
       <Tabs defaultValue={form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${contentTypes.length}, 1fr)`}}>
+        <TabsList className="flex flex-wrap h-auto justify-start">
           {contentTypes.map((type) => (
             <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
           ))}
