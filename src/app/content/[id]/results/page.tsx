@@ -141,7 +141,7 @@ function ResultsDisplay() {
         </CardHeader>
         <CardContent className="space-y-4 pt-0">
             <Separator />
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
                 {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
                 
@@ -213,4 +213,5 @@ export default function TestResultsPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
 
