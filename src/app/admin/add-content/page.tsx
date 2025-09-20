@@ -317,7 +317,6 @@ export default function CreateTestPage() {
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
-  const [generatorMode, setGeneratorMode] = useState<'full' | 'questions'>('full');
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -370,8 +369,8 @@ export default function CreateTestPage() {
       difficulty: 'Medium',
       access: 'free',
       price: undefined,
-      publishedAt: new Date(),
       subscriptionPlan: 'pass',
+      publishedAt: new Date(),
       questions: [],
     },
   });
@@ -670,7 +669,61 @@ export default function CreateTestPage() {
     }
   }
 
-  const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
+  const handleAIGenerateFull = async (aiData: AIGeneratorFormValues) => {
+    setIsGenerating(true);
+    try {
+        const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
+                     : aiData.sourceType === 'text' ? aiData.sourceText
+                     : aiData.sourceFile || null;
+
+        if (!source || source.length < 3) {
+            toast({
+                variant: "destructive",
+                title: 'AI Generation Failed',
+                description: 'Source content must be at least 3 characters.',
+            });
+            setIsGenerating(false);
+            return;
+        }
+
+        const input: AIContentGeneratorInput = {
+            numQuestions: aiData.numQuestions,
+            difficulty: aiData.difficulty,
+            questionType: aiData.questionType,
+            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+            source: source,
+            contentType: form.getValues('testType') || 'Mock Test',
+        };
+        const result: AIContentGeneratorOutput = await generateContent(input);
+
+        form.setValue('title', result.title);
+        form.setValue('description', result.description);
+        form.setValue('difficulty', aiData.difficulty);
+        replace(result.questions.map(q => ({
+            ...q,
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            explanation: q.explanation || ''
+        })));
+
+        toast({
+            title: 'Content Generated!',
+            description: `AI has created a draft for "${result.title}".`,
+        });
+        
+        setIsAiGeneratorOpen(false);
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: 'AI Generation Failed',
+        description: (error as Error).message,
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  const handleAIAddQuestions = async (aiData: AIGeneratorFormValues) => {
     setIsGenerating(true);
     try {
         const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
@@ -687,56 +740,32 @@ export default function CreateTestPage() {
             setIsGenerating(false);
             return;
         }
-
-        const commonInput = {
+        
+        const input: AIQuestionGeneratorInput = {
             numQuestions: aiData.numQuestions,
             difficulty: aiData.difficulty,
             questionType: aiData.questionType,
             sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
             source: source,
         };
-
-        if (generatorMode === 'questions') {
-            const input: AIQuestionGeneratorInput = commonInput;
-            const result: AIQuestionGeneratorOutput = await generateQuestions(input);
-            append(result.questions);
-            toast({
-                title: 'Questions Added!',
-                description: `${result.questions.length} new questions have been added.`,
-            });
-        } else { // full generation
-            const input: AIContentGeneratorInput = {
-                ...commonInput,
-                contentType: form.getValues('testType') || 'Mock Test',
-            };
-            const result: AIContentGeneratorOutput = await generateContent(input);
-
-            form.setValue('title', result.title);
-            form.setValue('description', result.description);
-            form.setValue('difficulty', aiData.difficulty);
-            replace(result.questions.map(q => ({
-                ...q,
-                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
-                explanation: q.explanation || ''
-            })));
-
-            toast({
-                title: 'Content Generated!',
-                description: `AI has created a draft for "${result.title}".`,
-            });
-        }
-        setIsAiGeneratorOpen(false);
+        
+        const result: AIQuestionGeneratorOutput = await generateQuestions(input);
+        append(result.questions);
+        toast({
+            title: 'Questions Added!',
+            description: `${result.questions.length} new questions have been added.`,
+        });
 
     } catch (error) {
-      toast({
+       toast({
         variant: "destructive",
         title: 'AI Generation Failed',
         description: (error as Error).message,
       });
     } finally {
-      setIsGenerating(false);
+        setIsGenerating(false);
     }
-  };
+  }
 
   const handleAIDescriptionGenerate = async () => {
     const title = form.getValues('title');
@@ -912,18 +941,16 @@ export default function CreateTestPage() {
     )
   }
   
-  const AIGeneratorDialog = ({ children, mode }: { children: React.ReactNode, mode: 'full' | 'questions' }) => {
+  const FullContentAIGenerator = () => {
     
-    const openGenerator = () => {
-        setGeneratorMode(mode);
-        setIsAiGeneratorOpen(true);
-    }
-
     if (currentTestType === 'Learn') {
         return (
              <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
-                <DialogTrigger asChild onClick={openGenerator}>
-                    {children}
+                <DialogTrigger asChild>
+                     <Button variant="outline" className="w-full md:w-auto">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Generate Article with AI
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                      <DialogHeader>
@@ -961,18 +988,21 @@ export default function CreateTestPage() {
     
     return (
          <Dialog open={isAiGeneratorOpen} onOpenChange={setIsAiGeneratorOpen}>
-            <DialogTrigger asChild onClick={openGenerator}>
-                {children}
+            <DialogTrigger asChild>
+                <Button variant="outline" className="w-full md:w-auto">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate with AI
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
-                <DialogTitle>{mode === 'full' ? 'Generate Content with AI' : 'Generate Questions with AI'}</DialogTitle>
+                <DialogTitle>Generate Content with AI</DialogTitle>
                 <DialogDescription>
-                    {mode === 'full' ? 'Describe the content you want to create, and Gemini will generate a draft for you.' : 'Generate a set of questions to add to your content.'}
+                    Describe the content you want to create, and Gemini will generate a draft for you.
                 </DialogDescription>
                 </DialogHeader>
                 <Form {...aiForm}>
-                <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                <form onSubmit={aiForm.handleSubmit(handleAIGenerateFull)} className="space-y-4">
                         <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
                             <TabsList className="grid w-full grid-cols-3">
                                 <TabsTrigger value="topic">From Topic</TabsTrigger>
@@ -1117,12 +1147,7 @@ export default function CreateTestPage() {
                     Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
                 </p>
             </div>
-             <AIGeneratorDialog mode="full">
-                <Button variant="outline" className="w-full md:w-auto">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    {currentTestType === 'Learn' ? 'Generate Article with AI' : 'Generate with AI'}
-                </Button>
-            </AIGeneratorDialog>
+             <FullContentAIGenerator />
         </div>
 
 
@@ -1853,9 +1878,10 @@ export default function CreateTestPage() {
                       <PlusCircle className="mr-2" />
                       Add Question Manually
                   </Button>
-                  <Collapsible>
+                  <div className="flex-1">
+                    <Collapsible>
                       <CollapsibleTrigger asChild>
-                         <Button type="button" variant="outline">
+                         <Button type="button" variant="outline" className="w-full">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                          </Button>
@@ -1863,7 +1889,7 @@ export default function CreateTestPage() {
                       <CollapsibleContent>
                         <Card className="mt-4 p-4">
                            <Form {...aiForm}>
-                            <form onSubmit={aiForm.handleSubmit((data) => handleAIGenerate({ ...data, ...aiForm.getValues() }))} className="space-y-4">
+                            <form onSubmit={aiForm.handleSubmit(handleAIAddQuestions)} className="space-y-4">
                                 <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
                                     <TabsList className="grid w-full grid-cols-3">
                                         <TabsTrigger value="topic">From Topic</TabsTrigger>
@@ -1909,7 +1935,8 @@ export default function CreateTestPage() {
                            </Form>
                         </Card>
                       </CollapsibleContent>
-                  </Collapsible>
+                    </Collapsible>
+                  </div>
                 </div>
               </CardFooter>
             </Card>
@@ -1938,3 +1965,6 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
+
+    
