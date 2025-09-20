@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -122,8 +122,14 @@ const UserNav = () => {
 
   return (
     <div className="hidden md:flex items-center gap-2">
-      <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>Sign In</Button>
-      <Button onClick={() => openAuthDialog('sign-up')}>Sign Up</Button>
+      <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>
+        <LogIn />
+        Sign In
+      </Button>
+      <Button onClick={() => openAuthDialog('sign-up')}>
+        <UserPlus />
+        Sign Up
+      </Button>
     </div>
   );
 };
@@ -160,7 +166,7 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
 };
 
 export function Header() {
-  const { user, loading } = useAuth();
+  const { user, loading, logOut } = useAuth();
   const { openAuthDialog } = useAuthDialog();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   
