@@ -403,8 +403,32 @@ export default function CreateTestPage() {
       }
     }
 
+    const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
+    if (aiQuestionsRaw) {
+      try {
+        const aiQuestions = JSON.parse(aiQuestionsRaw);
+        append(aiQuestions.map((q: any) => ({
+            ...q,
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            explanation: q.explanation || ''
+        })));
+        toast({
+            title: 'Questions Added!',
+            description: 'AI-generated questions have been added to the form.',
+        });
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Failed to load AI questions',
+            description: 'The stored AI questions were corrupted.',
+        });
+      } finally {
+          sessionStorage.removeItem('aiGeneratedQuestions');
+      }
+    }
+
     fetchFormData();
-  }, [form, replace, toast]);
+  }, [form, replace, toast, append]);
   
   const currentTestType = form.watch('testType');
 
@@ -686,50 +710,6 @@ export default function CreateTestPage() {
         title: 'Error Creating Content',
         description: (error as Error).message,
       });
-    }
-  }
-
-  const handleAIAddQuestions = async (aiData: AIGeneratorFormValues) => {
-    setIsGenerating(true);
-    try {
-        const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
-                     : aiData.sourceType === 'text' ? aiData.sourceText
-                     : aiData.sourceFile || null;
-
-
-        if (!source || source.length < 3) {
-            toast({
-                variant: "destructive",
-                title: 'AI Generation Failed',
-                description: 'Source content must be at least 3 characters.',
-            });
-            setIsGenerating(false);
-            return;
-        }
-        
-        const input: AIQuestionGeneratorInput = {
-            numQuestions: aiData.numQuestions,
-            difficulty: aiData.difficulty,
-            questionType: aiData.questionType,
-            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
-            source: source,
-        };
-        
-        const result: AIQuestionGeneratorOutput = await generateQuestions(input);
-        append(result.questions);
-        toast({
-            title: 'Questions Added!',
-            description: `${result.questions.length} new questions have been added.`,
-        });
-
-    } catch (error) {
-       toast({
-        variant: "destructive",
-        title: 'AI Generation Failed',
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsGenerating(false);
     }
   }
 
@@ -1629,6 +1609,12 @@ export default function CreateTestPage() {
                       <PlusCircle className="mr-2" />
                       Add Question Manually
                   </Button>
+                   <Button asChild variant="outline">
+                        <Link href="/admin/add-content/add-ai-question">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Add Questions with AI
+                        </Link>
+                    </Button>
                 </div>
               </CardFooter>
             </Card>
@@ -1657,6 +1643,3 @@ export default function CreateTestPage() {
     </div>
   );
 }
-
-
-    
