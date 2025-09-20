@@ -91,10 +91,6 @@ export default function DashboardLayout({
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex items-center justify-between p-4 border-b md:hidden">
-            <DeshExamLogo />
-            <SidebarTrigger />
-        </header>
         <main className="p-4 md:p-6 lg:p-8">
             {children}
         </main>
