@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -1307,7 +1306,7 @@ export default function CreateTestPage() {
                 />}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                  {settings.enableExamCategoryMetafield && <FormField
                   control={form.control}
                   name="examCategory"
@@ -1555,7 +1554,7 @@ export default function CreateTestPage() {
                         </FormItem>
                     )}
                 />
-                  <div className='space-y-2'>
+                  <div className='space-y-2 lg:col-span-3'>
                       <FormField
                         control={form.control}
                         name="access"
@@ -1712,8 +1711,8 @@ export default function CreateTestPage() {
                                               control={form.control}
                                               name={`questions.${index}.correctAnswer`}
                                               render={({ field }) => (
-                                                  <RadioGroup 
-                                                    key={`${question.id}-${field.value}`} // Force re-render
+                                                  <RadioGroup
+                                                    key={`${question.id}-${field.value}`}
                                                     onValueChange={field.onChange} 
                                                     value={field.value} 
                                                     className="grid grid-cols-1 md:grid-cols-2 gap-4"

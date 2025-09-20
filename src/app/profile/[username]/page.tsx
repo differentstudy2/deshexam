@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -180,12 +179,12 @@ export default function UserProfilePage() {
                     <AvatarFallback>{profile.displayName?.[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex-grow text-center md:text-left">
-                    <div className="flex items-center justify-center md:justify-start gap-2">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
                         <h1 className="text-2xl font-bold font-headline">{profile.displayName}</h1>
                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                         <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-600"><Star className="w-3.5 h-3.5 mr-1" />Level 42</Badge>
                     </div>
-                    <div className="text-muted-foreground text-sm mt-1 flex items-center justify-center md:justify-start gap-4">
+                    <div className="text-muted-foreground text-sm mt-1 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1">
                         <span>@{profile.username}</span>
                         <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> United States</span>
                         <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Joined on {new Date(profile.createdAt?.seconds * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -247,39 +246,41 @@ export default function UserProfilePage() {
               <Card>
                  <CardHeader><CardTitle>Quizzes Taken ({submissions.length})</CardTitle></CardHeader>
                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Test Title</TableHead>
-                          <TableHead className="hidden md:table-cell">Score</TableHead>
-                          <TableHead className="hidden md:table-cell">Date</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {submissions.length > 0 ? submissions.map(sub => (
-                          <TableRow key={sub.id}>
-                            <TableCell className="font-medium">{sub.testTitle}</TableCell>
-                            <TableCell className="hidden md:table-cell">
-                              <div className="flex items-center gap-2">
-                                  <span>{Math.round((sub.score / sub.totalQuestions) * 100)}%</span>
-                                  <Progress value={Math.round((sub.score / sub.totalQuestions) * 100)} className="w-20 h-2"/>
-                              </div>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">{sub.submittedAt.toLocaleDateString()}</TableCell>
-                            <TableCell className="text-right">
-                              <Button asChild variant="outline" size="sm">
-                                  <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
-                                      <Eye className="mr-2"/> View
-                                  </Link>
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        )) : (
-                          <TableRow><TableCell colSpan={4} className="h-24 text-center">No tests taken yet.</TableCell></TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
+                    <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Test Title</TableHead>
+                              <TableHead className="hidden md:table-cell">Score</TableHead>
+                              <TableHead className="hidden md:table-cell">Date</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {submissions.length > 0 ? submissions.map(sub => (
+                              <TableRow key={sub.id}>
+                                <TableCell className="font-medium">{sub.testTitle}</TableCell>
+                                <TableCell className="hidden md:table-cell">
+                                  <div className="flex items-center gap-2">
+                                      <span>{Math.round((sub.score / sub.totalQuestions) * 100)}%</span>
+                                      <Progress value={Math.round((sub.score / sub.totalQuestions) * 100)} className="w-20 h-2"/>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell">{sub.submittedAt.toLocaleDateString()}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button asChild variant="outline" size="sm">
+                                      <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
+                                          <Eye className="mr-2"/> View
+                                      </Link>
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            )) : (
+                              <TableRow><TableCell colSpan={4} className="h-24 text-center">No tests taken yet.</TableCell></TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                    </div>
                  </CardContent>
               </Card>
             </TabsContent>
@@ -287,34 +288,36 @@ export default function UserProfilePage() {
               <Card>
                  <CardHeader><CardTitle>Created Quizzes ({createdContent.length})</CardTitle></CardHeader>
                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Title</TableHead>
-                          <TableHead className="hidden md:table-cell">Type</TableHead>
-                          <TableHead className="hidden md:table-cell">Subject</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {createdContent.length > 0 ? createdContent.map(content => (
-                          <TableRow key={content.id}>
-                            <TableCell className="font-medium">{content.title}</TableCell>
-                            <TableCell className="hidden md:table-cell">{content.testType}</TableCell>
-                            <TableCell className="hidden md:table-cell">{content.subject}</TableCell>
-                            <TableCell className="text-right">
-                              <Button asChild variant="outline" size="sm">
-                                  <Link href={getUrlForContent(content.testType, content.id)}>
-                                    <Eye className="mr-2"/> View
-                                  </Link>
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        )) : (
-                          <TableRow><TableCell colSpan={4} className="h-24 text-center">No content created yet.</TableCell></TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
+                    <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Title</TableHead>
+                              <TableHead className="hidden md:table-cell">Type</TableHead>
+                              <TableHead className="hidden md:table-cell">Subject</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {createdContent.length > 0 ? createdContent.map(content => (
+                              <TableRow key={content.id}>
+                                <TableCell className="font-medium">{content.title}</TableCell>
+                                <TableCell className="hidden md:table-cell">{content.testType}</TableCell>
+                                <TableCell className="hidden md:table-cell">{content.subject}</TableCell>
+                                <TableCell className="text-right">
+                                  <Button asChild variant="outline" size="sm">
+                                      <Link href={getUrlForContent(content.testType, content.id)}>
+                                        <Eye className="mr-2"/> View
+                                      </Link>
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            )) : (
+                              <TableRow><TableCell colSpan={4} className="h-24 text-center">No content created yet.</TableCell></TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                    </div>
                  </CardContent>
               </Card>
             </TabsContent>

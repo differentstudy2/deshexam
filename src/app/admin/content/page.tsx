@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -760,18 +759,18 @@ export default function ManageContentPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 className="font-headline text-3xl font-bold">Manage Content</h1>
             <p className="text-muted-foreground">
             View and manage all content across the platform.
             </p>
         </div>
-         <div className="flex gap-2">
-            <Button asChild variant="outline">
+         <div className="flex gap-2 w-full sm:w-auto">
+            <Button asChild variant="outline" className="w-full">
                 <Link href="/admin/add-article"><BookPlus className="mr-2"/>Add Article</Link>
             </Button>
-            <Button asChild>
+            <Button asChild className="w-full">
                 <Link href="/admin/add-content"><FilePlus className="mr-2"/>Add Quiz/Test</Link>
             </Button>
         </div>
@@ -790,91 +789,93 @@ export default function ManageContentPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search by title..." className="pl-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
-                 <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Filter by subject" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Subjects</SelectItem>
-                        {subjects.map(sub => <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                 <Select value={accessFilter} onValueChange={setAccessFilter} disabled={activeTab === 'Questions'}>
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Filter by access" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Access</SelectItem>
-                        <SelectItem value="free">Free</SelectItem>
-                        <SelectItem value="premium">Premium</SelectItem>
-                        <SelectItem value="pro">Pro</SelectItem>
-                    </SelectContent>
-                </Select>
-                 {selectedContent.length > 0 && activeTab !== 'Questions' && (
-                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full sm:w-auto">
-                                Bulk Actions ({selectedContent.length}) <Filter className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuLabel>Modify Selected</DropdownMenuLabel>
-                             <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Change Board</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    {boards.map(b => (
-                                        <DropdownMenuItem key={b.id} onClick={() => openBulkActionDialog({ type: 'board', value: b.name })}>{b.name}</DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                             <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Change Subject</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    {subjects.map(s => (
-                                        <DropdownMenuItem key={s.id} onClick={() => openBulkActionDialog({ type: 'subject', value: s.name })}>{s.name}</DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Change Chapter</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                     {chapters.map(c => (
-                                        <DropdownMenuItem key={c.id} onClick={() => openBulkActionDialog({ type: 'chapter', value: `${c.chapterNo}. ${c.chapterName}` })}>{c.chapterNo}. {c.chapterName}</DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                             <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Change Exam Category</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    {examTypes.map(et => (
-                                        <DropdownMenuItem key={et.id} onClick={() => openBulkActionDialog({ type: 'examCategory', value: et.name })}>{et.name}</DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                             <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Change Exam</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    {exams.map(e => (
-                                        <DropdownMenuItem key={e.id} onClick={() => openBulkActionDialog({ type: 'exam', value: e.name })}>{e.name}</DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSub>
-                                <DropdownMenuSubTrigger>Change Access Level</DropdownMenuSubTrigger>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'free' })}>Free</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'premium' })}>Premium</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'pro' })}>Pro</DropdownMenuItem>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete' })}>
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Selected
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                 )}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Filter by subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Subjects</SelectItem>
+                            {subjects.map(sub => <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={accessFilter} onValueChange={setAccessFilter} disabled={activeTab === 'Questions'}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Filter by access" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Access</SelectItem>
+                            <SelectItem value="free">Free</SelectItem>
+                            <SelectItem value="premium">Premium</SelectItem>
+                            <SelectItem value="pro">Pro</SelectItem>
+                        </SelectContent>
+                    </Select>
+                     {selectedContent.length > 0 && activeTab !== 'Questions' && (
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full">
+                                    Bulk Actions ({selectedContent.length}) <Filter className="ml-2 h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuLabel>Modify Selected</DropdownMenuLabel>
+                                 <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Change Board</DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent>
+                                        {boards.map(b => (
+                                            <DropdownMenuItem key={b.id} onClick={() => openBulkActionDialog({ type: 'board', value: b.name })}>{b.name}</DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                                 <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Change Subject</DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent>
+                                        {subjects.map(s => (
+                                            <DropdownMenuItem key={s.id} onClick={() => openBulkActionDialog({ type: 'subject', value: s.name })}>{s.name}</DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Change Chapter</DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent>
+                                         {chapters.map(c => (
+                                            <DropdownMenuItem key={c.id} onClick={() => openBulkActionDialog({ type: 'chapter', value: `${c.chapterNo}. ${c.chapterName}` })}>{c.chapterNo}. {c.chapterName}</DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                                 <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Change Exam Category</DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent>
+                                        {examTypes.map(et => (
+                                            <DropdownMenuItem key={et.id} onClick={() => openBulkActionDialog({ type: 'examCategory', value: et.name })}>{et.name}</DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                                 <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Change Exam</DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent>
+                                        {exams.map(e => (
+                                            <DropdownMenuItem key={e.id} onClick={() => openBulkActionDialog({ type: 'exam', value: e.name })}>{e.name}</DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                                <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>Change Access Level</DropdownMenuSubTrigger>
+                                    <DropdownMenuSubContent>
+                                        <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'free' })}>Free</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'premium' })}>Premium</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => openBulkActionDialog({ type: 'access', value: 'pro' })}>Pro</DropdownMenuItem>
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete' })}>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Selected
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                     )}
+                </div>
             </div>
            {loading ? (
              <div className="flex items-center justify-center min-h-[200px]">
@@ -1209,5 +1210,3 @@ export default function ManageContentPage() {
     </div>
   );
 }
-
-

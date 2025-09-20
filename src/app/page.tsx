@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,9 @@ import {
   Rocket,
   Star,
   Trophy,
+  BarChart,
+  Users,
+  TrendingUp,
 } from "lucide-react";
 
 const features = [
@@ -38,26 +42,44 @@ const features = [
   },
 ];
 
+const whyChooseUs = [
+    {
+        icon: <BarChart className="w-10 h-10 text-primary" />,
+        title: "Comprehensive Analytics",
+        description: "Get detailed insights into your performance to identify strengths and weaknesses."
+    },
+    {
+        icon: <Users className="w-10 h-10 text-primary" />,
+        title: "Expert-Crafted Content",
+        description: "Our tests and materials are created by subject-matter experts for top-quality preparation."
+    },
+    {
+        icon: <TrendingUp className="w-10 h-10 text-primary" />,
+        title: "Proven Results",
+        description: "Join thousands of successful students who have achieved their exam goals with DeshExam."
+    }
+];
+
 const testimonials = [
   {
     name: "Priya Sharma",
-    role: "Medical Aspirant",
+    role: "Medical Aspirant, NEET",
     quote:
-      "DeshExam's mock tests were a game-changer for my NEET preparation. The AI analysis of my weak areas was incredibly accurate.",
+      "DeshExam's mock tests were a game-changer for my NEET preparation. The AI analysis of my weak areas was incredibly accurate and helped me focus my study time effectively.",
     avatar: "/avatars/01.png",
   },
   {
     name: "Rahul Verma",
-    role: "Engineering Student",
+    role: "Engineering Student, JEE",
     quote:
-      "The solved textbook feature is amazing! It's like having a personal tutor available 24/7. Highly recommended for clearing concepts.",
+      "The solved textbook feature is amazing! It's like having a personal tutor available 24/7. It made understanding complex physics problems so much easier.",
     avatar: "/avatars/02.png",
   },
   {
     name: "Anjali Singh",
     role: "UPSC Aspirant",
     quote:
-      "I love the variety of quizzes available. It makes learning fun and competitive. The leaderboard keeps me motivated.",
+      "I love the variety of quizzes available on DeshExam. It makes learning fun and competitive. The leaderboard is a great motivator to keep improving.",
     avatar: "/avatars/03.png",
   },
 ];
@@ -69,10 +91,10 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
            <Image
             src="https://picsum.photos/seed/hero/1920/1080"
-            alt="Students studying"
+            alt="Students studying diligently in a modern, well-lit library"
             fill
             className="object-cover"
-            data-ai-hint="students studying library"
+            data-ai-hint="students library"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
@@ -84,8 +106,7 @@ export default function Home() {
                 Unlock Your Potential with DeshExam
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Your ultimate destination for mock tests, quizzes, and personalized
-                AI-powered learning paths. Ace your exams with confidence.
+                Master your competitive exam preparation for NEET, JEE, UPSC, and more with our mock tests, quizzes, and personalized AI-powered learning paths.
               </p>
             </div>
             <div className="space-x-4">
@@ -110,8 +131,7 @@ export default function Home() {
               Everything You Need to Succeed
             </h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              From realistic mock tests to AI-driven insights, our platform is
-              designed to give you a competitive edge.
+              From realistic mock tests simulating exam conditions to AI-driven insights that target your weak spots, our platform is meticulously designed to give you a competitive edge.
             </p>
           </div>
           <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-4">
@@ -130,7 +150,32 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
+       <section id="why-us" className="w-full py-12 md:py-24 lg:py-32">
+        <div className="container px-4 md:px-6">
+           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+             <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
+              Why Choose DeshExam?
+            </div>
+            <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
+              A Smarter Way to Prepare
+            </h2>
+            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                We blend expert content with intelligent technology to create a learning experience that is both effective and engaging.
+            </p>
+          </div>
+           <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
+            {whyChooseUs.map((reason) => (
+              <div key={reason.title} className="grid gap-4 text-center">
+                <div className="flex justify-center">{reason.icon}</div>
+                <h3 className="text-xl font-bold font-headline">{reason.title}</h3>
+                <p className="text-muted-foreground">{reason.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
         <div className="container mx-auto px-4 md:px-6">
           <h2 className="font-headline text-3xl font-bold tracking-tighter text-center sm:text-4xl md:text-5xl mb-12">
             Loved by Learners Across India
@@ -141,7 +186,7 @@ export default function Home() {
                 <CardContent className="pt-6">
                   <div className="flex mb-2">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-accent fill-accent" />
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
                     ))}
                   </div>
                   <blockquote className="text-lg italic">
@@ -152,7 +197,7 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <Image
                       src={`https://picsum.photos/seed/${testimonial.name.replace(/\s/g, '')}/40/40`}
-                      alt={testimonial.name}
+                      alt={`Profile picture of ${testimonial.name}`}
                       width={40}
                       height={40}
                       className="rounded-full"
@@ -174,7 +219,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
+      <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
             <h2 className="font-headline text-3xl font-bold tracking-tighter md:text-4xl/tight">

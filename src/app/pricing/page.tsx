@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -252,46 +251,62 @@ export default function PricingPage() {
                 <CardContent className="p-6 md:p-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Left side: Benefits and Comparison */}
-                        <div className="flex p-1">
-                            <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md rounded-lg mb-8">
-                                <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
-                                <div className="space-y-5">
-                                    {pricingData.benefits.map(benefit => (
-                                        <div key={benefit.id} className="text-sm h-10 flex items-center pl-4">{benefit.name}</div>
-                                    ))}
+                        <div className="flex flex-col">
+                            <div className="hidden lg:flex p-1">
+                                <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md rounded-lg mb-8">
+                                    <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
+                                    <div className="space-y-5">
+                                        {pricingData.benefits.map(benefit => (
+                                            <div key={benefit.id} className="text-sm h-10 flex items-center pl-4">{benefit.name}</div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                            <div onClick={() => setPlanType('pro')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pro' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
-                                 <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
-                                 <div className="space-y-5">
-                                    {pricingData.benefits.map(benefit => (
-                                        <div key={benefit.id} className="h-10 flex items-center justify-center">
-                                            {benefit.pro ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
+                                <div onClick={() => setPlanType('pro')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pro' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
+                                     <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
+                                     <div className="space-y-5">
+                                        {pricingData.benefits.map(benefit => (
+                                            <div key={benefit.id} className="h-10 flex items-center justify-center">
+                                                {benefit.pro ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
+                                            </div>
+                                        ))}
+                                        <div className="h-10 flex items-center justify-center pt-2">
+                                            <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
+                                                <RadioGroupItem value="pro" id="select-pro" />
+                                            </RadioGroup>
                                         </div>
-                                    ))}
-                                    <div className="h-10 flex items-center justify-center pt-2">
-                                        <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
-                                            <RadioGroupItem value="pro" id="select-pro" />
-                                        </RadioGroup>
+                                    </div>
+                                </div>
+                                <div onClick={() => setPlanType('pass')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pass' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
+                                   <h4 className="font-semibold mb-2 text-sm">Pass</h4>
+                                     <div className="space-y-5">
+                                        {pricingData.benefits.map(benefit => (
+                                            <div key={benefit.id} className="h-10 flex items-center justify-center">
+                                                {benefit.pass ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
+                                            </div>
+                                        ))}
+                                         <div className="h-10 flex items-center justify-center pt-2">
+                                            <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
+                                                <RadioGroupItem value="pass" id="select-pass" />
+                                            </RadioGroup>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div onClick={() => setPlanType('pass')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pass' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
-                               <h4 className="font-semibold mb-2 text-sm">Pass</h4>
-                                 <div className="space-y-5">
+                            <div className="lg:hidden">
+                                <h3 className="font-bold text-lg mb-4">Plan Benefits</h3>
+                                <ul className="space-y-2 text-sm">
                                     {pricingData.benefits.map(benefit => (
-                                        <div key={benefit.id} className="h-10 flex items-center justify-center">
-                                            {benefit.pass ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
-                                        </div>
+                                        (planType === 'pro' && benefit.pro) || (planType === 'pass' && benefit.pass) ? (
+                                            <li key={benefit.id} className="flex items-center gap-2">
+                                                <Check className="w-4 h-4 text-green-500" />
+                                                {benefit.name}
+                                            </li>
+                                        ) : null
                                     ))}
-                                     <div className="h-10 flex items-center justify-center pt-2">
-                                        <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
-                                            <RadioGroupItem value="pass" id="select-pass" />
-                                        </RadioGroup>
-                                    </div>
-                                </div>
+                                </ul>
                             </div>
                         </div>
+
 
                         {/* Right side: Plan selection and payment */}
                         <div>
@@ -406,8 +421,8 @@ export default function PricingPage() {
             </Card>
 
             <Card className="w-full max-w-5xl mx-auto shadow-lg mt-8 p-6">
-                <div className="flex justify-between items-center">
-                    <div>
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="text-center md:text-left">
                         <p className="font-semibold">This subscription does not include these individual goals:</p>
                         <ul className="text-sm text-muted-foreground list-disc list-inside mt-2">
                             <li>UPSC, UGC, CAT, CSIR, Judiciary</li>
@@ -415,7 +430,7 @@ export default function PricingPage() {
                             <li>CUET UG</li>
                         </ul>
                     </div>
-                    <div>
+                    <div className="text-center md:text-right mt-4 md:mt-0">
                         <p className="text-sm text-muted-foreground">Find these in our Exclusively created Test Series with New exam specific featuers in <span className="font-bold">DeshExam Elite</span></p>
                         <Button variant="outline" className="mt-2">Explore Pass Elite</Button>
                     </div>
@@ -461,4 +476,3 @@ export default function PricingPage() {
     </div>
   );
 }
-

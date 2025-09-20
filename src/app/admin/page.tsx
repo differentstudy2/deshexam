@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {adminStats.map((stat) => (
             <Card key={stat.title}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -55,20 +55,20 @@ export default function AdminDashboardPage() {
                     <CardTitle>Quick Actions</CardTitle>
                     <CardDescription>Perform common administrative tasks.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col sm:flex-row flex-wrap gap-4">
-                    <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
+                <CardContent className="grid grid-cols-2 gap-4">
+                    <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <Users className="mx-auto mb-2" />
                         <span>Manage Users</span>
                     </Link>
-                     <Link href="/admin/content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
+                     <Link href="/admin/content" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <FileText className="mx-auto mb-2" />
                         <span>Manage Content</span>
                     </Link>
-                    <Link href="/admin/add-content" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
+                    <Link href="/admin/add-content" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <PlusCircle className="mx-auto mb-2" />
                         <span>Add Quiz/Test</span>
                     </Link>
-                     <Link href="/admin/add-article" className="p-4 border rounded-lg hover:bg-secondary w-full sm:w-auto text-center flex-grow">
+                     <Link href="/admin/add-article" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <FilePlus className="mx-auto mb-2" />
                         <span>Add Article</span>
                     </Link>
