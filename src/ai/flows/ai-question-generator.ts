@@ -49,6 +49,8 @@ const prompt = ai.definePrompt({
   output: { schema: AIQuestionGeneratorOutputSchema },
   prompt: `You are an expert at creating educational questions. Your task is to generate a set of questions based on the provided source.
 
+IMPORTANT: You MUST generate all content (questions, options, explanations) in the same language as the provided source material.
+
 The questions should have the following properties:
 - Number of questions: {{numQuestions}}
 - Difficulty level: {{difficulty}}
