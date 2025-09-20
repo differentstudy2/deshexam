@@ -8,6 +8,8 @@ import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/hooks/use-auth";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
+import { AuthDialog } from "@/components/feature/auth-dialog";
 
 const fontBody = Inter({
   subsets: ["latin"],
@@ -40,9 +42,12 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <AuthProvider>
-            <Header />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
+            <AuthDialogProvider>
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+              <AuthDialog />
+            </AuthDialogProvider>
           </AuthProvider>
           <Toaster />
           <Script src="https://checkout.razorpay.com/v1/checkout.js" />

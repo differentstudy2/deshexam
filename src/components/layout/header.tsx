@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "./theme-toggle";
 import { getUserProfile } from "@/lib/firebase/firestore";
 import { ScrollArea } from "../ui/scroll-area";
+import { useAuthDialog } from "@/hooks/use-auth-dialog";
 
 const navLinks = [
     { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
@@ -39,6 +40,7 @@ type UserProfile = {
 
 const UserNav = () => {
   const { user, loading, logOut } = useAuth();
+  const { openAuthDialog } = useAuthDialog();
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
@@ -120,21 +122,18 @@ const UserNav = () => {
 
   return (
     <div className="hidden md:flex items-center gap-2">
-      <Button variant="ghost" asChild>
-        <Link href="/sign-in">Sign In</Link>
-      </Button>
-      <Button asChild>
-        <Link href="/sign-up">Sign Up</Link>
-      </Button>
+      <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>Sign In</Button>
+      <Button onClick={() => openAuthDialog('sign-up')}>Sign Up</Button>
     </div>
   );
 };
 
-const MainNav = ({ isMobile = false }: { isMobile?: boolean }) => {
+const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLinkClick?: () => void }) => {
   const pathname = usePathname();
   const NavLink = ({ href, label, icon }: { href: string; label: string, icon?: React.ReactNode }) => (
     <Link
       href={href}
+      onClick={onLinkClick}
       className={cn(
         "transition-colors hover:text-primary flex items-center gap-4",
         pathname === href ? "text-primary font-medium" : "text-muted-foreground",
@@ -161,7 +160,9 @@ const MainNav = ({ isMobile = false }: { isMobile?: boolean }) => {
 };
 
 export function Header() {
-  const { user, loading, logOut } = useAuth();
+  const { user, loading } = useAuth();
+  const { openAuthDialog } = useAuthDialog();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -173,7 +174,7 @@ export function Header() {
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />
           <UserNav />
-          <Sheet>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
@@ -183,27 +184,23 @@ export function Header() {
             <SheetContent side="left" className="p-0">
                <SheetHeader className="border-b p-4">
                  <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
-                 <Link href="/" className="flex items-center space-x-2">
+                 <Link href="/" onClick={() => setIsSheetOpen(false)} className="flex items-center space-x-2">
                    <DeshExamLogo />
                  </Link>
                </SheetHeader>
               <div className="flex flex-col h-[calc(100%-4.5rem)]">
                 <ScrollArea className="flex-1 p-4">
-                    <MainNav isMobile />
+                    <MainNav isMobile onLinkClick={() => setIsSheetOpen(false)} />
                 </ScrollArea>
                 <div className="mt-auto border-t p-4">
                   {!loading && !user && (
                     <div className="flex flex-col gap-2">
-                      <Button variant="ghost" asChild>
-                        <Link href="/sign-in">Sign In</Link>
-                      </Button>
-                      <Button asChild>
-                        <Link href="/sign-up">Sign Up</Link>
-                      </Button>
+                      <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsSheetOpen(false); }}>Sign In</Button>
+                      <Button onClick={() => { openAuthDialog('sign-up'); setIsSheetOpen(false); }}>Sign Up</Button>
                     </div>
                   )}
                   {!loading && user && (
-                     <Button onClick={logOut} className="w-full">Log Out</Button>
+                     <Button onClick={() => { logOut(); setIsSheetOpen(false); }} className="w-full">Log Out</Button>
                   )}
                 </div>
               </div>
