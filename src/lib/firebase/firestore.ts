@@ -1340,6 +1340,39 @@ export const updateSettings = async (data: any) => {
         throw new Error("Failed to save site settings.");
     }
 }
+
+export const addContactMessage = async (data: { name: string; email: string; subject: string; message: string; }) => {
+    try {
+        await addDoc(collection(db, "contactMessages"), {
+            ...data,
+            createdAt: serverTimestamp(),
+            isRead: false,
+        });
+    } catch (error) {
+        console.error("Error adding contact message:", error);
+        throw new Error("Failed to send message.");
+    }
+};
+
+
+export const getContactMessages = async () => {
+    try {
+        const q = query(collection(db, "contactMessages"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const messages = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toLocaleString() || new Date().toLocaleString(),
+            };
+        });
+        return messages;
+    } catch (e) {
+        console.error("Error getting contact messages: ", e);
+        throw new Error("Failed to fetch messages.");
+    }
+};
     
     
 
@@ -1358,4 +1391,5 @@ export const updateSettings = async (data: any) => {
 
 
     
+
 
