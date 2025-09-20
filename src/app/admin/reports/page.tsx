@@ -18,10 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 type Message = {
   id: string;
@@ -84,8 +86,8 @@ export default function ReportsPage() {
                 <TableRow>
                   <TableHead>From</TableHead>
                   <TableHead>Subject</TableHead>
-                  <TableHead className="hidden md:table-cell">Message</TableHead>
-                  <TableHead className="text-right">Received</TableHead>
+                  <TableHead className="hidden md:table-cell">Received</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -107,8 +109,15 @@ export default function ReportsPage() {
                       <TableCell>
                           <Badge variant="outline">{message.subject}</Badge>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell max-w-sm truncate">{message.message}</TableCell>
-                      <TableCell className="text-right text-muted-foreground text-xs">{message.createdAt}</TableCell>
+                      <TableCell className="hidden md:table-cell text-muted-foreground text-xs">{message.createdAt}</TableCell>
+                      <TableCell className="text-right">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/admin/reports/view/${message.id}`}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </Link>
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (

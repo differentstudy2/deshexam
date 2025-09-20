@@ -1373,6 +1373,29 @@ export const getContactMessages = async () => {
         throw new Error("Failed to fetch messages.");
     }
 };
+
+export const getContactMessageById = async (messageId: string) => {
+    if (!messageId) {
+        throw new Error("Message ID is required.");
+    }
+    try {
+        const messageDoc = await getDoc(doc(db, "contactMessages", messageId));
+        if (messageDoc.exists()) {
+            const data = messageDoc.data();
+            await updateDoc(doc(db, "contactMessages", messageId), { isRead: true });
+            return {
+                id: messageDoc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate().toLocaleString() || new Date().toLocaleString(),
+            };
+        } else {
+            return null;
+        }
+    } catch (e) {
+        console.error("Error getting message:", e);
+        throw new Error("Failed to fetch message.");
+    }
+};
     
     
 
@@ -1391,5 +1414,6 @@ export const getContactMessages = async () => {
 
 
     
+
 
 
