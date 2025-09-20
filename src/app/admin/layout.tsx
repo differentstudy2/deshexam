@@ -34,6 +34,7 @@ import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin', label: 'Admin Overview', icon: ShieldCheck },
@@ -104,19 +105,30 @@ export default function AdminLayout({
                         <SidebarMenuButton
                         asChild
                         isActive={pathname === item.href}
+                        className={cn(
+                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                            "hover:bg-primary/10 hover:text-primary",
+                            pathname === item.href && "bg-primary/20 text-primary font-semibold border-l-4 border-primary"
+                        )}
                         tooltip={{
                             children: item.label,
                         }}
                         >
                         <Link href={item.href}>
-                            <item.icon />
+                            <item.icon className="h-5 w-5" />
                             <span>{item.label}</span>
                         </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     ))}
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton 
+                         asChild
+                         className={cn(
+                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                            "hover:bg-secondary/80"
+                         )}
+                        >
                             <Link href="/dashboard">
                                 <LayoutGrid />
                                 <span>User Dashboard</span>
