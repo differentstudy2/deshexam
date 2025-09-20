@@ -109,26 +109,26 @@ function ResultsDisplay() {
     <>
       <Card className="max-w-4xl mx-auto">
          <CardHeader>
-            <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                <div className="flex flex-col md:flex-row items-center gap-4">
                      <Avatar className="h-16 w-16">
                         <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center md:justify-start gap-2">
                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                         </div>
-                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                        <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
                             {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
                             {student.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
                             {student.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-6">
-                    <div className="text-right">
+                <div className="flex items-center gap-6 mt-4 md:mt-0">
+                    <div className="text-center md:text-right">
                         <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
                         <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
                     </div>
@@ -213,3 +213,4 @@ export default function TestResultsPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
