@@ -1632,7 +1632,7 @@ export default function CreateTestPage() {
                   <div className="flex-1">
                     <Collapsible>
                       <CollapsibleTrigger asChild>
-                         <Button type="button" variant="outline" className="w-full">
+                         <Button type="button" variant="outline">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                          </Button>
@@ -1658,15 +1658,17 @@ export default function CreateTestPage() {
                                           <FormItem>
                                               <FormLabel>Upload File</FormLabel>
                                               <FormControl>
-                                                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                                      <div className="space-y-1 text-center">
-                                                          <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                                          <p>{aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}</p>
-                                                          <p className="text-xs text-muted-foreground">{aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}</p>
+                                                  <div>
+                                                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                                          <div className="space-y-1 text-center">
+                                                              <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                              <p>{aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}</p>
+                                                              <p className="text-xs text-muted-foreground">{aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}</p>
+                                                          </div>
                                                       </div>
+                                                      <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt"/>
                                                   </div>
                                               </FormControl>
-                                              <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt"/>
                                               <FormMessage />
                                           </FormItem>
                                       </TabsContent>
