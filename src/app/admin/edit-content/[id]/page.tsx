@@ -52,6 +52,7 @@ import { generateImage } from '@/ai/flows/ai-image-generator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 
 
 const optionSchema = z.object({
@@ -447,6 +448,32 @@ export default function EditContentPage() {
     fetchContent();
   }, [contentId, form, toast, router]);
 
+  useEffect(() => {
+    const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
+    if (aiQuestionsRaw) {
+      try {
+        const aiQuestions = JSON.parse(aiQuestionsRaw);
+        append(aiQuestions.map((q: any) => ({
+            ...q,
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            explanation: q.explanation || ''
+        })));
+        toast({
+            title: 'Questions Added!',
+            description: 'AI-generated questions have been added to the form.',
+        });
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Failed to load AI questions',
+            description: 'The stored AI questions were corrupted.',
+        });
+      } finally {
+          sessionStorage.removeItem('aiGeneratedQuestions');
+      }
+    }
+  }, [append, toast]);
+
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
@@ -538,33 +565,6 @@ export default function EditContentPage() {
     }
   };
 
-  const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
-    setIsGenerating(true);
-    try {
-        const input: AIQuestionGeneratorInput = {
-            ...aiData,
-            sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
-        };
-        const result: AIQuestionGeneratorOutput = await generateQuestions(input);
-        append(result.questions);
-        toast({
-            title: 'Questions Added!',
-            description: `${result.questions.length} new questions have been added.`,
-        });
-        
-        setIsGeneratorOpen(false);
-
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: 'AI Generation Failed',
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const handleAIDescriptionGenerate = async () => {
     const title = form.getValues('title');
     if (!title) {
@@ -594,28 +594,6 @@ export default function EditContentPage() {
         setIsGeneratingDesc(false);
     }
   };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-        if (file.type === 'text/plain') {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target?.result as string;
-                aiForm.setValue('source', text, { shouldValidate: true });
-                aiForm.setValue('sourceType', 'text');
-            };
-            reader.readAsText(file);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Invalid File Type',
-                description: 'Please upload a .txt file.',
-            });
-        }
-    }
-  };
-
 
   const handleSubjectChange = async (value: string) => {
       form.setValue('subject', value);
@@ -1358,7 +1336,7 @@ export default function EditContentPage() {
                     );
                  })}
             </CardContent>
-            <CardFooter className="gap-4">
+            <CardFooter className="flex flex-col sm:flex-row gap-4">
                  <Button
                     type="button"
                     variant="outline"
@@ -1379,156 +1357,14 @@ export default function EditContentPage() {
                       }}
                 >
                     <PlusCircle className="mr-2" />
-                    Add Question
+                    Add Question Manually
                 </Button>
-                <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
-                    <DialogTrigger asChild>
-                        <Button type="button" variant="outline">
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            Add Questions with AI
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-xl">
-                        <DialogHeader>
-                        <DialogTitle>Generate Questions with AI</DialogTitle>
-                        <DialogDescription>
-                            Generate a set of questions to add to your content.
-                        </DialogDescription>
-                        </DialogHeader>
-                        <Form {...aiForm}>
-                        <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
-                                <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
-                                    <TabsList className="grid w-full grid-cols-3">
-                                        <TabsTrigger value="topic">From Topic</TabsTrigger>
-                                        <TabsTrigger value="text">From Text</TabsTrigger>
-                                        <TabsTrigger value="file">From File</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="topic" className="pt-4">
-                                        <FormField
-                                            control={aiForm.control}
-                                            name="source"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Topic</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </TabsContent>
-                                    <TabsContent value="text" className="pt-4">
-                                        <FormField
-                                            control={aiForm.control}
-                                            name="source"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Paste Text</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </TabsContent>
-                                    <TabsContent value="file" className="pt-4">
-                                        <FormItem>
-                                            <FormLabel>Upload File</FormLabel>
-                                            <FormControl>
-                                                <div 
-                                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
-                                                    onClick={() => fileInputRef.current?.click()}
-                                                >
-                                                    <div className="space-y-1 text-center">
-                                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                                        <div className="flex text-sm text-muted-foreground">
-                                                            <p className="pl-1">
-                                                                {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'}
-                                                            </p>
-                                                        </div>
-                                                        <p className="text-xs text-muted-foreground">
-                                                        {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </FormControl>
-                                            <Input
-                                                type="file"
-                                                ref={fileInputRef}
-                                                onChange={handleFileChange}
-                                                className="hidden"
-                                                accept=".txt"
-                                            />
-                                            <FormMessage />
-                                        </FormItem>
-                                    </TabsContent>
-                                </Tabs>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={aiForm.control}
-                                        name="numQuestions"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Number of Questions</FormLabel>
-                                                <FormControl>
-                                                    <Input type="number" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={aiForm.control}
-                                        name="difficulty"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Difficulty</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="Easy">Easy</SelectItem>
-                                                        <SelectItem value="Medium">Medium</SelectItem>
-                                                        <SelectItem value="Hard">Hard</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                                <FormField
-                                    control={form.control}
-                                    name="questionType"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Question Type</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="Any">Any</SelectItem>
-                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                                    <SelectItem value="True/False">True/False</SelectItem>
-                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                                    <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                    {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <DialogFooter>
-                                    <Button type="submit" disabled={isGenerating}>
-                                        {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}
-                                    </Button>
-                                </DialogFooter>
-                        </form>
-                        </Form>
-                    </DialogContent>
-                </Dialog>
+                <Button asChild variant="outline">
+                    <Link href={`/admin/edit-content/${contentId}/add-ai-question`}>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Add Questions with AI
+                    </Link>
+                </Button>
             </CardFooter>
           </Card>
           
@@ -1546,5 +1382,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
-    
