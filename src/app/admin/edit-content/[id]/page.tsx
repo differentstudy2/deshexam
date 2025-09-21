@@ -459,12 +459,10 @@ export default function EditContentPage() {
             options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
             explanation: q.explanation || ''
         }))];
-        
         replace(combinedQuestions);
-        
         toast({
             title: 'Questions Added!',
-            description: `${newQuestions.length} AI-generated questions have been added to the form.`,
+            description: `${newQuestions.length} AI-generated questions have been added.`,
         });
       } catch (error) {
         toast({

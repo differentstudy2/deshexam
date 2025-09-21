@@ -375,43 +375,17 @@ export default function CreateTestPage() {
   });
 
   useEffect(() => {
-    // Check for AI generated content in session storage
-    const aiContentRaw = sessionStorage.getItem('aiGeneratedContent');
-    if (aiContentRaw) {
-      try {
-        const aiContent = JSON.parse(aiContentRaw);
-        form.setValue('title', aiContent.title);
-        form.setValue('description', aiContent.description);
-        form.setValue('difficulty', aiContent.difficulty);
-        replace(aiContent.questions.map((q: any) => ({
-            ...q,
-            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
-            explanation: q.explanation || ''
-        })));
-        toast({
-            title: 'Content Loaded!',
-            description: 'AI-generated content has been populated into the form.',
-        });
-      } catch (error) {
-        toast({
-            variant: "destructive",
-            title: 'Failed to load AI content',
-            description: 'The stored AI content was corrupted.',
-        });
-      } finally {
-          sessionStorage.removeItem('aiGeneratedContent');
-      }
-    }
-
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
     if (aiQuestionsRaw) {
       try {
-        const aiQuestions = JSON.parse(aiQuestionsRaw);
-        append(aiQuestions.map((q: any) => ({
+        const newQuestions = JSON.parse(aiQuestionsRaw);
+        const existingQuestions = form.getValues('questions') || [];
+        const combinedQuestions = [...existingQuestions, ...newQuestions.map((q: any) => ({
             ...q,
             options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
             explanation: q.explanation || ''
-        })));
+        }))];
+        replace(combinedQuestions);
         toast({
             title: 'Questions Added!',
             description: 'AI-generated questions have been added to the form.',
@@ -425,10 +399,37 @@ export default function CreateTestPage() {
       } finally {
           sessionStorage.removeItem('aiGeneratedQuestions');
       }
+    } else {
+        const aiContentRaw = sessionStorage.getItem('aiGeneratedContent');
+        if (aiContentRaw) {
+          try {
+            const aiContent = JSON.parse(aiContentRaw);
+            form.setValue('title', aiContent.title);
+            form.setValue('description', aiContent.description);
+            form.setValue('difficulty', aiContent.difficulty);
+            replace(aiContent.questions.map((q: any) => ({
+                ...q,
+                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+                explanation: q.explanation || ''
+            })));
+            toast({
+                title: 'Content Loaded!',
+                description: 'AI-generated content has been populated into the form.',
+            });
+          } catch (error) {
+            toast({
+                variant: "destructive",
+                title: 'Failed to load AI content',
+                description: 'The stored AI content was corrupted.',
+            });
+          } finally {
+              sessionStorage.removeItem('aiGeneratedContent');
+          }
+        }
     }
-
+    
     fetchFormData();
-  }, [form, replace, toast, append]);
+  }, [form, replace, toast]);
   
   const currentTestType = form.watch('testType');
 
