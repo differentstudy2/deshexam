@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
-import { getAllContent } from "@/lib/firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 import { MockTestFilters } from "@/components/mock-test-filters";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -36,24 +37,30 @@ export default function MockTestsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchTests = async () => {
-      try {
-        setLoading(true);
-        const fetchedTests = await getAllContent("Mock Test");
-        setTests(fetchedTests as Test[]);
-        const uniqueSubjects = Array.from(new Set(fetchedTests.map((test: any) => test.subject))).filter(Boolean) as string[];
-        setSubjects(uniqueSubjects);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error fetching mock tests",
-          description: (error as Error).message,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTests();
+    const q = query(collection(db, "content"), where("testType", "==", "Mock Test"));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedTests = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Test[];
+      
+      setTests(fetchedTests);
+      const uniqueSubjects = Array.from(new Set(fetchedTests.map((test: any) => test.subject))).filter(Boolean) as string[];
+      setSubjects(uniqueSubjects);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching mock tests in real-time: ", error);
+      toast({
+        variant: "destructive",
+        title: "Error fetching mock tests",
+        description: (error as Error).message,
+      });
+      setLoading(false);
+    });
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
   }, [toast]);
 
   return (
