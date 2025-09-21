@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, HelpCircle, BarChart } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
-import { getAllContent } from "@/lib/firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 import { MockTestFilters } from "@/components/mock-test-filters";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -36,24 +37,30 @@ export default function QuizzesPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        setLoading(true);
-        const fetchedQuizzes = await getAllContent("Quiz");
-        setQuizzes(fetchedQuizzes as Quiz[]);
-        const uniqueSubjects = Array.from(new Set(fetchedQuizzes.map((quiz: any) => quiz.subject))).filter(Boolean) as string[];
-        setSubjects(uniqueSubjects);
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error fetching quizzes",
-          description: (error as Error).message,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuizzes();
+    const q = query(collection(db, "content"), where("testType", "==", "Quiz"));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedQuizzes = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Quiz[];
+      
+      setQuizzes(fetchedQuizzes);
+      const uniqueSubjects = Array.from(new Set(fetchedQuizzes.map((quiz: any) => quiz.subject))).filter(Boolean) as string[];
+      setSubjects(uniqueSubjects);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching quizzes in real-time: ", error);
+      toast({
+        variant: "destructive",
+        title: "Error fetching quizzes",
+        description: (error as Error).message,
+      });
+      setLoading(false);
+    });
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
   }, [toast]);
 
   return (
