@@ -450,11 +450,10 @@ function ReviewDisplay() {
   );
 }
 
-export default function TestReviewPage() {
-  const params = useParams();
+export default function TestReviewPage({ params }: { params: { id: string } }) {
+  const { id: testId } = params;
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submissionId');
-  const testId = params.id as string;
   const [testType, setTestType] = useState('');
 
   useEffect(() => {
@@ -494,4 +493,5 @@ export default function TestReviewPage() {
     
 
     
+
 
