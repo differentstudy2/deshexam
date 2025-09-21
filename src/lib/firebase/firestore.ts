@@ -1,7 +1,7 @@
 
 
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -101,6 +101,39 @@ export const getAllQuestions = async () => {
         throw new Error("Failed to fetch questions.");
     }
 }
+
+export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
+    try {
+        let q;
+        if (startAfterDoc) {
+            q = query(collection(db, "questions"), orderBy("createdAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage));
+        } else {
+            q = query(collection(db, "questions"), orderBy("createdAt", "desc"), limit(itemsPerPage));
+        }
+
+        const querySnapshot = await getDocs(q);
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate()?.toLocaleDateString() || 'N/A',
+            };
+        });
+
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
+        
+        // A simple way to check if there are more pages
+        const nextQuery = query(collection(db, "questions"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(1));
+        const nextSnapshot = await getDocs(nextQuery);
+        const hasMore = !nextSnapshot.empty;
+
+        return { questions, lastVisible, hasMore };
+    } catch (e) {
+        console.error("Error getting paginated questions: ", e);
+        throw new Error("Failed to fetch questions.");
+    }
+};
 
 export const getQuestionById = async (questionId: string) => {
     if (!questionId) {
@@ -1414,6 +1447,7 @@ export const getContactMessageById = async (messageId: string) => {
 
 
     
+
 
 
 

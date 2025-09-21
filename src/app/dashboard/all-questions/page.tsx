@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getAllQuestions } from '@/lib/firebase/firestore';
+import { getPaginatedQuestions } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Eye, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { DocumentSnapshot } from 'firebase/firestore';
 
 type Question = {
     id: string;
@@ -33,55 +34,27 @@ type Question = {
 
 const ITEMS_PER_PAGE = 10;
 
-const PaginationControls = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
-    if (totalPages <= 1) return null;
-    return (
-        <div className="flex items-center justify-end space-x-2 py-4">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-            >
-                Previous
-            </Button>
-             <span className="text-sm text-muted-foreground">
-                Page {currentPage} of {totalPages}
-            </span>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-            >
-                Next
-            </Button>
-        </div>
-    );
-};
-
-
 export default function AllQuestionsPage() {
   const { toast } = useToast();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const totalPages = Math.ceil(questions.length / ITEMS_PER_PAGE);
+  const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
+  const [pageHistory, setPageHistory] = useState<(DocumentSnapshot | null)[]>([null]);
+  const [hasMore, setHasMore] = useState(true);
 
-  const paginatedQuestions = useMemo(() => {
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      return questions.slice(startIndex, endIndex);
-  }, [questions, currentPage]);
-
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
+  const fetchQuestions = async (page: number, startAfterDoc: DocumentSnapshot | null) => {
       try {
         setLoading(true);
-        const allQuestions = await getAllQuestions();
-        setQuestions(allQuestions as Question[]);
+        const { questions: fetchedQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(ITEMS_PER_PAGE, startAfterDoc);
+        setQuestions(fetchedQuestions as Question[]);
+        setLastVisible(newLastVisible);
+        setHasMore(newHasMore);
+
+        if (page > pageHistory.length) {
+            setPageHistory(prev => [...prev, newLastVisible]);
+        }
+        
       } catch (error) {
          toast({
           variant: "destructive",
@@ -91,10 +64,28 @@ export default function AllQuestionsPage() {
       } finally {
         setLoading(false);
       }
-    };
+  };
 
-    fetchQuestions();
+  useEffect(() => {
+    fetchQuestions(1, null);
   }, [toast]);
+
+  const handleNextPage = () => {
+    if (hasMore) {
+        const nextPage = currentPage + 1;
+        fetchQuestions(nextPage, lastVisible);
+        setCurrentPage(nextPage);
+    }
+  }
+
+  const handlePrevPage = () => {
+      if (currentPage > 1) {
+          const prevPage = currentPage - 1;
+          const prevStartAfter = pageHistory[prevPage - 1]; // -1 because pageHistory is 0-indexed and has a null at the beginning
+          fetchQuestions(prevPage, prevStartAfter);
+          setCurrentPage(prevPage);
+      }
+  }
 
   return (
     <div>
@@ -130,7 +121,7 @@ export default function AllQuestionsPage() {
                     </TableHeader>
                     <TableBody>
                         {loading ? (
-                        Array.from({ length: 5 }).map((_, i) => (
+                        Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                             <TableRow key={i}>
                                 <TableCell><Skeleton className="h-5 w-full" /></TableCell>
                                 <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
@@ -138,8 +129,8 @@ export default function AllQuestionsPage() {
                                 <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
                             </TableRow>
                         ))
-                        ) : paginatedQuestions.length > 0 ? (
-                        paginatedQuestions.map((question) => (
+                        ) : questions.length > 0 ? (
+                        questions.map((question) => (
                             <TableRow key={question.id}>
                                 <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
                                 <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
@@ -162,11 +153,27 @@ export default function AllQuestionsPage() {
                         )}
                     </TableBody>
                 </Table>
-                 <PaginationControls 
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+                <div className="flex items-center justify-end space-x-2 py-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrevPage}
+                        disabled={currentPage === 1 || loading}
+                    >
+                        Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                        Page {currentPage}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNextPage}
+                        disabled={!hasMore || loading}
+                    >
+                        Next
+                    </Button>
+                </div>
             </>
            )}
         </CardContent>
