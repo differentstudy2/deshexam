@@ -114,10 +114,18 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
         const querySnapshot = await getDocs(q);
         const questions = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            const createdAt = data.createdAt;
+            let formattedDate = 'N/A';
+            // Firestore timestamps have a toDate method, JS Dates do not.
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                formattedDate = createdAt.toDate().toLocaleDateString();
+            } else if (createdAt instanceof Date) {
+                formattedDate = createdAt.toLocaleDateString();
+            }
             return {
                 id: doc.id,
                 ...data,
-                createdAt: data.createdAt?.toDate()?.toLocaleDateString() || 'N/A',
+                createdAt: formattedDate,
             };
         });
 
@@ -1447,6 +1455,7 @@ export const getContactMessageById = async (messageId: string) => {
 
 
     
+
 
 
 
