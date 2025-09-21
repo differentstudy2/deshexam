@@ -184,22 +184,20 @@ function ResultsDisplay() {
   );
 }
 
-export default function TestResultsPage({ params }: { params: { id: string } }) {
-  const searchParams = useSearchParams();
-  const submissionId = searchParams.get('submissionId');
+export default function TestResultsPage({ params, searchParams: pageSearchParams }: { params: { id: string }, searchParams: { [key: string]: string | string[] | undefined } }) {
   const [testType, setTestType] = useState('Test');
   
   useEffect(() => {
     const getTestType = async () => {
-        if(submissionId) {
-            const sub = await getSubmissionById(submissionId);
+        if(pageSearchParams.submissionId) {
+            const sub = await getSubmissionById(pageSearchParams.submissionId as string);
             if(sub) {
                 setTestType(sub.testType);
             }
         }
     }
     getTestType();
-  }, [submissionId]);
+  }, [pageSearchParams.submissionId]);
 
   return (
     <div className="container py-12">
@@ -213,6 +211,7 @@ export default function TestResultsPage({ params }: { params: { id: string } }) 
     </div>
   );
 }
+
 
 
 

@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getUserByUsername, getContentByAuthor, getSubmissionsByUserId, toggleFollowUser } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,7 +52,7 @@ type Submission = {
 };
 
 
-export default function UserProfilePage() {
+export default function UserProfilePage({ params }: { params: { username: string } }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [createdContent, setCreatedContent] = useState<Content[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -62,7 +62,6 @@ export default function UserProfilePage() {
 
   const { toast } = useToast();
   const router = useRouter();
-  const params = useParams();
   const { user: currentUser } = useAuth();
   const username = params.username as string;
 

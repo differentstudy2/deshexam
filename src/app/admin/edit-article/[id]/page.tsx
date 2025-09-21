@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent } from '@/lib/firebase/firestore';
 import { Loader2, Save } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
 
 
@@ -39,10 +39,9 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function EditArticlePage() {
+export default function EditArticlePage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
-  const params = useParams();
   const contentId = params.id as string;
   const [loading, setLoading] = useState(true);
 

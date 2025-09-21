@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
@@ -59,7 +59,7 @@ type Comment = {
     createdAt: Date;
 }
 
-export default function QuestionPage() {
+export default function QuestionPage({ params }: { params: { id: string } }) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -68,7 +68,6 @@ export default function QuestionPage() {
   const [isVoting, setIsVoting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
-  const params = useParams();
   const { user } = useAuth();
   const questionId = params.id as string;
 
@@ -120,7 +119,7 @@ export default function QuestionPage() {
             newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
         } else {
             newLikedBy.push(user.uid);
-            if (hasDisliked) {
+            if (hasDisliked) { // If they previously disliked, remove dislike
                 newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
             }
         }
@@ -129,7 +128,7 @@ export default function QuestionPage() {
             newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
         } else {
             newDislikedBy.push(user.uid);
-            if (hasLiked) {
+            if (hasLiked) { // If they previously liked, remove like
                 newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
             }
         }
