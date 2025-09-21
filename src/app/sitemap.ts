@@ -1,17 +1,25 @@
 
 import { MetadataRoute } from 'next';
-import { getAllContent } from '@/lib/firebase/firestore';
+import { getAllContent, getContentTypes } from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
 
-  // Static pages
-  const staticRoutes = [
+  // 1. Fetch all content types to generate category pages
+  const contentTypes = await getContentTypes();
+  const contentTypeRoutes = contentTypes.map((type) => {
+    const slug = type.name.toLowerCase().replace(/\s+/g, '-');
+    return {
+      url: `${baseUrl}/${slug}`,
+      lastModified: new Date(),
+      priority: 0.8,
+    };
+  });
+
+  // 2. Define other truly static pages
+  const otherStaticRoutes = [
     { url: baseUrl, lastModified: new Date(), priority: 1.0 },
     { url: `${baseUrl}/features`, lastModified: new Date(), priority: 0.8 },
-    { url: `${baseUrl}/mock-tests`, lastModified: new Date(), priority: 0.8 },
-    { url: `${baseUrl}/quizzes`, lastModified: new Date(), priority: 0.8 },
-    { url: `${baseUrl}/learn`, lastModified: new Date(), priority: 0.8 },
     { url: `${baseUrl}/leaderboard`, lastModified: new Date(), priority: 0.8 },
     { url: `${baseUrl}/pricing`, lastModified: new Date(), priority: 0.8 },
     { url: `${baseUrl}/contact`, lastModified: new Date(), priority: 0.6 },
@@ -20,10 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/privacy`, lastModified: new Date(), priority: 0.5 },
   ];
 
-  // Dynamic content pages
+  // 3. Fetch all individual content items for dynamic routes
   const allContent = await getAllContent();
-
-  const contentRoutes = allContent.map((item) => {
+  const contentItemRoutes = allContent.map((item) => {
     const typeSlug = (item.testType || 'content').toLowerCase().replace(/\s+/g, '-');
     const path = `/${typeSlug}/${item.id}`;
     let lastMod;
@@ -42,6 +49,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
   
-
-  return [...staticRoutes, ...contentRoutes];
+  // 4. Combine all routes
+  return [...otherStaticRoutes, ...contentTypeRoutes, ...contentItemRoutes];
 }
