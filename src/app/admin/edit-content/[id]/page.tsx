@@ -356,7 +356,7 @@ export default function EditContentPage() {
   });
 
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'questions',
   });
@@ -452,15 +452,19 @@ export default function EditContentPage() {
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
     if (aiQuestionsRaw) {
       try {
-        const aiQuestions = JSON.parse(aiQuestionsRaw);
-        append(aiQuestions.map((q: any) => ({
+        const newQuestions = JSON.parse(aiQuestionsRaw);
+        const existingQuestions = form.getValues('questions') || [];
+        const combinedQuestions = [...existingQuestions, ...newQuestions.map((q: any) => ({
             ...q,
             options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
             explanation: q.explanation || ''
-        })));
+        }))];
+        
+        replace(combinedQuestions);
+        
         toast({
             title: 'Questions Added!',
-            description: 'AI-generated questions have been added to the form.',
+            description: `${newQuestions.length} AI-generated questions have been added to the form.`,
         });
       } catch (error) {
         toast({
@@ -472,7 +476,7 @@ export default function EditContentPage() {
           sessionStorage.removeItem('aiGeneratedQuestions');
       }
     }
-  }, [append, toast]);
+  }, [replace, toast, form]);
 
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
