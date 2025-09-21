@@ -205,7 +205,7 @@ export default function TestPage() {
 
   return (
     <div className="container py-12">
-       <header className="mb-8">
+       <header className="mb-8 p-4">
         <p className="text-primary font-semibold">{test.subject}</p>
         <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
         <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
