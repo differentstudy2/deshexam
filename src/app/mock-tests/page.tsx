@@ -73,5 +73,3 @@ export default async function MockTestsPage() {
     </div>
   );
 }
-
-    
