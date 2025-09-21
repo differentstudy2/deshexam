@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { getAllQuestions } from '@/lib/firebase/firestore';
 import {
@@ -31,10 +31,50 @@ type Question = {
     createdAt: string;
 }
 
+const ITEMS_PER_PAGE = 10;
+
+const PaginationControls = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
+    if (totalPages <= 1) return null;
+    return (
+        <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+            >
+                Previous
+            </Button>
+             <span className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+            </span>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+            >
+                Next
+            </Button>
+        </div>
+    );
+};
+
+
 export default function AllQuestionsPage() {
   const { toast } = useToast();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const totalPages = Math.ceil(questions.length / ITEMS_PER_PAGE);
+
+  const paginatedQuestions = useMemo(() => {
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      return questions.slice(startIndex, endIndex);
+  }, [questions, currentPage]);
+
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -76,51 +116,58 @@ export default function AllQuestionsPage() {
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
              </div>
            ) : (
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                    <TableHead className="w-[60%]">Question Text</TableHead>
-                    <TableHead className="hidden md:table-cell">Author</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
-                    <TableHead>
-                        <span className="sr-only">Actions</span>
-                    </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {loading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                        <TableRow key={i}>
-                            <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                            <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+            <>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead className="w-[60%]">Question Text</TableHead>
+                        <TableHead className="hidden md:table-cell">Author</TableHead>
+                        <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                        <TableHead>
+                            <span className="sr-only">Actions</span>
+                        </TableHead>
                         </TableRow>
-                    ))
-                    ) : questions.length > 0 ? (
-                    questions.map((question) => (
-                        <TableRow key={question.id}>
-                            <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
-                            <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
-                            <TableCell className="text-right">
-                                <Button asChild variant="outline" size="sm">
-                                    <Link href={`/question/${question.id}`}>
-                                        <Eye className="mr-2 h-4 w-4"/>View
-                                    </Link>
-                                </Button>
+                    </TableHeader>
+                    <TableBody>
+                        {loading ? (
+                        Array.from({ length: 5 }).map((_, i) => (
+                            <TableRow key={i}>
+                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                                <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                                <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                                <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+                            </TableRow>
+                        ))
+                        ) : paginatedQuestions.length > 0 ? (
+                        paginatedQuestions.map((question) => (
+                            <TableRow key={question.id}>
+                                <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
+                                <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
+                                <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
+                                <TableCell className="text-right">
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href={`/question/${question.id}`}>
+                                            <Eye className="mr-2 h-4 w-4"/>View
+                                        </Link>
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                        ) : (
+                        <TableRow>
+                            <TableCell colSpan={4} className="text-center h-24">
+                                No questions found.
                             </TableCell>
                         </TableRow>
-                    ))
-                    ) : (
-                    <TableRow>
-                        <TableCell colSpan={4} className="text-center h-24">
-                            No questions found.
-                        </TableCell>
-                    </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                        )}
+                    </TableBody>
+                </Table>
+                 <PaginationControls 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            </>
            )}
         </CardContent>
       </Card>
