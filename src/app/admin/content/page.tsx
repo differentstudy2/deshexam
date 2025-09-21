@@ -150,6 +150,33 @@ function getUrlForTest(testType: string, testId: string) {
     return `/${typeSlug}/${testId}`;
 }
 
+const PaginationControls = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
+    if (totalPages <= 1) return null;
+    return (
+        <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+            >
+                Previous
+            </Button>
+             <span className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+            </span>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+            >
+                Next
+            </Button>
+        </div>
+    );
+};
+
 const ContentTable = ({ 
     content, 
     loading, 
@@ -357,6 +384,8 @@ const QuestionsTable = ({
     </div>
 );
 
+const ITEMS_PER_PAGE = 10;
+
 export default function ManageContentPage() {
   const { toast } = useToast();
   const [allContent, setAllContent] = useState<Content[]>([]);
@@ -380,6 +409,9 @@ export default function ManageContentPage() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [dialogSelectedContent, setDialogSelectedContent] = useState<string[]>([]);
   
+  const [contentCurrentPage, setContentCurrentPage] = useState(1);
+  const [questionsCurrentPage, setQuestionsCurrentPage] = useState(1);
+
   const [isEditQuestionDialogOpen, setIsEditQuestionDialogOpen] = useState(false);
   const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
   const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
@@ -528,6 +560,26 @@ export default function ManageContentPage() {
     });
   }, [allQuestions, searchQuery, subjectFilter]);
 
+  const paginatedContent = useMemo(() => {
+      const startIndex = (contentCurrentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      return filteredContent.slice(startIndex, endIndex);
+  }, [filteredContent, contentCurrentPage]);
+  
+  const paginatedQuestions = useMemo(() => {
+      const startIndex = (questionsCurrentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      return filteredQuestions.slice(startIndex, endIndex);
+  }, [filteredQuestions, questionsCurrentPage]);
+  
+  const totalContentPages = Math.ceil(filteredContent.length / ITEMS_PER_PAGE);
+  const totalQuestionPages = Math.ceil(filteredQuestions.length / ITEMS_PER_PAGE);
+
+
+  useEffect(() => {
+    setContentCurrentPage(1);
+    setQuestionsCurrentPage(1);
+  }, [searchQuery, activeTab, subjectFilter, accessFilter]);
 
   const openDeleteDialog = (item: Content) => {
     setContentToDelete(item);
@@ -891,6 +943,7 @@ export default function ManageContentPage() {
                 {allTabs.map(type => (
                     <TabsContent key={type.id} value={type.name}>
                         {type.name === 'Questions' ? (
+                            <>
                             <Collapsible>
                                 <div className="flex items-center justify-end mb-4">
                                      <CollapsibleTrigger asChild>
@@ -956,13 +1009,18 @@ export default function ManageContentPage() {
                                     </Card>
                                 </CollapsibleContent>
                                 <QuestionsTable 
-                                    questions={filteredQuestions} 
+                                    questions={paginatedQuestions} 
                                     loading={loading}
                                     selectedQuestions={selectedQuestions}
                                     onSelectQuestion={handleSelectQuestion}
                                     onSelectAllQuestions={handleSelectAllQuestions}
                                     isAllQuestionsSelected={isAllQuestionsSelected}
                                     onEditQuestion={openEditQuestionDialog}
+                                />
+                                <PaginationControls 
+                                    currentPage={questionsCurrentPage} 
+                                    totalPages={totalQuestionPages} 
+                                    onPageChange={setQuestionsCurrentPage} 
                                 />
                                 {selectedQuestions.length > 0 && (
                                      <div className="flex items-center space-x-2 mt-4">
@@ -987,9 +1045,11 @@ export default function ManageContentPage() {
                                     </div>
                                 )}
                             </Collapsible>
+                            </>
                         ) : (
+                            <>
                            <ContentTable 
-                                content={filteredContent.filter(c => activeTab === 'All' || c.testType === type.name)}
+                                content={paginatedContent.filter(c => activeTab === 'All' || c.testType === type.name)}
                                 loading={loading}
                                 openDeleteDialog={openDeleteDialog}
                                 selectedContent={selectedContent}
@@ -997,6 +1057,12 @@ export default function ManageContentPage() {
                                 onSelectAll={handleSelectAllContent}
                                 isAllSelected={isAllContentSelected}
                             />
+                             <PaginationControls 
+                                currentPage={contentCurrentPage} 
+                                totalPages={totalContentPages} 
+                                onPageChange={setContentCurrentPage} 
+                            />
+                            </>
                         )}
                     </TabsContent>
                 ))}
