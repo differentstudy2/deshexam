@@ -27,11 +27,10 @@ type Message = {
   createdAt: string;
 };
 
-export default function ViewReportPage() {
+export default function ViewReportPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
-  const params = useParams();
-  const messageId = params.id as string;
+  const messageId = params.id;
   const [message, setMessage] = useState<Message | null>(null);
   const [loading, setLoading] = useState(true);
 
