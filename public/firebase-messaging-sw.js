@@ -1,26 +1,32 @@
 
-// This service worker can be customized!
-// See https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker
+// Give the service worker access to Firebase Messaging.
+// Note: this lives in the public folder
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-self.addEventListener("install", (event) => {
-    console.log("Service worker installed");
-});
+// Initialize the Firebase app in the service worker with your Firebase project configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAzSss2t5UoydcGRh4CJ41VvE4x-t0Ikrc",
+  authDomain: "studio-8356746366-699c1.firebaseapp.com",
+  projectId: "studio-8356746366-699c1",
+  storageBucket: "studio-8356746366-699c1.firebasestorage.app",
+  messagingSenderId: "643911224795",
+  appId: "1:643911224795:web:ea10a865635776d4932bfe"
+};
 
-self.addEventListener("activate", (event) => {
-    console.log("Service worker activated");
-});
+firebase.initializeApp(firebaseConfig);
 
-self.addEventListener('push', (event) => {
-    console.log('Push message received:', event);
-    const notificationData = event.data.json();
+// Retrieve an instance of Firebase Messaging so that it can handle background messages.
+const messaging = firebase.messaging();
 
-    const title = notificationData.title;
-    const options = {
-        body: notificationData.body,
-        icon: '/icon-192x192.png', // Make sure you have an icon in your public folder
-    };
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  // Customize notification here
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/icon.png'
+  };
 
-    event.waitUntil(
-        self.registration.showNotification(title, options)
-    );
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
