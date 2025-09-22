@@ -11,14 +11,14 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 
 // Service Account credentials
 const serviceAccount = {
   "type": "service_account",
   "project_id": "studio-8356746366-699c1",
   "private_key_id": "806412b646c5952c424564ee1c3d5964893793ae",
-  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCp\\n-----END PRIVATE KEY-----\\n".replace(/\\n/g, '\n'),
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCp\n-----END PRIVATE KEY-----\n",
   "client_email": "firebase-adminsdk-d5a4w@studio-8356746366-699c1.iam.gserviceaccount.com",
   "client_id": "111951528659179532824",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -29,17 +29,20 @@ const serviceAccount = {
 };
 
 // Initialize Firebase Admin SDK
+let app: App;
 if (!getApps().length) {
   try {
-    initializeApp({
+    app = initializeApp({
       credential: cert(serviceAccount),
     });
   } catch (e) {
     throw new Error(`Failed to initialize Firebase Admin SDK: ${(e as Error).message}`);
   }
+} else {
+  app = getApps()[0];
 }
 
-const db = getFirestore();
+const db = getFirestore(app);
 
 const PushNotificationInputSchema = z.object({
   title: z.string().describe('The title of the notification.'),
@@ -80,7 +83,7 @@ const sendPushNotificationFlow = ai.defineFlow(
         tokens: tokens,
       };
 
-      const response = await getMessaging().sendEachForMulticast(message);
+      const response = await getMessaging(app).sendEachForMulticast(message);
       console.log(`${response.successCount} messages were sent successfully`);
 
       if (response.failureCount > 0) {
