@@ -8,7 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
@@ -43,6 +43,7 @@ const db = getFirestore(app);
 const PushNotificationInputSchema = z.object({
   title: z.string().describe('The title of the notification.'),
   body: z.string().describe('The main message content of the notification.'),
+  link: z.string().url().optional().describe('The URL to open when the notification is clicked.'),
 });
 export type PushNotificationInput = z.infer<typeof PushNotificationInputSchema>;
 
@@ -56,7 +57,7 @@ const sendPushNotificationFlow = ai.defineFlow(
     inputSchema: PushNotificationInputSchema,
     outputSchema: z.void(),
   },
-  async ({ title, body }) => {
+  async ({ title, body, link }) => {
     try {
       const tokensSnapshot = await db.collection('fcmTokens').get();
       if (tokensSnapshot.empty) {
@@ -79,12 +80,16 @@ const sendPushNotificationFlow = ai.defineFlow(
         data: {
             title,
             body,
+            link: link || 'https://deshexam.com',
         },
         webpush: {
           notification: {
             title,
             body,
             icon: '/icon.png',
+          },
+          fcm_options: {
+            link: link || 'https://deshexam.com',
           },
         },
         tokens: tokens,
@@ -110,5 +115,3 @@ const sendPushNotificationFlow = ai.defineFlow(
     }
   }
 );
-
-    

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +19,7 @@ import { db } from '@/lib/firebase/client';
 const notificationSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
   body: z.string().min(5, "Message body must be at least 5 characters."),
+  link: z.string().url("Please enter a valid URL.").optional().or(z.literal('')),
 });
 
 type NotificationFormValues = z.infer<typeof notificationSchema>;
@@ -49,12 +50,17 @@ export default function PushNotificationPage() {
         defaultValues: {
             title: '',
             body: '',
+            link: '',
         },
     });
 
     const onSubmit: SubmitHandler<NotificationFormValues> = async (data) => {
         try {
-            await sendPushNotification(data);
+            await sendPushNotification({
+                title: data.title,
+                body: data.body,
+                link: data.link || undefined, // Send undefined if empty
+            });
             toast({
                 title: 'Notifications Sent!',
                 description: 'Your message has been sent to all subscribed users.',
@@ -125,6 +131,22 @@ export default function PushNotificationPage() {
                     <FormControl>
                       <Textarea placeholder="Describe the new content or announcement..." {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="link"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Link (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://deshexam.com/mock-tests/new-test" {...field} />
+                    </FormControl>
+                     <FormDescription>
+                      The URL to open when the user clicks the notification. Defaults to the homepage if left empty.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
