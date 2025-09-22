@@ -1,6 +1,6 @@
 
 import { MetadataRoute } from 'next';
-import { getAllContent, getContentTypes } from '@/lib/firebase/firestore';
+import { getAllContent, getContentTypes, getAllQuestions } from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 3. Fetch all individual content items for dynamic routes
   const allContent = await getAllContent();
-  const contentItemRoutes = allContent.map((item) => {
+  const contentItemRoutes = allContent.map((item: any) => {
     const typeSlug = (item.testType || 'content').toLowerCase().replace(/\s+/g, '-');
     const path = `/${typeSlug}/${item.id}`;
     let lastMod;
@@ -49,6 +49,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
   
-  // 4. Combine all routes
-  return [...otherStaticRoutes, ...contentTypeRoutes, ...contentItemRoutes];
+  // 4. Fetch all individual questions for dynamic routes
+  const allQuestions = await getAllQuestions();
+  const questionItemRoutes = allQuestions.map((item: any) => {
+    const path = `/question/${item.id}`;
+    let lastMod;
+     if (item.createdAt && typeof item.createdAt.toDate === 'function') {
+        lastMod = item.createdAt.toDate();
+    } else {
+        lastMod = new Date();
+    }
+    
+    return {
+      url: `${baseUrl}${path}`,
+      lastModified: lastMod,
+      priority: 0.6,
+    };
+  });
+
+  // 5. Combine all routes
+  return [...otherStaticRoutes, ...contentTypeRoutes, ...contentItemRoutes, ...questionItemRoutes];
 }
