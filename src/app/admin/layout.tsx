@@ -28,6 +28,7 @@ import {
   DollarSign,
   Bell,
   Flag,
+  Menu,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,8 +37,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+
 
 const navItems = [
   { href: '/admin', label: 'Admin Overview', icon: ShieldCheck },
@@ -62,6 +65,7 @@ export default function AdminLayout({
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -93,6 +97,48 @@ export default function AdminLayout({
     );
   }
 
+  const sidebarContent = (
+    <ScrollArea className="h-full">
+        <SidebarMenu className="mt-6">
+            {navItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                asChild
+                isActive={pathname === item.href}
+                className={cn(
+                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                    "hover:bg-primary/10 hover:text-primary",
+                    pathname === item.href && "bg-primary/20 text-primary font-semibold border-l-4 border-primary"
+                )}
+                tooltip={{
+                    children: item.label,
+                }}
+                >
+                <Link href={item.href} onClick={() => setIsSheetOpen(false)}>
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            ))}
+            <SidebarMenuItem>
+                <SidebarMenuButton 
+                 asChild
+                 className={cn(
+                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                    "hover:bg-secondary/80"
+                 )}
+                >
+                    <Link href="/dashboard" onClick={() => setIsSheetOpen(false)}>
+                        <LayoutGrid />
+                        <span>User Dashboard</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    </ScrollArea>
+  );
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -104,45 +150,7 @@ export default function AdminLayout({
           </div>
         </SidebarHeader>
         <SidebarContent>
-            <ScrollArea className="h-full">
-                <SidebarMenu className="mt-6">
-                    {navItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                        asChild
-                        isActive={pathname === item.href}
-                        className={cn(
-                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                            "hover:bg-primary/10 hover:text-primary",
-                            pathname === item.href && "bg-primary/20 text-primary font-semibold border-l-4 border-primary"
-                        )}
-                        tooltip={{
-                            children: item.label,
-                        }}
-                        >
-                        <Link href={item.href}>
-                            <item.icon className="h-5 w-5" />
-                            <span>{item.label}</span>
-                        </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    ))}
-                    <SidebarMenuItem>
-                        <SidebarMenuButton 
-                         asChild
-                         className={cn(
-                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                            "hover:bg-secondary/80"
-                         )}
-                        >
-                            <Link href="/dashboard">
-                                <LayoutGrid />
-                                <span>User Dashboard</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </ScrollArea>
+            {sidebarContent}
         </SidebarContent>
         <SidebarFooter>
             <div className="flex items-center gap-2">
@@ -159,25 +167,30 @@ export default function AdminLayout({
       </Sidebar>
       <SidebarInset>
         <header className="md:hidden sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <ScrollArea className="w-full whitespace-nowrap">
-                <div className="flex w-max space-x-1 p-2">
-                    {navItems.map((item) => (
-                        <Button
-                            key={item.href}
-                            asChild
-                            variant={pathname === item.href ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className="flex items-center gap-2"
-                        >
-                            <Link href={item.href}>
-                                <item.icon className="h-4 w-4" />
-                                {item.label}
-                            </Link>
+            <div className="container flex h-14 items-center">
+                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon" className="md:hidden">
+                            <Menu />
                         </Button>
-                    ))}
-                </div>
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0 flex flex-col">
+                        <SheetHeader className="border-b p-4">
+                            <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+                            <Link href="/admin" onClick={() => setIsSheetOpen(false)} className="flex items-center space-x-2">
+                                <DeshExamLogo />
+                            </Link>
+                        </SheetHeader>
+                        {sidebarContent}
+                    </SheetContent>
+                </Sheet>
+                 <div className="flex flex-1 items-center justify-end">
+                    <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
+                        <AvatarFallback>{user?.email?.[0].toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                 </div>
+            </div>
         </header>
         <main className="p-4 md:p-6 lg:p-8">
             {children}
