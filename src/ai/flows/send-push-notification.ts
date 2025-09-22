@@ -73,15 +73,6 @@ const sendPushNotificationFlow = ai.defineFlow(
       }
 
       const message = {
-        notification: {
-          title,
-          body,
-        },
-        data: {
-            title,
-            body,
-            link: link || 'https://deshexam.com',
-        },
         webpush: {
           notification: {
             title,
