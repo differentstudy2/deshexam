@@ -78,11 +78,11 @@ const sendPushNotificationFlow = ai.defineFlow(
           body,
         },
         webpush: {
-          notification: {
-            icon: '/icon.png',
-          },
           fcm_options: {
             link: link || 'https://deshexam.com',
+          },
+          notification: {
+            icon: '/icon.png',
           },
         },
         tokens: tokens,
