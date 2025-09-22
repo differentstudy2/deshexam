@@ -17,6 +17,18 @@ import { messaging } from "@/lib/firebase/client";
 import { getToken } from "firebase/messaging";
 import { useToast } from "@/hooks/use-toast";
 import { addFCMToken } from "@/lib/firebase/firestore";
+import { Inter, Lexend } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+
+const lexend = Lexend({
+  subsets: ['latin'],
+  variable: '--font-lexend',
+  weight: ['400', '700'],
+});
 
 
 const FirebaseMessagingProvider = ({ children }: { children: React.ReactNode }) => {
@@ -62,7 +74,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("antialiased")}>
+      <body className={cn("antialiased", inter.variable, lexend.variable)}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
