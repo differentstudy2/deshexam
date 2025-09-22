@@ -1,13 +1,9 @@
 
-// Give the service worker access to Firebase Messaging.
-// Note that you can only use Firebase Messaging here, other Firebase libraries
-// are not available in the service worker.
-importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-messaging-compat.js');
+// Import the Firebase app and messaging services
+importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-messaging.js');
 
-// Initialize the Firebase app in the service worker by passing in
-// your app's Firebase config object.
-// https://firebase.google.com/docs/web/setup#config-object
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAzSss2t5UoydcGRh4CJ41VvE4x-t0Ikrc",
   authDomain: "studio-8356746366-699c1.firebaseapp.com",
@@ -17,20 +13,38 @@ const firebaseConfig = {
   appId: "1:643911224795:web:ea10a865635776d4932bfe"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging(app);
 
-// Retrieve an instance of Firebase Messaging so that it can handle background
-// messages.
-const messaging = firebase.messaging();
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-// If you would like to customize notifications that are received in the
-// background (Web app is closed or not in browser focus) then you should
-// implement this optional method.
-// Keep in mind that FCM will still show notification messages automatically 
-// and only data messages will be handled by this method.
-// Refer to the online documentation for more information.
-// https://firebase.google.com/docs/cloud-messaging/js/receive
+  // Check if the app is already in the foreground. If so, don't show a notification.
+  // The foreground message will be handled by the main app.
+  self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  }).then((clients) => {
+    let isAppInForeground = false;
+    clients.forEach((client) => {
+      if (client.visibilityState === 'visible') {
+        isAppInForeground = true;
+      }
+    });
 
-// This service worker is intentionally left blank for background message handling.
-// The default FCM behavior will display notifications when the app is in the background.
-// Foreground messages are handled in src/app/layout.tsx to display a toast.
+    if (isAppInForeground) {
+      console.log('App is in the foreground, not showing notification.');
+      return;
+    }
+
+    // If app is not in foreground, show the notification.
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+      body: payload.notification.body,
+      icon: payload.notification.icon || '/icon.png'
+    };
+
+    self.registration.showNotification(notificationTitle, notificationOptions);
+  });
+});
