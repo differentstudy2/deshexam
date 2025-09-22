@@ -14,7 +14,7 @@ import { AuthDialog } from "@/components/feature/auth-dialog";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { messaging } from "@/lib/firebase/client";
-import { getToken, onMessage } from "firebase/messaging";
+import { getToken } from "firebase/messaging";
 import { useToast } from "@/hooks/use-toast";
 import { addFCMToken } from "@/lib/firebase/firestore";
 
@@ -31,19 +31,6 @@ const FirebaseMessagingProvider = ({ children }: { children: React.ReactNode }) 
             const currentToken = await getToken(messaging, { vapidKey: 'BPwG_wGjDhWT_DVSY3Fd6fgrhNhlQrK2hklIDuqFRu4B29XTRnOemSrulxX0RAFXtzjy2dg0a0EV34RkK48CakA' });
             if (currentToken) {
               await addFCMToken(currentToken);
-              
-              // Listen for foreground messages
-              onMessage(messaging, (payload) => {
-                console.log('Message received. ', payload);
-                const notificationTitle = payload.notification?.title || payload.data?.title;
-                const notificationBody = payload.notification?.body || payload.data?.body;
-
-                toast({
-                  title: notificationTitle,
-                  description: notificationBody,
-                });
-              });
-
             } else {
               console.log('No registration token available. Request permission to generate one.');
             }
@@ -101,5 +88,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    
