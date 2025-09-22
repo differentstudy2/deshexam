@@ -103,7 +103,7 @@ export default function Home() {
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
               <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                Unlock Your Potential with DeshExam
+                Unlock Your Potential <br className="hidden md:block" /> with DeshExam
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
                 Master your competitive exam preparation for NEET, JEE, UPSC, and more with our mock tests, quizzes, and personalized AI-powered learning paths.
