@@ -21,7 +21,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
-const messaging = (typeof window !== 'undefined') ? getMessaging(app) : null;
+const messaging = typeof window !== 'undefined' ? getMessaging(app) : null;
 
 
 export { db, auth, storage, googleProvider, app, messaging };
