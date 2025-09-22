@@ -1,6 +1,8 @@
 
+
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,8 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Send } from 'lucide-react';
+import { Send, Users } from 'lucide-react';
 import { sendPushNotification } from '@/ai/flows/send-push-notification';
+import { getFCMTokenCount } from '@/lib/firebase/firestore';
 
 const notificationSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -22,6 +25,16 @@ type NotificationFormValues = z.infer<typeof notificationSchema>;
 
 export default function PushNotificationPage() {
     const { toast } = useToast();
+    const [subscriberCount, setSubscriberCount] = useState(0);
+
+    useEffect(() => {
+        const fetchSubscriberCount = async () => {
+            const count = await getFCMTokenCount();
+            setSubscriberCount(count);
+        };
+        fetchSubscriberCount();
+    }, []);
+
     const form = useForm<NotificationFormValues>({
         resolver: zodResolver(notificationSchema),
         defaultValues: {
@@ -55,6 +68,21 @@ export default function PushNotificationPage() {
           Send a message to all users who have subscribed to notifications.
         </p>
       </div>
+
+       <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Subscribers
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{subscriberCount}</div>
+            <p className="text-xs text-muted-foreground">
+              Total devices subscribed to receive notifications.
+            </p>
+          </CardContent>
+        </Card>
 
       <Card className="max-w-2xl">
         <CardHeader>

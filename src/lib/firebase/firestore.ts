@@ -1,7 +1,7 @@
 
 
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -1452,6 +1452,16 @@ export const addFCMToken = async (token: string) => {
         console.error("Error adding FCM token: ", error);
     }
 }
+
+export const getFCMTokenCount = async (): Promise<number> => {
+    try {
+        const snapshot = await getCountFromServer(collection(db, "fcmTokens"));
+        return snapshot.data().count;
+    } catch (error) {
+        console.error("Error getting FCM token count: ", error);
+        return 0;
+    }
+};
     
 
 
@@ -1467,6 +1477,7 @@ export const addFCMToken = async (token: string) => {
 
 
     
+
 
 
 
