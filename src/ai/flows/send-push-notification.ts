@@ -18,7 +18,7 @@ const serviceAccount = {
   "type": "service_account",
   "project_id": "studio-8356746366-699c1",
   "private_key_id": "806412b646c5952c424564ee1c3d5964893793ae",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCp\n-----END PRIVATE KEY-----\n",
+  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCp\\n-----END PRIVATE KEY-----\\n".replace(/\\n/g, '\n'),
   "client_email": "firebase-adminsdk-d5a4w@studio-8356746366-699c1.iam.gserviceaccount.com",
   "client_id": "111951528659179532824",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
