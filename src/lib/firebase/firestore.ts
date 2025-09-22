@@ -1438,23 +1438,36 @@ export const getContactMessageById = async (messageId: string) => {
     }
 };
     
+export const addFCMToken = async (token: string) => {
+    if (!token) {
+        return;
+    }
+    try {
+        const tokenRef = doc(db, "fcmTokens", token);
+        await setDoc(tokenRef, {
+            token: token,
+            createdAt: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error adding FCM token: ", error);
+    }
+}
     
 
+
+
+
+
+
+
+
+
+
+
+
+
     
 
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
 
 
