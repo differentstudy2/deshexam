@@ -13,31 +13,26 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 
-// Service Account credentials
-const serviceAccount = {
-  "type": "service_account",
-  "project_id": "studio-8356746366-699c1",
-  "private_key_id": "806412b646c5952c424564ee1c3d5964893793ae",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCp\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-d5a4w@studio-8356746366-699c1.iam.gserviceaccount.com",
-  "client_id": "111951528659179532824",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-d5a4w%40studio-8356746366-699c1.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-};
-
 // Initialize Firebase Admin SDK
 let app: App;
 if (!getApps().length) {
-  try {
-    app = initializeApp({
-      credential: cert(serviceAccount),
-    });
-  } catch (e) {
-    throw new Error(`Failed to initialize Firebase Admin SDK: ${(e as Error).message}`);
-  }
+    const serviceAccountConfig = process.env.FIREBASE_ADMIN_SDK_CONFIG_BASE64;
+
+    if (!serviceAccountConfig) {
+        throw new Error('FIREBASE_ADMIN_SDK_CONFIG_BASE64 environment variable is not set.');
+    }
+
+    try {
+        const serviceAccountJson = Buffer.from(serviceAccountConfig, 'base64').toString('utf-8');
+        const serviceAccount = JSON.parse(serviceAccountJson);
+
+        app = initializeApp({
+            credential: cert(serviceAccount),
+        });
+    } catch (e) {
+        console.error("Failed to parse or initialize Firebase Admin SDK credentials.", e);
+        throw new Error(`Failed to initialize Firebase Admin SDK. Please check your environment variables.`);
+    }
 } else {
   app = getApps()[0];
 }
