@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -27,10 +28,11 @@ type Message = {
   createdAt: string;
 };
 
-export default function ViewReportPage({ params }: { params: { id: string } }) {
+export default function ViewReportPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const messageId = params.id;
+  const params = useParams();
+  const messageId = params.id as string;
   const [message, setMessage] = useState<Message | null>(null);
   const [loading, setLoading] = useState(true);
 
