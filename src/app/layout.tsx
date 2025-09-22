@@ -28,7 +28,7 @@ const FirebaseMessagingProvider = ({ children }: { children: React.ReactNode }) 
         try {
           const permission = await Notification.requestPermission();
           if (permission === 'granted') {
-            const currentToken = await getToken(messaging, { vapidKey: 'BDatzP4l-S4Jz3T3b-g3_N8uN-c8_a8yP8_H7v6J1FzZ5j3qX2xK7J8wQ9G3' });
+            const currentToken = await getToken(messaging, { vapidKey: 'BPwG_wGjDhWT_DVSY3Fd6fgrhNhlQrK2hklIDuqFRu4B29XTRnOemSrulxX0RAFXtzjy2dg0a0EV34RkK48CakA' });
             if (currentToken) {
               await addFCMToken(currentToken);
             } else {
