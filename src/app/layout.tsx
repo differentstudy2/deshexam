@@ -1,7 +1,6 @@
 
 "use client";
 
-import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,17 +13,6 @@ import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
 import { usePathname } from "next/navigation";
 
-const fontBody = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
-});
-
-const fontHeadline = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-headline",
-});
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,7 +23,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("antialiased", fontBody.variable, fontHeadline.variable)}>
+      <body className={cn("antialiased")}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
