@@ -35,9 +35,12 @@ const FirebaseMessagingProvider = ({ children }: { children: React.ReactNode }) 
               // Listen for foreground messages
               onMessage(messaging, (payload) => {
                 console.log('Message received. ', payload);
+                const notificationTitle = payload.notification?.title || payload.data?.title;
+                const notificationBody = payload.notification?.body || payload.data?.body;
+
                 toast({
-                  title: payload.notification?.title,
-                  description: payload.notification?.body,
+                  title: notificationTitle,
+                  description: notificationBody,
                 });
               });
 
@@ -98,3 +101,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+    

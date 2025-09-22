@@ -64,7 +64,7 @@ const sendPushNotificationFlow = ai.defineFlow(
         return;
       }
 
-      const tokens = tokensSnapshot.docs.map(doc => doc.data().token);
+      const tokens = tokensSnapshot.docs.map(doc => doc.data().token).filter(Boolean);
       
       if (tokens.length === 0) {
         console.log('No valid tokens found.');
@@ -72,12 +72,20 @@ const sendPushNotificationFlow = ai.defineFlow(
       }
 
       const message = {
+        notification: {
+          title,
+          body,
+        },
         webpush: {
           notification: {
             title,
             body,
             icon: '/icon.png', 
           },
+          data: {
+             title,
+             body,
+          }
         },
         tokens: tokens,
       };
@@ -102,3 +110,5 @@ const sendPushNotificationFlow = ai.defineFlow(
     }
   }
 );
+
+    
