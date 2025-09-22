@@ -1453,15 +1453,6 @@ export const addFCMToken = async (token: string) => {
     }
 }
 
-export const getFCMTokenCount = async (): Promise<number> => {
-    try {
-        const snapshot = await getCountFromServer(collection(db, "fcmTokens"));
-        return snapshot.data().count;
-    } catch (error) {
-        console.error("Error getting FCM token count: ", error);
-        return 0;
-    }
-};
     
 
 
@@ -1477,6 +1468,7 @@ export const getFCMTokenCount = async (): Promise<number> => {
 
 
     
+
 
 
 

@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -14,7 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Users } from 'lucide-react';
 import { sendPushNotification } from '@/ai/flows/send-push-notification';
-import { getFCMTokenCount } from '@/lib/firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 const notificationSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -28,12 +28,21 @@ export default function PushNotificationPage() {
     const [subscriberCount, setSubscriberCount] = useState(0);
 
     useEffect(() => {
-        const fetchSubscriberCount = async () => {
-            const count = await getFCMTokenCount();
-            setSubscriberCount(count);
-        };
-        fetchSubscriberCount();
-    }, []);
+        const tokensCollection = collection(db, 'fcmTokens');
+        const unsubscribe = onSnapshot(tokensCollection, (snapshot) => {
+            setSubscriberCount(snapshot.size);
+        }, (error) => {
+            console.error("Error fetching subscriber count in real-time: ", error);
+            toast({
+                variant: 'destructive',
+                title: 'Real-time Error',
+                description: 'Could not connect for live subscriber updates.',
+            });
+        });
+
+        // Cleanup the listener when the component unmounts
+        return () => unsubscribe();
+    }, [toast]);
 
     const form = useForm<NotificationFormValues>({
         resolver: zodResolver(notificationSchema),
