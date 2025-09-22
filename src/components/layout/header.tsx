@@ -63,10 +63,10 @@ const UserNav = () => {
     return (
       <div className="flex items-center gap-2">
          {profile?.role === 'admin' && (
-            <Button asChild size="sm" className="hidden md:flex">
+            <Button asChild size="icon" variant="ghost" className="hidden md:flex">
               <Link href="/admin/add-content">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Content
+                <PlusCircle className="h-5 w-5" />
+                <span className="sr-only">Add Content</span>
               </Link>
             </Button>
           )}
