@@ -74,6 +74,13 @@
     font-size: 1rem;
     line-height: 1.5;
   }
+  .text-gradient-green-blue {
+    background: linear-gradient(to right, #10B981, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 .ql-editor {

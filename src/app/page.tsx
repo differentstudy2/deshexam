@@ -14,6 +14,7 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const features = [
   {
@@ -102,7 +103,7 @@ export default function Home() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className={cn("font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl", "text-gradient-green-blue")} style={{ fontSize: '3.25rem', lineHeight: '1.3' }}>
                 Unlock Your Potential <br className="hidden md:block" /> with DeshExam
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
