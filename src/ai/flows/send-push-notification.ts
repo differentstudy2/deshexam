@@ -76,16 +76,16 @@ const sendPushNotificationFlow = ai.defineFlow(
           title,
           body,
         },
+        data: {
+            title,
+            body,
+        },
         webpush: {
           notification: {
             title,
             body,
-            icon: '/icon.png', 
+            icon: '/icon.png',
           },
-          data: {
-             title,
-             body,
-          }
         },
         tokens: tokens,
       };
