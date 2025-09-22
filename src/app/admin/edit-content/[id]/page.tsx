@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -276,6 +277,7 @@ export default function EditContentPage() {
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
+  const contentId = params.id as string;
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
@@ -285,7 +287,6 @@ export default function EditContentPage() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-  const contentId = params.id as string;
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
   const [isAddingNewClass, setIsAddingNewClass] = useState(false);

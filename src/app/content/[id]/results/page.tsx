@@ -3,7 +3,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname, useParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -184,20 +184,22 @@ function ResultsDisplay() {
   );
 }
 
-export default function TestResultsPage({ params, searchParams: pageSearchParams }: { params: { id: string }, searchParams: { [key: string]: string | string[] | undefined } }) {
+export default function TestResultsPage() {
   const [testType, setTestType] = useState('Test');
+  const searchParams = useSearchParams();
   
   useEffect(() => {
     const getTestType = async () => {
-        if(pageSearchParams.submissionId) {
-            const sub = await getSubmissionById(pageSearchParams.submissionId as string);
+        const submissionId = searchParams.get('submissionId');
+        if(submissionId) {
+            const sub = await getSubmissionById(submissionId);
             if(sub) {
                 setTestType(sub.testType);
             }
         }
     }
     getTestType();
-  }, [pageSearchParams.submissionId]);
+  }, [searchParams]);
 
   return (
     <div className="container py-12">
@@ -211,7 +213,3 @@ export default function TestResultsPage({ params, searchParams: pageSearchParams
     </div>
   );
 }
-
-
-
-

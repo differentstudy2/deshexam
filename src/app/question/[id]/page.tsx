@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
@@ -59,7 +58,7 @@ type Comment = {
     createdAt: Date;
 }
 
-export default function QuestionPage({ params }: { params: { id: string } }) {
+export default function QuestionPage() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -69,6 +68,7 @@ export default function QuestionPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
+  const params = useParams();
   const questionId = params.id as string;
 
   useEffect(() => {

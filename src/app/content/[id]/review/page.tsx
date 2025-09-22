@@ -14,7 +14,7 @@ import {
 import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getSubmissionById, getContentById, getUserProfile, handleCommentVote } from '@/lib/firebase/firestore';
+import { getSubmissionById, getContentById, getUserProfile, handleQuestionVote } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -450,9 +450,10 @@ function ReviewDisplay() {
   );
 }
 
-export default function TestReviewPage({ params }: { params: { id: string } }) {
-  const { id: testId } = params;
+export default function TestReviewPage() {
+  const params = useParams();
   const searchParams = useSearchParams();
+  const testId = params.id as string;
   const submissionId = searchParams.get('submissionId');
   const [testType, setTestType] = useState('');
 
@@ -493,5 +494,6 @@ export default function TestReviewPage({ params }: { params: { id: string } }) {
     
 
     
+
 
 
