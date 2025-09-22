@@ -141,8 +141,8 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
       href={href}
       onClick={onLinkClick}
       className={cn(
-        "transition-colors hover:text-primary flex items-center gap-4",
-        pathname === href ? "text-primary font-medium" : "text-muted-foreground",
+        "transition-colors hover:text-primary flex items-center gap-4 nav-link-style",
+        pathname === href ? "text-primary font-bold" : "text-muted-foreground",
         isMobile && "text-lg py-2"
       )}
     >
