@@ -36,7 +36,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -158,6 +158,27 @@ export default function AdminLayout({
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
+        <header className="md:hidden sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <ScrollArea className="w-full whitespace-nowrap">
+                <div className="flex w-max space-x-1 p-2">
+                    {navItems.map((item) => (
+                        <Button
+                            key={item.href}
+                            asChild
+                            variant={pathname === item.href ? 'secondary' : 'ghost'}
+                            size="sm"
+                            className="flex items-center gap-2"
+                        >
+                            <Link href={item.href}>
+                                <item.icon className="h-4 w-4" />
+                                {item.label}
+                            </Link>
+                        </Button>
+                    ))}
+                </div>
+                <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+        </header>
         <main className="p-4 md:p-6 lg:p-8">
             {children}
         </main>
