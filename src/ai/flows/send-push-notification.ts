@@ -14,12 +14,18 @@ import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 // Initialize Firebase Admin SDK
-const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG!);
-
 if (!getApps().length) {
-  initializeApp({
-    credential: cert(serviceAccount),
-  });
+  if (!process.env.FIREBASE_ADMIN_SDK_CONFIG) {
+    throw new Error('FIREBASE_ADMIN_SDK_CONFIG environment variable is not set.');
+  }
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG);
+    initializeApp({
+      credential: cert(serviceAccount),
+    });
+  } catch (e) {
+    throw new Error(`Failed to parse FIREBASE_ADMIN_SDK_CONFIG: ${(e as Error).message}`);
+  }
 }
 
 const db = getFirestore();
