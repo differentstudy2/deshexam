@@ -13,18 +13,29 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
+// Service Account credentials
+const serviceAccount = {
+  "type": "service_account",
+  "project_id": "studio-8356746366-699c1",
+  "private_key_id": "806412b646c5952c424564ee1c3d5964893793ae",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCp\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-d5a4w@studio-8356746366-699c1.iam.gserviceaccount.com",
+  "client_id": "111951528659179532824",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-d5a4w%40studio-8356746366-699c1.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+};
+
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
-  if (!process.env.FIREBASE_ADMIN_SDK_CONFIG) {
-    throw new Error('FIREBASE_ADMIN_SDK_CONFIG environment variable is not set.');
-  }
   try {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_CONFIG);
     initializeApp({
       credential: cert(serviceAccount),
     });
   } catch (e) {
-    throw new Error(`Failed to parse FIREBASE_ADMIN_SDK_CONFIG: ${(e as Error).message}`);
+    throw new Error(`Failed to initialize Firebase Admin SDK: ${(e as Error).message}`);
   }
 }
 
