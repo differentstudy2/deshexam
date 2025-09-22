@@ -1,6 +1,6 @@
 
 import { MetadataRoute } from 'next';
-import { getAllContent, getContentTypes, getAllQuestions } from '@/lib/firebase/firestore';
+import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses, getExamTypes, getSubjects } from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
@@ -67,6 +67,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  // 5. Combine all routes
-  return [...otherStaticRoutes, ...contentTypeRoutes, ...contentItemRoutes, ...questionItemRoutes];
+  // 5. Fetch all metafields for dynamic routes
+  const [boards, classes, examTypes, subjects] = await Promise.all([
+      getBoards(),
+      getClasses(),
+      getExamTypes(),
+      getSubjects()
+  ]);
+
+  const generateMetafieldRoutes = (items: any[], pathPrefix: string) => {
+      return items.map(item => ({
+          url: `${baseUrl}/${pathPrefix}/${item.name.toLowerCase().replace(/\s+/g, '-')}`,
+          lastModified: new Date(),
+          priority: 0.7
+      }));
+  }
+
+  const boardRoutes = generateMetafieldRoutes(boards, 'boards');
+  const classRoutes = generateMetafieldRoutes(classes, 'classes');
+  const examTypeRoutes = generateMetafieldRoutes(examTypes, 'exam-types');
+  const subjectRoutes = generateMetafieldRoutes(subjects, 'subjects');
+
+  // 6. Combine all routes
+  return [
+    ...otherStaticRoutes, 
+    ...contentTypeRoutes, 
+    ...contentItemRoutes, 
+    ...questionItemRoutes,
+    ...boardRoutes,
+    ...classRoutes,
+    ...examTypeRoutes,
+    ...subjectRoutes,
+  ];
 }
