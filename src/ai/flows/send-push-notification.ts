@@ -73,10 +73,12 @@ const sendPushNotificationFlow = ai.defineFlow(
       }
 
       const message = {
+        notification: {
+          title,
+          body,
+        },
         webpush: {
           notification: {
-            title,
-            body,
             icon: '/icon.png',
           },
           fcm_options: {
