@@ -72,14 +72,17 @@ const sendPushNotificationFlow = ai.defineFlow(
       }
 
       const message = {
-        notification: {
-          title,
-          body,
+        webpush: {
+          notification: {
+            title,
+            body,
+            icon: '/icon.png', 
+          },
         },
         tokens: tokens,
       };
 
-      const response = await getMessaging(app).sendEachForMulticast(message);
+      const response = await getMessaging(app).sendEachForMulticast(message as any);
       console.log(`${response.successCount} messages were sent successfully`);
 
       if (response.failureCount > 0) {
