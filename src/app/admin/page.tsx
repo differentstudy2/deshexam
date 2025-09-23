@@ -10,13 +10,44 @@ import {
 } from '@/components/ui/card';
 import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { getAllUsers, getAllContent, getTodaysSubmissions } from '@/lib/firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminDashboardPage() {
-  
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalContent: 0,
+    submissionsToday: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [users, content, submissions] = await Promise.all([
+          getAllUsers(),
+          getAllContent(),
+          getTodaysSubmissions(),
+        ]);
+        setStats({
+          totalUsers: users.length,
+          totalContent: content.length,
+          submissionsToday: submissions.length,
+        });
+      } catch (error) {
+        console.error("Failed to fetch admin dashboard stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const adminStats = [
-    { title: "Total Users", value: "1,254", icon: <Users/>, description: "+12 since last week" },
-    { title: "Total Content", value: "342", icon: <FileText/>, description: "+5 new items" },
-    { title: "Submissions Today", value: "8,432", icon: <BarChart2/>, description: "2% increase" },
+    { title: "Total Users", value: stats.totalUsers, icon: <Users/>, description: "Total registered users" },
+    { title: "Total Content", value: stats.totalContent, icon: <FileText/>, description: "Tests, quizzes, and articles" },
+    { title: "Submissions Today", value: stats.submissionsToday, icon: <BarChart2/>, description: "Test submissions today" },
      { title: "Site Activity", value: "High", icon: <Activity/>, description: "All systems normal" },
   ];
 
@@ -32,21 +63,29 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {adminStats.map((stat) => (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <span className="text-muted-foreground">{stat.icon}</span>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">{stat.description}</p>
-              </CardContent>
-            </Card>
-          ))
-        }
+        {adminStats.map((stat, index) => (
+          <Card key={stat.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
+              <span className="text-muted-foreground">{stat.icon}</span>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <>
+                  <Skeleton className="h-8 w-1/2 mb-2" />
+                  <Skeleton className="h-3 w-3/4" />
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                  <p className="text-xs text-muted-foreground">{stat.description}</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
        <div className="grid gap-6 md:grid-cols-2">

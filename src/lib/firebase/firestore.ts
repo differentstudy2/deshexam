@@ -634,6 +634,26 @@ export const getSubmissionsByUserId = async (userId: string) => {
     }
 };
 
+export const getTodaysSubmissions = async () => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Start of today
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1); // Start of tomorrow
+
+        const q = query(
+            collection(db, "submissions"),
+            where("submittedAt", ">=", today),
+            where("submittedAt", "<", tomorrow)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+        console.error("Error getting today's submissions: ", e);
+        throw new Error("Failed to fetch today's submissions.");
+    }
+};
+
 export const getContentTypes = async () => {
     try {
         const q = query(collection(db, "contentTypes"), orderBy("name"));
@@ -1468,6 +1488,7 @@ export const addFCMToken = async (token: string) => {
 
 
     
+
 
 
 
