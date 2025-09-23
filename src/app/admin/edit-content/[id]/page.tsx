@@ -1511,7 +1511,7 @@ export default function EditContentPage() {
                                 <AccordionContent>
                                   <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
                                   <Tabs defaultValue="mcq" className="w-full">
-                                    <TabsList>
+                                    <TabsList className="h-auto flex-wrap justify-start">
                                       <TabsTrigger value="mcq">MCQ</TabsTrigger>
                                       <TabsTrigger value="tf">T/F</TabsTrigger>
                                       <TabsTrigger value="sa">Short Answer</TabsTrigger>
@@ -1548,3 +1548,4 @@ export default function EditContentPage() {
   );
 }
 
+    
