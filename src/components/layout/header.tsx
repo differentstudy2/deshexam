@@ -296,8 +296,8 @@ export function Header() {
   const [isDashboardSheetOpen, setIsDashboardSheetOpen] = useState(false);
   const [isMainSheetOpen, setIsMainSheetOpen] = useState(false);
 
-  const isAdminPath = pathname.startsWith('/admin');
-  const isDashboardPath = pathname.startsWith('/dashboard');
+  const isAdminPath = user ? pathname.startsWith('/admin') : false;
+  const isDashboardPath = user ? pathname.startsWith('/dashboard') : false;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
