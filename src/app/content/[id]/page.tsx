@@ -200,162 +200,172 @@ export default function TestPage() {
     );
   }
 
+  const unansweredQuestions = test.questions.map((_, index) => index).filter(index => answers[index] === undefined);
+
   return (
     <div className="container py-12">
-       <header className="mb-8 p-4">
-        <p className="text-primary font-semibold">{test.subject}</p>
-        <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
-        <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
-        <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
-            <div className="flex items-center gap-1.5">
-              <HelpCircle className="w-4 h-4" />
-              <span>{test.questions.length} Questions</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-4 h-4" />
-              <span>{test.duration} min</span>
-            </div>
-        </div>
-      </header>
-
-      <Card className="mb-8 sticky top-[72px] z-20">
-        <CardContent className="p-4">
-            <p className="text-sm font-medium mb-2">Question Navigator</p>
-            <div className="flex flex-wrap gap-2">
-                {test.questions.map((_, index) => (
-                    <Button
-                        key={index}
-                        variant={answers[index] !== undefined ? "default" : "outline"}
-                        size="sm"
-                        className={cn(
-                          "h-8 w-8",
-                          currentPage === Math.floor(index / QUESTIONS_PER_PAGE) && "ring-2 ring-primary"
-                        )}
-                        onClick={() => setCurrentPage(Math.floor(index / QUESTIONS_PER_PAGE))}
-                    >
-                        {index + 1}
-                    </Button>
-                ))}
-            </div>
-        </CardContent>
-      </Card>
-
-
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-8">
-          {currentQuestions && currentQuestions.map((question, index) => {
-            const questionIndex = startIndex + index;
-            return (
-                <Card key={questionIndex}>
-                  <CardHeader>
-                    <CardTitle>Question {questionIndex + 1}</CardTitle>
-                    <CardDescription className="text-lg text-foreground pt-2">{question.text}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {question.type === 'Multiple Choice' && question.options && (
-                      <RadioGroup onValueChange={(value) => handleAnswerChange(questionIndex, value)} value={answers[questionIndex]} className="space-y-2">
-                        {question.options.map((option, optIndex) => (
-                          <div key={optIndex} className="flex items-center space-x-2">
-                            <RadioGroupItem value={option.text} id={`q${questionIndex}-opt${optIndex}`} />
-                            <Label htmlFor={`q${questionIndex}-opt${optIndex}`} className="text-base">{option.text}</Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    )}
-                    {question.type === 'True/False' && (
-                      <RadioGroup onValueChange={(value) => handleAnswerChange(questionIndex, value)} value={answers[questionIndex]} className="flex space-x-4">
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="True" id={`q${questionIndex}-true`} />
-                          <Label htmlFor={`q${questionIndex}-true`}>True</Label>
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
+            <div className="md:col-span-1">
+                <header className="mb-8 p-4">
+                    <p className="text-primary font-semibold">{test.subject}</p>
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
+                    <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
+                    <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
+                        <div className="flex items-center gap-1.5">
+                        <HelpCircle className="w-4 h-4" />
+                        <span>{test.questions.length} Questions</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="False" id={`q${questionIndex}-false`} />
-                          <Label htmlFor={`q${questionIndex}-false`}>False</Label>
+                        <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4" />
+                        <span>{test.duration} min</span>
                         </div>
-                      </RadioGroup>
-                    )}
-                    {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                      <Input 
-                        placeholder="Your answer..." 
-                        onChange={(e) => handleAnswerChange(questionIndex, e.target.value)}
-                        value={answers[questionIndex] || ''}
-                      />
-                    )}
-                    {question.type === 'Matching' && question.matchingOptions && (
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                <div className="font-bold text-center">Column A</div>
-                                <div></div>
-                                <div className="font-bold text-center">Column B</div>
-                            </div>
-                            {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                    <div className="p-3 border rounded-md text-center bg-secondary">
-                                        {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                        {itemA.text}
+                    </div>
+                </header>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="space-y-8">
+                    {currentQuestions && currentQuestions.map((question, index) => {
+                        const questionIndex = startIndex + index;
+                        return (
+                            <Card key={questionIndex}>
+                            <CardHeader>
+                                <CardTitle>Question {questionIndex + 1}</CardTitle>
+                                <CardDescription className="text-lg text-foreground pt-2">{question.text}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {question.type === 'Multiple Choice' && question.options && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(questionIndex, value)} value={answers[questionIndex]} className="space-y-2">
+                                    {question.options.map((option, optIndex) => (
+                                    <div key={optIndex} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option.text} id={`q${questionIndex}-opt${optIndex}`} />
+                                        <Label htmlFor={`q${questionIndex}-opt${optIndex}`} className="text-base">{option.text}</Label>
                                     </div>
-                                    <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                    <Select 
-                                        onValueChange={(value) => handleMatchingAnswerChange(questionIndex, itemA.text, value)} 
-                                        value={answers[questionIndex]?.[itemA.text] || ''}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a match" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                <SelectItem key={bIndex} value={itemB.text}>
-                                                    <div className="flex items-center gap-2">
-                                                        {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                        <span>{itemB.text}</span>
-                                                    </div>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                  </CardContent>
-                </Card>
-            )
-          })}
-        </div>
+                                    ))}
+                                </RadioGroup>
+                                )}
+                                {question.type === 'True/False' && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(questionIndex, value)} value={answers[questionIndex]} className="flex space-x-4">
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="True" id={`q${questionIndex}-true`} />
+                                    <Label htmlFor={`q${questionIndex}-true`}>True</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="False" id={`q${questionIndex}-false`} />
+                                    <Label htmlFor={`q${questionIndex}-false`}>False</Label>
+                                    </div>
+                                </RadioGroup>
+                                )}
+                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                                <Input 
+                                    placeholder="Your answer..." 
+                                    onChange={(e) => handleAnswerChange(questionIndex, e.target.value)}
+                                    value={answers[questionIndex] || ''}
+                                />
+                                )}
+                                {question.type === 'Matching' && question.matchingOptions && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                            <div className="font-bold text-center">Column A</div>
+                                            <div></div>
+                                            <div className="font-bold text-center">Column B</div>
+                                        </div>
+                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                <div className="p-3 border rounded-md text-center bg-secondary">
+                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                    {itemA.text}
+                                                </div>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                <Select 
+                                                    onValueChange={(value) => handleMatchingAnswerChange(questionIndex, itemA.text, value)} 
+                                                    value={answers[questionIndex]?.[itemA.text] || ''}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a match" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                                            <SelectItem key={bIndex} value={itemB.text}>
+                                                                <div className="flex items-center gap-2">
+                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                    <span>{itemB.text}</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                            </Card>
+                        )
+                    })}
+                    </div>
 
-        <div className="mt-8 flex justify-between items-center">
-            <Button 
-                type="button"
-                variant="outline" 
-                onClick={() => setCurrentPage(p => p - 1)} 
-                disabled={currentPage === 0}
-            >
-              <ChevronLeft className="mr-2"/>
-              Previous
-            </Button>
+                    <div className="mt-8 flex justify-between items-center">
+                        <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => setCurrentPage(p => p - 1)} 
+                            disabled={currentPage === 0}
+                        >
+                        <ChevronLeft className="mr-2"/>
+                        Previous
+                        </Button>
+                        
+                        <span className="text-sm text-muted-foreground">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+
+                        <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => setCurrentPage(p => p + 1)} 
+                            disabled={currentPage === totalPages - 1}
+                        >
+                        Next
+                        <ChevronRight className="ml-2"/>
+                        </Button>
+                    </div>
+
+
+                    <div className="mt-8 flex justify-center">
+                        <Button size="lg" type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
+                        </Button>
+                    </div>
+                </form>
+            </div>
             
-            <span className="text-sm text-muted-foreground">
-                Page {currentPage + 1} of {totalPages}
-            </span>
-
-             <Button 
-                type="button"
-                variant="outline" 
-                onClick={() => setCurrentPage(p => p + 1)} 
-                disabled={currentPage === totalPages - 1}
-            >
-              Next
-              <ChevronRight className="ml-2"/>
-            </Button>
+            <aside className="md:col-span-1">
+                <div className="sticky top-24">
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Remaining Questions</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                                {unansweredQuestions.length > 0 ? unansweredQuestions.map((qIndex) => (
+                                    <Button
+                                        key={qIndex}
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 w-8"
+                                        onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
+                                    >
+                                        {qIndex + 1}
+                                    </Button>
+                                )) : (
+                                    <p className="text-sm text-muted-foreground">All questions have been answered!</p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </aside>
         </div>
-
-
-        <div className="mt-8 flex justify-end">
-            <Button size="lg" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
-            </Button>
-        </div>
-      </form>
     </div>
   );
 }
