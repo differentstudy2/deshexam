@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -1518,11 +1517,11 @@ export default function EditContentPage() {
                                       <TabsTrigger value="fib">Fill in Blank</TabsTrigger>
                                       <TabsTrigger value="matching">Matching</TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="mcq"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExample}</pre></TabsContent>
-                                    <TabsContent value="tf"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleTF}</pre></TabsContent>
-                                    <TabsContent value="sa"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleSA}</pre></TabsContent>
-                                    <TabsContent value="fib"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleFIB}</pre></TabsContent>
-                                    <TabsContent value="matching"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleMatching}</pre></TabsContent>
+                                    <TabsContent value="mcq"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExample}</pre></TabsContent>
+                                    <TabsContent value="tf"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleTF}</pre></TabsContent>
+                                    <TabsContent value="sa"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleSA}</pre></TabsContent>
+                                    <TabsContent value="fib"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleFIB}</pre></TabsContent>
+                                    <TabsContent value="matching"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleMatching}</pre></TabsContent>
                                   </Tabs>
                                 </AccordionContent>
                               </AccordionItem>
