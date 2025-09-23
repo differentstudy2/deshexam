@@ -13,7 +13,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, logOut } = useAuth();
   const router = useRouter();
   const [verifying, setVerifying] = useState(true);
   
@@ -39,16 +39,15 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
         <Sidebar>
-            <DashboardSidebar user={user} />
+            <DashboardSidebar user={user} logOut={logOut} />
         </Sidebar>
         <SidebarInset>
             <main className="p-4 md:p-6 lg:p-8">
-                 <div className="md:hidden mb-4">
-                    <SidebarTrigger />
-                </div>
                 {children}
             </main>
         </SidebarInset>
     </SidebarProvider>
   );
 }
+
+    

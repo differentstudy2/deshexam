@@ -186,7 +186,7 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
   );
 };
 
-export const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
+export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void; logOut: () => void; }) => {
     const pathname = usePathname();
     return (
         <ScrollArea className="h-full">
@@ -195,45 +195,53 @@ export const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
                     <DeshExamLogo />
                 </Link>
             </div>
-            <ul className="mt-6 space-y-1 p-4">
-                {adminNavItems.map((item) => (
-                    <li key={item.href}>
+            <div className="flex flex-col h-[calc(100%-4.5rem)]">
+                <ul className="mt-6 space-y-1 p-4 flex-1">
+                    {adminNavItems.map((item) => (
+                        <li key={item.href}>
+                            <Button
+                                asChild
+                                variant="ghost"
+                                className={cn(
+                                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                                    pathname === item.href ? "bg-primary/20 text-primary font-semibold" : "hover:bg-primary/10 hover:text-primary"
+                                )}
+                            >
+                                <Link href={item.href} onClick={onLinkClick}>
+                                    {item.icon}
+                                    <span className="ml-3">{item.label}</span>
+                                </Link>
+                            </Button>
+                        </li>
+                    ))}
+                    <li>
                         <Button
                             asChild
                             variant="ghost"
                             className={cn(
                                 "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                                pathname === item.href ? "bg-primary/20 text-primary font-semibold" : "hover:bg-primary/10 hover:text-primary"
+                                "hover:bg-secondary/80"
                             )}
                         >
-                            <Link href={item.href} onClick={onLinkClick}>
-                                {item.icon}
-                                <span className="ml-3">{item.label}</span>
+                            <Link href="/dashboard" onClick={onLinkClick}>
+                                <LayoutGrid className="h-5 w-5" />
+                                <span className="ml-3">User Dashboard</span>
                             </Link>
                         </Button>
                     </li>
-                ))}
-                <li>
-                    <Button
-                        asChild
-                        variant="ghost"
-                        className={cn(
-                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                            "hover:bg-secondary/80"
-                        )}
-                    >
-                        <Link href="/dashboard" onClick={onLinkClick}>
-                            <LayoutGrid className="h-5 w-5" />
-                            <span className="ml-3">User Dashboard</span>
-                        </Link>
+                </ul>
+                <div className="p-4 border-t">
+                    <Button variant="ghost" className="w-full justify-start" onClick={logOut}>
+                        <LogOut className="mr-3 h-5 w-5"/>
+                        Logout
                     </Button>
-                </li>
-            </ul>
+                </div>
+            </div>
         </ScrollArea>
     );
 };
 
-export const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => void; user: any }) => {
+export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: () => void; user: any; logOut: () => void; }) => {
   const pathname = usePathname();
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
@@ -254,44 +262,52 @@ export const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => vo
                 <DeshExamLogo />
             </Link>
         </div>
-      <ul className="mt-6 space-y-1 p-4">
-        {dashboardNavItems.map((item) => (
-          <li key={item.href}>
-            <Button
-              asChild
-              variant="ghost"
-              className={cn(
-                "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                pathname === item.href
-                  ? "bg-primary/20 text-primary font-semibold"
-                  : "hover:bg-primary/10 hover:text-primary"
-              )}
-            >
-              <Link href={item.href} onClick={onLinkClick}>
-                {item.icon}
-                <span className="ml-3">{item.label}</span>
-              </Link>
-            </Button>
-          </li>
-        ))}
-        {profile?.role === 'admin' && (
-          <li>
-            <Button
-              asChild
-              variant="ghost"
-              className={cn(
-                "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                "hover:bg-secondary/80"
-              )}
-            >
-              <Link href="/admin" onClick={onLinkClick}>
-                <ShieldCheck className="h-5 w-5" />
-                <span className="ml-3">Admin Dashboard</span>
-              </Link>
-            </Button>
-          </li>
-        )}
-      </ul>
+        <div className="flex flex-col h-[calc(100%-4.5rem)]">
+          <ul className="mt-6 space-y-1 p-4 flex-1">
+            {dashboardNavItems.map((item) => (
+              <li key={item.href}>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={cn(
+                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                    pathname === item.href
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "hover:bg-primary/10 hover:text-primary"
+                  )}
+                >
+                  <Link href={item.href} onClick={onLinkClick}>
+                    {item.icon}
+                    <span className="ml-3">{item.label}</span>
+                  </Link>
+                </Button>
+              </li>
+            ))}
+            {profile?.role === 'admin' && (
+              <li>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={cn(
+                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                    "hover:bg-secondary/80"
+                  )}
+                >
+                  <Link href="/admin" onClick={onLinkClick}>
+                    <ShieldCheck className="h-5 w-5" />
+                    <span className="ml-3">Admin Dashboard</span>
+                  </Link>
+                </Button>
+              </li>
+            )}
+          </ul>
+           <div className="p-4 border-t">
+                <Button variant="ghost" className="w-full justify-start" onClick={logOut}>
+                    <LogOut className="mr-3 h-5 w-5"/>
+                    Logout
+                </Button>
+            </div>
+        </div>
     </ScrollArea>
   );
 };
@@ -316,7 +332,7 @@ export function Header() {
                         <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Sidebar</span></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0">
-                        {pathname.startsWith('/admin') ? <AdminSidebar onLinkClick={() => setIsMainSheetOpen(false)} /> : <DashboardSidebar user={user} onLinkClick={() => setIsMainSheetOpen(false)} />}
+                        {pathname.startsWith('/admin') ? <AdminSidebar logOut={logOut} onLinkClick={() => setIsMainSheetOpen(false)} /> : <DashboardSidebar user={user} logOut={logOut} onLinkClick={() => setIsMainSheetOpen(false)} />}
                     </SheetContent>
                 </Sheet>
             </div>
@@ -326,42 +342,42 @@ export function Header() {
             <DeshExamLogo />
         </Link>
         
-        {!isDashboardLayout && <MainNav />}
+        <MainNav />
 
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />
           <UserNav />
 
-          {!isDashboardLayout && (
-            <div className="md:hidden">
-                <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
-                    <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="p-0">
-                    <div className="border-b p-4">
-                        <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
-                        <DeshExamLogo />
-                        </Link>
-                    </div>
-                    <div className="flex flex-col h-[calc(100%-4.5rem)]">
-                        <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
-                        <div className="mt-auto border-t p-4">
-                        {!loading && !user && (
-                            <div className="flex flex-col gap-2">
-                            <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsMainSheetOpen(false); }}>Sign In</Button>
-                            <Button onClick={() => { openAuthDialog('sign-up'); setIsMainSheetOpen(false); }}>Sign Up</Button>
-                            </div>
-                        )}
-                        {!loading && user && (<Button onClick={() => { logOut(); setIsMainSheetOpen(false); }} className="w-full">Log Out</Button>)}
-                        </div>
-                    </div>
-                    </SheetContent>
-                </Sheet>
-            </div>
-          )}
+          <div className="md:hidden">
+              <Sheet open={!isDashboardLayout && isMainSheetOpen} onOpenChange={(open) => !isDashboardLayout && setIsMainSheetOpen(open)}>
+                  <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="p-0">
+                  <div className="border-b p-4">
+                      <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
+                      <DeshExamLogo />
+                      </Link>
+                  </div>
+                  <div className="flex flex-col h-[calc(100%-4.5rem)]">
+                      <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
+                      <div className="mt-auto border-t p-4">
+                      {!loading && !user && (
+                          <div className="flex flex-col gap-2">
+                          <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsMainSheetOpen(false); }}>Sign In</Button>
+                          <Button onClick={() => { openAuthDialog('sign-up'); setIsMainSheetOpen(false); }}>Sign Up</Button>
+                          </div>
+                      )}
+                      {!loading && user && (<Button onClick={() => { logOut(); setIsMainSheetOpen(false); }} className="w-full">Log Out</Button>)}
+                      </div>
+                  </div>
+                  </SheetContent>
+              </Sheet>
+          </div>
         </div>
       </div>
     </header>
   );
 }
+
+    

@@ -14,7 +14,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logOut } = useAuth();
   const router = useRouter();
   const [verifying, setVerifying] = useState(true);
 
@@ -63,16 +63,15 @@ export default function AdminLayout({
   return (
     <SidebarProvider>
         <Sidebar>
-            <AdminSidebar />
+            <AdminSidebar logOut={logOut} />
         </Sidebar>
         <SidebarInset>
             <main className="p-4 md:p-6 lg:p-8">
-                <div className="md:hidden mb-4">
-                    <SidebarTrigger />
-                </div>
                 {children}
             </main>
         </SidebarInset>
     </SidebarProvider>
   );
 }
+
+    
