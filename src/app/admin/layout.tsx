@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
+import { AdminSidebar } from '@/components/layout/header';
 
 export default function AdminLayout({
   children,
@@ -59,10 +61,18 @@ export default function AdminLayout({
   }
 
   return (
-    <div>
-        <main className="p-4 md:p-6 lg:p-8">
-            {children}
-        </main>
-    </div>
+    <SidebarProvider>
+        <Sidebar>
+            <AdminSidebar />
+        </Sidebar>
+        <SidebarInset>
+            <main className="p-4 md:p-6 lg:p-8">
+                <div className="md:hidden mb-4">
+                    <SidebarTrigger />
+                </div>
+                {children}
+            </main>
+        </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Sidebar } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -186,10 +186,13 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
   );
 };
 
-const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
+export const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     const pathname = usePathname();
     return (
         <ScrollArea className="h-full">
+            <SheetHeader className="border-b p-4">
+                <SheetTitle className="flex items-center gap-2"><Link href="/admin" onClick={onLinkClick}><DeshExamLogo /></Link></SheetTitle>
+            </SheetHeader>
             <ul className="mt-6 space-y-1 p-4">
                 {adminNavItems.map((item) => (
                     <li key={item.href}>
@@ -203,7 +206,7 @@ const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
                         >
                             <Link href={item.href} onClick={onLinkClick}>
                                 {item.icon}
-                                <span>{item.label}</span>
+                                <span className="ml-3">{item.label}</span>
                             </Link>
                         </Button>
                     </li>
@@ -219,7 +222,7 @@ const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
                     >
                         <Link href="/dashboard" onClick={onLinkClick}>
                             <LayoutGrid className="h-5 w-5" />
-                            <span>User Dashboard</span>
+                            <span className="ml-3">User Dashboard</span>
                         </Link>
                     </Button>
                 </li>
@@ -228,7 +231,7 @@ const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     );
 };
 
-const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => void; user: any }) => {
+export const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => void; user: any }) => {
   const pathname = usePathname();
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
@@ -244,6 +247,9 @@ const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => void; use
 
   return (
     <ScrollArea className="h-full">
+        <SheetHeader className="border-b p-4">
+            <SheetTitle className="flex items-center gap-2"><Link href="/dashboard" onClick={onLinkClick}><DeshExamLogo /></Link></SheetTitle>
+        </SheetHeader>
       <ul className="mt-6 space-y-1 p-4">
         {dashboardNavItems.map((item) => (
           <li key={item.href}>
@@ -259,7 +265,7 @@ const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => void; use
             >
               <Link href={item.href} onClick={onLinkClick}>
                 {item.icon}
-                <span>{item.label}</span>
+                <span className="ml-3">{item.label}</span>
               </Link>
             </Button>
           </li>
@@ -276,7 +282,7 @@ const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => void; use
             >
               <Link href="/admin" onClick={onLinkClick}>
                 <ShieldCheck className="h-5 w-5" />
-                <span>Admin Dashboard</span>
+                <span className="ml-3">Admin Dashboard</span>
               </Link>
             </Button>
           </li>
@@ -302,9 +308,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <DeshExamLogo />
-        </Link>
+        { (isAdminPath || isDashboardPath) ? null :
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <DeshExamLogo />
+          </Link>
+        }
         
         {!isAdminPath && !isDashboardPath && <MainNav />}
 
@@ -313,33 +321,7 @@ export function Header() {
           <UserNav />
 
           <div className="md:hidden">
-            {isAdminPath ? (
-              <Sheet open={isAdminSheetOpen} onOpenChange={setIsAdminSheetOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon"> <Menu className="h-5 w-5" /> <span className="sr-only">Toggle Admin Menu</span></Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="p-0 flex flex-col w-[80%] sm:w-[320px]">
-                  <SheetHeader className="border-b p-4">
-                    <SheetTitle className="flex items-center gap-2"><Link href="/admin" onClick={() => setIsAdminSheetOpen(false)}><DeshExamLogo /></Link></SheetTitle>
-                    <SheetDescription>Admin Sidebar Menu</SheetDescription>
-                  </SheetHeader>
-                  <AdminSidebar onLinkClick={() => setIsAdminSheetOpen(false)} />
-                </SheetContent>
-              </Sheet>
-            ) : isDashboardPath ? (
-              <Sheet open={isDashboardSheetOpen} onOpenChange={setIsDashboardSheetOpen}>
-                <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Dashboard Menu</span></Button>
-                </SheetTrigger>
-                 <SheetContent side="left" className="p-0 flex flex-col w-[80%] sm:w-[320px]">
-                  <SheetHeader className="border-b p-4">
-                    <SheetTitle className="flex items-center gap-2"><Link href="/dashboard" onClick={() => setIsDashboardSheetOpen(false)}><DeshExamLogo /></Link></SheetTitle>
-                    <SheetDescription>Dashboard Sidebar Menu</SheetDescription>
-                  </SheetHeader>
-                  <DashboardSidebar user={user} onLinkClick={() => setIsDashboardSheetOpen(false)} />
-                </SheetContent>
-              </Sheet>
-            ) : (
+            {isAdminPath ? null : isDashboardPath ? null : (
               <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
