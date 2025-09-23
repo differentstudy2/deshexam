@@ -37,12 +37,12 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: <LayoutGrid /> },
-  { href: '/dashboard/my-content', label: 'My Content', icon: <Library /> },
-  { href: '/dashboard/all-questions', label: 'All Questions', icon: <ClipboardList /> },
-  { href: '/dashboard/my-results', label: 'My Results', icon: <FileText /> },
-  { href: '/dashboard/profile', label: 'Profile', icon: <BookUser /> },
-  { href: '/dashboard/settings', label: 'Settings', icon: <Settings /> },
+  { href: '/dashboard', label: 'Overview', icon: <LayoutGrid className="h-5 w-5" /> },
+  { href: '/dashboard/my-content', label: 'My Content', icon: <Library className="h-5 w-5" /> },
+  { href: '/dashboard/all-questions', label: 'All Questions', icon: <ClipboardList className="h-5 w-5" /> },
+  { href: '/dashboard/my-results', label: 'My Results', icon: <FileText className="h-5 w-5" /> },
+  { href: '/dashboard/profile', label: 'Profile', icon: <BookUser className="h-5 w-5" /> },
+  { href: '/dashboard/settings', label: 'Settings', icon: <Settings className="h-5 w-5" /> },
 ];
 
 type UserProfile = {
@@ -87,7 +87,7 @@ export default function DashboardLayout({
                 }}
                 >
                 <Link href={item.href} onClick={() => setIsSheetOpen(false)}>
-                    <item.icon className="h-5 w-5" />
+                    {item.icon}
                     <span>{item.label}</span>
                 </Link>
                 </SidebarMenuButton>
@@ -103,7 +103,7 @@ export default function DashboardLayout({
                     )}
                     >
                         <Link href="/admin" onClick={() => setIsSheetOpen(false)}>
-                            <ShieldCheck />
+                            <ShieldCheck className="h-5 w-5" />
                             <span>Admin Dashboard</span>
                         </Link>
                     </SidebarMenuButton>
@@ -155,7 +155,7 @@ export default function DashboardLayout({
                                     <DeshExamLogo />
                                 </Link>
                             </SheetTitle>
-                             <SheetDescription className="sr-only">Dashboard sidebar menu</SheetDescription>
+                             <SheetDescription>Dashboard sidebar menu</SheetDescription>
                         </SheetHeader>
                         {sidebarContent}
                     </SheetContent>

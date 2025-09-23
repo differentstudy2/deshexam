@@ -43,16 +43,16 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescri
 
 
 const navItems = [
-  { href: '/admin', label: 'Admin Overview', icon: <ShieldCheck /> },
-  { href: '/admin/users', label: 'Manage Users', icon: <Users /> },
-  { href: '/admin/content', label: 'Manage Content', icon: <Library /> },
-  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: <FilePlus /> },
-  { href: '/admin/add-article', label: 'Add Article', icon: <BookPlus /> },
-  { href: '/admin/coupons', label: 'Manage Coupons', icon: <Tag /> },
-  { href: '/admin/earning', label: 'Earning', icon: <DollarSign /> },
-  { href: '/admin/push-notification', label: 'Push Notification', icon: <Bell /> },
-  { href: '/admin/reports', label: 'Reports & Contact', icon: <Flag /> },
-  { href: '/admin/settings', label: 'Site Settings', icon: <Settings /> },
+  { href: '/admin', label: 'Admin Overview', icon: <ShieldCheck className="h-5 w-5" /> },
+  { href: '/admin/users', label: 'Manage Users', icon: <Users className="h-5 w-5" /> },
+  { href: '/admin/content', label: 'Manage Content', icon: <Library className="h-5 w-5" /> },
+  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: <FilePlus className="h-5 w-5" /> },
+  { href: '/admin/add-article', label: 'Add Article', icon: <BookPlus className="h-5 w-5" /> },
+  { href: '/admin/coupons', label: 'Manage Coupons', icon: <Tag className="h-5 w-5" /> },
+  { href: '/admin/earning', label: 'Earning', icon: <DollarSign className="h-5 w-5" /> },
+  { href: '/admin/push-notification', label: 'Push Notification', icon: <Bell className="h-5 w-5" /> },
+  { href: '/admin/reports', label: 'Reports & Contact', icon: <Flag className="h-5 w-5" /> },
+  { href: '/admin/settings', label: 'Site Settings', icon: <Settings className="h-5 w-5" /> },
 ];
 
 export default function AdminLayout({
@@ -115,7 +115,7 @@ export default function AdminLayout({
                 }}
                 >
                 <Link href={item.href} onClick={() => setIsSheetOpen(false)}>
-                    <item.icon className="h-5 w-5" />
+                    {item.icon}
                     <span>{item.label}</span>
                 </Link>
                 </SidebarMenuButton>
@@ -130,7 +130,7 @@ export default function AdminLayout({
                  )}
                 >
                     <Link href="/dashboard" onClick={() => setIsSheetOpen(false)}>
-                        <LayoutGrid />
+                        <LayoutGrid className="h-5 w-5" />
                         <span>User Dashboard</span>
                     </Link>
                 </SidebarMenuButton>
@@ -181,7 +181,7 @@ export default function AdminLayout({
                                     <DeshExamLogo />
                                 </Link>
                             </SheetTitle>
-                            <SheetDescription className="sr-only">Admin sidebar menu</SheetDescription>
+                            <SheetDescription>Admin sidebar menu</SheetDescription>
                         </SheetHeader>
                         {sidebarContent}
                     </SheetContent>

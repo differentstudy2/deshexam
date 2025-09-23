@@ -194,7 +194,7 @@ export function Header() {
                         <DeshExamLogo />
                     </Link>
                 </SheetTitle>
-                <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
+                <SheetDescription>Main navigation menu</SheetDescription>
                </SheetHeader>
               <div className="flex flex-col h-[calc(100%-4.5rem)]">
                 <ScrollArea className="flex-1 p-4">
