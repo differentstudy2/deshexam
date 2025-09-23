@@ -174,7 +174,7 @@ export default function AdminLayout({
                             <Menu />
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="p-0 flex flex-col">
+                    <SheetContent side="left" className="p-0 flex flex-col w-[80%]">
                         <SheetHeader className="border-b p-4">
                             <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                             <Link href="/admin" onClick={() => setIsSheetOpen(false)} className="flex items-center space-x-2">
