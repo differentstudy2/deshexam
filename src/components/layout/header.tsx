@@ -361,7 +361,7 @@ export function Header() {
                     )}
                 </SheetContent>
             </Sheet>
-            <Link href="/" className="hidden sm:flex">
+            <Link href="/" className="flex items-center">
                 <DeshExamLogo />
             </Link>
         </div>
