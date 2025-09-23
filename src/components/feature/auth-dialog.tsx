@@ -18,8 +18,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 import { DeshExamLogo } from "@/components/icons";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "../ui/card";
+import Link from "next/link";
+import { Checkbox } from "../ui/checkbox";
 
 // Schemas
 const signInSchema = z.object({
@@ -32,6 +33,9 @@ const signUpSchema = z.object({
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  terms: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions.",
+  }),
 });
 
 type SignInValues = z.infer<typeof signInSchema>;
@@ -139,7 +143,7 @@ const SignUpForm = () => {
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { firstName: "", lastName: "", email: "", password: "" },
+    defaultValues: { firstName: "", lastName: "", email: "", password: "", terms: false },
   });
 
   const onSubmit: SubmitHandler<SignUpValues> = async (data) => {
@@ -178,6 +182,31 @@ const SignUpForm = () => {
           </div>
           <FormField control={form.control} name="email" render={({ field }) => ( <FormItem> <FormLabel>Email</FormLabel> <FormControl><Input placeholder="m@example.com" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
           <FormField control={form.control} name="password" render={({ field }) => ( <FormItem> <FormLabel>Password</FormLabel> <FormControl><Input type="password" {...field} /></FormControl> <FormMessage /> </FormItem> )} />
+          <FormField
+            control={form.control}
+            name="terms"
+            render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal">
+                            I agree to the{' '}
+                            <Link href="/terms" className="underline hover:text-primary" target="_blank">
+                                Terms of Service
+                            </Link>{' '}
+                            and{' '}
+                            <Link href="/privacy" className="underline hover:text-primary" target="_blank">
+                                Privacy Policy
+                            </Link>
+                            .
+                        </FormLabel>
+                        <FormMessage />
+                    </div>
+                </FormItem>
+            )}
+          />
           <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Creating Account..." : "Create an account"}
           </Button>
