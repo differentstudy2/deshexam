@@ -14,14 +14,19 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [verifying, setVerifying] = useState(true);
   
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading) {
+      if (!user) {
         router.push('/sign-in');
+      } else {
+        setVerifying(false);
+      }
     }
   }, [user, loading, router]);
   
-  if (loading || !user) {
+  if (verifying) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="mr-2 h-8 w-8 animate-spin" />
