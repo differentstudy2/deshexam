@@ -101,6 +101,7 @@ export default function TestPage() {
     if (timeLeft === null || timeLeft <= 0) {
       if (timeLeft === 0) {
         setTimeUp(true);
+        handleSubmit();
       }
       return;
     }
@@ -229,8 +230,6 @@ export default function TestPage() {
       </div>
     );
   }
-
-  const unansweredQuestions = test.questions.map((_, index) => index).filter(index => answers[index] === undefined);
 
   return (
     <div className="container py-12">
@@ -375,23 +374,21 @@ export default function TestPage() {
                 <div className="sticky top-24">
                      <Card>
                         <CardHeader>
-                            <CardTitle>Remaining Questions</CardTitle>
+                            <CardTitle>Question Navigator</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-2">
-                                {unansweredQuestions.length > 0 ? unansweredQuestions.map((qIndex) => (
+                                {test.questions.map((_, qIndex) => (
                                     <Button
                                         key={qIndex}
-                                        variant="outline"
+                                        variant={answers[qIndex] !== undefined ? 'default' : 'outline'}
                                         size="sm"
                                         className="h-8 w-8"
                                         onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
                                     >
                                         {qIndex + 1}
                                     </Button>
-                                )) : (
-                                    <p className="text-sm text-muted-foreground">All questions have been answered!</p>
-                                )}
+                                ))}
                             </div>
                         </CardContent>
                     </Card>
