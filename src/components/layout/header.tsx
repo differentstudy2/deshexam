@@ -24,6 +24,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { getUserProfile } from "@/lib/firebase/firestore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
+import { navItems as adminNavItems } from "@/app/admin/layout";
 
 const navLinks = [
     { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
@@ -134,7 +135,7 @@ const UserNav = () => {
   );
 };
 
-const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLinkClick?: () => void }) => {
+const MainNav = ({ isMobile = false, onLinkClick, items }: { isMobile?: boolean, onLinkClick?: () => void, items: typeof navLinks }) => {
   const pathname = usePathname();
   const NavLink = ({ href, label, icon }: { href: string; label: string, icon?: React.ReactNode }) => (
     <Link
@@ -158,62 +159,132 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
         isMobile ? "flex flex-col items-start space-x-0 space-y-4 pt-4" : "hidden md:flex"
       )}
     >
-      {navLinks.map((link) => (
+      {items.map((link) => (
         <NavLink key={link.href} {...link} />
       ))}
     </nav>
   );
 };
 
+const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
+    const pathname = usePathname();
+    return (
+        <ScrollArea className="h-full">
+            <ul className="mt-6 space-y-1">
+                {adminNavItems.map((item) => (
+                    <li key={item.href}>
+                        <Button
+                            asChild
+                            variant="ghost"
+                            className={cn(
+                                "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                                pathname === item.href ? "bg-primary/20 text-primary font-semibold" : "hover:bg-primary/10 hover:text-primary"
+                            )}
+                        >
+                            <Link href={item.href} onClick={onLinkClick}>
+                                {item.icon}
+                                <span>{item.label}</span>
+                            </Link>
+                        </Button>
+                    </li>
+                ))}
+                <li>
+                    <Button
+                        asChild
+                        variant="ghost"
+                        className={cn(
+                            "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
+                            "hover:bg-secondary/80"
+                        )}
+                    >
+                        <Link href="/dashboard" onClick={onLinkClick}>
+                            <LayoutGrid className="h-5 w-5" />
+                            <span>User Dashboard</span>
+                        </Link>
+                    </Button>
+                </li>
+            </ul>
+        </ScrollArea>
+    );
+};
+
 export function Header() {
   const { user, loading, logOut } = useAuth();
   const { openAuthDialog } = useAuthDialog();
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const pathname = usePathname();
+  const [isMainSheetOpen, setIsMainSheetOpen] = useState(false);
+  const [isAdminSheetOpen, setIsAdminSheetOpen] = useState(false);
   
+  const isAdminPath = pathname.startsWith('/admin');
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <DeshExamLogo />
         </Link>
-        <MainNav />
+        <MainNav items={navLinks} />
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />
           <UserNav />
-          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0">
-               <SheetHeader className="border-b p-4">
-                 <SheetTitle className="flex items-center gap-2">
-                    <Link href="/" onClick={() => setIsSheetOpen(false)}>
+          <div className="md:hidden">
+            {isAdminPath ? (
+              <Sheet open={isAdminSheetOpen} onOpenChange={setIsAdminSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle Admin Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 flex flex-col w-[80%] sm:w-[320px]">
+                  <SheetHeader className="border-b p-4">
+                    <SheetTitle className="flex items-center gap-2">
+                      <Link href="/admin" onClick={() => setIsAdminSheetOpen(false)}>
                         <DeshExamLogo />
-                    </Link>
-                </SheetTitle>
-                <SheetDescription>Main navigation menu</SheetDescription>
-               </SheetHeader>
-              <div className="flex flex-col h-[calc(100%-4.5rem)]">
-                <ScrollArea className="flex-1 p-4">
-                    <MainNav isMobile onLinkClick={() => setIsSheetOpen(false)} />
-                </ScrollArea>
-                <div className="mt-auto border-t p-4">
-                  {!loading && !user && (
-                    <div className="flex flex-col gap-2">
-                      <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsSheetOpen(false); }}>Sign In</Button>
-                      <Button onClick={() => { openAuthDialog('sign-up'); setIsSheetOpen(false); }}>Sign Up</Button>
+                      </Link>
+                    </SheetTitle>
+                    <SheetDescription>Admin Sidebar Menu</SheetDescription>
+                  </SheetHeader>
+                  <AdminSidebar onLinkClick={() => setIsAdminSheetOpen(false)} />
+                </SheetContent>
+              </Sheet>
+            ) : (
+              <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle Main Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0">
+                  <SheetHeader className="border-b p-4">
+                    <SheetTitle className="flex items-center gap-2">
+                      <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
+                        <DeshExamLogo />
+                      </Link>
+                    </SheetTitle>
+                    <SheetDescription>Main navigation menu</SheetDescription>
+                  </SheetHeader>
+                  <div className="flex flex-col h-[calc(100%-4.5rem)]">
+                    <ScrollArea className="flex-1 p-4">
+                      <MainNav isMobile items={navLinks} onLinkClick={() => setIsMainSheetOpen(false)} />
+                    </ScrollArea>
+                    <div className="mt-auto border-t p-4">
+                      {!loading && !user && (
+                        <div className="flex flex-col gap-2">
+                          <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsMainSheetOpen(false); }}>Sign In</Button>
+                          <Button onClick={() => { openAuthDialog('sign-up'); setIsMainSheetOpen(false); }}>Sign Up</Button>
+                        </div>
+                      )}
+                      {!loading && user && (
+                        <Button onClick={() => { logOut(); setIsMainSheetOpen(false); }} className="w-full">Log Out</Button>
+                      )}
                     </div>
-                  )}
-                  {!loading && user && (
-                     <Button onClick={() => { logOut(); setIsSheetOpen(false); }} className="w-full">Log Out</Button>
-                  )}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+          </div>
         </div>
       </div>
     </header>
