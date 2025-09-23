@@ -200,11 +200,14 @@ const SignUpForm = () => {
 
 // Main Auth Dialog
 export function AuthDialog() {
-  const { isOpen, variant, closeAuthDialog, switchVariant } = useAuthDialog();
+  const { isOpen, variant, closeAuthDialog } = useAuthDialog();
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeAuthDialog()}>
-      <DialogContent className="p-0 border-0 max-w-md">
+      <DialogContent 
+        className="p-0 border-0 max-w-md min-h-[620px]"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <div className="pt-8 pb-4 px-4 text-center">
              <div className="mb-4 inline-block">
                 <DeshExamLogo />
