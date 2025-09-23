@@ -748,11 +748,11 @@ export default function EditContentPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.type !== 'application/json') {
+    if (file.type !== 'application/json' && file.type !== 'text/plain') {
       toast({
         variant: 'destructive',
         title: 'Invalid File Type',
-        description: 'Please upload a valid JSON file.',
+        description: 'Please upload a valid JSON or TXT file.',
       });
       return;
     }
@@ -1495,13 +1495,13 @@ export default function EditContentPage() {
                         <DialogHeader>
                             <DialogTitle>Bulk Import Questions</DialogTitle>
                             <DialogDescription>
-                                Upload a JSON file containing an array of questions. The file must have a top-level key named "questions".
+                                Upload a JSON or TXT file containing an array of questions. The file must have a top-level key named "questions".
                             </DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                 <Label htmlFor="json-import">JSON File</Label>
-                                <Input id="json-import" type="file" accept=".json" onChange={handleBulkImport} ref={importFileRef} disabled={isImporting} />
+                                <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImport} ref={importFileRef} disabled={isImporting} />
                                 {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
                             </div>
 
