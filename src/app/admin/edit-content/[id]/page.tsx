@@ -371,6 +371,7 @@ export default function EditContentPage() {
   const importFileRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [jsonText, setJsonText] = useState('');
 
 
   const [settings, setSettings] = useState({
@@ -743,25 +744,9 @@ export default function EditContentPage() {
     }
   };
 
-  const handleBulkImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'application/json' && file.type !== 'text/plain') {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid File Type',
-        description: 'Please upload a valid JSON or TXT file.',
-      });
-      return;
-    }
-
-    setIsImporting(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        const json = JSON.parse(text);
+  const processJsonImport = (jsonText: string) => {
+    try {
+        const json = JSON.parse(jsonText);
         if (!json.questions || !Array.isArray(json.questions)) {
           throw new Error("JSON must have a top-level 'questions' array.");
         }
@@ -780,6 +765,7 @@ export default function EditContentPage() {
           description: `${json.questions.length} questions have been added.`,
         });
         setIsImportDialogOpen(false);
+        setJsonText('');
       } catch (error) {
         toast({
           variant: 'destructive',
@@ -788,14 +774,46 @@ export default function EditContentPage() {
         });
       } finally {
         setIsImporting(false);
-        // Reset file input
-        if(importFileRef.current) {
+      }
+  }
+
+  const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/json' && file.type !== 'text/plain') {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid File Type',
+        description: 'Please upload a valid JSON or TXT file.',
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      processJsonImport(text);
+       if(importFileRef.current) {
             importFileRef.current.value = '';
         }
-      }
     };
     reader.readAsText(file);
   };
+  
+  const handleBulkImportFromText = () => {
+    if (!jsonText.trim()) {
+         toast({
+            variant: "destructive",
+            title: 'Import Failed',
+            description: "Textbox cannot be empty."
+        });
+        return;
+    }
+    setIsImporting(true);
+    processJsonImport(jsonText);
+  }
 
   const accessLevel = form.watch('access');
 
@@ -1494,39 +1512,61 @@ export default function EditContentPage() {
                         <DialogHeader>
                             <DialogTitle>Bulk Import Questions</DialogTitle>
                             <DialogDescription>
-                                Upload a JSON or TXT file containing an array of questions. The file must have a top-level key named "questions".
+                                Upload a JSON file or paste JSON text containing an array of questions. The file must have a top-level key named "questions".
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="py-4">
-                            <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label htmlFor="json-import">JSON File</Label>
-                                <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImport} ref={importFileRef} disabled={isImporting} />
-                                {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
-                            </div>
+                        <Tabs defaultValue="upload" className="w-full">
+                             <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="upload">Upload File</TabsTrigger>
+                                <TabsTrigger value="paste">Paste JSON</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="upload">
+                                <div className="py-4">
+                                    <div className="grid w-full max-w-sm items-center gap-1.5">
+                                        <Label htmlFor="json-import">JSON/TXT File</Label>
+                                        <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                        {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                    </div>
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="paste">
+                                <div className="py-4 space-y-4">
+                                     <Textarea
+                                        placeholder='Paste your JSON content here...'
+                                        value={jsonText}
+                                        onChange={(e) => setJsonText(e.target.value)}
+                                        className="min-h-[200px] font-mono text-xs"
+                                        disabled={isImporting}
+                                    />
+                                    <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                        {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                    </Button>
+                                </div>
+                            </TabsContent>
+                        </Tabs>
 
-                            <Accordion type="single" collapsible className="w-full mt-6">
-                              <AccordionItem value="item-1">
-                                <AccordionTrigger>View JSON Format Examples</AccordionTrigger>
-                                <AccordionContent>
-                                  <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
-                                  <Tabs defaultValue="mcq" className="w-full">
-                                    <TabsList className="h-auto flex-wrap justify-start">
-                                      <TabsTrigger value="mcq">MCQ</TabsTrigger>
-                                      <TabsTrigger value="tf">T/F</TabsTrigger>
-                                      <TabsTrigger value="sa">Short Answer</TabsTrigger>
-                                      <TabsTrigger value="fib">Fill in Blank</TabsTrigger>
-                                      <TabsTrigger value="matching">Matching</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="mcq"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExample}</pre></TabsContent>
-                                    <TabsContent value="tf"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleTF}</pre></TabsContent>
-                                    <TabsContent value="sa"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleSA}</pre></TabsContent>
-                                    <TabsContent value="fib"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleFIB}</pre></TabsContent>
-                                    <TabsContent value="matching"><pre className="mt-2 w-full rounded-md bg-secondary p-4 text-sm whitespace-pre-wrap break-words">{jsonExampleMatching}</pre></TabsContent>
-                                  </Tabs>
-                                </AccordionContent>
-                              </AccordionItem>
-                            </Accordion>
-                        </div>
+                        <Accordion type="single" collapsible className="w-full mt-6">
+                          <AccordionItem value="item-1">
+                            <AccordionTrigger>View JSON Format Examples</AccordionTrigger>
+                            <AccordionContent>
+                              <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
+                              <Tabs defaultValue="mcq" className="w-full">
+                                <TabsList className="h-auto flex-wrap justify-start">
+                                  <TabsTrigger value="mcq">MCQ</TabsTrigger>
+                                  <TabsTrigger value="tf">T/F</TabsTrigger>
+                                  <TabsTrigger value="sa">Short Answer</TabsTrigger>
+                                  <TabsTrigger value="fib">Fill in Blank</TabsTrigger>
+                                  <TabsTrigger value="matching">Matching</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="mcq"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre></TabsContent>
+                                <TabsContent value="tf"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></TabsContent>
+                                <TabsContent value="sa"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleSA}</pre></TabsContent>
+                                <TabsContent value="fib"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleFIB}</pre></TabsContent>
+                                <TabsContent value="matching"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleMatching}</pre></TabsContent>
+                              </Tabs>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                     </DialogContent>
                 </Dialog>
             </CardFooter>
@@ -1546,5 +1586,7 @@ export default function EditContentPage() {
     </div>
   );
 }
+
+    
 
     
