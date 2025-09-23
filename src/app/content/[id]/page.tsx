@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+
 
 type Option = {
   text: string;
@@ -67,6 +69,8 @@ export default function TestPage() {
   const { user } = useAuth();
   const { openAuthDialog } = useAuthDialog();
   const testId = params.id as string;
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [timeUp, setTimeUp] = useState(false);
 
   useEffect(() => {
     const fetchTest = async () => {
@@ -74,7 +78,10 @@ export default function TestPage() {
       try {
         setLoading(true);
         const testData = await getContentById(testId);
-        setTest(testData as Test);
+        if (testData) {
+            setTest(testData as Test);
+            setTimeLeft(testData.duration * 60);
+        }
       } catch (error) {
         toast({
           variant: "destructive",
@@ -90,6 +97,22 @@ export default function TestPage() {
     fetchTest();
   }, [testId, toast, router]);
   
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0) {
+      if (timeLeft === 0) {
+        setTimeUp(true);
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+
   const handleAnswerChange = (questionIndex: number, answer: string) => {
     setAnswers(prev => ({ ...prev, [questionIndex]: answer }));
   };
@@ -104,8 +127,8 @@ export default function TestPage() {
     });
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
     if (!user) {
         openAuthDialog('sign-in');
         return;
@@ -170,6 +193,13 @@ export default function TestPage() {
         setIsSubmitting(false);
     }
   };
+  
+    const formatTime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+    };
 
   const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
   const startIndex = currentPage * QUESTIONS_PER_PAGE;
@@ -215,15 +245,17 @@ export default function TestPage() {
                         <HelpCircle className="w-4 h-4" />
                         <span>{test.questions.length} Questions</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4" />
-                        <span>{test.duration} min</span>
-                        </div>
+                        {timeLeft !== null && (
+                            <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
+                                <Clock className="w-4 h-4" />
+                                <span>{formatTime(timeLeft)}</span>
+                            </div>
+                        )}
                     </div>
                 </header>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="space-y-8">
+                    <fieldset disabled={timeUp} className="space-y-8">
                     {currentQuestions && currentQuestions.map((question, index) => {
                         const questionIndex = startIndex + index;
                         return (
@@ -302,7 +334,7 @@ export default function TestPage() {
                             </Card>
                         )
                     })}
-                    </div>
+                    </fieldset>
 
                     <div className="mt-8 flex justify-between items-center">
                         <Button 
@@ -332,7 +364,7 @@ export default function TestPage() {
 
 
                     <div className="mt-8 flex justify-center">
-                        <Button size="lg" type="submit" disabled={isSubmitting}>
+                        <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
                             {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
                         </Button>
                     </div>
@@ -366,6 +398,21 @@ export default function TestPage() {
                 </div>
             </aside>
         </div>
+        
+        <AlertDialog open={timeUp}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Time's Up!</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        The time limit for this test has been reached. Your answers will now be submitted.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogAction onClick={() => handleSubmit()}>
+                    View Results
+                </AlertDialogAction>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
   );
 }
+
