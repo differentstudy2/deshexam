@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -189,10 +189,12 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="p-0">
                <SheetHeader className="border-b p-4">
-                 <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
-                 <Link href="/" onClick={() => setIsSheetOpen(false)} className="flex items-center space-x-2">
-                   <DeshExamLogo />
-                 </Link>
+                 <SheetTitle className="flex items-center gap-2">
+                    <Link href="/" onClick={() => setIsSheetOpen(false)}>
+                        <DeshExamLogo />
+                    </Link>
+                </SheetTitle>
+                <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
                </SheetHeader>
               <div className="flex flex-col h-[calc(100%-4.5rem)]">
                 <ScrollArea className="flex-1 p-4">

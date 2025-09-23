@@ -34,15 +34,15 @@ import { getUserProfile } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutGrid },
-  { href: '/dashboard/my-content', label: 'My Content', icon: Library },
-  { href: '/dashboard/all-questions', label: 'All Questions', icon: ClipboardList },
-  { href: '/dashboard/my-results', label: 'My Results', icon: FileText },
-  { href: '/dashboard/profile', label: 'Profile', icon: BookUser },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard', label: 'Overview', icon: <LayoutGrid /> },
+  { href: '/dashboard/my-content', label: 'My Content', icon: <Library /> },
+  { href: '/dashboard/all-questions', label: 'All Questions', icon: <ClipboardList /> },
+  { href: '/dashboard/my-results', label: 'My Results', icon: <FileText /> },
+  { href: '/dashboard/profile', label: 'Profile', icon: <BookUser /> },
+  { href: '/dashboard/settings', label: 'Settings', icon: <Settings /> },
 ];
 
 type UserProfile = {
@@ -150,10 +150,12 @@ export default function DashboardLayout({
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 flex flex-col w-[80%]">
                         <SheetHeader className="border-b p-4">
-                            <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
-                            <Link href="/dashboard" onClick={() => setIsSheetOpen(false)} className="flex items-center space-x-2">
-                                <DeshExamLogo />
-                            </Link>
+                             <SheetTitle className="flex items-center gap-2">
+                                <Link href="/dashboard" onClick={() => setIsSheetOpen(false)}>
+                                    <DeshExamLogo />
+                                </Link>
+                            </SheetTitle>
+                             <SheetDescription className="sr-only">Dashboard sidebar menu</SheetDescription>
                         </SheetHeader>
                         {sidebarContent}
                     </SheetContent>

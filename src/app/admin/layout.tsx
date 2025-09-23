@@ -39,20 +39,20 @@ import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 
 
 const navItems = [
-  { href: '/admin', label: 'Admin Overview', icon: ShieldCheck },
-  { href: '/admin/users', label: 'Manage Users', icon: Users },
-  { href: '/admin/content', label: 'Manage Content', icon: Library },
-  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: FilePlus },
-  { href: '/admin/add-article', label: 'Add Article', icon: BookPlus },
-  { href: '/admin/coupons', label: 'Manage Coupons', icon: Tag },
-  { href: '/admin/earning', label: 'Earning', icon: DollarSign },
-  { href: '/admin/push-notification', label: 'Push Notification', icon: Bell },
-  { href: '/admin/reports', label: 'Reports & Contact', icon: Flag },
-  { href: '/admin/settings', label: 'Site Settings', icon: Settings },
+  { href: '/admin', label: 'Admin Overview', icon: <ShieldCheck /> },
+  { href: '/admin/users', label: 'Manage Users', icon: <Users /> },
+  { href: '/admin/content', label: 'Manage Content', icon: <Library /> },
+  { href: '/admin/add-content', label: 'Add Quiz/Test', icon: <FilePlus /> },
+  { href: '/admin/add-article', label: 'Add Article', icon: <BookPlus /> },
+  { href: '/admin/coupons', label: 'Manage Coupons', icon: <Tag /> },
+  { href: '/admin/earning', label: 'Earning', icon: <DollarSign /> },
+  { href: '/admin/push-notification', label: 'Push Notification', icon: <Bell /> },
+  { href: '/admin/reports', label: 'Reports & Contact', icon: <Flag /> },
+  { href: '/admin/settings', label: 'Site Settings', icon: <Settings /> },
 ];
 
 export default function AdminLayout({
@@ -176,10 +176,12 @@ export default function AdminLayout({
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 flex flex-col w-[80%]">
                         <SheetHeader className="border-b p-4">
-                            <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
-                            <Link href="/admin" onClick={() => setIsSheetOpen(false)} className="flex items-center space-x-2">
-                                <DeshExamLogo />
-                            </Link>
+                             <SheetTitle className="flex items-center gap-2">
+                                <Link href="/admin" onClick={() => setIsSheetOpen(false)}>
+                                    <DeshExamLogo />
+                                </Link>
+                            </SheetTitle>
+                            <SheetDescription className="sr-only">Admin sidebar menu</SheetDescription>
                         </SheetHeader>
                         {sidebarContent}
                     </SheetContent>
