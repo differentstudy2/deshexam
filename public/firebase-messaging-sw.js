@@ -1,7 +1,6 @@
-
-// Import the Firebase app and messaging services
-importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-messaging.js');
+// Scripts for Firebase products
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,37 +13,24 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging(app);
+firebase.initializeApp(firebaseConfig);
 
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+// Retrieve an instance of Firebase Messaging so that it can handle background
+// messages.
+const messaging = firebase.messaging();
 
-  // Check if the app is already in the foreground. If so, don't show a notification.
-  // The foreground message will be handled by the main app.
-  self.clients.matchAll({
-    type: 'window',
-    includeUncontrolled: true
-  }).then((clients) => {
-    let isAppInForeground = false;
-    clients.forEach((client) => {
-      if (client.visibilityState === 'visible') {
-        isAppInForeground = true;
-      }
-    });
+// If you would like to customize notifications that are received in the
+// background (Web app is closed or not in browser focus) then you should
+// implement this optional method.
+// messaging.onBackgroundMessage(function(payload) {
+//   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+//   // Customize notification here
+//   const notificationTitle = 'Background Message Title';
+//   const notificationOptions = {
+//     body: 'Background Message body.',
+//     icon: '/icon.png'
+//   };
 
-    if (isAppInForeground) {
-      console.log('App is in the foreground, not showing notification.');
-      return;
-    }
-
-    // If app is not in foreground, show the notification.
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-      body: payload.notification.body,
-      icon: payload.notification.icon || '/icon.png'
-    };
-
-    self.registration.showNotification(notificationTitle, notificationOptions);
-  });
-});
+//   self.registration.showNotification(notificationTitle,
+//     notificationOptions);
+// });
