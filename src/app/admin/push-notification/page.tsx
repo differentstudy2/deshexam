@@ -15,6 +15,7 @@ import { Send, Users } from 'lucide-react';
 import { sendPushNotification } from '@/ai/flows/send-push-notification';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { useAuth } from '@/hooks/use-auth';
 
 const notificationSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -27,23 +28,30 @@ type NotificationFormValues = z.infer<typeof notificationSchema>;
 export default function PushNotificationPage() {
     const { toast } = useToast();
     const [subscriberCount, setSubscriberCount] = useState(0);
+    const { user } = useAuth();
 
     useEffect(() => {
-        const tokensCollection = collection(db, 'fcmTokens');
-        const unsubscribe = onSnapshot(tokensCollection, (snapshot) => {
-            setSubscriberCount(snapshot.size);
-        }, (error) => {
-            console.error("Error fetching subscriber count in real-time: ", error);
-            toast({
-                variant: 'destructive',
-                title: 'Real-time Error',
-                description: 'Could not connect for live subscriber updates.',
+        let unsubscribe: () => void;
+        if(user) {
+            const tokensCollection = collection(db, 'fcmTokens');
+            unsubscribe = onSnapshot(tokensCollection, (snapshot) => {
+                setSubscriberCount(snapshot.size);
+            }, (error) => {
+                console.error("Error fetching subscriber count in real-time: ", error);
+                toast({
+                    variant: 'destructive',
+                    title: 'Real-time Error',
+                    description: 'Could not connect for live subscriber updates.',
+                });
             });
-        });
-
+        }
         // Cleanup the listener when the component unmounts
-        return () => unsubscribe();
-    }, [toast]);
+        return () => {
+          if (unsubscribe) {
+            unsubscribe()
+          }
+        };
+    }, [toast, user]);
 
     const form = useForm<NotificationFormValues>({
         resolver: zodResolver(notificationSchema),

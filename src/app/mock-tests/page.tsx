@@ -62,30 +62,39 @@ export default function MockTestsPage() {
   }, [toast]);
 
   useEffect(() => {
-    if(!user) return; // Don't attach listener if user is not logged in
-    
-    const q = query(collection(db, "content"), where("testType", "==", "Mock Test"));
-    
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedTests = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Test[];
-      
-      setTests(fetchedTests);
-      const uniqueSubjects = Array.from(new Set(fetchedTests.map((test: any) => test.subject))).filter(Boolean) as string[];
-      setSubjects(uniqueSubjects);
-    }, (error) => {
-      console.error("Error fetching mock tests in real-time: ", error);
-      toast({
-        variant: "destructive",
-        title: "Error fetching real-time data",
-        description: (error as Error).message,
-      });
-    });
+    let unsubscribe: () => void;
 
-    // Cleanup subscription on component unmount
-    return () => unsubscribe();
+    if (user) {
+        const q = query(collection(db, "content"), where("testType", "==", "Mock Test"));
+        
+        unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const fetchedTests = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            })) as Test[];
+            
+            setTests(fetchedTests);
+            const uniqueSubjects = Array.from(new Set(fetchedTests.map((test: any) => test.subject))).filter(Boolean) as string[];
+            setSubjects(uniqueSubjects);
+        }, (error) => {
+            console.error("Error fetching mock tests in real-time: ", error);
+            // Don't toast permission errors on public pages for guests
+            if (error.code !== 'permission-denied') {
+              toast({
+                variant: "destructive",
+                title: "Error fetching real-time data",
+                description: (error as Error).message,
+              });
+            }
+        });
+    }
+
+    // Cleanup subscription on component unmount or when user logs out
+    return () => {
+        if (unsubscribe) {
+            unsubscribe();
+        }
+    };
   }, [toast, user]);
 
   return (

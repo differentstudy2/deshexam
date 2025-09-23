@@ -60,30 +60,36 @@ export default function QuizzesPage() {
   }, [toast]);
   
   useEffect(() => {
-    if (!user) return; // Don't attach listener if user is not logged in
-
-    const q = query(collection(db, "content"), where("testType", "==", "Quiz"));
-    
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedQuizzes = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Quiz[];
-      
-      setQuizzes(fetchedQuizzes);
-      const uniqueSubjects = Array.from(new Set(fetchedQuizzes.map((quiz: any) => quiz.subject))).filter(Boolean) as string[];
-      setSubjects(uniqueSubjects);
-    }, (error) => {
-      console.error("Error fetching quizzes in real-time: ", error);
-      toast({
-        variant: "destructive",
-        title: "Error fetching real-time data",
-        description: (error as Error).message,
-      });
-    });
-
+    let unsubscribe: () => void;
+    if (user) {
+        const q = query(collection(db, "content"), where("testType", "==", "Quiz"));
+        
+        unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const fetchedQuizzes = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Quiz[];
+          
+          setQuizzes(fetchedQuizzes);
+          const uniqueSubjects = Array.from(new Set(fetchedQuizzes.map((quiz: any) => quiz.subject))).filter(Boolean) as string[];
+          setSubjects(uniqueSubjects);
+        }, (error) => {
+          console.error("Error fetching quizzes in real-time: ", error);
+           if (error.code !== 'permission-denied') {
+              toast({
+                variant: "destructive",
+                title: "Error fetching real-time data",
+                description: (error as Error).message,
+              });
+            }
+        });
+    }
     // Cleanup subscription on component unmount
-    return () => unsubscribe();
+    return () => {
+      if(unsubscribe) {
+        unsubscribe();
+      }
+    }
   }, [toast, user]);
 
   return (
