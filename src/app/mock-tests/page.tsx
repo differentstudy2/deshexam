@@ -13,6 +13,8 @@ import { db } from "@/lib/firebase/client";
 import { MockTestFilters } from "@/components/mock-test-filters";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { getAllContent } from '@/lib/firebase/firestore';
+import { useAuth } from '@/hooks/use-auth';
 
 type Test = {
   id: string;
@@ -35,8 +37,33 @@ export default function MockTestsPage() {
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<string[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
+    const fetchInitialTests = async () => {
+      try {
+        const fetchedTests = (await getAllContent("Mock Test")) as Test[];
+        setTests(fetchedTests);
+        const uniqueSubjects = Array.from(new Set(fetchedTests.map((test) => test.subject))).filter(Boolean) as string[];
+        setSubjects(uniqueSubjects);
+        setLoading(false);
+      } catch (error) {
+         toast({
+          variant: "destructive",
+          title: "Error fetching tests",
+          description: (error as Error).message,
+        });
+        setLoading(false);
+      }
+    }
+    
+    fetchInitialTests();
+
+  }, [toast]);
+
+  useEffect(() => {
+    if(!user) return; // Don't attach listener if user is not logged in
+    
     const q = query(collection(db, "content"), where("testType", "==", "Mock Test"));
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -48,20 +75,18 @@ export default function MockTestsPage() {
       setTests(fetchedTests);
       const uniqueSubjects = Array.from(new Set(fetchedTests.map((test: any) => test.subject))).filter(Boolean) as string[];
       setSubjects(uniqueSubjects);
-      setLoading(false);
     }, (error) => {
       console.error("Error fetching mock tests in real-time: ", error);
       toast({
         variant: "destructive",
-        title: "Error fetching mock tests",
+        title: "Error fetching real-time data",
         description: (error as Error).message,
       });
-      setLoading(false);
     });
 
     // Cleanup subscription on component unmount
     return () => unsubscribe();
-  }, [toast]);
+  }, [toast, user]);
 
   return (
     <div className="container py-12 md:py-16">
