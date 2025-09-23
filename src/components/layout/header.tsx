@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Sidebar } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -190,9 +190,11 @@ export const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     const pathname = usePathname();
     return (
         <ScrollArea className="h-full">
-            <SheetHeader className="border-b p-4">
-                <SheetTitle className="flex items-center gap-2"><Link href="/admin" onClick={onLinkClick}><DeshExamLogo /></Link></SheetTitle>
-            </SheetHeader>
+            <div className="border-b p-4">
+                <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-2">
+                    <DeshExamLogo />
+                </Link>
+            </div>
             <ul className="mt-6 space-y-1 p-4">
                 {adminNavItems.map((item) => (
                     <li key={item.href}>
@@ -247,9 +249,11 @@ export const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => vo
 
   return (
     <ScrollArea className="h-full">
-        <SheetHeader className="border-b p-4">
-            <SheetTitle className="flex items-center gap-2"><Link href="/dashboard" onClick={onLinkClick}><DeshExamLogo /></Link></SheetTitle>
-        </SheetHeader>
+        <div className="border-b p-4">
+            <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2">
+                <DeshExamLogo />
+            </Link>
+        </div>
       <ul className="mt-6 space-y-1 p-4">
         {dashboardNavItems.map((item) => (
           <li key={item.href}>
@@ -298,8 +302,6 @@ export function Header() {
   const { openAuthDialog } = useAuthDialog();
   const pathname = usePathname();
   
-  const [isAdminSheetOpen, setIsAdminSheetOpen] = useState(false);
-  const [isDashboardSheetOpen, setIsDashboardSheetOpen] = useState(false);
   const [isMainSheetOpen, setIsMainSheetOpen] = useState(false);
 
   const isAdminPath = user ? pathname.startsWith('/admin') : false;
@@ -328,8 +330,11 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0">
                   <SheetHeader className="border-b p-4">
-                    <SheetTitle className="flex items-center gap-2"><Link href="/" onClick={() => setIsMainSheetOpen(false)}><DeshExamLogo /></Link></SheetTitle>
-                    <SheetDescription>Main navigation menu</SheetDescription>
+                    <SheetTitle asChild>
+                      <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
+                        <DeshExamLogo />
+                      </Link>
+                    </SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-col h-[calc(100%-4.5rem)]">
                     <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
