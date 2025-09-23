@@ -333,7 +333,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <div className="mr-6 flex items-center">
+        <div className="mr-auto md:mr-6 flex items-center">
             <Link href="/" className="flex items-center">
                 <DeshExamLogo />
             </Link>
@@ -347,7 +347,8 @@ export function Header() {
              <UserNav />
           </div>
            
-           <div className="md:hidden">
+           <div className="md:hidden flex items-center">
+            <UserNav />
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
                     <Button variant="ghost" size="icon">
@@ -356,18 +357,16 @@ export function Header() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="p-0">
-                    <SheetHeader>
+                    <SheetHeader className="p-4 border-b">
                        <SheetTitle className="sr-only">Menu</SheetTitle>
+                        <Link href="/" onClick={() => setIsSheetOpen(false)}>
+                            <DeshExamLogo />
+                        </Link>
                     </SheetHeader>
                     {isDashboardLayout ? (
                         pathname.startsWith('/admin') ? <AdminSidebar logOut={logOut} onLinkClick={() => setIsSheetOpen(false)} /> : <DashboardSidebar user={user} logOut={logOut} onLinkClick={() => setIsSheetOpen(false)} />
                     ) : (
                         <>
-                         <div className="border-b p-4">
-                            <Link href="/" onClick={() => setIsSheetOpen(false)}>
-                            <DeshExamLogo />
-                            </Link>
-                        </div>
                         <div className="flex flex-col h-[calc(100%-4.5rem)]">
                             <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsSheetOpen(false)} /></ScrollArea>
                             <div className="mt-auto border-t p-4">
@@ -389,4 +388,3 @@ export function Header() {
     </header>
   );
 }
-
