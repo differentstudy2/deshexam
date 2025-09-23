@@ -155,7 +155,7 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
     <nav
       className={cn(
         "items-center space-x-4 lg:space-x-6",
-        isMobile ? "flex flex-col space-x-0 space-y-4 pt-4" : "hidden md:flex"
+        isMobile ? "flex flex-col items-start space-x-0 space-y-4 pt-4" : "hidden md:flex"
       )}
     >
       {navLinks.map((link) => (
