@@ -24,6 +24,7 @@ import { Eye, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
+import { useAuth } from '@/hooks/use-auth';
 
 type Question = {
     id: string;
@@ -36,6 +37,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function AllQuestionsPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,8 +69,12 @@ export default function AllQuestionsPage() {
   };
 
   useEffect(() => {
-    fetchQuestions(1, null);
-  }, [toast]);
+    if (user) {
+        fetchQuestions(1, null);
+    } else {
+        setLoading(false);
+    }
+  }, [user, toast]);
 
   const handleNextPage = () => {
     if (hasMore) {
@@ -106,8 +112,12 @@ export default function AllQuestionsPage() {
              <div className="flex items-center justify-center min-h-[200px]">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
              </div>
+           ) : !user ? (
+            <div className="text-center py-16 text-muted-foreground">
+                <p>Please log in to view the question bank.</p>
+            </div>
            ) : (
-            <>
+            <div className="overflow-x-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -120,16 +130,7 @@ export default function AllQuestionsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {loading ? (
-                        Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                            <TableRow key={i}>
-                                <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                                <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                                <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                                <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
-                            </TableRow>
-                        ))
-                        ) : questions.length > 0 ? (
+                        {questions.length > 0 ? (
                         questions.map((question) => (
                             <TableRow key={question.id}>
                                 <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
@@ -174,7 +175,7 @@ export default function AllQuestionsPage() {
                         Next
                     </Button>
                 </div>
-            </>
+            </div>
            )}
         </CardContent>
       </Card>
