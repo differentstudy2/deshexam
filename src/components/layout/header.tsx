@@ -142,16 +142,24 @@ const UserNav = () => {
   }
 
   return (
-    <div className="hidden md:flex items-center gap-2">
-      <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>
-        <LogIn />
-        Sign In
-      </Button>
-      <Button onClick={() => openAuthDialog('sign-up')}>
-        <UserPlus />
-        Sign Up
-      </Button>
-    </div>
+    <>
+      <div className="hidden md:flex items-center gap-2">
+        <Button variant="ghost" onClick={() => openAuthDialog('sign-in')}>
+          <LogIn />
+          Sign In
+        </Button>
+        <Button onClick={() => openAuthDialog('sign-up')}>
+          <UserPlus />
+          Sign Up
+        </Button>
+      </div>
+       <div className="md:hidden">
+            <Button variant="ghost" size="icon" onClick={() => openAuthDialog('sign-in')}>
+                <UserIcon />
+                <span className="sr-only">Sign In</span>
+            </Button>
+        </div>
+    </>
   );
 };
 
@@ -318,49 +326,14 @@ export function Header() {
   const { openAuthDialog } = useAuthDialog();
   const pathname = usePathname();
   
-  const [isMainSheetOpen, setIsMainSheetOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const isDashboardLayout = pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <div className="mr-6 flex items-center space-x-2">
-            <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
-                <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="md:hidden">
-                        <Menu className="h-5 w-5" />
-                        <span className="sr-only">Toggle Menu</span>
-                    </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="p-0">
-                    <SheetHeader>
-                        <SheetTitle className="sr-only">Menu</SheetTitle>
-                    </SheetHeader>
-                    {isDashboardLayout ? (
-                        pathname.startsWith('/admin') ? <AdminSidebar logOut={logOut} onLinkClick={() => setIsMainSheetOpen(false)} /> : <DashboardSidebar user={user} logOut={logOut} onLinkClick={() => setIsMainSheetOpen(false)} />
-                    ) : (
-                        <>
-                         <div className="border-b p-4">
-                            <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
-                            <DeshExamLogo />
-                            </Link>
-                        </div>
-                        <div className="flex flex-col h-[calc(100%-4.5rem)]">
-                            <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
-                            <div className="mt-auto border-t p-4">
-                            {!loading && !user && (
-                                <div className="flex flex-col gap-2">
-                                <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsMainSheetOpen(false); }}>Sign In</Button>
-                                <Button onClick={() => { openAuthDialog('sign-up'); setIsMainSheetOpen(false); }}>Sign Up</Button>
-                                </div>
-                            )}
-                            </div>
-                        </div>
-                        </>
-                    )}
-                </SheetContent>
-            </Sheet>
+        <div className="mr-6 flex items-center">
             <Link href="/" className="flex items-center">
                 <DeshExamLogo />
             </Link>
@@ -370,9 +343,50 @@ export function Header() {
 
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />
-          <UserNav />
+          <div className="hidden md:flex">
+             <UserNav />
+          </div>
+           
+           <div className="md:hidden">
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="p-0">
+                    <SheetHeader>
+                       <SheetTitle className="sr-only">Menu</SheetTitle>
+                    </SheetHeader>
+                    {isDashboardLayout ? (
+                        pathname.startsWith('/admin') ? <AdminSidebar logOut={logOut} onLinkClick={() => setIsSheetOpen(false)} /> : <DashboardSidebar user={user} logOut={logOut} onLinkClick={() => setIsSheetOpen(false)} />
+                    ) : (
+                        <>
+                         <div className="border-b p-4">
+                            <Link href="/" onClick={() => setIsSheetOpen(false)}>
+                            <DeshExamLogo />
+                            </Link>
+                        </div>
+                        <div className="flex flex-col h-[calc(100%-4.5rem)]">
+                            <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsSheetOpen(false)} /></ScrollArea>
+                            <div className="mt-auto border-t p-4">
+                            {!loading && !user && (
+                                <div className="flex flex-col gap-2">
+                                <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsSheetOpen(false); }}>Sign In</Button>
+                                <Button onClick={() => { openAuthDialog('sign-up'); setIsSheetOpen(false); }}>Sign Up</Button>
+                                </div>
+                            )}
+                            </div>
+                        </div>
+                        </>
+                    )}
+                </SheetContent>
+            </Sheet>
+           </div>
         </div>
       </div>
     </header>
   );
 }
+
