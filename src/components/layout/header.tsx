@@ -304,26 +304,24 @@ export function Header() {
   
   const [isMainSheetOpen, setIsMainSheetOpen] = useState(false);
 
-  const isAdminPath = user ? pathname.startsWith('/admin') : false;
-  const isDashboardPath = user ? pathname.startsWith('/dashboard') : false;
+  const isDashboardLayout = pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        { (isAdminPath || isDashboardPath) ? null :
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <DeshExamLogo />
-          </Link>
-        }
+        {!isDashboardLayout && (
+            <Link href="/" className="mr-6 flex items-center space-x-2">
+                <DeshExamLogo />
+            </Link>
+        )}
         
-        {!isAdminPath && !isDashboardPath && <MainNav />}
+        {!isDashboardLayout && <MainNav />}
 
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />
           <UserNav />
 
           <div className="md:hidden">
-            {isAdminPath ? null : isDashboardPath ? null : (
               <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
@@ -348,7 +346,6 @@ export function Header() {
                   </div>
                 </SheetContent>
               </Sheet>
-            )}
           </div>
         </div>
       </div>
