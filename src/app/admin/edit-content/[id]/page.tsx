@@ -36,7 +36,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon, FileJson } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Dialog,
@@ -47,13 +47,13 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 
 const optionSchema = z.object({
@@ -104,15 +104,6 @@ const formSchema = z.object({
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).optional(),
 });
-
-const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['topic', 'text', 'file']),
-    source: z.string().min(3, 'Source must be at least 3 characters.'),
-    numQuestions: z.coerce.number().int().min(1).max(20),
-    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
-});
-type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
 type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
@@ -273,6 +264,88 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
   );
 };
 
+const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "Multiple Choice",
+      "marks": 1,
+      "options": [
+        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
+        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
+        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
+        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
+      ],
+      "correctAnswer": "Paris",
+      "explanation": "Paris is the capital and most populous city of France."
+    }
+  ]
+}
+`;
+
+const jsonExampleTF = `
+{
+  "questions": [
+    {
+      "text": "The Earth is flat.",
+      "type": "True/False",
+      "marks": 1,
+      "options": [
+        {"text": "True", "explanation": "This is incorrect. The Earth is an oblate spheroid."},
+        {"text": "False", "explanation": "This is correct. Scientific evidence overwhelmingly shows the Earth is round."}
+      ],
+      "correctAnswer": "False",
+      "explanation": "The Earth is roughly a sphere. Evidence includes satellite photos, the way ships disappear over the horizon, and the existence of different time zones."
+    }
+  ]
+}
+`;
+const jsonExampleSA = `
+{
+  "questions": [
+    {
+      "text": "What is the chemical symbol for water?",
+      "type": "Short Answer",
+      "marks": 1,
+      "correctAnswer": "H2O",
+      "explanation": "Water is a chemical compound consisting of two hydrogen atoms and one oxygen atom."
+    }
+  ]
+}
+`;
+const jsonExampleFIB = `
+{
+  "questions": [
+    {
+      "text": "The powerhouse of the cell is the ____.",
+      "type": "Fill in the Blank",
+      "marks": 1,
+      "correctAnswer": "mitochondrion",
+      "explanation": "Mitochondria are membrane-bound cell organelles that generate most of the chemical energy needed to power the cell's biochemical reactions."
+    }
+  ]
+}
+`;
+const jsonExampleMatching = `
+{
+  "questions": [
+    {
+      "text": "Match the countries to their capitals.",
+      "type": "Matching",
+      "marks": 3,
+      "correctAnswer": [
+        { "a": "Japan", "b": "Tokyo" },
+        { "a": "Canada", "b": "Ottawa" },
+        { "a": "Australia", "b": "Canberra" }
+      ],
+      "explanation": "This tests knowledge of world geography and capital cities."
+    }
+  ]
+}
+`;
+
+
 export default function EditContentPage() {
   const { toast } = useToast();
   const router = useRouter();
@@ -295,10 +368,11 @@ export default function EditContentPage() {
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
 
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const importFileRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+
 
   const [settings, setSettings] = useState({
     enableMatching: true,
@@ -344,18 +418,6 @@ export default function EditContentPage() {
       questions: [],
     },
   });
-
-  const aiForm = useForm<AIGeneratorFormValues>({
-    resolver: zodResolver(aiGeneratorFormSchema),
-    defaultValues: {
-      sourceType: 'topic',
-      source: '',
-      numQuestions: 5,
-      difficulty: 'Medium',
-      questionType: 'Any',
-    },
-  });
-
 
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
@@ -680,6 +742,60 @@ export default function EditContentPage() {
     } else {
       setIsAddingNewChapter(false);
     }
+  };
+
+  const handleBulkImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/json') {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid File Type',
+        description: 'Please upload a valid JSON file.',
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const json = JSON.parse(text);
+        if (!json.questions || !Array.isArray(json.questions)) {
+          throw new Error("JSON must have a top-level 'questions' array.");
+        }
+        
+        // Basic validation for each question
+        json.questions.forEach((q: any, i: number) => {
+            const { success } = questionSchema.safeParse(q);
+            if (!success) {
+                throw new Error(`Question at index ${i} has an invalid structure.`);
+            }
+        });
+        
+        append(json.questions);
+        toast({
+          title: 'Import Successful!',
+          description: `${json.questions.length} questions have been added.`,
+        });
+        setIsImportDialogOpen(false);
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Import Failed',
+          description: (error as Error).message,
+        });
+      } finally {
+        setIsImporting(false);
+        // Reset file input
+        if(importFileRef.current) {
+            importFileRef.current.value = '';
+        }
+      }
+    };
+    reader.readAsText(file);
   };
 
   const accessLevel = form.watch('access');
@@ -1339,7 +1455,7 @@ export default function EditContentPage() {
                     );
                  })}
             </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row gap-4">
+            <CardFooter className="flex flex-wrap gap-4">
                  <Button
                     type="button"
                     variant="outline"
@@ -1368,6 +1484,52 @@ export default function EditContentPage() {
                         Add Questions with AI
                     </Link>
                 </Button>
+                 <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                    <DialogTrigger asChild>
+                         <Button type="button" variant="outline">
+                            <FileJson className="mr-2" />
+                            Bulk Import from JSON
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Bulk Import Questions</DialogTitle>
+                            <DialogDescription>
+                                Upload a JSON file containing an array of questions. The file must have a top-level key named "questions".
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                <Label htmlFor="json-import">JSON File</Label>
+                                <Input id="json-import" type="file" accept=".json" onChange={handleBulkImport} ref={importFileRef} disabled={isImporting} />
+                                {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                            </div>
+
+                            <Accordion type="single" collapsible className="w-full mt-6">
+                              <AccordionItem value="item-1">
+                                <AccordionTrigger>View JSON Format Examples</AccordionTrigger>
+                                <AccordionContent>
+                                  <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
+                                  <Tabs defaultValue="mcq" className="w-full">
+                                    <TabsList>
+                                      <TabsTrigger value="mcq">MCQ</TabsTrigger>
+                                      <TabsTrigger value="tf">T/F</TabsTrigger>
+                                      <TabsTrigger value="sa">Short Answer</TabsTrigger>
+                                      <TabsTrigger value="fib">Fill in Blank</TabsTrigger>
+                                      <TabsTrigger value="matching">Matching</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="mcq"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExample}</pre></TabsContent>
+                                    <TabsContent value="tf"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleTF}</pre></TabsContent>
+                                    <TabsContent value="sa"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleSA}</pre></TabsContent>
+                                    <TabsContent value="fib"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleFIB}</pre></TabsContent>
+                                    <TabsContent value="matching"><pre className="mt-2 w-full rounded-md bg-secondary p-4 overflow-x-auto text-sm">{jsonExampleMatching}</pre></TabsContent>
+                                  </Tabs>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </CardFooter>
           </Card>
           
@@ -1385,3 +1547,4 @@ export default function EditContentPage() {
     </div>
   );
 }
+
