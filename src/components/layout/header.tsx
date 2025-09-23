@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Sidebar } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -24,7 +24,6 @@ import { ThemeToggle } from "./theme-toggle";
 import { getUserProfile } from "@/lib/firebase/firestore";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
-import { navItems as adminNavItems } from "@/app/admin/layout";
 
 const mainNavLinks = [
     { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
@@ -42,6 +41,17 @@ const dashboardNavItems = [
   { href: '/dashboard/my-results', label: 'My Results', icon: <FileText className="h-5 w-5" /> },
   { href: '/dashboard/profile', label: 'Profile', icon: <BookUser className="h-5 w-5" /> },
   { href: '/dashboard/settings', label: 'Settings', icon: <Settings className="h-5 w-5" /> },
+];
+
+const adminNavItems = [
+    { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-5 w-5" /> },
+    { href: '/admin/content', label: 'Content', icon: <FileText className="h-5 w-5" /> },
+    { href: '/admin/users', label: 'Users', icon: <Users className="h-5 w-5" /> },
+    { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-5 w-5" /> },
+    { href: '/admin/push-notification', label: 'Push Notification', icon: <Send className="h-5 w-5" />},
+    { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-5 w-5" />},
+    { href: '/admin/earning', label: 'Earning', icon: <DollarSign className="h-5 w-5" />},
+    { href: '/admin/settings', label: 'Settings', icon: <Settings className="h-5 w-5" /> },
 ];
 
 

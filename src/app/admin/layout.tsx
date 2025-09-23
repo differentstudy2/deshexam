@@ -1,47 +1,11 @@
 
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { DeshExamLogo } from '@/components/icons';
-import {
-  LayoutGrid,
-  Library,
-  Users,
-  Settings,
-  ShieldCheck,
-  Tag,
-  FilePlus,
-  BookPlus,
-  DollarSign,
-  Bell,
-  Flag,
-  Menu,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-
-
-export const navItems = [
-    { href: '/admin', label: 'Admin Overview', icon: <ShieldCheck /> },
-    { href: '/admin/users', label: 'Manage Users', icon: <Users /> },
-    { href: '/admin/content', label: 'Manage Content', icon: <Library /> },
-    { href: '/admin/add-content', label: 'Add Quiz/Test', icon: <FilePlus /> },
-    { href: '/admin/add-article', label: 'Add Article', icon: <BookPlus /> },
-    { href: '/admin/coupons', label: 'Manage Coupons', icon: <Tag /> },
-    { href: '/admin/earning', label: 'Earning', icon: <DollarSign /> },
-    { href: '/admin/push-notification', label: 'Push Notification', icon: <Bell /> },
-    { href: '/admin/reports', label: 'Reports & Contact', icon: <Flag /> },
-    { href: '/admin/settings', label: 'Site Settings', icon: <Settings /> },
-];
 
 export default function AdminLayout({
   children,
@@ -50,7 +14,6 @@ export default function AdminLayout({
 }) {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [verifying, setVerifying] = useState(true);
 
   useEffect(() => {
@@ -68,7 +31,7 @@ export default function AdminLayout({
       try {
         const userProfile = await getUserProfile(user.uid);
         if (userProfile && userProfile.role === 'admin') {
-          setIsAdmin(true);
+          // User is an admin, allow access
         } else {
           // If not an admin, redirect to user dashboard
           router.push('/dashboard');
@@ -86,7 +49,7 @@ export default function AdminLayout({
   }, [user, authLoading, router]);
 
 
-  if (verifying || !isAdmin) {
+  if (verifying) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="mr-2 h-8 w-8 animate-spin" />
