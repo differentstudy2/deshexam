@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
@@ -190,8 +190,8 @@ export const AdminSidebar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
     const pathname = usePathname();
     return (
         <ScrollArea className="h-full">
-            <div className="border-b p-4">
-                <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-2">
+             <div className="border-b p-4">
+                <Link href="/admin" onClick={onLinkClick}>
                     <DeshExamLogo />
                 </Link>
             </div>
@@ -250,7 +250,7 @@ export const DashboardSidebar = ({ onLinkClick, user }: { onLinkClick?: () => vo
   return (
     <ScrollArea className="h-full">
         <div className="border-b p-4">
-            <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2">
+            <Link href="/dashboard" onClick={onLinkClick}>
                 <DeshExamLogo />
             </Link>
         </div>
@@ -329,13 +329,11 @@ export function Header() {
                   <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0">
-                  <SheetHeader className="border-b p-4">
-                    <SheetTitle asChild>
-                      <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
-                        <DeshExamLogo />
-                      </Link>
-                    </SheetTitle>
-                  </SheetHeader>
+                  <div className="border-b p-4">
+                    <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
+                      <DeshExamLogo />
+                    </Link>
+                  </div>
                   <div className="flex flex-col h-[calc(100%-4.5rem)]">
                     <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
                     <div className="mt-auto border-t p-4">
