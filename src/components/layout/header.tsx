@@ -309,11 +309,22 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        {!isDashboardLayout && (
-            <Link href="/" className="mr-6 flex items-center space-x-2">
-                <DeshExamLogo />
-            </Link>
-        )}
+        {isDashboardLayout ? (
+            <div className="md:hidden mr-4">
+                <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Sidebar</span></Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0">
+                        {pathname.startsWith('/admin') ? <AdminSidebar onLinkClick={() => setIsMainSheetOpen(false)} /> : <DashboardSidebar user={user} onLinkClick={() => setIsMainSheetOpen(false)} />}
+                    </SheetContent>
+                </Sheet>
+            </div>
+        ) : null}
+        
+        <Link href="/" className="mr-6 flex items-center space-x-2">
+            <DeshExamLogo />
+        </Link>
         
         {!isDashboardLayout && <MainNav />}
 
@@ -321,32 +332,34 @@ export function Header() {
           <ThemeToggle />
           <UserNav />
 
-          <div className="md:hidden">
-              <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="p-0">
-                  <div className="border-b p-4">
-                    <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
-                      <DeshExamLogo />
-                    </Link>
-                  </div>
-                  <div className="flex flex-col h-[calc(100%-4.5rem)]">
-                    <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
-                    <div className="mt-auto border-t p-4">
-                      {!loading && !user && (
-                        <div className="flex flex-col gap-2">
-                          <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsMainSheetOpen(false); }}>Sign In</Button>
-                          <Button onClick={() => { openAuthDialog('sign-up'); setIsMainSheetOpen(false); }}>Sign Up</Button>
-                        </div>
-                      )}
-                      {!loading && user && (<Button onClick={() => { logOut(); setIsMainSheetOpen(false); }} className="w-full">Log Out</Button>)}
+          {!isDashboardLayout && (
+            <div className="md:hidden">
+                <Sheet open={isMainSheetOpen} onOpenChange={setIsMainSheetOpen}>
+                    <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /><span className="sr-only">Toggle Main Menu</span></Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-0">
+                    <div className="border-b p-4">
+                        <Link href="/" onClick={() => setIsMainSheetOpen(false)}>
+                        <DeshExamLogo />
+                        </Link>
                     </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-          </div>
+                    <div className="flex flex-col h-[calc(100%-4.5rem)]">
+                        <ScrollArea className="flex-1 p-4"><MainNav isMobile onLinkClick={() => setIsMainSheetOpen(false)} /></ScrollArea>
+                        <div className="mt-auto border-t p-4">
+                        {!loading && !user && (
+                            <div className="flex flex-col gap-2">
+                            <Button variant="ghost" onClick={() => { openAuthDialog('sign-in'); setIsMainSheetOpen(false); }}>Sign In</Button>
+                            <Button onClick={() => { openAuthDialog('sign-up'); setIsMainSheetOpen(false); }}>Sign Up</Button>
+                            </div>
+                        )}
+                        {!loading && user && (<Button onClick={() => { logOut(); setIsMainSheetOpen(false); }} className="w-full">Log Out</Button>)}
+                        </div>
+                    </div>
+                    </SheetContent>
+                </Sheet>
+            </div>
+          )}
         </div>
       </div>
     </header>
