@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
@@ -33,6 +33,7 @@ const lexend = Lexend({
 
 const FirebaseMessagingProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     const requestPermission = async () => {
@@ -58,8 +59,10 @@ const FirebaseMessagingProvider = ({ children }: { children: React.ReactNode }) 
       }
     };
     
-    requestPermission();
-  }, [toast]);
+    if (user) {
+      requestPermission();
+    }
+  }, [toast, user]);
 
   return <>{children}</>;
 };
