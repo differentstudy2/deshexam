@@ -35,7 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon, Book } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef } from 'react';
 import {
@@ -101,7 +101,6 @@ const formSchema = z.object({
   newState: z.string().optional(),
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
-  newChapterNo: z.string().optional(),
   newChapterName: z.string().optional(),
   testType: z.string().optional(),
   description: z.string().optional(),
@@ -354,7 +353,6 @@ export default function CreateTestPage() {
       newState: '',
       newExamCategory: '',
       newExam: '',
-      newChapterNo: '',
       newChapterName: '',
       testType: 'Mock Test',
       description: '',
@@ -446,7 +444,9 @@ export default function CreateTestPage() {
           getSettings()
       ]);
       
-      setContentTypes(types);
+      const allContentTypes = [...types, { id: 'textbook', name: 'Textbook' }];
+      setContentTypes(allContentTypes);
+
       setSubjects(subjectData);
       setBoards(boardData);
       setClasses(classData);
@@ -544,7 +544,7 @@ export default function CreateTestPage() {
   
   const questions = form.watch('questions');
   useEffect(() => {
-    if (currentTestType !== 'Learn') {
+    if (currentTestType !== 'Learn' && currentTestType !== 'Textbook') {
         const totalMarks = questions?.reduce((total, q) => {
             if (q.type === 'Matching') {
                 return total + (q.correctAnswer?.length || q.marks || 1);
@@ -615,9 +615,9 @@ export default function CreateTestPage() {
         }
 
         let chapterName = data.chapter;
-        if (data.chapter === 'add_new_chapter' && data.newChapterNo && data.newChapterName && subjectId) {
-          await addChapter(subjectId, { chapterNo: data.newChapterNo, chapterName: data.newChapterName });
-          chapterName = `${data.newChapterNo}. ${data.newChapterName}`;
+        if (data.chapter === 'add_new_chapter' && data.newChapterName && subjectId) {
+          await addChapter(subjectId, { chapterName: data.newChapterName });
+          chapterName = data.newChapterName;
           setIsAddingNewChapter(false);
         }
         
@@ -645,7 +645,6 @@ export default function CreateTestPage() {
         delete contentToSave.newState;
         delete contentToSave.newExamCategory;
         delete contentToSave.newExam;
-        delete contentToSave.newChapterNo;
         delete contentToSave.newChapterName;
       }
 
@@ -681,7 +680,6 @@ export default function CreateTestPage() {
             newState: '',
             newExamCategory: '',
             newExam: '',
-            newChapterNo: '',
             newChapterName: '',
             difficulty: 'Medium',
         });
@@ -871,7 +869,7 @@ export default function CreateTestPage() {
             <div>
                 <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
                 <p className="text-muted-foreground">
-                    Select a content type and fill out the form to create a new mock test, quiz, or practice questions.
+                    Select a content type and fill out the form to create new content.
                 </p>
             </div>
              <Button asChild variant="outline" className="w-full md:w-auto">
@@ -885,7 +883,7 @@ export default function CreateTestPage() {
 
     {contentTypes.length > 0 && (
       <Tabs defaultValue={form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
-        <TabsList className="flex flex-wrap h-auto justify-start">
+        <TabsList className="grid w-full grid-cols-4">
           {contentTypes.map((type) => (
             <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
           ))}
@@ -1038,7 +1036,7 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />}
-                {settings.enableChapterMetafield && <FormField
+                {settings.enableChapterMetafield && currentTestType !== 'Textbook' && <FormField
                     control={form.control}
                     name="chapter"
                     render={({ field }) => (
@@ -1048,13 +1046,12 @@ export default function CreateTestPage() {
                             <Select onValueChange={handleChapterChange} value={field.value} disabled={!form.watch('subject') || form.watch('subject') === 'add_new_subject'}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl>
                                 <SelectContent>
-                                    {chapters.map(chap => <SelectItem key={chap.id} value={`${chap.chapterNo}. ${chap.chapterName}`}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}
+                                    {chapters.map(chap => <SelectItem key={chap.id} value={`${chap.chapterName}`}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}
                                     <SelectItem value="add_new_chapter">Add new chapter...</SelectItem>
                                 </SelectContent>
                             </Select>
                         ) : (
                             <div className='space-y-2'>
-                                <FormField control={form.control} name="newChapterNo" render={({ field }) => (<Input {...field} placeholder="Chapter No." />)} />
                                 <FormField control={form.control} name="newChapterName" render={({ field }) => (<Input {...field} placeholder="Chapter Name" />)} />
                                 <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewChapter(false); form.setValue('chapter', ''); }}>Cancel</Button>
                             </div>
@@ -1235,7 +1232,7 @@ export default function CreateTestPage() {
                 />
               )}
 
-              {currentTestType !== 'Learn' && (
+              {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                   <FormField
                     control={form.control}
@@ -1388,7 +1385,7 @@ export default function CreateTestPage() {
             </CardContent>
           </Card>
           
-          {currentTestType !== 'Learn' && (
+          {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
             <Card>
               <CardHeader>
                   <CardTitle>Questions</CardTitle>

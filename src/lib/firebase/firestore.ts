@@ -3,6 +3,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -391,12 +392,14 @@ export const addContent = async (contentData: any) => {
     const user = auth.currentUser;
 
     if (!user) {
-        throw new Error("You must be logged in to create a content.");
+        throw new Error("You must be logged in to create content.");
     }
     const cleanedContent = cleanDataForFirebase(contentData);
     const { featureImage, ...restOfContentData } = cleanedContent;
 
     try {
+        const collectionName = contentData.testType === 'Textbook' ? 'textbooks' : 'content';
+
         let finalContentData: any = {
             ...restOfContentData,
             authorId: user.uid,
@@ -405,7 +408,7 @@ export const addContent = async (contentData: any) => {
             updatedAt: serverTimestamp(),
         };
         
-        if (contentData.testType !== 'Learn' && restOfContentData.questions) {
+        if (contentData.testType !== 'Learn' && contentData.testType !== 'Textbook' && restOfContentData.questions) {
             const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
                 const questionId = await addQuestion(question);
                 return { ...question, id: questionId };
@@ -417,8 +420,15 @@ export const addContent = async (contentData: any) => {
             finalContentData.featureImage = featureImage;
         }
         delete finalContentData.publishedAt;
+        
+        // For textbooks, remove questions array if it exists
+        if (collectionName === 'textbooks') {
+            delete finalContentData.questions;
+            delete finalContentData.duration;
+            delete finalContentData.difficulty;
+        }
 
-        const docRef = await addDoc(collection(db, "content"), finalContentData);
+        const docRef = await addDoc(collection(db, collectionName), finalContentData);
         console.log("Document written with ID: ", docRef.id);
         return docRef.id;
     } catch (e) {
@@ -482,6 +492,18 @@ export const getContentById = async (contentId: string) => {
             }
             return { id: contentDoc.id, ...data };
         } else {
+            // Check textbooks collection if not in content
+            const textbookDoc = await getDoc(doc(db, "textbooks", contentId));
+            if (textbookDoc.exists()) {
+                const data = textbookDoc.data();
+                 const createdAt = data.createdAt;
+                if (createdAt && typeof createdAt.toDate === 'function') {
+                    data.createdAt = createdAt.toDate().toLocaleDateString();
+                } else if (createdAt) {
+                    data.createdAt = new Date(createdAt).toLocaleDateString();
+                }
+                return { id: textbookDoc.id, ...data };
+            }
             return null;
         }
     } catch (e) {
@@ -494,8 +516,10 @@ export const updateContent = async (contentId: string, contentData: any) => {
     if (!contentId) {
         throw new Error("Content ID is required to update content.");
     }
-
-    const contentRef = doc(db, "content", contentId);
+    
+    const collectionName = contentData.testType === 'Textbook' ? 'textbooks' : 'content';
+    const contentRef = doc(db, collectionName, contentId);
+    
     const cleanedData = cleanDataForFirebase(contentData);
     
     const finalContentData = {
@@ -1714,16 +1738,8 @@ export const deleteTextbook = async (textbookId: string) => {
 
     const textbookRef = doc(db, "textbooks", textbookId);
 
-    // Recursively delete subcollections
-    const deleteSubcollection = async (collectionRef: any) => {
-        const snapshot = await getDocs(collectionRef);
-        snapshot.forEach(async (doc) => {
-            // Recurse for sub-subcollections if needed, then delete the document
-            // Example: await deleteSubcollection(collection(doc.ref, 'subSubCollection'));
-            await deleteDoc(doc.ref);
-        });
-    };
-
+    // This is a simplified delete. For production, you'd want a more robust, recursive delete,
+    // possibly triggered by a Cloud Function to handle nested subcollections reliably.
     try {
         // Get all chapters
         const chaptersRef = collection(db, `textbooks/${textbookId}/chapters`);
@@ -1742,24 +1758,16 @@ export const deleteTextbook = async (textbookId: string) => {
                 for(const practiceSetDoc of practiceSetsSnapshot.docs) {
                     // Delete questions within practice set
                     const questionsRef = collection(practiceSetDoc.ref, "questions");
-                    await deleteSubcollection(questionsRef);
-                    // Delete the practice set itself
+                    const questionsSnapshot = await getDocs(questionsRef);
+                    for (const qDoc of questionsSnapshot.docs) {
+                         await deleteDoc(qDoc.ref);
+                    }
                     await deleteDoc(practiceSetDoc.ref);
                 }
-
-                // Delete solutions within topic (if any)
-                const solutionsRef = collection(topicDoc.ref, "solutions");
-                await deleteSubcollection(solutionsRef);
                 
-                // Delete the topic itself
                 await deleteDoc(topicDoc.ref);
             }
             
-            // Delete solutions within chapter (if any)
-            const chapterSolutionsRef = collection(chapterDoc.ref, "solutions");
-            await deleteSubcollection(chapterSolutionsRef);
-
-            // Delete the chapter itself
             await deleteDoc(chapterDoc.ref);
         }
 
