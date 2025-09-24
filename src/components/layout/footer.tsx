@@ -12,14 +12,6 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               Your ultimate destination for mock tests, quizzes, and personalized learning paths.
             </p>
-             <div className="space-y-4">
-                <h4 className="font-headline font-semibold">Follow Us</h4>
-                <div className="flex space-x-4">
-                <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Twitter /></Link>
-                <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Github /></Link>
-                <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Linkedin /></Link>
-                </div>
-            </div>
           </div>
           <div>
             <h4 className="font-headline font-semibold mb-4">Quick Links</h4>
@@ -38,6 +30,14 @@ export function Footer() {
               <li><Link href="/terms" className="text-sm hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link href="/privacy" className="text-sm hover:text-primary transition-colors">Privacy Policy</Link></li>
             </ul>
+          </div>
+           <div className="space-y-4">
+              <h4 className="font-headline font-semibold">Follow Us</h4>
+              <div className="flex space-x-4">
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Twitter /></Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Github /></Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Linkedin /></Link>
+              </div>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
