@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -52,7 +53,7 @@ export default function ManageChaptersPage() {
       }
 
       // Fetch chapters
-      const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`));
+      const chaptersQuery = query(collection(db, 'textbooks', textbookId, 'chapters'));
       const querySnapshot = await getDocs(chaptersQuery);
       const chaptersData = querySnapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as Chapter)
@@ -67,7 +68,7 @@ export default function ManageChaptersPage() {
   const handleAddOrUpdateChapter = async () => {
     if (!newChapter.title.trim()) return;
     try {
-        const chaptersCollectionRef = collection(db, `textbooks/${textbookId}/chapters`);
+        const chaptersCollectionRef = collection(db, 'textbooks', textbookId, 'chapters');
         
         if (editingChapter) {
             // Update logic
@@ -146,7 +147,7 @@ export default function ManageChaptersPage() {
                 <Textarea
                 id="chapter-content"
                 placeholder="Add a summary or introduction for the chapter."
-                value={newChapter.content}
+                value={newChapter.content || ''}
                 onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
                 />
             </div>

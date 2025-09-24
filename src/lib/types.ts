@@ -17,6 +17,7 @@ export type Chapter = {
 export type Topic = {
     id: string;
     title: string;
+    content?: string;
     practiceSets: PracticeSet[];
 };
 
