@@ -27,7 +27,6 @@ import { useAuthDialog } from "@/hooks/use-auth-dialog";
 
 const mainNavLinks = [
     { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
-    { href: "/about", label: "About", icon: <Users className="h-5 w-5" /> },
     { href: "/mock-tests", label: "Mock Tests", icon: <BookOpen className="h-5 w-5" /> },
     { href: "/quizzes", label: "Quizzes", icon: <Gem className="h-5 w-5" /> },
     { href: "/learn", label: "Learn", icon: <LayoutDashboard className="h-5 w-5" /> },
