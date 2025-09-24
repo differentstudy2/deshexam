@@ -5,6 +5,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1592,7 +1593,7 @@ export const getAllTextbooks = async () => {
 
 export const getChaptersByTextbookId = async (textbookId: string) => {
     try {
-        const q = query(collection(db, `textbooks/${textbookId}/chapters`), orderBy("title"));
+        const q = query(collection(db, "textbooks", textbookId, "chapters"), orderBy("title"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
