@@ -2,6 +2,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1519,7 +1520,7 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const ordersCollection = collection(db, "orders");
         const usersCollection = collection(db, "users");
-
+        
         const allOrdersQuery = query(ordersCollection, orderBy("createdAt", "desc"));
         
         const [allOrdersSnapshot, usersCountSnapshot] = await Promise.all([
@@ -1703,5 +1704,70 @@ export const deleteQuestionFromPracticeSet = async (textbookId: string, chapterI
     } catch (e) {
         console.error("Error deleting question from practice set: ", e);
         throw new Error("Failed to delete question.");
+    }
+};
+
+export const deleteTextbook = async (textbookId: string) => {
+    if (!textbookId) {
+        throw new Error("Textbook ID is required to delete.");
+    }
+
+    const textbookRef = doc(db, "textbooks", textbookId);
+
+    // Recursively delete subcollections
+    const deleteSubcollection = async (collectionRef: any) => {
+        const snapshot = await getDocs(collectionRef);
+        snapshot.forEach(async (doc) => {
+            // Recurse for sub-subcollections if needed, then delete the document
+            // Example: await deleteSubcollection(collection(doc.ref, 'subSubCollection'));
+            await deleteDoc(doc.ref);
+        });
+    };
+
+    try {
+        // Get all chapters
+        const chaptersRef = collection(db, `textbooks/${textbookId}/chapters`);
+        const chaptersSnapshot = await getDocs(chaptersRef);
+
+        for (const chapterDoc of chaptersSnapshot.docs) {
+            // Get all topics for each chapter
+            const topicsRef = collection(chapterDoc.ref, "topics");
+            const topicsSnapshot = await getDocs(topicsRef);
+
+            for (const topicDoc of topicsSnapshot.docs) {
+                // Get all practice sets for each topic
+                const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
+                const practiceSetsSnapshot = await getDocs(practiceSetsRef);
+                
+                for(const practiceSetDoc of practiceSetsSnapshot.docs) {
+                    // Delete questions within practice set
+                    const questionsRef = collection(practiceSetDoc.ref, "questions");
+                    await deleteSubcollection(questionsRef);
+                    // Delete the practice set itself
+                    await deleteDoc(practiceSetDoc.ref);
+                }
+
+                // Delete solutions within topic (if any)
+                const solutionsRef = collection(topicDoc.ref, "solutions");
+                await deleteSubcollection(solutionsRef);
+                
+                // Delete the topic itself
+                await deleteDoc(topicDoc.ref);
+            }
+            
+            // Delete solutions within chapter (if any)
+            const chapterSolutionsRef = collection(chapterDoc.ref, "solutions");
+            await deleteSubcollection(chapterSolutionsRef);
+
+            // Delete the chapter itself
+            await deleteDoc(chapterDoc.ref);
+        }
+
+        // Finally, delete the textbook document
+        await deleteDoc(textbookRef);
+        
+    } catch (error) {
+        console.error("Error deleting textbook and its subcollections: ", error);
+        throw new Error("Failed to delete textbook completely.");
     }
 };
