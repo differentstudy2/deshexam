@@ -4,6 +4,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1545,7 +1546,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
         const ordersCollection = collection(db, "orders");
         const usersCollection = collection(db, "users");
         
-        const allOrdersQuery = query(ordersCollection, orderBy("createdAt", "desc"));
+        // Fetch all successful orders first, then filter by date in client code.
+        const allOrdersQuery = query(ordersCollection, where("status", "==", "Success"), orderBy("createdAt", "desc"));
         
         const [allOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
@@ -1553,8 +1555,7 @@ export const getEarningStats = async (): Promise<EarningStats> => {
         ]);
 
         const successfulOrders = allOrdersSnapshot.docs
-            .map(doc => doc.data())
-            .filter(data => data.status === 'Success');
+            .map(doc => doc.data());
             
         const totalRevenue = successfulOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
         
@@ -1601,10 +1602,20 @@ export const getChaptersByTextbookId = async (textbookId: string) => {
 };
 
 export const getTopicsByChapterId = async (textbookId: string, chapterId: string) => {
+    if (!textbookId || !chapterId) return [];
     try {
         const q = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`), orderBy("title"));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const topicsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Topic }));
+        
+        // Fetch practice sets for each topic
+        for (let topic of topicsData) {
+            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
+            const practiceSetsSnap = await getDocs(practiceSetsQuery);
+            topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
+        }
+        
+        return topicsData;
     } catch (e) {
         console.error("Error getting topics: ", e);
         throw new Error("Failed to fetch topics.");
@@ -1613,7 +1624,10 @@ export const getTopicsByChapterId = async (textbookId: string, chapterId: string
     
 export const addTopicToChapter = async (textbookId: string, chapterId: string, topicData: any) => {
     try {
-        const docRef = await addDoc(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`), topicData);
+        const docRef = await addDoc(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`), {
+            ...topicData,
+            createdAt: serverTimestamp()
+        });
         return docRef.id;
     } catch (e) {
         console.error("Error adding topic: ", e);
@@ -1624,7 +1638,10 @@ export const addTopicToChapter = async (textbookId: string, chapterId: string, t
 export const updateTopic = async (textbookId: string, chapterId: string, topicId: string, topicData: any) => {
     try {
         const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-        await updateDoc(topicRef, topicData);
+        await updateDoc(topicRef, {
+            ...topicData,
+            updatedAt: serverTimestamp()
+        });
     } catch (e) {
         console.error("Error updating topic: ", e);
         throw new Error("Failed to update topic.");
