@@ -46,13 +46,13 @@ export default function QuizzesPage() {
         setQuizzes(fetchedQuizzes);
         const uniqueSubjects = Array.from(new Set(fetchedQuizzes.map((quiz) => quiz.subject))).filter(Boolean) as string[];
         setSubjects(uniqueSubjects);
-        setLoading(false);
       } catch (error) {
         toast({
           variant: "destructive",
           title: "Error fetching quizzes",
           description: (error as Error).message,
         });
+      } finally {
         setLoading(false);
       }
     };
@@ -141,7 +141,7 @@ export default function QuizzesPage() {
               </CardHeader>
               <CardContent className="flex-grow p-4">
                 {quiz.subject && <p className="text-sm font-medium text-primary">{quiz.subject}</p>}
-                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-tight">{quiz.title}</CardTitle>
+                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
                 <div className="flex items-center text-sm text-muted-foreground space-x-4">
                   {quiz.questions?.length > 0 && (
                     <div className="flex items-center gap-1.5">

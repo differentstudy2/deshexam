@@ -41,7 +41,7 @@ export default async function LearnPage() {
             </CardHeader>
             <CardContent className="flex-grow p-4">
               <p className="text-sm font-medium text-primary">{article.subject}</p>
-              <CardTitle className="font-headline text-lg mt-1 mb-2 leading-tight">{article.title}</CardTitle>
+              <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{article.title}</CardTitle>
               <CardDescription>{article.description}</CardDescription>
               <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
                 <div className="flex items-center gap-1.5">

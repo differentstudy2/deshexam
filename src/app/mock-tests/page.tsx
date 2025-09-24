@@ -46,13 +46,13 @@ export default function MockTestsPage() {
         setTests(fetchedTests);
         const uniqueSubjects = Array.from(new Set(fetchedTests.map((test) => test.subject))).filter(Boolean) as string[];
         setSubjects(uniqueSubjects);
-        setLoading(false);
       } catch (error) {
          toast({
           variant: "destructive",
           title: "Error fetching tests",
           description: (error as Error).message,
         });
+      } finally {
         setLoading(false);
       }
     }
@@ -146,7 +146,7 @@ export default function MockTestsPage() {
               </CardHeader>
               <CardContent className="flex-grow p-4">
                 <p className="text-sm font-medium text-primary">{test.subject}</p>
-                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-tight">{test.title}</CardTitle>
+                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{test.title}</CardTitle>
                 <div className="flex items-center text-sm text-muted-foreground space-x-4">
                   <div className="flex items-center gap-1.5">
                     <HelpCircle className="w-4 h-4" />
