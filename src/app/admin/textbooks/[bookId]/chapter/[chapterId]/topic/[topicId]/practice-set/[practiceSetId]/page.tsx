@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -16,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -28,6 +27,9 @@ import {
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -38,7 +40,7 @@ const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
-  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.'),
+  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
     columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
@@ -49,6 +51,87 @@ const questionSchema = z.object({
 });
 
 type QuestionFormValues = z.infer<typeof questionSchema>;
+
+const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "Multiple Choice",
+      "marks": 1,
+      "options": [
+        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
+        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
+        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
+        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
+      ],
+      "correctAnswer": "Paris",
+      "explanation": "Paris is the capital and most populous city of France."
+    }
+  ]
+}
+`;
+
+const jsonExampleTF = `
+{
+  "questions": [
+    {
+      "text": "The Earth is flat.",
+      "type": "True/False",
+      "marks": 1,
+      "options": [
+        {"text": "True", "explanation": "This is incorrect. The Earth is an oblate spheroid."},
+        {"text": "False", "explanation": "This is correct. Scientific evidence overwhelmingly shows the Earth is round."}
+      ],
+      "correctAnswer": "False",
+      "explanation": "The Earth is roughly a sphere. Evidence includes satellite photos, the way ships disappear over the horizon, and the existence of different time zones."
+    }
+  ]
+}
+`;
+const jsonExampleSA = `
+{
+  "questions": [
+    {
+      "text": "What is the chemical symbol for water?",
+      "type": "Short Answer",
+      "marks": 1,
+      "correctAnswer": "H2O",
+      "explanation": "Water is a chemical compound consisting of two hydrogen atoms and one oxygen atom."
+    }
+  ]
+}
+`;
+const jsonExampleFIB = `
+{
+  "questions": [
+    {
+      "text": "The powerhouse of the cell is the ____.",
+      "type": "Fill in the Blank",
+      "marks": 1,
+      "correctAnswer": "mitochondrion",
+      "explanation": "Mitochondria are membrane-bound cell organelles that generate most of the chemical energy needed to power the cell's biochemical reactions."
+    }
+  ]
+}
+`;
+const jsonExampleMatching = `
+{
+  "questions": [
+    {
+      "text": "Match the countries to their capitals.",
+      "type": "Matching",
+      "marks": 3,
+      "correctAnswer": [
+        { "a": "Japan", "b": "Tokyo" },
+        { "a": "Canada", "b": "Ottawa" },
+        { "a": "Australia", "b": "Canberra" }
+      ],
+      "explanation": "This tests knowledge of world geography and capital cities."
+    }
+  ]
+}
+`;
 
 const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean }) => {
     const questionType = form.watch('type');
@@ -197,6 +280,11 @@ export default function ManagePracticeSetQuestionsPage() {
     const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const importFileRef = useRef<HTMLInputElement>(null);
+    const [isImporting, setIsImporting] = useState(false);
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [jsonText, setJsonText] = useState('');
+
     const form = useForm<QuestionFormValues>({
         resolver: zodResolver(questionSchema),
         defaultValues: {
@@ -281,6 +369,78 @@ export default function ManagePracticeSetQuestionsPage() {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
         }
     }
+
+    const processJsonImport = async (jsonText: string) => {
+        try {
+            const json = JSON.parse(jsonText);
+            if (!json.questions || !Array.isArray(json.questions)) {
+                throw new Error("JSON must have a top-level 'questions' array.");
+            }
+            
+            // Basic validation for each question
+            for (const q of json.questions) {
+                const { success } = questionSchema.safeParse(q);
+                if (!success) {
+                    throw new Error(`A question in the JSON has an invalid structure.`);
+                }
+                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, q);
+            }
+            
+            toast({
+              title: 'Import Successful!',
+              description: `${json.questions.length} questions have been added.`,
+            });
+            fetchData();
+            setIsImportDialogOpen(false);
+            setJsonText('');
+          } catch (error) {
+            toast({
+              variant: 'destructive',
+              title: 'Import Failed',
+              description: (error as Error).message,
+            });
+          } finally {
+            setIsImporting(false);
+          }
+    }
+
+    const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (file.type !== 'application/json' && file.type !== 'text/plain') {
+          toast({
+            variant: 'destructive',
+            title: 'Invalid File Type',
+            description: 'Please upload a valid JSON or TXT file.',
+          });
+          return;
+        }
+
+        setIsImporting(true);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result as string;
+          processJsonImport(text);
+           if(importFileRef.current) {
+                importFileRef.current.value = '';
+            }
+        };
+        reader.readAsText(file);
+      };
+      
+      const handleBulkImportFromText = () => {
+        if (!jsonText.trim()) {
+             toast({
+                variant: "destructive",
+                title: 'Import Failed',
+                description: "Textbox cannot be empty."
+            });
+            return;
+        }
+        setIsImporting(true);
+        processJsonImport(jsonText);
+      }
     
     if (loading) return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
 
@@ -305,9 +465,77 @@ export default function ManagePracticeSetQuestionsPage() {
                         <CardTitle>Questions</CardTitle>
                         <CardDescription>Manage the questions for this practice set.</CardDescription>
                     </div>
-                    <Button size="sm" onClick={() => openQuestionDialog(null)}>
-                        <PlusCircle className="mr-2"/> Add Question
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button size="sm" onClick={() => openQuestionDialog(null)}>
+                            <PlusCircle className="mr-2"/> Add Question
+                        </Button>
+                        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="sm" variant="outline">
+                                    <FileJson className="mr-2"/> Bulk Import
+                                </Button>
+                            </DialogTrigger>
+                             <DialogContent className="sm:max-w-2xl">
+                                <DialogHeader>
+                                    <DialogTitle>Bulk Import Questions</DialogTitle>
+                                    <DialogDescription>
+                                        Upload a JSON file or paste JSON text containing an array of questions.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <Tabs defaultValue="upload" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2">
+                                        <TabsTrigger value="upload">Upload File</TabsTrigger>
+                                        <TabsTrigger value="paste">Paste JSON</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="upload">
+                                        <div className="py-4">
+                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                <Label htmlFor="json-import">JSON/TXT File</Label>
+                                                <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                                {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                            </div>
+                                        </div>
+                                    </TabsContent>
+                                    <TabsContent value="paste">
+                                        <div className="py-4 space-y-4">
+                                            <Textarea
+                                                placeholder='Paste your JSON content here...'
+                                                value={jsonText}
+                                                onChange={(e) => setJsonText(e.target.value)}
+                                                className="min-h-[200px] font-mono text-xs"
+                                                disabled={isImporting}
+                                            />
+                                            <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                                {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                            </Button>
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
+                                <Accordion type="single" collapsible className="w-full">
+                                    <AccordionItem value="item-1">
+                                        <AccordionTrigger>View JSON Format Examples</AccordionTrigger>
+                                        <AccordionContent>
+                                        <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
+                                        <Tabs defaultValue="mcq" className="w-full">
+                                            <TabsList className="h-auto flex-wrap justify-start">
+                                            <TabsTrigger value="mcq">MCQ</TabsTrigger>
+                                            <TabsTrigger value="tf">T/F</TabsTrigger>
+                                            <TabsTrigger value="sa">Short Answer</TabsTrigger>
+                                            <TabsTrigger value="fib">Fill in Blank</TabsTrigger>
+                                            <TabsTrigger value="matching">Matching</TabsTrigger>
+                                            </TabsList>
+                                            <TabsContent value="mcq"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre></TabsContent>
+                                            <TabsContent value="tf"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></TabsContent>
+                                            <TabsContent value="sa"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleSA}</pre></TabsContent>
+                                            <TabsContent value="fib"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleFIB}</pre></TabsContent>
+                                            <TabsContent value="matching"><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExampleMatching}</pre></TabsContent>
+                                        </Tabs>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {questions.length > 0 ? (
@@ -353,3 +581,5 @@ export default function ManagePracticeSetQuestionsPage() {
         </div>
     )
 }
+
+    
