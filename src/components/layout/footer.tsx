@@ -8,13 +8,13 @@ export function Footer() {
     <footer className="bg-secondary text-secondary-foreground">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4 md:col-span-2 flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="space-y-4 md:col-span-2">
             <DeshExamLogo />
             <p className="text-sm text-muted-foreground max-w-xs">
               Your ultimate destination for mock tests, quizzes, and personalized learning paths.
             </p>
           </div>
-          <div className="text-center md:text-left">
+          <div>
             <h4 className="font-headline font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link href="/mock-tests" className="text-sm hover:text-primary transition-colors">Mock Tests</Link></li>
@@ -23,10 +23,9 @@ export function Footer() {
               <li><Link href="/leaderboard" className="text-sm hover:text-primary transition-colors">Leaderboard</Link></li>
             </ul>
           </div>
-          <div className="text-center md:text-left">
+          <div>
             <h4 className="font-headline font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
-              <li><Link href="/about" className="text-sm hover:text-primary transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-sm hover:text-primary transition-colors">Contact Us</Link></li>
               <li><Link href="/faq" className="text-sm hover:text-primary transition-colors">FAQ</Link></li>
               <li><Link href="/terms" className="text-sm hover:text-primary transition-colors">Terms of Service</Link></li>
