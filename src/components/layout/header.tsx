@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -46,6 +46,7 @@ const dashboardNavItems = [
 const adminNavItems = [
     { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-5 w-5" /> },
     { href: '/admin/content', label: 'Content', icon: <FileText className="h-5 w-5" /> },
+    { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-5 w-5" /> },
     { href: '/admin/users', label: 'Users', icon: <Users className="h-5 w-5" /> },
     { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-5 w-5" /> },
     { href: '/admin/push-notification', label: 'Push Notification', icon: <Send className="h-5 w-5" />},
