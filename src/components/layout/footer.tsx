@@ -10,8 +10,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4 md:col-span-2">
             <DeshExamLogo />
-            <p className="text-sm text-muted-foreground max-w-xs">
-              Your ultimate destination for mock tests, quizzes, and personalized learning paths.
+            <p className="text-sm text-muted-foreground max-w-md">
+              DeshExam is your ultimate destination for mock tests, quizzes, and personalized learning paths. Our goal is to empower students across India to achieve their academic dreams by providing high-quality, accessible, and affordable exam preparation for NEET, JEE, UPSC, and more.
             </p>
           </div>
           <div>
