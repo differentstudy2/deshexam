@@ -357,11 +357,8 @@ export function Header() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="p-0">
-                    <SheetHeader className="p-4 border-b">
-                       <SheetTitle className="sr-only">Menu</SheetTitle>
-                        <Link href="/" onClick={() => setIsSheetOpen(false)}>
-                            <DeshExamLogo />
-                        </Link>
+                    <SheetHeader className="sr-only">
+                       <SheetTitle>Menu</SheetTitle>
                     </SheetHeader>
                     {isDashboardLayout ? (
                         pathname.startsWith('/admin') ? <AdminSidebar logOut={logOut} onLinkClick={() => setIsSheetOpen(false)} /> : <DashboardSidebar user={user} logOut={logOut} onLinkClick={() => setIsSheetOpen(false)} />
