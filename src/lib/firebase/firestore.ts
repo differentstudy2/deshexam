@@ -6,6 +6,22 @@ import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
+export type Order = {
+    orderId: string;
+    planName: string;
+    amount: number;
+    createdAt: string;
+    status: 'Success' | 'Failed';
+};
+
+export type EarningStats = {
+    totalRevenue: number;
+    totalUsers: number;
+    revenueToday: number;
+    salesTodayCount: number;
+    revenueThisMonth: number;
+};
+
 const generateUsername = async (displayName: string): Promise<string> => {
     const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 30);
     let username = baseUsername;
@@ -1473,6 +1489,65 @@ export const addFCMToken = async (token: string) => {
     }
 }
 
+export const getRecentOrders = async (count: number): Promise<Order[]> => {
+    try {
+        const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(count));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                orderId: data.orderId || doc.id,
+                planName: data.planName || 'N/A',
+                amount: data.amount || 0,
+                status: data.status || 'Success',
+                createdAt: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
+            } as Order;
+        });
+    } catch (error) {
+        console.error("Error fetching recent orders:", error);
+        throw new Error("Failed to fetch recent orders.");
+    }
+};
+
+export const getEarningStats = async (): Promise<EarningStats> => {
+    try {
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const ordersCollection = collection(db, "orders");
+        const usersCollection = collection(db, "users");
+
+        // Queries
+        const allOrdersQuery = query(ordersCollection, where("status", "==", "Success"));
+        const todayOrdersQuery = query(ordersCollection, where("status", "==", "Success"), where("createdAt", ">=", startOfToday));
+        const monthOrdersQuery = query(ordersCollection, where("status", "==", "Success"), where("createdAt", ">=", startOfMonth));
+        const usersCountSnapshot = await getCountFromServer(usersCollection);
+        
+        const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot] = await Promise.all([
+            getDocs(allOrdersQuery),
+            getDocs(todayOrdersQuery),
+            getDocs(monthOrdersQuery),
+        ]);
+
+        // Calculations
+        const totalRevenue = allOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const revenueToday = todayOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        
+        return {
+            totalRevenue,
+            revenueToday,
+            revenueThisMonth,
+            salesTodayCount: todayOrdersSnapshot.size,
+            totalUsers: usersCountSnapshot.data().count,
+        };
+
+    } catch (error) {
+        console.error("Error fetching earning stats:", error);
+        throw new Error("Failed to fetch earning statistics.");
+    }
+}
     
 
 
@@ -1488,6 +1563,7 @@ export const addFCMToken = async (token: string) => {
 
 
     
+
 
 
 

@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -18,24 +19,47 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DollarSign, BarChart, Users, ShoppingCart, Download } from 'lucide-react';
-
-const earningStats = [
-    { title: "Total Revenue", value: "₹45,231.89", description: "+20.1% from last month", icon: <DollarSign/> },
-    { title: "Subscriptions", value: "+2350", description: "+180.1% from last month", icon: <Users/> },
-    { title: "Sales Today", value: "+12,234", description: "+19% from last month", icon: <ShoppingCart/> },
-    { title: "Monthly Earnings", value: "₹15,340.50", description: "Your earnings this month", icon: <BarChart/> },
-];
-
-const recentSales = [
-    { orderId: "ORD001", plan: "Yearly Pass Pro", amount: "₹649.00", date: "2024-05-23", status: "Success" },
-    { orderId: "ORD002", plan: "Monthly Pass", amount: "₹299.00", date: "2024-05-23", status: "Success" },
-    { orderId: "ORD003", plan: "Yearly Pass", amount: "₹349.00", date: "2024-05-22", status: "Failed" },
-    { orderId: "ORD004", plan: "18 Months Pass Pro", amount: "₹799.00", date: "2024-05-22", status: "Success" },
-    { orderId: "ORD005", plan: "Monthly Pass Pro", amount: "₹599.00", date: "2024-05-21", status: "Success" },
-];
+import { DollarSign, BarChart, Users, ShoppingCart, Download, Loader2 } from 'lucide-react';
+import { getRecentOrders, getEarningStats, EarningStats, Order } from '@/lib/firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EarningPage() {
+    const [stats, setStats] = useState<EarningStats | null>(null);
+    const [recentSales, setRecentSales] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const [statsData, salesData] = await Promise.all([
+                    getEarningStats(),
+                    getRecentOrders(5)
+                ]);
+                setStats(statsData);
+                setRecentSales(salesData);
+            } catch (error) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error Fetching Earning Data',
+                    description: (error as Error).message,
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [toast]);
+
+    const statCards = [
+        { title: "Total Revenue", value: `₹${stats?.totalRevenue.toFixed(2) ?? '0.00'}`, description: ``, icon: <DollarSign/> },
+        { title: "Subscriptions", value: `${stats?.totalUsers ?? 0}`, description: "Total registered users", icon: <Users/> },
+        { title: "Sales Today", value: `₹${stats?.revenueToday.toFixed(2) ?? '0.00'}`, description: `from ${stats?.salesTodayCount ?? 0} sales`, icon: <ShoppingCart/> },
+        { title: "Monthly Earnings", value: `₹${stats?.revenueThisMonth.toFixed(2) ?? '0.00'}`, description: "Your earnings this month", icon: <BarChart/> },
+    ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -52,7 +76,7 @@ export default function EarningPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {earningStats.map((stat) => (
+        {statCards.map((stat) => (
             <Card key={stat.title}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -61,8 +85,17 @@ export default function EarningPage() {
                 <span className="text-muted-foreground">{stat.icon}</span>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">{stat.description}</p>
+                {loading ? (
+                    <>
+                        <Skeleton className="h-8 w-1/2 mb-2" />
+                        <Skeleton className="h-4 w-3/4" />
+                    </>
+                ) : (
+                    <>
+                        <div className="text-2xl font-bold">{stat.value}</div>
+                        <p className="text-xs text-muted-foreground">{stat.description}</p>
+                    </>
+                )}
               </CardContent>
             </Card>
           ))
@@ -75,6 +108,11 @@ export default function EarningPage() {
             <CardDescription>A list of the most recent sales.</CardDescription>
         </CardHeader>
         <CardContent>
+             {loading ? (
+                 <div className="flex items-center justify-center min-h-[200px]">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                 </div>
+           ) : (
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -89,9 +127,9 @@ export default function EarningPage() {
                     {recentSales.map((sale) => (
                         <TableRow key={sale.orderId}>
                             <TableCell className="font-mono">{sale.orderId}</TableCell>
-                            <TableCell>{sale.plan}</TableCell>
-                            <TableCell className="font-medium">{sale.amount}</TableCell>
-                            <TableCell>{sale.date}</TableCell>
+                            <TableCell>{sale.planName}</TableCell>
+                            <TableCell className="font-medium">₹{sale.amount.toFixed(2)}</TableCell>
+                            <TableCell>{sale.createdAt}</TableCell>
                             <TableCell className="text-right">
                                 <Badge variant={sale.status === 'Success' ? 'default' : 'destructive'}>
                                     {sale.status}
@@ -99,8 +137,14 @@ export default function EarningPage() {
                             </TableCell>
                         </TableRow>
                     ))}
+                     {recentSales.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={5} className="text-center h-24">No recent transactions found.</TableCell>
+                        </TableRow>
+                    )}
                 </TableBody>
             </Table>
+           )}
         </CardContent>
       </Card>
     </div>
