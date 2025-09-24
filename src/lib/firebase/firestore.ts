@@ -1518,28 +1518,30 @@ export const getEarningStats = async (): Promise<EarningStats> => {
         const ordersCollection = collection(db, "orders");
         const usersCollection = collection(db, "users");
 
-        // Queries
-        const allOrdersQuery = query(ordersCollection, where("status", "==", "Success"));
-        const todayOrdersQuery = query(ordersCollection, where("status", "==", "Success"), where("createdAt", ">=", startOfToday));
-        const monthOrdersQuery = query(ordersCollection, where("status", "==", "Success"), where("createdAt", ">=", startOfMonth));
-        const usersCountSnapshot = await getCountFromServer(usersCollection);
+        const allOrdersQuery = query(ordersCollection, orderBy("createdAt", "desc"));
         
-        const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot] = await Promise.all([
+        const [allOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersQuery),
-            getDocs(monthOrdersQuery),
+            getCountFromServer(usersCollection),
         ]);
 
-        // Calculations
-        const totalRevenue = allOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-        const revenueToday = todayOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const successfulOrders = allOrdersSnapshot.docs
+            .map(doc => doc.data())
+            .filter(data => data.status === 'Success');
+            
+        const totalRevenue = successfulOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
+        
+        const todayOrders = successfulOrders.filter(data => data.createdAt.toDate() >= startOfToday);
+        const revenueToday = todayOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
+        
+        const monthOrders = successfulOrders.filter(data => data.createdAt.toDate() >= startOfMonth);
+        const revenueThisMonth = monthOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
         
         return {
             totalRevenue,
             revenueToday,
             revenueThisMonth,
-            salesTodayCount: todayOrdersSnapshot.size,
+            salesTodayCount: todayOrders.length,
             totalUsers: usersCountSnapshot.data().count,
         };
 
@@ -1563,6 +1565,7 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
 
     
+
 
 
 
