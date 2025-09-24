@@ -311,20 +311,30 @@ function ReviewDisplay() {
 
                                 return (
                                     <div key={optIndex} className={cn(
-                                        "p-3 rounded-lg border",
-                                        isUserAnswer && !isCorrectAnswer && "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800",
-                                        isCorrectAnswer && "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                        "p-3 rounded-lg border flex items-start gap-3",
+                                        isCorrectAnswer 
+                                            ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                            : isUserAnswer 
+                                                ? "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                                : "bg-secondary/30"
                                     )}>
-                                        <div className="flex items-center">
-                                        <span className="font-medium">{option.text}</span>
-                                        {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
-                                        {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-2">Correct Answer</Badge>}
+                                        {isCorrectAnswer 
+                                            ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
+                                            : isUserAnswer 
+                                                ? <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
+                                                : <div className="w-5 h-5 mt-0.5 shrink-0" /> 
+                                        }
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-medium">{option.text}</span>
+                                                {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
+                                            </div>
+                                            {option.explanation && (
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {option.explanation}
+                                                </p>
+                                            )}
                                         </div>
-                                        {option.explanation && (
-                                            <p className="text-xs text-muted-foreground mt-1 pl-2 border-l-2 ml-1">
-                                                {option.explanation}
-                                            </p>
-                                        )}
                                     </div>
                                 )
                             })}
@@ -384,7 +394,7 @@ function ReviewDisplay() {
                                         const isPairCorrect = userMatchedB === pair.b;
                                         
                                         return (
-                                            <div key={pairIndex} className={cn("p-3 border rounded-lg", isPairCorrect ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20')}>
+                                            <div key={pairIndex} className={cn("p-3 border rounded-lg", isPairCorrect ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20')}>
                                                 <div className="flex items-center gap-2">
                                                     {isPairCorrect ? <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" /> : <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />}
                                                     <div className="flex flex-col items-center">
@@ -494,6 +504,7 @@ export default function TestReviewPage() {
     
 
     
+
 
 
 
