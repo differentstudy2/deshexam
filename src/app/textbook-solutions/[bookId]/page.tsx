@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Pencil } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -27,7 +27,6 @@ export default function TextbookSolutionsPage() {
 
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [solutions, setSolutions] = useState<{ [chapterId: string]: Solution[] }>({});
   const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
   const [loading, setLoading] = useState(true);
 
@@ -50,14 +49,9 @@ export default function TextbookSolutionsPage() {
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         setChapters(chaptersData);
 
-        const allSolutions: { [key: string]: Solution[] } = {};
         const allTopics: { [key: string]: Topic[] } = {};
 
         for (const chapter of chaptersData) {
-            const solutionsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/solutions`));
-            const solutionsSnap = await getDocs(solutionsQuery);
-            allSolutions[chapter.id] = solutionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Solution));
-            
             const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics`));
             const topicsSnap = await getDocs(topicsQuery);
             const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
@@ -71,7 +65,6 @@ export default function TextbookSolutionsPage() {
 
             allTopics[chapter.id] = topicsForChapter;
         }
-        setSolutions(allSolutions);
         setTopics(allTopics);
 
       } else {
@@ -84,14 +77,13 @@ export default function TextbookSolutionsPage() {
   }, [textbookId, router]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
-      const params = new URLSearchParams(searchParams);
+      const params = new URLSearchParams(searchParams.toString());
       params.set('chapter', chapterId);
       params.set('topic', topicId);
       router.push(`?${params.toString()}`, { scroll: false });
   };
   
   const selectedTopicContent = activeChapter && activeTopic ? topics[activeChapter]?.find(t => t.id === activeTopic) : null;
-  const selectedSolutionContent = activeChapter && activeTopic ? solutions[activeChapter]?.find(s => s.id === activeTopic) : null;
 
   if (loading) {
     return <div>Loading...</div>;
