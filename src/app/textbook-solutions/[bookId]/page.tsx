@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -13,13 +14,20 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import { useAuth } from '@/hooks/use-auth';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+type UserProfile = {
+  subscriptionPlan?: 'pass' | 'pro';
+};
 
 const TextbookContentSidebar = ({
   chapters,
@@ -28,6 +36,7 @@ const TextbookContentSidebar = ({
   activeTopic,
   onTopicSelect,
   onSheetClose,
+  userProfile,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
@@ -35,41 +44,85 @@ const TextbookContentSidebar = ({
   activeTopic: string | null;
   onTopicSelect: (chapterId: string, topicId: string) => void;
   onSheetClose?: () => void;
-}) => (
+  userProfile: UserProfile | null;
+}) => {
+    
+    const hasAccess = (chapter: Chapter) => {
+        if (chapter.access === 'free') return true;
+        if (!userProfile) return false;
+        if (chapter.access === 'pass' && (userProfile.subscriptionPlan === 'pass' || userProfile.subscriptionPlan === 'pro')) return true;
+        if (chapter.access === 'pro' && userProfile.subscriptionPlan === 'pro') return true;
+        return false;
+    }
+
+    const [openAccordion, setOpenAccordion] = useState<string | undefined>(activeChapter ? `item-${activeChapter}` : undefined);
+    
+    useEffect(() => {
+        setOpenAccordion(activeChapter ? `item-${activeChapter}` : undefined);
+    }, [activeChapter]);
+
+    return (
     <Card>
         <CardHeader>
             <CardTitle>Chapters</CardTitle>
         </CardHeader>
         <CardContent>
-            <Accordion type="single" collapsible defaultValue={activeChapter ? `item-${activeChapter}` : undefined}>
-            {chapters.map((chapter) => (
-                <AccordionItem value={`item-${chapter.id}`} key={chapter.id}>
-                <AccordionTrigger>{chapter.title}</AccordionTrigger>
-                <AccordionContent>
-                    <ul className="space-y-1">
-                        {(topics[chapter.id] || []).map(topic => (
-                            <li key={topic.id}>
-                                <Button
-                                    variant="ghost"
-                                    className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
-                                    onClick={() => {
-                                        onTopicSelect(chapter.id, topic.id);
-                                        onSheetClose?.();
-                                    }}
-                                >
-                                <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
-                                <span className="flex-grow">{topic.title}</span>
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </AccordionContent>
-                </AccordionItem>
-            ))}
+            <Accordion 
+                type="single" 
+                collapsible 
+                value={openAccordion}
+                onValueChange={(value) => setOpenAccordion(value)}
+            >
+            {chapters.map((chapter) => {
+                const canAccess = hasAccess(chapter);
+                return (
+                    <AccordionItem value={`item-${chapter.id}`} key={chapter.id} disabled={!canAccess}>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <AccordionTrigger 
+                                        className={!canAccess ? 'cursor-not-allowed text-muted-foreground' : ''}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            {!canAccess && <Lock className="w-4 h-4" />}
+                                            {chapter.title}
+                                        </span>
+                                    </AccordionTrigger>
+                                </TooltipTrigger>
+                                {!canAccess && (
+                                    <TooltipContent>
+                                        <p>Upgrade to {chapter.access === 'pro' ? 'Pass Pro' : 'Pass'} to access this chapter.</p>
+                                    </TooltipContent>
+                                )}
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <AccordionContent>
+                            <ul className="space-y-1">
+                                {(topics[chapter.id] || []).map(topic => (
+                                    <li key={topic.id}>
+                                        <Button
+                                            variant="ghost"
+                                            className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
+                                            onClick={() => {
+                                                onTopicSelect(chapter.id, topic.id);
+                                                onSheetClose?.();
+                                            }}
+                                        >
+                                        <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
+                                        <span className="flex-grow">{topic.title}</span>
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                )
+            })}
             </Accordion>
         </CardContent>
     </Card>
-);
+)};
 
 
 export default function TextbookSolutionsPage() {
@@ -77,7 +130,9 @@ export default function TextbookSolutionsPage() {
   const searchParams = useSearchParams();
   const textbookId = params.bookId as string;
   const router = useRouter();
-
+  const { user } = useAuth();
+  
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
@@ -94,6 +149,11 @@ export default function TextbookSolutionsPage() {
       setLoading(true);
       const textbookDocRef = doc(db, 'textbooks', textbookId);
       const textbookDocSnap = await getDoc(textbookDocRef);
+      
+      if (user) {
+          const profile = await getUserProfile(user.uid);
+          setUserProfile(profile);
+      }
 
       if (textbookDocSnap.exists()) {
         setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
@@ -128,7 +188,7 @@ export default function TextbookSolutionsPage() {
     };
 
     fetchTextbookData();
-  }, [textbookId, router]);
+  }, [textbookId, router, user]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -181,6 +241,7 @@ export default function TextbookSolutionsPage() {
                             activeTopic={activeTopic}
                             onTopicSelect={handleTopicSelect}
                             onSheetClose={() => setIsSheetOpen(false)}
+                            userProfile={userProfile}
                         />
                     </SheetContent>
                 </Sheet>
@@ -213,6 +274,7 @@ export default function TextbookSolutionsPage() {
             activeChapter={activeChapter}
             activeTopic={activeTopic}
             onTopicSelect={handleTopicSelect}
+            userProfile={userProfile}
           />
         </aside>
 

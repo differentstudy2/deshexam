@@ -18,6 +18,7 @@ export type Chapter = {
     title: string;
     content?: string;
     topics: Topic[];
+    access: 'free' | 'pass' | 'pro';
 };
 
 export type Topic = {

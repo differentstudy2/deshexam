@@ -22,12 +22,14 @@ import {
   query,
   updateDoc,
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ContentBadge } from '@/components/content-badge';
 
 export default function ManageChaptersPage() {
   const params = useParams();
@@ -35,7 +37,7 @@ export default function ManageChaptersPage() {
 
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [newChapter, setNewChapter] = useState({ title: '', content: '' });
+  const [newChapter, setNewChapter] = useState({ title: '', content: '', access: 'free' as 'free' | 'pass' | 'pro' });
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -82,7 +84,7 @@ export default function ManageChaptersPage() {
             const docRef = await addDoc(chaptersCollectionRef, newChapter);
             setChapters([...chapters, { id: docRef.id, ...newChapter, topics: [] }]);
         }
-        setNewChapter({ title: '', content: '' });
+        setNewChapter({ title: '', content: '', access: 'free' });
 
     } catch (error) {
       console.error('Error saving chapter: ', error);
@@ -91,12 +93,12 @@ export default function ManageChaptersPage() {
 
   const handleEditClick = (chapter: Chapter) => {
     setEditingChapter(chapter);
-    setNewChapter({ title: chapter.title, content: chapter.content || '' });
+    setNewChapter({ title: chapter.title, content: chapter.content || '', access: chapter.access || 'free' });
   };
   
   const handleCancelEdit = () => {
     setEditingChapter(null);
-    setNewChapter({ title: '', content: '' });
+    setNewChapter({ title: '', content: '', access: 'free' });
   }
 
   if (loading) {
@@ -158,6 +160,19 @@ export default function ManageChaptersPage() {
                 onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
                 />
             </div>
+             <div className="space-y-2">
+                <Label htmlFor="chapter-access">Access Level</Label>
+                 <Select value={newChapter.access} onValueChange={(value) => setNewChapter({...newChapter, access: value as 'free' | 'pass' | 'pro' })}>
+                    <SelectTrigger id="chapter-access">
+                        <SelectValue placeholder="Select access level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="free">Free</SelectItem>
+                        <SelectItem value="pass">Pass</SelectItem>
+                        <SelectItem value="pro">Pass Pro</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
              <div className="flex gap-2">
               <Button onClick={handleAddOrUpdateChapter}>
                 {editingChapter ? 'Update Chapter' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Chapter</>}
@@ -184,7 +199,10 @@ export default function ManageChaptersPage() {
                     key={chapter.id}
                     className="flex items-center justify-between rounded-md border p-3 gap-2"
                   >
-                    <span className="truncate pr-2">{chapter.title}</span>
+                    <div className="flex items-center gap-2">
+                        <ContentBadge type={chapter.access || 'free'} />
+                        <span className="truncate pr-2">{chapter.title}</span>
+                    </div>
                     <div className="flex-shrink-0 flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)}>
                             <Edit className="h-3 w-3 mr-1"/>
