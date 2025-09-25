@@ -591,6 +591,58 @@ export default function CreateTestPage() {
   const handleFormSubmit = async (data: FormValues, resetType: 'full' | 'partial') => {
     try {
       let contentToSave: any;
+      let subjectName = data.subject;
+      let subjectId = subjects.find(s => s.name === data.subject)?.id;
+      if(data.subject === 'add_new_subject' && data.newSubject) {
+        const newSubId = await addSubject(data.newSubject);
+        subjectName = data.newSubject;
+        subjectId = newSubId;
+        setIsAddingNewSubject(false);
+      }
+      
+      let boardName = data.board;
+      if(data.board === 'add_new_board' && data.newBoard) {
+        await addBoard(data.newBoard);
+        boardName = data.newBoard;
+        setIsAddingNewBoard(false);
+      }
+      
+      let className = data.class;
+      if(data.class === 'add_new_class' && data.newClass) {
+        await addClass(data.newClass);
+        className = data.newClass;
+        setIsAddingNewClass(false);
+      }
+      
+      let stateName = data.state;
+      if(data.state === 'add_new_state' && data.newState) {
+          await addState(data.newState);
+          stateName = data.newState;
+          setIsAddingNewState(false);
+      }
+
+      let examCategoryName = data.examCategory;
+      let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
+      if(data.examCategory === 'add_new_exam_category' && data.newExamCategory) {
+        const newExamCatId = await addExamType(data.newExamCategory);
+        examCategoryName = data.newExamCategory;
+        examCategoryId = newExamCatId;
+        setIsAddingNewExamCategory(false);
+      }
+      
+      let examName = data.exam;
+      if(data.exam === 'add_new_exam' && data.newExam && examCategoryId) {
+        await addExam(examCategoryId, { name: data.newExam });
+        examName = data.newExam;
+        setIsAddingNewExam(false);
+      }
+
+      let chapterName = data.chapter;
+      if (data.chapter === 'add_new_chapter' && data.newChapterName && subjectId) {
+        await addChapter(subjectId, { chapterName: data.newChapterName });
+        chapterName = data.newChapterName;
+        setIsAddingNewChapter(false);
+      }
 
       if (data.testType === 'Learn') {
         contentToSave = {
@@ -600,60 +652,23 @@ export default function CreateTestPage() {
           testType: data.testType,
           createdAt: data.publishedAt || new Date(),
         };
+      } else if (data.testType === 'Textbook') {
+         contentToSave = {
+          title: data.title,
+          description: data.description,
+          featureImage: data.featureImage,
+          board: boardName,
+          classCategory: data.classCategory,
+          class: className,
+          subject: subjectName,
+          examCategory: examCategoryName,
+          exam: examName,
+          state: stateName,
+          school: data.school,
+          semester: data.semester,
+          testType: 'Textbook',
+        };
       } else {
-        let subjectName = data.subject;
-        let subjectId = subjects.find(s => s.name === data.subject)?.id;
-        if(data.subject === 'add_new_subject' && data.newSubject) {
-          const newSubId = await addSubject(data.newSubject);
-          subjectName = data.newSubject;
-          subjectId = newSubId;
-          setIsAddingNewSubject(false);
-        }
-        
-        let boardName = data.board;
-        if(data.board === 'add_new_board' && data.newBoard) {
-          await addBoard(data.newBoard);
-          boardName = data.newBoard;
-          setIsAddingNewBoard(false);
-        }
-        
-        let className = data.class;
-        if(data.class === 'add_new_class' && data.newClass) {
-          await addClass(data.newClass);
-          className = data.newClass;
-          setIsAddingNewClass(false);
-        }
-        
-        let stateName = data.state;
-        if(data.state === 'add_new_state' && data.newState) {
-            await addState(data.newState);
-            stateName = data.newState;
-            setIsAddingNewState(false);
-        }
-
-        let examCategoryName = data.examCategory;
-        let examCategoryId = examCategories.find(e => e.name === data.examCategory)?.id;
-        if(data.examCategory === 'add_new_exam_category' && data.newExamCategory) {
-          const newExamCatId = await addExamType(data.newExamCategory);
-          examCategoryName = data.newExamCategory;
-          examCategoryId = newExamCatId;
-          setIsAddingNewExamCategory(false);
-        }
-        
-        let examName = data.exam;
-        if(data.exam === 'add_new_exam' && data.newExam && examCategoryId) {
-          await addExam(examCategoryId, { name: data.newExam });
-          examName = data.newExam;
-          setIsAddingNewExam(false);
-        }
-
-        let chapterName = data.chapter;
-        if (data.chapter === 'add_new_chapter' && data.newChapterName && subjectId) {
-          await addChapter(subjectId, { chapterName: data.newChapterName });
-          chapterName = data.newChapterName;
-          setIsAddingNewChapter(false);
-        }
-        
         // Process matching questions
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
@@ -1754,6 +1769,7 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
 
 
 
