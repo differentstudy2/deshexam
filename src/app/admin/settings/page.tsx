@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -605,6 +605,7 @@ export default function AdminSettingsPage() {
         { id: 'api', label: 'API Keys', icon: KeyRound },
         { id: 'users', label: 'User Management', icon: Users },
         { id: 'plans', label: 'Plans & Pricing', icon: DollarSign },
+        { id: 'textbooks', label: 'Textbooks', icon: Book },
         { id: 'metafields', label: 'Content Metafields', icon: LayoutTemplate },
         { id: 'questionTypes', label: 'Question Types', icon: Type },
         { id: 'content', label: 'Content Details', icon: Library },
@@ -776,6 +777,20 @@ export default function AdminSettingsPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-muted-foreground">Pricing management UI will be built here.</p>
+                        </CardContent>
+                    </Card>
+                )}
+                
+                {activeTab === 'textbooks' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Textbook Settings</CardTitle>
+                            <CardDescription>
+                                Global settings for textbook solutions and content.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground">Textbook settings UI will be built here.</p>
                         </CardContent>
                     </Card>
                 )}
