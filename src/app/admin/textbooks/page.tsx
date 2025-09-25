@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { db } from '@/lib/firebase/client';
 import { deleteTextbook } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
-import { Book, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
@@ -23,6 +22,77 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+
+
+const TextbookStats = ({ textbookId }: { textbookId: string }) => {
+    const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            let chapterCount = 0;
+            let topicCount = 0;
+            let practiceSetCount = 0;
+            
+            const chaptersRef = collection(db, 'textbooks', textbookId, 'chapters');
+            const chaptersSnapshot = await getDocs(chaptersRef);
+            chapterCount = chaptersSnapshot.size;
+
+            for (const chapterDoc of chaptersSnapshot.docs) {
+                const topicsRef = collection(chapterDoc.ref, "topics");
+                const topicsSnapshot = await getDocs(topicsRef);
+                topicCount += topicsSnapshot.size;
+
+                 for (const topicDoc of topicsSnapshot.docs) {
+                    const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
+                    const practiceSetsSnapshot = await getDocs(practiceSetsRef);
+                    practiceSetCount += practiceSetsSnapshot.size;
+                }
+            }
+            setStats({ chapterCount, topicCount, practiceSetCount });
+            setLoading(false);
+        };
+        fetchStats();
+    }, [textbookId]);
+
+    if (loading) {
+        return (
+            <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
+                <div className="flex flex-col items-center gap-1">
+                    <Layers className="h-4 w-4" />
+                    <span>... Chapters</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                    <FileText className="h-4 w-4" />
+                    <span>... Topics</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                    <CheckSquare className="h-4 w-4" />
+                    <span>... Sets</span>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
+            <div className="flex flex-col items-center gap-1">
+                <Layers className="h-4 w-4" />
+                <span>{stats.chapterCount} Chapters</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+                <FileText className="h-4 w-4" />
+                <span>{stats.topicCount} Topics</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+                <CheckSquare className="h-4 w-4" />
+                <span>{stats.practiceSetCount} Sets</span>
+            </div>
+        </div>
+    );
+};
+
 
 export default function ManageTextbooksPage() {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
@@ -31,8 +101,7 @@ export default function ManageTextbooksPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchTextbooks = async () => {
+  const fetchTextbooks = async () => {
       setLoading(true);
       const textbooksCollectionRef = collection(db, 'textbooks');
       const querySnapshot = await getDocs(textbooksCollectionRef);
@@ -43,6 +112,7 @@ export default function ManageTextbooksPage() {
       setLoading(false);
     };
 
+  useEffect(() => {
     fetchTextbooks();
   }, []);
 
@@ -55,11 +125,11 @@ export default function ManageTextbooksPage() {
     setIsDeleting(true);
     try {
       await deleteTextbook(textbookToDelete.id);
-      setTextbooks(textbooks.filter(book => book.id !== textbookToDelete.id));
       toast({
         title: "Textbook Deleted",
         description: `"${textbookToDelete.title}" and all its content have been removed.`,
       });
+      fetchTextbooks(); // Refetch the list
     } catch (error) {
        toast({
         variant: "destructive",
@@ -104,9 +174,11 @@ export default function ManageTextbooksPage() {
                 className="w-full h-48 object-cover rounded-t-lg"
                />
             </CardHeader>
-            <CardContent className="flex-grow p-4">
-              <h3 className="font-bold text-lg flex items-center gap-2"><Book /> {book.title}</h3>
+            <CardContent className="flex-grow p-4 flex flex-col">
+              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow"><Book /> {book.title}</h3>
+              {book.board && <Badge variant="outline">{book.board}</Badge>}
               <p className="text-sm text-muted-foreground mt-2">{book.description}</p>
+              <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardFooter className="flex flex-col gap-2 p-4">
                 <Button asChild className="w-full">
