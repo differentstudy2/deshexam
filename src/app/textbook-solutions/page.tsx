@@ -141,13 +141,12 @@ export default function TextbookSolutionsListPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
-            <div className="overflow-hidden h-48">
+            <div className="relative w-full aspect-video overflow-hidden">
                 <Image
                     src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
                     alt={book.title}
-                    width={400}
-                    height={300}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
             </div>
             <CardContent className="p-4 flex-grow flex flex-col">
