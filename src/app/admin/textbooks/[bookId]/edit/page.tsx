@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -33,6 +32,10 @@ import {
   getClasses,
   getGradesByClass,
   uploadFile,
+  getBoards,
+  getStates,
+  getExamTypes,
+  getExamsByCategory,
 } from '@/lib/firebase/firestore';
 import { Loader2, Save, Upload, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
@@ -56,12 +59,22 @@ const formSchema = z.object({
   classCategory: z.string().optional(),
   class: z.string().optional(),
   featureImage: z.string().optional(),
+  board: z.string().optional(),
+  state: z.string().optional(),
+  examCategory: z.string().optional(),
+  exam: z.string().optional(),
+  school: z.string().optional(),
+  semester: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 type Subject = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
 type Grade = { id: string, name: string };
+type Board = { id: string, name: string };
+type State = { id: string, name: string };
+type ExamType = { id: string, name: string };
+type Exam = { id: string, name: string };
 
 const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlChange: (url: string) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -158,6 +171,10 @@ export default function EditContentPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [states, setStates] = useState<State[]>([]);
+  const [examCategories, setExamCategories] = useState<ExamType[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -168,10 +185,17 @@ export default function EditContentPage() {
       classCategory: '',
       class: '',
       featureImage: '',
+      board: '',
+      state: '',
+      examCategory: '',
+      exam: '',
+      school: '',
+      semester: '',
     },
   });
   
   const selectedClassCategory = form.watch('classCategory');
+  const selectedExamCategory = form.watch('examCategory');
 
   useEffect(() => {
     const fetchDependentData = async () => {
@@ -186,25 +210,46 @@ export default function EditContentPage() {
   }, [selectedClassCategory]);
 
   useEffect(() => {
+    const fetchDependentData = async () => {
+        if (selectedExamCategory) {
+            const fetchedExams = await getExamsByCategory(selectedExamCategory);
+            setExams(fetchedExams);
+        } else {
+            setExams([]);
+        }
+    };
+    fetchDependentData();
+  }, [selectedExamCategory]);
+
+  useEffect(() => {
     const fetchContent = async () => {
       if (!contentId) return;
       try {
         setLoading(true);
-        const [contentData, subjectData, classData] = await Promise.all([
+        const [contentData, subjectData, classData, boardData, stateData, examTypeData] = await Promise.all([
           getContentById(contentId),
           getSubjects(),
           getClasses(),
+          getBoards(),
+          getStates(),
+          getExamTypes(),
         ]);
 
         setSubjects(subjectData);
         setClassCategories(classData);
+        setBoards(boardData);
+        setStates(stateData);
+        setExamCategories(examTypeData);
 
         if (contentData) {
           form.reset(contentData as FormValues);
-          // If a class category is already set, fetch its grades
-          if(contentData.classCategory) {
-              const initialGrades = await getGradesByClass(contentData.classCategory);
-              setGrades(initialGrades);
+          if (contentData.classCategory) {
+            const initialGrades = await getGradesByClass(contentData.classCategory);
+            setGrades(initialGrades);
+          }
+          if (contentData.examCategory) {
+            const initialExams = await getExamsByCategory(contentData.examCategory);
+            setExams(initialExams);
           }
         } else {
           throw new Error("Textbook not found");
@@ -294,6 +339,57 @@ export default function EditContentPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <FormField
                     control={form.control}
+                    name="board"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Board</FormLabel>
+                             <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a board" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {boards.map((b) => (
+                                    <SelectItem key={b.id} value={b.name}>
+                                    {b.name}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>State</FormLabel>
+                             <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a state" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {states.map((s) => (
+                                    <SelectItem key={s.id} value={s.name}>
+                                    {s.name}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField
+                    control={form.control}
                     name="subject"
                     render={({ field }) => (
                         <FormItem>
@@ -367,6 +463,87 @@ export default function EditContentPage() {
                     />
                 </div>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="examCategory"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Exam Category</FormLabel>
+                            <Select onValueChange={(value) => { field.onChange(value); form.setValue('exam', ''); }} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an exam category" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {examCategories.map((ec) => (
+                                    <SelectItem key={ec.id} value={ec.name}>
+                                    {ec.name}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="exam"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Exam</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={!selectedExamCategory}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an exam" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {exams.map((e) => (
+                                    <SelectItem key={e.id} value={e.name}>
+                                    {e.name}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+              </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField
+                    control={form.control}
+                    name="school"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>School/College (Optional)</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., St. Stephen's College" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="semester"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Semester (Optional)</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., 3rd Semester" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+               </div>
+
 
                <FormField
                     control={form.control}
