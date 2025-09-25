@@ -185,12 +185,12 @@ export default function ManageTextbooksPage() {
                     <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
                 </Button>
                 <div className="flex gap-2 w-full">
-                    <Button asChild variant="outline" className="w-full">
+                    <Button asChild className="w-full">
                         <Link href={`/textbook-solutions/${book.id}`} target="_blank">
                             <Eye className="mr-2 h-4 w-4" /> View
                         </Link>
                     </Button>
-                    <Button asChild variant="outline" className="w-full">
+                    <Button asChild className="w-full">
                         <Link href={`/admin/textbooks/${book.id}/edit`}>
                             <Edit className="mr-2 h-4 w-4" /> Edit
                         </Link>
@@ -232,3 +232,5 @@ export default function ManageTextbooksPage() {
     </div>
   );
 }
+
+    
