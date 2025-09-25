@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { Book, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 export default function TextbookSolutionsListPage() {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
@@ -45,7 +45,7 @@ export default function TextbookSolutionsListPage() {
       </header>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
-          <Card key={book.id} className="overflow-hidden">
+          <Card key={book.id} className="overflow-hidden flex flex-col">
             <CardHeader className="p-0">
                 <Image
                     src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
@@ -55,8 +55,12 @@ export default function TextbookSolutionsListPage() {
                     className="w-full h-48 object-cover"
                 />
             </CardHeader>
-            <CardContent className="p-4">
+            <CardContent className="p-4 flex-grow">
               <h3 className="font-bold text-lg flex items-center gap-2"><Book /> {book.title}</h3>
+              <div className="flex flex-wrap gap-2 mt-2">
+                  {book.subject && <Badge variant="secondary">{book.subject}</Badge>}
+                  {book.class && <Badge variant="secondary">{book.class}</Badge>}
+              </div>
               <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{book.description}</p>
             </CardContent>
             <CardContent className="p-4 pt-0">
