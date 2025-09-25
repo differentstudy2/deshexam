@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -50,7 +50,11 @@ import {
     getExamsByCategory,
     addExam,
     updateExam,
-    deleteExam
+    deleteExam,
+    getGradesByClass,
+    addGradeToClass,
+    updateGradeInClass,
+    deleteGradeFromClass
 } from '@/lib/firebase/firestore';
 import {
   AlertDialog,
@@ -286,6 +290,7 @@ const DependentMetafieldManager = ({
     };
     
     const isChapter = childTitle === 'Chapters';
+    const isGrade = childTitle === 'Grades';
 
     const getFullItemName = (item: MetafieldItem) => {
         return isChapter ? `${item.chapterNo}. ${item.chapterName}` : item.name!;
@@ -588,6 +593,13 @@ export default function AdminSettingsPage() {
     const examHandlers = {
         onAdd: addExam, onUpdate: updateExam, onDelete: deleteExam,
     };
+    
+    const gradeHandlers = {
+        fetchChildren: getGradesByClass,
+        onAdd: addGradeToClass,
+        onUpdate: updateGradeInClass,
+        onDelete: deleteGradeFromClass,
+    }
 
     const settingTabs = [
         { id: 'general', label: 'General', icon: Settings },
@@ -887,7 +899,7 @@ export default function AdminSettingsPage() {
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-center justify-between">
                                                 <div className="space-y-0.5">
-                                                    <FormLabel className="text-base">Classes</FormLabel>
+                                                    <FormLabel className="text-base">Class Categories</FormLabel>
                                                 </div>
                                                 <FormControl>
                                                     <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -903,6 +915,28 @@ export default function AdminSettingsPage() {
                                         onAdd={classHandlers.onAdd}
                                         onUpdate={classHandlers.onUpdate}
                                         onDelete={classHandlers.onDelete}
+                                        defaultValue={form.watch('defaultClass')}
+                                        onSetDefault={(value) => form.setValue('defaultClass', value)}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <FormLabel className="text-base flex items-center gap-2">
+                                        <GraduationCap /> Grades
+                                    </FormLabel>
+                                    <FormDescription>Manage grades within each class category (e.g., "First Grade" inside "Primary").</FormDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <DependentMetafieldManager
+                                        parentTitle="Class Categories"
+                                        childTitle="Grades"
+                                        parentItems={classes}
+                                        fetchChildren={gradeHandlers.fetchChildren}
+                                        onAdd={gradeHandlers.onAdd}
+                                        onUpdate={gradeHandlers.onUpdate}
+                                        onDelete={gradeHandlers.onDelete}
                                         defaultValue={form.watch('defaultClass')}
                                         onSetDefault={(value) => form.setValue('defaultClass', value)}
                                     />
@@ -1221,3 +1255,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+

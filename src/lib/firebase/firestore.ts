@@ -7,6 +7,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -886,6 +887,40 @@ export const deleteClass = async (id: string) => {
     } catch (e) {
         console.error("Error deleting class: ", e);
         throw new Error("Failed to delete class.");
+    }
+};
+
+export const addGradeToClass = async (classId: string, gradeData: { name: string }) => {
+    if (!classId || !gradeData.name) {
+        throw new Error("Class ID and Grade Name are required.");
+    }
+    try {
+        const gradesRef = collection(db, `classes/${classId}/grades`);
+        const docRef = await addDoc(gradesRef, gradeData);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding grade: ", e);
+        throw new Error("Failed to add grade.");
+    }
+};
+
+export const updateGradeInClass = async (classId: string, gradeId: string, data: { name: string }) => {
+    if (!classId || !gradeId || !data) throw new Error("IDs and data are required.");
+    try {
+        await updateDoc(doc(db, `classes/${classId}/grades`, gradeId), data);
+    } catch (e) {
+        console.error("Error updating grade: ", e);
+        throw new Error("Failed to update grade.");
+    }
+};
+
+export const deleteGradeFromClass = async (classId: string, gradeId: string) => {
+    if (!classId || !gradeId) throw new Error("IDs are required.");
+    try {
+        await deleteDoc(doc(db, `classes/${classId}/grades`, gradeId));
+    } catch (e) {
+        console.error("Error deleting grade: ", e);
+        throw new Error("Failed to delete grade.");
     }
 };
 
@@ -1812,3 +1847,4 @@ export const deleteTextbook = async (textbookId: string) => {
         throw new Error("Failed to delete textbook completely.");
     }
 };
+
