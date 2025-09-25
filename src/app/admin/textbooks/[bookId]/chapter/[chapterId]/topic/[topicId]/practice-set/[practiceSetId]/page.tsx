@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { PracticeSet, Question, Topic } from '@/lib/types';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';

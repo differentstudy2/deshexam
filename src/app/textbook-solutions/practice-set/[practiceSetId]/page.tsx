@@ -89,12 +89,15 @@ export default function PracticeSetPage() {
 
         // Shuffle columnB for matching questions
         questionsData = questionsData.map(q => {
-            if (q.type === 'Matching' && q.matchingOptions) {
+            if (q.type === 'Matching' && q.correctAnswer) {
+                const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
                 return {
                     ...q,
                     matchingOptions: {
-                        ...q.matchingOptions,
-                        columnB: shuffleArray(q.matchingOptions.columnB)
+                        columnA,
+                        columnB: shuffleArray(columnB)
                     }
                 }
             }
@@ -333,7 +336,7 @@ export default function PracticeSetPage() {
                       <Label htmlFor={`${question.id}-false`}>False</Label>
                     </div>
                 </RadioGroup>
-              ) : question.type === 'Short Answer' ? (
+              ) : (question.type === 'Short Answer' || question.type === 'Fill in the Blank') ? (
                 <Input 
                   placeholder="Your answer..."
                   onChange={(e) => handleAnswerChange(question.id, e.target.value)}
@@ -397,5 +400,3 @@ export default function PracticeSetPage() {
     </div>
   );
 }
-
-    
