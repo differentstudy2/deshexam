@@ -48,10 +48,18 @@ const TextbookContentSidebar = ({
 }) => {
     
     const hasAccess = (chapter: Chapter) => {
-        if (chapter.access === 'free') return true;
-        if (!userProfile) return false;
-        if (chapter.access === 'pass' && (userProfile.subscriptionPlan === 'pass' || userProfile.subscriptionPlan === 'pro')) return true;
-        if (chapter.access === 'pro' && userProfile.subscriptionPlan === 'pro') return true;
+        if (chapter.access === 'free') {
+            return true;
+        }
+        if (!userProfile) {
+            return false;
+        }
+        if (chapter.access === 'pro') {
+            return userProfile.subscriptionPlan === 'pro';
+        }
+        if (chapter.access === 'pass') {
+            return userProfile.subscriptionPlan === 'pass' || userProfile.subscriptionPlan === 'pro';
+        }
         return false;
     }
 
@@ -247,7 +255,7 @@ export default function TextbookSolutionsPage() {
                 </Sheet>
             </div>
        </div>
-      <header className="mb-8 flex flex-col items-center gap-6 rounded-lg bg-card p-6">
+      <header className="mb-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 rounded-lg bg-card p-6">
         <Image 
             src={textbook.featureImage || "https://picsum.photos/seed/bookcover/200/280"}
             alt={textbook.title}
@@ -255,10 +263,10 @@ export default function TextbookSolutionsPage() {
             height={210}
             className="rounded-md shadow-lg object-cover w-36 md:w-40 flex-shrink-0"
         />
-        <div className="text-center">
+        <div className="text-center md:text-left">
             <h1 className="font-headline text-3xl md:text-4xl font-bold">{textbook.title} Solutions</h1>
             <p className="mt-2 text-lg text-muted-foreground">{textbook.description}</p>
-            <div className="mt-4 flex justify-center flex-wrap gap-2">
+            <div className="mt-4 flex justify-center md:justify-start flex-wrap gap-2">
                 <Badge variant="secondary">{textbook.subject}</Badge>
                 <Badge variant="secondary">{textbook.class}</Badge>
                 {textbook.board && <Badge variant="outline">{textbook.board}</Badge>}
