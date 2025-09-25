@@ -11,16 +11,18 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, RefreshCw, Download } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle, XCircle, RefreshCw, Download, GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Progress } from '@/components/ui/progress';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 
 type UserAnswer = {
   questionId: string;
-  answer: string;
+  answer: any;
 };
 
 type Result = {
@@ -29,12 +31,14 @@ type Result = {
     percentage: number;
     results: Array<{
         question: Question;
-        userAnswer: string;
+        userAnswer: any;
         isCorrect: boolean;
+        matchingScore?: number;
     }>
 }
 
 const shuffleArray = (array: any[]) => {
+  if (!array) return [];
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -77,10 +81,26 @@ export default function PracticeSetPage() {
       const practiceSetSnap = await getDoc(practiceSetDocRef);
 
       if (practiceSetSnap.exists()) {
-        setPracticeSet({ id: practiceSetSnap.id, ...practiceSetSnap.data() } as PracticeSet);
+        const psData = { id: practiceSetSnap.id, ...practiceSetSnap.data() } as PracticeSet
+        setPracticeSet(psData);
         const questionsQuery = query(collection(practiceSetDocRef, 'questions'));
         const questionsSnap = await getDocs(questionsQuery);
-        const questionsData = questionsSnap.docs.map(qDoc => ({ id: qDoc.id, ...qDoc.data() } as Question));
+        let questionsData = questionsSnap.docs.map(qDoc => ({ id: qDoc.id, ...qDoc.data() } as Question));
+
+        // Shuffle columnB for matching questions
+        questionsData = questionsData.map(q => {
+            if (q.type === 'Matching' && q.matchingOptions) {
+                return {
+                    ...q,
+                    matchingOptions: {
+                        ...q.matchingOptions,
+                        columnB: shuffleArray(q.matchingOptions.columnB)
+                    }
+                }
+            }
+            return q;
+        });
+
         setQuestions(shuffleArray(questionsData));
       }
       setLoading(false);
@@ -89,12 +109,18 @@ export default function PracticeSetPage() {
     fetchPracticeSet();
   }, [practiceSetId, textbookId, chapterId, topicId]);
 
-  const handleAnswerChange = (questionId: string, answer: string) => {
+  const handleAnswerChange = (questionId: string, answer: any) => {
     setUserAnswers(prevAnswers => {
       const otherAnswers = prevAnswers.filter(a => a.questionId !== questionId);
       return [...otherAnswers, { questionId, answer }];
     });
   };
+
+  const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
+    const currentAnswer = userAnswers.find(a => a.questionId === questionId)?.answer || {};
+    const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
+    handleAnswerChange(questionId, newAnswer);
+  }
 
   const handleSubmit = () => {
     let score = 0;
@@ -102,12 +128,28 @@ export default function PracticeSetPage() {
     
     const results = questions.map(question => {
         const userAnswerObj = userAnswers.find(a => a.questionId === question.id);
-        const userAnswer = userAnswerObj ? userAnswerObj.answer : "";
-        const isCorrect = userAnswer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim();
-        if (isCorrect) {
-            score += question.marks;
+        const userAnswer = userAnswerObj ? userAnswerObj.answer : null;
+        let isCorrect = false;
+        let matchingScore = 0;
+
+        if (question.type === 'Matching') {
+            if (userAnswer && Array.isArray(question.correctAnswer)) {
+                for(const pair of question.correctAnswer) {
+                    if (userAnswer[pair.a] === pair.b) {
+                        matchingScore++;
+                    }
+                }
+                isCorrect = matchingScore === question.correctAnswer.length;
+            }
+            if(isCorrect) score += question.marks;
+        } else {
+             isCorrect = userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim();
+            if (isCorrect) {
+                score += question.marks;
+            }
         }
-        return { question, userAnswer, isCorrect };
+        
+        return { question, userAnswer, isCorrect, matchingScore };
     });
 
     const percentage = totalMarks > 0 ? (score / totalMarks) * 100 : 0;
@@ -136,10 +178,14 @@ export default function PracticeSetPage() {
       const canvasHeight = canvas.height;
       const ratio = canvasWidth / canvasHeight;
       const width = pdfWidth;
-      const height = width / ratio;
+      let height = width / ratio;
 
+      if(height > pdfHeight){
+        height = pdfHeight;
+      }
+      
       let position = 0;
-      let heightLeft = height;
+      let heightLeft = canvasHeight * (pdfWidth / canvasWidth);
       
       pdf.addImage(imgData, 'PNG', 0, position, width, height);
       heightLeft -= pdfHeight;
@@ -192,14 +238,43 @@ export default function PracticeSetPage() {
                 </div>
             </CardHeader>
             <CardContent className="space-y-8">
-                {result.results.map(({ question, userAnswer, isCorrect }, index) => (
+                {result.results.map(({ question, userAnswer, isCorrect, matchingScore }, index) => (
                     <div key={question.id} className={`space-y-4 border rounded-lg p-4 ${isCorrect ? 'border-green-300 bg-green-50/50' : 'border-red-300 bg-red-50/50'}`}>
                         <div className="flex justify-between items-start">
                             <p className="font-semibold">{index + 1}. {question.text}</p>
-                            {isCorrect ? <CheckCircle className="h-5 w-5 text-green-600"/> : <XCircle className="h-5 w-5 text-red-600"/>}
+                             {question.type === 'Matching' ? (
+                                <span className="font-semibold text-sm">{matchingScore}/{question.correctAnswer.length}</span>
+                            ) : isCorrect ? (
+                                <CheckCircle className="h-5 w-5 text-green-600"/>
+                            ) : (
+                                <XCircle className="h-5 w-5 text-red-600"/>
+                            )}
                         </div>
-                        <p className={`text-sm ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>Your Answer: <span className="font-medium">{userAnswer || "No answer"}</span></p>
-                        {!isCorrect && <p className="text-sm text-primary">Correct Answer: <span className="font-medium">{question.correctAnswer}</span></p>}
+                        
+                         {question.type === 'Matching' ? (
+                            <div className="space-y-2">
+                               {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: any, pairIndex) => {
+                                   const userMatchedB = userAnswer?.[pair.a];
+                                   const isPairCorrect = userMatchedB === pair.b;
+                                   return (
+                                        <div key={pairIndex} className={`p-2 border rounded-md ${isPairCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <span className="font-medium">{pair.a}</span>
+                                                <span>-</span>
+                                                <span className={!isPairCorrect ? 'line-through' : ''}>{userMatchedB || "Not answered"}</span>
+                                                {!isPairCorrect && <span className="font-bold text-green-700">{pair.b}</span>}
+                                            </div>
+                                        </div>
+                                   )
+                               })}
+                           </div>
+                         ) : (
+                            <>
+                                <p className={`text-sm ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>Your Answer: <span className="font-medium">{userAnswer || "No answer"}</span></p>
+                                {!isCorrect && <p className="text-sm text-primary">Correct Answer: <span className="font-medium">{question.correctAnswer}</span></p>}
+                            </>
+                         )}
+
                         {question.explanation && <p className="text-sm text-muted-foreground bg-secondary/50 p-2 rounded-md">Explanation: {question.explanation}</p>}
                     </div>
                 ))}
@@ -252,6 +327,40 @@ export default function PracticeSetPage() {
                   placeholder="Your answer..."
                   onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                 />
+               ) : question.type === 'Matching' && question.matchingOptions ? (
+                  <div className="space-y-4">
+                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                            <div className="font-bold text-center">Column A</div>
+                            <div></div>
+                            <div className="font-bold text-center">Column B</div>
+                        </div>
+                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                <div className="p-3 border rounded-md text-center bg-secondary">
+                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                    {itemA.text}
+                                </div>
+                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                <Select 
+                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a match" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                            <SelectItem key={bIndex} value={itemB.text}>
+                                                <div className="flex items-center gap-2">
+                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                    <span>{itemB.text}</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        ))}
+                    </div>
               ) : null}
             </div>
           ))}
