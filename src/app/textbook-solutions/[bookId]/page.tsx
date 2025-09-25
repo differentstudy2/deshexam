@@ -192,7 +192,7 @@ export default function TextbookSolutionsPage() {
             alt={textbook.title}
             width={150}
             height={210}
-            className="rounded-md shadow-lg object-cover w-36 md:w-40"
+            className="rounded-md shadow-lg object-cover w-36 md:w-40 flex-shrink-0"
         />
         <div className="text-center md:text-left">
             <h1 className="font-headline text-3xl md:text-4xl font-bold">{textbook.title} Solutions</h1>
