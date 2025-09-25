@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -127,7 +128,13 @@ export default function PracticeSetPage() {
 
   const handleSubmit = () => {
     let score = 0;
-    const totalMarks = questions.reduce((acc, q) => acc + q.marks, 0);
+    
+    const totalMarks = questions.reduce((acc, q) => {
+        if (q.type === 'Matching') {
+            return acc + (Array.isArray(q.correctAnswer) ? q.correctAnswer.length : (q.marks || 0));
+        }
+        return acc + (q.marks || 1);
+    }, 0);
     
     const results = questions.map(question => {
         const userAnswerObj = userAnswers.find(a => a.questionId === question.id);
@@ -144,11 +151,11 @@ export default function PracticeSetPage() {
                 }
                 isCorrect = matchingScore === question.correctAnswer.length;
             }
-            if(isCorrect) score += question.marks;
+            score += matchingScore; // Add points for each correct match
         } else {
-             isCorrect = userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim();
+            isCorrect = userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim();
             if (isCorrect) {
-                score += question.marks;
+                score += question.marks || 1;
             }
         }
         
@@ -400,3 +407,4 @@ export default function PracticeSetPage() {
     </div>
   );
 }
+

@@ -546,8 +546,8 @@ export default function CreateTestPage() {
   useEffect(() => {
     if (currentTestType !== 'Learn' && currentTestType !== 'Textbook') {
         const totalMarks = questions?.reduce((total, q) => {
-            if (q.type === 'Matching') {
-                return total + (q.correctAnswer?.length || q.marks || 1);
+            if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+                return total + (q.correctAnswer.length || 0);
             }
             return total + (q.marks || 1);
         }, 0) || 0;
@@ -1641,3 +1641,4 @@ export default function CreateTestPage() {
     </div>
   );
 }
+

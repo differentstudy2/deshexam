@@ -142,26 +142,27 @@ export default function TestPage() {
         test?.questions.forEach((question, index) => {
             if (question.type === 'Matching') {
                 const correctAnswers = question.correctAnswer;
-                const userAnswers = answers[index];
-                if (userAnswers && Array.isArray(correctAnswers)) {
+                const userAnswersForQuestion = answers[index];
+                if (userAnswersForQuestion && Array.isArray(correctAnswers)) {
                     for (const pair of correctAnswers) {
-                        if (userAnswers[pair.a] === pair.b) {
-                            score++;
+                        if (userAnswersForQuestion[pair.a] === pair.b) {
+                            score++; // Award 1 mark for each correct pair
                         }
                     }
                 }
             } else {
                  if (answers[index] === question.correctAnswer) {
-                    score++;
+                    score += question.marks || 1;
                 }
             }
         });
         
-        const totalQuestions = test?.questions.reduce((total, q) => {
+        const totalMarks = test?.questions.reduce((total, q) => {
             if (q.type === 'Matching') {
-                return total + (q.correctAnswer?.length || 1);
+                // Total marks for a matching question is the number of pairs
+                return total + (q.correctAnswer?.length || 0);
             }
-            return total + 1;
+            return total + (q.marks || 1);
         }, 0) || 0;
 
 
@@ -170,7 +171,7 @@ export default function TestPage() {
             testTitle: test?.title,
             answers,
             score,
-            totalQuestions: totalQuestions,
+            totalQuestions: totalMarks,
             testType: test?.testType
         };
 
@@ -412,4 +413,5 @@ export default function TestPage() {
     </div>
   );
 }
+
 

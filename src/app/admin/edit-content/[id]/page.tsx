@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -427,8 +428,8 @@ export default function EditContentPage() {
   const questions = form.watch('questions');
   useEffect(() => {
     const totalMarks = questions?.reduce((total, q) => {
-        if (q.type === 'Matching') {
-            return total + (q.correctAnswer?.length || q.marks || 1);
+        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+            return total + (q.correctAnswer.length || 0);
         }
         return total + (q.marks || 1);
     }, 0) || 0;
