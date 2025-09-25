@@ -80,6 +80,7 @@ import { cn } from '@/lib/utils';
 import { generateMetadata } from '@/ai/flows/ai-metadata-generator';
 import type { AIMetadataGeneratorOutput, AIMetadataGeneratorInput } from '@/ai/flows/ai-metadata-generator';
 import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 
 const settingsSchema = z.object({
     siteName: z.string().min(1, "Site name is required."),
@@ -106,6 +107,13 @@ const settingsSchema = z.object({
     defaultExamCategory: z.string().optional(),
     defaultState: z.string().optional(),
     defaultExam: z.string().optional(),
+    textbookOneTimePurchase: z.boolean().default(false),
+    freeChaptersPerBook: z.coerce.number().int().min(0).default(1),
+    practiceSetAttempts: z.coerce.number().int().min(1).default(3),
+    enablePracticeSetRetry: z.boolean().default(true),
+    practiceSetPassMark: z.coerce.number().int().min(0).max(100).default(40),
+    gateChaptersOnPass: z.boolean().default(false),
+    practiceSetSubmissionLimit: z.coerce.number().int().min(1).default(5),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -401,6 +409,13 @@ export default function AdminSettingsPage() {
         defaultExamCategory: '',
         defaultState: '',
         defaultExam: '',
+        textbookOneTimePurchase: false,
+        freeChaptersPerBook: 1,
+        practiceSetAttempts: 3,
+        enablePracticeSetRetry: true,
+        practiceSetPassMark: 40,
+        gateChaptersOnPass: false,
+        practiceSetSubmissionLimit: 5,
     },
   });
 
@@ -789,8 +804,106 @@ export default function AdminSettingsPage() {
                                 Global settings for textbook solutions and content.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Textbook settings UI will be built here.</p>
+                        <CardContent className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="textbookOneTimePurchase"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                        <div className="space-y-0.5">
+                                            <FormLabel className="text-base">One-Time Purchase for Textbooks</FormLabel>
+                                            <FormDescription>Enable to make textbooks a one-time paid product instead of part of a subscription.</FormDescription>
+                                        </div>
+                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="freeChaptersPerBook"
+                                render={({ field }) => (
+                                    <FormItem className="p-4 border rounded-lg">
+                                        <FormLabel className="text-base">Free Chapters per Book</FormLabel>
+                                        <FormDescription>Set the number of initial chapters that are free for any user to access.</FormDescription>
+                                        <FormControl><Input type="number" {...field} className="mt-2 w-24" /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="practiceSetAttempts"
+                                render={({ field }) => (
+                                    <FormItem className="p-4 border rounded-lg">
+                                        <FormLabel className="text-base">Practice Set Attempts</FormLabel>
+                                        <FormDescription>Limit how many times a user can submit a practice set.</FormDescription>
+                                        <FormControl><Input type="number" {...field} className="mt-2 w-24" /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="practiceSetSubmissionLimit"
+                                render={({ field }) => (
+                                    <FormItem className="p-4 border rounded-lg">
+                                        <FormLabel className="text-base">Total Practice Set Submissions</FormLabel>
+                                        <FormDescription>Set a global limit on how many total practice sets a free user can submit.</FormDescription>
+                                        <FormControl><Input type="number" {...field} className="mt-2 w-24" /></FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="practiceSetPassMark"
+                                render={({ field }) => (
+                                    <FormItem className="p-4 border rounded-lg">
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <FormLabel className="text-base">Practice Set Pass Mark</FormLabel>
+                                                <FormDescription>The minimum percentage required to "pass" a practice set.</FormDescription>
+                                            </div>
+                                            <span className="font-bold text-lg">{field.value}%</span>
+                                        </div>
+                                        <FormControl>
+                                            <Slider
+                                                defaultValue={[field.value ?? 40]}
+                                                max={100}
+                                                step={1}
+                                                onValueChange={(value) => field.onChange(value[0])}
+                                                className="mt-3"
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="gateChaptersOnPass"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                        <div className="space-y-0.5">
+                                            <FormLabel className="text-base">Gate Chapters on Pass Mark</FormLabel>
+                                            <FormDescription>Require users to pass the current chapter's practice set before unlocking the next one.</FormDescription>
+                                        </div>
+                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="enablePracticeSetRetry"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                        <div className="space-y-0.5">
+                                            <FormLabel className="text-base">Allow Practice Set Retries</FormLabel>
+                                            <FormDescription>Let users retry a practice set after submitting it.</FormDescription>
+                                        </div>
+                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                    </FormItem>
+                                )}
+                            />
                         </CardContent>
                     </Card>
                 )}
