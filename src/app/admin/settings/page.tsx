@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -16,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -605,6 +604,7 @@ export default function AdminSettingsPage() {
         { id: 'general', label: 'General', icon: Settings },
         { id: 'api', label: 'API Keys', icon: KeyRound },
         { id: 'users', label: 'User Management', icon: Users },
+        { id: 'plans', label: 'Plans & Pricing', icon: DollarSign },
         { id: 'metafields', label: 'Content Metafields', icon: LayoutTemplate },
         { id: 'questionTypes', label: 'Question Types', icon: Type },
         { id: 'content', label: 'Content Details', icon: Library },
@@ -762,6 +762,20 @@ export default function AdminSettingsPage() {
                                 </FormItem>
                             )}
                             />
+                        </CardContent>
+                    </Card>
+                )}
+                
+                 {activeTab === 'plans' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Plans & Pricing</CardTitle>
+                            <CardDescription>
+                            Manage your subscription tiers and one-time purchases.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground">Pricing management UI will be built here.</p>
                         </CardContent>
                     </Card>
                 )}
@@ -1255,5 +1269,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-
-
