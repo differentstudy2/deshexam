@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -825,7 +826,7 @@ export default function AdminSettingsPage() {
                                     <FormItem className="p-4 border rounded-lg">
                                         <FormLabel className="text-base">Free Chapters per Book</FormLabel>
                                         <FormDescription>Set the number of initial chapters that are free for any user to access.</FormDescription>
-                                        <FormControl><Input type="number" {...field} className="mt-2 w-24" /></FormControl>
+                                        <FormControl><Input type="number" {...field} value={field.value ?? 0} className="mt-2 w-24" /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -837,7 +838,7 @@ export default function AdminSettingsPage() {
                                     <FormItem className="p-4 border rounded-lg">
                                         <FormLabel className="text-base">Practice Set Attempts</FormLabel>
                                         <FormDescription>Limit how many times a user can submit a practice set.</FormDescription>
-                                        <FormControl><Input type="number" {...field} className="mt-2 w-24" /></FormControl>
+                                        <FormControl><Input type="number" {...field} value={field.value ?? 0} className="mt-2 w-24" /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -849,7 +850,7 @@ export default function AdminSettingsPage() {
                                     <FormItem className="p-4 border rounded-lg">
                                         <FormLabel className="text-base">Total Practice Set Submissions</FormLabel>
                                         <FormDescription>Set a global limit on how many total practice sets a free user can submit.</FormDescription>
-                                        <FormControl><Input type="number" {...field} className="mt-2 w-24" /></FormControl>
+                                        <FormControl><Input type="number" {...field} value={field.value ?? 0} className="mt-2 w-24" /></FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
