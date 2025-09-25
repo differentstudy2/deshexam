@@ -65,6 +65,9 @@ const formSchema = z.object({
   exam: z.string().optional(),
   school: z.string().optional(),
   semester: z.string().optional(),
+  access: z.enum(['free', 'premium', 'pro']),
+  price: z.coerce.number().optional(),
+  subscriptionPlan: z.enum(['pass', 'pro']).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -191,11 +194,15 @@ export default function EditContentPage() {
       exam: '',
       school: '',
       semester: '',
+      access: 'free',
+      price: undefined,
+      subscriptionPlan: 'pass',
     },
   });
   
   const selectedClassCategory = form.watch('classCategory');
   const selectedExamCategory = form.watch('examCategory');
+  const accessLevel = form.watch('access');
 
   useEffect(() => {
     const fetchDependentData = async () => {
@@ -562,6 +569,74 @@ export default function EditContentPage() {
                     </FormItem>
                     )}
                 />
+                
+                <div className='space-y-2 lg:col-span-3'>
+                      <FormField
+                        control={form.control}
+                        name="access"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Access Level</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select access level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="free">Free</SelectItem>
+                                <SelectItem value="premium">Paid (Premium)</SelectItem>
+                                <SelectItem value="pro">Subscription (Pro)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {accessLevel === 'premium' && (
+                          <FormField
+                              control={form.control}
+                              name="price"
+                              render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Price (INR)</FormLabel>
+                                      <FormControl>
+                                          <Input
+                                            type="number"
+                                            placeholder="e.g., 199"
+                                            {...field}
+                                            value={field.value ?? ''}
+                                          />
+                                      </FormControl>
+                                      <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+                      {accessLevel === 'pro' && (
+                          <FormField
+                              control={form.control}
+                              name="subscriptionPlan"
+                              render={({ field }) => (
+                                  <FormItem>
+                                      <FormLabel>Subscription Plan</FormLabel>
+                                      <Select onValueChange={field.onChange} value={field.value}>
+                                          <FormControl>
+                                              <SelectTrigger>
+                                                  <SelectValue placeholder="Select a plan" />
+                                              </SelectTrigger>
+                                          </FormControl>
+                                          <SelectContent>
+                                              <SelectItem value="pass">Pass</SelectItem>
+                                              <SelectItem value="pro">Pass Pro</SelectItem>
+                                          </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                  </FormItem>
+                              )}
+                          />
+                      )}
+                  </div>
             </CardContent>
           </Card>
           
