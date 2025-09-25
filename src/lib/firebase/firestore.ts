@@ -10,6 +10,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -401,33 +402,29 @@ export const addContent = async (contentData: any) => {
         throw new Error("You must be logged in to create content.");
     }
     const cleanedContent = cleanDataForFirebase(contentData);
-    const { featureImage, ...restOfContentData } = cleanedContent;
 
     try {
-        const collectionName = contentData.testType === 'Textbook' ? 'textbooks' : 'content';
-
+        const collectionName = cleanedContent.testType === 'Textbook' ? 'textbooks' : 'content';
+        
         let finalContentData: any = {
-            ...restOfContentData,
+            ...cleanedContent,
             authorId: user.uid,
             authorName: user.displayName || user.email,
-            createdAt: contentData.publishedAt ? new Date(contentData.publishedAt) : serverTimestamp(),
+            createdAt: cleanedContent.publishedAt ? new Date(cleanedContent.publishedAt) : serverTimestamp(),
             updatedAt: serverTimestamp(),
         };
-        
-        if (contentData.testType !== 'Learn' && contentData.testType !== 'Textbook' && restOfContentData.questions) {
-            const questionsWithIds = await Promise.all(restOfContentData.questions.map(async (question: any) => {
+
+        if (cleanedContent.testType !== 'Learn' && cleanedContent.testType !== 'Textbook' && cleanedContent.questions) {
+            const questionsWithIds = await Promise.all(cleanedContent.questions.map(async (question: any) => {
                 const questionId = await addQuestion(question);
                 return { ...question, id: questionId };
             }));
             finalContentData.questions = questionsWithIds;
         }
 
-        if(featureImage){
-            finalContentData.featureImage = featureImage;
-        }
         delete finalContentData.publishedAt;
         
-        // For textbooks, remove questions array if it exists
+        // For textbooks, remove questions array if it exists as it's not a direct property
         if (collectionName === 'textbooks') {
             delete finalContentData.questions;
             delete finalContentData.duration;
@@ -1849,6 +1846,7 @@ export const deleteTextbook = async (textbookId: string) => {
         throw new Error("Failed to delete textbook completely.");
     }
 };
+
 
 
 

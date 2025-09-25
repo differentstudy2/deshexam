@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ContentBadge } from '@/components/content-badge';
 
 type Textbook = {
     id: string;
@@ -20,6 +21,7 @@ type Textbook = {
     class: string;
     board?: string;
     featureImage?: string;
+    access: 'free' | 'premium' | 'pro';
 };
 
 const TextbookStats = ({ textbookId }: { textbookId: string }) => {
@@ -121,7 +123,7 @@ export default function TextbookSolutionsListPage() {
                 Select a textbook to view its solutions, topics, and practice questions.
                 </p>
             </header>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {Array.from({length: 4}).map((_, i) => (
                     <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
                 ))}
@@ -148,6 +150,9 @@ export default function TextbookSolutionsListPage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                 <div className="absolute top-2 right-2">
+                    <ContentBadge type={book.access} />
+                </div>
             </div>
             <CardContent className="p-4 flex-grow flex flex-col">
               <div className="flex flex-wrap gap-2 mb-2">

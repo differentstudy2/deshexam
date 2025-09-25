@@ -8,6 +8,9 @@ export type Textbook = {
     classCategory: string;
     class: string;
     featureImage?: string;
+    access: 'free' | 'premium' | 'pro';
+    price?: number;
+    subscriptionPlan?: 'pass' | 'pro';
 };
 
 export type Chapter = {
