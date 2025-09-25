@@ -105,6 +105,7 @@ const formSchema = z.object({
   testType: z.string().optional(),
   description: z.string().optional(),
   body: z.string().optional(),
+  featureImage: z.string().optional(),
   duration: z.coerce
     .number()
     .int()
@@ -357,6 +358,7 @@ export default function CreateTestPage() {
       testType: 'Mock Test',
       description: '',
       body: '',
+      featureImage: '',
       duration: 0,
       difficulty: 'Medium',
       access: 'free',
@@ -669,6 +671,7 @@ export default function CreateTestPage() {
             description: '',
             body: '',
             duration: 0,
+            featureImage: '',
             access: 'free',
             price: undefined,
             publishedAt: new Date(),
@@ -693,6 +696,7 @@ export default function CreateTestPage() {
             body: '',
             duration: 0,
             access: 'free',
+            featureImage: '',
             price: undefined,
             publishedAt: new Date(),
             subscriptionPlan: 'pass',
@@ -1231,6 +1235,25 @@ export default function CreateTestPage() {
                   )}
                 />
               )}
+              {currentTestType === 'Textbook' && (
+                 <FormField
+                    control={form.control}
+                    name="featureImage"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Feature Image</FormLabel>
+                        <div className="flex items-center gap-4">
+                            <ImageUploader
+                                fieldName={field.name}
+                                onUrlChange={(url) => form.setValue('featureImage', url)}
+                            />
+                            {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              )}
 
               {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
@@ -1641,4 +1664,5 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
 

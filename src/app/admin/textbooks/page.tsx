@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 export default function ManageTextbooksPage() {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
@@ -88,22 +90,31 @@ export default function ManageTextbooksPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
           <Card key={book.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Book /> {book.title}</CardTitle>
-              <CardDescription>{book.description}</CardDescription>
+            <CardHeader className="p-0">
+               <Image 
+                src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
+                alt={book.title}
+                width={400}
+                height={300}
+                className="w-full h-48 object-cover rounded-t-lg"
+               />
             </CardHeader>
-            <CardContent className="flex-grow">
+            <CardContent className="flex-grow p-4">
+              <h3 className="font-bold text-lg flex items-center gap-2"><Book /> {book.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2">{book.description}</p>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-2 p-4">
                 <Button asChild className="w-full">
                     <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
                 </Button>
-            </CardContent>
-            <CardFooter className="flex gap-2">
-                <Button variant="outline" className="w-full" disabled>
-                    <Edit className="mr-2 h-4 w-4" /> Edit
-                </Button>
-                 <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
-                    <Trash2 className="mr-2 h-4 w-4" /> Delete
-                </Button>
+                <div className="flex gap-2 w-full">
+                    <Button variant="outline" className="w-full" disabled>
+                        <Edit className="mr-2 h-4 w-4" /> Edit
+                    </Button>
+                    <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
+                        <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    </Button>
+                </div>
             </CardFooter>
           </Card>
         ))}

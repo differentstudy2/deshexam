@@ -6,6 +6,7 @@ export type Textbook = {
     description: string;
     subject: string;
     class: string;
+    featureImage?: string;
 };
 
 export type Chapter = {

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { Book, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 export default function TextbookSolutionsListPage() {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
@@ -43,12 +45,21 @@ export default function TextbookSolutionsListPage() {
       </header>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
-          <Card key={book.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Book /> {book.title}</CardTitle>
-              <CardDescription>{book.description}</CardDescription>
+          <Card key={book.id} className="overflow-hidden">
+            <CardHeader className="p-0">
+                <Image
+                    src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
+                    alt={book.title}
+                    width={400}
+                    height={225}
+                    className="w-full h-48 object-cover"
+                />
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
+              <h3 className="font-bold text-lg flex items-center gap-2"><Book /> {book.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{book.description}</p>
+            </CardContent>
+            <CardContent className="p-4 pt-0">
                 <Button asChild className="w-full">
                     <Link href={`/textbook-solutions/${book.id}`}>View Solutions</Link>
                 </Button>
