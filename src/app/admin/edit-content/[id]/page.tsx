@@ -747,23 +747,34 @@ export default function EditContentPage() {
 
   const processJsonImport = (jsonText: string) => {
     try {
-        const json = JSON.parse(jsonText);
-        if (!json.questions || !Array.isArray(json.questions)) {
-          throw new Error("JSON must have a top-level 'questions' array.");
+        let parsedJson = JSON.parse(jsonText);
+        let questionsToImport = [];
+
+        if (parsedJson.questions && Array.isArray(parsedJson.questions)) {
+            questionsToImport = parsedJson.questions;
+        } else {
+            // If no "questions" key, combine all arrays in the object
+            questionsToImport = Object.values(parsedJson).flat();
+        }
+
+        if (!Array.isArray(questionsToImport) || questionsToImport.length === 0) {
+            throw new Error("No valid question array found in the JSON.");
         }
         
         // Basic validation for each question
-        json.questions.forEach((q: any, i: number) => {
+        questionsToImport.forEach((q: any, i: number) => {
             const { success } = questionSchema.safeParse(q);
             if (!success) {
+                // Log the failing question for easier debugging
+                console.error("Invalid question structure at index:", i, q, questionSchema.safeParse(q));
                 throw new Error(`Question at index ${i} has an invalid structure.`);
             }
         });
         
-        append(json.questions);
+        append(questionsToImport);
         toast({
           title: 'Import Successful!',
-          description: `${json.questions.length} questions have been added.`,
+          description: `${questionsToImport.length} questions have been added.`,
         });
         setIsImportDialogOpen(false);
         setJsonText('');
@@ -1591,3 +1602,4 @@ export default function EditContentPage() {
     
 
     
+

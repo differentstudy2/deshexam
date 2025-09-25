@@ -407,13 +407,20 @@ export default function ManagePracticeSetQuestionsPage() {
 
     const processJsonImport = async (jsonText: string) => {
         try {
-            const json = JSON.parse(jsonText);
-            if (!json.questions || !Array.isArray(json.questions)) {
-                throw new Error("JSON must have a top-level 'questions' array.");
+            const parsedJson = JSON.parse(jsonText);
+            let questionsToImport = [];
+
+            if (parsedJson.questions && Array.isArray(parsedJson.questions)) {
+                questionsToImport = parsedJson.questions;
+            } else {
+                questionsToImport = Object.values(parsedJson).flat();
+            }
+
+            if (!Array.isArray(questionsToImport) || questionsToImport.length === 0) {
+                throw new Error("No valid question array found in the JSON.");
             }
             
-            // Basic validation for each question
-            for (const q of json.questions) {
+            for (const q of questionsToImport) {
                 const { success } = questionSchema.safeParse(q);
                 if (!success) {
                     throw new Error(`A question in the JSON has an invalid structure.`);
@@ -423,7 +430,7 @@ export default function ManagePracticeSetQuestionsPage() {
             
             toast({
               title: 'Import Successful!',
-              description: `${json.questions.length} questions have been added.`,
+              description: `${questionsToImport.length} questions have been added.`,
             });
             fetchData();
             setIsImportDialogOpen(false);
@@ -550,7 +557,7 @@ export default function ManagePracticeSetQuestionsPage() {
                                     <AccordionItem value="item-1">
                                         <AccordionTrigger>View JSON Format Examples</AccordionTrigger>
                                         <AccordionContent>
-                                        <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
+                                        <p className="text-sm text-muted-foreground mb-4">Your JSON file can contain a single key "questions" which is an array of question objects, or multiple keys with arrays of questions which will be combined.</p>
                                         <Tabs defaultValue="mcq" className="w-full">
                                             <TabsList className="h-auto flex-wrap justify-start">
                                             <TabsTrigger value="mcq">MCQ</TabsTrigger>
@@ -655,3 +662,4 @@ export default function ManagePracticeSetQuestionsPage() {
         </div>
     )
 }
+
