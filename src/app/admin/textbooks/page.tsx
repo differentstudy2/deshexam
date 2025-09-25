@@ -87,7 +87,7 @@ export default function ManageTextbooksPage() {
           </p>
         </div>
         <Button asChild>
-            <Link href="/admin/add-content?type=Textbook">
+            <Link href="/admin/textbooks/add">
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Textbook
             </Link>
         </Button>
