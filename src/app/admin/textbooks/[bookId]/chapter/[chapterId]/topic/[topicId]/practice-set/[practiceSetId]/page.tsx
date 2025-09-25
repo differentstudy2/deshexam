@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -32,6 +33,7 @@ import {
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -281,6 +283,8 @@ export default function ManagePracticeSetQuestionsPage() {
     const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+
 
     const importFileRef = useRef<HTMLInputElement>(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -369,6 +373,35 @@ export default function ManagePracticeSetQuestionsPage() {
             fetchData();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
+        }
+    }
+    
+    const handleSelectQuestion = (questionId: string) => {
+        setSelectedQuestions(prev => 
+            prev.includes(questionId) 
+                ? prev.filter(id => id !== questionId) 
+                : [...prev, questionId]
+        );
+    };
+
+    const handleSelectAllQuestions = (checked: boolean) => {
+        if (checked) {
+            setSelectedQuestions(questions.map(q => q.id));
+        } else {
+            setSelectedQuestions([]);
+        }
+    };
+    
+    const handleDeleteSelected = async () => {
+        try {
+            await Promise.all(
+                selectedQuestions.map(id => deleteQuestionFromPracticeSet(textbookId, chapterId, topicId, practiceSetId, id))
+            );
+            toast({ title: `${selectedQuestions.length} question(s) deleted.` });
+            setSelectedQuestions([]);
+            fetchData();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error deleting questions', description: (error as Error).message });
         }
     }
 
@@ -540,11 +573,50 @@ export default function ManagePracticeSetQuestionsPage() {
                     </div>
                 </CardHeader>
                 <CardContent>
+                     {selectedQuestions.length > 0 && (
+                        <div className="mb-4">
+                             <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                        <Trash2 className="mr-2 h-4 w-4"/>
+                                        Delete Selected ({selectedQuestions.length})
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>This will permanently delete {selectedQuestions.length} question(s). This action cannot be undone.</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleDeleteSelected}>Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    )}
                     {questions.length > 0 ? (
                         <ul className="space-y-2">
+                             <li className="flex items-center p-3 border-b">
+                                <Checkbox 
+                                    id="select-all"
+                                    checked={selectedQuestions.length === questions.length && questions.length > 0}
+                                    onCheckedChange={handleSelectAllQuestions}
+                                    className="mr-4"
+                                />
+                                <label htmlFor="select-all" className="flex-1 font-semibold text-sm">Select All</label>
+                            </li>
                             {questions.map(q => (
                                 <li key={q.id} className="flex items-center justify-between p-3 border rounded-md">
-                                    <p className="truncate pr-4">{q.text}</p>
+                                    <div className="flex items-center">
+                                        <Checkbox 
+                                            id={`select-${q.id}`}
+                                            checked={selectedQuestions.includes(q.id)}
+                                            onCheckedChange={() => handleSelectQuestion(q.id)}
+                                            className="mr-4"
+                                        />
+                                        <label htmlFor={`select-${q.id}`} className="truncate pr-4">{q.text}</label>
+                                    </div>
                                     <div className="flex gap-2">
                                         <Button variant="ghost" size="icon" onClick={() => openQuestionDialog(q)}><Edit className="h-4 w-4"/></Button>
                                         <AlertDialog>
