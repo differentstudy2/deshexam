@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import { db } from '@/lib/firebase/client';
 import { deleteTextbook } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
-import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare } from 'lucide-react';
+import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
@@ -164,7 +165,7 @@ export default function ManageTextbooksPage() {
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
-          <Card key={book.id} className="flex flex-col max-h-[500px]">
+          <Card key={book.id} className="flex flex-col max-h-[550px]">
             <CardHeader className="p-0 relative h-48 flex-shrink-0">
                <Image 
                 src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
@@ -185,14 +186,19 @@ export default function ManageTextbooksPage() {
                 </Button>
                 <div className="flex gap-2 w-full">
                     <Button asChild variant="outline" className="w-full">
+                        <Link href={`/textbook-solutions/${book.id}`} target="_blank">
+                            <Eye className="mr-2 h-4 w-4" /> View
+                        </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full">
                         <Link href={`/admin/textbooks/${book.id}/edit`}>
                             <Edit className="mr-2 h-4 w-4" /> Edit
                         </Link>
                     </Button>
-                    <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete
-                    </Button>
                 </div>
+                <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
+                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                </Button>
             </CardFooter>
           </Card>
         ))}
