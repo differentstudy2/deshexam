@@ -205,33 +205,37 @@ export default function TextbookSolutionsPage() {
         <main>
            {selectedTopicContent ? (
              <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">{selectedTopicContent.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="prose dark:prose-invert max-w-none">
-                   <div dangerouslySetInnerHTML={{ __html: selectedTopicContent.content || '<p>No content available for this topic yet.</p>' }} />
-                   
-                   {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
-                       <div className="mt-8">
-                            <Separator />
-                           <h3 className="mt-6 font-semibold text-lg">Practice Sets</h3>
-                           <div className="space-y-2 mt-4">
-                               {selectedTopicContent.practiceSets.map(ps => (
-                                   <Card key={ps.id} className="p-4 flex justify-between items-center">
-                                       <div className="flex items-center gap-3">
-                                           <CheckSquare className="h-5 w-5 text-primary" />
-                                           <span className="font-medium">{ps.title}</span>
-                                       </div>
-                                       <Button asChild>
-                                           <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${activeChapter}&topic=${activeTopic}`}>
-                                                Start Practice
-                                           </Link>
-                                       </Button>
-                                   </Card>
-                               ))}
-                           </div>
-                       </div>
-                   )}
+                <CardContent className="p-4">
+                     <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="text-xl font-headline">{selectedTopicContent.title}</AccordionTrigger>
+                            <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
+                                <div dangerouslySetInnerHTML={{ __html: selectedTopicContent.content || '<p>No content available for this topic yet.</p>' }} />
+                                
+                                {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
+                                    <div className="mt-8">
+                                        <Separator />
+                                        <h3 className="mt-6 font-semibold text-lg">Practice Sets</h3>
+                                        <div className="space-y-2 mt-4">
+                                            {selectedTopicContent.practiceSets.map(ps => (
+                                                <Card key={ps.id} className="p-4 flex justify-between items-center">
+                                                    <div className="flex items-center gap-3">
+                                                        <CheckSquare className="h-5 w-5 text-primary" />
+                                                        <span className="font-medium">{ps.title}</span>
+                                                    </div>
+                                                    <Button asChild>
+                                                        <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${activeChapter}&topic=${activeTopic}`}>
+                                                                Start Practice
+                                                        </Link>
+                                                    </Button>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </CardContent>
             </Card>
            ) : (
