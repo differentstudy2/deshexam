@@ -48,18 +48,10 @@ const TextbookContentSidebar = ({
 }) => {
     
     const hasAccess = (chapter: Chapter) => {
-        if (chapter.access === 'free') {
-            return true;
-        }
-        if (!userProfile) {
-            return false;
-        }
-        if (chapter.access === 'pro') {
-            return userProfile.subscriptionPlan === 'pro';
-        }
-        if (chapter.access === 'pass') {
-            return userProfile.subscriptionPlan === 'pass' || userProfile.subscriptionPlan === 'pro';
-        }
+        if (chapter.access === 'free') return true;
+        if (!userProfile) return false;
+        if (chapter.access === 'pro') return userProfile.subscriptionPlan === 'pro';
+        if (chapter.access === 'pass') return userProfile.subscriptionPlan === 'pass' || userProfile.subscriptionPlan === 'pro';
         return false;
     }
 
