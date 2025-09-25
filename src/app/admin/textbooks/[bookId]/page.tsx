@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -125,6 +126,12 @@ export default function ManageChaptersPage() {
             Add, edit, and manage chapters for this textbook.
           </p>
         </div>
+        <Button variant="outline" asChild>
+          <Link href={`/admin/textbooks/${textbookId}/edit`}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit Textbook
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

@@ -108,8 +108,10 @@ export default function ManageTextbooksPage() {
                     <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
                 </Button>
                 <div className="flex gap-2 w-full">
-                    <Button variant="outline" className="w-full" disabled>
-                        <Edit className="mr-2 h-4 w-4" /> Edit
+                    <Button asChild variant="outline" className="w-full">
+                        <Link href={`/admin/textbooks/${book.id}/edit`}>
+                            <Edit className="mr-2 h-4 w-4" /> Edit
+                        </Link>
                     </Button>
                     <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
                         <Trash2 className="mr-2 h-4 w-4" /> Delete
