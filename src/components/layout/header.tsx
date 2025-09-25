@@ -30,6 +30,7 @@ const mainNavLinks = [
     { href: "/mock-tests", label: "Mock Tests", icon: <BookOpen className="h-5 w-5" /> },
     { href: "/quizzes", label: "Quizzes", icon: <Gem className="h-5 w-5" /> },
     { href: "/learn", label: "Learn", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { href: "/textbook-solutions", label: "Textbook Solutions", icon: <Book className="h-5 w-5" /> },
     { href: "/leaderboard", label: "Leaderboard", icon: <Trophy className="h-5 w-5" /> },
     { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
 ];
