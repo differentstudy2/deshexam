@@ -34,7 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState } from '@/lib/firebase/firestore';
+import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon, Book } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef } from 'react';
@@ -89,6 +89,7 @@ const questionSchema = z.object({
 const formSchema = z.object({
   title: z.string().optional(),
   board: z.string().optional(),
+  classCategory: z.string().optional(),
   class: z.string().optional(),
   subject: z.string().optional(),
   chapter: z.string().optional(),
@@ -125,7 +126,8 @@ type FormValues = z.infer<typeof formSchema>;
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
-type Class = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
 type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
@@ -298,7 +300,8 @@ export default function CreateTestPage() {
   const { toast } = useToast();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
@@ -330,6 +333,7 @@ export default function CreateTestPage() {
     enableExamMetafield: true,
     enableChapterMetafield: true,
     defaultBoard: '',
+    defaultClassCategory: '',
     defaultClass: '',
     defaultSubject: '',
     defaultChapter: '',
@@ -344,6 +348,7 @@ export default function CreateTestPage() {
     defaultValues: {
       title: '',
       board: '',
+      classCategory: '',
       class: '',
       subject: '',
       chapter: '',
@@ -377,6 +382,20 @@ export default function CreateTestPage() {
     control: form.control,
     name: 'questions',
   });
+  
+  const selectedClassCategory = form.watch('classCategory');
+  useEffect(() => {
+    const fetchGrades = async () => {
+      if (selectedClassCategory) {
+        const fetchedGrades = await getGradesByClass(selectedClassCategory);
+        setGrades(fetchedGrades);
+      } else {
+        setGrades([]);
+      }
+    };
+    fetchGrades();
+  }, [selectedClassCategory]);
+
 
   useEffect(() => {
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
@@ -455,7 +474,7 @@ export default function CreateTestPage() {
 
       setSubjects(subjectData);
       setBoards(boardData);
-      setClasses(classData);
+      setClassCategories(classData);
       setStates(stateData);
       setExamCategories(examTypeData);
 
@@ -474,6 +493,7 @@ export default function CreateTestPage() {
             enableExamMetafield: siteSettings.enableExamMetafield ?? true,
             enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
             defaultBoard: siteSettings.defaultBoard ?? '',
+            defaultClassCategory: siteSettings.defaultClassCategory ?? '',
             defaultClass: siteSettings.defaultClass ?? '',
             defaultSubject: siteSettings.defaultSubject ?? '',
             defaultChapter: siteSettings.defaultChapter ?? '',
@@ -487,11 +507,18 @@ export default function CreateTestPage() {
         form.reset({
             ...currentValues,
             board: currentValues.board || siteSettings.defaultBoard || '',
+            classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
             class: currentValues.class || siteSettings.defaultClass || '',
             subject: currentValues.subject || siteSettings.defaultSubject || '',
             examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
             state: currentValues.state || siteSettings.defaultState || '',
         });
+        
+        const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
+        if (defaultClassCat) {
+          const fetchedGrades = await getGradesByClass(defaultClassCat);
+          setGrades(fetchedGrades);
+        }
 
          if (form.getValues('subject')) {
             const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
@@ -666,6 +693,7 @@ export default function CreateTestPage() {
             ...form.getValues(),
             title: '',
             board: settings.defaultBoard || '',
+            classCategory: settings.defaultClassCategory || '',
             class: settings.defaultClass || '',
             subject: settings.defaultSubject || '',
             chapter: '', // Reset chapter as it depends on subject
@@ -694,6 +722,8 @@ export default function CreateTestPage() {
         });
         if (!settings.defaultSubject) setChapters([]);
         if (!settings.defaultExamCategory) setExams([]);
+        if (!settings.defaultClassCategory) setGrades([]);
+
       } else { // partial reset
          form.reset({
             ...form.getValues(),
@@ -786,6 +816,11 @@ export default function CreateTestPage() {
       }
   }
   
+  const handleClassCategoryChange = (value: string) => {
+      form.setValue('classCategory', value);
+      form.setValue('class', '');
+  }
+
   const handleClassChange = (value: string) => {
       form.setValue('class', value);
       if (value === 'add_new_class') {
@@ -969,44 +1004,61 @@ export default function CreateTestPage() {
                         </FormItem>
                     )}
                     />}
-                    {settings.enableClassMetafield && <FormField
-                    control={form.control}
-                    name="class"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Class</FormLabel>
-                        {!isAddingNewClass ? (
-                                <Select onValueChange={handleClassChange} value={field.value}>
-                                    <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a class" />
-                                    </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                    {classes.map((c) => (
-                                        <SelectItem key={c.id} value={c.name}>
-                                        {c.name}
-                                        </SelectItem>
-                                    ))}
-                                    <SelectItem value="add_new_class">Add new class...</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            ) : (
-                                <div className='space-y-2'>
-                                    <FormField
-                                        control={form.control}
-                                        name="newClass"
-                                        render={({ field }) => (
-                                            <Input {...field} placeholder="Enter new class name" />
-                                        )}
-                                    />
-                                    <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewClass(false); form.setValue('class', ''); }}>Cancel</Button>
-                                </div>
-                            )}
-                        <FormMessage />
-                        </FormItem>
+                    
+                    {settings.enableClassMetafield && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="classCategory"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Class Category</FormLabel>
+                                    <Select onValueChange={handleClassCategoryChange} value={field.value}>
+                                        <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a category" />
+                                        </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                        {classCategories.map((c) => (
+                                            <SelectItem key={c.id} value={c.id}>
+                                            {c.name}
+                                            </SelectItem>
+                                        ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="class"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Grade</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategory}>
+                                        <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a grade" />
+                                        </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                        {grades.map((g) => (
+                                            <SelectItem key={g.id} value={g.name}>
+                                            {g.name}
+                                            </SelectItem>
+                                        ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                     )}
-                    />}
+
+
                      {settings.enableStateMetafield && <FormField
                       control={form.control}
                       name="state"
@@ -1702,6 +1754,7 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
 
 
 
