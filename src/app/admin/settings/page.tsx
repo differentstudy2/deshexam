@@ -110,12 +110,21 @@ const settingsSchema = z.object({
     defaultExam: z.string().optional(),
     textbookOneTimePurchase: z.boolean().default(false),
     freeChaptersPerBook: z.coerce.number().int().min(0).default(1),
-    practiceSetAttempts: z.coerce.number().int().min(1).default(3),
+    practiceSetAttempts: z.object({
+        free: z.coerce.number().int().min(1).default(3),
+        pass: z.coerce.number().int().min(1).default(10),
+        pro: z.coerce.number().int().min(1).default(99),
+    }).default({ free: 3, pass: 10, pro: 99 }),
     enablePracticeSetRetry: z.boolean().default(true),
     practiceSetPassMark: z.coerce.number().int().min(0).max(100).default(40),
     gateChaptersOnPass: z.boolean().default(false),
-    practiceSetSubmissionLimit: z.coerce.number().int().min(1).default(5),
+    practiceSetSubmissionLimit: z.object({
+        free: z.coerce.number().int().min(1).default(5),
+        pass: z.coerce.number().int().min(1).default(50),
+        pro: z.coerce.number().int().min(1).default(200),
+    }).default({ free: 5, pass: 50, pro: 200 }),
 });
+
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 type ContentSummary = { [key: string]: number; };
@@ -412,11 +421,11 @@ export default function AdminSettingsPage() {
         defaultExam: '',
         textbookOneTimePurchase: false,
         freeChaptersPerBook: 1,
-        practiceSetAttempts: 3,
+        practiceSetAttempts: { free: 3, pass: 10, pro: 99 },
         enablePracticeSetRetry: true,
         practiceSetPassMark: 40,
         gateChaptersOnPass: false,
-        practiceSetSubmissionLimit: 5,
+        practiceSetSubmissionLimit: { free: 5, pass: 50, pro: 200 },
     },
   });
 
@@ -831,30 +840,78 @@ export default function AdminSettingsPage() {
                                     </FormItem>
                                 )}
                             />
-                             <FormField
-                                control={form.control}
-                                name="practiceSetAttempts"
-                                render={({ field }) => (
-                                    <FormItem className="p-4 border rounded-lg">
-                                        <FormLabel className="text-base">Practice Set Attempts</FormLabel>
-                                        <FormDescription>Limit how many times a user can submit a practice set.</FormDescription>
-                                        <FormControl><Input type="number" {...field} value={field.value ?? 0} className="mt-2 w-24" /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                             <FormField
-                                control={form.control}
-                                name="practiceSetSubmissionLimit"
-                                render={({ field }) => (
-                                    <FormItem className="p-4 border rounded-lg">
-                                        <FormLabel className="text-base">Total Practice Set Submissions</FormLabel>
-                                        <FormDescription>Set a global limit on how many total practice sets a free user can submit.</FormDescription>
-                                        <FormControl><Input type="number" {...field} value={field.value ?? 0} className="mt-2 w-24" /></FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className="p-4 border rounded-lg">
+                                <FormLabel className="text-base">Practice Set Attempts</FormLabel>
+                                <FormDescription>Limit how many times a user can submit a practice set, based on their plan.</FormDescription>
+                                <div className="grid grid-cols-3 gap-4 mt-4">
+                                     <FormField
+                                        control={form.control}
+                                        name="practiceSetAttempts.free"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Free</FormLabel>
+                                                <FormControl><Input type="number" {...field} value={field.value ?? 0} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="practiceSetAttempts.pass"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Pass</FormLabel>
+                                                <FormControl><Input type="number" {...field} value={field.value ?? 0} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="practiceSetAttempts.pro"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Pass Pro</FormLabel>
+                                                <FormControl><Input type="number" {...field} value={field.value ?? 0} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+                            <div className="p-4 border rounded-lg">
+                                <FormLabel className="text-base">Total Practice Set Submissions</FormLabel>
+                                <FormDescription>Set a global limit on how many total practice sets a user can submit, based on their plan.</FormDescription>
+                                <div className="grid grid-cols-3 gap-4 mt-4">
+                                     <FormField
+                                        control={form.control}
+                                        name="practiceSetSubmissionLimit.free"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Free</FormLabel>
+                                                <FormControl><Input type="number" {...field} value={field.value ?? 0} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                     <FormField
+                                        control={form.control}
+                                        name="practiceSetSubmissionLimit.pass"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Pass</FormLabel>
+                                                <FormControl><Input type="number" {...field} value={field.value ?? 0} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                     <FormField
+                                        control={form.control}
+                                        name="practiceSetSubmissionLimit.pro"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Pass Pro</FormLabel>
+                                                <FormControl><Input type="number" {...field} value={field.value ?? 0} /></FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
                             <FormField
                                 control={form.control}
                                 name="practiceSetPassMark"
