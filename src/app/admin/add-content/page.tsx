@@ -37,7 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon, Book } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -58,6 +58,7 @@ import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 
 const optionSchema = z.object({
@@ -296,8 +297,9 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
 };
 
 
-export default function CreateTestPage() {
+function AddContentForm() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
@@ -453,6 +455,8 @@ export default function CreateTestPage() {
     
     fetchFormData();
   }, [form, replace, toast]);
+
+  const initialContentType = searchParams.get('type');
   
   const currentTestType = form.watch('testType');
 
@@ -502,7 +506,6 @@ export default function CreateTestPage() {
             defaultExam: siteSettings.defaultExam ?? '',
         });
 
-        // Set default form values from settings, but only if they haven't been set by AI content
         const currentValues = form.getValues();
         form.reset({
             ...currentValues,
@@ -512,6 +515,7 @@ export default function CreateTestPage() {
             subject: currentValues.subject || siteSettings.defaultSubject || '',
             examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
             state: currentValues.state || siteSettings.defaultState || '',
+            testType: initialContentType || currentValues.testType || 'Mock Test',
         });
         
         const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
@@ -549,6 +553,10 @@ export default function CreateTestPage() {
         } else {
           form.setValue('testType', types[0].name);
         }
+      }
+
+       if (initialContentType) {
+        form.setValue('testType', initialContentType);
       }
     } catch (error) {
       toast({
@@ -944,7 +952,7 @@ export default function CreateTestPage() {
 
 
     {contentTypes.length > 0 && (
-      <Tabs defaultValue={form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
+      <Tabs defaultValue={initialContentType || form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
         <TabsList className="grid w-full grid-cols-4">
           {contentTypes.map((type) => (
             <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
@@ -1770,7 +1778,10 @@ export default function CreateTestPage() {
   );
 }
 
-
-
-
-
+export default function CreateTestPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AddContentForm />
+        </Suspense>
+    )
+}

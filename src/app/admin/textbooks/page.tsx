@@ -8,7 +8,7 @@ import { db } from '@/lib/firebase/client';
 import { deleteTextbook } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
-import { Book, Edit, Trash2 } from 'lucide-react';
+import { Book, Edit, Trash2, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
@@ -86,6 +86,11 @@ export default function ManageTextbooksPage() {
             A list of all textbooks available on the platform.
           </p>
         </div>
+        <Button asChild>
+            <Link href="/admin/add-content?type=Textbook">
+                <PlusCircle className="mr-2 h-4 w-4" /> Add New Textbook
+            </Link>
+        </Button>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
@@ -122,7 +127,7 @@ export default function ManageTextbooksPage() {
         ))}
          {textbooks.length === 0 && (
             <div className="col-span-full text-center text-muted-foreground py-10">
-                <p>No textbooks found. Add one from the main content editor.</p>
+                <p>No textbooks found. Add one to get started.</p>
             </div>
         )}
       </div>
