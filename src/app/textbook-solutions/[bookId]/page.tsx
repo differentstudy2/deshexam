@@ -9,15 +9,67 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+
+const TextbookContentSidebar = ({
+  chapters,
+  topics,
+  activeChapter,
+  activeTopic,
+  onTopicSelect,
+  onSheetClose,
+}: {
+  chapters: Chapter[];
+  topics: { [key: string]: Topic[] };
+  activeChapter: string | null;
+  activeTopic: string | null;
+  onTopicSelect: (chapterId: string, topicId: string) => void;
+  onSheetClose?: () => void;
+}) => (
+    <Card>
+        <CardHeader>
+            <CardTitle>Chapters</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Accordion type="single" collapsible defaultValue={activeChapter ? `item-${activeChapter}` : undefined}>
+            {chapters.map((chapter) => (
+                <AccordionItem value={`item-${chapter.id}`} key={chapter.id}>
+                <AccordionTrigger>{chapter.title}</AccordionTrigger>
+                <AccordionContent>
+                    <ul className="space-y-1">
+                        {(topics[chapter.id] || []).map(topic => (
+                            <li key={topic.id}>
+                                <Button
+                                    variant="ghost"
+                                    className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
+                                    onClick={() => {
+                                        onTopicSelect(chapter.id, topic.id);
+                                        onSheetClose?.();
+                                    }}
+                                >
+                                <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
+                                <span className="flex-grow">{topic.title}</span>
+                                </Button>
+                            </li>
+                        ))}
+                    </ul>
+                </AccordionContent>
+                </AccordionItem>
+            ))}
+            </Accordion>
+        </CardContent>
+    </Card>
+);
+
 
 export default function TextbookSolutionsPage() {
   const params = useParams();
@@ -29,6 +81,7 @@ export default function TextbookSolutionsPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
   const [loading, setLoading] = useState(true);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const activeChapter = searchParams.get('chapter');
   const activeTopic = searchParams.get('topic');
@@ -100,14 +153,34 @@ export default function TextbookSolutionsPage() {
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
-       <div className="mb-6">
-        <Button variant="ghost" asChild>
-          <Link href="/textbook-solutions">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to All Textbooks
-          </Link>
-        </Button>
-      </div>
+       <div className="mb-6 flex justify-between items-center">
+            <Button variant="ghost" asChild>
+                <Link href="/textbook-solutions">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to All Textbooks
+                </Link>
+            </Button>
+            <div className="md:hidden">
+                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="outline">
+                            <Menu className="mr-2 h-4 w-4" />
+                            Table of Contents
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
+                        <TextbookContentSidebar
+                            chapters={chapters}
+                            topics={topics}
+                            activeChapter={activeChapter}
+                            activeTopic={activeTopic}
+                            onTopicSelect={handleTopicSelect}
+                            onSheetClose={() => setIsSheetOpen(false)}
+                        />
+                    </SheetContent>
+                </Sheet>
+            </div>
+       </div>
       <header className="mb-8 text-center">
         <BookOpen className="mx-auto h-12 w-12 text-primary" />
         <h1 className="mt-4 font-headline text-4xl font-bold">{textbook.title}</h1>
@@ -119,37 +192,14 @@ export default function TextbookSolutionsPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
-        <aside className="md:sticky md:top-20">
-          <Card>
-            <CardHeader>
-              <CardTitle>Chapters</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible defaultValue={activeChapter ? `item-${activeChapter}` : undefined}>
-                {chapters.map((chapter) => (
-                  <AccordionItem value={`item-${chapter.id}`} key={chapter.id}>
-                    <AccordionTrigger>{chapter.title}</AccordionTrigger>
-                    <AccordionContent>
-                      <ul className="space-y-1">
-                          {(topics[chapter.id] || []).map(topic => (
-                              <li key={topic.id}>
-                                  <Button 
-                                      variant="ghost" 
-                                      className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
-                                      onClick={() => handleTopicSelect(chapter.id, topic.id)}
-                                    >
-                                    <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
-                                    <span className="flex-grow">{topic.title}</span>
-                                  </Button>
-                              </li>
-                          ))}
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
+        <aside className="hidden md:block md:sticky md:top-20">
+          <TextbookContentSidebar
+            chapters={chapters}
+            topics={topics}
+            activeChapter={activeChapter}
+            activeTopic={activeTopic}
+            onTopicSelect={handleTopicSelect}
+          />
         </aside>
 
         <main>
@@ -187,7 +237,7 @@ export default function TextbookSolutionsPage() {
            ) : (
              <Card className="min-h-[60vh] flex items-center justify-center">
                 <CardContent className="text-center text-muted-foreground">
-                    <p>Select a chapter and topic from the left to view the content.</p>
+                    <p>Select a chapter and topic from the menu to view the content.</p>
                 </CardContent>
             </Card>
            )}
