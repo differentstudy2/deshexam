@@ -523,7 +523,7 @@ export default function EditContentPage() {
                         <FormItem>
                         <FormLabel>School/College (Optional)</FormLabel>
                         <FormControl>
-                            <Input placeholder="e.g., St. Stephen's College" {...field} />
+                            <Input placeholder="e.g., St. Stephen's College" {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -536,7 +536,7 @@ export default function EditContentPage() {
                         <FormItem>
                         <FormLabel>Semester (Optional)</FormLabel>
                         <FormControl>
-                            <Input placeholder="e.g., 3rd Semester" {...field} />
+                            <Input placeholder="e.g., 3rd Semester" {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
