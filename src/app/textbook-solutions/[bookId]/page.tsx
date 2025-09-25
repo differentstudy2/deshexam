@@ -94,7 +94,7 @@ export default function TextbookSolutionsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 max-w-7xl">
        <div className="mb-6">
         <Button variant="ghost" asChild>
           <Link href="/textbook-solutions">
