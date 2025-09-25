@@ -119,7 +119,7 @@ export default function TextbookSolutionsPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
-        <aside className="sticky top-20">
+        <aside className="md:sticky md:top-20">
           <Card>
             <CardHeader>
               <CardTitle>Chapters</CardTitle>
