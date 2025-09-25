@@ -164,23 +164,22 @@ export default function ManageTextbooksPage() {
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
-          <Card key={book.id} className="flex flex-col">
-            <CardHeader className="p-0">
+          <Card key={book.id} className="flex flex-col max-h-[500px]">
+            <CardHeader className="p-0 relative h-48 flex-shrink-0">
                <Image 
                 src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
                 alt={book.title}
-                width={400}
-                height={300}
-                className="w-full h-48 object-cover rounded-t-lg"
+                fill
+                className="object-cover rounded-t-lg"
                />
             </CardHeader>
-            <CardContent className="flex-grow p-4 flex flex-col">
+            <CardContent className="flex-grow p-4 flex flex-col overflow-y-auto">
               <h3 className="font-bold text-lg flex items-center gap-2 flex-grow"><Book /> {book.title}</h3>
               {book.board && <Badge variant="outline">{book.board}</Badge>}
               <p className="text-sm text-muted-foreground mt-2">{book.description}</p>
               <TextbookStats textbookId={book.id} />
             </CardContent>
-            <CardFooter className="flex flex-col gap-2 p-4">
+            <CardFooter className="flex flex-col gap-2 p-4 border-t">
                 <Button asChild className="w-full">
                     <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
                 </Button>
