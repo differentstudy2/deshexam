@@ -114,7 +114,7 @@ export default function TextbookSolutionsListPage() {
 
   if (loading) {
     return (
-        <div className="container mx-auto py-8 space-y-6">
+        <div className="container mx-auto py-8 space-y-6 max-w-7xl">
             <header className="text-center mb-12">
                 <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Textbook Solutions</h1>
                 <p className="text-lg text-muted-foreground mt-2">
@@ -131,7 +131,7 @@ export default function TextbookSolutionsListPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-6 max-w-7xl">
        <header className="text-center mb-12">
         <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Textbook Solutions</h1>
         <p className="text-lg text-muted-foreground mt-2">
