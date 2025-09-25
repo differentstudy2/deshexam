@@ -45,6 +45,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { generateImage } from '@/ai/flows/ai-image-generator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty.'),
@@ -283,7 +284,20 @@ export default function EditContentPage() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Class</FormLabel>
-                            <Input {...field} />
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a class" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {classes.map((c) => (
+                                    <SelectItem key={c.id} value={c.name}>
+                                    {c.name}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                     )}
