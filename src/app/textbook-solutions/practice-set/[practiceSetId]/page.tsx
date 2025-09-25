@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -312,7 +313,7 @@ export default function PracticeSetPage() {
             <div key={question.id} className="space-y-4 border-t pt-6 first:border-t-0 first:pt-0">
               <p className="font-semibold">{index + 1}. {question.text} <span className="text-sm font-normal text-muted-foreground">({question.marks} mark{question.marks > 1 ? 's': ''})</span></p>
 
-              {question.type === 'Multiple Choice' || question.type === 'True/False' ? (
+              {question.type === 'Multiple Choice' ? (
                 <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)}>
                   {(question.options || []).map((option, i) => (
                     <div key={i} className="flex items-center space-x-2">
@@ -321,45 +322,56 @@ export default function PracticeSetPage() {
                     </div>
                   ))}
                 </RadioGroup>
+              ) : question.type === 'True/False' ? (
+                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="True" id={`${question.id}-true`} />
+                      <Label htmlFor={`${question.id}-true`}>True</Label>
+                    </div>
+                     <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="False" id={`${question.id}-false`} />
+                      <Label htmlFor={`${question.id}-false`}>False</Label>
+                    </div>
+                </RadioGroup>
               ) : question.type === 'Short Answer' ? (
                 <Input 
                   placeholder="Your answer..."
                   onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                 />
-               ) : question.type === 'Matching' && question.matchingOptions ? (
+              ) : question.type === 'Matching' && question.matchingOptions ? (
                   <div className="space-y-4">
-                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                            <div className="font-bold text-center">Column A</div>
-                            <div></div>
-                            <div className="font-bold text-center">Column B</div>
-                        </div>
-                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                <div className="p-3 border rounded-md text-center bg-secondary">
-                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                    {itemA.text}
-                                </div>
-                                <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                <Select 
-                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a match" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                            <SelectItem key={bIndex} value={itemB.text}>
-                                                <div className="flex items-center gap-2">
-                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                    <span>{itemB.text}</span>
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        ))}
-                    </div>
+                      <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                          <div className="font-bold text-center">Column A</div>
+                          <div></div>
+                          <div className="font-bold text-center">Column B</div>
+                      </div>
+                      {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                          <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                              <div className="p-3 border rounded-md text-center bg-secondary">
+                                  {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                  {itemA.text}
+                              </div>
+                              <GripVertical className="h-5 w-5 text-muted-foreground" />
+                              <Select 
+                                  onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
+                              >
+                                  <SelectTrigger>
+                                      <SelectValue placeholder="Select a match" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                      {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                          <SelectItem key={bIndex} value={itemB.text}>
+                                              <div className="flex items-center gap-2">
+                                                  {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                  <span>{itemB.text}</span>
+                                              </div>
+                                          </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                              </Select>
+                          </div>
+                      ))}
+                  </div>
               ) : null}
             </div>
           ))}
@@ -385,3 +397,5 @@ export default function PracticeSetPage() {
     </div>
   );
 }
+
+    
