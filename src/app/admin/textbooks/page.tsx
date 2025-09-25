@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -150,14 +149,14 @@ export default function ManageTextbooksPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="font-headline text-3xl font-bold">Manage Textbooks</h1>
           <p className="text-muted-foreground">
             A list of all textbooks available on the platform.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="w-full md:w-auto">
             <Link href="/admin/textbooks/add">
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Textbook
             </Link>
@@ -185,12 +184,12 @@ export default function ManageTextbooksPage() {
                     <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
                 </Button>
                 <div className="flex gap-2 w-full">
-                    <Button asChild className="w-full">
+                    <Button asChild className="w-full" variant="secondary">
                         <Link href={`/textbook-solutions/${book.id}`} target="_blank">
                             <Eye className="mr-2 h-4 w-4" /> View
                         </Link>
                     </Button>
-                    <Button asChild className="w-full">
+                    <Button asChild className="w-full" variant="outline">
                         <Link href={`/admin/textbooks/${book.id}/edit`}>
                             <Edit className="mr-2 h-4 w-4" /> Edit
                         </Link>
