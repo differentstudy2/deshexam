@@ -13,12 +13,13 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 const TextbookContentSidebar = ({
   chapters,
@@ -148,18 +149,22 @@ export default function TextbookSolutionsPage() {
   }
 
   if (!textbook) {
-    return <div>Textbook not found</div>;
+    return (
+        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+            <p>Textbook not found.</p>
+        </div>
+    );
   }
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
        <div className="mb-6 flex justify-between items-center">
-            <Button variant="ghost" asChild>
-                <Link href="/textbook-solutions">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to All Textbooks
-                </Link>
-            </Button>
+            <div className="text-sm text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                <Link href="/textbook-solutions" className="hover:text-primary">Textbook Solutions</Link>
+                <ChevronRight className="w-4 h-4" />
+                <span className="text-foreground">{textbook.title}</span>
+            </div>
+
             <div className="md:hidden">
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                     <SheetTrigger asChild>
@@ -181,18 +186,27 @@ export default function TextbookSolutionsPage() {
                 </Sheet>
             </div>
        </div>
-      <header className="mb-8 text-center">
-        <BookOpen className="mx-auto h-12 w-12 text-primary" />
-        <h1 className="mt-4 font-headline text-4xl font-bold">{textbook.title}</h1>
-        <p className="mt-2 text-lg text-muted-foreground">{textbook.description}</p>
-        <div className="mt-2 flex justify-center gap-2">
-            <Badge variant="secondary">{textbook.subject}</Badge>
-            <Badge variant="secondary">{textbook.class}</Badge>
+      <header className="mb-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 rounded-lg bg-card p-6">
+        <Image 
+            src={textbook.featureImage || "https://picsum.photos/seed/bookcover/200/280"}
+            alt={textbook.title}
+            width={150}
+            height={210}
+            className="rounded-md shadow-lg object-cover w-36 md:w-40"
+        />
+        <div className="text-center md:text-left">
+            <h1 className="font-headline text-3xl md:text-4xl font-bold">{textbook.title} Solutions</h1>
+            <p className="mt-2 text-lg text-muted-foreground">{textbook.description}</p>
+            <div className="mt-4 flex justify-center md:justify-start flex-wrap gap-2">
+                <Badge variant="secondary">{textbook.subject}</Badge>
+                <Badge variant="secondary">{textbook.class}</Badge>
+                {textbook.board && <Badge variant="outline">{textbook.board}</Badge>}
+            </div>
         </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
-        <aside className="hidden md:block md:sticky md:top-20">
+        <aside className="hidden md:block md:sticky md:top-24">
           <TextbookContentSidebar
             chapters={chapters}
             topics={topics}
@@ -218,7 +232,7 @@ export default function TextbookSolutionsPage() {
                                         <h3 className="mt-6 font-semibold text-lg">Practice Sets</h3>
                                         <div className="space-y-2 mt-4">
                                             {selectedTopicContent.practiceSets.map(ps => (
-                                                <Card key={ps.id} className="p-4 flex justify-between items-center">
+                                                <Card key={ps.id} className="p-4 flex justify-between items-center not-prose">
                                                     <div className="flex items-center gap-3">
                                                         <CheckSquare className="h-5 w-5 text-primary" />
                                                         <span className="font-medium">{ps.title}</span>
@@ -241,7 +255,8 @@ export default function TextbookSolutionsPage() {
            ) : (
              <Card className="min-h-[60vh] flex items-center justify-center">
                 <CardContent className="text-center text-muted-foreground">
-                    <p>Select a chapter and topic from the menu to view the content.</p>
+                    <BookOpen className="mx-auto h-12 w-12 mb-4" />
+                    <p className="font-semibold">Select a chapter and topic to start learning.</p>
                 </CardContent>
             </Card>
            )}
