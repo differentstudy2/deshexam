@@ -95,6 +95,8 @@ const formSchema = z.object({
   examCategory: z.string().optional(),
   state: z.string().optional(),
   exam: z.string().optional(),
+  school: z.string().optional(),
+  semester: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newClass: z.string().optional(),
@@ -348,6 +350,8 @@ export default function CreateTestPage() {
       examCategory: '',
       state: '',
       exam: '',
+      school: '',
+      semester: '',
       newSubject: '',
       newBoard: '',
       newClass: '',
@@ -685,6 +689,8 @@ export default function CreateTestPage() {
             newExam: '',
             newChapterName: '',
             difficulty: 'Medium',
+            school: '',
+            semester: '',
         });
         if (!settings.defaultSubject) setChapters([]);
         if (!settings.defaultExamCategory) setExams([]);
@@ -702,6 +708,8 @@ export default function CreateTestPage() {
             subscriptionPlan: 'pass',
             questions: [],
             difficulty: 'Medium',
+            school: '',
+            semester: '',
          });
       }
       
@@ -999,7 +1007,74 @@ export default function CreateTestPage() {
                         </FormItem>
                     )}
                     />}
+                     {settings.enableStateMetafield && <FormField
+                      control={form.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State</FormLabel>
+                          {!isAddingNewState ? (
+                            <Select onValueChange={handleStateChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a state" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {states.map((s) => (
+                                  <SelectItem key={s.id} value={s.name}>
+                                    {s.name}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value="add_new_state">Add new state...</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <div className='space-y-2'>
+                              <FormField
+                                control={form.control}
+                                name="newState"
+                                render={({ field }) => (
+                                  <Input {...field} placeholder="Enter new state name" />
+                                )}
+                              />
+                              <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewState(false); form.setValue('state', ''); }}>Cancel</Button>
+                            </div>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />}
                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="school"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>School/College (Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., St. Stephen's College" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="semester"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Semester (Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., 3rd Semester" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  {settings.enableSubjectMetafield && <FormField
@@ -1105,44 +1180,7 @@ export default function CreateTestPage() {
                     </FormItem>
                   )}
                 />}
-                 {settings.enableStateMetafield && <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>State</FormLabel>
-                        {!isAddingNewState ? (
-                                <Select onValueChange={handleStateChange} value={field.value}>
-                                    <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a state" />
-                                    </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                    {states.map((s) => (
-                                        <SelectItem key={s.id} value={s.name}>
-                                        {s.name}
-                                        </SelectItem>
-                                    ))}
-                                    <SelectItem value="add_new_state">Add new state...</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            ) : (
-                                <div className='space-y-2'>
-                                    <FormField
-                                        control={form.control}
-                                        name="newState"
-                                        render={({ field }) => (
-                                            <Input {...field} placeholder="Enter new state name" />
-                                        )}
-                                    />
-                                    <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewState(false); form.setValue('state', ''); }}>Cancel</Button>
-                                </div>
-                            )}
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />}
+                 
                  {settings.enableExamMetafield && <FormField
                   control={form.control}
                   name="exam"
@@ -1664,5 +1702,6 @@ export default function CreateTestPage() {
     </div>
   );
 }
+
 
 

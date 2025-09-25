@@ -84,6 +84,8 @@ const formSchema = z.object({
   exam: z.string().optional(),
   subject: z.string().optional(),
   chapter: z.string().optional(),
+  school: z.string().optional(),
+  semester: z.string().optional(),
   newSubject: z.string().optional(),
   newBoard: z.string().optional(),
   newClass: z.string().optional(),
@@ -401,6 +403,8 @@ export default function EditContentPage() {
       exam: '',
       subject: '',
       chapter: '',
+      school: '',
+      semester: '',
       newSubject: '',
       newBoard: '',
       newClass: '',
@@ -986,6 +990,35 @@ export default function EditContentPage() {
                     />}
               </div>
 
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                    control={form.control}
+                    name="school"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>School/College (Optional)</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., St. Stephen's College" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="semester"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Semester (Optional)</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., 3rd Semester" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {settings.enableSubjectMetafield && <FormField
                   control={form.control}
@@ -1524,7 +1557,7 @@ export default function EditContentPage() {
                         <DialogHeader>
                             <DialogTitle>Bulk Import Questions</DialogTitle>
                             <DialogDescription>
-                                Upload a JSON file or paste JSON text containing an array of questions. The file must have a top-level key named "questions".
+                                Upload a JSON file or paste JSON text containing an array of questions.
                             </DialogDescription>
                         </DialogHeader>
                         <Tabs defaultValue="upload" className="w-full">
@@ -1561,7 +1594,7 @@ export default function EditContentPage() {
                           <AccordionItem value="item-1">
                             <AccordionTrigger>View JSON Format Examples</AccordionTrigger>
                             <AccordionContent>
-                              <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects.</p>
+                              <p className="text-sm text-muted-foreground mb-4">Your JSON file should contain a single key "questions" which is an array of question objects, or multiple keys with arrays of questions which will be combined.</p>
                               <Tabs defaultValue="mcq" className="w-full">
                                 <TabsList className="h-auto flex-wrap justify-start">
                                   <TabsTrigger value="mcq">MCQ</TabsTrigger>
@@ -1602,4 +1635,5 @@ export default function EditContentPage() {
     
 
     
+
 
