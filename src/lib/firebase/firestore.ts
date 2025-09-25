@@ -6,6 +6,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -831,6 +832,20 @@ export const getClasses = async () => {
         throw new Error("Failed to fetch classes.");
     }
 };
+
+export const getGradesByClass = async (classId: string) => {
+    try {
+        const gradesRef = collection(db, `classes/${classId}/grades`);
+        const q = query(gradesRef, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const grades = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return grades;
+    } catch (e) {
+        console.error("Error getting grades: ", e);
+        throw new Error("Failed to fetch grades for the class.");
+    }
+};
+
 
 export const addClass = async (className: string) => {
     if (!className) {

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -30,6 +31,7 @@ import {
   updateContent,
   getSubjects,
   getClasses,
+  getGradesByClass,
   uploadFile,
 } from '@/lib/firebase/firestore';
 import { Loader2, Save, Upload, Image as ImageIcon, Sparkles } from 'lucide-react';
@@ -51,13 +53,15 @@ const formSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty.'),
   description: z.string().optional(),
   subject: z.string().optional(),
+  classCategory: z.string().optional(),
   class: z.string().optional(),
   featureImage: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 type Subject = { id: string, name: string };
-type Class = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
 
 const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlChange: (url: string) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -152,7 +156,8 @@ export default function EditContentPage() {
   const contentId = params.bookId as string;
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -160,10 +165,25 @@ export default function EditContentPage() {
       title: '',
       description: '',
       subject: '',
+      classCategory: '',
       class: '',
       featureImage: '',
     },
   });
+  
+  const selectedClassCategory = form.watch('classCategory');
+
+  useEffect(() => {
+    const fetchDependentData = async () => {
+        if(selectedClassCategory) {
+            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            setGrades(fetchedGrades);
+        } else {
+            setGrades([]);
+        }
+    };
+    fetchDependentData();
+  }, [selectedClassCategory]);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -177,10 +197,15 @@ export default function EditContentPage() {
         ]);
 
         setSubjects(subjectData);
-        setClasses(classData);
+        setClassCategories(classData);
 
         if (contentData) {
           form.reset(contentData as FormValues);
+          // If a class category is already set, fetch its grades
+          if(contentData.classCategory) {
+              const initialGrades = await getGradesByClass(contentData.classCategory);
+              setGrades(initialGrades);
+          }
         } else {
           throw new Error("Textbook not found");
         }
@@ -273,27 +298,16 @@ export default function EditContentPage() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Subject</FormLabel>
-                             <Input {...field} />
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={form.control}
-                    name="class"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Class</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                             <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select a class" />
+                                    <SelectValue placeholder="Select a subject" />
                                 </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                {classes.map((c) => (
-                                    <SelectItem key={c.id} value={c.name}>
-                                    {c.name}
+                                {subjects.map((s) => (
+                                    <SelectItem key={s.id} value={s.name}>
+                                    {s.name}
                                     </SelectItem>
                                 ))}
                                 </SelectContent>
@@ -302,6 +316,56 @@ export default function EditContentPage() {
                         </FormItem>
                     )}
                 />
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <FormField
+                        control={form.control}
+                        name="classCategory"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Class Category</FormLabel>
+                                <Select onValueChange={(value) => { field.onChange(value); form.setValue('class', ''); }} value={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a category" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {classCategories.map((c) => (
+                                        <SelectItem key={c.id} value={c.id}>
+                                        {c.name}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="class"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Grade</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategory}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a grade" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    {grades.map((g) => (
+                                        <SelectItem key={g.id} value={g.name}>
+                                        {g.name}
+                                        </SelectItem>
+                                    ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
               </div>
 
                <FormField
