@@ -197,18 +197,18 @@ export default function ManageChaptersPage() {
                 {chapters.map((chapter) => (
                   <li
                     key={chapter.id}
-                    className="flex items-center justify-between rounded-md border p-3 gap-2"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-md border p-3 gap-2"
                   >
                     <div className="flex items-center gap-2">
                         <ContentBadge type={chapter.access || 'free'} />
-                        <span className="truncate pr-2">{chapter.title}</span>
+                        <span className="font-medium">{chapter.title}</span>
                     </div>
-                    <div className="flex-shrink-0 flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)}>
+                    <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                        <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full sm:w-auto">
                             <Edit className="h-3 w-3 mr-1"/>
                             Edit
                         </Button>
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
                           <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics</Link>
                         </Button>
                     </div>
