@@ -13,9 +13,12 @@ type TextbookFiltersProps = {
     subjects: MetafieldItem[];
     selectedSubject: string;
     onSubjectChange: (subject: string) => void;
-    classes: MetafieldItem[];
-    selectedClass: string;
-    onClassChange: (className: string) => void;
+    classCategories: MetafieldItem[];
+    selectedClassCategory: string;
+    onClassCategoryChange: (classCategory: string) => void;
+    grades: MetafieldItem[];
+    selectedGrade: string;
+    onGradeChange: (grade: string) => void;
     boards: MetafieldItem[];
     selectedBoard: string;
     onBoardChange: (board: string) => void;
@@ -27,9 +30,12 @@ export function TextbookFilters({
     subjects,
     selectedSubject,
     onSubjectChange,
-    classes,
-    selectedClass,
-    onClassChange,
+    classCategories,
+    selectedClassCategory,
+    onClassCategoryChange,
+    grades,
+    selectedGrade,
+    onGradeChange,
     boards,
     selectedBoard,
     onBoardChange
@@ -37,7 +43,7 @@ export function TextbookFilters({
   return (
     <div className="mb-8 p-4 bg-card border rounded-lg">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="relative lg:col-span-2">
+        <div className="relative lg:col-span-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             placeholder="Search by textbook title..." 
@@ -46,7 +52,7 @@ export function TextbookFilters({
             onChange={(e) => onSearchQueryChange(e.target.value)}
           />
         </div>
-        <Select value={selectedBoard} onValueChange={onBoardChange}>
+         <Select value={selectedBoard} onValueChange={onBoardChange}>
           <SelectTrigger className="h-10">
             <SelectValue placeholder="Filter by board" />
           </SelectTrigger>
@@ -57,19 +63,8 @@ export function TextbookFilters({
             ))}
           </SelectContent>
         </Select>
-         <Select value={selectedClass} onValueChange={onClassChange}>
-          <SelectTrigger className="h-10">
-            <SelectValue placeholder="Filter by class" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Classes</SelectItem>
-            {classes.map((c) => (
-              <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select value={selectedSubject} onValueChange={onSubjectChange}>
-          <SelectTrigger className="h-10 lg:col-start-3">
+          <SelectTrigger className="h-10">
             <SelectValue placeholder="Filter by subject" />
           </SelectTrigger>
           <SelectContent>
@@ -78,6 +73,28 @@ export function TextbookFilters({
               <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
             ))}
           </SelectContent>
+        </Select>
+        <Select value={selectedClassCategory} onValueChange={onClassCategoryChange}>
+          <SelectTrigger className="h-10">
+            <SelectValue placeholder="Filter by Class Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Class Categories</SelectItem>
+            {classCategories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={selectedGrade} onValueChange={onGradeChange} disabled={selectedClassCategory === 'all' || grades.length === 0}>
+            <SelectTrigger className="h-10">
+                <SelectValue placeholder="Filter by Grade" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="all">All Grades</SelectItem>
+                {grades.map((g) => (
+                <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
+                ))}
+            </SelectContent>
         </Select>
       </div>
     </div>

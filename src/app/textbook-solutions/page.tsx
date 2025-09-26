@@ -12,7 +12,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ContentBadge } from '@/components/content-badge';
-import { getSubjects, getClasses, getBoards } from '@/lib/firebase/firestore';
+import { getSubjects, getClasses, getBoards, getGradesByClass } from '@/lib/firebase/firestore';
 import { TextbookFilters } from '@/components/feature/textbook-filters';
 
 type Textbook = {
@@ -21,6 +21,7 @@ type Textbook = {
     description: string;
     subject: string;
     class: string;
+    classCategory: string; // Ensure this field exists or is added
     board?: string;
     featureImage?: string;
     access: 'free' | 'premium' | 'pro';
@@ -99,12 +100,14 @@ export default function TextbookSolutionsListPage() {
   const [loading, setLoading] = useState(true);
   
   const [subjects, setSubjects] = useState<{ id: string, name: string }[]>([]);
-  const [classes, setClasses] = useState<{ id: string, name: string }[]>([]);
+  const [classCategories, setClassCategories] = useState<{ id: string, name: string }[]>([]);
+  const [grades, setGrades] = useState<{ id: string, name: string }[]>([]);
   const [boards, setBoards] = useState<{ id: string, name: string }[]>([]);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('all');
-  const [selectedClass, setSelectedClass] = useState('all');
+  const [selectedClassCategory, setSelectedClassCategory] = useState('all');
+  const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedBoard, setSelectedBoard] = useState('all');
 
   useEffect(() => {
@@ -132,7 +135,7 @@ export default function TextbookSolutionsListPage() {
 
         setAllTextbooks(textbooksData);
         setSubjects(subjectsData);
-        setClasses(classesData);
+        setClassCategories(classesData);
         setBoards(boardsData);
 
       } catch (error) {
@@ -145,15 +148,40 @@ export default function TextbookSolutionsListPage() {
     fetchInitialData();
   }, []);
 
+  useEffect(() => {
+    const fetchGrades = async () => {
+        if(selectedClassCategory !== 'all') {
+            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            setGrades(fetchedGrades);
+        } else {
+            setGrades([]);
+        }
+        setSelectedGrade('all');
+    }
+    fetchGrades();
+  }, [selectedClassCategory]);
+
   const filteredTextbooks = useMemo(() => {
+      const gradeNames = grades.map(g => g.name);
+
       return allTextbooks.filter(book => {
           const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
           const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject;
-          const matchesClass = selectedClass === 'all' || book.class === selectedClass;
           const matchesBoard = selectedBoard === 'all' || book.board === selectedBoard;
+          
+          let matchesClass = true;
+          if (selectedClassCategory !== 'all') {
+              if (selectedGrade !== 'all') {
+                  matchesClass = book.class === selectedGrade;
+              } else {
+                  // If a category is selected but no specific grade, check if the book's grade is in that category
+                  matchesClass = book.classCategory === selectedClassCategory;
+              }
+          }
+
           return matchesSearch && matchesSubject && matchesClass && matchesBoard;
       });
-  }, [allTextbooks, searchQuery, selectedSubject, selectedClass, selectedBoard]);
+  }, [allTextbooks, searchQuery, selectedSubject, selectedClassCategory, selectedGrade, selectedBoard, grades]);
 
 
   if (loading) {
@@ -189,9 +217,12 @@ export default function TextbookSolutionsListPage() {
         subjects={subjects}
         selectedSubject={selectedSubject}
         onSubjectChange={setSelectedSubject}
-        classes={classes}
-        selectedClass={selectedClass}
-        onClassChange={setSelectedClass}
+        classCategories={classCategories}
+        selectedClassCategory={selectedClassCategory}
+        onClassCategoryChange={setSelectedClassCategory}
+        grades={grades}
+        selectedGrade={selectedGrade}
+        onGradeChange={setSelectedGrade}
         boards={boards}
         selectedBoard={selectedBoard}
         onBoardChange={setSelectedBoard}
