@@ -63,17 +63,6 @@ export function TextbookFilters({
             ))}
           </SelectContent>
         </Select>
-        <Select value={selectedSubject} onValueChange={onSubjectChange}>
-          <SelectTrigger className="h-10">
-            <SelectValue placeholder="Filter by subject" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Subjects</SelectItem>
-            {subjects.map((subject) => (
-              <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select value={selectedClassCategory} onValueChange={onClassCategoryChange}>
           <SelectTrigger className="h-10">
             <SelectValue placeholder="Filter by Class Category" />
@@ -95,6 +84,17 @@ export function TextbookFilters({
                 <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
                 ))}
             </SelectContent>
+        </Select>
+        <Select value={selectedSubject} onValueChange={onSubjectChange}>
+          <SelectTrigger className="h-10">
+            <SelectValue placeholder="Filter by subject" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Subjects</SelectItem>
+            {subjects.map((subject) => (
+              <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </div>
     </div>
