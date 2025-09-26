@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
@@ -310,6 +310,9 @@ export default function TextbookSolutionsPage() {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
+                        <SheetHeader>
+                           <SheetTitle className="sr-only">Table of Contents</SheetTitle>
+                        </SheetHeader>
                         <TextbookContentSidebar
                             chapters={chapters}
                             topics={topics}
