@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -237,7 +236,7 @@ export default function ManageChaptersPage() {
               </CardHeader>
               <CardContent>
                 {chapters.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
                                 <CardHeader className="flex-row items-center justify-between pb-2">
