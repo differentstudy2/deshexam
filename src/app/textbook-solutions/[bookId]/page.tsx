@@ -49,9 +49,9 @@ const TextbookContentSidebar = ({
     
     const hasAccess = (chapter: Chapter) => {
         if (chapter.access === 'free') return true;
-        if (!userProfile) return false;
-        if (chapter.access === 'pro') return userProfile.subscriptionPlan === 'pro';
-        if (chapter.access === 'pass') return userProfile.subscriptionPlan === 'pass' || userProfile.subscriptionPlan === 'pro';
+        if (!userProfile) return false; // Not logged in, can't access paid content
+        if (userProfile.subscriptionPlan === 'pro') return true; // Pro has access to everything
+        if (userProfile.subscriptionPlan === 'pass') return chapter.access === 'pass'; // Pass has access to 'pass' content
         return false;
     }
 
