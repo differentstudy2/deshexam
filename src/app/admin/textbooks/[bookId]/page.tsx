@@ -179,7 +179,7 @@ export default function ManageChaptersPage() {
         </Button>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</CardTitle>
@@ -237,7 +237,7 @@ export default function ManageChaptersPage() {
               </CardHeader>
               <CardContent>
                 {chapters.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
                                 <CardHeader className="flex-row items-center justify-between pb-2">
