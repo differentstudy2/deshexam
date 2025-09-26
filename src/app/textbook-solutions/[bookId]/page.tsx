@@ -311,7 +311,7 @@ export default function TextbookSolutionsPage() {
                     </SheetTrigger>
                     <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
                         <SheetHeader>
-                           <SheetTitle className="sr-only">Table of Contents</SheetTitle>
+                           <SheetTitle>Table of Contents</SheetTitle>
                         </SheetHeader>
                         <TextbookContentSidebar
                             chapters={chapters}
