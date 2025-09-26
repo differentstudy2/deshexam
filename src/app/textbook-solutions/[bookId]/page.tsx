@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
-import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
