@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -17,7 +16,7 @@ import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -35,16 +34,20 @@ const TextbookContentSidebar = ({
   activeChapter,
   activeTopic,
   onTopicSelect,
+  onChapterToggle,
   onSheetClose,
   userProfile,
+  loadingTopics,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
   activeChapter: string | null;
   activeTopic: string | null;
   onTopicSelect: (chapterId: string, topicId: string) => void;
+  onChapterToggle: (chapterId: string) => void;
   onSheetClose?: () => void;
   userProfile: UserProfile | null;
+  loadingTopics: string | null;
 }) => {
     
     const hasAccess = (chapter: Chapter) => {
@@ -61,6 +64,14 @@ const TextbookContentSidebar = ({
         setOpenAccordion(activeChapter ? `item-${activeChapter}` : undefined);
     }, [activeChapter]);
 
+    const handleAccordionChange = (value: string) => {
+        const chapterId = value.replace('item-', '');
+        setOpenAccordion(value);
+        if (chapterId) {
+            onChapterToggle(chapterId);
+        }
+    }
+
     return (
     <Card>
         <CardHeader>
@@ -71,7 +82,7 @@ const TextbookContentSidebar = ({
                 type="single" 
                 collapsible 
                 value={openAccordion}
-                onValueChange={(value) => setOpenAccordion(value)}
+                onValueChange={handleAccordionChange}
             >
             {chapters.map((chapter) => {
                 const canAccess = hasAccess(chapter);
@@ -98,23 +109,32 @@ const TextbookContentSidebar = ({
                         </TooltipProvider>
 
                         <AccordionContent>
-                            <ul className="space-y-1">
-                                {(topics[chapter.id] || []).map(topic => (
-                                    <li key={topic.id}>
-                                        <Button
-                                            variant="ghost"
-                                            className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
-                                            onClick={() => {
-                                                onTopicSelect(chapter.id, topic.id);
-                                                onSheetClose?.();
-                                            }}
-                                        >
-                                        <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
-                                        <span className="flex-grow">{topic.title}</span>
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
+                             {loadingTopics === chapter.id ? (
+                                <div className="flex justify-center items-center p-4">
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                </div>
+                            ) : (
+                                <ul className="space-y-1">
+                                    {(topics[chapter.id] || []).map(topic => (
+                                        <li key={topic.id}>
+                                            <Button
+                                                variant="ghost"
+                                                className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
+                                                onClick={() => {
+                                                    onTopicSelect(chapter.id, topic.id);
+                                                    onSheetClose?.();
+                                                }}
+                                            >
+                                            <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
+                                            <span className="flex-grow">{topic.title}</span>
+                                            </Button>
+                                        </li>
+                                    ))}
+                                    {topics[chapter.id] && topics[chapter.id].length === 0 && (
+                                        <li className="text-sm text-muted-foreground text-center p-2">No topics in this chapter.</li>
+                                    )}
+                                </ul>
+                            )}
                         </AccordionContent>
                     </AccordionItem>
                 )
@@ -137,6 +157,7 @@ export default function TextbookSolutionsPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
   const [loading, setLoading] = useState(true);
+  const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const activeChapter = searchParams.get('chapter');
@@ -145,7 +166,7 @@ export default function TextbookSolutionsPage() {
   useEffect(() => {
     if (!textbookId) return;
 
-    const fetchTextbookData = async () => {
+    const fetchTextbookAndChapters = async () => {
       setLoading(true);
       const textbookDocRef = doc(db, 'textbooks', textbookId);
       const textbookDocSnap = await getDoc(textbookDocRef);
@@ -162,7 +183,6 @@ export default function TextbookSolutionsPage() {
         const chaptersSnap = await getDocs(chaptersQuery);
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
-        // Sort chapters numerically by title prefix
         chaptersData.sort((a, b) => {
             const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '0', 10);
             const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '0', 10);
@@ -170,30 +190,9 @@ export default function TextbookSolutionsPage() {
         });
         setChapters(chaptersData);
 
-        const allTopics: { [key: string]: Topic[] } = {};
-
-        for (const chapter of chaptersData) {
-            const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics`));
-            const topicsSnap = await getDocs(topicsQuery);
-            const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
-            
-            // Sort topics numerically
-            topicsForChapter.sort((a, b) => {
-                const numA = parseFloat(a.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
-                const numB = parseFloat(b.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
-                return numA - numB;
-            });
-            
-             // Fetch practice sets for each topic
-            for (let topic of topicsForChapter) {
-              const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics/${topic.id}/practiceSets`));
-              const practiceSetsSnap = await getDocs(practiceSetsQuery);
-              topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
-            }
-
-            allTopics[chapter.id] = topicsForChapter;
+        if(activeChapter) {
+            handleChapterToggle(activeChapter);
         }
-        setTopics(allTopics);
 
       } else {
         router.push('/');
@@ -201,8 +200,38 @@ export default function TextbookSolutionsPage() {
       setLoading(false);
     };
 
-    fetchTextbookData();
+    fetchTextbookAndChapters();
   }, [textbookId, router, user]);
+
+  const handleChapterToggle = useCallback(async (chapterId: string) => {
+      // Don't refetch if topics for this chapter are already loaded
+      if (topics[chapterId]) return;
+
+      setLoadingTopics(chapterId);
+      try {
+          const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`));
+          const topicsSnap = await getDocs(topicsQuery);
+          const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
+          
+          topicsForChapter.sort((a, b) => {
+              const numA = parseFloat(a.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
+              const numB = parseFloat(b.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
+              return numA - numB;
+          });
+          
+          for (let topic of topicsForChapter) {
+            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`));
+            const practiceSetsSnap = await getDocs(practiceSetsQuery);
+            topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
+          }
+
+          setTopics(prev => ({ ...prev, [chapterId]: topicsForChapter }));
+      } catch (error) {
+          console.error("Failed to fetch topics:", error);
+      } finally {
+          setLoadingTopics(null);
+      }
+  }, [textbookId, topics]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -254,8 +283,10 @@ export default function TextbookSolutionsPage() {
                             activeChapter={activeChapter}
                             activeTopic={activeTopic}
                             onTopicSelect={handleTopicSelect}
+                            onChapterToggle={handleChapterToggle}
                             onSheetClose={() => setIsSheetOpen(false)}
                             userProfile={userProfile}
+                            loadingTopics={loadingTopics}
                         />
                     </SheetContent>
                 </Sheet>
@@ -288,7 +319,9 @@ export default function TextbookSolutionsPage() {
             activeChapter={activeChapter}
             activeTopic={activeTopic}
             onTopicSelect={handleTopicSelect}
+            onChapterToggle={handleChapterToggle}
             userProfile={userProfile}
+            loadingTopics={loadingTopics}
           />
         </aside>
 
