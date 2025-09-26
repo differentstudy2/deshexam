@@ -51,7 +51,7 @@ const TextbookContentSidebar = ({
         if (chapter.access === 'free') return true;
         if (!userProfile) return false; // Not logged in, can't access paid content
         if (userProfile.subscriptionPlan === 'pro') return true; // Pro has access to everything
-        if (userProfile.subscriptionPlan === 'pass') return chapter.access === 'pass'; // Pass has access to 'pass' content
+        if (userProfile.subscriptionPlan === 'pass' && (chapter.access === 'pass' || chapter.access === 'free')) return true; // Pass has access to 'pass' and 'free' content
         return false;
     }
 
@@ -161,6 +161,13 @@ export default function TextbookSolutionsPage() {
         const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`));
         const chaptersSnap = await getDocs(chaptersQuery);
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+        
+        // Sort chapters numerically by title prefix
+        chaptersData.sort((a, b) => {
+            const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '0', 10);
+            const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '0', 10);
+            return numA - numB;
+        });
         setChapters(chaptersData);
 
         const allTopics: { [key: string]: Topic[] } = {};
@@ -169,6 +176,13 @@ export default function TextbookSolutionsPage() {
             const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics`));
             const topicsSnap = await getDocs(topicsQuery);
             const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
+            
+            // Sort topics numerically
+            topicsForChapter.sort((a, b) => {
+                const numA = parseFloat(a.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
+                const numB = parseFloat(b.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
+                return numA - numB;
+            });
             
              // Fetch practice sets for each topic
             for (let topic of topicsForChapter) {
