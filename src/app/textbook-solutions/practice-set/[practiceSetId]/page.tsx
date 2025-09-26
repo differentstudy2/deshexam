@@ -308,7 +308,8 @@ export default function PracticeSetPage() {
         <Button variant="ghost" asChild>
           <Link href={backUrl}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to {topic?.title || 'Topic'}
+            <span className="truncate md:hidden">Back to Topic</span>
+            <span className="truncate hidden md:inline">Back to {topic?.title || 'Topic'}</span>
           </Link>
         </Button>
       </div>
