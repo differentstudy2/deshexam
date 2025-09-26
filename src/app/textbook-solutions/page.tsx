@@ -170,14 +170,14 @@ export default function TextbookSolutionsListPage() {
           const matchesBoard = selectedBoard === 'all' || book.board === selectedBoard;
           
           let matchesClass = true;
-          if (selectedClassCategory !== 'all') {
-              if (selectedGrade !== 'all') {
-                  matchesClass = book.class === selectedGrade;
-              } else {
-                  // If a category is selected but no specific grade, check if the book's grade is in that category
-                  matchesClass = book.classCategory === selectedClassCategory;
-              }
-          }
+            if (selectedClassCategory !== 'all') {
+                if (selectedGrade !== 'all') {
+                    matchesClass = book.class === selectedGrade;
+                } else {
+                    // If a category is selected but no grade, check if the book's class is one of the grades in that category.
+                    matchesClass = gradeNames.includes(book.class);
+                }
+            }
 
           return matchesSearch && matchesSubject && matchesClass && matchesBoard;
       });
