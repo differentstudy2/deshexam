@@ -378,7 +378,7 @@ export default function TextbookSolutionsPage() {
                                 {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
                                     <div className="mt-8">
                                         <Separator />
-                                        <h3 className="mt-6 font-semibold text-lg">Practice Sets</h3>
+                                        <h3 className="mt-6 font-semibold text-2xl">Practice Sets</h3>
                                         <div className="space-y-2 mt-4">
                                             {selectedTopicContent.practiceSets.map(ps => (
                                                 <Card key={ps.id} className="p-4 flex justify-between items-center not-prose">
