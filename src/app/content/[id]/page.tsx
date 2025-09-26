@@ -276,14 +276,14 @@ export default function TestPage() {
                                 </RadioGroup>
                                 )}
                                 {question.type === 'True/False' && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(questionIndex, value)} value={answers[questionIndex]} className="flex space-x-4">
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(questionIndex, value)} value={answers[questionIndex]} className="flex space-x-4 true-false-group">
                                     <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="True" id={`q${questionIndex}-true`} />
-                                    <Label htmlFor={`q${questionIndex}-true`}>True</Label>
+                                    <Label htmlFor={`q${questionIndex}-true`} className="text-base">True</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="False" id={`q${questionIndex}-false`} />
-                                    <Label htmlFor={`q${questionIndex}-false`}>False</Label>
+                                    <Label htmlFor={`q${questionIndex}-false`} className="text-base">False</Label>
                                     </div>
                                 </RadioGroup>
                                 )}
@@ -413,5 +413,6 @@ export default function TestPage() {
     </div>
   );
 }
+
 
 
