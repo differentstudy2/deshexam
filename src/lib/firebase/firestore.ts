@@ -13,6 +13,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1597,39 +1598,40 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const ordersCollection = collection(db, "orders");
         const usersCollection = collection(db, "users");
-        
-        // Fetch all successful orders first, then filter by date in client code.
-        const allOrdersQuery = query(ordersCollection, where("status", "==", "Success"), orderBy("createdAt", "desc"));
-        
-        const [allOrdersSnapshot, usersCountSnapshot] = await Promise.all([
+
+        const allOrdersQuery = query(ordersCollection, where("status", "==", "Success"));
+        const todayOrdersQuery = query(ordersCollection, where("status", "==", "Success"), where("createdAt", ">=", startOfToday));
+        const monthOrdersQuery = query(ordersCollection, where("status", "==", "Success"), where("createdAt", ">=", startOfMonth));
+
+        const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
+            getDocs(todayOrdersQuery),
+            getDocs(monthOrdersQuery),
             getCountFromServer(usersCollection),
         ]);
 
-        const successfulOrders = allOrdersSnapshot.docs
-            .map(doc => doc.data());
-            
-        const totalRevenue = successfulOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
-        
-        const todayOrders = successfulOrders.filter(data => data.createdAt.toDate() >= startOfToday);
-        const revenueToday = todayOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
-        
-        const monthOrders = successfulOrders.filter(data => data.createdAt.toDate() >= startOfMonth);
-        const revenueThisMonth = monthOrders.reduce((sum, data) => sum + (data.amount || 0), 0);
-        
+        const totalRevenue = allOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const revenueToday = todayOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+
         return {
             totalRevenue,
             revenueToday,
             revenueThisMonth,
-            salesTodayCount: todayOrders.length,
+            salesTodayCount: todayOrdersSnapshot.size,
             totalUsers: usersCountSnapshot.data().count,
         };
 
-    } catch (error) {
+    } catch (error: any) {
+        // Firestore will suggest creating an index in the error message.
+        if (error.code === 'failed-precondition') {
+            console.error("Firestore error: ", error.message);
+            throw new Error(`Query failed. Firestore likely requires a new index. Please check the console logs for a link to create it.`);
+        }
         console.error("Error fetching earning stats:", error);
         throw new Error("Failed to fetch earning statistics.");
     }
-}
+};
 
 export const getAllTextbooks = async () => {
     try {
