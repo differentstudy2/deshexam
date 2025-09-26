@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
-import { getUserProfile, getTextbookProgress } from '@/lib/firebase/firestore';
+import { getUserProfile, getTextbookProgress, getSettings } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type UserProfile = {
@@ -46,6 +46,7 @@ const TextbookContentSidebar = ({
   userProfile,
   loadingTopics,
   progress,
+  settings,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
@@ -57,11 +58,12 @@ const TextbookContentSidebar = ({
   userProfile: UserProfile | null;
   loadingTopics: string | null;
   progress: TextbookProgress | null;
+  settings: any;
 }) => {
     
     const hasAccess = (chapter: Chapter, index: number) => {
-        // Rule 1: First chapter is always unlocked
-        if (index === 0) return true;
+        if (!settings.gateChaptersOnPass) return true; // If gating is off, all are accessible
+        if (index < settings.freeChaptersPerBook) return true; // Free chapters are always accessible
 
         // Rule 2: Check subscription access
         if (chapter.access !== 'free') {
@@ -181,6 +183,7 @@ export default function TextbookSolutionsPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
   const [progress, setProgress] = useState<TextbookProgress | null>(null);
+  const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -194,8 +197,10 @@ export default function TextbookSolutionsPage() {
     const fetchTextbookAndChapters = async () => {
       setLoading(true);
       const textbookDocRef = doc(db, 'textbooks', textbookId);
-      const textbookDocSnap = await getDoc(textbookDocRef);
       
+      const [siteSettings, textbookDocSnap] = await Promise.all([getSettings(), getDoc(textbookDocRef)]);
+      setSettings(siteSettings);
+
       if (user) {
           const [profile, progressData] = await Promise.all([
             getUserProfile(user.uid),
@@ -248,7 +253,7 @@ export default function TextbookSolutionsPage() {
           });
           
           for (let topic of topicsForChapter) {
-            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`));
+            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
             const practiceSetsSnap = await getDocs(practiceSetsQuery);
             topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
           }
@@ -316,6 +321,7 @@ export default function TextbookSolutionsPage() {
                             userProfile={userProfile}
                             loadingTopics={loadingTopics}
                             progress={progress}
+                            settings={settings}
                         />
                     </SheetContent>
                 </Sheet>
@@ -352,6 +358,7 @@ export default function TextbookSolutionsPage() {
             userProfile={userProfile}
             loadingTopics={loadingTopics}
             progress={progress}
+            settings={settings}
           />
         </aside>
 

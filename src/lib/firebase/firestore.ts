@@ -12,6 +12,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1860,5 +1861,16 @@ export const getTextbookProgress = async (userId: string, textbookId: string) =>
     } catch (error) {
         console.error("Error fetching textbook progress: ", error);
         return null; // Return null on error to avoid breaking the UI
+    }
+}
+
+export const updateTextbookProgress = async (userId: string, textbookId: string, chapterId: string, data: any) => {
+    if (!userId || !textbookId || !chapterId) return;
+    try {
+        const progressRef = doc(db, `users/${userId}/textbookProgress`, textbookId);
+        await setDoc(progressRef, { [chapterId]: data }, { merge: true });
+    } catch (error) {
+        console.error("Error updating textbook progress: ", error);
+        throw new Error("Failed to update progress.");
     }
 }
