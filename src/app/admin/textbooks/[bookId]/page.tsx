@@ -78,8 +78,8 @@ export default function ManageChaptersPage() {
     
     // Sort chapters numerically by title prefix
     chaptersData.sort((a, b) => {
-        const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '0', 10);
-        const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '0', 10);
+        const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
+        const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
         return numA - numB;
     });
 

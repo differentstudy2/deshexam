@@ -218,8 +218,8 @@ export default function TextbookSolutionsPage() {
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
         chaptersData.sort((a, b) => {
-            const numA = parseInt(a.title.match(/^(\\d+)/)?.[1] || '0', 10);
-            const numB = parseInt(b.title.match(/^(\\d+)/)?.[1] || '0', 10);
+            const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
+            const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
             return numA - numB;
         });
         setChapters(chaptersData);
@@ -247,8 +247,8 @@ export default function TextbookSolutionsPage() {
           const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
           
           topicsForChapter.sort((a, b) => {
-              const numA = parseFloat(a.title.match(/^(\\d+(\\.\\d+)?)/)?.[1] || '0');
-              const numB = parseFloat(b.title.match(/^(\\d+(\\.\\d+)?)/)?.[1] || '0');
+              const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || '0');
+              const numB = parseFloat(b.title.match(/^\d+(\.\d+)?/)?.[0] || '0');
               return numA - numB;
           });
           
@@ -311,7 +311,7 @@ export default function TextbookSolutionsPage() {
                     </SheetTrigger>
                     <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
                         <SheetHeader>
-                           <SheetTitle>Table of Contents</SheetTitle>
+                           <SheetTitle className="sr-only">Table of Contents</SheetTitle>
                         </SheetHeader>
                         <TextbookContentSidebar
                             chapters={chapters}
