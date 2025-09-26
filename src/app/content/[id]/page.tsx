@@ -270,7 +270,7 @@ export default function TestPage() {
                                     {question.options.map((option, optIndex) => (
                                     <div key={optIndex} className="flex items-center space-x-2">
                                         <RadioGroupItem value={option.text} id={`q${questionIndex}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${questionIndex}-opt${optIndex}`} className="text-base">{option.text}</Label>
+                                        <Label htmlFor={`q${questionIndex}-opt${optIndex}`} className="text-2xl">{option.text}</Label>
                                     </div>
                                     ))}
                                 </RadioGroup>
@@ -413,6 +413,7 @@ export default function TestPage() {
     </div>
   );
 }
+
 
 
 
