@@ -22,6 +22,8 @@ type TextbookFiltersProps = {
     boards: MetafieldItem[];
     selectedBoard: string;
     onBoardChange: (board: string) => void;
+    schoolQuery: string;
+    onSchoolQueryChange: (query: string) => void;
 }
 
 export function TextbookFilters({
@@ -38,12 +40,14 @@ export function TextbookFilters({
     onGradeChange,
     boards,
     selectedBoard,
-    onBoardChange
+    onBoardChange,
+    schoolQuery,
+    onSchoolQueryChange,
 }: TextbookFiltersProps) {
   return (
     <div className="mb-8 p-4 bg-card border rounded-lg">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="relative lg:col-span-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="relative lg:col-span-5">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             placeholder="Search by textbook title..." 
@@ -63,6 +67,16 @@ export function TextbookFilters({
             ))}
           </SelectContent>
         </Select>
+
+        <div className="relative">
+          <Input 
+            placeholder="Search by School/College..." 
+            className="h-10" 
+            value={schoolQuery}
+            onChange={(e) => onSchoolQueryChange(e.target.value)}
+          />
+        </div>
+
         <Select value={selectedClassCategory} onValueChange={onClassCategoryChange}>
           <SelectTrigger className="h-10">
             <SelectValue placeholder="Filter by Class Category" />
@@ -74,6 +88,7 @@ export function TextbookFilters({
             ))}
           </SelectContent>
         </Select>
+
         <Select value={selectedGrade} onValueChange={onGradeChange} disabled={selectedClassCategory === 'all' || grades.length === 0}>
             <SelectTrigger className="h-10">
                 <SelectValue placeholder="Filter by Grade" />
@@ -85,6 +100,7 @@ export function TextbookFilters({
                 ))}
             </SelectContent>
         </Select>
+
         <Select value={selectedSubject} onValueChange={onSubjectChange}>
           <SelectTrigger className="h-10">
             <SelectValue placeholder="Filter by subject" />

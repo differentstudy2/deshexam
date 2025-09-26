@@ -23,6 +23,7 @@ type Textbook = {
     class: string;
     classCategory: string; // Ensure this field exists or is added
     board?: string;
+    school?: string;
     featureImage?: string;
     access: 'free' | 'premium' | 'pro';
 };
@@ -109,6 +110,7 @@ export default function TextbookSolutionsListPage() {
   const [selectedClassCategory, setSelectedClassCategory] = useState('all');
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedBoard, setSelectedBoard] = useState('all');
+  const [selectedSchool, setSelectedSchool] = useState('');
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -168,6 +170,7 @@ export default function TextbookSolutionsListPage() {
           const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
           const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject;
           const matchesBoard = selectedBoard === 'all' || book.board === selectedBoard;
+          const matchesSchool = !selectedSchool || (book.school && book.school.toLowerCase().includes(selectedSchool.toLowerCase()));
           
           let matchesClass = true;
             if (selectedClassCategory !== 'all') {
@@ -179,9 +182,9 @@ export default function TextbookSolutionsListPage() {
                 }
             }
 
-          return matchesSearch && matchesSubject && matchesClass && matchesBoard;
+          return matchesSearch && matchesSubject && matchesClass && matchesBoard && matchesSchool;
       });
-  }, [allTextbooks, searchQuery, selectedSubject, selectedClassCategory, selectedGrade, selectedBoard, grades]);
+  }, [allTextbooks, searchQuery, selectedSubject, selectedClassCategory, selectedGrade, selectedBoard, selectedSchool, grades]);
 
 
   if (loading) {
@@ -226,6 +229,8 @@ export default function TextbookSolutionsListPage() {
         boards={boards}
         selectedBoard={selectedBoard}
         onBoardChange={setSelectedBoard}
+        schoolQuery={selectedSchool}
+        onSchoolQueryChange={setSelectedSchool}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
