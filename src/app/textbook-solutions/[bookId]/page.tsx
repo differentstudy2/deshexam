@@ -62,7 +62,7 @@ const TextbookContentSidebar = ({
 }) => {
     
     const hasAccess = (chapter: Chapter, index: number) => {
-        if (!settings.gateChaptersOnPass) return true; // If gating is off, all are accessible
+        if (!settings?.gateChaptersOnPass) return true; // If gating is off, all are accessible
         if (index < settings.freeChaptersPerBook) return true; // Free chapters are always accessible
 
         // Rule 2: Check subscription access
@@ -218,8 +218,8 @@ export default function TextbookSolutionsPage() {
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
         chaptersData.sort((a, b) => {
-            const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '0', 10);
-            const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '0', 10);
+            const numA = parseInt(a.title.match(/^(\\d+)/)?.[1] || '0', 10);
+            const numB = parseInt(b.title.match(/^(\\d+)/)?.[1] || '0', 10);
             return numA - numB;
         });
         setChapters(chaptersData);
@@ -247,8 +247,8 @@ export default function TextbookSolutionsPage() {
           const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
           
           topicsForChapter.sort((a, b) => {
-              const numA = parseFloat(a.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
-              const numB = parseFloat(b.title.match(/^(\d+(\.\d+)?)/)?.[1] || '0');
+              const numA = parseFloat(a.title.match(/^(\\d+(\\.\\d+)?)/)?.[1] || '0');
+              const numB = parseFloat(b.title.match(/^(\\d+(\\.\\d+)?)/)?.[1] || '0');
               return numA - numB;
           });
           
@@ -294,14 +294,14 @@ export default function TextbookSolutionsPage() {
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
-       <div className="mb-6 flex justify-between items-center">
+       <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-muted-foreground flex items-center gap-1.5 flex-wrap">
                 <Link href="/textbook-solutions" className="hover:text-primary">Textbook Solutions</Link>
                 <ChevronRight className="w-4 h-4" />
                 <span className="text-foreground">{textbook.title}</span>
             </div>
 
-            <div className="md:hidden">
+            <div className="md:hidden self-end">
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                     <SheetTrigger asChild>
                         <Button variant="outline">
