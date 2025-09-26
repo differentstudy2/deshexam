@@ -70,11 +70,19 @@ export default function ManageChaptersPage() {
     }
 
     // Fetch chapters
-    const chaptersQuery = query(collection(db, 'textbooks', textbookId, 'chapters'), orderBy("title"));
+    const chaptersQuery = query(collection(db, 'textbooks', textbookId, 'chapters'));
     const querySnapshot = await getDocs(chaptersQuery);
     const chaptersData = querySnapshot.docs.map(
       (doc) => ({ id: doc.id, ...doc.data() } as Chapter)
     );
+    
+    // Sort chapters numerically by title prefix
+    chaptersData.sort((a, b) => {
+        const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '0', 10);
+        const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '0', 10);
+        return numA - numB;
+    });
+
     setChapters(chaptersData);
     setLoading(false);
   };
