@@ -11,6 +11,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1847,6 +1848,17 @@ export const deleteTextbook = async (textbookId: string) => {
     }
 };
 
-
-
-
+export const getTextbookProgress = async (userId: string, textbookId: string) => {
+    if (!userId || !textbookId) return null;
+    try {
+        const progressRef = doc(db, `users/${userId}/textbookProgress`, textbookId);
+        const docSnap = await getDoc(progressRef);
+        if (docSnap.exists()) {
+            return docSnap.data();
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching textbook progress: ", error);
+        return null; // Return null on error to avoid breaking the UI
+    }
+}

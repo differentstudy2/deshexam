@@ -21,12 +21,19 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
-import { getUserProfile } from '@/lib/firebase/firestore';
+import { getUserProfile, getTextbookProgress } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
 };
+
+type TextbookProgress = {
+    [chapterId: string]: {
+        completed: boolean;
+        // In the future, we can add more details like score, completionDate, etc.
+    }
+}
 
 const TextbookContentSidebar = ({
   chapters,
@@ -38,6 +45,7 @@ const TextbookContentSidebar = ({
   onSheetClose,
   userProfile,
   loadingTopics,
+  progress,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
@@ -48,14 +56,30 @@ const TextbookContentSidebar = ({
   onSheetClose?: () => void;
   userProfile: UserProfile | null;
   loadingTopics: string | null;
+  progress: TextbookProgress | null;
 }) => {
     
-    const hasAccess = (chapter: Chapter) => {
-        if (chapter.access === 'free') return true;
-        if (!userProfile) return false; // Not logged in, can't access paid content
-        if (userProfile.subscriptionPlan === 'pro') return true; // Pro has access to everything
-        if (userProfile.subscriptionPlan === 'pass' && (chapter.access === 'pass' || chapter.access === 'free')) return true; // Pass has access to 'pass' and 'free' content
-        return false;
+    const hasAccess = (chapter: Chapter, index: number) => {
+        // Rule 1: First chapter is always unlocked
+        if (index === 0) return true;
+
+        // Rule 2: Check subscription access
+        if (chapter.access !== 'free') {
+            if (!userProfile) return false;
+            if (userProfile.subscriptionPlan === 'pro') {
+                // Pro can access everything
+            } else if (userProfile.subscriptionPlan === 'pass' && chapter.access === 'pro') {
+                return false; // Pass user can't access Pro chapter
+            } else if (!userProfile.subscriptionPlan) {
+                return false; // Free user can't access paid chapters
+            }
+        }
+        
+        // Rule 3: Check sequential completion
+        const previousChapter = chapters[index - 1];
+        if (!previousChapter) return true; // Should not happen
+        
+        return progress?.[previousChapter.id]?.completed ?? false;
     }
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(activeChapter ? `item-${activeChapter}` : undefined);
@@ -84,8 +108,8 @@ const TextbookContentSidebar = ({
                 value={openAccordion}
                 onValueChange={handleAccordionChange}
             >
-            {chapters.map((chapter) => {
-                const canAccess = hasAccess(chapter);
+            {chapters.map((chapter, index) => {
+                const canAccess = hasAccess(chapter, index);
                 return (
                     <AccordionItem value={`item-${chapter.id}`} key={chapter.id} disabled={!canAccess}>
                         <TooltipProvider>
@@ -102,7 +126,7 @@ const TextbookContentSidebar = ({
                                 </TooltipTrigger>
                                 {!canAccess && (
                                     <TooltipContent>
-                                        <p>Upgrade to {chapter.access === 'pro' ? 'Pass Pro' : 'Pass'} to access this chapter.</p>
+                                        <p>Complete the previous chapter to unlock.</p>
                                     </TooltipContent>
                                 )}
                             </Tooltip>
@@ -156,6 +180,7 @@ export default function TextbookSolutionsPage() {
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
+  const [progress, setProgress] = useState<TextbookProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -172,8 +197,12 @@ export default function TextbookSolutionsPage() {
       const textbookDocSnap = await getDoc(textbookDocRef);
       
       if (user) {
-          const profile = await getUserProfile(user.uid);
+          const [profile, progressData] = await Promise.all([
+            getUserProfile(user.uid),
+            getTextbookProgress(user.uid, textbookId)
+          ]);
           setUserProfile(profile);
+          setProgress(progressData);
       }
 
       if (textbookDocSnap.exists()) {
@@ -204,7 +233,6 @@ export default function TextbookSolutionsPage() {
   }, [textbookId, router, user]);
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
-      // Don't refetch if topics for this chapter are already loaded
       if (topics[chapterId]) return;
 
       setLoadingTopics(chapterId);
@@ -287,6 +315,7 @@ export default function TextbookSolutionsPage() {
                             onSheetClose={() => setIsSheetOpen(false)}
                             userProfile={userProfile}
                             loadingTopics={loadingTopics}
+                            progress={progress}
                         />
                     </SheetContent>
                 </Sheet>
@@ -322,6 +351,7 @@ export default function TextbookSolutionsPage() {
             onChapterToggle={handleChapterToggle}
             userProfile={userProfile}
             loadingTopics={loadingTopics}
+            progress={progress}
           />
         </aside>
 
