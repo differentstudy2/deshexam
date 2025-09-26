@@ -22,8 +22,9 @@ type TextbookFiltersProps = {
     boards: MetafieldItem[];
     selectedBoard: string;
     onBoardChange: (board: string) => void;
-    schoolQuery: string;
-    onSchoolQueryChange: (query: string) => void;
+    schools: string[];
+    selectedSchool: string;
+    onSchoolChange: (school: string) => void;
 }
 
 export function TextbookFilters({
@@ -41,8 +42,9 @@ export function TextbookFilters({
     boards,
     selectedBoard,
     onBoardChange,
-    schoolQuery,
-    onSchoolQueryChange,
+    schools,
+    selectedSchool,
+    onSchoolChange,
 }: TextbookFiltersProps) {
   return (
     <div className="mb-8 p-4 bg-card border rounded-lg">
@@ -68,14 +70,17 @@ export function TextbookFilters({
           </SelectContent>
         </Select>
 
-        <div className="relative">
-          <Input 
-            placeholder="Search by School/College..." 
-            className="h-10" 
-            value={schoolQuery}
-            onChange={(e) => onSchoolQueryChange(e.target.value)}
-          />
-        </div>
+         <Select value={selectedSchool} onValueChange={onSchoolChange}>
+          <SelectTrigger className="h-10">
+            <SelectValue placeholder="Filter by school" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Schools</SelectItem>
+            {schools.map((school) => (
+              <SelectItem key={school} value={school}>{school}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Select value={selectedClassCategory} onValueChange={onClassCategoryChange}>
           <SelectTrigger className="h-10">

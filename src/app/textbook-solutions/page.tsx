@@ -104,13 +104,14 @@ export default function TextbookSolutionsListPage() {
   const [classCategories, setClassCategories] = useState<{ id: string, name: string }[]>([]);
   const [grades, setGrades] = useState<{ id: string, name: string }[]>([]);
   const [boards, setBoards] = useState<{ id: string, name: string }[]>([]);
+  const [schools, setSchools] = useState<string[]>([]);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [selectedClassCategory, setSelectedClassCategory] = useState('all');
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedBoard, setSelectedBoard] = useState('all');
-  const [selectedSchool, setSelectedSchool] = useState('');
+  const [selectedSchool, setSelectedSchool] = useState('all');
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -139,6 +140,9 @@ export default function TextbookSolutionsListPage() {
         setSubjects(subjectsData);
         setClassCategories(classesData);
         setBoards(boardsData);
+        
+        const uniqueSchools = Array.from(new Set(textbooksData.map(book => book.school).filter(Boolean))) as string[];
+        setSchools(uniqueSchools);
 
       } catch (error) {
           console.error("Error fetching data:", error);
@@ -170,17 +174,16 @@ export default function TextbookSolutionsListPage() {
           const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
           const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject;
           const matchesBoard = selectedBoard === 'all' || book.board === selectedBoard;
-          const matchesSchool = !selectedSchool || (book.school && book.school.toLowerCase().includes(selectedSchool.toLowerCase()));
+          const matchesSchool = selectedSchool === 'all' || book.school === selectedSchool;
           
           let matchesClass = true;
-            if (selectedClassCategory !== 'all') {
-                if (selectedGrade !== 'all') {
-                    matchesClass = book.class === selectedGrade;
-                } else {
-                    // If a category is selected but no grade, check if the book's class is one of the grades in that category.
-                    matchesClass = gradeNames.includes(book.class);
-                }
-            }
+          if (selectedClassCategory !== 'all') {
+              if (selectedGrade !== 'all') {
+                  matchesClass = book.class === selectedGrade;
+              } else {
+                  matchesClass = gradeNames.includes(book.class);
+              }
+          }
 
           return matchesSearch && matchesSubject && matchesClass && matchesBoard && matchesSchool;
       });
@@ -229,8 +232,9 @@ export default function TextbookSolutionsListPage() {
         boards={boards}
         selectedBoard={selectedBoard}
         onBoardChange={setSelectedBoard}
-        schoolQuery={selectedSchool}
-        onSchoolQueryChange={setSelectedSchool}
+        schools={schools}
+        selectedSchool={selectedSchool}
+        onSchoolChange={setSelectedSchool}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
