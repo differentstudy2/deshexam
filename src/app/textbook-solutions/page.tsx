@@ -7,11 +7,13 @@ import { db } from '@/lib/firebase/client';
 import { collection, getDocs } from 'firebase/firestore';
 import { Book, Layers, FileText, CheckSquare, Library } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ContentBadge } from '@/components/content-badge';
+import { getSubjects, getClasses, getBoards } from '@/lib/firebase/firestore';
+import { TextbookFilters } from '@/components/feature/textbook-filters';
 
 type Textbook = {
     id: string;
@@ -93,26 +95,66 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
 };
 
 export default function TextbookSolutionsListPage() {
-  const [textbooks, setTextbooks] = useState<Textbook[]>([]);
+  const [allTextbooks, setAllTextbooks] = useState<Textbook[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [subjects, setSubjects] = useState<{ id: string, name: string }[]>([]);
+  const [classes, setClasses] = useState<{ id: string, name: string }[]>([]);
+  const [boards, setBoards] = useState<{ id: string, name: string }[]>([]);
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [selectedClass, setSelectedClass] = useState('all');
+  const [selectedBoard, setSelectedBoard] = useState('all');
 
   useEffect(() => {
-    const fetchTextbooks = async () => {
+    const fetchInitialData = async () => {
       setLoading(true);
       const textbooksCollectionRef = collection(db, 'textbooks');
-      const querySnapshot = await getDocs(textbooksCollectionRef);
       
-      const textbooksData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-      })) as Textbook[];
+      try {
+        const [
+            textbooksSnapshot, 
+            subjectsData, 
+            classesData, 
+            boardsData
+        ] = await Promise.all([
+            getDocs(textbooksCollectionRef),
+            getSubjects(),
+            getClasses(),
+            getBoards()
+        ]);
+        
+        const textbooksData = textbooksSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Textbook[];
 
-      setTextbooks(textbooksData);
-      setLoading(false);
+        setAllTextbooks(textbooksData);
+        setSubjects(subjectsData);
+        setClasses(classesData);
+        setBoards(boardsData);
+
+      } catch (error) {
+          console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchTextbooks();
+    fetchInitialData();
   }, []);
+
+  const filteredTextbooks = useMemo(() => {
+      return allTextbooks.filter(book => {
+          const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject;
+          const matchesClass = selectedClass === 'all' || book.class === selectedClass;
+          const matchesBoard = selectedBoard === 'all' || book.board === selectedBoard;
+          return matchesSearch && matchesSubject && matchesClass && matchesBoard;
+      });
+  }, [allTextbooks, searchQuery, selectedSubject, selectedClass, selectedBoard]);
+
 
   if (loading) {
     return (
@@ -140,8 +182,23 @@ export default function TextbookSolutionsListPage() {
           Select a textbook to view its solutions, topics, and practice questions.
         </p>
       </header>
+
+      <TextbookFilters
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        subjects={subjects}
+        selectedSubject={selectedSubject}
+        onSubjectChange={setSelectedSubject}
+        classes={classes}
+        selectedClass={selectedClass}
+        onClassChange={setSelectedClass}
+        boards={boards}
+        selectedBoard={selectedBoard}
+        onBoardChange={setSelectedBoard}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {textbooks.map((book) => (
+        {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
             <div className="relative w-full h-48 overflow-hidden">
                 <Image
@@ -171,9 +228,9 @@ export default function TextbookSolutionsListPage() {
             </CardContent>
           </Card>
         ))}
-         {textbooks.length === 0 && (
+         {filteredTextbooks.length === 0 && (
             <div className="col-span-full text-center text-muted-foreground py-10">
-                <p>No textbooks found.</p>
+                <p>No textbooks found matching your filters.</p>
             </div>
         )}
       </div>
