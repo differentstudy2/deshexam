@@ -218,13 +218,14 @@ export default function TextbookSolutionsPage() {
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
         chaptersData.sort((a, b) => {
-            const numA = parseInt(a.title.match(/^\d+/)?.[0] ?? 'NaN');
-            const numB = parseInt(b.title.match(/^\d+/)?.[0] ?? 'NaN');
+            const numA = parseInt(a.title, 10);
+            const numB = parseInt(b.title, 10);
+
             if (!isNaN(numA) && !isNaN(numB)) {
                 return numA - numB;
             }
-            // Fallback to string comparison if numbers can't be parsed
-            return a.title.localeCompare(b.title);
+            // Fallback for non-numeric titles or mixed formats
+            return a.title.localeCompare(b.title, undefined, { numeric: true });
         });
 
         setChapters(chaptersData);
@@ -318,8 +319,8 @@ export default function TextbookSolutionsPage() {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
-                        <SheetHeader>
-                           <SheetTitle className="sr-only">Table of Contents</SheetTitle>
+                         <SheetHeader>
+                           <SheetTitle>Table of Contents</SheetTitle>
                         </SheetHeader>
                         <TextbookContentSidebar
                             chapters={chapters}
