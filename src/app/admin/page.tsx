@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -11,7 +12,7 @@ import {
 import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2, Book } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
+import { getPaginatedSubmissions, getAllContent, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import { ScoreCircle } from '@/components/feature/score-circle';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { DocumentSnapshot } from 'firebase/firestore';
 
 type Submission = {
   id: string;
@@ -35,6 +37,8 @@ type Submission = {
   };
 };
 
+const ITEMS_PER_PAGE = 5;
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -47,17 +51,33 @@ export default function AdminDashboardPage() {
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
   const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null);
 
-  const fetchStats = async () => {
+  const [submissionsCurrentPage, setSubmissionsCurrentPage] = useState(1);
+  const [submissionsLastVisible, setSubmissionsLastVisible] = useState<DocumentSnapshot | null>(null);
+  const [submissionsPageHistory, setSubmissionsPageHistory] = useState<(DocumentSnapshot | null)[]>([null]);
+  const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
+
+
+  const fetchStatsAndSubmissions = async (page: number, startAfter: DocumentSnapshot | null) => {
     try {
       setLoading(true);
-      const [users, content, submissions] = await Promise.all([
-        getAllUsers(),
-        getAllContent(),
-        getTodaysSubmissions(),
-      ]);
+
+      // Fetch stats only on the first page load
+      if (page === 1) {
+        const [users, content] = await Promise.all([
+          getAllUsers(),
+          getAllContent(),
+        ]);
+        setStats({
+          totalUsers: users.length,
+          totalContent: content.length,
+          submissionsToday: 0, // This is no longer accurate as we fetch all submissions
+        });
+      }
+      
+      const { submissions, lastVisible, hasMore } = await getPaginatedSubmissions(ITEMS_PER_PAGE, startAfter);
 
       const submissionsWithUsers = await Promise.all(
-        submissions.slice(0, 10).map(async (sub) => {
+        submissions.map(async (sub: any) => {
           const userProfile = await getUserProfile(sub.userId);
           return {
             ...sub,
@@ -68,14 +88,15 @@ export default function AdminDashboardPage() {
           } as Submission;
         })
       );
-      
-      setStats({
-        totalUsers: users.length,
-        totalContent: content.length,
-        submissionsToday: submissions.length,
-      });
 
       setRecentSubmissions(submissionsWithUsers);
+      setSubmissionsLastVisible(lastVisible);
+      setHasMoreSubmissions(hasMore);
+
+      if (page >= submissionsPageHistory.length) {
+        setSubmissionsPageHistory(prev => [...prev, lastVisible]);
+      }
+      
     } catch (error) {
       console.error("Failed to fetch admin dashboard stats:", error);
     } finally {
@@ -84,9 +105,26 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    fetchStats();
+    fetchStatsAndSubmissions(1, null);
   }, []);
   
+  const handleNextPage = () => {
+    if (hasMoreSubmissions) {
+        const nextPage = submissionsCurrentPage + 1;
+        fetchStatsAndSubmissions(nextPage, submissionsLastVisible);
+        setSubmissionsCurrentPage(nextPage);
+    }
+  }
+
+  const handlePrevPage = () => {
+      if (submissionsCurrentPage > 1) {
+          const prevPage = submissionsCurrentPage - 1;
+          const prevStartAfter = submissionsPageHistory[prevPage - 1];
+          fetchStatsAndSubmissions(prevPage, prevStartAfter);
+          setSubmissionsCurrentPage(prevPage);
+      }
+  }
+
   const getUrlForResults = (testType: string, testId: string, submissionId: string) => {
     const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
@@ -164,7 +202,7 @@ export default function AdminDashboardPage() {
                     <CardTitle>Quick Actions</CardTitle>
                     <CardDescription>Perform common administrative tasks.</CardDescription>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 gap-4">
                     <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <Users className="mx-auto mb-2" />
                         <span>Manage Users</span>
@@ -269,6 +307,29 @@ export default function AdminDashboardPage() {
                        <p className="text-muted-foreground text-center py-10">No submissions yet.</p>
                     )}
                 </CardContent>
+                 <CardFooter>
+                    <div className="flex items-center justify-end space-x-2 w-full">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handlePrevPage}
+                            disabled={submissionsCurrentPage === 1 || loading}
+                        >
+                            Previous
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            Page {submissionsCurrentPage}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleNextPage}
+                            disabled={!hasMoreSubmissions || loading}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </CardFooter>
             </Card>
        </div>
     </div>

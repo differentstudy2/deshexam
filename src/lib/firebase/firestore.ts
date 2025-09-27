@@ -16,6 +16,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -685,13 +686,32 @@ export const getSubmissionsByUserId = async (userId: string) => {
     }
 };
 
-export const getTodaysSubmissions = async () => {
+export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
-        const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"));
+        let q;
+        const submissionsRef = collection(db, "submissions");
+        if (startAfterDoc) {
+            q = query(submissionsRef, orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage));
+        } else {
+            q = query(submissionsRef, orderBy("submittedAt", "desc"), limit(itemsPerPage));
+        }
+
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+        const submissions = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+        // Check if there are more pages
+        const nextQuery = query(submissionsRef, orderBy("submittedAt", "desc"), startAfter(lastVisible), limit(1));
+        const nextSnapshot = await getDocs(nextQuery);
+        const hasMore = !nextSnapshot.empty;
+
+        return { submissions, lastVisible, hasMore };
     } catch (e) {
-        console.error("Error getting all submissions: ", e);
+        console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
     }
 };
