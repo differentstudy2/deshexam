@@ -12,7 +12,7 @@ import {
 import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getAllUsers, getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
+import { getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -217,13 +217,13 @@ export default function AdminDashboardPage() {
                     ) : recentSubmissions.length > 0 ? (
                         <div className="space-y-4">
                             {recentSubmissions.map(sub => (
-                                <div key={sub.id} className="p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div key={sub.id} className="relative p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                      <Checkbox 
                                         className="absolute top-2 right-2 sm:static sm:mr-4" 
                                         checked={selectedSubmissions.includes(sub.id)}
                                         onCheckedChange={() => handleSelectSubmission(sub.id)}
                                     />
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 flex-grow min-w-0">
                                         <Avatar className="h-9 w-9">
                                             <AvatarImage src={sub.user?.photoURL} />
                                             <AvatarFallback>{sub.user?.displayName?.[0]}</AvatarFallback>
@@ -233,7 +233,7 @@ export default function AdminDashboardPage() {
                                             <div className="text-sm text-muted-foreground truncate">{sub.testTitle}</div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-between sm:justify-end gap-4 flex-grow">
+                                    <div className="flex items-center justify-between sm:justify-end gap-4 flex-shrink-0 self-end sm:self-center">
                                         <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={36} />
                                         <div className="flex gap-2">
                                             <Button asChild variant="outline" size="sm" className="flex-shrink-0">
@@ -271,3 +271,4 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
