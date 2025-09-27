@@ -179,9 +179,6 @@ export default function ManageTextbooksPage() {
               <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardFooter className="flex flex-col gap-2 p-4 border-t">
-                <Button asChild className="w-full">
-                    <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
-                </Button>
                 <div className="flex gap-2 w-full">
                     <Button asChild className="w-full" variant="secondary">
                         <Link href={`/textbook-solutions/${book.id}`} target="_blank">
@@ -194,6 +191,9 @@ export default function ManageTextbooksPage() {
                         </Link>
                     </Button>
                 </div>
+                 <Button asChild className="w-full">
+                    <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
+                </Button>
                 <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
                     <Trash2 className="mr-2 h-4 w-4" /> Delete
                 </Button>
