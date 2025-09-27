@@ -15,6 +15,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -692,6 +693,19 @@ export const getTodaysSubmissions = async () => {
     } catch (e) {
         console.error("Error getting all submissions: ", e);
         throw new Error("Failed to fetch submissions.");
+    }
+};
+
+export const deleteSubmissions = async (submissionIds: string[]) => {
+    if (!submissionIds || submissionIds.length === 0) {
+        throw new Error("Submission ID(s) are required for deletion.");
+    }
+    try {
+        const deletePromises = submissionIds.map(id => deleteDoc(doc(db, "submissions", id)));
+        await Promise.all(deletePromises);
+    } catch (e) {
+        console.error("Error deleting submission(s):", e);
+        throw new Error("Failed to delete submission(s).");
     }
 };
 

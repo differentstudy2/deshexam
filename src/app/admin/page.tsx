@@ -9,15 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye } from 'lucide-react';
+import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getAllUsers, getAllContent, getTodaysSubmissions, getUserProfile } from '@/lib/firebase/firestore';
+import { getAllUsers, getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableRow, TableHeader, TableHead } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ScoreCircle } from '@/components/feature/score-circle';
+import { Checkbox } from '@/components/ui/checkbox';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 type Submission = {
   id: string;
@@ -42,48 +44,75 @@ export default function AdminDashboardPage() {
   });
   const [recentSubmissions, setRecentSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
+  const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const [users, content, submissions] = await Promise.all([
+        getAllUsers(),
+        getAllContent(),
+        getTodaysSubmissions(),
+      ]);
+
+      const submissionsWithUsers = await Promise.all(
+        submissions.slice(0, 10).map(async (sub) => {
+          const userProfile = await getUserProfile(sub.userId);
+          return {
+            ...sub,
+            user: {
+              displayName: userProfile?.displayName || 'Unknown User',
+              photoURL: userProfile?.photoURL,
+            }
+          } as Submission;
+        })
+      );
+      
+      setStats({
+        totalUsers: users.length,
+        totalContent: content.length,
+        submissionsToday: submissions.length,
+      });
+
+      setRecentSubmissions(submissionsWithUsers);
+    } catch (error) {
+      console.error("Failed to fetch admin dashboard stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [users, content, submissions] = await Promise.all([
-          getAllUsers(),
-          getAllContent(),
-          getTodaysSubmissions(),
-        ]);
-
-        const submissionsWithUsers = await Promise.all(
-          submissions.slice(0, 5).map(async (sub) => {
-            const userProfile = await getUserProfile(sub.userId);
-            return {
-              ...sub,
-              user: {
-                displayName: userProfile?.displayName || 'Unknown User',
-                photoURL: userProfile?.photoURL,
-              }
-            } as Submission;
-          })
-        );
-        
-        setStats({
-          totalUsers: users.length,
-          totalContent: content.length,
-          submissionsToday: submissions.length,
-        });
-
-        setRecentSubmissions(submissionsWithUsers);
-      } catch (error) {
-        console.error("Failed to fetch admin dashboard stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchStats();
   }, []);
   
   const getUrlForResults = (testType: string, testId: string, submissionId: string) => {
     const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
+  }
+  
+  const handleSelectSubmission = (id: string) => {
+    setSelectedSubmissions(prev => 
+      prev.includes(id) ? prev.filter(subId => subId !== id) : [...prev, id]
+    );
+  }
+
+  const handleDelete = async (ids: string[]) => {
+    try {
+        await deleteSubmissions(ids);
+        toast({ title: `${ids.length} submission(s) deleted successfully!` });
+        setRecentSubmissions(prev => prev.filter(sub => !ids.includes(sub.id)));
+        setSelectedSubmissions([]);
+        setSubmissionToDelete(null);
+    } catch (error) {
+         toast({
+            variant: "destructive",
+            title: 'Error deleting submissions',
+            description: (error as Error).message,
+        });
+    }
   }
 
   const adminStats = [
@@ -161,12 +190,39 @@ export default function AdminDashboardPage() {
                      <CardDescription>The latest test submissions from users.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {selectedSubmissions.length > 0 && (
+                       <div className="mb-4">
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                        <Trash2 className="mr-2 h-4 w-4"/>
+                                        Delete Selected ({selectedSubmissions.length})
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>This will permanently delete {selectedSubmissions.length} submission(s).</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(selectedSubmissions)}>Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    )}
                     {loading ? (
                        <Skeleton className="h-48 w-full" />
                     ) : recentSubmissions.length > 0 ? (
                         <div className="space-y-4">
                             {recentSubmissions.map(sub => (
                                 <div key={sub.id} className="p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                     <Checkbox 
+                                        className="absolute top-2 right-2 sm:static sm:mr-4" 
+                                        checked={selectedSubmissions.includes(sub.id)}
+                                        onCheckedChange={() => handleSelectSubmission(sub.id)}
+                                    />
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-9 w-9">
                                             <AvatarImage src={sub.user?.photoURL} />
@@ -179,12 +235,29 @@ export default function AdminDashboardPage() {
                                     </div>
                                     <div className="flex items-center justify-between sm:justify-end gap-4 flex-grow">
                                         <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={36} />
-                                        <Button asChild variant="outline" size="sm" className="flex-shrink-0">
-                                            <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
-                                                <Eye className="mr-2 h-4 w-4" />
-                                                View
-                                            </Link>
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button asChild variant="outline" size="sm" className="flex-shrink-0">
+                                                <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
+                                                    <Eye className="mr-2 h-4 w-4" />
+                                                    View
+                                                </Link>
+                                            </Button>
+                                             <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4"/></Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Delete Submission?</AlertDialogTitle>
+                                                        <AlertDialogDescription>This will permanently delete this submission record. It cannot be undone.</AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleDelete([sub.id])}>Delete</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
