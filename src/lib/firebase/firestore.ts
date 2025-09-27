@@ -686,19 +686,12 @@ export const getSubmissionsByUserId = async (userId: string) => {
 
 export const getTodaysSubmissions = async () => {
     try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Start of today
-
-        const q = query(
-            collection(db, "submissions"),
-            where("submittedAt", ">=", today),
-            orderBy("submittedAt", "desc")
-        );
+        const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
     } catch (e) {
-        console.error("Error getting today's submissions: ", e);
-        throw new Error("Failed to fetch today's submissions.");
+        console.error("Error getting all submissions: ", e);
+        throw new Error("Failed to fetch submissions.");
     }
 };
 
@@ -1605,7 +1598,7 @@ export const getEarningStats = async (): Promise<EarningStats> => {
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
             getDocs(todayOrdersSnapshot),
-            getDocs(monthOrdersQuery),
+            getDocs(monthOrdersSnapshot),
             getCountFromServer(usersCollection),
         ]);
 

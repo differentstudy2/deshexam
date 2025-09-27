@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -88,7 +89,7 @@ export default function AdminDashboardPage() {
   const adminStats = [
     { title: "Total Users", value: stats.totalUsers, icon: <Users/>, description: "Total registered users" },
     { title: "Total Content", value: stats.totalContent, icon: <FileText/>, description: "Tests, quizzes, and articles" },
-    { title: "Submissions Today", value: stats.submissionsToday, icon: <BarChart2/>, description: "Test submissions today" },
+    { title: "Total Submissions", value: stats.submissionsToday, icon: <BarChart2/>, description: "All test submissions" },
      { title: "Site Activity", value: "High", icon: <Activity/>, description: "All systems normal" },
   ];
 
@@ -195,7 +196,7 @@ export default function AdminDashboardPage() {
                            </TableBody>
                        </Table>
                     ) : (
-                       <p className="text-muted-foreground text-center py-10">No submissions today.</p>
+                       <p className="text-muted-foreground text-center py-10">No submissions yet.</p>
                     )}
                 </CardContent>
             </Card>
