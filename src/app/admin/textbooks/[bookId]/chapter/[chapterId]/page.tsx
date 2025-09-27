@@ -128,7 +128,7 @@ export default function ManageTopicsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         <Card>
           <CardHeader>
             <CardTitle>{editingTopic ? 'Edit Topic' : 'Add New Topic'}</CardTitle>
@@ -180,7 +180,7 @@ export default function ManageTopicsPage() {
                     className="flex items-center justify-between rounded-md border p-3 gap-2"
                   >
                     <span className="truncate pr-4">{topic.title}</span>
-                    <div className="flex-shrink-0 flex gap-2">
+                    <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)}>
                             <Edit className="h-3 w-3 mr-1" />
                             Edit
