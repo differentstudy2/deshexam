@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getAllUsers, getAllContent, getTodaysSubmissions, getUserProfile } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow, TableHeader, TableHead } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ScoreCircle } from '@/components/feature/score-circle';
@@ -164,37 +164,31 @@ export default function AdminDashboardPage() {
                     {loading ? (
                        <Skeleton className="h-48 w-full" />
                     ) : recentSubmissions.length > 0 ? (
-                        <Table>
-                           <TableBody>
+                        <div className="space-y-4">
                             {recentSubmissions.map(sub => (
-                                <TableRow key={sub.id}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-9 w-9">
-                                                <AvatarImage src={sub.user?.photoURL} />
-                                                <AvatarFallback>{sub.user?.displayName?.[0]}</AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <div className="font-medium">{sub.user?.displayName}</div>
-                                                <div className="text-sm text-muted-foreground">{sub.testTitle}</div>
-                                            </div>
+                                <div key={sub.id} className="p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={sub.user?.photoURL} />
+                                            <AvatarFallback>{sub.user?.displayName?.[0]}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0">
+                                            <div className="font-medium truncate">{sub.user?.displayName}</div>
+                                            <div className="text-sm text-muted-foreground truncate">{sub.testTitle}</div>
                                         </div>
-                                    </TableCell>
-                                    <TableCell className="text-right">
+                                    </div>
+                                    <div className="flex items-center justify-between sm:justify-end gap-4 flex-grow">
                                         <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={36} />
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button asChild variant="outline" size="sm">
+                                        <Button asChild variant="outline" size="sm" className="flex-shrink-0">
                                             <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
                                                 <Eye className="mr-2 h-4 w-4" />
                                                 View
                                             </Link>
                                         </Button>
-                                    </TableCell>
-                                </TableRow>
+                                    </div>
+                                </div>
                             ))}
-                           </TableBody>
-                       </Table>
+                        </div>
                     ) : (
                        <p className="text-muted-foreground text-center py-10">No submissions yet.</p>
                     )}
