@@ -14,6 +14,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -687,16 +688,14 @@ export const getTodaysSubmissions = async () => {
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Start of today
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1); // Start of tomorrow
 
         const q = query(
             collection(db, "submissions"),
             where("submittedAt", ">=", today),
-            where("submittedAt", "<", tomorrow)
+            orderBy("submittedAt", "desc")
         );
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
     } catch (e) {
         console.error("Error getting today's submissions: ", e);
         throw new Error("Failed to fetch today's submissions.");
@@ -1605,7 +1604,7 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersQuery),
+            getDocs(todayOrdersSnapshot),
             getDocs(monthOrdersQuery),
             getCountFromServer(usersCollection),
         ]);

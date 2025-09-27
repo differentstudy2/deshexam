@@ -8,11 +8,30 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus } from 'lucide-react';
+import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getAllUsers, getAllContent, getTodaysSubmissions } from '@/lib/firebase/firestore';
+import { getAllUsers, getAllContent, getTodaysSubmissions, getUserProfile } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { ScoreCircle } from '@/components/feature/score-circle';
+
+type Submission = {
+  id: string;
+  testId: string;
+  testTitle: string;
+  score: number;
+  totalQuestions: number;
+  submittedAt: any;
+  testType: string;
+  userId: string;
+  user?: {
+    displayName: string;
+    photoURL?: string;
+  };
+};
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -20,6 +39,7 @@ export default function AdminDashboardPage() {
     totalContent: 0,
     submissionsToday: 0,
   });
+  const [recentSubmissions, setRecentSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,11 +50,27 @@ export default function AdminDashboardPage() {
           getAllContent(),
           getTodaysSubmissions(),
         ]);
+
+        const submissionsWithUsers = await Promise.all(
+          submissions.slice(0, 5).map(async (sub) => {
+            const userProfile = await getUserProfile(sub.userId);
+            return {
+              ...sub,
+              user: {
+                displayName: userProfile?.displayName || 'Unknown User',
+                photoURL: userProfile?.photoURL,
+              }
+            } as Submission;
+          })
+        );
+        
         setStats({
           totalUsers: users.length,
           totalContent: content.length,
           submissionsToday: submissions.length,
         });
+
+        setRecentSubmissions(submissionsWithUsers);
       } catch (error) {
         console.error("Failed to fetch admin dashboard stats:", error);
       } finally {
@@ -43,6 +79,11 @@ export default function AdminDashboardPage() {
     };
     fetchStats();
   }, []);
+  
+  const getUrlForResults = (testType: string, testId: string, submissionId: string) => {
+    const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
+  }
 
   const adminStats = [
     { title: "Total Users", value: stats.totalUsers, icon: <Users/>, description: "Total registered users" },
@@ -115,11 +156,47 @@ export default function AdminDashboardPage() {
             </Card>
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Site Activity</CardTitle>
-                     <CardDescription>A log of recent important events.</CardDescription>
+                    <CardTitle>Recent Submissions</CardTitle>
+                     <CardDescription>The latest test submissions from users.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                   <p className="text-muted-foreground">Activity feed coming soon...</p>
+                    {loading ? (
+                       <Skeleton className="h-48 w-full" />
+                    ) : recentSubmissions.length > 0 ? (
+                        <Table>
+                           <TableBody>
+                            {recentSubmissions.map(sub => (
+                                <TableRow key={sub.id}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-9 w-9">
+                                                <AvatarImage src={sub.user?.photoURL} />
+                                                <AvatarFallback>{sub.user?.displayName?.[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <div className="font-medium">{sub.user?.displayName}</div>
+                                                <div className="text-sm text-muted-foreground">{sub.testTitle}</div>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={36} />
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                View
+                                            </Link>
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                           </TableBody>
+                       </Table>
+                    ) : (
+                       <p className="text-muted-foreground text-center py-10">No submissions today.</p>
+                    )}
                 </CardContent>
             </Card>
        </div>
