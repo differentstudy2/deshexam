@@ -176,7 +176,6 @@ export default function ManageTextbooksPage() {
             <CardContent className="flex-grow p-4 flex flex-col overflow-y-auto">
               <h3 className="font-bold text-lg flex items-center gap-2 flex-grow"><Book /> {book.title}</h3>
               {book.board && <Badge variant="outline">{book.board}</Badge>}
-              <p className="text-sm text-muted-foreground mt-2">{book.description}</p>
               <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardFooter className="flex flex-col gap-2 p-4 border-t">
@@ -231,5 +230,3 @@ export default function ManageTextbooksPage() {
     </div>
   );
 }
-
-    
