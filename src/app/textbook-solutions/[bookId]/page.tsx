@@ -218,10 +218,15 @@ export default function TextbookSolutionsPage() {
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
         chaptersData.sort((a, b) => {
-            const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
-            const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
-            return numA - numB;
+            const numA = parseInt(a.title.match(/^\d+/)?.[0] ?? 'NaN');
+            const numB = parseInt(b.title.match(/^\d+/)?.[0] ?? 'NaN');
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return numA - numB;
+            }
+            // Fallback to string comparison if numbers can't be parsed
+            return a.title.localeCompare(b.title);
         });
+
         setChapters(chaptersData);
 
         if(activeChapter) {
@@ -247,9 +252,12 @@ export default function TextbookSolutionsPage() {
           const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
           
           topicsForChapter.sort((a, b) => {
-              const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || '0');
-              const numB = parseFloat(b.title.match(/^\d+(\.\d+)?/)?.[0] || '0');
-              return numA - numB;
+              const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
+              const numB = parseFloat(b.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
+              if(!isNaN(numA) && !isNaN(numB)) {
+                  return numA - numB;
+              }
+              return a.title.localeCompare(b.title);
           });
           
           for (let topic of topicsForChapter) {
