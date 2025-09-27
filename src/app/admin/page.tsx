@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2 } from 'lucide-react';
+import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2, Book } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
                     <CardTitle>Quick Actions</CardTitle>
                     <CardDescription>Perform common administrative tasks.</CardDescription>
                 </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <Users className="mx-auto mb-2" />
                         <span>Manage Users</span>
@@ -172,6 +172,10 @@ export default function AdminDashboardPage() {
                      <Link href="/admin/content" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <FileText className="mx-auto mb-2" />
                         <span>Manage Content</span>
+                    </Link>
+                    <Link href="/admin/textbooks" className="p-4 border rounded-lg hover:bg-secondary text-center">
+                        <Book className="mx-auto mb-2" />
+                        <span>Manage Textbooks</span>
                     </Link>
                     <Link href="/admin/add-content" className="p-4 border rounded-lg hover:bg-secondary text-center">
                         <PlusCircle className="mx-auto mb-2" />
