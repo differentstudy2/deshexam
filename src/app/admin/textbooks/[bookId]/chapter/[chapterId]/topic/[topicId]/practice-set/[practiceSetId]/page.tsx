@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -502,18 +501,18 @@ export default function ManagePracticeSetQuestionsPage() {
             </header>
 
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
                         <CardTitle>Questions</CardTitle>
                         <CardDescription>Manage the questions for this practice set.</CardDescription>
                     </div>
-                    <div className="flex gap-2">
-                        <Button size="sm" onClick={() => openQuestionDialog(null)}>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <Button size="sm" onClick={() => openQuestionDialog(null)} className="w-full">
                             <PlusCircle className="mr-2"/> Add Question
                         </Button>
                         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button size="sm" variant="outline">
+                                <Button size="sm" variant="outline" className="w-full">
                                     <FileJson className="mr-2"/> Bulk Import
                                 </Button>
                             </DialogTrigger>
@@ -614,17 +613,19 @@ export default function ManagePracticeSetQuestionsPage() {
                                 <label htmlFor="select-all" className="flex-1 font-semibold text-sm">Select All</label>
                             </li>
                             {questions.map(q => (
-                                <li key={q.id} className="flex items-center justify-between p-3 border rounded-md">
-                                    <div className="flex items-center flex-1 min-w-0">
+                                <li key={q.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-4">
+                                    <div className="flex items-start flex-1 min-w-0">
                                         <Checkbox 
                                             id={`select-${q.id}`}
                                             checked={selectedQuestions.includes(q.id)}
                                             onCheckedChange={() => handleSelectQuestion(q.id)}
-                                            className="mr-4"
+                                            className="mr-4 mt-1"
                                         />
-                                        <label htmlFor={`select-${q.id}`} className="pr-4 flex-1">{q.text}</label>
+                                        <label htmlFor={`select-${q.id}`} className="flex-1">
+                                            {q.text}
+                                        </label>
                                     </div>
-                                    <div className="flex gap-2 flex-shrink-0">
+                                    <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
                                         <Button variant="ghost" size="icon" onClick={() => openQuestionDialog(q)}><Edit className="h-4 w-4"/></Button>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
@@ -664,3 +665,4 @@ export default function ManagePracticeSetQuestionsPage() {
 }
 
 
+    
