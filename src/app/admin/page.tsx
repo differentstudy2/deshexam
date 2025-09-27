@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -12,7 +11,7 @@ import {
 import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
+import { getAllContent, getTodaysSubmissions, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -271,4 +270,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
