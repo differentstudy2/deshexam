@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2, Book } from 'lucide-react';
 import Link from 'next/link';
