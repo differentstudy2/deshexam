@@ -112,7 +112,7 @@ export default function ViewReportPage() {
                 </div>
                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="w-4 h-4"/>
-                    <strong>Email:</strong> <a href={`mailto:${message.email}`} className="text-primary hover:underline">{message.email}</a>
+                    <strong>Email:</strong> <a href={`mailto:${message.email}`} className="text-primary hover:underline break-all">{message.email}</a>
                 </div>
                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-4 h-4"/>
