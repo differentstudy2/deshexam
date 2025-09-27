@@ -113,9 +113,9 @@ export default function ManageTopicPage() {
                     {practiceSets.length > 0 ? (
                          <ul className="space-y-2">
                             {practiceSets.map(ps => (
-                                <li key={ps.id} className="flex items-center justify-between p-3 border rounded-md">
-                                    <span>{ps.title}</span>
-                                    <div className="flex gap-2">
+                                <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
+                                    <span className="font-medium flex-grow">{ps.title}</span>
+                                    <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
                                                 Manage Questions
