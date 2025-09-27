@@ -615,16 +615,16 @@ export default function ManagePracticeSetQuestionsPage() {
                             </li>
                             {questions.map(q => (
                                 <li key={q.id} className="flex items-center justify-between p-3 border rounded-md">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center flex-1 min-w-0">
                                         <Checkbox 
                                             id={`select-${q.id}`}
                                             checked={selectedQuestions.includes(q.id)}
                                             onCheckedChange={() => handleSelectQuestion(q.id)}
                                             className="mr-4"
                                         />
-                                        <label htmlFor={`select-${q.id}`} className="truncate pr-4">{q.text}</label>
+                                        <label htmlFor={`select-${q.id}`} className="pr-4 flex-1">{q.text}</label>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 flex-shrink-0">
                                         <Button variant="ghost" size="icon" onClick={() => openQuestionDialog(q)}><Edit className="h-4 w-4"/></Button>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
@@ -662,4 +662,5 @@ export default function ManagePracticeSetQuestionsPage() {
         </div>
     )
 }
+
 
