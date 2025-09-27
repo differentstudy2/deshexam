@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-       <div className="grid gap-6 md:grid-cols-2">
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
                 <CardHeader>
                     <CardTitle>Quick Actions</CardTitle>
