@@ -6,13 +6,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Question, Topic } from '@/lib/types';
+import type { PracticeSet, Question, Topic, Textbook } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, RefreshCw, Download, GripVertical } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle, XCircle, RefreshCw, Download, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star } from 'lucide-react';
 import Link from 'next/link';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Progress } from '@/components/ui/progress';
@@ -20,16 +20,27 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
+import { addPracticeSetSubmission, getUserProfile } from '@/lib/firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { ScoreCircle } from '@/components/feature/score-circle';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 type UserAnswer = {
   questionId: string;
   answer: any;
 };
 
+type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
+
 type Result = {
     score: number;
     totalMarks: number;
     percentage: number;
+    submittedAt: Date;
     results: Array<{
         question: Question;
         userAnswer: any;
@@ -59,11 +70,17 @@ export default function PracticeSetPage() {
   const [practiceSet, setPracticeSet] = useState<PracticeSet | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [textbook, setTextbook] = useState<Textbook | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
+
   const resultsRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
   
   useEffect(() => {
     if (!practiceSetId || !textbookId || !chapterId || !topicId) {
@@ -73,6 +90,10 @@ export default function PracticeSetPage() {
 
     const fetchPracticeSet = async () => {
       setLoading(true);
+      
+      const textbookDocRef = doc(db, 'textbooks', textbookId);
+      const textbookSnap = await getDoc(textbookDocRef);
+      if (textbookSnap.exists()) setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
       
       const topicDocRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
       const topicSnap = await getDoc(topicDocRef);
@@ -88,7 +109,6 @@ export default function PracticeSetPage() {
         const questionsSnap = await getDocs(questionsQuery);
         let questionsData = questionsSnap.docs.map(qDoc => ({ id: qDoc.id, ...qDoc.data() } as Question));
 
-        // Shuffle columnB for matching questions
         questionsData = questionsData.map(q => {
             if (q.type === 'Matching' && q.correctAnswer) {
                 const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
@@ -107,11 +127,16 @@ export default function PracticeSetPage() {
 
         setQuestions(shuffleArray(questionsData));
       }
+
+       if (user) {
+        const profile = await getUserProfile(user.uid);
+        setUserProfile(profile);
+      }
       setLoading(false);
     };
 
     fetchPracticeSet();
-  }, [practiceSetId, textbookId, chapterId, topicId]);
+  }, [practiceSetId, textbookId, chapterId, topicId, user]);
 
   const handleAnswerChange = (questionId: string, answer: any) => {
     setUserAnswers(prevAnswers => {
@@ -126,7 +151,11 @@ export default function PracticeSetPage() {
     handleAnswerChange(questionId, newAnswer);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+        toast({variant: "destructive", title: "Please log in to submit."});
+        return;
+    }
     let score = 0;
     
     const totalMarks = questions.reduce((acc, q) => {
@@ -151,7 +180,7 @@ export default function PracticeSetPage() {
                 }
                 isCorrect = matchingScore === question.correctAnswer.length;
             }
-            score += matchingScore; // Add points for each correct match
+            score += matchingScore;
         } else {
             isCorrect = userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim();
             if (isCorrect) {
@@ -163,9 +192,29 @@ export default function PracticeSetPage() {
     });
 
     const percentage = totalMarks > 0 ? (score / totalMarks) * 100 : 0;
+    const submissionTime = new Date();
 
-    setResult({ score, totalMarks, percentage, results });
+    setResult({ score, totalMarks, percentage, submittedAt: submissionTime, results });
     setIsSubmitted(true);
+    
+     const submissionData = {
+        practiceSetId: practiceSet?.id,
+        practiceSetTitle: practiceSet?.title,
+        topicId: topic?.id,
+        topicTitle: topic?.title,
+        chapterId: chapterId,
+        textbookId: textbookId,
+        answers: userAnswers.reduce((acc, ans) => ({...acc, [ans.questionId]: ans.answer}), {}),
+        score,
+        totalQuestions: totalMarks,
+    };
+
+    try {
+        const subId = await addPracticeSetSubmission(submissionData);
+        setSubmissionId(subId);
+    } catch(error) {
+        console.error("Failed to save submission:", error);
+    }
   };
 
   const handleTryAgain = () => {
@@ -227,77 +276,123 @@ export default function PracticeSetPage() {
 
   if (isSubmitted && result) {
     return (
-      <div className="container mx-auto max-w-3xl py-8">
-         <div className="mb-6 flex justify-between">
-            <Button variant="ghost" onClick={handleTryAgain}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Try Again
-            </Button>
-            <Button variant="outline" onClick={handleDownloadPdf}>
-                <Download className="mr-2 h-4 w-4" />
-                Download as PDF
+      <div className="container mx-auto max-w-4xl py-8">
+        <div className="flex justify-between items-center mb-6">
+            <h1 className="font-headline text-3xl font-bold">Practice Set Results</h1>
+             <div className="flex items-center gap-2">
+                <Button variant="ghost" onClick={handleTryAgain}>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Try Again
+                </Button>
+                <Button variant="outline" onClick={handleDownloadPdf}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                </Button>
+            </div>
+        </div>
+
+        <div ref={resultsRef}>
+            <Card className="mb-8">
+                 <CardHeader>
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                        <div className="flex flex-col md:flex-row items-center gap-4">
+                            <Avatar className="h-16 w-16">
+                                <AvatarImage src={userProfile?.photoURL || `https://picsum.photos/seed/${userProfile?.uid}/64/64`} />
+                                <AvatarFallback>{userProfile?.displayName?.[0]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <div className="flex items-center justify-center md:justify-start gap-2">
+                                <h3 className="text-lg font-semibold">{userProfile?.displayName}</h3>
+                                <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                                </div>
+                                <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
+                                    {userProfile?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{userProfile.school}</div>}
+                                    {userProfile?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{userProfile.classGrade}</div>}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-6 mt-4 md:mt-0">
+                            <div className="text-center md:text-right">
+                                <div className="text-3xl font-bold">{result.score}/{result.totalMarks}</div>
+                                <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <ScoreCircle score={result.percentage} size={60} strokeWidth={5}/>
+                                <span className="text-xs font-semibold text-muted-foreground mt-1">Your Score</span>
+                            </div>
+                        </div>
+                    </div>
+                </CardHeader>
+                 <CardContent className="space-y-4 pt-0">
+                    <Separator />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{practiceSet.title}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic?.title}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Book className="w-4 h-4"/> <strong>Textbook:</strong> <span className="text-foreground">{textbook?.title}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{result.totalMarks}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{result.submittedAt.toLocaleDateString()}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{result.submittedAt.toLocaleTimeString()}</span></div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Detailed Answer Review</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                    {result.results.map(({ question, userAnswer, isCorrect, matchingScore }, index) => (
+                        <div key={question.id} className={cn("space-y-4 border rounded-lg p-4", isCorrect ? 'border-green-300 bg-green-50/50' : 'border-red-300 bg-red-50/50')}>
+                            <div className="flex justify-between items-start">
+                                <p className="font-semibold">{index + 1}. {question.text}</p>
+                                {question.type === 'Matching' ? (
+                                    <span className="font-semibold text-sm">{matchingScore}/{question.correctAnswer.length}</span>
+                                ) : isCorrect ? (
+                                    <CheckCircle className="h-5 w-5 text-green-600"/>
+                                ) : (
+                                    <XCircle className="h-5 w-5 text-red-600"/>
+                                )}
+                            </div>
+                            
+                            {question.type === 'Matching' ? (
+                                <div className="space-y-2">
+                                {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: any, pairIndex) => {
+                                    const userMatchedB = userAnswer?.[pair.a];
+                                    const isPairCorrect = userMatchedB === pair.b;
+                                    return (
+                                            <div key={pairIndex} className={`p-2 border rounded-md ${isPairCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="font-medium">{pair.a}</span>
+                                                    <span>-</span>
+                                                    <span className={!isPairCorrect ? 'line-through' : ''}>{userMatchedB || "Not answered"}</span>
+                                                    {!isPairCorrect && <span className="font-bold text-green-700">{pair.b}</span>}
+                                                </div>
+                                            </div>
+                                    )
+                                })}
+                            </div>
+                            ) : (
+                                <>
+                                    <p className={cn("text-sm", isCorrect ? 'text-green-800' : 'text-red-800')}>Your Answer: <span className="font-medium">{userAnswer || "No answer"}</span></p>
+                                    {!isCorrect && <p className="text-sm text-primary">Correct Answer: <span className="font-medium">{question.correctAnswer}</span></p>}
+                                </>
+                            )}
+
+                            {question.explanation && <p className="text-sm text-muted-foreground bg-secondary/50 p-2 rounded-md">Explanation: {question.explanation}</p>}
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+        </div>
+
+        <div className="mt-8 flex justify-center">
+            <Button asChild variant="outline">
+                <Link href={backUrl}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Topic
+                </Link>
             </Button>
         </div>
-        <Card ref={resultsRef} className="p-4 sm:p-0">
-            <CardHeader className="text-center items-center">
-                <CardTitle className="font-headline text-3xl">Results: {practiceSet.title}</CardTitle>
-                <CardDescription>You scored {result.score} out of {result.totalMarks}</CardDescription>
-                <div className="w-full max-w-sm pt-4">
-                    <Progress value={result.percentage} />
-                    <p className="text-lg font-bold mt-2">{result.percentage.toFixed(2)}%</p>
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-8">
-                {result.results.map(({ question, userAnswer, isCorrect, matchingScore }, index) => (
-                    <div key={question.id} className={`space-y-4 border rounded-lg p-4 ${isCorrect ? 'border-green-300 bg-green-50/50' : 'border-red-300 bg-red-50/50'}`}>
-                        <div className="flex justify-between items-start">
-                            <p className="font-semibold">{index + 1}. {question.text}</p>
-                             {question.type === 'Matching' ? (
-                                <span className="font-semibold text-sm">{matchingScore}/{question.correctAnswer.length}</span>
-                            ) : isCorrect ? (
-                                <CheckCircle className="h-5 w-5 text-green-600"/>
-                            ) : (
-                                <XCircle className="h-5 w-5 text-red-600"/>
-                            )}
-                        </div>
-                        
-                         {question.type === 'Matching' ? (
-                            <div className="space-y-2">
-                               {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: any, pairIndex) => {
-                                   const userMatchedB = userAnswer?.[pair.a];
-                                   const isPairCorrect = userMatchedB === pair.b;
-                                   return (
-                                        <div key={pairIndex} className={`p-2 border rounded-md ${isPairCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
-                                            <div className="flex items-center gap-2 text-sm">
-                                                <span className="font-medium">{pair.a}</span>
-                                                <span>-</span>
-                                                <span className={!isPairCorrect ? 'line-through' : ''}>{userMatchedB || "Not answered"}</span>
-                                                {!isPairCorrect && <span className="font-bold text-green-700">{pair.b}</span>}
-                                            </div>
-                                        </div>
-                                   )
-                               })}
-                           </div>
-                         ) : (
-                            <>
-                                <p className={`text-sm ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>Your Answer: <span className="font-medium">{userAnswer || "No answer"}</span></p>
-                                {!isCorrect && <p className="text-sm text-primary">Correct Answer: <span className="font-medium">{question.correctAnswer}</span></p>}
-                            </>
-                         )}
-
-                        {question.explanation && <p className="text-sm text-muted-foreground bg-secondary/50 p-2 rounded-md">Explanation: {question.explanation}</p>}
-                    </div>
-                ))}
-            </CardContent>
-             <CardFooter className="justify-center">
-                <Button asChild>
-                    <Link href={backUrl}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Topic
-                    </Link>
-                </Button>
-            </CardFooter>
-        </Card>
       </div>
     )
   }
