@@ -300,10 +300,9 @@ export default function PracticeSetPage() {
                         return (
                             <Card key={question.id}>
                             <CardHeader>
-                                <h1 className="flex items-baseline gap-2 text-2xl font-bold">
-                                    <span className="font-semibold">Question {questionIndex + 1}:</span>
-                                    <span className="font-normal text-foreground">{question.text}</span>
-                                </h1>
+                                <CardTitle className="flex items-baseline gap-2 text-2xl font-bold">
+                                    <h1>Q. {questionIndex + 1} {question.text}</h1>
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {question.type === 'Multiple Choice' && question.options && (
@@ -357,7 +356,7 @@ export default function PracticeSetPage() {
                                                         <SelectValue placeholder="Select a match" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB) => (
+                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
                                                             <SelectItem key={`${itemB.originalIndex}-${itemB.text}`} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
@@ -454,3 +453,4 @@ export default function PracticeSetPage() {
     </div>
   );
 }
+
