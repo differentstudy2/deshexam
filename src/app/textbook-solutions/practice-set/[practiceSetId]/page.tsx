@@ -298,10 +298,10 @@ export default function PracticeSetPage() {
                         return (
                             <Card key={question.id}>
                             <CardHeader>
-                                <CardTitle className="flex items-baseline gap-2">
-                                  <span className="text-lg font-semibold">Question {questionIndex + 1}:</span>
-                                  <span className="text-lg font-normal text-foreground">{question.text}</span>
-                                </CardTitle>
+                                <h1 className="flex items-baseline gap-2 text-2xl font-bold">
+                                    <span className="font-semibold">Question {questionIndex + 1}:</span>
+                                    <span className="font-normal text-foreground">{question.text}</span>
+                                </h1>
                             </CardHeader>
                             <CardContent>
                                 {question.type === 'Multiple Choice' && question.options && (
