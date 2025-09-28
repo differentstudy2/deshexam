@@ -115,7 +115,6 @@ export default function PracticeSetPage() {
                 testType: 'Practice Set' 
             } as Test);
             
-            // Set a default duration if not specified, e.g., 1 minute per mark
             const durationInSeconds = (practiceSetData.duration || calculatedTotalMarks) * 60;
             setTimeLeft(durationInSeconds);
         }
@@ -291,7 +290,7 @@ export default function PracticeSetPage() {
                     return (
                         <Card key={question.id}>
                             <CardHeader>
-                                <CardTitle className="text-2xl font-bold">
+                                <CardTitle className="flex items-baseline gap-2 text-2xl font-bold">
                                     Q. {questionIndex + 1} {question.text}
                                 </CardTitle>
                             </CardHeader>
@@ -301,7 +300,7 @@ export default function PracticeSetPage() {
                                     {question.options.map((option, optIndex) => (
                                     <div key={optIndex} className="flex items-center space-x-2">
                                         <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-lg">{option.text}</Label>
+                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-2xl">{option.text}</Label>
                                     </div>
                                     ))}
                                 </RadioGroup>
@@ -310,11 +309,11 @@ export default function PracticeSetPage() {
                                 <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
                                     <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                    <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
+                                    <Label htmlFor={`q${question.id}-true`} className="text-2xl">True</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                    <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
+                                    <Label htmlFor={`q${question.id}-false`} className="text-2xl">False</Label>
                                     </div>
                                 </RadioGroup>
                                 )}
@@ -348,7 +347,7 @@ export default function PracticeSetPage() {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                            <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
+                                                            <SelectItem key={bIndex} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
                                                                     <span>{itemB.text}</span>
