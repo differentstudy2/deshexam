@@ -25,8 +25,6 @@ import { db } from '@/lib/firebase/client';
 
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
 
-const QUESTIONS_PER_PAGE = 5;
-
 const shuffleArray = (array: any[]) => {
   if (!array) return [];
   // Attach original index before shuffling to ensure stable keys
@@ -48,7 +46,6 @@ export default function PracticeSetPage() {
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const { toast } = useToast();
   const router = useRouter();
   const pathname = usePathname();
@@ -232,11 +229,6 @@ export default function PracticeSetPage() {
         return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
     };
 
-  const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
-  const startIndex = currentPage * QUESTIONS_PER_PAGE;
-  const endIndex = startIndex + QUESTIONS_PER_PAGE;
-  const currentQuestions = test?.questions.slice(startIndex, endIndex);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -273,168 +265,114 @@ export default function PracticeSetPage() {
 
   return (
     <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
-            <div className="md:col-span-1">
-                <header className="mb-8 p-4">
-                    <p className="text-primary font-semibold">{textbook?.subject || 'Practice'}</p>
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
-                    <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
-                     <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
+        <div>
+            <header className="mb-8 p-4">
+                <p className="text-primary font-semibold">{textbook?.subject || 'Practice'}</p>
+                <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
+                <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
+                 <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
+                    <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
+                        <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                        <span>{test.questions.length} Questions</span>
+                    </div>
+                    {timeLeft !== null && (
                         <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                            <HelpCircle className="w-4 h-4 text-muted-foreground" />
-                            <span>{test.questions.length} Questions</span>
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <span>{formatTime(timeLeft)}</span>
                         </div>
-                        {timeLeft !== null && (
-                            <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                                <Clock className="w-4 h-4 text-muted-foreground" />
-                                <span>{formatTime(timeLeft)}</span>
-                            </div>
-                        )}
-                    </div>
-                </header>
+                    )}
+                </div>
+            </header>
 
-                <form onSubmit={handleSubmit}>
-                    <fieldset disabled={timeUp || isSubmitting} className="space-y-8">
-                    {currentQuestions && currentQuestions.map((question, index) => {
-                        const questionIndex = startIndex + index;
-                        return (
-                            <Card key={question.id}>
-                            <CardHeader>
-                                <CardTitle className="flex items-baseline gap-2 text-2xl font-bold">
-                                    Q. {questionIndex + 1} {question.text}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {question.type === 'Multiple Choice' && question.options && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
-                                    {question.options.map((option, optIndex) => (
-                                    <div key={optIndex} className="flex items-center space-x-2">
-                                        <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base">{option.text}</Label>
-                                    </div>
-                                    ))}
-                                </RadioGroup>
-                                )}
-                                {question.type === 'True/False' && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                    <Label htmlFor={`q${question.id}-true`} className="text-base">True</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                    <Label htmlFor={`q${question.id}-false`} className="text-base">False</Label>
-                                    </div>
-                                </RadioGroup>
-                                )}
-                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                                <Input 
-                                    placeholder="Your answer..." 
-                                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                                    value={answers[question.id] || ''}
-                                />
-                                )}
-                                {question.type === 'Matching' && question.matchingOptions && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                            <div className="font-bold text-center">Column A</div>
-                                            <div></div>
-                                            <div className="font-bold text-center">Column B</div>
-                                        </div>
-                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                <div className="p-3 border rounded-md text-center bg-secondary">
-                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                    {itemA.text}
-                                                </div>
-                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                <Select 
-                                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                                    value={answers[question.id]?.[itemA.text] || ''}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a match" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB) => (
-                                                            <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
-                                                                <div className="flex items-center gap-2">
-                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                                    <span>{itemB.text}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                            </Card>
-                        )
-                    })}
-                    </fieldset>
-
-                    <div className="mt-8 flex justify-between items-center">
-                        <Button 
-                            type="button"
-                            variant="outline" 
-                            onClick={() => setCurrentPage(p => p - 1)} 
-                            disabled={currentPage === 0}
-                        >
-                        <ChevronLeft className="mr-2"/>
-                        Previous
-                        </Button>
-                        
-                        <span className="text-sm text-muted-foreground">
-                            Page {currentPage + 1} of {totalPages}
-                        </span>
-
-                        <Button 
-                            type="button"
-                            variant="outline" 
-                            onClick={() => setCurrentPage(p => p + 1)} 
-                            disabled={currentPage === totalPages - 1}
-                        >
-                        Next
-                        <ChevronRight className="ml-2"/>
-                        </Button>
-                    </div>
-
-
-                    <div className="mt-8 flex justify-center">
-                        <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
-                            {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Practice Set"}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-            
-            <aside className="md:col-span-1">
-                <div className="sticky top-24">
-                     <Card>
+            <form onSubmit={handleSubmit}>
+                <fieldset disabled={timeUp || isSubmitting} className="space-y-8">
+                {test.questions && test.questions.map((question, index) => {
+                    const questionIndex = index;
+                    return (
+                        <Card key={question.id}>
                         <CardHeader>
-                            <CardTitle>Question Navigator</CardTitle>
+                            <CardTitle className="text-2xl font-bold">
+                                Q. {questionIndex + 1} {question.text}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex flex-wrap gap-2">
-                                {test.questions.map((q, qIndex) => (
-                                    <Button
-                                        key={q.id}
-                                        variant={answers[q.id] !== undefined ? 'default' : 'outline'}
-                                        size="sm"
-                                        className="h-8 w-8"
-                                        onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
-                                    >
-                                        {qIndex + 1}
-                                    </Button>
+                            {question.type === 'Multiple Choice' && question.options && (
+                            <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
+                                {question.options.map((option, optIndex) => (
+                                <div key={optIndex} className="flex items-center space-x-2">
+                                    <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
+                                    <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-lg">{option.text}</Label>
+                                </div>
                                 ))}
-                            </div>
+                            </RadioGroup>
+                            )}
+                            {question.type === 'True/False' && (
+                            <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
+                                <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="True" id={`q${question.id}-true`} />
+                                <Label htmlFor={`q${question.id}-true`} className="text-base">True</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="False" id={`q${question.id}-false`} />
+                                <Label htmlFor={`q${question.id}-false`} className="text-base">False</Label>
+                                </div>
+                            </RadioGroup>
+                            )}
+                            {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                            <Input 
+                                placeholder="Your answer..." 
+                                onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                                value={answers[question.id] || ''}
+                            />
+                            )}
+                            {question.type === 'Matching' && question.matchingOptions && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                        <div className="font-bold text-center">Column A</div>
+                                        <div></div>
+                                        <div className="font-bold text-center">Column B</div>
+                                    </div>
+                                    {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                        <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                            <div className="p-3 border rounded-md text-center bg-secondary">
+                                                {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                {itemA.text}
+                                            </div>
+                                            <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                            <Select 
+                                                onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
+                                                value={answers[question.id]?.[itemA.text] || ''}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a match" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {question.matchingOptions?.columnB.map((itemB) => (
+                                                        <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
+                                                            <div className="flex items-center gap-2">
+                                                                {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                <span>{itemB.text}</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
-                    </Card>
+                        </Card>
+                    )
+                })}
+                </fieldset>
+
+                <div className="mt-8 flex justify-center">
+                    <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
+                        {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Practice Set"}
+                    </Button>
                 </div>
-            </aside>
+            </form>
         </div>
         
         <AlertDialog open={timeUp}>
