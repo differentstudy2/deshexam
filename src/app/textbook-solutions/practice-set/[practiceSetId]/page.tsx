@@ -1,30 +1,29 @@
 
-
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Question, Topic, Textbook } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowLeft, GripVertical } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter, usePathname, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useAuth } from '@/hooks/use-auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
-import { addPracticeSetSubmission } from '@/lib/firebase/firestore';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
+import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import type { PracticeSet, Question, Topic } from '@/lib/types';
 
-type UserAnswer = {
-  questionId: string;
-  answer: any;
-};
+
+type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
+
+const QUESTIONS_PER_PAGE = 5;
 
 const shuffleArray = (array: any[]) => {
   if (!array) return [];
@@ -36,270 +35,393 @@ const shuffleArray = (array: any[]) => {
   return newArray;
 };
 
+
 export default function PracticeSetPage() {
+  const [test, setTest] = useState<Test | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const practiceSetId = params.practiceSetId as string;
-  const textbookId = searchParams.get('textbook');
-  const chapterId = searchParams.get('chapter');
-  const topicId = searchParams.get('topic');
-
-  const [practiceSet, setPracticeSet] = useState<PracticeSet | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [topic, setTopic] = useState<Topic | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { openAuthDialog } = useAuthDialog();
+
+  const practiceSetId = params.practiceSetId as string;
+  const textbookId = searchParams.get('textbook')!;
+  const chapterId = searchParams.get('chapter')!;
+  const topicId = searchParams.get('topic')!;
   
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [timeUp, setTimeUp] = useState(false);
+  const [totalMarks, setTotalMarks] = useState(0);
+
   useEffect(() => {
-    if (!practiceSetId || !textbookId || !chapterId || !topicId) {
-        setLoading(false);
-        return;
-    };
-
-    const fetchPracticeSet = async () => {
-      setLoading(true);
-      
-      const topicDocRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-      const topicSnap = await getDoc(topicDocRef);
-      if(topicSnap.exists()) setTopic({ id: topicSnap.id, ...topicSnap.data() } as Topic);
-
-      const practiceSetDocRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
-      const practiceSetSnap = await getDoc(practiceSetDocRef);
-
-      if (practiceSetSnap.exists()) {
-        const psData = { id: practiceSetSnap.id, ...practiceSetSnap.data() } as PracticeSet
-        setPracticeSet(psData);
-        const questionsQuery = query(collection(practiceSetDocRef, 'questions'));
-        const questionsSnap = await getDocs(questionsQuery);
-        let questionsData = questionsSnap.docs.map(qDoc => ({ id: qDoc.id, ...qDoc.data() } as Question));
-
-        questionsData = questionsData.map(q => {
-            if (q.type === 'Matching' && q.correctAnswer) {
-                const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
-                const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
-                let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
-                return {
-                    ...q,
-                    matchingOptions: {
-                        columnA,
-                        columnB: shuffleArray(columnB)
+    const fetchTest = async () => {
+      if (!practiceSetId || !textbookId || !chapterId || !topicId) return;
+      try {
+        setLoading(true);
+        const practiceSetData = await getPracticeSetById(textbookId, chapterId, topicId, practiceSetId);
+        
+        if (practiceSetData) {
+            let questionsData = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
+            
+            questionsData = questionsData.map((q: any) => {
+                if (q.type === 'Matching' && q.correctAnswer) {
+                    const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                    const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                    let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
+                    return {
+                        ...q,
+                        matchingOptions: {
+                            columnA,
+                            columnB: shuffleArray(columnB)
+                        }
                     }
                 }
-            }
-            return q;
+                return q;
+            });
+
+            const shuffledQuestions = shuffleArray(questionsData);
+            const calculatedTotalMarks = shuffledQuestions.reduce((total, q) => {
+                if (q.type === 'Matching') {
+                    return total + (q.correctAnswer?.length || 0);
+                }
+                return total + (q.marks || 1);
+            }, 0);
+
+            setTotalMarks(calculatedTotalMarks);
+
+            setTest({ 
+                ...practiceSetData, 
+                questions: shuffledQuestions,
+                testType: 'Practice Set' 
+            } as Test);
+            
+            // Set a default duration if not specified, e.g., 1 minute per mark
+            const durationInSeconds = (practiceSetData.duration || calculatedTotalMarks) * 60;
+            setTimeLeft(durationInSeconds);
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: 'Error fetching practice set',
+          description: (error as Error).message,
         });
-
-        setQuestions(shuffleArray(questionsData));
+        router.push('/textbook-solutions');
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
-    fetchPracticeSet();
-  }, [practiceSetId, textbookId, chapterId, topicId]);
+    fetchTest();
+  }, [practiceSetId, textbookId, chapterId, topicId, toast, router]);
+  
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0) {
+      if (timeLeft === 0) {
+        setTimeUp(true);
+        if(!isSubmitting) handleSubmit();
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, isSubmitting]);
+
 
   const handleAnswerChange = (questionId: string, answer: any) => {
-    setUserAnswers(prevAnswers => {
-      const otherAnswers = prevAnswers.filter(a => a.questionId !== questionId);
-      return [...otherAnswers, { questionId, answer }];
-    });
+    setAnswers(prev => ({ ...prev, [questionId]: answer }));
   };
 
   const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
-    const currentAnswer = userAnswers.find(a => a.questionId === questionId)?.answer || {};
+    const currentAnswer = answers[questionId] || {};
     const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
     handleAnswerChange(questionId, newAnswer);
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    if (isSubmitting) return;
+
     if (!user) {
-        toast({variant: "destructive", title: "Please log in to submit."});
+        openAuthDialog('sign-in');
         return;
     }
+
     setIsSubmitting(true);
-    let score = 0;
-    
-    const totalMarks = questions.reduce((acc, q) => {
-        if (q.type === 'Matching') {
-            return acc + (Array.isArray(q.correctAnswer) ? q.correctAnswer.length : (q.marks || 0));
-        }
-        return acc + (q.marks || 1);
-    }, 0);
-    
-    questions.forEach(question => {
-        const userAnswerObj = userAnswers.find(a => a.questionId === question.id);
-        const userAnswer = userAnswerObj ? userAnswerObj.answer : null;
-        
-        if (question.type === 'Matching') {
-            if (userAnswer && Array.isArray(question.correctAnswer)) {
-                for(const pair of question.correctAnswer) {
-                    if (userAnswer[pair.a] === pair.b) {
-                        score++;
-                    }
-                }
-            }
-        } else {
-            if (userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim()) {
-                score += question.marks || 1;
-            }
-        }
-    });
-    
-     const submissionData = {
-        practiceSetId: practiceSet?.id,
-        practiceSetTitle: practiceSet?.title,
-        topicId: topic?.id,
-        topicTitle: topic?.title,
-        chapterId: chapterId,
-        textbookId: textbookId,
-        answers: userAnswers.reduce((acc, ans) => ({...acc, [ans.questionId]: ans.answer}), {}),
-        score,
-        totalQuestions: totalMarks,
-    };
 
     try {
-        const subId = await addPracticeSetSubmission(submissionData);
+        let score = 0;
+        test?.questions.forEach((question) => {
+            const userAnswer = answers[question.id];
+            if (question.type === 'Matching') {
+                const correctAnswers = question.correctAnswer;
+                if (userAnswer && Array.isArray(correctAnswers)) {
+                    for (const pair of correctAnswers) {
+                        if (userAnswer[pair.a] === pair.b) {
+                            score++;
+                        }
+                    }
+                }
+            } else {
+                 if (userAnswer === question.correctAnswer) {
+                    score += question.marks || 1;
+                }
+            }
+        });
+        
+        const submissionData = {
+            practiceSetId: test?.id,
+            practiceSetTitle: test?.title,
+            topicId: topicId,
+            chapterId: chapterId,
+            textbookId: textbookId,
+            answers: answers,
+            score,
+            totalQuestions: totalMarks,
+        };
+
+        const submissionId = await addPracticeSetSubmission(submissionData);
+
         toast({
             title: "Practice Set Submitted!",
-            description: "Redirecting to your results...",
+            description: "Your results have been recorded.",
         });
-        router.push(`/textbook-solutions/practice-set/${practiceSetId}/results?submissionId=${subId}`);
-    } catch(error) {
-        console.error("Failed to save submission:", error);
+        
+        router.push(`/textbook-solutions/practice-set/${test?.id}/results?submissionId=${submissionId}`);
+
+    } catch (error) {
         toast({
             variant: "destructive",
-            title: "Submission Error",
-            description: "There was an issue saving your results. Please try again."
+            title: 'Error submitting practice set',
+            description: (error as Error).message,
         });
-    } finally {
         setIsSubmitting(false);
     }
   };
+  
+    const formatTime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+    };
+
+  const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
+  const startIndex = currentPage * QUESTIONS_PER_PAGE;
+  const endIndex = startIndex + QUESTIONS_PER_PAGE;
+  const currentQuestions = test?.questions.slice(startIndex, endIndex);
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="ml-4 text-lg">Loading Practice Set...</p>
       </div>
     );
   }
 
-  if (!practiceSet) {
-    return <div className="container mx-auto py-8 text-center">Practice set not found.</div>;
-  }
-
-  const backUrl = `/textbook-solutions/${textbookId}?chapter=${chapterId}&topic=${topicId}`;
-
-  return (
-    <div className="container mx-auto max-w-3xl py-8">
-       <div className="mb-6">
-        <Button variant="ghost" asChild>
-          <Link href={backUrl}>
+  if (!test) {
+    return (
+      <div className="text-center min-h-[calc(100vh-200px)] flex flex-col justify-center">
+        <h2 className="text-2xl font-bold">Practice Set not found</h2>
+        <p className="text-muted-foreground">The practice set you are looking for does not exist.</p>
+        <Button asChild className="mt-4 mx-auto" variant="outline">
+          <Link href="/textbook-solutions">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="truncate md:hidden">Back to Topic</span>
-            <span className="truncate hidden md:inline">Back to {topic?.title || 'Topic'}</span>
+            Back to Textbooks
           </Link>
         </Button>
       </div>
+    );
+  }
 
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="font-headline text-3xl">{practiceSet.title}</CardTitle>
-          <CardDescription>Topic: {topic?.title}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {questions.map((question, index) => (
-            <div key={question.id} className="space-y-4 border-t pt-6 first:border-t-0 first:pt-0">
-              <p className="font-semibold">{index + 1}. {question.text} <span className="text-sm font-normal text-muted-foreground">({question.marks} mark{question.marks > 1 ? 's': ''})</span></p>
+  return (
+    <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
+            <div className="md:col-span-1">
+                <header className="mb-8 p-4">
+                    <p className="text-primary font-semibold">{test.subject}</p>
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
+                    <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
+                    <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
+                        <div className="flex items-center gap-1.5">
+                        <HelpCircle className="w-4 h-4" />
+                        <span>{test.questions.length} Questions</span>
+                        </div>
+                        {timeLeft !== null && (
+                            <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
+                                <Clock className="w-4 h-4" />
+                                <span>{formatTime(timeLeft)}</span>
+                            </div>
+                        )}
+                    </div>
+                </header>
 
-              {question.type === 'Multiple Choice' ? (
-                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)}>
-                  {(question.options || []).map((option, i) => (
-                    <div key={i} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.text} id={`${question.id}-option-${i}`} />
-                      <Label htmlFor={`${question.id}-option-${i}`}>{option.text}</Label>
+                <form onSubmit={handleSubmit}>
+                    <fieldset disabled={timeUp || isSubmitting} className="space-y-8">
+                    {currentQuestions && currentQuestions.map((question, index) => {
+                        const questionIndex = startIndex + index;
+                        return (
+                            <Card key={question.id}>
+                            <CardHeader>
+                                <CardTitle>Question {questionIndex + 1}</CardTitle>
+                                <CardDescription className="text-lg text-foreground pt-2">{question.text}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {question.type === 'Multiple Choice' && question.options && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
+                                    {question.options.map((option, optIndex) => (
+                                    <div key={optIndex} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
+                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base">{option.text}</Label>
+                                    </div>
+                                    ))}
+                                </RadioGroup>
+                                )}
+                                {question.type === 'True/False' && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="True" id={`q${question.id}-true`} />
+                                    <Label htmlFor={`q${question.id}-true`} className="text-base">True</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="False" id={`q${question.id}-false`} />
+                                    <Label htmlFor={`q${question.id}-false`} className="text-base">False</Label>
+                                    </div>
+                                </RadioGroup>
+                                )}
+                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                                <Input 
+                                    placeholder="Your answer..." 
+                                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                                    value={answers[question.id] || ''}
+                                />
+                                )}
+                                {question.type === 'Matching' && question.matchingOptions && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                            <div className="font-bold text-center">Column A</div>
+                                            <div></div>
+                                            <div className="font-bold text-center">Column B</div>
+                                        </div>
+                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                <div className="p-3 border rounded-md text-center bg-secondary">
+                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                    {itemA.text}
+                                                </div>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                <Select 
+                                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
+                                                    value={answers[question.id]?.[itemA.text] || ''}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a match" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                                            <SelectItem key={bIndex} value={itemB.text}>
+                                                                <div className="flex items-center gap-2">
+                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                    <span>{itemB.text}</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                            </Card>
+                        )
+                    })}
+                    </fieldset>
+
+                    <div className="mt-8 flex justify-between items-center">
+                        <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => setCurrentPage(p => p - 1)} 
+                            disabled={currentPage === 0}
+                        >
+                        <ChevronLeft className="mr-2"/>
+                        Previous
+                        </Button>
+                        
+                        <span className="text-sm text-muted-foreground">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+
+                        <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => setCurrentPage(p => p + 1)} 
+                            disabled={currentPage === totalPages - 1}
+                        >
+                        Next
+                        <ChevronRight className="ml-2"/>
+                        </Button>
                     </div>
-                  ))}
-                </RadioGroup>
-              ) : question.type === 'True/False' ? (
-                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="True" id={`${question.id}-true`} />
-                      <Label htmlFor={`${question.id}-true`}>True</Label>
+
+
+                    <div className="mt-8 flex justify-center">
+                        <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
+                            {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Practice Set"}
+                        </Button>
                     </div>
-                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="False" id={`${question.id}-false`} />
-                      <Label htmlFor={`${question.id}-false`}>False</Label>
-                    </div>
-                </RadioGroup>
-              ) : (question.type === 'Short Answer' || question.type === 'Fill in the Blank') ? (
-                <Input 
-                  placeholder="Your answer..."
-                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                />
-              ) : question.type === 'Matching' && question.matchingOptions ? (
-                  <div className="space-y-4">
-                      <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                          <div className="font-bold text-center">Column A</div>
-                          <div></div>
-                          <div className="font-bold text-center">Column B</div>
-                      </div>
-                      {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                          <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                              <div className="p-3 border rounded-md text-center bg-secondary">
-                                  {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                  {itemA.text}
-                              </div>
-                              <GripVertical className="h-5 w-5 text-muted-foreground" />
-                              <Select 
-                                  onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                              >
-                                  <SelectTrigger>
-                                      <SelectValue placeholder="Select a match" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                      {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                          <SelectItem key={bIndex} value={itemB.text}>
-                                              <div className="flex items-center gap-2">
-                                                  {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                  <span>{itemB.text}</span>
-                                              </div>
-                                          </SelectItem>
-                                      ))}
-                                  </SelectContent>
-                              </Select>
-                          </div>
-                      ))}
-                  </div>
-              ) : null}
+                </form>
             </div>
-          ))}
-           <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="w-full mt-8" disabled={isSubmitting}>
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : "Submit Test"}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
+            
+            <aside className="md:col-span-1">
+                <div className="sticky top-24">
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Question Navigator</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                                {test.questions.map((q, qIndex) => (
+                                    <Button
+                                        key={q.id}
+                                        variant={answers[q.id] !== undefined ? 'default' : 'outline'}
+                                        size="sm"
+                                        className="h-8 w-8"
+                                        onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
+                                    >
+                                        {qIndex + 1}
+                                    </Button>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </aside>
+        </div>
+        
+        <AlertDialog open={timeUp}>
+            <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    You are about to submit your answers. You cannot change them after submission.
-                  </AlertDialogDescription>
+                    <AlertDialogTitle>Time's Up!</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        The time limit for this practice set has been reached. Your answers will now be submitted.
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleSubmit}>Submit</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-        </CardContent>
-      </Card>
+                <AlertDialogAction onClick={() => handleSubmit()}>
+                    View Results
+                </AlertDialogAction>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
   );
 }
