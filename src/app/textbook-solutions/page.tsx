@@ -258,7 +258,6 @@ export default function TextbookSolutionsListPage() {
                   {book.board && <Badge variant="outline">{book.board}</Badge>}
               </div>
               <h3 className="font-bold text-lg flex items-center gap-2 flex-grow">{book.title}</h3>
-              <p className="text-sm text-muted-foreground mt-2 line-clamp-2 min-h-[40px]">{book.description}</p>
               <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardContent className="p-4 pt-0">
