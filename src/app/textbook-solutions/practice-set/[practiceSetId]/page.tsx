@@ -18,7 +18,9 @@ import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { cn } from '@/lib/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import type { PracticeSet, Question, Topic } from '@/lib/types';
+import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
@@ -38,6 +40,9 @@ const shuffleArray = (array: any[]) => {
 
 export default function PracticeSetPage() {
   const [test, setTest] = useState<Test | null>(null);
+  const [textbook, setTextbook] = useState<Textbook | null>(null);
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [topic, setTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,8 +69,18 @@ export default function PracticeSetPage() {
       if (!practiceSetId || !textbookId || !chapterId || !topicId) return;
       try {
         setLoading(true);
-        const practiceSetData = await getPracticeSetById(textbookId, chapterId, topicId, practiceSetId);
+
+        const [practiceSetData, textbookData, chapterData, topicData] = await Promise.all([
+            getPracticeSetById(textbookId, chapterId, topicId, practiceSetId),
+            getDoc(doc(db, 'textbooks', textbookId)),
+            getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId)),
+            getDoc(doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId)),
+        ]);
         
+        if (textbookData.exists()) setTextbook(textbookData.data() as Textbook);
+        if (chapterData.exists()) setChapter(chapterData.data() as Chapter);
+        if (topicData.exists()) setTopic(topicData.data() as Topic);
+
         if (practiceSetData) {
             let questionsData = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
             
@@ -243,14 +258,24 @@ export default function PracticeSetPage() {
       </div>
     );
   }
+  
+  const pageTitle = [
+    textbook?.board,
+    textbook?.class,
+    textbook?.subject,
+    chapter?.title,
+    topic?.title,
+    test.title
+  ].filter(Boolean).join(' - ');
+
 
   return (
     <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
             <div className="md:col-span-1">
                 <header className="mb-8 p-4">
-                    <p className="text-primary font-semibold">{test.subject}</p>
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
+                    <p className="text-primary font-semibold">{textbook?.subject || 'Practice'}</p>
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
                     <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
                     <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
                         <div className="flex items-center gap-1.5">
