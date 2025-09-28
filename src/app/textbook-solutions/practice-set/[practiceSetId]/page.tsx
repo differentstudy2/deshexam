@@ -268,9 +268,9 @@ export default function PracticeSetPage() {
         <div className="md:col-span-1">
             <header className="mb-8 p-4">
                 <p className="text-primary font-semibold">{textbook?.subject || 'Practice'}</p>
-                <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
+                 <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
                 <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
-                 <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
+                 <div className="flex items-center text-muted-foreground space-x-4 mt-2">
                     <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
                         <HelpCircle className="w-4 h-4 text-muted-foreground" />
                         <span>{test.questions.length} Questions</span>
@@ -347,7 +347,7 @@ export default function PracticeSetPage() {
                                                         <SelectValue placeholder="Select a match" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB) => (
+                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
                                                             <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
