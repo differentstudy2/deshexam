@@ -29,12 +29,14 @@ const QUESTIONS_PER_PAGE = 5;
 
 const shuffleArray = (array: any[]) => {
   if (!array) return [];
-  const newArray = [...array];
-  for (let i = newArray.length - 1; i > 0; i--) {
+  // Attach original index before shuffling to ensure stable keys
+  const indexedArray = array.map((item, index) => ({ ...item, originalIndex: index }));
+  
+  for (let i = indexedArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    [indexedArray[i], indexedArray[j]] = [indexedArray[j], indexedArray[i]];
   }
-  return newArray;
+  return indexedArray;
 };
 
 
@@ -355,8 +357,8 @@ export default function PracticeSetPage() {
                                                         <SelectValue placeholder="Select a match" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                            <SelectItem key={`${bIndex}-${itemB.text}`} value={itemB.text}>
+                                                        {question.matchingOptions?.columnB.map((itemB) => (
+                                                            <SelectItem key={`${itemB.originalIndex}-${itemB.text}`} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
                                                                     <span>{itemB.text}</span>
