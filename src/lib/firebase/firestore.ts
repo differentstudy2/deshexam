@@ -17,6 +17,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -617,6 +618,27 @@ export const addTestSubmission = async (submissionData: any) => {
     }
 }
 
+export const addPracticeSetSubmission = async (submissionData: any) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+        throw new Error("You must be logged in to submit a practice set.");
+    }
+
+    try {
+        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), {
+            ...submissionData,
+            userId: user.uid,
+            submittedAt: serverTimestamp(),
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding practice set submission: ", e);
+        throw new Error("Failed to submit practice set results.");
+    }
+};
+
 export const getSubmissionById = async (submissionId: string) => {
     if (!submissionId) {
         throw new Error("Submission ID is required to fetch a submission.");
@@ -697,10 +719,16 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
         }
 
         const querySnapshot = await getDocs(q);
-        const submissions = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        const submissions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                user: {
+                    displayName: data.authorName || 'Unknown User',
+                },
+            };
+        });
 
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
 

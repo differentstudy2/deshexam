@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter } from '@/lib/types';
+import type { Textbook, Chapter, Topic } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -24,14 +24,12 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Lock, Trash2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ContentBadge } from '@/components/content-badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,112 +41,113 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { getTopicsByChapterId, addTopicToChapter, updateTopic } from '@/lib/firebase/firestore';
 
-export default function ManageChaptersPage() {
+export default function ManageTopicsPage() {
   const params = useParams();
   const textbookId = params.bookId as string;
+  const chapterId = params.chapterId as string;
 
   const [textbook, setTextbook] = useState<Textbook | null>(null);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [newChapter, setNewChapter] = useState({ title: '', content: '', access: 'free' as 'free' | 'pass' | 'pro' });
-  const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [newTopic, setNewTopic] = useState({ title: '', content: '' });
+  const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
-  const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
+  const [topicToDelete, setTopicToDelete] = useState<Topic | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
-  const fetchTextbookAndChapters = async () => {
-    if (!textbookId) return;
+  const fetchChapterAndTopics = useCallback(async () => {
+    if (!textbookId || !chapterId) return;
     setLoading(true);
-    // Fetch textbook details
-    const textbookDocRef = doc(db, 'textbooks', textbookId);
-    const textbookDocSnap = await getDoc(textbookDocRef);
-    if (textbookDocSnap.exists()) {
-      setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
-    } else {
-      console.error('No such textbook!');
-    }
-
-    // Fetch chapters
-    const chaptersQuery = query(collection(db, 'textbooks', textbookId, 'chapters'));
-    const querySnapshot = await getDocs(chaptersQuery);
-    const chaptersData = querySnapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() } as Chapter)
-    );
     
-    chaptersData.sort((a, b) => {
-      const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
-      const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
-      if (numA !== numB) {
-        return numA - numB;
-      }
-      return a.title.localeCompare(b.title, undefined, { numeric: true });
-    });
-
-    setChapters(chaptersData);
-    setLoading(false);
-  };
-  
-  useEffect(() => {
-    fetchTextbookAndChapters();
-  }, [textbookId]);
-
-  const handleAddOrUpdateChapter = async () => {
-    if (!newChapter.title.trim()) return;
     try {
-        const chaptersCollectionRef = collection(db, 'textbooks', textbookId, 'chapters');
+        const textbookDocRef = doc(db, 'textbooks', textbookId);
+        const textbookDocSnap = await getDoc(textbookDocRef);
+        if(textbookDocSnap.exists()) setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
         
-        if (editingChapter) {
-            // Update logic
-            const chapterDocRef = doc(chaptersCollectionRef, editingChapter.id);
-            await updateDoc(chapterDocRef, newChapter);
-            setEditingChapter(null);
-        } else {
-            // Add logic
-            await addDoc(chaptersCollectionRef, newChapter);
-        }
-        setNewChapter({ title: '', content: '', access: 'free' });
-        fetchTextbookAndChapters(); // Refetch to get the updated/new chapter
+        const chapterDocRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+        const chapterDocSnap = await getDoc(chapterDocRef);
+        if(chapterDocSnap.exists()) setChapter({ id: chapterDocSnap.id, ...chapterDocSnap.data() } as Chapter);
+        
+        const topicsData = await getTopicsByChapterId(textbookId, chapterId);
+        setTopics(topicsData);
 
     } catch (error) {
-      console.error('Error saving chapter: ', error);
+        toast({
+            variant: "destructive",
+            title: "Error fetching data",
+            description: (error as Error).message,
+        })
+    } finally {
+        setLoading(false);
+    }
+  }, [textbookId, chapterId, toast]);
+  
+  useEffect(() => {
+    fetchChapterAndTopics();
+  }, [fetchChapterAndTopics]);
+
+  const handleAddOrUpdateTopic = async () => {
+    if (!newTopic.title.trim()) return;
+    try {
+        if (editingTopic) {
+            await updateTopic(textbookId, chapterId, editingTopic.id, newTopic);
+            setEditingTopic(null);
+            toast({ title: "Topic updated successfully." });
+        } else {
+            await addTopicToChapter(textbookId, chapterId, newTopic);
+            toast({ title: "Topic added successfully." });
+        }
+        setNewTopic({ title: '', content: '' });
+        fetchChapterAndTopics(); 
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error saving topic",
+        description: (error as Error).message,
+      });
     }
   };
 
-  const handleEditClick = (chapter: Chapter) => {
-    setEditingChapter(chapter);
-    setNewChapter({ title: chapter.title, content: chapter.content || '', access: chapter.access || 'free' });
+  const handleEditClick = (topic: Topic) => {
+    setEditingTopic(topic);
+    setNewTopic({ title: topic.title, content: topic.content || '' });
   };
   
   const handleCancelEdit = () => {
-    setEditingChapter(null);
-    setNewChapter({ title: '', content: '', access: 'free' });
+    setEditingTopic(null);
+    setNewTopic({ title: '', content: '' });
   }
   
-  const handleDeleteClick = (chapter: Chapter) => {
-    setChapterToDelete(chapter);
+  const handleDeleteClick = (topic: Topic) => {
+    setTopicToDelete(topic);
   };
 
   const handleConfirmDelete = async () => {
-    if (!chapterToDelete) return;
+    if (!topicToDelete) return;
     setIsDeleting(true);
     try {
-      const chapterRef = doc(db, 'textbooks', textbookId, 'chapters', chapterToDelete.id);
-      await deleteDoc(chapterRef);
+      // Note: A robust delete would use a Cloud Function to recursively delete subcollections.
+      // This is a simplified client-side delete.
+      const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicToDelete.id);
+      await deleteDoc(topicRef);
       toast({
-        title: "Chapter Deleted",
-        description: `"${chapterToDelete.title}" has been removed.`,
+        title: "Topic Deleted",
+        description: `"${topicToDelete.title}" has been removed.`,
       });
-      fetchTextbookAndChapters(); // Refresh the list
+      fetchChapterAndTopics();
     } catch (error) {
        toast({
         variant: "destructive",
-        title: "Error Deleting Chapter",
+        title: "Error Deleting Topic",
         description: (error as Error).message,
       });
     } finally {
       setIsDeleting(false);
-      setChapterToDelete(null);
+      setTopicToDelete(null);
     }
   };
 
@@ -157,79 +156,61 @@ export default function ManageChaptersPage() {
     return <div>Loading...</div>;
   }
 
-  if (!textbook) {
-    return <div>Textbook not found.</div>;
+  if (!chapter) {
+    return <div>Chapter not found.</div>;
   }
 
   return (
     <div className="space-y-6">
       <div>
         <Button variant="ghost" asChild>
-          <Link href="/admin/textbooks">
+          <Link href={`/admin/textbooks/${textbookId}`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Textbooks
+            Back to Chapters
           </Link>
         </Button>
       </div>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
         <div>
           <h1 className="font-headline text-3xl font-bold">
-            Manage Chapters for <span className="text-primary">{textbook.title}</span>
+            Manage Topics for <span className="text-primary">{chapter.title}</span>
           </h1>
           <p className="text-muted-foreground">
-            Add, edit, and manage chapters for this textbook.
+            Add, edit, and manage topics for this chapter.
           </p>
         </div>
-        <Button variant="outline" asChild>
-          <Link href={`/admin/textbooks/${textbookId}/edit`}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Textbook Details
-          </Link>
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</CardTitle>
+            <CardTitle>{editingTopic ? 'Edit Topic' : 'Add New Topic'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="chapter-title">Chapter Title</Label>
+                <Label htmlFor="topic-title">Topic Title</Label>
                 <Input
-                id="chapter-title"
-                placeholder="e.g., Chapter 1: Electric Charges"
-                value={newChapter.title}
-                onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
+                id="topic-title"
+                placeholder="e.g., 1.1 Electric Charge"
+                value={newTopic.title}
+                onChange={(e) => setNewTopic({...newTopic, title: e.target.value})}
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="chapter-content">Chapter Content</Label>
+                <Label htmlFor="topic-content">Topic Content (HTML)</Label>
                 <Textarea
-                id="chapter-content"
-                placeholder="Add a summary or introduction for the chapter."
-                value={newChapter.content || ''}
-                onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
+                id="topic-content"
+                placeholder="Add the main educational content for this topic. You can use HTML tags."
+                value={newTopic.content || ''}
+                onChange={(e) => setNewTopic({...newTopic, content: e.target.value})}
+                className="min-h-[200px]"
                 />
             </div>
-             <div className="space-y-2">
-                <Label htmlFor="chapter-access">Access Level</Label>
-                 <Select value={newChapter.access} onValueChange={(value) => setNewChapter({...newChapter, access: value as 'free' | 'pass' | 'pro' })}>
-                    <SelectTrigger id="chapter-access">
-                        <SelectValue placeholder="Select access level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="free">Free</SelectItem>
-                        <SelectItem value="pass">Pass</SelectItem>
-                        <SelectItem value="pro">Pass Pro</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
              <div className="flex gap-2">
-              <Button onClick={handleAddOrUpdateChapter}>
-                {editingChapter ? 'Update Chapter' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Chapter</>}
+              <Button onClick={handleAddOrUpdateTopic}>
+                {editingTopic ? 'Update Topic' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Topic</>}
               </Button>
-              {editingChapter && (
+              {editingTopic && (
                 <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
               )}
             </div>
@@ -239,29 +220,31 @@ export default function ManageChaptersPage() {
         <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Existing Chapters</CardTitle>
+                <CardTitle>Existing Topics</CardTitle>
                 <CardDescription>
-                  A list of all chapters in this textbook.
+                  A list of all topics in this chapter.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {chapters.length > 0 ? (
+                {topics.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4">
-                        {chapters.map((chapter) => (
-                            <Card key={chapter.id} className="flex flex-col">
-                                <CardHeader className="flex-row items-center justify-between pb-2">
-                                    <CardTitle className="text-base font-medium leading-tight">{chapter.title}</CardTitle>
-                                    <ContentBadge type={chapter.access || 'free'} />
+                        {topics.map((topic) => (
+                            <Card key={topic.id} className="flex flex-col">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-base font-medium leading-tight">{topic.title}</CardTitle>
                                 </CardHeader>
+                                 <CardContent className="flex-grow text-sm text-muted-foreground">
+                                    {topic.content ? `${topic.content.substring(0, 100)}...` : 'No content summary.'}
+                                </CardContent>
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics</Link>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>Manage Practice Sets</Link>
                                     </Button>
                                     <div className="flex gap-2">
-                                         <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
+                                         <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
                                             <Edit className="h-3 w-3 mr-1"/> Edit
                                         </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(chapter)} className="w-full">
+                                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(topic)} className="w-full">
                                             <Trash2 className="h-3 w-3 mr-1"/> Delete
                                         </Button>
                                     </div>
@@ -271,7 +254,7 @@ export default function ManageChaptersPage() {
                     </div>
                 ) : (
                   <div className="text-center text-muted-foreground py-4">
-                    No chapters added yet.
+                    No topics added yet.
                   </div>
                 )}
               </CardContent>
@@ -279,12 +262,12 @@ export default function ManageChaptersPage() {
         </div>
       </div>
       
-       <AlertDialog open={!!chapterToDelete} onOpenChange={(open) => !open && setChapterToDelete(null)}>
+       <AlertDialog open={!!topicToDelete} onOpenChange={(open) => !open && setTopicToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the chapter "{chapterToDelete?.title}". This action cannot be undone.
+              This will permanently delete the topic "{topicToDelete?.title}" and all its practice sets. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
