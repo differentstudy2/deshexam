@@ -18,6 +18,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -417,8 +418,7 @@ export const addContent = async (contentData: any) => {
             ...cleanedContent,
             authorId: user.uid,
             authorName: user.displayName || user.email,
-            createdAt: cleanedContent.publishedAt ? new Date(cleanedContent.publishedAt) : serverTimestamp(),
-            updatedAt: serverTimestamp(),
+            createdAt: cleanedContent.publishedAt || serverTimestamp(),
         };
 
         if (cleanedContent.testType !== 'Learn' && cleanedContent.testType !== 'Textbook' && cleanedContent.questions) {
@@ -725,7 +725,7 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
                 id: doc.id,
                 ...data,
                 user: {
-                    displayName: data.authorName || 'Unknown User',
+                    displayName: 'Unknown User', // Placeholder
                 },
             };
         });
