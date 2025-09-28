@@ -240,12 +240,12 @@ export default function TextbookSolutionsListPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
-            <div className="relative w-full h-48 overflow-hidden">
+            <div className="relative w-full h-48 overflow-hidden bg-secondary">
                 <Image
                     src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
                     alt={book.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
                 />
                  <div className="absolute top-2 right-2">
                     <ContentBadge type={book.access} />
