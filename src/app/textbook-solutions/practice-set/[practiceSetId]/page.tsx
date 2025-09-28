@@ -265,7 +265,7 @@ export default function PracticeSetPage() {
 
   return (
     <div className="container py-12">
-        <div>
+        <div className="md:col-span-1">
             <header className="mb-8 p-4">
                 <p className="text-primary font-semibold">{textbook?.subject || 'Practice'}</p>
                 <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
@@ -290,78 +290,78 @@ export default function PracticeSetPage() {
                     const questionIndex = index;
                     return (
                         <Card key={question.id}>
-                        <CardHeader>
-                            <CardTitle className="text-2xl font-bold">
-                                Q. {questionIndex + 1} {question.text}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {question.type === 'Multiple Choice' && question.options && (
-                            <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
-                                {question.options.map((option, optIndex) => (
-                                <div key={optIndex} className="flex items-center space-x-2">
-                                    <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                    <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-lg">{option.text}</Label>
-                                </div>
-                                ))}
-                            </RadioGroup>
-                            )}
-                            {question.type === 'True/False' && (
-                            <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
-                                <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                <Label htmlFor={`q${question.id}-true`} className="text-base">True</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                <Label htmlFor={`q${question.id}-false`} className="text-base">False</Label>
-                                </div>
-                            </RadioGroup>
-                            )}
-                            {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                            <Input 
-                                placeholder="Your answer..." 
-                                onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                                value={answers[question.id] || ''}
-                            />
-                            )}
-                            {question.type === 'Matching' && question.matchingOptions && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                        <div className="font-bold text-center">Column A</div>
-                                        <div></div>
-                                        <div className="font-bold text-center">Column B</div>
+                            <CardHeader>
+                                <CardTitle className="text-2xl font-bold">
+                                    Q. {questionIndex + 1} {question.text}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {question.type === 'Multiple Choice' && question.options && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
+                                    {question.options.map((option, optIndex) => (
+                                    <div key={optIndex} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
+                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-lg">{option.text}</Label>
                                     </div>
-                                    {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                        <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                            <div className="p-3 border rounded-md text-center bg-secondary">
-                                                {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                {itemA.text}
-                                            </div>
-                                            <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                            <Select 
-                                                onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                                value={answers[question.id]?.[itemA.text] || ''}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a match" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {question.matchingOptions?.columnB.map((itemB) => (
-                                                        <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
-                                                            <div className="flex items-center gap-2">
-                                                                {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                                <span>{itemB.text}</span>
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
                                     ))}
-                                </div>
-                            )}
-                        </CardContent>
+                                </RadioGroup>
+                                )}
+                                {question.type === 'True/False' && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="True" id={`q${question.id}-true`} />
+                                    <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="False" id={`q${question.id}-false`} />
+                                    <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
+                                    </div>
+                                </RadioGroup>
+                                )}
+                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                                <Input 
+                                    placeholder="Your answer..." 
+                                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                                    value={answers[question.id] || ''}
+                                />
+                                )}
+                                {question.type === 'Matching' && question.matchingOptions && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                            <div className="font-bold text-center">Column A</div>
+                                            <div></div>
+                                            <div className="font-bold text-center">Column B</div>
+                                        </div>
+                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                <div className="p-3 border rounded-md text-center bg-secondary">
+                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                    {itemA.text}
+                                                </div>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                <Select 
+                                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
+                                                    value={answers[question.id]?.[itemA.text] || ''}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a match" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {question.matchingOptions?.columnB.map((itemB) => (
+                                                            <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
+                                                                <div className="flex items-center gap-2">
+                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                    <span>{itemB.text}</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
                         </Card>
                     )
                 })}
