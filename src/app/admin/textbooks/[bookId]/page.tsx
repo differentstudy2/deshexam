@@ -24,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Lock, Trash2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -42,6 +42,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ManageChaptersPage() {
@@ -55,6 +64,9 @@ export default function ManageChaptersPage() {
   const [loading, setLoading] = useState(true);
   const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+  const [bulkChaptersText, setBulkChaptersText] = useState('');
+  const [isBulkAdding, setIsBulkAdding] = useState(false);
   const { toast } = useToast();
 
   const fetchTextbookAndChapters = async () => {
@@ -76,11 +88,13 @@ export default function ManageChaptersPage() {
       (doc) => ({ id: doc.id, ...doc.data() } as Chapter)
     );
     
-    // Sort chapters numerically by title prefix
     chaptersData.sort((a, b) => {
-        const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
-        const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
+      const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
+      const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
+      if (numA !== numB) {
         return numA - numB;
+      }
+      return a.title.localeCompare(b.title, undefined, { numeric: true });
     });
 
     setChapters(chaptersData);
@@ -110,6 +124,40 @@ export default function ManageChaptersPage() {
 
     } catch (error) {
       console.error('Error saving chapter: ', error);
+    }
+  };
+
+  const handleBulkAddChapters = async () => {
+    if (!bulkChaptersText.trim()) return;
+    setIsBulkAdding(true);
+    try {
+        const chapterTitles = bulkChaptersText.split('\n').map(t => t.trim()).filter(Boolean);
+        const chaptersCollectionRef = collection(db, 'textbooks', textbookId, 'chapters');
+
+        for (const title of chapterTitles) {
+            await addDoc(chaptersCollectionRef, {
+                title: title,
+                content: '',
+                access: 'free'
+            });
+        }
+        
+        toast({
+            title: 'Chapters Added',
+            description: `${chapterTitles.length} chapters have been added successfully.`,
+        });
+        
+        setBulkChaptersText('');
+        setIsBulkAddOpen(false);
+        fetchTextbookAndChapters(); // Refresh the list
+    } catch (error) {
+         toast({
+            variant: "destructive",
+            title: "Error adding chapters",
+            description: (error as Error).message,
+        });
+    } finally {
+        setIsBulkAdding(false);
     }
   };
 
@@ -178,12 +226,39 @@ export default function ManageChaptersPage() {
             Add, edit, and manage chapters for this textbook.
           </p>
         </div>
-        <Button variant="outline" asChild>
-          <Link href={`/admin/textbooks/${textbookId}/edit`}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Textbook Details
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Dialog open={isBulkAddOpen} onOpenChange={setIsBulkAddOpen}>
+            <DialogTrigger asChild>
+              <Button variant="secondary"><Library className="mr-2 h-4 w-4" /> Bulk Add</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Bulk Add Chapters</DialogTitle>
+                <DialogDescription>
+                  Paste a list of chapter titles below, one per line. Each line will be created as a new chapter.
+                </DialogDescription>
+              </DialogHeader>
+              <Textarea
+                placeholder="Chapter 1: Introduction&#10;Chapter 2: The Basics&#10;Chapter 3: Advanced Topics"
+                className="min-h-[200px]"
+                value={bulkChaptersText}
+                onChange={(e) => setBulkChaptersText(e.target.value)}
+                disabled={isBulkAdding}
+              />
+              <DialogFooter>
+                <Button onClick={handleBulkAddChapters} disabled={isBulkAdding || !bulkChaptersText.trim()}>
+                  {isBulkAdding ? 'Adding...' : 'Add Chapters'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Button variant="outline" asChild>
+            <Link href={`/admin/textbooks/${textbookId}/edit`}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Textbook Details
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
