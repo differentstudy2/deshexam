@@ -3,51 +3,28 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { PracticeSet, Question, Topic, Textbook } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Loader2, ArrowLeft, CheckCircle, XCircle, RefreshCw, Download, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Progress } from '@/components/ui/progress';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
-import { addPracticeSetSubmission, getUserProfile } from '@/lib/firebase/firestore';
+import { addPracticeSetSubmission } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import { ScoreCircle } from '@/components/feature/score-circle';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 
 type UserAnswer = {
   questionId: string;
   answer: any;
 };
-
-type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
-
-type Result = {
-    score: number;
-    totalMarks: number;
-    percentage: number;
-    submittedAt: Date;
-    results: Array<{
-        question: Question;
-        userAnswer: any;
-        isCorrect: boolean;
-        matchingScore?: number;
-    }>
-}
 
 const shuffleArray = (array: any[]) => {
   if (!array) return [];
@@ -62,6 +39,7 @@ const shuffleArray = (array: any[]) => {
 export default function PracticeSetPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const practiceSetId = params.practiceSetId as string;
   const textbookId = searchParams.get('textbook');
   const chapterId = searchParams.get('chapter');
@@ -70,15 +48,10 @@ export default function PracticeSetPage() {
   const [practiceSet, setPracticeSet] = useState<PracticeSet | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [topic, setTopic] = useState<Topic | null>(null);
-  const [textbook, setTextbook] = useState<Textbook | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [result, setResult] = useState<Result | null>(null);
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const resultsRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -90,10 +63,6 @@ export default function PracticeSetPage() {
 
     const fetchPracticeSet = async () => {
       setLoading(true);
-      
-      const textbookDocRef = doc(db, 'textbooks', textbookId);
-      const textbookSnap = await getDoc(textbookDocRef);
-      if (textbookSnap.exists()) setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
       
       const topicDocRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
       const topicSnap = await getDoc(topicDocRef);
@@ -128,15 +97,11 @@ export default function PracticeSetPage() {
         setQuestions(shuffleArray(questionsData));
       }
 
-       if (user) {
-        const profile = await getUserProfile(user.uid);
-        setUserProfile(profile);
-      }
       setLoading(false);
     };
 
     fetchPracticeSet();
-  }, [practiceSetId, textbookId, chapterId, topicId, user]);
+  }, [practiceSetId, textbookId, chapterId, topicId]);
 
   const handleAnswerChange = (questionId: string, answer: any) => {
     setUserAnswers(prevAnswers => {
@@ -156,6 +121,7 @@ export default function PracticeSetPage() {
         toast({variant: "destructive", title: "Please log in to submit."});
         return;
     }
+    setIsSubmitting(true);
     let score = 0;
     
     const totalMarks = questions.reduce((acc, q) => {
@@ -165,37 +131,24 @@ export default function PracticeSetPage() {
         return acc + (q.marks || 1);
     }, 0);
     
-    const results = questions.map(question => {
+    questions.forEach(question => {
         const userAnswerObj = userAnswers.find(a => a.questionId === question.id);
         const userAnswer = userAnswerObj ? userAnswerObj.answer : null;
-        let isCorrect = false;
-        let matchingScore = 0;
-
+        
         if (question.type === 'Matching') {
             if (userAnswer && Array.isArray(question.correctAnswer)) {
                 for(const pair of question.correctAnswer) {
                     if (userAnswer[pair.a] === pair.b) {
-                        matchingScore++;
+                        score++;
                     }
                 }
-                isCorrect = matchingScore === question.correctAnswer.length;
             }
-            score += matchingScore;
         } else {
-            isCorrect = userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim();
-            if (isCorrect) {
+            if (userAnswer?.toLowerCase().trim() === question.correctAnswer?.toLowerCase().trim()) {
                 score += question.marks || 1;
             }
         }
-        
-        return { question, userAnswer, isCorrect, matchingScore };
     });
-
-    const percentage = totalMarks > 0 ? (score / totalMarks) * 100 : 0;
-    const submissionTime = new Date();
-
-    setResult({ score, totalMarks, percentage, submittedAt: submissionTime, results });
-    setIsSubmitted(true);
     
      const submissionData = {
         practiceSetId: practiceSet?.id,
@@ -211,53 +164,21 @@ export default function PracticeSetPage() {
 
     try {
         const subId = await addPracticeSetSubmission(submissionData);
-        setSubmissionId(subId);
+        toast({
+            title: "Practice Set Submitted!",
+            description: "Redirecting to your results...",
+        });
+        router.push(`/textbook-solutions/practice-set/${practiceSetId}/results?submissionId=${subId}`);
     } catch(error) {
         console.error("Failed to save submission:", error);
+        toast({
+            variant: "destructive",
+            title: "Submission Error",
+            description: "There was an issue saving your results. Please try again."
+        });
+    } finally {
+        setIsSubmitting(false);
     }
-  };
-
-  const handleTryAgain = () => {
-    setIsSubmitted(false);
-    setResult(null);
-    setUserAnswers([]);
-    setQuestions(shuffleArray(questions));
-  }
-
-  const handleDownloadPdf = () => {
-    const input = resultsRef.current;
-    if (!input) return;
-
-    html2canvas(input, { scale: 2 }).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      const ratio = canvasWidth / canvasHeight;
-      const width = pdfWidth;
-      let height = width / ratio;
-
-      if(height > pdfHeight){
-        height = pdfHeight;
-      }
-      
-      let position = 0;
-      let heightLeft = canvasHeight * (pdfWidth / canvasWidth);
-      
-      pdf.addImage(imgData, 'PNG', 0, position, width, height);
-      heightLeft -= pdfHeight;
-
-      while(heightLeft > 0){
-        position = heightLeft - height;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, width, height);
-        heightLeft -= pdfHeight;
-      }
-      
-      pdf.save(`results-${practiceSet?.title.replace(/ /g, '_')}.pdf`);
-    });
   };
 
   if (loading) {
@@ -273,129 +194,6 @@ export default function PracticeSetPage() {
   }
 
   const backUrl = `/textbook-solutions/${textbookId}?chapter=${chapterId}&topic=${topicId}`;
-
-  if (isSubmitted && result) {
-    return (
-      <div className="container mx-auto max-w-4xl py-8">
-        <div className="flex justify-between items-center mb-6">
-            <h1 className="font-headline text-3xl font-bold">Practice Set Results</h1>
-             <div className="flex items-center gap-2">
-                <Button variant="ghost" onClick={handleTryAgain}>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Try Again
-                </Button>
-                <Button variant="outline" onClick={handleDownloadPdf}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
-                </Button>
-            </div>
-        </div>
-
-        <div ref={resultsRef}>
-            <Card className="mb-8">
-                 <CardHeader>
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-                        <div className="flex flex-col md:flex-row items-center gap-4">
-                            <Avatar className="h-16 w-16">
-                                <AvatarImage src={userProfile?.photoURL || `https://picsum.photos/seed/${userProfile?.uid}/64/64`} />
-                                <AvatarFallback>{userProfile?.displayName?.[0]}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <div className="flex items-center justify-center md:justify-start gap-2">
-                                <h3 className="text-lg font-semibold">{userProfile?.displayName}</h3>
-                                <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
-                                </div>
-                                <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
-                                    {userProfile?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{userProfile.school}</div>}
-                                    {userProfile?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{userProfile.classGrade}</div>}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-6 mt-4 md:mt-0">
-                            <div className="text-center md:text-right">
-                                <div className="text-3xl font-bold">{result.score}/{result.totalMarks}</div>
-                                <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <ScoreCircle score={result.percentage} size={60} strokeWidth={5}/>
-                                <span className="text-xs font-semibold text-muted-foreground mt-1">Your Score</span>
-                            </div>
-                        </div>
-                    </div>
-                </CardHeader>
-                 <CardContent className="space-y-4 pt-0">
-                    <Separator />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{practiceSet.title}</span></div>
-                        <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic?.title}</span></div>
-                        <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Book className="w-4 h-4"/> <strong>Textbook:</strong> <span className="text-foreground">{textbook?.title}</span></div>
-                        <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{result.totalMarks}</span></div>
-                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{result.submittedAt.toLocaleDateString()}</span></div>
-                        <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{result.submittedAt.toLocaleTimeString()}</span></div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Detailed Answer Review</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-8">
-                    {result.results.map(({ question, userAnswer, isCorrect, matchingScore }, index) => (
-                        <div key={question.id} className={cn("space-y-4 border rounded-lg p-4", isCorrect ? 'border-green-300 bg-green-50/50' : 'border-red-300 bg-red-50/50')}>
-                            <div className="flex justify-between items-start">
-                                <p className="font-semibold">{index + 1}. {question.text}</p>
-                                {question.type === 'Matching' ? (
-                                    <span className="font-semibold text-sm">{matchingScore}/{question.correctAnswer.length}</span>
-                                ) : isCorrect ? (
-                                    <CheckCircle className="h-5 w-5 text-green-600"/>
-                                ) : (
-                                    <XCircle className="h-5 w-5 text-red-600"/>
-                                )}
-                            </div>
-                            
-                            {question.type === 'Matching' ? (
-                                <div className="space-y-2">
-                                {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: any, pairIndex) => {
-                                    const userMatchedB = userAnswer?.[pair.a];
-                                    const isPairCorrect = userMatchedB === pair.b;
-                                    return (
-                                            <div key={pairIndex} className={`p-2 border rounded-md ${isPairCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <span className="font-medium">{pair.a}</span>
-                                                    <span>-</span>
-                                                    <span className={!isPairCorrect ? 'line-through' : ''}>{userMatchedB || "Not answered"}</span>
-                                                    {!isPairCorrect && <span className="font-bold text-green-700">{pair.b}</span>}
-                                                </div>
-                                            </div>
-                                    )
-                                })}
-                            </div>
-                            ) : (
-                                <>
-                                    <p className={cn("text-sm", isCorrect ? 'text-green-800' : 'text-red-800')}>Your Answer: <span className="font-medium">{userAnswer || "No answer"}</span></p>
-                                    {!isCorrect && <p className="text-sm text-primary">Correct Answer: <span className="font-medium">{question.correctAnswer}</span></p>}
-                                </>
-                            )}
-
-                            {question.explanation && <p className="text-sm text-muted-foreground bg-secondary/50 p-2 rounded-md">Explanation: {question.explanation}</p>}
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
-        </div>
-
-        <div className="mt-8 flex justify-center">
-            <Button asChild variant="outline">
-                <Link href={backUrl}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Topic
-                </Link>
-            </Button>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -483,7 +281,9 @@ export default function PracticeSetPage() {
           ))}
            <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button className="w-full mt-8">Submit Test</Button>
+                <Button className="w-full mt-8" disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="animate-spin" /> : "Submit Test"}
+                </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -503,4 +303,3 @@ export default function PracticeSetPage() {
     </div>
   );
 }
-

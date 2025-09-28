@@ -19,6 +19,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -418,7 +419,7 @@ export const addContent = async (contentData: any) => {
             ...cleanedContent,
             authorId: user.uid,
             authorName: user.displayName || user.email,
-            createdAt: cleanedContent.publishedAt || serverTimestamp(),
+            createdAt: cleanedContent.publishedAt || new Date(),
         };
 
         if (cleanedContent.testType !== 'Learn' && cleanedContent.testType !== 'Textbook' && cleanedContent.questions) {
@@ -644,7 +645,14 @@ export const getSubmissionById = async (submissionId: string) => {
         throw new Error("Submission ID is required to fetch a submission.");
     }
     try {
-        const submissionDoc = await getDoc(doc(db, "submissions", submissionId));
+        // Try fetching from 'submissions' first
+        let submissionDoc = await getDoc(doc(db, "submissions", submissionId));
+
+        if (!submissionDoc.exists()) {
+            // If not found, try 'practiceSetSubmissions'
+            submissionDoc = await getDoc(doc(db, "practiceSetSubmissions", submissionId));
+        }
+
         if (submissionDoc.exists()) {
             const data = submissionDoc.data();
             const submittedAt = data.submittedAt;
@@ -669,20 +677,25 @@ export const getSubmissionById = async (submissionId: string) => {
         console.error("Error getting document: ", e);
         throw new Error("Failed to fetch submission.");
     }
-}
+};
+
 
 export const getSubmissionsByUserId = async (userId: string) => {
     if (!userId) {
         throw new Error("User ID is required to fetch submissions.");
     }
     try {
-        const q = query(
-            collection(db, "submissions"), 
-            where("userId", "==", userId)
-        );
-        const querySnapshot = await getDocs(q);
-        const submissions = querySnapshot.docs.map(doc => {
+        const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
+        const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
+        
+        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
+            getDocs(testSubsQuery),
+            getDocs(practiceSubsQuery)
+        ]);
+
+        const formatSubmission = (doc: DocumentSnapshot) => {
             const data = doc.data();
+            if (!data) return null;
             const submittedAt = data.submittedAt;
             let formattedDate = new Date();
             if (submittedAt && typeof submittedAt.toDate === 'function') {
@@ -697,11 +710,19 @@ export const getSubmissionsByUserId = async (userId: string) => {
                 id: doc.id,
                 ...data,
                 submittedAt: formattedDate,
-            }
-        });
+            };
+        };
+
+        const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
+        const practiceSubmissions = practiceSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
+        
+        const allSubmissions = [...testSubmissions, ...practiceSubmissions];
+        
         // Sort on the client-side
-        submissions.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
-        return submissions;
+        allSubmissions.sort((a, b) => b!.submittedAt.getTime() - a!.submittedAt.getTime());
+        
+        return allSubmissions;
+
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -1659,8 +1680,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersSnapshot),
-            getDocs(monthOrdersSnapshot),
+            getDocs(todayOrdersQuery),
+            getDocs(monthOrdersQuery),
             getCountFromServer(usersCollection),
         ]);
 
