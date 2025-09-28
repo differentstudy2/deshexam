@@ -278,13 +278,13 @@ export default function PracticeSetPage() {
                     <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
                     <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
                     <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
-                        <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-4 h-4" />
-                        <span>{test.questions.length} Questions</span>
+                        <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
+                            <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                            <span>{test.questions.length} Questions</span>
                         </div>
                         {timeLeft !== null && (
                             <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                                <Clock className="w-4 h-4" />
+                                <Clock className="w-4 h-4 text-muted-foreground" />
                                 <span>{formatTime(timeLeft)}</span>
                             </div>
                         )}
