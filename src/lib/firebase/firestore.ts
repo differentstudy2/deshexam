@@ -21,6 +21,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -688,15 +689,16 @@ export const getSubmissionsByUserId = async (userId: string) => {
     try {
         const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
         const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
-        
+
         const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
             getDocs(testSubsQuery),
-            getDocs(practiceSubsQuery)
+            getDocs(practiceSubsQuery),
         ]);
-
+        
         const formatSubmission = (doc: DocumentSnapshot) => {
-            const data = doc.data();
+            const data = doc.data() as any; // Cast to any to handle potential missing fields gracefully
             if (!data) return null;
+
             const submittedAt = data.submittedAt;
             let formattedDate = new Date();
             if (submittedAt && typeof submittedAt.toDate === 'function') {
@@ -707,11 +709,27 @@ export const getSubmissionsByUserId = async (userId: string) => {
                     formattedDate = d;
                 }
             }
-            return {
+            
+            // Normalize the structure
+            const isPracticeSet = !!data.practiceSetId;
+            const normalizedData = {
                 id: doc.id,
-                ...data,
+                userId: data.userId,
+                score: data.score,
+                totalQuestions: data.totalQuestions,
                 submittedAt: formattedDate,
+                testId: isPracticeSet ? data.practiceSetId : data.testId,
+                testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
+                testType: isPracticeSet ? "Practice Set" : data.testType,
+                // Include textbook/chapter/topic info for context if it's a practice set
+                ...(isPracticeSet && {
+                    textbookId: data.textbookId,
+                    chapterId: data.chapterId,
+                    topicId: data.topicId,
+                })
             };
+
+            return normalizedData;
         };
 
         const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
