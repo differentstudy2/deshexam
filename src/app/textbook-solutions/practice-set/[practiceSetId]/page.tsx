@@ -356,7 +356,7 @@ export default function PracticeSetPage() {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                            <SelectItem key={bIndex} value={itemB.text}>
+                                                            <SelectItem key={`${bIndex}-${itemB.text}`} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
                                                                     <span>{itemB.text}</span>
