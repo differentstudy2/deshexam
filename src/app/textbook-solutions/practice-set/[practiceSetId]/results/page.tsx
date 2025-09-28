@@ -36,6 +36,7 @@ type Submission = {
     totalQuestions: number; 
     answers: { [key: string]: string };
     submittedAt: any;
+    timeTaken: number;
 };
 
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
@@ -122,7 +123,7 @@ function ResultsDisplay() {
     );
   }
 
-  const { score, totalQuestions } = submission;
+  const { score, totalQuestions, timeTaken } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
   const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
@@ -130,14 +131,20 @@ function ResultsDisplay() {
   const tryAgainUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}?textbook=${submission.textbookId}&chapter=${submission.chapterId}&topic=${submission.topicId}`;
   const backToTopicUrl = `/textbook-solutions/${submission.textbookId}?chapter=${submission.chapterId}&topic=${submission.topicId}`;
   
-  const pageTitle = `${student?.displayName}'s Practice Set Results`;
+  const pageTitle = `${student?.displayName}'s Practice Set Results for ${textbook?.board} - ${textbook?.title}`;
+  
+  const formatTimeTaken = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
+  };
 
 
   return (
     <>
       <header className="text-center mb-8">
         <h1 className="font-headline text-4xl font-bold">{pageTitle}</h1>
-        <p className="text-muted-foreground">Here's how you performed on the practice set for <span className="font-semibold text-foreground">{textbook?.board} - {textbook?.title}</span>.</p>
+        <p className="text-muted-foreground">Here's how you performed on the practice set for <span className="font-semibold text-foreground">{submission.practiceSetTitle}</span>.</p>
       </header>
       <Card className="max-w-4xl mx-auto">
          <CardHeader>
@@ -173,21 +180,20 @@ function ResultsDisplay() {
         <CardContent className="space-y-4 pt-0">
             <Separator />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{submission.practiceSetTitle}</span></div>
-                {topic?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic.title}</span></div>}
-                {textbook?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Book className="w-4 h-4" /> <strong>Textbook:</strong> <span className="text-foreground">{textbook.title}</span></div>}
-
+                <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-1"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{submission.practiceSetTitle}</span></div>
+                {topic?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-2"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic.title}</span></div>}
+                
                 {textbook?.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{textbook.subject}</span></div>}
                 {textbook?.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{textbook.board}</span></div>}
                 {textbook?.class && <div className="flex items-center gap-2 text-muted-foreground"><GraduationCap className="w-4 h-4"/> <strong>Class:</strong> <span className="text-foreground">{textbook.class}</span></div>}
                 
                 {totalQuestions > 0 && <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{totalQuestions}</span></div>}
-                {totalQuestions > 0 && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Duration:</strong> <span className="text-foreground">{totalQuestions} min</span></div>}
+                
+                {timeTaken && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time Taken:</strong> <span className="text-foreground">{formatTimeTaken(timeTaken)}</span></div>}
 
                 {submittedAtDate && submittedAtDate.toString() !== 'Invalid Date' && (
                     <>
                         <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submittedAtDate.toLocaleDateString()}</span></div>
-                        <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time:</strong> <span className="text-foreground">{submittedAtDate.toLocaleTimeString()}</span></div>
                     </>
                 )}
             </div>
@@ -224,5 +230,3 @@ export default function PracticeSetResultsPage() {
     </div>
   );
 }
-
-    

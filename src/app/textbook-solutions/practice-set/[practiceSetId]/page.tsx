@@ -190,6 +190,9 @@ export default function PracticeSetPage() {
                 }
             }
         });
+
+        const totalDurationInSeconds = (test?.duration || totalMarks) * 60;
+        const timeTakenInSeconds = totalDurationInSeconds - (timeLeft || 0);
         
         const submissionData = {
             practiceSetId: test?.id,
@@ -200,6 +203,7 @@ export default function PracticeSetPage() {
             answers: answers,
             score,
             totalQuestions: totalMarks,
+            timeTaken: timeTakenInSeconds,
         };
 
         const submissionId = await addPracticeSetSubmission(submissionData);
@@ -346,8 +350,8 @@ export default function PracticeSetPage() {
                                                         <SelectValue placeholder="Select a match" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                            <SelectItem key={bIndex} value={itemB.text}>
+                                                        {question.matchingOptions?.columnB.map((itemB) => (
+                                                            <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
                                                                     <span>{itemB.text}</span>
