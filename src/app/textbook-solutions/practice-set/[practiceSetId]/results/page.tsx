@@ -132,6 +132,12 @@ function ResultsDisplay() {
 
   return (
     <>
+      <header className="text-center mb-8">
+        <h1 className="font-headline text-4xl font-bold">
+            {textbook?.board && `${textbook.board} - `}{textbook?.title} Practice Set Results
+        </h1>
+        <p className="text-muted-foreground">Here's how you performed.</p>
+      </header>
       <Card className="max-w-4xl mx-auto">
          <CardHeader>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
@@ -204,10 +210,6 @@ export default function PracticeSetResultsPage() {
 
   return (
     <div className="container py-12">
-      <header className="text-center mb-8">
-        <h1 className="font-headline text-4xl font-bold">Practice Set Results</h1>
-        <p className="text-muted-foreground">Here's how you performed.</p>
-      </header>
       <Suspense fallback={<div className="text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto"/></div>}>
         <ResultsDisplay />
       </Suspense>
