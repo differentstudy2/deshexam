@@ -134,7 +134,7 @@ function ResultsDisplay() {
     <>
       <header className="text-center mb-8">
         <h1 className="font-headline text-4xl font-bold">
-            {textbook?.board && `${textbook.board} - `}{textbook?.title} Practice Set Results
+            {student?.displayName}'s {textbook?.board && `${textbook.board} - `}{textbook?.title} Practice Set Results
         </h1>
         <p className="text-muted-foreground">Here's how you performed.</p>
       </header>
