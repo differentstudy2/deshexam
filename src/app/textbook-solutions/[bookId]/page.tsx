@@ -475,7 +475,7 @@ export default function TextbookSolutionsPage() {
                                                   return (
                                                       <div key={resource.id} className="space-y-2">
                                                           <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                           <div className="aspect-video w-full">
+                                                           <div className="aspect-video w-full max-h-[450px]">
                                                               <iframe 
                                                                   className="w-full h-full rounded-lg"
                                                                   src={`https://www.youtube.com/embed/${videoId}`} 
@@ -491,7 +491,7 @@ export default function TextbookSolutionsPage() {
                                                   return (
                                                       <div key={resource.id} className="space-y-2">
                                                         <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                        <video controls controlsList="nodownload" src={resource.url} className="w-full rounded-lg">
+                                                        <video controls controlsList="nodownload" src={resource.url} className="w-full rounded-lg max-h-[450px]">
                                                             Your browser does not support the video tag.
                                                         </video>
                                                       </div>
@@ -579,6 +579,7 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
 
