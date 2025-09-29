@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 
 
 export default function ManageTopicPage() {
@@ -50,9 +51,13 @@ export default function ManageTopicPage() {
     const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [viewerResource, setViewerResource] = useState<Resource | null>(null);
 
-    const [resourcesLoading, setResourcesLoading] = useState(false);
-    const [resourcesFetched, setResourcesFetched] = useState(false);
+
+    const [areResourcesFetched, setAreResourcesFetched] = useState(false);
+    const [areResourcesLoading, setAreResourcesLoading] = useState(false);
 
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
@@ -74,26 +79,31 @@ export default function ManageTopicPage() {
     };
 
     const fetchResources = async () => {
-        if (!topicId || resourcesFetched) return;
-        setResourcesLoading(true);
+        if (!topicId || areResourcesFetched) return;
+        setAreResourcesLoading(true);
         try {
             const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
             const topicSnap = await getDoc(topicRef);
             if (topicSnap.exists()) {
                 const topicData = topicSnap.data() as Topic;
                 setTopic(prev => prev ? { ...prev, resources: topicData.resources || [] } : null);
-                setResourcesFetched(true);
+                setAreResourcesFetched(true);
             }
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to load resources', description: (error as Error).message });
         } finally {
-            setResourcesLoading(false);
+            setAreResourcesLoading(false);
         }
     };
 
     useEffect(() => {
         fetchData();
     }, [textbookId, chapterId, topicId]);
+    
+     useEffect(() => {
+        // Reset resource fetching state when topic changes
+        setAreResourcesFetched(false);
+    }, [topicId]);
 
     const handleOpenPracticeSetDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
@@ -141,7 +151,6 @@ export default function ManageTopicPage() {
         try {
             const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
             
-            // It's safer to fetch the latest resources directly from state if available, or fetch fresh.
             const currentResources = topic.resources || [];
             let updatedResources;
             
@@ -157,9 +166,8 @@ export default function ManageTopicPage() {
             setIsResourceDialogOpen(false);
             setEditingResource(null);
             
-            // Manually update local state and force a UI refresh
             setTopic(prev => prev ? { ...prev, resources: updatedResources } : null);
-            setResourcesFetched(true);
+            setAreResourcesFetched(true);
     
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
@@ -175,7 +183,6 @@ export default function ManageTopicPage() {
             toast({ title: 'Resource Deleted' });
             setResourceToDelete(null);
             
-            // Manually update local state
             setTopic(prev => prev ? { ...prev, resources: updatedResources } : null);
 
         } catch (error) {
@@ -197,6 +204,11 @@ export default function ManageTopicPage() {
                 setIsUploading(false);
             }
         }
+    };
+
+    const handleResourceClick = (resource: Resource) => {
+        setViewerResource(resource);
+        setViewerOpen(true);
     };
 
      const getResourceIcon = (type: string) => {
@@ -249,7 +261,7 @@ export default function ManageTopicPage() {
                             </CardHeader>
                             <AccordionContent>
                                 <CardContent>
-                                    {resourcesLoading ? (
+                                    {areResourcesLoading ? (
                                         <div className="flex justify-center p-4">
                                             <Loader2 className="w-6 h-6 animate-spin" />
                                         </div>
@@ -416,6 +428,15 @@ export default function ManageTopicPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            {viewerResource && (
+                <ResourceViewerDialog 
+                    resource={viewerResource} 
+                    open={viewerOpen} 
+                    onOpenChange={setViewerOpen} 
+                />
+            )}
         </div>
     )
 }
+
+    
