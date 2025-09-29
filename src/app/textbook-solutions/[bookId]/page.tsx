@@ -28,22 +28,22 @@ type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
 };
 
-type ChapterProgress = {
-    completed: boolean;
-    topics: {
-        [topicId: string]: {
-            practiceSets: {
-                [practiceSetId: string]: {
-                    highestScore: number;
-                    totalMarks: number;
+type PracticeSetProgress = {
+    highestScore: number;
+    totalMarks: number;
+};
+
+type TextbookProgress = {
+    [chapterId: string]: {
+        completed: boolean;
+        topics: {
+            [topicId: string]: {
+                practiceSets: {
+                    [practiceSetId: string]: PracticeSetProgress
                 }
             }
         }
     }
-}
-
-type TextbookProgress = {
-    [chapterId: string]: ChapterProgress;
 }
 
 const PracticeSetItem = ({ 
@@ -52,15 +52,19 @@ const PracticeSetItem = ({
     chapterId, 
     topicId, 
     isLocked, 
-    highestScore 
+    progress 
 }: { 
     ps: any; 
     textbookId: string; 
     chapterId: string; 
     topicId: string; 
     isLocked: boolean; 
-    highestScore?: number; 
+    progress?: PracticeSetProgress; 
 }) => {
+    const scorePercentage = progress && progress.totalMarks > 0 
+        ? Math.round((progress.highestScore / progress.totalMarks) * 100)
+        : null;
+
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
@@ -72,9 +76,9 @@ const PracticeSetItem = ({
                 <span className="font-medium">{ps.title}</span>
             </div>
             <div className="flex items-center gap-4">
-                {highestScore !== undefined && (
+                {scorePercentage !== null && (
                     <div className="text-center">
-                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {highestScore}%</p>
+                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {scorePercentage}%</p>
                     </div>
                 )}
                 <Button asChild disabled={isLocked}>
@@ -242,51 +246,46 @@ export default function TextbookSolutionsPage() {
   const activeTopic = searchParams.get('topic');
 
   const fetchFullProgress = useCallback(async (userId: string, textbookId: string) => {
-    let fullProgress: any = {};
-    const chaptersRef = collection(db, `textbooks/${textbookId}/chapters`);
-    const chaptersSnap = await getDocs(chaptersRef);
-  
+    let fullProgress: TextbookProgress = {};
+    const textbookDocRef = doc(db, 'textbooks', textbookId);
+    const chaptersSnap = await getDocs(collection(textbookDocRef, 'chapters'));
+    
     for (const chapterDoc of chaptersSnap.docs) {
       const chapterId = chapterDoc.id;
-      fullProgress[chapterId] = { topics: {} };
+      fullProgress[chapterId] = { completed: false, topics: {} };
       
-      const topicsRef = collection(chapterDoc.ref, "topics");
-      const topicsSnap = await getDocs(topicsRef);
-      
+      const topicsSnap = await getDocs(collection(chapterDoc.ref, 'topics'));
       for (const topicDoc of topicsSnap.docs) {
         const topicId = topicDoc.id;
         fullProgress[chapterId].topics[topicId] = { practiceSets: {} };
 
-        const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
-        const practiceSetsSnap = await getDocs(practiceSetsRef);
-        
+        const practiceSetsSnap = await getDocs(collection(topicDoc.ref, 'practiceSets'));
         for (const psDoc of practiceSetsSnap.docs) {
-            const psId = psDoc.id;
-            const submissionsQuery = query(
-                collection(db, 'practiceSetSubmissions'),
-                where('userId', '==', userId),
-                where('practiceSetId', '==', psId)
-            );
-            const submissionsSnapshot = await getDocs(submissionsQuery);
+          const psId = psDoc.id;
+          const submissionsQuery = query(
+            collection(db, 'practiceSetSubmissions'),
+            where('userId', '==', userId),
+            where('practiceSetId', '==', psId)
+          );
+          const subsSnap = await getDocs(submissionsQuery);
+          if (!subsSnap.empty) {
             let highestScore = -1;
             let totalMarks = 0;
-            
-            if (!submissionsSnapshot.empty) {
-                submissionsSnapshot.forEach(subDoc => {
-                    const data = subDoc.data();
-                    totalMarks = data.totalQuestions > 0 ? data.totalQuestions : totalMarks;
-                    const percentage = data.totalQuestions > 0 ? (data.score / data.totalQuestions) * 100 : 0;
-                    if (percentage > highestScore) {
-                        highestScore = percentage;
-                    }
-                });
-            }
+            subsSnap.forEach(subDoc => {
+              const data = subDoc.data();
+              totalMarks = data.totalQuestions > 0 ? data.totalQuestions : totalMarks;
+              const currentScore = data.score;
+              if (currentScore > highestScore) {
+                highestScore = currentScore;
+              }
+            });
             if (highestScore > -1) {
               fullProgress[chapterId].topics[topicId].practiceSets[psId] = {
-                  highestScore: Math.round(highestScore),
-                  totalMarks
+                highestScore,
+                totalMarks
               };
             }
+          }
         }
       }
     }
@@ -491,11 +490,17 @@ export default function TextbookSolutionsPage() {
                                         <h3 className="mt-6 font-semibold text-2xl">Practice Sets</h3>
                                         <div className="space-y-2 mt-4">
                                             {selectedTopicContent.practiceSets.map((ps, index) => {
-                                                const passMark = settings?.practiceSetPassMark || 40;
+                                                const passMark = settings?.practiceSetPassMark || 60;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
-                                                const prevSetScore = prevPsId ? progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[prevPsId]?.highestScore : 100;
-                                                const isLocked = index > 0 && (prevSetScore === undefined || prevSetScore < passMark);
-                                                const highestScore = progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[ps.id]?.highestScore;
+                                                const prevSetProgress = prevPsId ? progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[prevPsId] : undefined;
+                                                
+                                                const prevSetScorePercentage = prevSetProgress && prevSetProgress.totalMarks > 0
+                                                    ? (prevSetProgress.highestScore / prevSetProgress.totalMarks) * 100
+                                                    : 100; // Default to 100 if no previous set, so first one is unlocked
+
+                                                const isLocked = index > 0 && prevSetScorePercentage < passMark;
+                                                
+                                                const currentSetProgress = progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[ps.id];
 
                                                 return (
                                                   <PracticeSetItem
@@ -505,7 +510,7 @@ export default function TextbookSolutionsPage() {
                                                     chapterId={activeChapter!}
                                                     topicId={activeTopic!}
                                                     isLocked={isLocked}
-                                                    highestScore={highestScore}
+                                                    progress={currentSetProgress}
                                                   />
                                                 );
                                             })}
