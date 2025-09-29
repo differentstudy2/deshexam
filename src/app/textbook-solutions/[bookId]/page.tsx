@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -17,7 +16,7 @@ import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebas
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -29,11 +28,65 @@ type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
 };
 
-type TextbookProgress = {
-    [chapterId: string]: {
-        completed: boolean;
+type ChapterProgress = {
+    completed: boolean;
+    topics: {
+        [topicId: string]: {
+            practiceSets: {
+                [practiceSetId: string]: {
+                    highestScore: number;
+                    totalMarks: number;
+                }
+            }
+        }
     }
 }
+
+type TextbookProgress = {
+    [chapterId: string]: ChapterProgress;
+}
+
+const PracticeSetItem = ({ 
+    ps, 
+    textbookId, 
+    chapterId, 
+    topicId, 
+    isLocked, 
+    highestScore 
+}: { 
+    ps: any; 
+    textbookId: string; 
+    chapterId: string; 
+    topicId: string; 
+    isLocked: boolean; 
+    highestScore?: number; 
+}) => {
+    return (
+        <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
+            <div className="flex items-center gap-3 flex-grow">
+                {isLocked ? (
+                    <Lock className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                    <CheckSquare className="h-5 w-5 text-primary" />
+                )}
+                <span className="font-medium">{ps.title}</span>
+            </div>
+            <div className="flex items-center gap-4">
+                {highestScore !== undefined && (
+                    <div className="text-center">
+                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {highestScore}%</p>
+                    </div>
+                )}
+                <Button asChild disabled={isLocked}>
+                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                            Start Practice
+                    </Link>
+                </Button>
+            </div>
+        </Card>
+    );
+};
+
 
 const TextbookContentSidebar = ({
   chapters,
@@ -184,10 +237,61 @@ export default function TextbookSolutionsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [practiceSetScores, setPracticeSetScores] = useState<{[key: string]: number}>({});
 
   const activeChapter = searchParams.get('chapter');
   const activeTopic = searchParams.get('topic');
+
+  const fetchFullProgress = useCallback(async (userId: string, textbookId: string) => {
+    let fullProgress: any = {};
+    const chaptersRef = collection(db, `textbooks/${textbookId}/chapters`);
+    const chaptersSnap = await getDocs(chaptersRef);
+  
+    for (const chapterDoc of chaptersSnap.docs) {
+      const chapterId = chapterDoc.id;
+      fullProgress[chapterId] = { topics: {} };
+      
+      const topicsRef = collection(chapterDoc.ref, "topics");
+      const topicsSnap = await getDocs(topicsRef);
+      
+      for (const topicDoc of topicsSnap.docs) {
+        const topicId = topicDoc.id;
+        fullProgress[chapterId].topics[topicId] = { practiceSets: {} };
+
+        const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
+        const practiceSetsSnap = await getDocs(practiceSetsRef);
+        
+        for (const psDoc of practiceSetsSnap.docs) {
+            const psId = psDoc.id;
+            const submissionsQuery = query(
+                collection(db, 'practiceSetSubmissions'),
+                where('userId', '==', userId),
+                where('practiceSetId', '==', psId)
+            );
+            const submissionsSnapshot = await getDocs(submissionsQuery);
+            let highestScore = -1;
+            let totalMarks = 0;
+            
+            if (!submissionsSnapshot.empty) {
+                submissionsSnapshot.forEach(subDoc => {
+                    const data = subDoc.data();
+                    totalMarks = data.totalQuestions > 0 ? data.totalQuestions : totalMarks;
+                    const percentage = data.totalQuestions > 0 ? (data.score / data.totalQuestions) * 100 : 0;
+                    if (percentage > highestScore) {
+                        highestScore = percentage;
+                    }
+                });
+            }
+            if (highestScore > -1) {
+              fullProgress[chapterId].topics[topicId].practiceSets[psId] = {
+                  highestScore: Math.round(highestScore),
+                  totalMarks
+              };
+            }
+        }
+      }
+    }
+    return fullProgress;
+  }, []);
 
   useEffect(() => {
     if (!textbookId) return;
@@ -200,11 +304,9 @@ export default function TextbookSolutionsPage() {
       setSettings(siteSettings);
 
       if (user) {
-          const [profile, progressData] = await Promise.all([
-            getUserProfile(user.uid),
-            getTextbookProgress(user.uid, textbookId)
-          ]);
+          const profile = await getUserProfile(user.uid);
           setUserProfile(profile);
+          const progressData = await fetchFullProgress(user.uid, textbookId);
           setProgress(progressData);
       }
 
@@ -216,10 +318,9 @@ export default function TextbookSolutionsPage() {
         const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
         chaptersData.sort((a, b) => {
-            const numA = parseInt(a.title, 10);
-            const numB = parseInt(b.title, 10);
-
-            if (!isNaN(numA) && !isNaN(numB)) {
+            const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
+            const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
+            if (numA !== numB) {
                 return numA - numB;
             }
             return a.title.localeCompare(b.title, undefined, { numeric: true });
@@ -238,7 +339,7 @@ export default function TextbookSolutionsPage() {
     };
 
     fetchTextbookAndChapters();
-  }, [textbookId, router, user]);
+  }, [textbookId, router, user, fetchFullProgress]);
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
       if (topics[chapterId]) return;
@@ -247,7 +348,7 @@ export default function TextbookSolutionsPage() {
       try {
           const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`));
           const topicsSnap = await getDocs(topicsQuery);
-          const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as Topic }));
+          let topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as Topic }));
           
           topicsForChapter.sort((a, b) => {
               const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
@@ -259,31 +360,9 @@ export default function TextbookSolutionsPage() {
           });
           
           for (let topic of topicsForChapter) {
-            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
+            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "asc"));
             const practiceSetsSnap = await getDocs(practiceSetsQuery);
             topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
-
-            if (user) {
-              for (const ps of topic.practiceSets) {
-                const submissionsQuery = query(
-                  collection(db, 'practiceSetSubmissions'),
-                  where('userId', '==', user.uid),
-                  where('practiceSetId', '==', ps.id)
-                );
-                const submissionsSnapshot = await getDocs(submissionsQuery);
-                if (!submissionsSnapshot.empty) {
-                  let maxScore = 0;
-                  submissionsSnapshot.forEach(subDoc => {
-                    const data = subDoc.data();
-                    const percentage = data.totalQuestions > 0 ? (data.score / data.totalQuestions) * 100 : 0;
-                    if (percentage > maxScore) {
-                      maxScore = percentage;
-                    }
-                  });
-                  setPracticeSetScores(prev => ({ ...prev, [ps.id]: Math.round(maxScore) }));
-                }
-              }
-            }
           }
 
           setTopics(prev => ({ ...prev, [chapterId]: topicsForChapter }));
@@ -292,7 +371,7 @@ export default function TextbookSolutionsPage() {
       } finally {
           setLoadingTopics(null);
       }
-  }, [textbookId, topics, user]);
+  }, [textbookId, topics]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -301,13 +380,25 @@ export default function TextbookSolutionsPage() {
       router.push(`?${params.toString()}`, { scroll: false });
   };
   
-  const selectedTopicContent = activeChapter && activeTopic ? topics[activeChapter]?.find(t => t.id === activeTopic) : null;
+  const selectedTopicContent = useMemo(() => {
+    return activeChapter && activeTopic ? topics[activeChapter]?.find(t => t.id === activeTopic) : null;
+  }, [activeChapter, activeTopic, topics]);
+
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            <p className="ml-4 text-lg">Loading Textbook...</p>
+        <div className="container mx-auto py-8 max-w-7xl">
+            <header className="text-center mb-12">
+                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Textbook Solutions</h1>
+                <p className="text-lg text-muted-foreground mt-2">
+                Select a textbook to view its solutions, topics, and practice questions.
+                </p>
+            </header>
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {Array.from({length: 4}).map((_, i) => (
+                    <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
+                ))}
+            </div>
         </div>
     );
   }
@@ -408,26 +499,25 @@ export default function TextbookSolutionsPage() {
                                         <Separator />
                                         <h3 className="mt-6 font-semibold text-2xl">Practice Sets</h3>
                                         <div className="space-y-2 mt-4">
-                                            {selectedTopicContent.practiceSets.map(ps => (
-                                                <Card key={ps.id} className="p-4 flex justify-between items-center not-prose">
-                                                    <div className="flex items-center gap-3">
-                                                        <CheckSquare className="h-5 w-5 text-primary" />
-                                                        <span className="font-medium">{ps.title}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-4">
-                                                        {practiceSetScores[ps.id] !== undefined && (
-                                                            <div className="text-center">
-                                                                <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {practiceSetScores[ps.id]}%</p>
-                                                            </div>
-                                                        )}
-                                                        <Button asChild>
-                                                            <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${activeChapter}&topic=${activeTopic}`}>
-                                                                    Start Practice
-                                                            </Link>
-                                                        </Button>
-                                                    </div>
-                                                </Card>
-                                            ))}
+                                            {selectedTopicContent.practiceSets.map((ps, index) => {
+                                                const passMark = settings?.practiceSetPassMark || 40;
+                                                const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
+                                                const prevSetScore = prevPsId ? progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[prevPsId]?.highestScore : 100;
+                                                const isLocked = index > 0 && (prevSetScore === undefined || prevSetScore < passMark);
+                                                const highestScore = progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[ps.id]?.highestScore;
+
+                                                return (
+                                                  <PracticeSetItem
+                                                    key={ps.id}
+                                                    ps={ps}
+                                                    textbookId={textbookId}
+                                                    chapterId={activeChapter!}
+                                                    topicId={activeTopic!}
+                                                    isLocked={isLocked}
+                                                    highestScore={highestScore}
+                                                  />
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 )}
