@@ -12,9 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Solution, Textbook, Topic, Resource } from '@/lib/types';
+import type { Chapter, Solution, Textbook, Topic, Resource, Question } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -22,9 +22,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
-import { getUserProfile, getTextbookProgress, getSettings } from '@/lib/firebase/firestore';
+import { getUserProfile, getTextbookProgress, getSettings, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
@@ -41,7 +43,8 @@ const PracticeSetItem = ({
     chapterId, 
     topicId, 
     isLocked, 
-    highestScore 
+    highestScore,
+    onDownload
 }: { 
     ps: any; 
     textbookId: string; 
@@ -49,6 +52,7 @@ const PracticeSetItem = ({
     topicId: string; 
     isLocked: boolean; 
     highestScore?: number; 
+    onDownload: () => void;
 }) => {
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
@@ -66,6 +70,10 @@ const PracticeSetItem = ({
                         <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {Math.round(highestScore)}%</p>
                     </div>
                 )}
+                 <Button variant="outline" size="sm" onClick={onDownload} disabled={isLocked}>
+                    <Download className="mr-2 h-4 w-4" />
+                    PDF
+                </Button>
                 <Button asChild disabled={isLocked}>
                     <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
                             Start Practice
@@ -231,6 +239,7 @@ export default function TextbookSolutionsPage() {
   const textbookId = params.bookId as string;
   const router = useRouter();
   const { user } = useAuth();
+  const { toast } = useToast();
   
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [textbook, setTextbook] = useState<Textbook | null>(null);
@@ -250,6 +259,7 @@ export default function TextbookSolutionsPage() {
   
   const [areResourcesFetched, setAreResourcesFetched] = useState(false);
   const [areResourcesLoading, setAreResourcesLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
 
   useEffect(() => {
@@ -374,6 +384,115 @@ export default function TextbookSolutionsPage() {
         setAreResourcesLoading(false);
     }
   }
+
+  const handleDownloadPdf = async (practiceSet: any) => {
+    if (!activeChapter || !activeTopic) return;
+    setIsDownloading(true);
+    toast({
+        title: "Generating PDF...",
+        description: "Your download will begin shortly.",
+    });
+
+    try {
+        const questions = await getQuestionsByPracticeSet(textbookId, activeChapter, activeTopic, practiceSet.id);
+        const totalMarks = questions.reduce((total, q: any) => {
+            if (q.type === 'Matching') return total + (q.correctAnswer?.length || 0);
+            return total + (q.marks || 1);
+        }, 0);
+        
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageHeight = 297;
+        const pageWidth = 210;
+        const margin = 10;
+        let y = margin;
+
+        pdf.setFontSize(18);
+        pdf.text(practiceSet.title, pageWidth / 2, y, { align: 'center' });
+        y += 10;
+        pdf.setFontSize(12);
+        pdf.text(`Total Marks: ${totalMarks}`, pageWidth / 2, y, { align: 'center' });
+        y += 15;
+
+        for (let i = 0; i < questions.length; i++) {
+            const question = questions[i] as Question;
+            const content = (
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-4 bg-white text-black font-sans w-[700px]">
+                  <h3 className="text-lg font-bold mb-2">Q{i + 1}: {question.text}</h3>
+                  {question.type === 'Multiple Choice' && question.options && (
+                      <ol type="A" className="list-[upper-alpha] list-inside space-y-1">
+                          {question.options.map((option, optIndex) => (
+                              <li key={optIndex}>{option.text}</li>
+                          ))}
+                      </ol>
+                  )}
+                  {question.type === 'True/False' && (
+                      <div className="flex space-x-4"><span>A) True</span><span>B) False</span></div>
+                  )}
+                  {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                      <div className="mt-4 border-b-2 border-dotted border-black"></div>
+                  )}
+                  {question.type === 'Matching' && question.matchingOptions && (
+                      <div className="mt-2 flex gap-8">
+                          <div>
+                              <h4 className="font-semibold underline">Column A</h4>
+                              <ol className="list-decimal list-inside">
+                                  {question.matchingOptions.columnA.map((item, i) => <li key={i}>{item.text}</li>)}
+                              </ol>
+                          </div>
+                          <div>
+                              <h4 className="font-semibold underline">Column B</h4>
+                              <ol className="list-[lower-alpha] list-inside">
+                                   {question.matchingOptions.columnB.map((item, i) => <li key={i}>{item.text}</li>)}
+                              </ol>
+                          </div>
+                      </div>
+                  )}
+                   <div className="mt-2 text-right text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</div>
+              </div>
+            );
+
+            // Temporarily render the element off-screen to use html2canvas
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            document.body.appendChild(container);
+
+            const { createRoot } = await import('react-dom/client');
+            const root = createRoot(container);
+            await new Promise<void>(resolve => root.render(content, () => resolve()));
+            
+            const element = container.querySelector(`#pdf-question-${i}`);
+            if (element) {
+                const canvas = await html2canvas(element as HTMLElement, { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = pageWidth - 2 * margin;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                if (y + imgHeight > pageHeight - margin) {
+                    pdf.addPage();
+                    y = margin;
+                }
+
+                pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+                y += imgHeight + 5; 
+            }
+            root.unmount();
+            document.body.removeChild(container);
+        }
+        
+        pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
+
+    } catch (error) {
+        console.error(error);
+        toast({
+            variant: "destructive",
+            title: "Download Failed",
+            description: "An error occurred while generating the PDF.",
+        });
+    } finally {
+        setIsDownloading(false);
+    }
+  };
 
 
   if (loading) {
@@ -556,6 +675,7 @@ export default function TextbookSolutionsPage() {
                                                     topicId={activeTopic!}
                                                     isLocked={isLocked}
                                                     highestScore={progress?.highestScores?.[ps.id]}
+                                                    onDownload={() => handleDownloadPdf(ps)}
                                                   />
                                                 );
                                             })}

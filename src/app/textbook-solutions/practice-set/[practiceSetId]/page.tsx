@@ -22,9 +22,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescript
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-
 
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
 
@@ -47,7 +44,6 @@ export default function PracticeSetPage() {
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDownloading, setIsDownloading] = useState(false);
   const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -163,62 +159,6 @@ export default function PracticeSetPage() {
     const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
     handleAnswerChange(questionId, newAnswer);
   }
-
-  const handleDownloadPdf = async () => {
-    if (!test) return;
-    setIsDownloading(true);
-    toast({
-        title: "Generating PDF...",
-        description: "Your download will begin shortly.",
-    });
-
-    try {
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pageHeight = 297;
-        const pageWidth = 210;
-        const margin = 10;
-        let y = margin;
-
-        pdf.setFontSize(18);
-        pdf.text(test.title, pageWidth / 2, y, { align: 'center' });
-        y += 10;
-        pdf.setFontSize(12);
-        pdf.text(`Total Marks: ${totalMarks}`, pageWidth / 2, y, { align: 'center' });
-        y += 15;
-
-        for (let i = 0; i < test.questions.length; i++) {
-            const question = test.questions[i];
-            const elementId = `pdf-question-${i}`;
-            const element = document.getElementById(elementId);
-
-            if (element) {
-                const canvas = await html2canvas(element, { scale: 2 });
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = pageWidth - 2 * margin;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                if (y + imgHeight > pageHeight - margin) {
-                    pdf.addPage();
-                    y = margin;
-                }
-
-                pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-                y += imgHeight + 10; // Add some space between questions
-            }
-        }
-        
-        pdf.save(`${test.title.replace(/\s/g, '_')}.pdf`);
-
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "Download Failed",
-            description: "An error occurred while generating the PDF.",
-        });
-    } finally {
-        setIsDownloading(false);
-    }
-};
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
@@ -346,19 +286,6 @@ export default function PracticeSetPage() {
                         </div>
                     )}
                 </div>
-                 <Button onClick={handleDownloadPdf} disabled={isDownloading} variant="outline" className="mt-4">
-                    {isDownloading ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Generating...
-                        </>
-                    ) : (
-                        <>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download as PDF
-                        </>
-                    )}
-                </Button>
             </header>
 
             <form onSubmit={handleSubmit}>
@@ -452,45 +379,6 @@ export default function PracticeSetPage() {
             </form>
         </div>
         
-        {/* Hidden printable element */}
-        <div id="pdf-content" className="hidden">
-            {test.questions.map((question, index) => (
-                <div key={`pdf-q-${index}`} id={`pdf-question-${index}`} className="p-4 bg-white text-black font-sans">
-                    <h3 className="text-lg font-bold mb-2">Q{index + 1}: {question.text}</h3>
-                    {question.type === 'Multiple Choice' && question.options && (
-                        <ol type="A" className="list-[upper-alpha] list-inside space-y-1">
-                            {question.options.map((option, optIndex) => (
-                                <li key={optIndex}>{option.text}</li>
-                            ))}
-                        </ol>
-                    )}
-                    {question.type === 'True/False' && (
-                        <div className="flex space-x-4"><span>A) True</span><span>B) False</span></div>
-                    )}
-                    {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                        <div className="mt-4 border-b-2 border-dotted border-black"></div>
-                    )}
-                    {question.type === 'Matching' && question.matchingOptions && (
-                        <div className="mt-2 flex gap-8">
-                            <div>
-                                <h4 className="font-semibold underline">Column A</h4>
-                                <ol className="list-decimal list-inside">
-                                    {question.matchingOptions.columnA.map((item, i) => <li key={i}>{item.text}</li>)}
-                                </ol>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold underline">Column B</h4>
-                                <ol className="list-[lower-alpha] list-inside">
-                                     {question.matchingOptions.columnB.map((item, i) => <li key={i}>{item.text}</li>)}
-                                </ol>
-                            </div>
-                        </div>
-                    )}
-                     <div className="mt-2 text-right text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</div>
-                </div>
-            ))}
-        </div>
-
         <AlertDialog open={timeUp}>
             <AlertDialogContent>
                 <AlertDialogHeader>
