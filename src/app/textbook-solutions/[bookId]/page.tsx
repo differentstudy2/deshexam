@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -17,8 +18,8 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
+import { flushSync } from 'react-dom';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -338,7 +339,7 @@ export default function TextbookSolutionsPage() {
     }
   }
 
-  const handleDownloadPdf = async (practiceSet: any) => {
+ const handleDownloadPdf = async (practiceSet: any) => {
     if (!activeChapter || !activeTopic) return;
     setIsDownloading(practiceSet.id);
     toast({
@@ -361,24 +362,10 @@ export default function TextbookSolutionsPage() {
 
         const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
             if (yPos + contentHeight > pageHeight - margin) {
-                addWatermark(pdf);
                 pdf.addPage();
                 return margin;
             }
             return yPos;
-        };
-
-        const addWatermark = (pdfInstance: jsPDF) => {
-            const totalPages = pdfInstance.getNumberOfPages();
-            for (let i = 1; i <= totalPages; i++) {
-                pdfInstance.setPage(i);
-                pdfInstance.setFontSize(50);
-                pdfInstance.setTextColor(220, 220, 220);
-                pdfInstance.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-                    angle: -45,
-                    align: 'center',
-                });
-            }
         };
 
         const headerContent = (
@@ -412,14 +399,11 @@ export default function TextbookSolutionsPage() {
 
         const headerElement = headerContainer.firstElementChild;
         if (headerElement) {
-            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2 });
+            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = pageWidth - 2 * margin;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             
-            // Add watermark before adding the header image
-            addWatermark(pdf);
-
             pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
             y += imgHeight + 5;
         }
@@ -435,16 +419,16 @@ export default function TextbookSolutionsPage() {
                 const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
                 let columnB = [...pairs.map(p => ({ text: p.b, image: p.bImage }))];
                 
-                for (let i = columnB.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
+                for (let j = columnB.length - 1; j > 0; j--) {
+                    const k = Math.floor(Math.random() * (j + 1));
+                    [columnB[j], columnB[k]] = [columnB[k], columnB[j]];
                 }
                 question.matchingOptions = { columnA, columnB };
             }
 
             const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-transparent text-black font-sans w-[700px] text-base">
-                  <div className="flex justify-between items-start mb-1">
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-transparent text-black font-sans w-[700px]">
+                  <div className="flex justify-between items-start mb-1 text-base">
                       <span className="flex-1"><strong>Q{i + 1}:</strong> {question.text}</span>
                       <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
@@ -523,7 +507,18 @@ export default function TextbookSolutionsPage() {
             document.body.removeChild(container);
         }
         
-        addWatermark(pdf); // Ensure last page also gets a watermark
+        // Add watermark to all pages after content is rendered
+        const totalPages = pdf.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            pdf.setFontSize(50);
+            pdf.setTextColor(220, 220, 220); // Light gray color
+            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                angle: -45,
+                align: 'center',
+            });
+        }
+        
         pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
 
     } catch (error) {
