@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -499,12 +499,16 @@ export default function TextbookSolutionsPage() {
                                             return (
                                                 <div key={resource.id} className="space-y-2">
                                                     <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                    <div className="aspect-[4/3] w-full border rounded-lg">
+                                                    <div className="aspect-[4/3] w-full border rounded-lg overflow-hidden relative group">
                                                         <iframe 
                                                             className="w-full h-full"
                                                             src={resource.url} 
                                                             title={resource.title}>
+                                                                <p className="p-4">Your browser does not support PDFs. Please download the PDF to view it.</p>
                                                         </iframe>
+                                                         <a href={resource.url} target="_blank" rel="noopener noreferrer" className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity" title="Open in new tab">
+                                                            <ExternalLink className="w-5 h-5"/>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             );
@@ -568,3 +572,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
