@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -421,7 +422,7 @@ export default function TextbookSolutionsPage() {
              if (question.type === 'Matching' && question.correctAnswer && !question.matchingOptions) {
                 const pairs = question.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
                 const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
-                let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
+                let columnB = [...pairs.map(p => ({ text: p.b, image: p.bImage }))];
                 
                 // Shuffle column B
                 for (let i = columnB.length - 1; i > 0; i--) {
@@ -451,19 +452,17 @@ export default function TextbookSolutionsPage() {
                       <div className="mt-4 border-b-2 border-dotted border-black"></div>
                   )}
                   {question.type === 'Matching' && question.matchingOptions && (
-                      <div className="mt-2 flex gap-8">
-                          <div>
+                      <div className="mt-2">
+                          <div className="grid grid-cols-2 gap-8">
                               <h4 className="font-semibold underline">Column A</h4>
-                              <ol className="list-decimal list-inside">
-                                  {question.matchingOptions.columnA.map((item, i) => <li key={i}>{item.text}</li>)}
-                              </ol>
-                          </div>
-                          <div>
                               <h4 className="font-semibold underline">Column B</h4>
-                              <ol className="list-[lower-alpha] list-inside">
-                                   {question.matchingOptions.columnB.map((item, i) => <li key={i}>{item.text}</li>)}
-                              </ol>
                           </div>
+                          {question.matchingOptions.columnA.map((itemA, index) => (
+                              <div key={index} className="grid grid-cols-2 gap-8 items-center">
+                                  <span>{index + 1}. {itemA.text}</span>
+                                  <span>{String.fromCharCode(97 + index)}. {question.matchingOptions!.columnB[index]?.text}</span>
+                              </div>
+                          ))}
                       </div>
                   )}
                    <div className="mt-2 text-right text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</div>
@@ -730,3 +729,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
