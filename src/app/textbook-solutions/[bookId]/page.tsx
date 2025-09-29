@@ -23,7 +23,6 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile, getTextbookProgress, getSettings } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Skeleton } from '@/components/ui/skeleton';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
@@ -388,18 +387,9 @@ export default function TextbookSolutionsPage() {
 
   if (loading) {
     return (
-        <div className="container mx-auto py-8 max-w-7xl">
-            <header className="text-center mb-12">
-                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Textbook Solutions</h1>
-                <p className="text-lg text-muted-foreground mt-2">
-                Select a textbook to view its solutions, topics, and practice questions.
-                </p>
-            </header>
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {Array.from({length: 4}).map((_, i) => (
-                    <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
-                ))}
-            </div>
+        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <p className="ml-4 text-lg">Loading...</p>
         </div>
     );
   }
