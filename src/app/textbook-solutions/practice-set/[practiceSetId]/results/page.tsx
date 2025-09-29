@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -37,6 +38,7 @@ type Submission = {
     answers: { [key: string]: string };
     submittedAt: any;
     timeTaken: number;
+    duration?: number;
 };
 
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; subscriptionPlan?: 'pro' | 'pass'; };
@@ -199,6 +201,8 @@ function ResultsDisplay() {
                 
                 {totalQuestions > 0 && <div className="flex items-center gap-2 text-muted-foreground"><BarChart className="w-4 h-4"/> <strong>Full Marks:</strong> <span className="text-foreground">{totalQuestions}</span></div>}
                 
+                {submission.duration && submission.duration > 0 && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Duration:</strong> <span className="text-foreground">{submission.duration} min</span></div>}
+
                 {timeTaken && <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4"/> <strong>Time Taken:</strong> <span className="text-foreground">{formatTimeTaken(timeTaken)}</span></div>}
 
                 {submittedAtDate && submittedAtDate.toString() !== 'Invalid Date' && (
