@@ -18,7 +18,6 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import ReactDOM from 'react-dom';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { Badge } from '@/components/ui/badge';
@@ -372,6 +371,8 @@ export default function TextbookSolutionsPage() {
                     <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
                     <p><strong>Subject:</strong> {textbook?.subject}</p>
                     <p><strong>Board:</strong> {textbook?.board}</p>
+                    <p><strong>Class:</strong> {textbook?.class}</p>
+                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                     <p><strong>Full Marks:</strong> {totalMarks}</p>
                     <p><strong>Duration:</strong> {totalMarks} min</p>
                 </div>
@@ -728,4 +729,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
