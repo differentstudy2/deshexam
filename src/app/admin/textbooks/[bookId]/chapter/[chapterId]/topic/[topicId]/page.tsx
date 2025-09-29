@@ -8,17 +8,18 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Topic, PracticeSet, Resource } from '@/lib/types';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic } from 'lucide-react';
+import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { 
     addPracticeSetToTopic, 
     getPracticeSetsByTopicId, 
+    uploadFile
 } from '@/lib/firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -284,6 +285,8 @@ export default function ManageTopicPage() {
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
     const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
     const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
@@ -379,6 +382,22 @@ export default function ManageTopicPage() {
             fetchData();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to delete resource', description: (error as Error).message });
+        }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setIsUploading(true);
+            try {
+                const downloadURL = await uploadFile(file);
+                setNewResource(prev => ({...prev, url: downloadURL}));
+                toast({ title: 'File uploaded!', description: 'URL has been set. Click Save.' });
+            } catch (error) {
+                toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
+            } finally {
+                setIsUploading(false);
+            }
         }
     };
 
@@ -516,10 +535,32 @@ export default function ManageTopicPage() {
                              <Label>Title</Label>
                             <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
                          </div>
-                         <div className="space-y-2">
-                            <Label>URL</Label>
-                            <Input placeholder="Resource URL" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
-                         </div>
+                         <Tabs defaultValue="url">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="url">From URL</TabsTrigger>
+                                <TabsTrigger value="upload">Upload File</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="url" className="pt-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="resource-url">URL</Label>
+                                    <Input id="resource-url" placeholder="https://example.com/resource" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="upload" className="pt-4">
+                                 <div 
+                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <div className="space-y-1 text-center">
+                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                        <p className="text-sm text-muted-foreground">Click to upload a file</p>
+                                        <p className="text-xs text-muted-foreground">Video, Audio, PDF, DOC up to 50MB</p>
+                                    </div>
+                                </div>
+                                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                                {isUploading && <div className="mt-2 flex items-center justify-center text-sm"><Loader2 className="animate-spin mr-2" /> Uploading...</div>}
+                            </TabsContent>
+                         </Tabs>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
