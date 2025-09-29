@@ -485,6 +485,16 @@ export default function TextbookSolutionsPage() {
                                                   )
                                               }
                                           }
+                                          if (resource.type === 'audio') {
+                                            return (
+                                              <div key={resource.id} className="space-y-2">
+                                                <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
+                                                <audio controls src={resource.url} className="w-full">
+                                                  Your browser does not support the audio element.
+                                                </audio>
+                                              </div>
+                                            );
+                                          }
                                           // Fallback for non-youtube videos or other resources
                                           return (
                                               <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
