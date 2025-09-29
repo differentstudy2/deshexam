@@ -25,6 +25,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -765,16 +766,17 @@ export const getSubmissionsByUserId = async (userId: string) => {
 
 export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
-        // This is a simplified approach and may have pagination inaccuracies
-        // across the two collections. A robust solution might involve a unified "events" collection
-        // or backend processing.
         const testSubsQuery = query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
         const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
 
-        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
-            getDocs(testSubsQuery),
-            getDocs(practiceSubsQuery),
-        ]);
+        let queryToUse = testSubsQuery;
+        if(startAfterDoc) {
+            queryToUse = query(testSubsQuery, startAfter(startAfterDoc));
+        }
+
+        const testSubsSnapshot = await getDocs(queryToUse);
+        const practiceSubsSnapshot = await getDocs(practiceSubsQuery);
+
 
         const formatSubmission = (doc: DocumentSnapshot) => {
             const data = doc.data() as any;
@@ -804,11 +806,11 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
             .sort((a, b) => b!.submittedAt.getTime() - a!.submittedAt.getTime())
             .slice(0, itemsPerPage);
 
-        const hasMore = allSubmissions.length === itemsPerPage; // This is an approximation
+        const hasMore = allSubmissions.length === itemsPerPage; 
         
-        // The lastVisible logic here is flawed for true pagination across two collections.
-        // It's omitted to prevent incorrect behavior. For real-world use, a better strategy is needed.
-        return { submissions: allSubmissions, lastVisible: null, hasMore };
+        const lastVisible = testSubsSnapshot.docs[testSubsSnapshot.docs.length - 1];
+
+        return { submissions: allSubmissions, lastVisible: lastVisible, hasMore };
     } catch (e) {
         console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -2032,6 +2034,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 
