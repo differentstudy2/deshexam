@@ -376,7 +376,9 @@ export default function TextbookSolutionsPage() {
   }
   
   const isVideoFile = (url: string) => {
-      return url.endsWith('.mp4') || url.endsWith('.mkv') || url.endsWith('.ogg') || url.endsWith('.webm');
+      if (!url) return false;
+      const videoExtensions = ['.mp4', '.mkv', '.ogg', '.webm'];
+      return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
   };
 
 
@@ -508,7 +510,7 @@ export default function TextbookSolutionsPage() {
                                               </div>
                                             );
                                           }
-                                          if (resource.type === 'pdf') {
+                                          if (resource.type === 'pdf' || resource.type === 'doc') {
                                             const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resource.url)}&embedded=true`;
                                             return (
                                                 <div key={resource.id} className="space-y-2">
@@ -579,6 +581,7 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
 
