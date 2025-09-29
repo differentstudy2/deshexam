@@ -209,6 +209,18 @@ export default function ManageTopicPage() {
         }
     };
 
+    const groupedResources = (topic?.resources || []).reduce((acc, resource) => {
+        const type = resource.type;
+        if (!acc[type]) {
+            acc[type] = [];
+        }
+        acc[type].push(resource);
+        return acc;
+    }, {} as { [key: string]: Resource[] });
+
+    const resourceOrder: ('video' | 'audio' | 'pdf' | 'doc')[] = ['video', 'audio', 'pdf', 'doc'];
+
+
     if (loading) return <div className="flex items-center justify-center h-full">Loading...</div>
 
     return (
@@ -243,17 +255,27 @@ export default function ManageTopicPage() {
                                         </div>
                                     ) : (
                                         <>
-                                            {topic?.resources && topic.resources.length > 0 ? (
-                                                <ul className="space-y-2">
-                                                    {topic.resources.map(res => (
-                                                        <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
-                                                            {getResourceIcon(res.type)}
-                                                            <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
-                                                            <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
-                                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
-                                                        </li>
+                                            {(topic?.resources && topic.resources.length > 0) ? (
+                                                <div className="space-y-4">
+                                                    <h3 className="font-semibold text-lg">Additional Resources</h3>
+                                                    {resourceOrder.map(type => (
+                                                        groupedResources[type] && (
+                                                            <div key={type}>
+                                                                <h4 className="font-semibold text-md mb-2 capitalize">{type}s</h4>
+                                                                <ul className="space-y-2">
+                                                                    {groupedResources[type].map(res => (
+                                                                        <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
+                                                                            {getResourceIcon(res.type)}
+                                                                            <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
+                                                                            <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
+                                                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        )
                                                     ))}
-                                                </ul>
+                                                </div>
                                             ) : (
                                                 <p className="text-muted-foreground text-center py-8">No resources added yet.</p>
                                             )}
