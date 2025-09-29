@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -27,8 +26,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { useToast } from '@/hooks/use-toast';
 import ReactDOM from 'react-dom';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 
 type UserProfile = {
@@ -39,6 +39,91 @@ type TextbookProgress = {
     highestScores: { [practiceSetId: string]: number };
     allAttempts: { [practiceSetId: string]: number };
 }
+
+const TextbookContentSidebar = ({
+  chapters,
+  topics,
+  activeChapter,
+  activeTopic,
+  onTopicSelect,
+  onChapterToggle,
+  onSheetClose,
+  userProfile,
+  loadingTopics,
+  progress,
+  settings,
+}: {
+  chapters: Chapter[];
+  topics: { [chapterId: string]: Topic[] };
+  activeChapter: string | null;
+  activeTopic: string | null;
+  onTopicSelect: (chapterId: string, topicId: string) => void;
+  onChapterToggle: (chapterId: string) => void;
+  onSheetClose?: () => void;
+  userProfile: UserProfile | null;
+  loadingTopics: string | null;
+  progress: TextbookProgress | null;
+  settings: any;
+}) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Table of Contents</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          defaultValue={activeChapter || undefined}
+          onValueChange={(value) => onChapterToggle(value)}
+        >
+          {chapters.map((chapter, index) => {
+            const isFree = chapter.access === 'free' || index < (settings?.freeChaptersPerBook || 1);
+            const isChapterLocked = !isFree && !userProfile?.subscriptionPlan;
+
+            return (
+              <AccordionItem value={chapter.id} key={chapter.id}>
+                <AccordionTrigger disabled={isChapterLocked} className="hover:no-underline">
+                  <div className="flex items-center gap-2 text-left">
+                    {isChapterLocked && <Lock className="w-4 h-4 flex-shrink-0" />}
+                    <span>{chapter.title}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  {loadingTopics === chapter.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                  ) : (
+                    <ul className="space-y-1 pl-2">
+                      {(topics[chapter.id] || []).map(topic => (
+                        <li key={topic.id}>
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                                "w-full justify-start text-left h-auto py-1 px-2",
+                                activeTopic === topic.id ? "bg-accent text-accent-foreground" : ""
+                            )}
+                            onClick={() => {
+                              onTopicSelect(chapter.id, topic.id);
+                              onSheetClose?.();
+                            }}
+                          >
+                            {topic.title}
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+};
+
 
 const PracticeSetItem = ({ 
     ps, 
@@ -593,5 +678,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
-
