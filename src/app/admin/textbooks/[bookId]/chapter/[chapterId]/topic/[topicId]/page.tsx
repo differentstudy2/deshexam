@@ -288,6 +288,9 @@ export default function ManageTopicPage() {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const [resourcesLoading, setResourcesLoading] = useState(false);
+    const [resourcesFetched, setResourcesFetched] = useState(false);
+
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
         setLoading(true);
@@ -295,13 +298,34 @@ export default function ManageTopicPage() {
         const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
         const topicSnap = await getDoc(topicRef);
         if (topicSnap.exists()) {
-            setTopic({ id: topicSnap.id, ...topicSnap.data() } as Topic);
+             const topicData = { id: topicSnap.id, ...topicSnap.data() } as Topic;
+            // Initially, don't load resources
+            delete (topicData as any).resources;
+            setTopic(topicData);
         }
 
         const fetchedPracticeSets = await getPracticeSetsByTopicId(textbookId, chapterId, topicId);
         setPracticeSets(fetchedPracticeSets as PracticeSet[]);
 
         setLoading(false);
+    };
+
+    const fetchResources = async () => {
+        if (!topicId || resourcesFetched) return;
+        setResourcesLoading(true);
+        try {
+            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
+            const topicSnap = await getDoc(topicRef);
+            if (topicSnap.exists()) {
+                const topicData = topicSnap.data() as Topic;
+                setTopic(prev => prev ? { ...prev, resources: topicData.resources || [] } : null);
+                setResourcesFetched(true);
+            }
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Failed to load resources', description: (error as Error).message });
+        } finally {
+            setResourcesLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -365,7 +389,7 @@ export default function ManageTopicPage() {
             toast({ title: `Resource ${editingResource ? 'updated' : 'added'}` });
             setIsResourceDialogOpen(false);
             setEditingResource(null);
-            fetchData();
+            fetchResources();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
         }
@@ -379,7 +403,7 @@ export default function ManageTopicPage() {
             await updateDoc(topicRef, { resources: updatedResources });
             toast({ title: 'Resource Deleted' });
             setResourceToDelete(null);
-            fetchData();
+            fetchResources();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to delete resource', description: (error as Error).message });
         }
@@ -429,31 +453,44 @@ export default function ManageTopicPage() {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Additional Resources</CardTitle>
-                            <CardDescription>Manage videos, audio, and documents for this topic.</CardDescription>
-                        </div>
-                        <Button size="sm" onClick={() => handleOpenResourceDialog(null)}><PlusCircle className="mr-2"/> Add Resource</Button>
-                    </CardHeader>
-                    <CardContent>
-                        {topic?.resources && topic.resources.length > 0 ? (
-                            <ul className="space-y-2">
-                                {topic.resources.map(res => (
-                                    <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
-                                        {getResourceIcon(res.type)}
-                                        <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
-                                        <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
-                                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-muted-foreground text-center py-8">No resources added yet.</p>
-                        )}
-                    </CardContent>
-                </Card>
+                 <Accordion type="single" collapsible className="w-full" onValueChange={(value) => { if(value) fetchResources() }}>
+                    <AccordionItem value="resources">
+                        <Card>
+                             <CardHeader>
+                                <AccordionTrigger className="w-full justify-between">
+                                    <CardTitle>Additional Resources</CardTitle>
+                                </AccordionTrigger>
+                            </CardHeader>
+                            <AccordionContent>
+                                <CardContent>
+                                    {resourcesLoading ? (
+                                        <div className="flex justify-center p-4">
+                                            <Loader2 className="w-6 h-6 animate-spin" />
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {topic?.resources && topic.resources.length > 0 ? (
+                                                <ul className="space-y-2">
+                                                    {topic.resources.map(res => (
+                                                        <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
+                                                            {getResourceIcon(res.type)}
+                                                            <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
+                                                            <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
+                                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-muted-foreground text-center py-8">No resources added yet.</p>
+                                            )}
+                                            <Button size="sm" className="mt-4" onClick={() => handleOpenResourceDialog(null)}><PlusCircle className="mr-2"/> Add Resource</Button>
+                                        </>
+                                    )}
+                                </CardContent>
+                            </AccordionContent>
+                        </Card>
+                    </AccordionItem>
+                </Accordion>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div>
@@ -586,3 +623,4 @@ export default function ManageTopicPage() {
         </div>
     )
 }
+
