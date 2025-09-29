@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
+  displayName?: string;
 };
 
 type TextbookProgress = {
@@ -360,12 +361,45 @@ export default function TextbookSolutionsPage() {
         const margin = 10;
         let y = margin;
 
-        pdf.setFontSize(18);
-        pdf.text(practiceSet.title, pageWidth / 2, y, { align: 'center' });
-        y += 10;
-        pdf.setFontSize(12);
-        pdf.text(`Total Marks: ${totalMarks}`, pageWidth / 2, y, { align: 'center' });
-        y += 15;
+        const headerContent = (
+            <div className="p-1 bg-white text-black font-sans w-[700px] text-base">
+                <div className="text-center mb-4">
+                    <h1 className="text-2xl font-bold">{practiceSet.title}</h1>
+                    <h2 className="text-lg">{textbook?.title}</h2>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm border-y-2 border-black py-2 my-2">
+                    <p><strong>Student Name:</strong> {userProfile?.displayName || 'N/A'}</p>
+                    <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
+                    <p><strong>Subject:</strong> {textbook?.subject}</p>
+                    <p><strong>Board:</strong> {textbook?.board}</p>
+                    <p><strong>Full Marks:</strong> {totalMarks}</p>
+                    <p><strong>Duration:</strong> {totalMarks} min</p>
+                </div>
+            </div>
+        );
+        
+        const headerContainer = document.createElement('div');
+        headerContainer.style.position = 'absolute';
+        headerContainer.style.left = '-9999px';
+        document.body.appendChild(headerContainer);
+        const headerRoot = createRoot(headerContainer);
+        
+        flushSync(() => {
+          headerRoot.render(headerContent);
+        });
+
+        const headerElement = headerContainer.firstElementChild;
+        if (headerElement) {
+            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = pageWidth - 2 * margin;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+            y += imgHeight + 5;
+        }
+        headerRoot.unmount();
+        document.body.removeChild(headerContainer);
+
 
         for (let i = 0; i < questions.length; i++) {
             let question = questions[i] as Question;
@@ -694,3 +728,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
