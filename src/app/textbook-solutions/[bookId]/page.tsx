@@ -18,6 +18,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import ReactDOM from 'react-dom/client';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -27,7 +28,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import ReactDOM from 'react-dom';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -382,12 +382,12 @@ export default function TextbookSolutionsPage() {
 
             const content = (
               <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px]">
-                  <div className="flex justify-between items-start text-lg font-bold mb-1">
+                  <div className="flex justify-between items-start text-base font-bold mb-1">
                       <span className="flex-1">Q{i + 1}: {question.text}</span>
                       <span className="ml-4 text-xs font-normal">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
                   {question.type === 'Multiple Choice' && question.options && (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                           {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
                                   <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
@@ -397,23 +397,35 @@ export default function TextbookSolutionsPage() {
                       </div>
                   )}
                   {question.type === 'True/False' && (
-                      <div className="flex space-x-4"><span>A) True</span><span>B) False</span></div>
+                      <div className="flex space-x-4 text-sm"><span>A) True</span><span>B) False</span></div>
                   )}
                   {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
                       <div className="mt-4 border-b-2 border-dotted border-black"></div>
                   )}
                   {question.type === 'Matching' && question.matchingOptions && (
-                      <div className="mt-2">
+                      <div className="mt-2 text-sm">
                           <div className="grid grid-cols-2 gap-8">
                               <h4 className="font-semibold underline">Column A</h4>
                               <h4 className="font-semibold underline">Column B</h4>
                           </div>
-                          {question.matchingOptions.columnA.map((itemA, index) => (
-                              <div key={index} className="grid grid-cols-2 gap-8 items-center">
-                                  <span>{index + 1}. {itemA.text}</span>
-                                  <span>{String.fromCharCode(97 + index)}. {question.matchingOptions!.columnB[index]?.text}</span>
+                          <div className="grid grid-cols-2 gap-8">
+                             <div>
+                                {question.matchingOptions.columnA.map((itemA, index) => (
+                                    <div key={index} className="grid grid-cols-[20px_1fr] items-center">
+                                      <span>{index + 1}.</span>
+                                      <span>{itemA.text}</span>
+                                    </div>
+                                ))}
                               </div>
-                          ))}
+                              <div>
+                                {question.matchingOptions.columnB.map((itemB, index) => (
+                                     <div key={index} className="grid grid-cols-[20px_1fr] items-center">
+                                       <span>{String.fromCharCode(97 + index)}.</span>
+                                       <span>{itemB.text}</span>
+                                     </div>
+                                ))}
+                              </div>
+                          </div>
                       </div>
                   )}
               </div>
@@ -425,8 +437,7 @@ export default function TextbookSolutionsPage() {
             container.style.left = '-9999px';
             document.body.appendChild(container);
             
-            const { createRoot } = await import('react-dom/client');
-            const root = createRoot(container);
+            const root = ReactDOM.createRoot(container);
             
             ReactDOM.flushSync(() => {
               root.render(content);
@@ -445,7 +456,7 @@ export default function TextbookSolutionsPage() {
                 }
 
                 pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-                y += imgHeight + 1; 
+                y += imgHeight + 0.5;
             }
             root.unmount();
             document.body.removeChild(container);
