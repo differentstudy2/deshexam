@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -142,12 +141,12 @@ function ResultsDisplay() {
 
 
   return (
-    <>
-       <header className="text-center mb-8">
+    <div className="max-w-4xl mx-auto">
+      <header className="text-center mb-8">
         <h1 className="font-headline text-4xl font-bold">{pageTitle}</h1>
         <p className="text-muted-foreground">Here's how you performed on the practice set for <span className="font-semibold text-foreground">{submission.practiceSetTitle}</span>.</p>
       </header>
-      <Card className="max-w-4xl mx-auto">
+      <Card>
          <CardHeader>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                 <div className="flex flex-col md:flex-row items-center gap-4">
@@ -191,8 +190,8 @@ function ResultsDisplay() {
         <CardContent className="space-y-4 pt-0">
             <Separator />
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-1"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{submission.practiceSetTitle}</span></div>
-                {topic?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-2"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic.title}</span></div>}
+                <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{submission.practiceSetTitle}</span></div>
+                {topic?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic.title}</span></div>}
                 
                 {textbook?.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{textbook.subject}</span></div>}
                 {textbook?.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{textbook.board}</span></div>}
@@ -227,7 +226,7 @@ function ResultsDisplay() {
             </div>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }
 
@@ -241,3 +240,5 @@ export default function PracticeSetResultsPage() {
     </div>
   );
 }
+
+    
