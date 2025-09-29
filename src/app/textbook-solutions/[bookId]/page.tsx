@@ -374,6 +374,10 @@ export default function TextbookSolutionsPage() {
       }
       return null;
   }
+  
+  const isVideoFile = (url: string) => {
+      return url.endsWith('.mp4') || url.endsWith('.mkv') || url.endsWith('.ogg') || url.endsWith('.webm');
+  };
 
 
   return (
@@ -483,6 +487,15 @@ export default function TextbookSolutionsPage() {
                                                           </div>
                                                       </div>
                                                   )
+                                              } else if (isVideoFile(resource.url)) {
+                                                  return (
+                                                      <div key={resource.id} className="space-y-2">
+                                                        <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
+                                                        <video controls controlsList="nodownload" src={resource.url} className="w-full rounded-lg">
+                                                            Your browser does not support the video tag.
+                                                        </video>
+                                                      </div>
+                                                  );
                                               }
                                           }
                                           if (resource.type === 'audio') {
@@ -566,6 +579,7 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
 
