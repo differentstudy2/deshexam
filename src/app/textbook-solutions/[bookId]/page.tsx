@@ -47,7 +47,8 @@ const PracticeSetItem = ({
     topicId, 
     isLocked, 
     highestScore,
-    onDownload
+    onDownload,
+    isDownloading,
 }: { 
     ps: any; 
     textbookId: string; 
@@ -56,6 +57,7 @@ const PracticeSetItem = ({
     isLocked: boolean; 
     highestScore?: number; 
     onDownload: () => void;
+    isDownloading: boolean;
 }) => {
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
@@ -73,9 +75,18 @@ const PracticeSetItem = ({
                         <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {Math.round(highestScore)}%</p>
                     </div>
                 )}
-                 <Button variant="outline" size="sm" onClick={onDownload} disabled={isLocked}>
-                    <Download className="mr-2 h-4 w-4" />
-                    PDF
+                 <Button variant="outline" size="sm" onClick={onDownload} disabled={isLocked || isDownloading}>
+                    {isDownloading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Generating...
+                        </>
+                    ) : (
+                        <>
+                            <Download className="mr-2 h-4 w-4" />
+                            PDF
+                        </>
+                    )}
                 </Button>
                 <Button asChild disabled={isLocked}>
                     <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
@@ -86,154 +97,6 @@ const PracticeSetItem = ({
         </Card>
     );
 };
-
-
-const TextbookContentSidebar = ({
-  chapters,
-  topics,
-  activeChapter,
-  activeTopic,
-  onTopicSelect,
-  onChapterToggle,
-  onSheetClose,
-  userProfile,
-  loadingTopics,
-  progress,
-  settings,
-}: {
-  chapters: Chapter[];
-  topics: { [key: string]: Topic[] };
-  activeChapter: string | null;
-  activeTopic: string | null;
-  onTopicSelect: (chapterId: string, topicId: string) => void;
-  onChapterToggle: (chapterId: string) => void;
-  onSheetClose?: () => void;
-  userProfile: UserProfile | null;
-  loadingTopics: string | null;
-  progress: TextbookProgress | null;
-  settings: any;
-}) => {
-    
-    const hasAccess = (chapter: Chapter, index: number) => {
-        if (!settings?.gateChaptersOnPass) return true; 
-        if (index < settings.freeChaptersPerBook) return true; 
-
-        if (chapter.access !== 'free') {
-            if (!userProfile) return false;
-            if (userProfile.subscriptionPlan === 'pro') {
-                return true;
-            } else if (userProfile.subscriptionPlan === 'pass' && chapter.access === 'pro') {
-                return false; 
-            } else if (!userProfile.subscriptionPlan) {
-                return false; 
-            }
-        }
-        
-        const previousChapter = chapters[index - 1];
-        if (!previousChapter) return true; 
-        
-        const prevChapterTopics = topics[previousChapter.id] || [];
-        if (prevChapterTopics.length === 0) return true;
-
-        for (const topic of prevChapterTopics) {
-            if (topic.practiceSets && topic.practiceSets.length > 0) {
-                for (const ps of topic.practiceSets) {
-                    const score = progress?.highestScores[ps.id];
-                    if (score === undefined || score < (settings?.practiceSetPassMark || 40)) {
-                        return false; // Found an incomplete/failed practice set
-                    }
-                }
-            }
-        }
-        
-        return true; // All practice sets in previous chapter are passed
-    }
-
-    const [openAccordion, setOpenAccordion] = useState<string | undefined>(activeChapter ? `item-${activeChapter}` : undefined);
-    
-    useEffect(() => {
-        setOpenAccordion(activeChapter ? `item-${activeChapter}` : undefined);
-    }, [activeChapter]);
-
-    const handleAccordionChange = (value: string) => {
-        const chapterId = value.replace('item-', '');
-        setOpenAccordion(value);
-        if (chapterId) {
-            onChapterToggle(chapterId);
-        }
-    }
-
-    return (
-    <Card>
-        <CardHeader>
-            <CardTitle>Chapters</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <Accordion 
-                type="single" 
-                collapsible 
-                value={openAccordion}
-                onValueChange={handleAccordionChange}
-            >
-            {chapters.map((chapter, index) => {
-                const canAccess = hasAccess(chapter, index);
-                return (
-                    <AccordionItem value={`item-${chapter.id}`} key={chapter.id} disabled={!canAccess}>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <AccordionTrigger 
-                                        className={!canAccess ? 'cursor-not-allowed text-muted-foreground' : ''}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            {!canAccess && <Lock className="w-4 h-4" />}
-                                            {chapter.title}
-                                        </span>
-                                    </AccordionTrigger>
-                                </TooltipTrigger>
-                                {!canAccess && (
-                                    <TooltipContent>
-                                        <p>Complete the previous chapter to unlock.</p>
-                                    </TooltipContent>
-                                )}
-                            </Tooltip>
-                        </TooltipProvider>
-
-                        <AccordionContent>
-                             {loadingTopics === chapter.id ? (
-                                <div className="flex justify-center items-center p-4">
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                </div>
-                            ) : (
-                                <ul className="space-y-1">
-                                    {(topics[chapter.id] || []).map(topic => (
-                                        <li key={topic.id}>
-                                            <Button
-                                                variant="ghost"
-                                                className={`w-full justify-start h-auto py-2 px-3 text-left font-normal ${activeTopic === topic.id ? 'bg-secondary' : ''}`}
-                                                onClick={() => {
-                                                    onTopicSelect(chapter.id, topic.id);
-                                                    onSheetClose?.();
-                                                }}
-                                            >
-                                            <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
-                                            <span className="flex-grow">{topic.title}</span>
-                                            </Button>
-                                        </li>
-                                    ))}
-                                    {topics[chapter.id] && topics[chapter.id].length === 0 && (
-                                        <li className="text-sm text-muted-foreground text-center p-2">No topics in this chapter.</li>
-                                    )}
-                                </ul>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-                )
-            })}
-            </Accordion>
-        </CardContent>
-    </Card>
-)};
 
 
 export default function TextbookSolutionsPage() {
@@ -262,7 +125,7 @@ export default function TextbookSolutionsPage() {
   
   const [areResourcesFetched, setAreResourcesFetched] = useState(false);
   const [areResourcesLoading, setAreResourcesLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -390,7 +253,7 @@ export default function TextbookSolutionsPage() {
 
   const handleDownloadPdf = async (practiceSet: any) => {
     if (!activeChapter || !activeTopic) return;
-    setIsDownloading(true);
+    setIsDownloading(practiceSet.id);
     toast({
         title: "Generating PDF...",
         description: "Your download will begin shortly.",
@@ -511,7 +374,7 @@ export default function TextbookSolutionsPage() {
             description: "An error occurred while generating the PDF.",
         });
     } finally {
-        setIsDownloading(false);
+        setIsDownloading(null);
     }
   };
 
@@ -697,6 +560,7 @@ export default function TextbookSolutionsPage() {
                                                     isLocked={isLocked}
                                                     highestScore={progress?.highestScores?.[ps.id]}
                                                     onDownload={() => handleDownloadPdf(ps)}
+                                                    isDownloading={isDownloading === ps.id}
                                                   />
                                                 );
                                             })}
@@ -729,4 +593,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
