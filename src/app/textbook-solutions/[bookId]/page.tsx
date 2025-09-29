@@ -29,10 +29,6 @@ type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
 };
 
-type PracticeSetProgress = {
-    highestScore: number;
-};
-
 type TextbookProgress = {
     highestScores: { [practiceSetId: string]: number };
     allAttempts: { [practiceSetId: string]: number };
@@ -339,15 +335,9 @@ export default function TextbookSolutionsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 space-y-6 max-w-7xl">
-        <header className="text-center mb-12">
-            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Textbook Solutions</h1>
-            <p className="text-lg text-muted-foreground mt-2">
-            Select a textbook to view its solutions, topics, and practice questions.
-            </p>
-        </header>
-        <div className="flex justify-center"><Loader2 className="w-8 h-8 animate-spin"/></div>
-      </div>
+        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+            <Loader2 className="w-8 h-8 animate-spin"/>
+        </div>
     );
   }
 
@@ -368,6 +358,22 @@ export default function TextbookSolutionsPage() {
       default: return <FileText className="w-4 h-4 text-primary" />;
     }
   };
+  
+  const getYoutubeVideoId = (url: string): string | null => {
+      if (!url) return null;
+      try {
+        const urlObj = new URL(url);
+        if (urlObj.hostname.includes('youtube.com')) {
+          return urlObj.searchParams.get('v');
+        }
+        if (urlObj.hostname.includes('youtu.be')) {
+          return urlObj.pathname.slice(1);
+        }
+      } catch (error) {
+          // Invalid URL format, ignore
+      }
+      return null;
+  }
 
 
   return (
@@ -457,13 +463,36 @@ export default function TextbookSolutionsPage() {
                                   <div className="mt-8">
                                     <Separator />
                                     <h3 className="mt-6 font-semibold text-2xl">Additional Resources</h3>
-                                    <div className="space-y-2 mt-4 not-prose">
-                                      {selectedTopicContent.resources.map(resource => (
-                                        <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors">
-                                          {getResourceIcon(resource.type)}
-                                          <span className="ml-3 font-medium">{resource.title}</span>
-                                        </a>
-                                      ))}
+                                    <div className="space-y-4 mt-4 not-prose">
+                                      {selectedTopicContent.resources.map(resource => {
+                                          if (resource.type === 'video') {
+                                              const videoId = getYoutubeVideoId(resource.url);
+                                              if(videoId) {
+                                                  return (
+                                                      <div key={resource.id} className="space-y-2">
+                                                          <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
+                                                           <div className="aspect-video w-full">
+                                                              <iframe 
+                                                                  className="w-full h-full rounded-lg"
+                                                                  src={`https://www.youtube.com/embed/${videoId}`} 
+                                                                  title={resource.title}
+                                                                  frameBorder="0" 
+                                                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                                  allowFullScreen>
+                                                              </iframe>
+                                                          </div>
+                                                      </div>
+                                                  )
+                                              }
+                                          }
+                                          // Fallback for non-youtube videos or other resources
+                                          return (
+                                              <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
+                                                {getResourceIcon(resource.type)}
+                                                <span className="ml-3 font-medium">{resource.title}</span>
+                                              </a>
+                                          );
+                                      })}
                                     </div>
                                   </div>
                                 )}
@@ -477,6 +506,9 @@ export default function TextbookSolutionsPage() {
                                                 const passMark = settings?.practiceSetPassMark || 40;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
                                                 const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
+                                                
+                                                // The first practice set is always unlocked.
+                                                // Subsequent sets are locked if the previous set hasn't been passed.
                                                 const isLocked = index > 0 && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
 
                                                 return (
@@ -512,4 +544,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
