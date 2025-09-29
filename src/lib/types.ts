@@ -1,5 +1,12 @@
 
 
+export type Resource = {
+    id: string;
+    type: 'video' | 'audio' | 'pdf' | 'doc';
+    title: string;
+    url: string;
+};
+
 export type Textbook = {
     id: string;
     title: string;
@@ -18,6 +25,7 @@ export type Chapter = {
     title: string;
     content?: string;
     topics: Topic[];
+    resources?: Resource[];
     access: 'free' | 'pass' | 'pro';
 };
 
@@ -26,6 +34,7 @@ export type Topic = {
     title: string;
     content?: string;
     practiceSets: PracticeSet[];
+    resources?: Resource[];
 };
 
 export type PracticeSet = {

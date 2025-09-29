@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Topic } from '@/lib/types';
+import type { Textbook, Chapter, Topic, Resource } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -24,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
@@ -42,6 +43,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { getTopicsByChapterId, addTopicToChapter, updateTopic } from '@/lib/firebase/firestore';
+import { Dialog, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function ManageTopicsPage() {
   const params = useParams();
@@ -57,6 +60,11 @@ export default function ManageTopicsPage() {
   const [topicToDelete, setTopicToDelete] = useState<Topic | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  
+  const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
+  const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
+
 
   const fetchChapterAndTopics = useCallback(async () => {
     if (!textbookId || !chapterId) return;
@@ -151,6 +159,46 @@ export default function ManageTopicsPage() {
     }
   };
 
+  const openResourceDialog = (resource: Resource | null) => {
+    setEditingResource(resource);
+    if (resource) {
+        setNewResource({ type: resource.type, title: resource.title, url: resource.url });
+    } else {
+        setNewResource({ type: 'video', title: '', url: '' });
+    }
+    setIsResourceDialogOpen(true);
+  }
+
+  const handleSaveResource = async (topicId: string) => {
+    if (!newResource.title || !newResource.url) {
+        toast({ variant: 'destructive', title: 'Please fill all fields.' });
+        return;
+    }
+
+    try {
+        const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
+        const topicSnap = await getDoc(topicRef);
+        if (!topicSnap.exists()) throw new Error("Topic not found");
+        
+        const topicData = topicSnap.data();
+        let resources = topicData.resources || [];
+        
+        if (editingResource) {
+            resources = resources.map((r: any) => r.id === editingResource.id ? { ...newResource, id: editingResource.id } : r);
+        } else {
+            resources.push({ ...newResource, id: new Date().getTime().toString() });
+        }
+        
+        await updateDoc(topicRef, { resources: resources });
+        toast({ title: `Resource ${editingResource ? 'updated' : 'added'}` });
+        setIsResourceDialogOpen(false);
+        setEditingResource(null);
+        fetchChapterAndTopics(); // refetch to show update
+    } catch (error) {
+        toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
+    }
+  }
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -227,14 +275,43 @@ export default function ManageTopicsPage() {
               </CardHeader>
               <CardContent>
                 {topics.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {topics.map((topic) => (
                             <Card key={topic.id} className="flex flex-col">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-base font-medium leading-tight">{topic.title}</CardTitle>
                                 </CardHeader>
                                  <CardContent className="flex-grow text-sm text-muted-foreground">
-                                    {topic.content ? `${topic.content.substring(0, 100)}...` : 'No content summary.'}
+                                    <div className="flex gap-2 flex-wrap">
+                                        <Dialog open={isResourceDialogOpen} onOpenChange={setIsResourceDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" size="sm" className="h-7" onClick={() => openResourceDialog(null)}><Video className="w-3 h-3 mr-1"/> Add Video</Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>{editingResource ? 'Edit' : 'Add'} Resource</DialogTitle>
+                                                </DialogHeader>
+                                                <div className="space-y-4 py-4">
+                                                    <Select value={newResource.type} onValueChange={(v) => setNewResource({...newResource, type: v as any})}>
+                                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="video">Video</SelectItem>
+                                                            <SelectItem value="audio">Audio</SelectItem>
+                                                            <SelectItem value="pdf">PDF</SelectItem>
+                                                            <SelectItem value="doc">Document</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
+                                                    <Input placeholder="Resource URL" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
+                                                </div>
+                                                <DialogFooter>
+                                                    <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                                                    <Button onClick={() => handleSaveResource(topic.id)}>Save Resource</Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                    <div className="mt-2 text-xs">{(topic.resources || []).length} resources</div>
                                 </CardContent>
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
                                     <Button variant="secondary" size="sm" asChild>
@@ -242,10 +319,10 @@ export default function ManageTopicsPage() {
                                     </Button>
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
-                                            <Edit className="h-3 w-3 mr-1"/> Edit
+                                            <Edit className="h-3 w-3 mr-1"/> Edit Topic
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(topic)} className="w-full">
-                                            <Trash2 className="h-3 w-3 mr-1"/> Delete
+                                            <Trash2 className="h-3 w-3 mr-1"/> Delete Topic
                                         </Button>
                                     </div>
                                 </CardFooter>

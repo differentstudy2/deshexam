@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -319,16 +320,23 @@ export default function ManageChaptersPage() {
               </CardHeader>
               <CardContent>
                 {chapters.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <CardHeader className="flex-row items-center justify-between pb-2">
+                                <CardHeader className="flex-row items-start justify-between pb-2">
                                     <CardTitle className="text-base font-medium leading-tight">{chapter.title}</CardTitle>
                                     <ContentBadge type={chapter.access || 'free'} />
                                 </CardHeader>
+                                <CardContent className="flex-grow text-sm text-muted-foreground">
+                                    <div className="flex gap-2 flex-wrap">
+                                        <Button variant="outline" size="sm" className="h-7"><Video className="w-3 h-3 mr-1"/> Video</Button>
+                                        <Button variant="outline" size="sm" className="h-7"><Mic className="w-3 h-3 mr-1"/> Audio</Button>
+                                        <Button variant="outline" size="sm" className="h-7"><File className="w-3 h-3 mr-1"/> PDF</Button>
+                                    </div>
+                                </CardContent>
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics</Link>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics & Practice Sets</Link>
                                     </Button>
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
