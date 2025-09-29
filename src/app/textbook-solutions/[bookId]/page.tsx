@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -360,6 +359,15 @@ export default function TextbookSolutionsPage() {
         const margin = 10;
         let y = margin;
 
+        const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
+            if (yPos + contentHeight > pageHeight - margin) {
+                addWatermark(pdf);
+                pdf.addPage();
+                return margin;
+            }
+            return yPos;
+        };
+
         const addWatermark = (pdfInstance: jsPDF) => {
             const totalPages = pdfInstance.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
@@ -383,8 +391,8 @@ export default function TextbookSolutionsPage() {
                     <p><strong>Student Name:</strong> {userProfile?.displayName || 'N/A'}</p>
                     <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
                     <p><strong>Subject:</strong> {textbook?.subject}</p>
-                    <p><strong>Board:</strong> {textbook?.board}</p>
                     <p><strong>Class:</strong> {textbook?.class}</p>
+                    <p><strong>Board:</strong> {textbook?.board}</p>
                     <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                     <p><strong>Full Marks:</strong> {totalMarks}</p>
                     <p><strong>Duration:</strong> {totalMarks} min</p>
@@ -408,6 +416,10 @@ export default function TextbookSolutionsPage() {
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = pageWidth - 2 * margin;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            // Add watermark before adding the header image
+            addWatermark(pdf);
+
             pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
             y += imgHeight + 5;
         }
@@ -431,12 +443,12 @@ export default function TextbookSolutionsPage() {
             }
 
             const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px]">
-                  <div className="flex justify-between items-start font-bold mb-1">
-                      <span className="flex-1 text-base">Q{i + 1}: {question.text}</span>
-                      <span className="ml-4 text-xs font-normal">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-transparent text-black font-sans w-[700px] text-base">
+                  <div className="flex justify-between items-start mb-1">
+                      <span className="flex-1"><strong>Q{i + 1}:</strong> {question.text}</span>
+                      <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
-                  {question.type === 'Multiple Choice' && question.options && (
+                   {question.type === 'Multiple Choice' && question.options && (
                       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                           {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
@@ -494,16 +506,15 @@ export default function TextbookSolutionsPage() {
             
             const element = container.querySelector(`#pdf-question-${i}`);
             if (element) {
-                const canvas = await html2canvas(element as HTMLElement, { scale: 2 });
+                const canvas = await html2canvas(element as HTMLElement, {
+                    scale: 2,
+                    backgroundColor: null, // Make background transparent
+                });
                 const imgData = canvas.toDataURL('image/png');
                 const imgWidth = pageWidth - 2 * margin;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                if (y + imgHeight > pageHeight - margin) {
-                    addWatermark(pdf);
-                    pdf.addPage();
-                    y = margin;
-                }
+                y = addWatermarkAndNewPageIfNeeded(y, imgHeight);
 
                 pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
                 y += imgHeight + 0.5;
@@ -512,7 +523,7 @@ export default function TextbookSolutionsPage() {
             document.body.removeChild(container);
         }
         
-        addWatermark(pdf);
+        addWatermark(pdf); // Ensure last page also gets a watermark
         pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
 
     } catch (error) {
