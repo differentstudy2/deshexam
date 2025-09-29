@@ -489,7 +489,7 @@ export default function TextbookSolutionsPage() {
                                             return (
                                               <div key={resource.id} className="space-y-2">
                                                 <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                <audio controls src={resource.url} className="w-full">
+                                                <audio controls controlsList="nodownload" src={resource.url} className="w-full">
                                                   Your browser does not support the audio element.
                                                 </audio>
                                               </div>
