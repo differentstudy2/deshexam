@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, ArrowLeft, Eye, Users, Calendar, BadgeCheck, UserPlus, UserCheck, MessageSquare, MapPin, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, Users, Calendar, BadgeCheck, UserPlus, UserCheck, MessageSquare, MapPin, Star, Crown, Gem } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/use-auth';
@@ -33,6 +32,7 @@ type UserProfile = {
   followersCount: number;
   followingCount: number;
   location?: string;
+  subscriptionPlan?: 'pro' | 'pass';
 };
 
 type Content = {
@@ -184,6 +184,16 @@ export default function UserProfilePage() {
                         <h1 className="text-2xl font-bold font-headline">{profile.displayName}</h1>
                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                         <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-600"><Star className="w-3.5 h-3.5 mr-1" />Level 42</Badge>
+                        {profile.subscriptionPlan === 'pro' && (
+                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
+                                <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
+                            </Badge>
+                        )}
+                        {profile.subscriptionPlan === 'pass' && (
+                            <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
+                                <Gem className="w-3.5 h-3.5 mr-1" /> Pass
+                            </Badge>
+                        )}
                     </div>
                     <div className="text-muted-foreground text-sm mt-1 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1">
                         <span>@{profile.username}</span>
