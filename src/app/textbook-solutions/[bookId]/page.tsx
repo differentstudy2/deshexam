@@ -496,13 +496,13 @@ export default function TextbookSolutionsPage() {
                                             );
                                           }
                                           if (resource.type === 'pdf') {
+                                            const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resource.url)}&embedded=true`;
                                             return (
                                                 <div key={resource.id} className="space-y-2">
                                                     <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                    <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
-                                                        <span>Open PDF Document</span>
-                                                        <ExternalLink className="w-4 h-4" />
-                                                    </a>
+                                                    <div className="aspect-w-4 aspect-h-3">
+                                                        <iframe src={googleViewerUrl} className="w-full h-96 rounded-lg" frameBorder="0"></iframe>
+                                                    </div>
                                                 </div>
                                             );
                                           }
@@ -511,6 +511,7 @@ export default function TextbookSolutionsPage() {
                                               <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
                                                 {getResourceIcon(resource.type)}
                                                 <span className="ml-3 font-medium">{resource.title}</span>
+                                                <ExternalLink className="w-4 h-4 ml-auto" />
                                               </a>
                                           );
                                       })}
@@ -565,5 +566,6 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
