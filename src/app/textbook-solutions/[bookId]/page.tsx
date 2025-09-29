@@ -499,17 +499,10 @@ export default function TextbookSolutionsPage() {
                                             return (
                                                 <div key={resource.id} className="space-y-2">
                                                     <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                    <div className="aspect-[4/3] w-full border rounded-lg overflow-hidden relative group">
-                                                        <iframe 
-                                                            className="w-full h-full"
-                                                            src={resource.url} 
-                                                            title={resource.title}>
-                                                                <p className="p-4">Your browser does not support PDFs. Please download the PDF to view it.</p>
-                                                        </iframe>
-                                                         <a href={resource.url} target="_blank" rel="noopener noreferrer" className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity" title="Open in new tab">
-                                                            <ExternalLink className="w-5 h-5"/>
-                                                        </a>
-                                                    </div>
+                                                    <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
+                                                        <span>Open PDF Document</span>
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </a>
                                                 </div>
                                             );
                                           }
@@ -572,4 +565,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
