@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -27,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useToast } from '@/hooks/use-toast';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
