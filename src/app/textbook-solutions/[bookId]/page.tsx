@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -30,20 +31,11 @@ type UserProfile = {
 
 type PracticeSetProgress = {
     highestScore: number;
-    totalMarks: number;
 };
 
 type TextbookProgress = {
-    [chapterId: string]: {
-        completed: boolean;
-        topics: {
-            [topicId: string]: {
-                practiceSets: {
-                    [practiceSetId: string]: PracticeSetProgress
-                }
-            }
-        }
-    }
+    highestScores: { [practiceSetId: string]: number };
+    allAttempts: { [practiceSetId: string]: number };
 }
 
 const PracticeSetItem = ({ 
@@ -52,19 +44,15 @@ const PracticeSetItem = ({
     chapterId, 
     topicId, 
     isLocked, 
-    progress 
+    highestScore 
 }: { 
     ps: any; 
     textbookId: string; 
     chapterId: string; 
     topicId: string; 
     isLocked: boolean; 
-    progress?: PracticeSetProgress; 
+    highestScore?: number; 
 }) => {
-    const scorePercentage = progress && progress.totalMarks > 0 
-        ? Math.round((progress.highestScore / progress.totalMarks) * 100)
-        : null;
-
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
@@ -76,9 +64,9 @@ const PracticeSetItem = ({
                 <span className="font-medium">{ps.title}</span>
             </div>
             <div className="flex items-center gap-4">
-                {scorePercentage !== null && (
+                {highestScore !== undefined && (
                     <div className="text-center">
-                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {scorePercentage}%</p>
+                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {Math.round(highestScore)}%</p>
                     </div>
                 )}
                 <Button asChild disabled={isLocked}>
@@ -125,6 +113,7 @@ const TextbookContentSidebar = ({
         if (chapter.access !== 'free') {
             if (!userProfile) return false;
             if (userProfile.subscriptionPlan === 'pro') {
+                return true;
             } else if (userProfile.subscriptionPlan === 'pass' && chapter.access === 'pro') {
                 return false; 
             } else if (!userProfile.subscriptionPlan) {
@@ -135,7 +124,21 @@ const TextbookContentSidebar = ({
         const previousChapter = chapters[index - 1];
         if (!previousChapter) return true; 
         
-        return progress?.[previousChapter.id]?.completed ?? false;
+        const prevChapterTopics = topics[previousChapter.id] || [];
+        if (prevChapterTopics.length === 0) return true;
+
+        for (const topic of prevChapterTopics) {
+            if (topic.practiceSets && topic.practiceSets.length > 0) {
+                for (const ps of topic.practiceSets) {
+                    const score = progress?.highestScores[ps.id];
+                    if (score === undefined || score < (settings?.practiceSetPassMark || 40)) {
+                        return false; // Found an incomplete/failed practice set
+                    }
+                }
+            }
+        }
+        
+        return true; // All practice sets in previous chapter are passed
     }
 
     const [openAccordion, setOpenAccordion] = useState<string | undefined>(activeChapter ? `item-${activeChapter}` : undefined);
@@ -245,53 +248,6 @@ export default function TextbookSolutionsPage() {
   const activeChapter = searchParams.get('chapter');
   const activeTopic = searchParams.get('topic');
 
-  const fetchFullProgress = useCallback(async (userId: string, textbookId: string) => {
-    let fullProgress: TextbookProgress = {};
-    const textbookDocRef = doc(db, 'textbooks', textbookId);
-    const chaptersSnap = await getDocs(collection(textbookDocRef, 'chapters'));
-    
-    for (const chapterDoc of chaptersSnap.docs) {
-      const chapterId = chapterDoc.id;
-      fullProgress[chapterId] = { completed: false, topics: {} };
-      
-      const topicsSnap = await getDocs(collection(chapterDoc.ref, 'topics'));
-      for (const topicDoc of topicsSnap.docs) {
-        const topicId = topicDoc.id;
-        fullProgress[chapterId].topics[topicId] = { practiceSets: {} };
-
-        const practiceSetsSnap = await getDocs(collection(topicDoc.ref, 'practiceSets'));
-        for (const psDoc of practiceSetsSnap.docs) {
-          const psId = psDoc.id;
-          const submissionsQuery = query(
-            collection(db, 'practiceSetSubmissions'),
-            where('userId', '==', userId),
-            where('practiceSetId', '==', psId)
-          );
-          const subsSnap = await getDocs(submissionsQuery);
-          if (!subsSnap.empty) {
-            let highestScore = -1;
-            let totalMarks = 0;
-            subsSnap.forEach(subDoc => {
-              const data = subDoc.data();
-              totalMarks = data.totalQuestions > 0 ? data.totalQuestions : totalMarks;
-              const currentScore = data.score;
-              if (currentScore > highestScore) {
-                highestScore = currentScore;
-              }
-            });
-            if (highestScore > -1) {
-              fullProgress[chapterId].topics[topicId].practiceSets[psId] = {
-                highestScore,
-                totalMarks
-              };
-            }
-          }
-        }
-      }
-    }
-    return fullProgress;
-  }, []);
-
   useEffect(() => {
     if (!textbookId) return;
 
@@ -305,7 +261,7 @@ export default function TextbookSolutionsPage() {
       if (user) {
           const profile = await getUserProfile(user.uid);
           setUserProfile(profile);
-          const progressData = await fetchFullProgress(user.uid, textbookId);
+          const progressData = await getTextbookProgress(user.uid, textbookId);
           setProgress(progressData);
       }
 
@@ -338,7 +294,7 @@ export default function TextbookSolutionsPage() {
     };
 
     fetchTextbookAndChapters();
-  }, [textbookId, router, user, fetchFullProgress]);
+  }, [textbookId, router, user]);
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
       if (topics[chapterId]) return;
@@ -347,7 +303,7 @@ export default function TextbookSolutionsPage() {
       try {
           const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`));
           const topicsSnap = await getDocs(topicsQuery);
-          let topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as Topic }));
+          let topicsForChapter: Topic[] = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
           
           topicsForChapter.sort((a, b) => {
               const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
@@ -359,9 +315,12 @@ export default function TextbookSolutionsPage() {
           });
           
           for (let topic of topicsForChapter) {
-            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "asc"));
+            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`));
             const practiceSetsSnap = await getDocs(practiceSetsQuery);
-            topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
+            topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title, ...doc.data() }));
+            
+            // Sort practice sets by title numerically/alphabetically
+            topic.practiceSets.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
           }
 
           setTopics(prev => ({ ...prev, [chapterId]: topicsForChapter }));
@@ -387,7 +346,7 @@ export default function TextbookSolutionsPage() {
   if (loading) {
     return (
         <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <p>Loading...</p>
+            <Loader2 className="w-8 h-8 animate-spin"/>
         </div>
     );
   }
@@ -489,21 +448,13 @@ export default function TextbookSolutionsPage() {
                                         <h3 className="mt-6 font-semibold text-2xl">Practice Sets</h3>
                                         <div className="space-y-2 mt-4">
                                             {selectedTopicContent.practiceSets.map((ps, index) => {
-                                                const passMark = settings?.practiceSetPassMark || 60;
+                                                const passMark = settings?.practiceSetPassMark || 40;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
                                                 
-                                                const prevSetProgress = prevPsId && activeChapter && activeTopic
-                                                    ? progress?.[activeChapter]?.topics?.[activeTopic]?.practiceSets?.[prevPsId] 
-                                                    : undefined;
+                                                const prevSetHighestScore = prevPsId ? progress?.highestScores[prevPsId] : 100;
 
-                                                const prevSetScorePercentage = prevSetProgress && prevSetProgress.totalMarks > 0
-                                                    ? (prevSetProgress.highestScore / prevSetProgress.totalMarks) * 100
-                                                    : 100; // Default to 100 if no previous set, so first one is unlocked
-
-                                                const isLocked = index > 0 && prevSetScorePercentage < passMark;
+                                                const isLocked = index > 0 && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
                                                 
-                                                const currentSetProgress = activeChapter && activeTopic ? progress?.[activeChapter]?.topics?.[activeTopic]?.practiceSets?.[ps.id] : undefined;
-
                                                 return (
                                                   <PracticeSetItem
                                                     key={ps.id}
@@ -512,7 +463,7 @@ export default function TextbookSolutionsPage() {
                                                     chapterId={activeChapter!}
                                                     topicId={activeTopic!}
                                                     isLocked={isLocked}
-                                                    progress={currentSetProgress}
+                                                    highestScore={progress?.highestScores[ps.id]}
                                                   />
                                                 );
                                             })}

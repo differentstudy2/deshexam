@@ -24,6 +24,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -630,13 +631,25 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
     if (!user) {
         throw new Error("You must be logged in to submit a practice set.");
     }
-
+    
     try {
-        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), {
+        // Fetch textbook details to add to submission
+        const textbookDoc = await getDoc(doc(db, 'textbooks', submissionData.textbookId));
+        if (!textbookDoc.exists()) {
+            throw new Error("Associated textbook not found.");
+        }
+        const textbookData = textbookDoc.data();
+
+        const dataToSave = {
             ...submissionData,
             userId: user.uid,
             submittedAt: serverTimestamp(),
-        });
+            board: textbookData.board || null,
+            class: textbookData.class || null,
+            subject: textbookData.subject || null,
+        };
+
+        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), dataToSave);
         return docRef.id;
     } catch (e) {
         console.error("Error adding practice set submission: ", e);
@@ -752,13 +765,11 @@ export const getSubmissionsByUserId = async (userId: string) => {
 
 export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
-        const testSubsQuery = startAfterDoc
-            ? query(collection(db, "submissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
-            : query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
-
-        const practiceSubsQuery = startAfterDoc
-            ? query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
-            : query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+        // This is a simplified approach and may have pagination inaccuracies
+        // across the two collections. A robust solution might involve a unified "events" collection
+        // or backend processing.
+        const testSubsQuery = query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+        const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
 
         const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
             getDocs(testSubsQuery),
@@ -793,16 +804,11 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
             .sort((a, b) => b!.submittedAt.getTime() - a!.submittedAt.getTime())
             .slice(0, itemsPerPage);
 
-        // This pagination logic is simplified and might not be perfectly accurate across large datasets
-        // as it doesn't correctly handle the `startAfter` with combined queries.
-        // A more robust solution might involve Cloud Functions or a more complex query structure.
-        const lastVisible = allSubmissions.length > 0 
-            ? (await getDoc(doc(db, allSubmissions[allSubmissions.length - 1]!.testType === 'Practice Set' ? 'practiceSetSubmissions' : 'submissions', allSubmissions[allSubmissions.length - 1]!.id)))
-            : null;
-            
-        const hasMore = allSubmissions.length === itemsPerPage;
-
-        return { submissions: allSubmissions, lastVisible, hasMore };
+        const hasMore = allSubmissions.length === itemsPerPage; // This is an approximation
+        
+        // The lastVisible logic here is flawed for true pagination across two collections.
+        // It's omitted to prevent incorrect behavior. For real-world use, a better strategy is needed.
+        return { submissions: allSubmissions, lastVisible: null, hasMore };
     } catch (e) {
         console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -1982,15 +1988,37 @@ export const deleteTextbook = async (textbookId: string) => {
 export const getTextbookProgress = async (userId: string, textbookId: string) => {
     if (!userId || !textbookId) return null;
     try {
-        const progressRef = doc(db, `users/${userId}/textbookProgress`, textbookId);
-        const docSnap = await getDoc(progressRef);
-        if (docSnap.exists()) {
-            return docSnap.data();
+        const userSubmissionsQuery = query(
+            collection(db, 'practiceSetSubmissions'),
+            where('userId', '==', userId),
+            where('textbookId', '==', textbookId)
+        );
+
+        const snapshot = await getDocs(userSubmissionsQuery);
+        if (snapshot.empty) {
+            return { highestScores: {}, allAttempts: {} };
         }
-        return null;
+
+        const highestScores: { [practiceSetId: string]: number } = {};
+        const allAttempts: { [practiceSetId: string]: number } = {};
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const practiceSetId = data.practiceSetId;
+
+            allAttempts[practiceSetId] = (allAttempts[practiceSetId] || 0) + 1;
+
+            const scorePercentage = (data.score / data.totalQuestions) * 100;
+
+            if (!highestScores[practiceSetId] || scorePercentage > highestScores[practiceSetId]) {
+                highestScores[practiceSetId] = scorePercentage;
+            }
+        });
+
+        return { highestScores, allAttempts };
     } catch (error) {
         console.error("Error fetching textbook progress: ", error);
-        return null; // Return null on error to avoid breaking the UI
+        throw new Error("Failed to fetch user progress for textbook.");
     }
 }
 
@@ -2004,5 +2032,6 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
