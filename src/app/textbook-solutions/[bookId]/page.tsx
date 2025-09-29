@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -399,7 +398,7 @@ export default function TextbookSolutionsPage() {
 
         const headerElement = headerContainer.firstElementChild;
         if (headerElement) {
-            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
+            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2 });
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = pageWidth - 2 * margin;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -748,3 +747,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
+    
