@@ -17,8 +17,8 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -358,6 +358,18 @@ export default function TextbookSolutionsPage() {
         const pageWidth = 210;
         const margin = 10;
         let y = margin;
+        
+        const totalPages = Math.ceil(questions.length / 5); // Rough estimation for watermark
+        for (let i = 1; i <= totalPages + 1; i++) { // Add a buffer page
+            pdf.setPage(i);
+            pdf.setFontSize(60);
+            pdf.setTextColor(230, 230, 230); // Light gray color
+            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                angle: -45,
+                align: 'center',
+            });
+        }
+        pdf.setPage(1);
 
         const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
             if (yPos + contentHeight > pageHeight - margin) {
@@ -369,12 +381,12 @@ export default function TextbookSolutionsPage() {
 
         const headerContent = (
             <div className="p-1 bg-white text-black font-sans w-[700px] text-base">
-                <div className="text-center mb-4">
+                <div className="text-center mb-2">
                     <h1 className="text-2xl font-bold">{practiceSet.title}</h1>
                     <h2 className="text-lg">{textbook?.title}</h2>
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm border-y-2 border-black py-2 my-2">
-                    <p><strong>Student Name:</strong> {userProfile?.displayName || 'N/A'}</p>
+                    <p><strong>Institute Name:</strong> Deshexam.com</p>
                     <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
                     <p><strong>Subject:</strong> {textbook?.subject}</p>
                     <p><strong>Class:</strong> {textbook?.class}</p>
@@ -398,13 +410,13 @@ export default function TextbookSolutionsPage() {
 
         const headerElement = headerContainer.firstElementChild;
         if (headerElement) {
-            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2 });
+            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = pageWidth - 2 * margin;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             
             pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-            y += imgHeight + 5;
+            y += imgHeight + 2;
         }
         headerRoot.unmount();
         document.body.removeChild(headerContainer);
@@ -504,18 +516,6 @@ export default function TextbookSolutionsPage() {
             }
             root.unmount();
             document.body.removeChild(container);
-        }
-        
-        // Add watermark to all pages after content is rendered
-        const totalPages = pdf.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-            pdf.setPage(i);
-            pdf.setFontSize(50);
-            pdf.setTextColor(220, 220, 220); // Light gray color
-            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-                angle: -45,
-                align: 'center',
-            });
         }
         
         pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
@@ -747,5 +747,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
-    
