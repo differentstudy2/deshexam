@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -27,6 +28,8 @@ import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialo
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
+import ReactDOM from 'react-dom';
+
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
@@ -252,7 +255,7 @@ export default function TextbookSolutionsPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   const [viewerOpen, setViewerOpen] = useState(false);
-  const [viewerResource, setViewerResource] = useState(null);
+  const [viewerResource, setViewerResource] = useState<Resource | null>(null);
 
   const activeChapter = searchParams.get('chapter');
   const activeTopic = searchParams.get('topic');
@@ -459,7 +462,10 @@ export default function TextbookSolutionsPage() {
 
             const { createRoot } = await import('react-dom/client');
             const root = createRoot(container);
-            await new Promise<void>(resolve => root.render(content, () => resolve()));
+            
+            ReactDOM.flushSync(() => {
+              root.render(content);
+            });
             
             const element = container.querySelector(`#pdf-question-${i}`);
             if (element) {
