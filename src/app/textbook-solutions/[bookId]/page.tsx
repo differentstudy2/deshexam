@@ -125,7 +125,6 @@ const TextbookContentSidebar = ({
   );
 };
 
-
 const PracticeSetItem = ({ 
     ps, 
     textbookId, 
@@ -388,7 +387,7 @@ export default function TextbookSolutionsPage() {
                       <span className="ml-4 text-xs font-normal">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
                   {question.type === 'Multiple Choice' && question.options && (
-                      <div className="space-y-1">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                           {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
                                   <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
@@ -446,7 +445,7 @@ export default function TextbookSolutionsPage() {
                 }
 
                 pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-                y += imgHeight + 2; 
+                y += imgHeight + 1; 
             }
             root.unmount();
             document.body.removeChild(container);
@@ -681,4 +680,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
