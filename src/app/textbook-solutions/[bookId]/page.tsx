@@ -382,8 +382,11 @@ export default function TextbookSolutionsPage() {
             }
 
             const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-2 bg-white text-black font-sans w-[700px]">
-                  <div className="text-lg font-bold mb-1">Q{i + 1}: {question.text}</div>
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px]">
+                  <div className="flex justify-between items-start text-lg font-bold mb-1">
+                      <span className="flex-1">Q{i + 1}: {question.text}</span>
+                      <span className="ml-4 text-xs font-normal">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
+                  </div>
                   {question.type === 'Multiple Choice' && question.options && (
                       <div className="space-y-1">
                           {question.options.map((option, optIndex) => (
@@ -414,7 +417,6 @@ export default function TextbookSolutionsPage() {
                           ))}
                       </div>
                   )}
-                   <div className="mt-1 text-right text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</div>
               </div>
             );
 
@@ -634,7 +636,7 @@ export default function TextbookSolutionsPage() {
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
                                                 const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
                                                 
-                                                const isLocked = index > 0 && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
+                                                const isLocked = index > 0 && settings?.gateChaptersOnPass && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
 
                                                 return (
                                                   <PracticeSetItem
@@ -679,3 +681,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
