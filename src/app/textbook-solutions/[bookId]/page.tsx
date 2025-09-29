@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile, getTextbookProgress, getSettings } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
