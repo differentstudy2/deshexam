@@ -495,7 +495,21 @@ export default function TextbookSolutionsPage() {
                                               </div>
                                             );
                                           }
-                                          // Fallback for non-youtube videos or other resources
+                                          if (resource.type === 'pdf') {
+                                            return (
+                                                <div key={resource.id} className="space-y-2">
+                                                    <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
+                                                    <div className="aspect-[4/3] w-full border rounded-lg">
+                                                        <iframe 
+                                                            className="w-full h-full"
+                                                            src={resource.url} 
+                                                            title={resource.title}>
+                                                        </iframe>
+                                                    </div>
+                                                </div>
+                                            );
+                                          }
+                                          // Fallback for other types or non-youtube videos
                                           return (
                                               <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
                                                 {getResourceIcon(resource.type)}
