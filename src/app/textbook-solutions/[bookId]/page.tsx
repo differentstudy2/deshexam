@@ -18,7 +18,9 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
@@ -124,6 +126,7 @@ const TextbookContentSidebar = ({
     </Card>
   );
 };
+
 
 const PracticeSetItem = ({ 
     ps, 
@@ -381,8 +384,8 @@ export default function TextbookSolutionsPage() {
             }
 
             const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px]">
-                  <div className="flex justify-between items-start text-base font-bold mb-1">
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px] text-base">
+                  <div className="flex justify-between items-start font-bold mb-1">
                       <span className="flex-1">Q{i + 1}: {question.text}</span>
                       <span className="ml-4 text-xs font-normal">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
@@ -437,9 +440,9 @@ export default function TextbookSolutionsPage() {
             container.style.left = '-9999px';
             document.body.appendChild(container);
             
-            const root = ReactDOM.createRoot(container);
+            const root = createRoot(container);
             
-            ReactDOM.flushSync(() => {
+            flushSync(() => {
               root.render(content);
             });
             
