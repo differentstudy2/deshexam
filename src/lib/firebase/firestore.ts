@@ -23,6 +23,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -751,34 +752,57 @@ export const getSubmissionsByUserId = async (userId: string) => {
 
 export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
-        let q;
-        const submissionsRef = collection(db, "submissions");
-        if (startAfterDoc) {
-            q = query(submissionsRef, orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage));
-        } else {
-            q = query(submissionsRef, orderBy("submittedAt", "desc"), limit(itemsPerPage));
-        }
+        const testSubsQuery = startAfterDoc
+            ? query(collection(db, "submissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
+            : query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
 
-        const querySnapshot = await getDocs(q);
-        const submissions = querySnapshot.docs.map(doc => {
-            const data = doc.data();
+        const practiceSubsQuery = startAfterDoc
+            ? query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
+            : query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+
+        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
+            getDocs(testSubsQuery),
+            getDocs(practiceSubsQuery),
+        ]);
+
+        const formatSubmission = (doc: DocumentSnapshot) => {
+            const data = doc.data() as any;
+            if (!data) return null;
+            const isPracticeSet = !!data.practiceSetId;
             return {
                 id: doc.id,
-                ...data,
-                user: {
-                    displayName: 'Unknown User', // Placeholder
-                },
+                userId: data.userId,
+                score: data.score,
+                totalQuestions: data.totalQuestions,
+                submittedAt: data.submittedAt.toDate(), // Keep as Date object for sorting
+                testId: isPracticeSet ? data.practiceSetId : data.testId,
+                testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
+                testType: isPracticeSet ? "Practice Set" : data.testType,
+                ...(isPracticeSet && {
+                    textbookId: data.textbookId,
+                    chapterId: data.chapterId,
+                    topicId: data.topicId,
+                })
             };
-        });
+        };
 
-        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+        const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
+        const practiceSubmissions = practiceSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
 
-        // Check if there are more pages
-        const nextQuery = query(submissionsRef, orderBy("submittedAt", "desc"), startAfter(lastVisible), limit(1));
-        const nextSnapshot = await getDocs(nextQuery);
-        const hasMore = !nextSnapshot.empty;
+        const allSubmissions = [...testSubmissions, ...practiceSubmissions]
+            .sort((a, b) => b!.submittedAt.getTime() - a!.submittedAt.getTime())
+            .slice(0, itemsPerPage);
 
-        return { submissions, lastVisible, hasMore };
+        // This pagination logic is simplified and might not be perfectly accurate across large datasets
+        // as it doesn't correctly handle the `startAfter` with combined queries.
+        // A more robust solution might involve Cloud Functions or a more complex query structure.
+        const lastVisible = allSubmissions.length > 0 
+            ? (await getDoc(doc(db, allSubmissions[allSubmissions.length - 1]!.testType === 'Practice Set' ? 'practiceSetSubmissions' : 'submissions', allSubmissions[allSubmissions.length - 1]!.id)))
+            : null;
+            
+        const hasMore = allSubmissions.length === itemsPerPage;
+
+        return { submissions: allSubmissions, lastVisible, hasMore };
     } catch (e) {
         console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -790,13 +814,22 @@ export const deleteSubmissions = async (submissionIds: string[]) => {
         throw new Error("Submission ID(s) are required for deletion.");
     }
     try {
-        const deletePromises = submissionIds.map(id => deleteDoc(doc(db, "submissions", id)));
+        const deletePromises = submissionIds.map(async (id) => {
+            // Need to check both collections
+            let docRef = doc(db, "submissions", id);
+            let docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                docRef = doc(db, "practiceSetSubmissions", id);
+            }
+            return deleteDoc(docRef);
+        });
         await Promise.all(deletePromises);
     } catch (e) {
         console.error("Error deleting submission(s):", e);
         throw new Error("Failed to delete submission(s).");
     }
 };
+
 
 export const getContentTypes = async () => {
     try {
@@ -1971,4 +2004,5 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 

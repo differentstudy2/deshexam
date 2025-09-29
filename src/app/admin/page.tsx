@@ -36,6 +36,9 @@ type Submission = {
     displayName: string;
     photoURL?: string;
   };
+  textbookId?: string;
+  chapterId?: string;
+  topicId?: string;
 };
 
 const ITEMS_PER_PAGE = 5;
@@ -126,10 +129,13 @@ export default function AdminDashboardPage() {
       }
   }
 
-  const getUrlForResults = (testType: string, testId: string, submissionId: string) => {
-    const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
-    return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
-  }
+  const getUrlForResults = (sub: Submission) => {
+    if (sub.testType === 'Practice Set') {
+      return `/textbook-solutions/practice-set/${sub.testId}/results?submissionId=${sub.id}`;
+    }
+    const typeSlug = (sub.testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    return `/${typeSlug}/${sub.testId}/results?submissionId=${sub.id}`;
+  };
   
   const handleSelectSubmission = (id: string) => {
     setSelectedSubmissions(prev => 
@@ -279,7 +285,7 @@ export default function AdminDashboardPage() {
                                         <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={36} />
                                         <div className="flex gap-2">
                                             <Button asChild variant="outline" size="sm" className="flex-shrink-0">
-                                                <Link href={getUrlForResults(sub.testType, sub.testId, sub.id)}>
+                                                <Link href={getUrlForResults(sub)}>
                                                     <Eye className="mr-2 h-4 w-4" />
                                                     View
                                                 </Link>
