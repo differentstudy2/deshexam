@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowLeft, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, ExternalLink, Crown, Gem } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getUserProfile, handleQuestionVote, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
@@ -43,7 +42,7 @@ type Submission = {
     timeTaken: number;
 };
 
-type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
+type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; subscriptionPlan?: 'pro' | 'pass'; };
 
 function ReviewDisplay() {
   const searchParams = useSearchParams();
@@ -228,6 +227,16 @@ function ReviewDisplay() {
                             <div className="flex items-center justify-center md:justify-start gap-2">
                             <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                             {student.subscriptionPlan === 'pro' && (
+                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
+                                    <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
+                                </Badge>
+                            )}
+                            {student.subscriptionPlan === 'pass' && (
+                                <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
+                                    <Gem className="w-3.5 h-3.5 mr-1" /> Pass
+                                </Badge>
+                            )}
                             </div>
                             <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
                                 {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
@@ -497,4 +506,3 @@ export default function PracticeSetReviewPage() {
     </div>
   );
 }
-
