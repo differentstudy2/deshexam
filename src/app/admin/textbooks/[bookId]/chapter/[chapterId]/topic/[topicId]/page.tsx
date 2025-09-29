@@ -19,6 +19,7 @@ import {
     addPracticeSetToTopic, 
     getPracticeSetsByTopicId, 
 } from '@/lib/firebase/firestore';
+import { Badge } from '@/components/ui/badge';
 
 export default function ManageTopicPage() {
     const params = useParams();
@@ -115,7 +116,10 @@ export default function ManageTopicPage() {
                          <ul className="space-y-2">
                             {practiceSets.map(ps => (
                                 <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                    <span className="font-medium flex-grow">{ps.title}</span>
+                                    <div className="flex-grow flex items-center gap-2">
+                                        <span className="font-medium">{ps.title}</span>
+                                        {(ps as any).questionCount > 0 && <Badge variant="secondary">{(ps as any).questionCount} questions</Badge>}
+                                    </div>
                                     <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>

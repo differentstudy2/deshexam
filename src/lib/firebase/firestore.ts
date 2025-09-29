@@ -26,6 +26,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1796,13 +1797,13 @@ export const getTopicsByChapterId = async (textbookId: string, chapterId: string
     try {
         const q = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`), orderBy("title"));
         const querySnapshot = await getDocs(q);
-        const topicsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Topic }));
+        const topicsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { title: string } }));
         
         // Fetch practice sets for each topic
         for (let topic of topicsData) {
             const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
             const practiceSetsSnap = await getDocs(practiceSetsQuery);
-            topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
+            (topic as any).practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
         }
         
         return topicsData;
@@ -1861,7 +1862,18 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
         const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`);
         const q = query(practiceSetsRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        const practiceSets = [];
+        for (const doc of querySnapshot.docs) {
+            const questionsRef = collection(doc.ref, 'questions');
+            const questionsSnapshot = await getDocs(questionsRef);
+            practiceSets.push({
+                id: doc.id,
+                ...doc.data(),
+                questionCount: questionsSnapshot.size
+            });
+        }
+        return practiceSets;
     } catch (e) {
         console.error("Error getting practice sets: ", e);
         throw new Error("Failed to fetch practice sets.");
@@ -2034,6 +2046,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 
