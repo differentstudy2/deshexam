@@ -270,22 +270,37 @@ export default function TextbookSolutionsPage() {
         
         const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`));
         const chaptersSnap = await getDocs(chaptersQuery);
-        const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+        let chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
         
         chaptersData.sort((a, b) => {
-            const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
-            const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
-            if (numA !== numB) {
-                return numA - numB;
-            }
             return a.title.localeCompare(b.title, undefined, { numeric: true });
         });
-
+        
         setChapters(chaptersData);
 
-        if(activeChapter) {
-            handleChapterToggle(activeChapter);
+        const allTopics : { [key: string]: Topic[] } = {};
+
+        for(const chapter of chaptersData) {
+            const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics`));
+            const topicsSnap = await getDocs(topicsQuery);
+            let topicsForChapter: Topic[] = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
+            
+            topicsForChapter.sort((a, b) => {
+                return a.title.localeCompare(b.title, undefined, { numeric: true });
+            });
+
+             for (let topic of topicsForChapter) {
+                const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics/${topic.id}/practiceSets`));
+                const practiceSetsSnap = await getDocs(practiceSetsQuery);
+                topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title, ...doc.data() }));
+                topic.practiceSets.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+             }
+
+             allTopics[chapter.id] = topicsForChapter;
         }
+
+        setTopics(allTopics);
+
 
       } else {
         router.push('/');
@@ -297,39 +312,9 @@ export default function TextbookSolutionsPage() {
   }, [textbookId, router, user]);
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
-      if (topics[chapterId]) return;
-
-      setLoadingTopics(chapterId);
-      try {
-          const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`));
-          const topicsSnap = await getDocs(topicsQuery);
-          let topicsForChapter: Topic[] = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
-          
-          topicsForChapter.sort((a, b) => {
-              const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
-              const numB = parseFloat(b.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
-              if(!isNaN(numA) && !isNaN(numB)) {
-                  return numA - numB;
-              }
-              return a.title.localeCompare(b.title);
-          });
-          
-          for (let topic of topicsForChapter) {
-            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`));
-            const practiceSetsSnap = await getDocs(practiceSetsQuery);
-            topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title, ...doc.data() }));
-            
-            // Sort practice sets by title numerically/alphabetically
-            topic.practiceSets.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-          }
-
-          setTopics(prev => ({ ...prev, [chapterId]: topicsForChapter }));
-      } catch (error) {
-          console.error("Failed to fetch topics:", error);
-      } finally {
-          setLoadingTopics(null);
-      }
-  }, [textbookId, topics]);
+      // Data is now pre-fetched, so this can be a simple state update if needed
+      // Or just rely on the accordion to show/hide content
+  }, []);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -451,8 +436,7 @@ export default function TextbookSolutionsPage() {
                                                 const passMark = settings?.practiceSetPassMark || 40;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
                                                 
-                                                const prevSetHighestScore = prevPsId ? progress?.highestScores[prevPsId] : 100;
-
+                                                const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : 100;
                                                 const isLocked = index > 0 && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
                                                 
                                                 return (
@@ -463,7 +447,7 @@ export default function TextbookSolutionsPage() {
                                                     chapterId={activeChapter!}
                                                     topicId={activeTopic!}
                                                     isLocked={isLocked}
-                                                    highestScore={progress?.highestScores[ps.id]}
+                                                    highestScore={progress?.highestScores?.[ps.id]}
                                                   />
                                                 );
                                             })}
@@ -488,3 +472,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
