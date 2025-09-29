@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Topic, PracticeSet } from '@/lib/types';
 
@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen } from 'lucide-react';
+import { ArrowLeft, PlusCircle, BookOpen, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -33,7 +33,8 @@ export default function ManageTopicPage() {
     const [loading, setLoading] = useState(true);
 
     const [isPracticeSetDialogOpen, setIsPracticeSetDialogOpen] = useState(false);
-    const [newPracticeSetTitle, setNewPracticeSetTitle] = useState('');
+    const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
+    const [practiceSetTitle, setPracticeSetTitle] = useState('');
 
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
@@ -55,13 +56,29 @@ export default function ManageTopicPage() {
         fetchData();
     }, [textbookId, chapterId, topicId]);
 
-    const handleAddPracticeSet = async () => {
-        if (!newPracticeSetTitle.trim()) return;
+    const handleOpenDialog = (ps: PracticeSet | null) => {
+        setEditingPracticeSet(ps);
+        setPracticeSetTitle(ps ? ps.title : '');
+        setIsPracticeSetDialogOpen(true);
+    }
+
+    const handleAddOrUpdatePracticeSet = async () => {
+        if (!practiceSetTitle.trim()) return;
         try {
-            await addPracticeSetToTopic(textbookId, chapterId, topicId, { title: newPracticeSetTitle });
-            toast({ title: 'Practice Set Added' });
-            setNewPracticeSetTitle('');
+            if (editingPracticeSet) {
+                // Update existing practice set
+                const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, editingPracticeSet.id);
+                await updateDoc(psRef, { title: practiceSetTitle });
+                toast({ title: 'Practice Set Updated' });
+            } else {
+                // Add new practice set
+                await addPracticeSetToTopic(textbookId, chapterId, topicId, { title: practiceSetTitle });
+                toast({ title: 'Practice Set Added' });
+            }
+
+            setPracticeSetTitle('');
             setIsPracticeSetDialogOpen(false);
+            setEditingPracticeSet(null);
             fetchData();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
@@ -91,23 +108,7 @@ export default function ManageTopicPage() {
                         <CardTitle>Practice Sets</CardTitle>
                         <CardDescription>Manage the practice sets associated with this topic.</CardDescription>
                     </div>
-                     <Dialog open={isPracticeSetDialogOpen} onOpenChange={setIsPracticeSetDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button size="sm"><PlusCircle className="mr-2"/> Add Practice Set</Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Add New Practice Set</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-2">
-                                <Label htmlFor="practice-set-title">Title</Label>
-                                <Input id="practice-set-title" value={newPracticeSetTitle} onChange={(e) => setNewPracticeSetTitle(e.target.value)} />
-                            </div>
-                            <DialogFooter>
-                                <Button onClick={handleAddPracticeSet}>Save</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                     <Button size="sm" onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
                 </CardHeader>
                 <CardContent>
                     {practiceSets.length > 0 ? (
@@ -120,6 +121,9 @@ export default function ManageTopicPage() {
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
                                                 Manage Questions
                                             </Link>
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(ps)}>
+                                            <Edit className="mr-2 h-4 w-4" /> Edit
                                         </Button>
                                         <Button variant="ghost" size="sm" asChild>
                                             <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`} target="_blank">
@@ -135,6 +139,21 @@ export default function ManageTopicPage() {
                     )}
                 </CardContent>
             </Card>
+
+            <Dialog open={isPracticeSetDialogOpen} onOpenChange={setIsPracticeSetDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingPracticeSet ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                        <Label htmlFor="practice-set-title">Title</Label>
+                        <Input id="practice-set-title" value={practiceSetTitle} onChange={(e) => setPracticeSetTitle(e.target.value)} />
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={handleAddOrUpdatePracticeSet}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
