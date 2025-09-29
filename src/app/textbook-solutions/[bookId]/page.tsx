@@ -360,6 +360,19 @@ export default function TextbookSolutionsPage() {
         const margin = 10;
         let y = margin;
 
+        const addWatermark = (pdfInstance: jsPDF) => {
+            const totalPages = pdfInstance.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                pdfInstance.setPage(i);
+                pdfInstance.setFontSize(50);
+                pdfInstance.setTextColor(220, 220, 220);
+                pdfInstance.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                    angle: -45,
+                    align: 'center',
+                });
+            }
+        };
+
         const headerContent = (
             <div className="p-1 bg-white text-black font-sans w-[700px] text-base">
                 <div className="text-center mb-4">
@@ -410,7 +423,6 @@ export default function TextbookSolutionsPage() {
                 const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
                 let columnB = [...pairs.map(p => ({ text: p.b, image: p.bImage }))];
                 
-                // Shuffle column B
                 for (let i = columnB.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
@@ -419,9 +431,9 @@ export default function TextbookSolutionsPage() {
             }
 
             const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px] text-base">
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-white text-black font-sans w-[700px]">
                   <div className="flex justify-between items-start font-bold mb-1">
-                      <span className="flex-1">Q{i + 1}: {question.text}</span>
+                      <span className="flex-1 text-base">Q{i + 1}: {question.text}</span>
                       <span className="ml-4 text-xs font-normal">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
                   {question.type === 'Multiple Choice' && question.options && (
@@ -468,8 +480,7 @@ export default function TextbookSolutionsPage() {
                   )}
               </div>
             );
-
-            // Temporarily render the element off-screen to use html2canvas
+            
             const container = document.createElement('div');
             container.style.position = 'absolute';
             container.style.left = '-9999px';
@@ -489,6 +500,7 @@ export default function TextbookSolutionsPage() {
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
                 if (y + imgHeight > pageHeight - margin) {
+                    addWatermark(pdf);
                     pdf.addPage();
                     y = margin;
                 }
@@ -500,6 +512,7 @@ export default function TextbookSolutionsPage() {
             document.body.removeChild(container);
         }
         
+        addWatermark(pdf);
         pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
 
     } catch (error) {
