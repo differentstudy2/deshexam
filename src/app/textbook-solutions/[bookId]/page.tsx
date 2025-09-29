@@ -24,6 +24,7 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 import { getUserProfile, getTextbookProgress, getSettings } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
@@ -240,9 +241,16 @@ export default function TextbookSolutionsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerResource, setViewerResource] = useState(null);
 
   const activeChapter = searchParams.get('chapter');
   const activeTopic = searchParams.get('topic');
+  
+  const [areResourcesFetched, setAreResourcesFetched] = useState(false);
+  const [areResourcesLoading, setAreResourcesLoading] = useState(false);
+
 
   useEffect(() => {
     if (!textbookId) return;
@@ -306,6 +314,12 @@ export default function TextbookSolutionsPage() {
 
     fetchTextbookAndChapters();
   }, [textbookId, router, user]);
+  
+  useEffect(() => {
+    // Reset resource fetching state when topic changes
+    setAreResourcesFetched(false);
+  }, [activeTopic]);
+
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
       // Data is now pre-fetched, so this can be a simple state update if needed
@@ -331,6 +345,35 @@ export default function TextbookSolutionsPage() {
   
     return { ...topic, practiceSets: sortedPracticeSets };
   }, [activeChapter, activeTopic, topics]);
+  
+  const handleResourceClick = (resource: any) => {
+    setViewerResource(resource);
+    setViewerOpen(true);
+  };
+  
+  const fetchResources = async () => {
+    if (!activeChapter || !activeTopic || areResourcesFetched) return;
+    
+    setAreResourcesLoading(true);
+    try {
+        const topicRef = doc(db, `textbooks/${textbookId}/chapters/${activeChapter}/topics`, activeTopic);
+        const topicSnap = await getDoc(topicRef);
+        if(topicSnap.exists()) {
+            const topicData = topicSnap.data();
+            setTopics(prevTopics => ({
+                ...prevTopics,
+                [activeChapter]: prevTopics[activeChapter].map(t => 
+                    t.id === activeTopic ? { ...t, resources: topicData.resources || [] } : t
+                )
+            }));
+            setAreResourcesFetched(true);
+        }
+    } catch(e) {
+        console.error("Failed to fetch resources", e);
+    } finally {
+        setAreResourcesLoading(false);
+    }
+  }
 
 
   if (loading) {
@@ -357,28 +400,6 @@ export default function TextbookSolutionsPage() {
       case 'doc': return <FileText className="w-4 h-4 text-primary" />;
       default: return <FileText className="w-4 h-4 text-primary" />;
     }
-  };
-  
-  const getYoutubeVideoId = (url: string): string | null => {
-      if (!url) return null;
-      try {
-        const urlObj = new URL(url);
-        if (urlObj.hostname.includes('youtube.com')) {
-          return urlObj.searchParams.get('v');
-        }
-        if (urlObj.hostname.includes('youtu.be')) {
-          return urlObj.pathname.slice(1);
-        }
-      } catch (error) {
-          // Invalid URL format, ignore
-      }
-      return null;
-  }
-  
-  const isVideoFile = (url: string) => {
-      if (!url) return false;
-      const videoExtensions = ['.mp4', '.mkv', '.ogg', '.webm'];
-      return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
   };
 
 
@@ -465,75 +486,33 @@ export default function TextbookSolutionsPage() {
                             <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
                                 <div dangerouslySetInnerHTML={{ __html: selectedTopicContent.content || '<p>No content available for this topic yet.</p>' }} />
                                 
-                                {selectedTopicContent.resources && selectedTopicContent.resources.length > 0 && (
-                                  <div className="mt-8">
-                                    <Separator />
-                                    <h3 className="mt-6 font-semibold text-2xl">Additional Resources</h3>
-                                    <div className="space-y-4 mt-4 not-prose">
-                                      {selectedTopicContent.resources.map(resource => {
-                                          if (resource.type === 'video') {
-                                              const videoId = getYoutubeVideoId(resource.url);
-                                              if(videoId) {
-                                                  return (
-                                                      <div key={resource.id} className="space-y-2">
-                                                          <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                           <div className="aspect-video w-full max-h-[450px]">
-                                                              <iframe 
-                                                                  className="w-full h-full rounded-lg"
-                                                                  src={`https://www.youtube.com/embed/${videoId}`} 
-                                                                  title={resource.title}
-                                                                  frameBorder="0" 
-                                                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                                                  allowFullScreen>
-                                                              </iframe>
-                                                          </div>
-                                                      </div>
-                                                  )
-                                              } else if (isVideoFile(resource.url)) {
-                                                  return (
-                                                      <div key={resource.id} className="space-y-2">
-                                                        <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                        <video controls controlsList="nodownload" src={resource.url} className="w-full rounded-lg max-h-[450px]">
-                                                            Your browser does not support the video tag.
-                                                        </video>
-                                                      </div>
-                                                  );
-                                              }
-                                          }
-                                          if (resource.type === 'audio') {
-                                            return (
-                                              <div key={resource.id} className="space-y-2">
-                                                <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                <audio controls controlsList="nodownload" src={resource.url} className="w-full">
-                                                  Your browser does not support the audio element.
-                                                </audio>
-                                              </div>
-                                            );
-                                          }
-                                          if (resource.type === 'pdf' || resource.type === 'doc') {
-                                            const googleViewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(resource.url)}&embedded=true`;
-                                            return (
-                                                <div key={resource.id} className="space-y-2">
-                                                    <h4 className="font-medium flex items-center gap-2">{getResourceIcon(resource.type)} {resource.title}</h4>
-                                                    <div className="aspect-w-4 aspect-h-3">
-                                                        <iframe src={googleViewerUrl} className="w-full h-96 rounded-lg" frameBorder="0"></iframe>
-                                                    </div>
-                                                </div>
-                                            );
-                                          }
-                                          // Fallback for other types or non-youtube videos
-                                          return (
-                                              <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors no-underline">
-                                                {getResourceIcon(resource.type)}
-                                                <span className="ml-3 font-medium">{resource.title}</span>
-                                                <ExternalLink className="w-4 h-4 ml-auto" />
-                                              </a>
-                                          );
-                                      })}
-                                    </div>
-                                  </div>
-                                )}
-                                
+                                <Accordion type="single" collapsible className="w-full not-prose mt-8" onValueChange={(value) => {if(value) fetchResources()}}>
+                                    <AccordionItem value="resources">
+                                        <AccordionTrigger>Additional Resources</AccordionTrigger>
+                                        <AccordionContent>
+                                        {areResourcesLoading ? (
+                                            <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
+                                        ) : selectedTopicContent.resources && selectedTopicContent.resources.length > 0 ? (
+                                            <div className="space-y-2 mt-4">
+                                            {selectedTopicContent.resources.map(resource => (
+                                                <button
+                                                    key={resource.id}
+                                                    onClick={() => handleResourceClick(resource)}
+                                                    className="w-full flex items-center p-3 border rounded-md hover:bg-secondary transition-colors text-left"
+                                                >
+                                                    {getResourceIcon(resource.type)}
+                                                    <span className="ml-3 font-medium">{resource.title}</span>
+                                                    <ExternalLink className="w-4 h-4 ml-auto text-muted-foreground" />
+                                                </button>
+                                            ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-muted-foreground text-center py-4">No additional resources for this topic.</p>
+                                        )}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+
                                 {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
                                     <div className="mt-8">
                                         <Separator />
@@ -544,8 +523,6 @@ export default function TextbookSolutionsPage() {
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
                                                 const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
                                                 
-                                                // The first practice set is always unlocked.
-                                                // Subsequent sets are locked if the previous set hasn't been passed.
                                                 const isLocked = index > 0 && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
 
                                                 return (
@@ -578,9 +555,18 @@ export default function TextbookSolutionsPage() {
            )}
         </main>
       </div>
+
+       {viewerResource && (
+            <ResourceViewerDialog 
+                resource={viewerResource} 
+                open={viewerOpen} 
+                onOpenChange={setViewerOpen} 
+            />
+        )}
     </div>
   );
 }
+
 
 
 
