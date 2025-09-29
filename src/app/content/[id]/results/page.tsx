@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck } from 'lucide-react';
+import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck, Crown, Gem } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -24,7 +24,7 @@ import { Badge } from '@/components/ui/badge';
 
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: string }, testType: string; submittedAt: any;};
 type Test = { id: string; title: string; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
-type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; };
+type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; subscriptionPlan?: 'pro' | 'pass'; };
 
 
 function ResultsDisplay() {
@@ -119,6 +119,16 @@ function ResultsDisplay() {
                         <div className="flex items-center justify-center md:justify-start gap-2">
                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                         {student.subscriptionPlan === 'pro' && (
+                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
+                                <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
+                            </Badge>
+                        )}
+                        {student.subscriptionPlan === 'pass' && (
+                            <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
+                                <Gem className="w-3.5 h-3.5 mr-1" /> Pass
+                            </Badge>
+                        )}
                         </div>
                         <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
                             {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
@@ -141,7 +151,7 @@ function ResultsDisplay() {
         </CardHeader>
         <CardContent className="space-y-4 pt-0">
             <Separator />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
                 {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
                 
