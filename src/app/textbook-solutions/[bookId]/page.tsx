@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
+import type { Chapter, Solution, Textbook, Topic, Resource } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
@@ -402,6 +402,16 @@ export default function TextbookSolutionsPage() {
     }
   };
 
+  const groupedResources = (selectedTopicContent?.resources || []).reduce((acc, resource) => {
+    const type = resource.type;
+    if (!acc[type]) {
+      acc[type] = [];
+    }
+    acc[type].push(resource);
+    return acc;
+  }, {} as { [key: string]: Resource[] });
+
+  const resourceOrder: ('video' | 'audio' | 'pdf' | 'doc')[] = ['video', 'audio', 'pdf', 'doc'];
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
@@ -488,22 +498,34 @@ export default function TextbookSolutionsPage() {
                                 
                                 <Accordion type="single" collapsible className="w-full not-prose mt-8" onValueChange={(value) => {if(value) fetchResources()}}>
                                     <AccordionItem value="resources">
-                                        <AccordionTrigger>Additional Resources</AccordionTrigger>
+                                        <AccordionTrigger>
+                                            <h3 className="font-semibold text-lg">Additional Resources</h3>
+                                        </AccordionTrigger>
                                         <AccordionContent>
                                         {areResourcesLoading ? (
                                             <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
                                         ) : selectedTopicContent.resources && selectedTopicContent.resources.length > 0 ? (
-                                            <div className="space-y-2 mt-4">
-                                            {selectedTopicContent.resources.map(resource => (
-                                                <button
-                                                    key={resource.id}
-                                                    onClick={() => handleResourceClick(resource)}
-                                                    className="w-full flex items-center p-3 border rounded-md hover:bg-secondary transition-colors text-left"
-                                                >
-                                                    {getResourceIcon(resource.type)}
-                                                    <span className="ml-3 font-medium">{resource.title}</span>
-                                                    <ExternalLink className="w-4 h-4 ml-auto text-muted-foreground" />
-                                                </button>
+                                            <div className="space-y-4 mt-4">
+                                            {resourceOrder.map(type => (
+                                                groupedResources[type] && (
+                                                <div key={type}>
+                                                    <h4 className="font-semibold text-md mb-2 capitalize">{type}s</h4>
+                                                    <ul className="space-y-2">
+                                                    {groupedResources[type].map(res => (
+                                                        <li key={res.id}>
+                                                            <button
+                                                                onClick={() => handleResourceClick(res)}
+                                                                className="w-full flex items-center p-3 border rounded-md hover:bg-secondary transition-colors text-left"
+                                                            >
+                                                                {getResourceIcon(res.type)}
+                                                                <span className="ml-3 font-medium">{res.title}</span>
+                                                                <ExternalLink className="w-4 h-4 ml-auto text-muted-foreground" />
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                    </ul>
+                                                </div>
+                                                )
                                             ))}
                                             </div>
                                         ) : (
@@ -566,10 +588,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
