@@ -416,7 +416,21 @@ export default function TextbookSolutionsPage() {
         y += 15;
 
         for (let i = 0; i < questions.length; i++) {
-            const question = questions[i] as Question;
+            let question = questions[i] as Question;
+
+             if (question.type === 'Matching' && question.correctAnswer && !question.matchingOptions) {
+                const pairs = question.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
+                
+                // Shuffle column B
+                for (let i = columnB.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
+                }
+                question.matchingOptions = { columnA, columnB };
+            }
+
             const content = (
               <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-4 bg-white text-black font-sans w-[700px]">
                   <div className="text-lg font-bold mb-2">Q{i + 1}: {question.text}</div>
@@ -461,7 +475,7 @@ export default function TextbookSolutionsPage() {
             container.style.position = 'absolute';
             container.style.left = '-9999px';
             document.body.appendChild(container);
-
+            
             const { createRoot } = await import('react-dom/client');
             const root = createRoot(container);
             
