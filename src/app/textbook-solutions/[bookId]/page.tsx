@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -398,7 +397,7 @@ export default function TextbookSolutionsPage() {
 
     try {
         const questions = await getQuestionsByPracticeSet(textbookId, activeChapter, activeTopic, practiceSet.id);
-        const totalMarks = questions.reduce((total, q: any) => {
+        const totalMarks = questions.reduce((total: number, q: any) => {
             if (q.type === 'Matching') return total + (q.correctAnswer?.length || 0);
             return total + (q.marks || 1);
         }, 0);
@@ -424,8 +423,8 @@ export default function TextbookSolutionsPage() {
                   {question.type === 'Multiple Choice' && question.options && (
                       <div className="space-y-1">
                           {question.options.map((option, optIndex) => (
-                              <div key={optIndex} className="flex">
-                                  <div className="w-8">{String.fromCharCode(65 + optIndex)}.</div>
+                              <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
+                                  <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
                                   <div>{option.text}</div>
                               </div>
                           ))}
