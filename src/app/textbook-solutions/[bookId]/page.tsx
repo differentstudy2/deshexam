@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -381,8 +382,8 @@ export default function TextbookSolutionsPage() {
             }
 
             const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-4 bg-white text-black font-sans w-[700px]">
-                  <div className="text-lg font-bold mb-2">Q{i + 1}: {question.text}</div>
+              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-2 bg-white text-black font-sans w-[700px]">
+                  <div className="text-lg font-bold mb-1">Q{i + 1}: {question.text}</div>
                   {question.type === 'Multiple Choice' && question.options && (
                       <div className="space-y-1">
                           {question.options.map((option, optIndex) => (
@@ -413,7 +414,7 @@ export default function TextbookSolutionsPage() {
                           ))}
                       </div>
                   )}
-                   <div className="mt-2 text-right text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</div>
+                   <div className="mt-1 text-right text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</div>
               </div>
             );
 
@@ -443,7 +444,7 @@ export default function TextbookSolutionsPage() {
                 }
 
                 pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-                y += imgHeight + 5; 
+                y += imgHeight + 2; 
             }
             root.unmount();
             document.body.removeChild(container);
