@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -12,8 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
-import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock } from 'lucide-react';
+import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
@@ -31,7 +32,6 @@ type UserProfile = {
 type TextbookProgress = {
     [chapterId: string]: {
         completed: boolean;
-        // In the future, we can add more details like score, completionDate, etc.
     }
 }
 
@@ -62,24 +62,21 @@ const TextbookContentSidebar = ({
 }) => {
     
     const hasAccess = (chapter: Chapter, index: number) => {
-        if (!settings?.gateChaptersOnPass) return true; // If gating is off, all are accessible
-        if (index < settings.freeChaptersPerBook) return true; // Free chapters are always accessible
+        if (!settings?.gateChaptersOnPass) return true; 
+        if (index < settings.freeChaptersPerBook) return true; 
 
-        // Rule 2: Check subscription access
         if (chapter.access !== 'free') {
             if (!userProfile) return false;
             if (userProfile.subscriptionPlan === 'pro') {
-                // Pro can access everything
             } else if (userProfile.subscriptionPlan === 'pass' && chapter.access === 'pro') {
-                return false; // Pass user can't access Pro chapter
+                return false; 
             } else if (!userProfile.subscriptionPlan) {
-                return false; // Free user can't access paid chapters
+                return false; 
             }
         }
         
-        // Rule 3: Check sequential completion
         const previousChapter = chapters[index - 1];
-        if (!previousChapter) return true; // Should not happen
+        if (!previousChapter) return true; 
         
         return progress?.[previousChapter.id]?.completed ?? false;
     }
@@ -187,6 +184,7 @@ export default function TextbookSolutionsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [practiceSetScores, setPracticeSetScores] = useState<{[key: string]: number}>({});
 
   const activeChapter = searchParams.get('chapter');
   const activeTopic = searchParams.get('topic');
@@ -224,7 +222,6 @@ export default function TextbookSolutionsPage() {
             if (!isNaN(numA) && !isNaN(numB)) {
                 return numA - numB;
             }
-            // Fallback for non-numeric titles or mixed formats
             return a.title.localeCompare(b.title, undefined, { numeric: true });
         });
 
@@ -250,7 +247,7 @@ export default function TextbookSolutionsPage() {
       try {
           const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`));
           const topicsSnap = await getDocs(topicsQuery);
-          const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
+          const topicsForChapter = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() as Topic }));
           
           topicsForChapter.sort((a, b) => {
               const numA = parseFloat(a.title.match(/^\d+(\.\d+)?/)?.[0] || 'NaN');
@@ -265,6 +262,28 @@ export default function TextbookSolutionsPage() {
             const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
             const practiceSetsSnap = await getDocs(practiceSetsQuery);
             topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
+
+            if (user) {
+              for (const ps of topic.practiceSets) {
+                const submissionsQuery = query(
+                  collection(db, 'practiceSetSubmissions'),
+                  where('userId', '==', user.uid),
+                  where('practiceSetId', '==', ps.id)
+                );
+                const submissionsSnapshot = await getDocs(submissionsQuery);
+                if (!submissionsSnapshot.empty) {
+                  let maxScore = 0;
+                  submissionsSnapshot.forEach(subDoc => {
+                    const data = subDoc.data();
+                    const percentage = data.totalQuestions > 0 ? (data.score / data.totalQuestions) * 100 : 0;
+                    if (percentage > maxScore) {
+                      maxScore = percentage;
+                    }
+                  });
+                  setPracticeSetScores(prev => ({ ...prev, [ps.id]: Math.round(maxScore) }));
+                }
+              }
+            }
           }
 
           setTopics(prev => ({ ...prev, [chapterId]: topicsForChapter }));
@@ -273,7 +292,7 @@ export default function TextbookSolutionsPage() {
       } finally {
           setLoadingTopics(null);
       }
-  }, [textbookId, topics]);
+  }, [textbookId, topics, user]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -395,11 +414,18 @@ export default function TextbookSolutionsPage() {
                                                         <CheckSquare className="h-5 w-5 text-primary" />
                                                         <span className="font-medium">{ps.title}</span>
                                                     </div>
-                                                    <Button asChild>
-                                                        <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${activeChapter}&topic=${activeTopic}`}>
-                                                                Start Practice
-                                                        </Link>
-                                                    </Button>
+                                                    <div className="flex items-center gap-4">
+                                                        {practiceSetScores[ps.id] !== undefined && (
+                                                            <div className="text-center">
+                                                                <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {practiceSetScores[ps.id]}%</p>
+                                                            </div>
+                                                        )}
+                                                        <Button asChild>
+                                                            <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${activeChapter}&topic=${activeTopic}`}>
+                                                                    Start Practice
+                                                            </Link>
+                                                        </Button>
+                                                    </div>
                                                 </Card>
                                             ))}
                                         </div>
