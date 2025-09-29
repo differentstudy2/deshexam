@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -13,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -338,9 +339,15 @@ export default function TextbookSolutionsPage() {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <Loader2 className="w-8 h-8 animate-spin"/>
-        </div>
+      <div className="container mx-auto py-8 space-y-6 max-w-7xl">
+        <header className="text-center mb-12">
+            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">Textbook Solutions</h1>
+            <p className="text-lg text-muted-foreground mt-2">
+            Select a textbook to view its solutions, topics, and practice questions.
+            </p>
+        </header>
+        <div className="flex justify-center"><Loader2 className="w-8 h-8 animate-spin"/></div>
+      </div>
     );
   }
 
@@ -351,6 +358,17 @@ export default function TextbookSolutionsPage() {
         </div>
     );
   }
+  
+  const getResourceIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Video className="w-4 h-4 text-primary" />;
+      case 'audio': return <Mic className="w-4 h-4 text-primary" />;
+      case 'pdf': return <FileIcon className="w-4 h-4 text-primary" />;
+      case 'doc': return <FileText className="w-4 h-4 text-primary" />;
+      default: return <FileText className="w-4 h-4 text-primary" />;
+    }
+  };
+
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
@@ -435,6 +453,21 @@ export default function TextbookSolutionsPage() {
                             <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
                                 <div dangerouslySetInnerHTML={{ __html: selectedTopicContent.content || '<p>No content available for this topic yet.</p>' }} />
                                 
+                                {selectedTopicContent.resources && selectedTopicContent.resources.length > 0 && (
+                                  <div className="mt-8">
+                                    <Separator />
+                                    <h3 className="mt-6 font-semibold text-2xl">Additional Resources</h3>
+                                    <div className="space-y-2 mt-4 not-prose">
+                                      {selectedTopicContent.resources.map(resource => (
+                                        <a key={resource.id} href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 border rounded-md hover:bg-secondary transition-colors">
+                                          {getResourceIcon(resource.type)}
+                                          <span className="ml-3 font-medium">{resource.title}</span>
+                                        </a>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                
                                 {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
                                     <div className="mt-8">
                                         <Separator />
@@ -479,3 +512,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
