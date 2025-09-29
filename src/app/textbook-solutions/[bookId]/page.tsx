@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -290,7 +289,7 @@ export default function TextbookSolutionsPage() {
             });
 
              for (let topic of topicsForChapter) {
-                const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics/${topic.id}/practiceSets`));
+                const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
                 const practiceSetsSnap = await getDocs(practiceSetsQuery);
                 topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title, ...doc.data() }));
                 topic.practiceSets.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
@@ -324,7 +323,16 @@ export default function TextbookSolutionsPage() {
   };
   
   const selectedTopicContent = useMemo(() => {
-    return activeChapter && activeTopic ? topics[activeChapter]?.find(t => t.id === activeTopic) : null;
+    if (!activeChapter || !activeTopic || !topics[activeChapter]) return null;
+    const topic = topics[activeChapter]?.find(t => t.id === activeTopic);
+    if (!topic) return null;
+  
+    // Ensure practice sets are sorted for consistent locking logic
+    const sortedPracticeSets = [...(topic.practiceSets || [])].sort((a, b) =>
+      a.title.localeCompare(b.title, undefined, { numeric: true })
+    );
+  
+    return { ...topic, practiceSets: sortedPracticeSets };
   }, [activeChapter, activeTopic, topics]);
 
 
@@ -435,10 +443,9 @@ export default function TextbookSolutionsPage() {
                                             {selectedTopicContent.practiceSets.map((ps, index) => {
                                                 const passMark = settings?.practiceSetPassMark || 40;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
-                                                
-                                                const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : 100;
+                                                const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
                                                 const isLocked = index > 0 && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
-                                                
+
                                                 return (
                                                   <PracticeSetItem
                                                     key={ps.id}
@@ -472,4 +479,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
