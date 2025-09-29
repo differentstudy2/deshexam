@@ -420,13 +420,16 @@ export default function TextbookSolutionsPage() {
             const question = questions[i] as Question;
             const content = (
               <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-4 bg-white text-black font-sans w-[700px]">
-                  <h3 className="text-lg font-bold mb-2">Q{i + 1}: {question.text}</h3>
+                  <div className="text-lg font-bold mb-2">Q{i + 1}: {question.text}</div>
                   {question.type === 'Multiple Choice' && question.options && (
-                      <ol type="A" className="list-[upper-alpha] list-inside space-y-1">
+                      <div className="space-y-1">
                           {question.options.map((option, optIndex) => (
-                              <li key={optIndex}>{option.text}</li>
+                              <div key={optIndex} className="flex">
+                                  <div className="w-8">{String.fromCharCode(65 + optIndex)}.</div>
+                                  <div>{option.text}</div>
+                              </div>
                           ))}
-                      </ol>
+                      </div>
                   )}
                   {question.type === 'True/False' && (
                       <div className="flex space-x-4"><span>A) True</span><span>B) False</span></div>
