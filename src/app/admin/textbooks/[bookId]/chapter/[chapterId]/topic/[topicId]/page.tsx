@@ -137,23 +137,30 @@ export default function ManageTopicPage() {
             toast({ variant: 'destructive', title: 'Please fill all fields.' });
             return;
         }
-
+    
         try {
             const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-            let resources = topic.resources || [];
+            
+            // It's safer to fetch the latest resources directly from state if available, or fetch fresh.
+            const currentResources = topic.resources || [];
+            let updatedResources;
             
             if (editingResource) {
-                resources = resources.map((r) => r.id === editingResource.id ? { ...newResource, id: editingResource.id } : r);
+                updatedResources = currentResources.map((r) => r.id === editingResource.id ? { ...newResource, id: editingResource.id } : r);
             } else {
-                resources.push({ ...newResource, id: new Date().getTime().toString() });
+                updatedResources = [...currentResources, { ...newResource, id: new Date().getTime().toString() }];
             }
             
-            await updateDoc(topicRef, { resources: resources });
+            await updateDoc(topicRef, { resources: updatedResources });
+    
             toast({ title: `Resource ${editingResource ? 'updated' : 'added'}` });
             setIsResourceDialogOpen(false);
             setEditingResource(null);
-            setResourcesFetched(false); // Force refetch on next open
-            fetchResources();
+            
+            // Manually update local state and force a UI refresh
+            setTopic(prev => prev ? { ...prev, resources: updatedResources } : null);
+            setResourcesFetched(true);
+    
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
         }
@@ -167,8 +174,10 @@ export default function ManageTopicPage() {
             await updateDoc(topicRef, { resources: updatedResources });
             toast({ title: 'Resource Deleted' });
             setResourceToDelete(null);
-            setResourcesFetched(false); // Force refetch on next open
-            fetchResources();
+            
+            // Manually update local state
+            setTopic(prev => prev ? { ...prev, resources: updatedResources } : null);
+
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to delete resource', description: (error as Error).message });
         }
@@ -388,4 +397,3 @@ export default function ManageTopicPage() {
         </div>
     )
 }
-
