@@ -387,8 +387,7 @@ export default function TextbookSolutionsPage() {
   if (loading) {
     return (
         <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            <p className="ml-4 text-lg">Loading...</p>
+            <p>Loading...</p>
         </div>
     );
   }
@@ -492,15 +491,18 @@ export default function TextbookSolutionsPage() {
                                             {selectedTopicContent.practiceSets.map((ps, index) => {
                                                 const passMark = settings?.practiceSetPassMark || 60;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
-                                                const prevSetProgress = prevPsId ? progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[prevPsId] : undefined;
                                                 
+                                                const prevSetProgress = prevPsId && activeChapter && activeTopic
+                                                    ? progress?.[activeChapter]?.topics?.[activeTopic]?.practiceSets?.[prevPsId] 
+                                                    : undefined;
+
                                                 const prevSetScorePercentage = prevSetProgress && prevSetProgress.totalMarks > 0
                                                     ? (prevSetProgress.highestScore / prevSetProgress.totalMarks) * 100
                                                     : 100; // Default to 100 if no previous set, so first one is unlocked
 
                                                 const isLocked = index > 0 && prevSetScorePercentage < passMark;
                                                 
-                                                const currentSetProgress = progress?.[activeChapter!]?.topics?.[activeTopic!]?.practiceSets?.[ps.id];
+                                                const currentSetProgress = activeChapter && activeTopic ? progress?.[activeChapter]?.topics?.[activeTopic]?.practiceSets?.[ps.id] : undefined;
 
                                                 return (
                                                   <PracticeSetItem
