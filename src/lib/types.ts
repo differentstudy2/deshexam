@@ -31,6 +31,7 @@ export type Topic = {
 export type PracticeSet = {
     id: string;
     title: string;
+    duration?: number;
 };
 
 export type Solution = {

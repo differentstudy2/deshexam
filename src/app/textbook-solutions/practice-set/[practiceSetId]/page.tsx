@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -204,6 +205,7 @@ export default function PracticeSetPage() {
             score,
             totalQuestions: totalMarks,
             timeTaken: timeTakenInSeconds,
+            duration: test?.duration || totalMarks,
         };
 
         const submissionId = await addPracticeSetSubmission(submissionData);

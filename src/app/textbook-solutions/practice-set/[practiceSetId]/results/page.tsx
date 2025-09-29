@@ -133,7 +133,7 @@ function ResultsDisplay() {
   const tryAgainUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}?textbook=${submission.textbookId}&chapter=${submission.chapterId}&topic=${submission.topicId}`;
   const backToTopicUrl = `/textbook-solutions/${submission.textbookId}?chapter=${submission.chapterId}&topic=${submission.topicId}`;
   
-  const pageTitle = `${student?.displayName}'s Practice Set Results for ${textbook?.board} - ${textbook?.title}`;
+  const pageTitle = `${student?.displayName}'s Practice Set Results`;
   
   const formatTimeTaken = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -207,7 +207,7 @@ function ResultsDisplay() {
 
                 {submittedAtDate && submittedAtDate.toString() !== 'Invalid Date' && (
                     <>
-                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submittedAtDate.toLocaleDateString()}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Submitted At:</strong> <span className="text-foreground">{submittedAtDate.toLocaleString()}</span></div>
                     </>
                 )}
             </div>
@@ -244,5 +244,3 @@ export default function PracticeSetResultsPage() {
     </div>
   );
 }
-
-    

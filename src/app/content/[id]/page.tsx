@@ -172,7 +172,8 @@ export default function TestPage() {
             answers,
             score,
             totalQuestions: totalMarks,
-            testType: test?.testType
+            testType: test?.testType,
+            duration: test?.duration,
         };
 
         const submissionId = await addTestSubmission(submissionData);
@@ -413,7 +414,3 @@ export default function TestPage() {
     </div>
   );
 }
-
-
-
-
