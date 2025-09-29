@@ -5,21 +5,24 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { Topic, PracticeSet } from '@/lib/types';
+import type { Topic, PracticeSet, Resource } from '@/lib/types';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen, Edit } from 'lucide-react';
+import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { 
     addPracticeSetToTopic, 
     getPracticeSetsByTopicId, 
 } from '@/lib/firebase/firestore';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+
 
 export default function ManageTopicPage() {
     const params = useParams();
@@ -36,6 +39,11 @@ export default function ManageTopicPage() {
     const [isPracticeSetDialogOpen, setIsPracticeSetDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
     const [practiceSetTitle, setPracticeSetTitle] = useState('');
+
+    const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
+    const [editingResource, setEditingResource] = useState<Resource | null>(null);
+    const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
+    const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
 
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
@@ -57,7 +65,7 @@ export default function ManageTopicPage() {
         fetchData();
     }, [textbookId, chapterId, topicId]);
 
-    const handleOpenDialog = (ps: PracticeSet | null) => {
+    const handleOpenPracticeSetDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
         setPracticeSetTitle(ps ? ps.title : '');
         setIsPracticeSetDialogOpen(true);
@@ -67,12 +75,10 @@ export default function ManageTopicPage() {
         if (!practiceSetTitle.trim()) return;
         try {
             if (editingPracticeSet) {
-                // Update existing practice set
                 const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, editingPracticeSet.id);
                 await updateDoc(psRef, { title: practiceSetTitle });
                 toast({ title: 'Practice Set Updated' });
             } else {
-                // Add new practice set
                 await addPracticeSetToTopic(textbookId, chapterId, topicId, { title: practiceSetTitle });
                 toast({ title: 'Practice Set Added' });
             }
@@ -85,7 +91,67 @@ export default function ManageTopicPage() {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
         }
     }
+
+    const handleOpenResourceDialog = (resource: Resource | null) => {
+        setEditingResource(resource);
+        if (resource) {
+            setNewResource({ type: resource.type, title: resource.title, url: resource.url });
+        } else {
+            setNewResource({ type: 'video', title: '', url: '' });
+        }
+        setIsResourceDialogOpen(true);
+    };
     
+    const handleSaveResource = async () => {
+        if (!newResource.title || !newResource.url || !topic) {
+            toast({ variant: 'destructive', title: 'Please fill all fields.' });
+            return;
+        }
+
+        try {
+            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
+            let resources = topic.resources || [];
+            
+            if (editingResource) {
+                resources = resources.map((r) => r.id === editingResource.id ? { ...newResource, id: editingResource.id } : r);
+            } else {
+                resources.push({ ...newResource, id: new Date().getTime().toString() });
+            }
+            
+            await updateDoc(topicRef, { resources: resources });
+            toast({ title: `Resource ${editingResource ? 'updated' : 'added'}` });
+            setIsResourceDialogOpen(false);
+            setEditingResource(null);
+            fetchData();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
+        }
+    };
+    
+    const handleDeleteResource = async () => {
+        if (!resourceToDelete || !topic) return;
+        try {
+            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
+            const updatedResources = (topic.resources || []).filter(r => r.id !== resourceToDelete.id);
+            await updateDoc(topicRef, { resources: updatedResources });
+            toast({ title: 'Resource Deleted' });
+            setResourceToDelete(null);
+            fetchData();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Failed to delete resource', description: (error as Error).message });
+        }
+    };
+
+     const getResourceIcon = (type: string) => {
+        switch (type) {
+        case 'video': return <Video className="w-4 h-4 text-muted-foreground" />;
+        case 'audio': return <Mic className="w-4 h-4 text-muted-foreground" />;
+        case 'pdf': return <FileText className="w-4 h-4 text-muted-foreground" />;
+        case 'doc': return <FileText className="w-4 h-4 text-muted-foreground" />;
+        default: return <FileText className="w-4 h-4 text-muted-foreground" />;
+        }
+    };
+
     if (loading) return <div className="flex items-center justify-center h-full">Loading...</div>
 
     return (
@@ -100,64 +166,142 @@ export default function ManageTopicPage() {
             </div>
             <header>
                 <h1 className="font-headline text-3xl font-bold">Manage Topic: <span className="text-primary">{topic?.title}</span></h1>
-                 <p className="text-muted-foreground mt-1">Here you can add and manage practice sets for this topic.</p>
+                 <p className="text-muted-foreground mt-1">Here you can add and manage practice sets and resources for this topic.</p>
             </header>
 
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                        <CardTitle>Practice Sets</CardTitle>
-                        <CardDescription>Manage the practice sets associated with this topic.</CardDescription>
-                    </div>
-                     <Button size="sm" onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
-                </CardHeader>
-                <CardContent>
-                    {practiceSets.length > 0 ? (
-                         <ul className="space-y-2">
-                            {practiceSets.map(ps => (
-                                <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                    <div className="flex-grow flex items-center gap-2">
-                                        <span className="font-medium">{ps.title}</span>
-                                        {(ps as any).questionCount > 0 && <Badge variant="secondary">{(ps as any).questionCount} questions</Badge>}
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-                                        <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
-                                                Manage Questions
-                                            </Link>
-                                        </Button>
-                                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(ps)}>
-                                            <Edit className="mr-2 h-4 w-4" /> Edit
-                                        </Button>
-                                        <Button variant="ghost" size="sm" asChild>
-                                            <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`} target="_blank">
-                                                <BookOpen className="mr-2 h-4 w-4"/> Preview
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-muted-foreground text-center py-8">No practice sets created for this topic yet.</p>
-                    )}
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                 <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>Additional Resources</CardTitle>
+                            <CardDescription>Manage videos, audio, and documents for this topic.</CardDescription>
+                        </div>
+                        <Button size="sm" onClick={() => handleOpenResourceDialog(null)}><PlusCircle className="mr-2"/> Add Resource</Button>
+                    </CardHeader>
+                    <CardContent>
+                        {topic?.resources && topic.resources.length > 0 ? (
+                            <ul className="space-y-2">
+                                {topic.resources.map(res => (
+                                    <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
+                                        {getResourceIcon(res.type)}
+                                        <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
+                                        <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
+                                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-muted-foreground text-center py-8">No resources added yet.</p>
+                        )}
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle>Practice Sets</CardTitle>
+                            <CardDescription>Manage the practice sets associated with this topic.</CardDescription>
+                        </div>
+                        <Button size="sm" onClick={() => handleOpenPracticeSetDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
+                    </CardHeader>
+                    <CardContent>
+                        {practiceSets.length > 0 ? (
+                            <ul className="space-y-2">
+                                {practiceSets.map(ps => (
+                                    <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
+                                        <div className="flex-grow flex items-center gap-2">
+                                            <span className="font-medium">{ps.title}</span>
+                                            {(ps as any).questionCount > 0 && <Badge variant="secondary">{(ps as any).questionCount} questions</Badge>}
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
+                                            <Button variant="outline" size="sm" asChild>
+                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
+                                                    Manage Questions
+                                                </Link>
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
+                                                <Edit className="mr-2 h-4 w-4" /> Edit
+                                            </Button>
+                                            <Button variant="ghost" size="sm" asChild>
+                                                <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`} target="_blank">
+                                                    <BookOpen className="mr-2 h-4 w-4"/> Preview
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-muted-foreground text-center py-8">No practice sets created for this topic yet.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+           
 
             <Dialog open={isPracticeSetDialogOpen} onOpenChange={setIsPracticeSetDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{editingPracticeSet ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-2">
+                    <div className="space-y-2 py-4">
                         <Label htmlFor="practice-set-title">Title</Label>
                         <Input id="practice-set-title" value={practiceSetTitle} onChange={(e) => setPracticeSetTitle(e.target.value)} />
                     </div>
                     <DialogFooter>
+                         <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
                         <Button onClick={handleAddOrUpdatePracticeSet}>Save</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+             <Dialog open={isResourceDialogOpen} onOpenChange={setIsResourceDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingResource ? 'Edit' : 'Add'} Resource</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                             <Label>Resource Type</Label>
+                            <Select value={newResource.type} onValueChange={(v) => setNewResource({...newResource, type: v as any})}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="video">Video</SelectItem>
+                                    <SelectItem value="audio">Audio</SelectItem>
+                                    <SelectItem value="pdf">PDF</SelectItem>
+                                    <SelectItem value="doc">Document</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                             <Label>Title</Label>
+                            <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
+                         </div>
+                         <div className="space-y-2">
+                            <Label>URL</Label>
+                            <Input placeholder="Resource URL" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
+                         </div>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                        <Button onClick={handleSaveResource}>Save Resource</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <AlertDialog open={!!resourceToDelete} onOpenChange={() => setResourceToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Resource?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete the resource "{resourceToDelete?.title}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteResource}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
