@@ -389,6 +389,7 @@ export default function ManageTopicPage() {
             toast({ title: `Resource ${editingResource ? 'updated' : 'added'}` });
             setIsResourceDialogOpen(false);
             setEditingResource(null);
+            setResourcesFetched(false); // Force refetch on next open
             fetchResources();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
@@ -403,6 +404,7 @@ export default function ManageTopicPage() {
             await updateDoc(topicRef, { resources: updatedResources });
             toast({ title: 'Resource Deleted' });
             setResourceToDelete(null);
+            setResourcesFetched(false); // Force refetch on next open
             fetchResources();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Failed to delete resource', description: (error as Error).message });
@@ -623,4 +625,5 @@ export default function ManageTopicPage() {
         </div>
     )
 }
+
 
