@@ -70,41 +70,52 @@ const TextbookContentSidebar = ({
   settings: any;
 }) => {
   
-    const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
-        const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
-        if (index < freeChapterCount) {
-            return true;
+  const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
+    // Free chapters are always unlocked
+    const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
+    if (index < freeChapterCount) {
+        return true;
+    }
+
+    // Performance-gated chapters
+    if (settings?.gateChaptersOnPass) {
+        // The first non-free chapter needs the previous free chapter to be passed
+        const prevChapter = chapters[index - 1];
+        if (!prevChapter) return false; // Should not happen for index > 0
+
+        const prevChapterTopics = topics[prevChapter.id];
+        if (!prevChapterTopics) {
+            // If topics for previous chapter aren't loaded, we can't determine status yet.
+            // For UI purposes, we might assume locked until topics are loaded.
+            return false;
+        }
+        
+        const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
+        
+        if (prevChapterPracticeSets.length === 0) {
+            // If previous chapter has no practice sets, the next one is unlocked.
+            return isChapterUnlocked(prevChapter, index - 1);
         }
 
-        if (settings?.gateChaptersOnPass) {
-            const prevChapter = chapters[index - 1];
-            if (!prevChapter) return false; // Should not happen for index > 0
+        const passMark = settings.practiceSetPassMark || 60;
+        const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
 
-            const prevChapterTopics = topics[prevChapter.id];
-            if (!prevChapterTopics) return false; // Topics for prev chapter not loaded
-            
-            const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-            
-            if (prevChapterPracticeSets.length === 0) {
-                 return true; 
-            }
-
-            const passMark = settings.practiceSetPassMark || 60;
-            const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
-
-            return allPreviousPassed;
+        if (allPreviousPassed) {
+             return isChapterUnlocked(prevChapter, index - 1);
         }
+    }
 
-        // Subscription-based access if performance gating is off
+    // Subscription-based access if performance gating is off or not applicable
+    if (!settings?.gateChaptersOnPass) {
         if (chapter.access === 'free') return true;
         const hasProAccess = userProfile?.subscriptionPlan === 'pro';
         const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
         if (chapter.access === 'pro' && hasProAccess) return true;
         if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-
-        return false;
-    }, [chapters, topics, userProfile, settings, progress]);
-
+    }
+    
+    return false;
+  }, [chapters, topics, userProfile, settings, progress]);
 
   return (
     <Card>
@@ -116,17 +127,17 @@ const TextbookContentSidebar = ({
           type="single"
           collapsible
           className="w-full"
-          defaultValue={activeChapter || undefined}
+          value={activeChapter || undefined}
           onValueChange={(value) => onChapterToggle(value)}
         >
           {chapters.map((chapter, index) => {
-            const unlocked = isChapterUnlocked(chapter, index);
+            const isUnlocked = isChapterUnlocked(chapter, index);
             
             return (
-              <AccordionItem value={chapter.id} key={chapter.id}>
-                <AccordionTrigger disabled={!unlocked} className="hover:no-underline">
+              <AccordionItem value={chapter.id} key={chapter.id} disabled={!isUnlocked}>
+                <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
                   <div className="flex items-center gap-2 text-left">
-                    {!unlocked && <Lock className="w-4 h-4 flex-shrink-0" />}
+                    {!isUnlocked && <Lock className="w-4 h-4 flex-shrink-0" />}
                     <span>{chapter.title}</span>
                   </div>
                 </AccordionTrigger>
@@ -199,7 +210,7 @@ const PracticeSetItem = ({
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
+                            <p>Get {passMark}% to unlock the chapters</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -217,17 +228,17 @@ const PracticeSetItem = ({
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
-                 {isLocked ? (
-                     <TooltipProvider>
-                         <Tooltip>
+                {isLocked ? (
+                    <TooltipProvider>
+                        <Tooltip>
                             <TooltipTrigger>
                                 <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                              <TooltipContent>
-                                <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
+                                <p>Get {passMark}% to unlock the chapters</p>
                             </TooltipContent>
-                         </Tooltip>
-                     </TooltipProvider>
+                        </Tooltip>
+                    </TooltipProvider>
                 ) : (
                     <CheckSquare className="h-5 w-5 text-primary" />
                 )}
@@ -866,5 +877,6 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
