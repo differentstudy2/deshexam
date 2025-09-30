@@ -28,6 +28,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -974,20 +975,6 @@ export const getClasses = async () => {
     }
 };
 
-export const getGradesByClass = async (classId: string) => {
-    try {
-        const gradesRef = collection(db, `classes/${classId}/grades`);
-        const q = query(gradesRef, orderBy("name"));
-        const querySnapshot = await getDocs(q);
-        const grades = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
-        return grades;
-    } catch (e) {
-        console.error("Error getting grades: ", e);
-        throw new Error("Failed to fetch grades for the class.");
-    }
-};
-
-
 export const addClass = async (className: string) => {
     if (!className) {
         throw new Error("Class name cannot be empty.");
@@ -1027,6 +1014,20 @@ export const deleteClass = async (id: string) => {
     } catch (e) {
         console.error("Error deleting class: ", e);
         throw new Error("Failed to delete class.");
+    }
+};
+
+export const getGradesByClass = async (classId: string) => {
+    if (!classId) return [];
+    try {
+        const gradesRef = collection(db, `classes/${classId}/grades`);
+        const q = query(gradesRef, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const grades = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return grades;
+    } catch (e) {
+        console.error("Error getting grades: ", e);
+        throw new Error("Failed to fetch grades for the class.");
     }
 };
 
@@ -2044,6 +2045,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 

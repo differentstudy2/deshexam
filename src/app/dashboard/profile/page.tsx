@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -13,20 +14,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { getUserProfile, updateUserProfile, uploadFile, getBoards, getClasses } from '@/lib/firebase/firestore';
+import { getUserProfile, updateUserProfile, uploadFile, getBoards, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
 import { updateProfile as updateAuthProfile } from 'firebase/auth';
 import { Upload, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Board = { id: string, name: string };
-type Class = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
 
 const profileSchema = z.object({
   displayName: z.string().min(2, "Display name must be at least 2 characters."),
   email: z.string().email(),
   photoURL: z.string().url().optional().or(z.literal('')),
   school: z.string().optional(),
-  classGrade: z.string().optional(),
+  classCategory: z.string().optional(),
+  grade: z.string().optional(),
   targetExam: z.string().optional(),
   board: z.string().optional(),
 });
@@ -39,7 +42,8 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
+  const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -48,18 +52,21 @@ export default function ProfilePage() {
       email: '',
       photoURL: '',
       school: '',
-      classGrade: '',
+      classCategory: '',
+      grade: '',
       targetExam: '',
       board: '',
     },
   });
   
+  const selectedClassCategory = form.watch('classCategory');
+
   useEffect(() => {
     const fetchMetadata = async () => {
         try {
             const [boardsData, classesData] = await Promise.all([getBoards(), getClasses()]);
             setBoards(boardsData);
-            setClasses(classesData);
+            setClassCategories(classesData);
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -70,6 +77,18 @@ export default function ProfilePage() {
     }
     fetchMetadata();
   }, [toast]);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+        if(selectedClassCategory) {
+            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            setGrades(fetchedGrades);
+        } else {
+            setGrades([]);
+        }
+    };
+    fetchGrades();
+  }, [selectedClassCategory]);
 
   useEffect(() => {
     if (user) {
@@ -87,7 +106,8 @@ export default function ProfilePage() {
           form.reset({
             ...form.getValues(),
             school: userProfile.school || '',
-            classGrade: userProfile.classGrade || '',
+            classCategory: userProfile.classCategory || '',
+            grade: userProfile.grade || '',
             targetExam: userProfile.targetExam || '',
             board: userProfile.board || '',
           });
@@ -129,7 +149,8 @@ export default function ProfilePage() {
         displayName: data.displayName,
         photoURL: data.photoURL,
         school: data.school,
-        classGrade: data.classGrade,
+        classCategory: data.classCategory,
+        grade: data.grade,
         targetExam: data.targetExam,
         board: data.board,
         email: user.email, // Keep email consistent
@@ -256,31 +277,7 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
-                       <FormField
-                          control={form.control}
-                          name="classGrade"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Class/Grade</FormLabel>
-                               <Select onValueChange={field.onChange} value={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select your class" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {classes.map(c => (
-                                            <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                   </div>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
+                         <FormField
                           control={form.control}
                           name="school"
                           render={({ field }) => (
@@ -293,20 +290,66 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        <FormField
                           control={form.control}
-                          name="targetExam"
+                          name="classCategory"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Target Exam</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g., NEET, JEE, UPSC" {...field} />
-                              </FormControl>
+                              <FormLabel>Class Category</FormLabel>
+                               <Select onValueChange={(value) => { field.onChange(value); form.setValue('grade', ''); }} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select your class category" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {classCategories.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="grade"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Grade</FormLabel>
+                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategory}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select your grade" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {grades.map(g => (
+                                            <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                    </div>
+                    <FormField
+                      control={form.control}
+                      name="targetExam"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target Exam</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., NEET, JEE, UPSC" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
               </CardContent>
           </Card>
 
