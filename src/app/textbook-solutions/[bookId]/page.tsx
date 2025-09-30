@@ -156,11 +156,6 @@ const TextbookContentSidebar = ({
                         </Badge>
                       )}
                     </div>
-                    {!isUnlocked && isGated && (
-                      <span className="text-xs text-destructive font-normal mt-1">
-                        (Get {settings.practiceSetPassMark || 60}% on the previous chapter to unlock)
-                      </span>
-                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -884,5 +879,6 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
