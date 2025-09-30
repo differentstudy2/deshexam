@@ -73,6 +73,7 @@ const TextbookContentSidebar = ({
   const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
     const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
     if (index < freeChapterCount) return true;
+    if (chapter.access === 'free') return true;
 
     if (settings?.gateChaptersOnPass) {
         if (index === 0) return true;
@@ -80,9 +81,7 @@ const TextbookContentSidebar = ({
         if (!prevChapter) return false;
         
         const prevChapterTopics = topics[prevChapter.id];
-        if (!prevChapterTopics) {
-            return false;
-        }
+        if (!prevChapterTopics) return false;
 
         const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
         if (prevChapterPracticeSets.length === 0) return true; 
@@ -93,7 +92,6 @@ const TextbookContentSidebar = ({
         return allPreviousPassed;
     }
 
-    if (chapter.access === 'free') return true;
     if (!userProfile?.subscriptionPlan) return false;
     
     const hasProAccess = userProfile.subscriptionPlan === 'pro';
@@ -138,30 +136,31 @@ const TextbookContentSidebar = ({
           {chapters.map((chapter, index) => {
             const isUnlocked = isChapterUnlocked(chapter, index);
             const chapterAggregate = calculateChapterAggregate(chapter.id);
-            
+            const isGated = settings?.gateChaptersOnPass && index >= (settings?.freeChaptersPerBook ?? 0);
+
             return (
               <AccordionItem value={chapter.id} key={chapter.id}>
-                 <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
+                <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
                   <div className="flex flex-col items-start w-full text-left">
-                      <div className="flex items-center justify-between w-full">
-                         <span className="flex items-center gap-2">
-                            {chapter.title}
-                            {chapterAggregate !== null && (
-                                <ScoreCircle score={chapterAggregate} size={24} />
-                            )}
-                         </span>
-                         {!isUnlocked && (
-                             <span className="flex items-center gap-1 text-xs text-muted-foreground mr-2">
-                                 <Lock className="w-3 h-3" />
-                                 Locked
-                             </span>
-                         )}
-                      </div>
-                      {!isUnlocked && settings?.gateChaptersOnPass && (
-                         <span className="text-xs text-muted-foreground font-normal mt-1">
-                             Get {settings.practiceSetPassMark || 60}% on previous chapter to unlock
-                         </span>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="flex items-center gap-2">
+                        {chapter.title}
+                        {chapterAggregate !== null && (
+                          <ScoreCircle score={chapterAggregate} size={24} />
+                        )}
+                      </span>
+                      {!isUnlocked && (
+                        <Badge variant="destructive" className="flex items-center gap-1 mr-2">
+                          <Lock className="w-3 h-3" />
+                          Locked
+                        </Badge>
                       )}
+                    </div>
+                    {!isUnlocked && isGated && (
+                      <span className="text-xs text-destructive font-normal mt-1">
+                        (Get {settings.practiceSetPassMark || 60}% on the previous chapter to unlock)
+                      </span>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -225,10 +224,10 @@ const PracticeSetItem = ({
         if (isLocked) {
             return (
                 <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-right">
-                    <span className="text-xs font-semibold text-destructive flex items-center gap-1">
+                    <div className="text-xs font-semibold text-destructive flex items-center gap-1">
                         <Lock className="w-4 h-4" />
-                        Get {passMark}% on previous set to unlock
-                    </span>
+                        <span>Get {passMark}% on the previous set to unlock</span>
+                    </div>
                 </div>
             );
         }
@@ -885,4 +884,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
