@@ -240,7 +240,7 @@ export default function DashboardPage() {
                     <TableCell>
                       <div className="font-medium">{sub.test?.title || sub.testTitle}</div>
                       <div className="text-sm text-muted-foreground">
-                        {sub.test?.subject} - {sub.testType}
+                         {sub.test?.subject && `${sub.test.subject} - `}{sub.testType}
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">
