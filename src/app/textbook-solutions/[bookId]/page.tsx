@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -359,28 +360,32 @@ export default function TextbookSolutionsPage() {
         const margin = 10;
         let y = margin;
         
-        const totalPages = Math.ceil(questions.length / 5); // Rough estimation for watermark
-        for (let i = 1; i <= totalPages + 1; i++) { // Add a buffer page
-            pdf.setPage(i);
-            pdf.setFontSize(60);
-            pdf.setTextColor(230, 230, 230); // Light gray color
-            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-                angle: -45,
-                align: 'center',
-            });
-        }
-        pdf.setPage(1);
-
         const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
             if (yPos + contentHeight > pageHeight - margin) {
                 pdf.addPage();
+                 pdf.setFontSize(60);
+                pdf.setTextColor(230, 230, 230);
+                pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                    angle: -45,
+                    align: 'center',
+                });
+                pdf.setTextColor(0, 0, 0);
                 return margin;
             }
             return yPos;
         };
 
+        // Draw watermark on the first page
+        pdf.setFontSize(60);
+        pdf.setTextColor(230, 230, 230); // Light gray color
+        pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+            angle: -45,
+            align: 'center',
+        });
+        pdf.setTextColor(0, 0, 0); // Reset text color
+
         const headerContent = (
-            <div className="p-1 bg-white text-black font-sans w-[700px] text-base">
+            <div className="p-1 bg-transparent text-black font-sans w-[700px] text-base">
                 <div className="text-center mb-2">
                     <h1 className="text-2xl font-bold">{practiceSet.title}</h1>
                     <h2 className="text-lg">{textbook?.title}</h2>
