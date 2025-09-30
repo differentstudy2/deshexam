@@ -134,6 +134,7 @@ const PracticeSetItem = ({
     chapterId, 
     topicId, 
     isLocked, 
+    passMark,
     highestScore,
     onDownload,
     isDownloading,
@@ -143,6 +144,7 @@ const PracticeSetItem = ({
     chapterId: string; 
     topicId: string; 
     isLocked: boolean; 
+    passMark: number;
     highestScore?: number; 
     onDownload: () => void;
     isDownloading: boolean;
@@ -151,7 +153,16 @@ const PracticeSetItem = ({
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
                 {isLocked ? (
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Lock className="h-5 w-5 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 ) : (
                     <CheckSquare className="h-5 w-5 text-primary" />
                 )}
@@ -177,7 +188,7 @@ const PracticeSetItem = ({
                     )}
                 </Button>
                 {isLocked ? (
-                    <Button disabled>Start Practice</Button>
+                     <Button disabled>Start Practice</Button>
                 ) : (
                     <Button asChild>
                         <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
@@ -721,6 +732,7 @@ export default function TextbookSolutionsPage() {
                                                     chapterId={activeChapter!}
                                                     topicId={activeTopic!}
                                                     isLocked={isLocked}
+                                                    passMark={passMark}
                                                     highestScore={progress?.highestScores?.[ps.id]}
                                                     onDownload={() => handleDownloadPdf(ps)}
                                                     isDownloading={isDownloading === ps.id}
