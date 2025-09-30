@@ -72,21 +72,22 @@ const TextbookContentSidebar = ({
   
   const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
     const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
-    if (index < freeChapterCount) {
-      return true;
-    }
+    if (index < freeChapterCount) return true;
 
     if (settings?.gateChaptersOnPass) {
+        if (index === 0) return true;
         const prevChapter = chapters[index - 1];
         if (!prevChapter) return false;
         
         const prevChapterTopics = topics[prevChapter.id];
-        if (!prevChapterTopics) return false;
+        if (!prevChapterTopics) {
+            // This case might happen if topics for prev chapter haven't been loaded. 
+            // We assume it's locked until topics are loaded and checked.
+            return false;
+        }
 
         const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-        if (prevChapterPracticeSets.length === 0) {
-           return true; // No barrier, so unlocked.
-        }
+        if (prevChapterPracticeSets.length === 0) return true; // No barrier, so unlocked.
 
         const passMark = settings.practiceSetPassMark || 60;
         const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
@@ -226,14 +227,12 @@ const PracticeSetItem = ({
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div>
-                                <Button disabled className="w-full">
-                                  <Lock className="mr-2 h-4 w-4" /> Locked
-                                </Button>
-                            </div>
+                           <Button disabled className="w-full">
+                              <Lock className="mr-2 h-4 w-4" /> Locked
+                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Get {passMark}% to unlock this chapter</p>
+                            <p>Get {passMark}% on the previous practice set to unlock.</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -258,7 +257,7 @@ const PracticeSetItem = ({
                                 <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                              <TooltipContent>
-                                <p>Get {passMark}% on the previous chapter to unlock</p>
+                                <p>Get {passMark}% on the previous set to unlock</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
