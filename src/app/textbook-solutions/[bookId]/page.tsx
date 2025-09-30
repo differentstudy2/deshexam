@@ -176,11 +176,15 @@ const PracticeSetItem = ({
                         </>
                     )}
                 </Button>
-                <Button asChild disabled={isLocked}>
-                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
-                            Start Practice
-                    </Link>
-                </Button>
+                {isLocked ? (
+                    <Button disabled>Start Practice</Button>
+                ) : (
+                    <Button asChild>
+                        <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                                Start Practice
+                        </Link>
+                    </Button>
+                )}
             </div>
         </Card>
     );
@@ -449,7 +453,7 @@ export default function TextbookSolutionsPage() {
                       <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
                    {question.type === 'Multiple Choice' && question.options && (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                      <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm">
                           {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
                                   <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
