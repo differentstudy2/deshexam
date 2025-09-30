@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { getUserProfile, updateUserProfile, uploadFile, getBoards, getClasses, getGradesByClass, getSchools } from '@/lib/firebase/firestore';
+import { getUserProfile, updateUserProfile, uploadFile, getBoards, getClasses, getGradesByClass, getSchools, addSchool } from '@/lib/firebase/firestore';
 import { updateProfile as updateAuthProfile } from 'firebase/auth';
 import { Upload, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -28,6 +28,7 @@ const profileSchema = z.object({
   email: z.string().email(),
   photoURL: z.string().url().optional().or(z.literal('')),
   school: z.string().optional(),
+  newSchool: z.string().optional(),
   classCategory: z.string().optional(),
   grade: z.string().optional(),
   targetExam: z.string().optional(),
@@ -45,6 +46,7 @@ export default function ProfilePage() {
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
+  const [isAddingNewSchool, setIsAddingNewSchool] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -53,6 +55,7 @@ export default function ProfilePage() {
       email: '',
       photoURL: '',
       school: '',
+      newSchool: '',
       classCategory: '',
       grade: '',
       targetExam: '',
@@ -151,6 +154,7 @@ export default function ProfilePage() {
         displayName: data.displayName,
         photoURL: data.photoURL,
         school: data.school,
+        newSchool: data.newSchool,
         classCategory: data.classCategory,
         grade: data.grade,
         targetExam: data.targetExam,
@@ -178,6 +182,16 @@ export default function ProfilePage() {
       });
     }
   };
+  
+    const handleSchoolChange = (value: string) => {
+      if (value === 'add_new_school') {
+          setIsAddingNewSchool(true);
+          form.setValue('school', 'add_new_school');
+      } else {
+          setIsAddingNewSchool(false);
+          form.setValue('school', value);
+      }
+  }
 
   return (
     <div>
@@ -284,20 +298,34 @@ export default function ProfilePage() {
                             name="school"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Current School/College</FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select your school" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {schools.map(school => (
-                                                <SelectItem key={school.id} value={school.name}>{school.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                <FormMessage />
+                                    <FormLabel>Current School/College</FormLabel>
+                                    {!isAddingNewSchool ? (
+                                        <Select onValueChange={handleSchoolChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select your school" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {schools.map((school) => (
+                                                    <SelectItem key={school.id} value={school.name}>{school.name}</SelectItem>
+                                                ))}
+                                                <SelectItem value="add_new_school">Add new school...</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    ) : (
+                                        <div className='space-y-2'>
+                                            <FormField
+                                                control={form.control}
+                                                name="newSchool"
+                                                render={({ field: newSchoolField }) => (
+                                                    <Input {...newSchoolField} placeholder="Enter your school name" />
+                                                )}
+                                            />
+                                            <Button type="button" variant="secondary" size="sm" onClick={() => { setIsAddingNewSchool(false); form.setValue('school', ''); }}>Cancel</Button>
+                                        </div>
+                                    )}
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

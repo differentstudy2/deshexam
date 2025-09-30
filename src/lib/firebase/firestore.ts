@@ -29,7 +29,6 @@
 
 
 
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -977,12 +976,18 @@ export const getSchools = async () => {
 };
 
 export const addSchool = async (schoolName: string) => {
-    if (!schoolName) throw new Error("School name cannot be empty.");
+    if (!schoolName?.trim()) {
+        throw new Error("School name cannot be empty.");
+    }
+    const trimmedName = schoolName.trim();
     try {
-        const q = query(collection(db, "schools"), where("name", "==", schoolName));
+        const q = query(collection(db, "schools"), where("name", "==", trimmedName));
         const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) return querySnapshot.docs[0].id;
-        const docRef = await addDoc(collection(db, "schools"), { name: schoolName });
+        if (!querySnapshot.empty) {
+            console.log("School already exists.");
+            return querySnapshot.docs[0].id;
+        }
+        const docRef = await addDoc(collection(db, "schools"), { name: trimmedName });
         return docRef.id;
     } catch (e) {
         console.error("Error adding school: ", e);
@@ -1367,7 +1372,6 @@ export const updateUserProfile = async (userId: string, data: any) => {
 
     try {
         await runTransaction(db, async (transaction) => {
-            // First, perform all reads
             const userDoc = await transaction.get(userDocRef);
             const currentData = userDoc.data() || {};
             const isUsernameChanging = data.displayName && data.displayName !== currentData.displayName;
@@ -1375,25 +1379,28 @@ export const updateUserProfile = async (userId: string, data: any) => {
             let oldUsernameRef: any;
             if (isUsernameChanging && currentData.username) {
                 oldUsernameRef = doc(db, "usernames", currentData.username);
-                // This read is necessary to check for existence before deleting
                 await transaction.get(oldUsernameRef); 
             }
 
-            // Now, perform all writes
             const newData = { ...currentData, ...data };
             if (!userDoc.exists()) {
-                newData.role = 'user'; // Default role
+                newData.role = 'user';
             }
+
+            if (data.school === 'add_new_school' && data.newSchool) {
+                const newSchoolId = await addSchool(data.newSchool);
+                newData.school = data.newSchool;
+            }
+            delete newData.newSchool;
+
 
             if (isUsernameChanging || (!currentData.username && data.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
                 newData.username = newUsername;
                 
-                // Set new username mapping
                 const newUsernameRef = doc(db, "usernames", newUsername);
                 transaction.set(newUsernameRef, { uid: userId });
 
-                // Delete old username mapping if it existed
                 if (oldUsernameRef) {
                     transaction.delete(oldUsernameRef);
                 }
@@ -2093,6 +2100,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 
