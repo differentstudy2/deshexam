@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -71,31 +70,45 @@ const TextbookContentSidebar = ({
 }) => {
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
-        if (chapter.access === 'free') return true;
-        
-        if (index < (settings?.freeChaptersPerBook || 0)) {
-             return true;
+        // A chapter is always unlocked if it's explicitly set to 'free'.
+        if (chapter.access === 'free') {
+            return true;
         }
 
+        // The first N chapters can be free, based on admin settings.
+        if (index < (settings?.freeChaptersPerBook || 0)) {
+            return true;
+        }
+
+        // Check for subscription access if the chapter is not free by default.
         const hasProAccess = userProfile?.subscriptionPlan === 'pro';
         const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-
-        if (chapter.access === 'pro' && hasProAccess) return true;
-        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-
+        if (chapter.access === 'pro' && hasProAccess) {
+            return true;
+        }
+        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) {
+            return true;
+        }
+        
+        // If gating is enabled, check if the previous chapter's practice sets are passed.
         if (settings?.gateChaptersOnPass && index > 0) {
             const prevChapter = chapters[index - 1];
-            if (!isChapterUnlocked(prevChapter, index - 1)) return false;
+            // Recursively check if the previous chapter itself is unlocked.
+            if (!isChapterUnlocked(prevChapter, index - 1)) {
+                return false;
+            }
 
             const prevChapterTopics = topics[prevChapter.id] || [];
+            // If the previous chapter has no topics or practice sets, it's considered "passed".
             if (prevChapterTopics.length === 0) return true;
-
             const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
             if (prevChapterPracticeSets.length === 0) return true;
 
+            // Check if all practice sets in the previous chapter meet the pass mark.
             return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= (settings.practiceSetPassMark || 60));
         }
 
+        // If none of the above conditions are met, the chapter is locked.
         return false;
     }, [chapters, topics, userProfile, settings, progress]);
 
@@ -219,7 +232,7 @@ const PracticeSetItem = ({
                     )}
                 </Button>
                 {isLocked ? (
-                     <Button disabled>Start Practice</Button>
+                    <Button disabled>Start Practice</Button>
                 ) : (
                     <Button asChild>
                         <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
@@ -436,6 +449,15 @@ export default function TextbookSolutionsPage() {
             }
             return yPos;
         };
+        
+        pdf.setFontSize(60);
+        pdf.setTextColor(230, 230, 230);
+        pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+            angle: -45,
+            align: 'center',
+        });
+        pdf.setTextColor(0, 0, 0);
+        y = margin;
 
         const headerContent = (
             <div className="p-1 bg-transparent text-black font-sans w-[700px] text-sm">
@@ -469,21 +491,12 @@ export default function TextbookSolutionsPage() {
 
         const headerElement = headerContainer.firstElementChild;
         if (headerElement) {
-            pdf.addPage();
-            pdf.setFontSize(60);
-            pdf.setTextColor(230, 230, 230);
-            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-                angle: -45,
-                align: 'center',
-            });
-            pdf.setTextColor(0, 0, 0);
-            y = margin;
-            
             const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = pageWidth - 2 * margin;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             
+            y = addWatermarkAndNewPageIfNeeded(y, imgHeight);
             pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
             y += imgHeight + 2;
         }
@@ -825,5 +838,7 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
+    
 
     
