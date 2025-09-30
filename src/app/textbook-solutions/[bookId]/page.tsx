@@ -70,46 +70,42 @@ const TextbookContentSidebar = ({
 }) => {
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
-        const freeChapterCount = settings?.freeChaptersPerBook ?? 1;
-
-        // Condition 1: Chapter is within the free allowance
+        const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
+        // Rule 1: The chapter is within the free allowance.
         if (index < freeChapterCount) {
             return true;
         }
 
-        // Condition 2: Chapter is explicitly marked as 'free'
-        if (chapter.access === 'free') {
-            return true;
-        }
-
-        // Condition 3: User has sufficient subscription
-        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-        if (chapter.access === 'pro' && hasProAccess) return true;
-        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-
-        // Condition 4: Performance-based unlock (if enabled)
+        // Rule 2: Performance-based unlock.
         if (settings?.gateChaptersOnPass) {
             const prevChapter = chapters[index - 1];
-            if (!prevChapter) return false;
+            if (!prevChapter) return false; // Should only be true for index 0, handled above.
 
-            // Check if the previous chapter itself was unlocked to allow progression
-            if (!isChapterUnlocked(prevChapter, index - 1)) {
-                return false;
-            }
+            // The previous chapter must also be unlocked for this check to be valid.
+            // This prevents a user from jumping ahead by just passing one chapter in a long chain.
+            const isPrevChapterUnlocked = (index - 1) < freeChapterCount || isChapterUnlocked(prevChapter, index - 1);
+            if(!isPrevChapterUnlocked) return false;
 
             const prevChapterTopics = topics[prevChapter.id] || [];
             const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-
-            // If prev chapter has no practice sets, this one unlocks
+            
+            // If the previous chapter has no practice sets, this one unlocks.
             if (prevChapterPracticeSets.length === 0) {
                 return true;
             }
 
             const passMark = settings.practiceSetPassMark || 60;
-            return prevChapterPracticeSets.every(ps =>
-                (progress?.highestScores?.[ps.id] || 0) >= passMark
-            );
+            // All practice sets in the previous chapter must be passed.
+            return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
+        }
+
+        // Rule 3: Subscription-based unlock (if performance gating is off).
+        if (!settings?.gateChaptersOnPass) {
+            if (chapter.access === 'free') return true;
+            const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+            const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+            if (chapter.access === 'pro' && hasProAccess) return true;
+            if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
         }
 
         return false;
@@ -220,7 +216,7 @@ const PracticeSetItem = ({
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
-                 <TooltipProvider>
+                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
                              {isLocked ? (
@@ -257,7 +253,7 @@ const PracticeSetItem = ({
                         </>
                     )}
                 </Button>
-                 {isLocked ? lockedButton : unlockedButton}
+                {isLocked ? lockedButton : unlockedButton}
             </div>
         </Card>
     );
@@ -556,16 +552,14 @@ export default function TextbookSolutionsPage() {
                       <span className="flex-1"><strong>Q{i + 1}:</strong> {question.text}</span>
                       <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
-                   {question.type === 'Multiple Choice' && question.options && (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm">
-                          {question.options.map((option, optIndex) => (
-                              <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
-                                  <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
-                                  <div>{option.text}</div>
-                              </div>
-                          ))}
-                      </div>
-                  )}
+                   <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm">
+                        {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => (
+                            <div key={optIndex} className="flex items-start gap-1">
+                                <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
+                                <div>{option.text}</div>
+                            </div>
+                        ))}
+                    </div>
                   {question.type === 'True/False' && (
                       <div className="flex space-x-4 text-sm"><span>A) True</span><span>B) False</span></div>
                   )}
@@ -573,31 +567,31 @@ export default function TextbookSolutionsPage() {
                       <div className="mt-4 border-b-2 border-dotted border-black"></div>
                   )}
                   {question.type === 'Matching' && question.matchingOptions && (
-                      <div className="mt-2 text-sm">
-                          <div className="grid grid-cols-2 gap-8">
-                              <h4 className="font-semibold underline">Column A</h4>
-                              <h4 className="font-semibold underline">Column B</h4>
-                          </div>
-                           <div className="grid grid-cols-2 gap-8">
-                             <div>
-                                {question.matchingOptions.columnA.map((itemA, index) => (
-                                    <div key={index} className="grid grid-cols-[20px_1fr] items-center">
-                                      <span>{index + 1}.</span>
-                                      <span>{itemA.text}</span>
-                                    </div>
-                                ))}
-                              </div>
-                              <div>
-                                {question.matchingOptions.columnB.map((itemB, index) => (
-                                     <div key={index} className="grid grid-cols-[20px_1fr] items-center">
-                                       <span>{String.fromCharCode(97 + index)}.</span>
-                                       <span>{itemB.text}</span>
-                                     </div>
-                                ))}
-                              </div>
-                          </div>
-                      </div>
-                  )}
+                        <div className="mt-2 text-sm">
+                            <div className="grid grid-cols-2 gap-8">
+                                <h4 className="font-semibold underline">Column A</h4>
+                                <h4 className="font-semibold underline">Column B</h4>
+                            </div>
+                            <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                    {question.matchingOptions.columnA.map((itemA, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <span>{index + 1}.</span>
+                                            <span>{itemA.text}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div>
+                                    {question.matchingOptions.columnB.map((itemB, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <span>{String.fromCharCode(97 + index)}.</span>
+                                            <span>{itemB.text}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
               </div>
             );
             
@@ -873,3 +867,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
