@@ -29,6 +29,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -962,6 +963,53 @@ export const deleteBoard = async (id: string) => {
         throw new Error("Failed to delete board.");
     }
 };
+
+export const getSchools = async () => {
+    try {
+        const q = query(collection(db, "schools"), orderBy("name"));
+        const querySnapshot = await getDocs(q);
+        const schools = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
+        return schools;
+    } catch (e) {
+        console.error("Error getting schools: ", e);
+        throw new Error("Failed to fetch schools.");
+    }
+};
+
+export const addSchool = async (schoolName: string) => {
+    if (!schoolName) throw new Error("School name cannot be empty.");
+    try {
+        const q = query(collection(db, "schools"), where("name", "==", schoolName));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) return querySnapshot.docs[0].id;
+        const docRef = await addDoc(collection(db, "schools"), { name: schoolName });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding school: ", e);
+        throw new Error("Failed to add school.");
+    }
+};
+
+export const updateSchool = async (id: string, name: string) => {
+    if (!id || !name) throw new Error("ID and name are required.");
+    try {
+        await updateDoc(doc(db, "schools", id), { name });
+    } catch (e) {
+        console.error("Error updating school: ", e);
+        throw new Error("Failed to update school.");
+    }
+};
+
+export const deleteSchool = async (id: string) => {
+    if (!id) throw new Error("ID is required.");
+    try {
+        await deleteDoc(doc(db, "schools", id));
+    } catch (e) {
+        console.error("Error deleting school: ", e);
+        throw new Error("Failed to delete school.");
+    }
+};
+
 
 export const getClasses = async () => {
     try {
@@ -2045,6 +2093,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 

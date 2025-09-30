@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { getUserProfile, updateUserProfile, uploadFile, getBoards, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
+import { getUserProfile, updateUserProfile, uploadFile, getBoards, getClasses, getGradesByClass, getSchools } from '@/lib/firebase/firestore';
 import { updateProfile as updateAuthProfile } from 'firebase/auth';
 import { Upload, Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 type Board = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
 type Grade = { id: string, name: string };
+type School = { id: string, name: string };
 
 const profileSchema = z.object({
   displayName: z.string().min(2, "Display name must be at least 2 characters."),
@@ -43,6 +44,7 @@ export default function ProfilePage() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [schools, setSchools] = useState<School[]>([]);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -63,14 +65,15 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchMetadata = async () => {
         try {
-            const [boardsData, classesData] = await Promise.all([getBoards(), getClasses()]);
+            const [boardsData, classesData, schoolsData] = await Promise.all([getBoards(), getClasses(), getSchools()]);
             setBoards(boardsData);
             setClassCategories(classesData);
+            setSchools(schoolsData);
         } catch (error) {
             toast({
                 variant: 'destructive',
                 title: 'Failed to load academic options',
-                description: 'Could not fetch boards and classes.',
+                description: 'Could not fetch boards, classes, or schools.',
             });
         }
     }
@@ -276,18 +279,27 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
-                         <FormField
-                          control={form.control}
-                          name="school"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Current School/College</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g., Delhi Public School" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                        <FormField
+                            control={form.control}
+                            name="school"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Current School/College</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select your school" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {schools.map(school => (
+                                                <SelectItem key={school.id} value={school.name}>{school.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
                         />
                    </div>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
