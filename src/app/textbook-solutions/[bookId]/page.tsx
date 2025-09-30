@@ -70,23 +70,36 @@ const TextbookContentSidebar = ({
 }) => {
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
+        // Free access overrides all locks
         if (chapter.access === 'free') return true;
         if (index < (settings?.freeChaptersPerBook || 1)) return true;
-        if (userProfile?.subscriptionPlan && (userProfile.subscriptionPlan === 'pro' || userProfile.subscriptionPlan === chapter.access)) {
-            return true;
-        }
 
-        if (index > 0 && settings?.gateChaptersOnPass) {
+        // Subscription-based access
+        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+
+        if (chapter.access === 'pro' && hasProAccess) return true;
+        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
+
+        // Performance-based gating (if enabled)
+        if (settings?.gateChaptersOnPass && index > 0) {
             const prevChapter = chapters[index - 1];
+            // If the previous chapter itself wasn't unlocked, this one can't be either
+            if (!isChapterUnlocked(prevChapter, index - 1)) return false;
+
             const prevChapterTopics = topics[prevChapter.id] || [];
-            if (prevChapterTopics.length === 0) return true; // If prev chapter has no topics/sets, unlock
+            // If the previous chapter has no topics, it can't be failed, so unlock the next.
+            if (prevChapterTopics.length === 0) return true;
 
             const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-            if (prevChapterPracticeSets.length === 0) return true; // If prev chapter has no sets, unlock
+            // If no practice sets, can't fail, so unlock.
+            if (prevChapterPracticeSets.length === 0) return true;
 
+            // Check if all practice sets in the previous chapter are passed
             return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= (settings.practiceSetPassMark || 60));
         }
 
+        // Default to locked if no other condition is met
         return false;
     }, [chapters, topics, userProfile, settings, progress]);
 
