@@ -31,6 +31,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { ScoreCircle } from '@/components/feature/score-circle';
 
 
 type UserProfile = {
@@ -70,36 +71,31 @@ const TextbookContentSidebar = ({
 }) => {
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
-        // Free access overrides all locks
         if (chapter.access === 'free') return true;
-        if (index < (settings?.freeChaptersPerBook || 1)) return true;
+        
+        if (index < (settings?.freeChaptersPerBook || 0)) {
+             return true;
+        }
 
-        // Subscription-based access
         const hasProAccess = userProfile?.subscriptionPlan === 'pro';
         const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
 
         if (chapter.access === 'pro' && hasProAccess) return true;
         if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
 
-        // Performance-based gating (if enabled)
         if (settings?.gateChaptersOnPass && index > 0) {
             const prevChapter = chapters[index - 1];
-            // If the previous chapter itself wasn't unlocked, this one can't be either
             if (!isChapterUnlocked(prevChapter, index - 1)) return false;
 
             const prevChapterTopics = topics[prevChapter.id] || [];
-            // If the previous chapter has no topics, it can't be failed, so unlock the next.
             if (prevChapterTopics.length === 0) return true;
 
             const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-            // If no practice sets, can't fail, so unlock.
             if (prevChapterPracticeSets.length === 0) return true;
 
-            // Check if all practice sets in the previous chapter are passed
             return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= (settings.practiceSetPassMark || 60));
         }
 
-        // Default to locked if no other condition is met
         return false;
     }, [chapters, topics, userProfile, settings, progress]);
 
@@ -223,7 +219,7 @@ const PracticeSetItem = ({
                     )}
                 </Button>
                 {isLocked ? (
-                    <Button disabled>Start Practice</Button>
+                     <Button disabled>Start Practice</Button>
                 ) : (
                     <Button asChild>
                         <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
@@ -296,10 +292,9 @@ export default function TextbookSolutionsPage() {
         
         setChapters(chaptersData);
 
-        // If a chapter is specified in the URL, fetch its topics
         const initialChapterId = searchParams.get('chapter');
         if (initialChapterId) {
-            handleChapterToggle(initialChapterId);
+            await handleChapterToggle(initialChapterId);
         }
 
       } else {
@@ -312,7 +307,6 @@ export default function TextbookSolutionsPage() {
   }, [textbookId, router, user]);
   
   useEffect(() => {
-    // Reset resource fetching state when topic changes
     setAreResourcesFetched(false);
   }, [activeTopic]);
 
@@ -357,13 +351,26 @@ export default function TextbookSolutionsPage() {
     const topic = topics[activeChapter]?.find(t => t.id === activeTopic);
     if (!topic) return null;
   
-    // Ensure practice sets are sorted for consistent locking logic
     const sortedPracticeSets = [...(topic.practiceSets || [])].sort((a, b) =>
       a.title.localeCompare(b.title, undefined, { numeric: true })
     );
   
     return { ...topic, practiceSets: sortedPracticeSets };
   }, [activeChapter, activeTopic, topics]);
+  
+  const topicAggregateScore = useMemo(() => {
+    if (!selectedTopicContent || !progress || !selectedTopicContent.practiceSets || selectedTopicContent.practiceSets.length === 0) {
+        return null;
+    }
+    const scores = selectedTopicContent.practiceSets
+        .map(ps => progress.highestScores[ps.id])
+        .filter(score => score !== undefined);
+        
+    if (scores.length === 0) return null;
+
+    const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    return Math.round(average);
+  }, [selectedTopicContent, progress]);
   
   const handleResourceClick = (resource: any) => {
     setViewerResource(resource);
@@ -430,14 +437,6 @@ export default function TextbookSolutionsPage() {
             return yPos;
         };
 
-        pdf.setFontSize(60);
-        pdf.setTextColor(230, 230, 230);
-        pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-            angle: -45,
-            align: 'center',
-        });
-        pdf.setTextColor(0, 0, 0);
-
         const headerContent = (
             <div className="p-1 bg-transparent text-black font-sans w-[700px] text-sm">
                 <div className="text-center mb-2">
@@ -470,6 +469,16 @@ export default function TextbookSolutionsPage() {
 
         const headerElement = headerContainer.firstElementChild;
         if (headerElement) {
+            pdf.addPage();
+            pdf.setFontSize(60);
+            pdf.setTextColor(230, 230, 230);
+            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                angle: -45,
+                align: 'center',
+            });
+            pdf.setTextColor(0, 0, 0);
+            y = margin;
+            
             const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = pageWidth - 2 * margin;
@@ -504,7 +513,7 @@ export default function TextbookSolutionsPage() {
                       <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
                    {question.type === 'Multiple Choice' && question.options && (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm">
                           {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
                                   <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
@@ -755,7 +764,15 @@ export default function TextbookSolutionsPage() {
                                 {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
                                     <div className="mt-8">
                                         <Separator />
-                                        <h3 className="mt-6 font-semibold text-2xl">Practice Sets</h3>
+                                        <div className="flex items-center justify-between mt-6">
+                                            <h3 className="font-semibold text-2xl">Practice Sets</h3>
+                                            {topicAggregateScore !== null && (
+                                                 <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-muted-foreground">Topic Average:</span>
+                                                    <ScoreCircle score={topicAggregateScore} size={40} />
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="space-y-2 mt-4">
                                             {selectedTopicContent.practiceSets.map((ps, index) => {
                                                 const passMark = settings?.practiceSetPassMark || 60;
@@ -808,3 +825,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
+    
