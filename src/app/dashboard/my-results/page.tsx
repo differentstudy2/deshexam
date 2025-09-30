@@ -55,7 +55,7 @@ export default function MyResultsPage() {
           highestScore: score,
           bestSubmission: sub,
           testTitle: sub.testTitle,
-          subject: (sub as any).test?.subject || sub.subject,
+          subject: sub.subject,
           testType: sub.testType,
         });
       }
