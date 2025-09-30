@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -71,48 +70,49 @@ const TextbookContentSidebar = ({
 }) => {
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
-        // The first chapter is always unlocked to start.
-        if (index === 0) {
+        const freeChapterCount = settings?.freeChaptersPerBook ?? 1;
+
+        // Condition 1: Chapter is within the free allowance
+        if (index < freeChapterCount) {
             return true;
         }
 
-        // If the feature is disabled, all chapters beyond the first (that aren't free) are essentially locked by this logic.
-        // Other logic paths (subscription, free status) will handle their unlocking.
-        if (!settings?.gateChaptersOnPass) {
-            // Re-introduce subscription/free checks if gating is off
-            if (chapter.access === 'free') return true;
-            if (index < (settings?.freeChaptersPerBook || 0)) return true;
-            const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-            const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-            if (chapter.access === 'pro' && hasProAccess) return true;
-            if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-            return false;
-        }
-
-        // --- Performance Gating Logic ---
-        // Get the previous chapter
-        const prevChapter = chapters[index - 1];
-        if (!prevChapter) return false; // Should not happen if index > 0
-
-        // If previous chapter itself is locked, this one is also locked.
-        if (!isChapterUnlocked(prevChapter, index - 1)) {
-            return false;
-        }
-        
-        // Find all practice sets within the previous chapter
-        const prevChapterTopics = topics[prevChapter.id] || [];
-        const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-
-        // If the previous chapter has no practice sets, this chapter is unlocked by default.
-        if (prevChapterPracticeSets.length === 0) {
+        // Condition 2: Chapter is explicitly marked as 'free'
+        if (chapter.access === 'free') {
             return true;
         }
 
-        // Check if all practice sets in the previous chapter have been passed.
-        const passMark = settings.practiceSetPassMark || 60;
-        return prevChapterPracticeSets.every(ps => 
-            (progress?.highestScores?.[ps.id] || 0) >= passMark
-        );
+        // Condition 3: User has sufficient subscription
+        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+        if (chapter.access === 'pro' && hasProAccess) return true;
+        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
+
+        // Condition 4: Performance-based unlock (if enabled)
+        if (settings?.gateChaptersOnPass) {
+            const prevChapter = chapters[index - 1];
+            if (!prevChapter) return false;
+
+            // Check if the previous chapter itself was unlocked to allow progression
+            if (!isChapterUnlocked(prevChapter, index - 1)) {
+                return false;
+            }
+
+            const prevChapterTopics = topics[prevChapter.id] || [];
+            const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
+
+            // If prev chapter has no practice sets, this one unlocks
+            if (prevChapterPracticeSets.length === 0) {
+                return true;
+            }
+
+            const passMark = settings.practiceSetPassMark || 60;
+            return prevChapterPracticeSets.every(ps =>
+                (progress?.highestScores?.[ps.id] || 0) >= passMark
+            );
+        }
+
+        return false;
     }, [chapters, topics, userProfile, settings, progress]);
 
 
@@ -873,7 +873,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
-    
-
-    
