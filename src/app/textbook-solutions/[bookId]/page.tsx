@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -70,43 +71,55 @@ const TextbookContentSidebar = ({
 }) => {
   
   const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
-    // 1. Check if the chapter is within the free allowance
     const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
     if (index < freeChapterCount) {
       return true;
     }
-    
-    // If gating is disabled, access depends on subscription
-    if (!settings?.gateChaptersOnPass) {
-        if (chapter.access === 'free') return true;
-        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-        if (chapter.access === 'pro' && hasProAccess) return true;
-        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-        return false; // If none of the above, it's locked.
-    }
-    
-    // Performance-based unlocking for chapters beyond the free limit
-    const prevChapter = chapters[index - 1];
-    if (!prevChapter) return false; // Should not happen if index > 0
 
-    const prevChapterTopics = topics[prevChapter.id];
-    // If previous chapter's topics aren't loaded, we can't check, so it's locked.
-    // This assumes topics are loaded sequentially or at least the previous one is loaded.
-    if (!prevChapterTopics) return false; 
-    
-    const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-    // If previous chapter has no practice sets, it's considered "passed".
-    if (prevChapterPracticeSets.length === 0) {
-        return isChapterUnlocked(prevChapter, index - 1);
+    if (settings?.gateChaptersOnPass) {
+        const prevChapter = chapters[index - 1];
+        if (!prevChapter) return false;
+        
+        const prevChapterTopics = topics[prevChapter.id];
+        if (!prevChapterTopics) return false;
+
+        const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
+        if (prevChapterPracticeSets.length === 0) {
+           return true; // No barrier, so unlocked.
+        }
+
+        const passMark = settings.practiceSetPassMark || 60;
+        const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
+        
+        return allPreviousPassed;
     }
-    
-    const passMark = settings.practiceSetPassMark || 60;
-    // Check if ALL practice sets in the previous chapter are passed
-    const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
-    
-    return allPreviousPassed;
+
+    if (chapter.access === 'free') return true;
+    const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+    const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+    if (chapter.access === 'pro' && hasProAccess) return true;
+    if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
+
+    return false;
   }, [chapters, topics, userProfile, settings, progress]);
+
+  const calculateChapterAggregate = (chapterId: string) => {
+    const chapterTopics = topics[chapterId];
+    if (!chapterTopics || !progress) return null;
+
+    const practiceSets = chapterTopics.flatMap(t => t.practiceSets || []);
+    if (practiceSets.length === 0) return null;
+
+    const scores = practiceSets
+        .map(ps => progress.highestScores[ps.id])
+        .filter(score => score !== undefined);
+        
+    if (scores.length === 0) return null;
+
+    const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    return Math.round(average);
+  };
+
 
   return (
     <Card>
@@ -123,13 +136,19 @@ const TextbookContentSidebar = ({
         >
           {chapters.map((chapter, index) => {
             const isUnlocked = isChapterUnlocked(chapter, index);
+            const chapterAggregate = calculateChapterAggregate(chapter.id);
             
             return (
               <AccordionItem value={chapter.id} key={chapter.id}>
                 <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
                   <div className="flex flex-col items-start w-full">
                       <div className="flex items-center justify-between w-full">
-                         <span className="flex items-center gap-2 text-left">{chapter.title}</span>
+                         <span className="flex items-center gap-2 text-left">
+                            {chapter.title}
+                            {chapterAggregate !== null && (
+                                <ScoreCircle score={chapterAggregate} size={24} />
+                            )}
+                         </span>
                          {!isUnlocked && (
                              <span className="flex items-center gap-1 text-xs text-muted-foreground mr-2">
                                  <Lock className="w-3 h-3" />
@@ -239,7 +258,7 @@ const PracticeSetItem = ({
                                 <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                              <TooltipContent>
-                                <p>Get {passMark}% to unlock this chapter</p>
+                                <p>Get {passMark}% on the previous chapter to unlock</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
