@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -71,42 +72,35 @@ const TextbookContentSidebar = ({
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
         const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
-        // Rule 1: The chapter is within the free allowance.
         if (index < freeChapterCount) {
             return true;
         }
 
-        // Rule 2: Performance-based unlock.
         if (settings?.gateChaptersOnPass) {
             const prevChapter = chapters[index - 1];
-            if (!prevChapter) return false; // Should only be true for index 0, handled above.
+            if (!prevChapter) return false; // Should not happen for index > 0
 
-            // The previous chapter must also be unlocked for this check to be valid.
-            // This prevents a user from jumping ahead by just passing one chapter in a long chain.
-            const isPrevChapterUnlocked = (index - 1) < freeChapterCount || isChapterUnlocked(prevChapter, index - 1);
-            if(!isPrevChapterUnlocked) return false;
-
-            const prevChapterTopics = topics[prevChapter.id] || [];
+            const prevChapterTopics = topics[prevChapter.id];
+            if (!prevChapterTopics) return false; // Topics for prev chapter not loaded
+            
             const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
             
-            // If the previous chapter has no practice sets, this one unlocks.
             if (prevChapterPracticeSets.length === 0) {
-                return true;
+                 return true; 
             }
 
             const passMark = settings.practiceSetPassMark || 60;
-            // All practice sets in the previous chapter must be passed.
-            return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
+            const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
+
+            return allPreviousPassed;
         }
 
-        // Rule 3: Subscription-based unlock (if performance gating is off).
-        if (!settings?.gateChaptersOnPass) {
-            if (chapter.access === 'free') return true;
-            const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-            const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-            if (chapter.access === 'pro' && hasProAccess) return true;
-            if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-        }
+        // Subscription-based access if performance gating is off
+        if (chapter.access === 'free') return true;
+        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+        if (chapter.access === 'pro' && hasProAccess) return true;
+        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
 
         return false;
     }, [chapters, topics, userProfile, settings, progress]);
@@ -192,46 +186,51 @@ const PracticeSetItem = ({
     onDownload: () => void;
     isDownloading: boolean;
 }) => {
-    const lockedButton = (
-        <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button disabled className="w-full">Start Practice</Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
-    );
 
-    const unlockedButton = (
-         <Button asChild className="w-full">
-            <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
-                Start Practice
-            </Link>
-        </Button>
-    );
+    const StartButton = () => {
+        if (isLocked) {
+            return (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            {/* The extra div is needed for Tooltip to correctly attach to a disabled button */}
+                            <div>
+                                <Button disabled className="w-full">Start Practice</Button>
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            );
+        }
+        return (
+            <Button asChild>
+                <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                    Start Practice
+                </Link>
+            </Button>
+        );
+    };
 
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                             {isLocked ? (
+                 {isLocked ? (
+                     <TooltipProvider>
+                         <Tooltip>
+                            <TooltipTrigger>
                                 <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
-                            ) : (
-                                <CheckSquare className="h-5 w-5 text-primary" />
-                            )}
-                        </TooltipTrigger>
-                        {isLocked && (
-                            <TooltipContent>
+                            </TooltipTrigger>
+                             <TooltipContent>
                                 <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
                             </TooltipContent>
-                        )}
-                    </Tooltip>
-                </TooltipProvider>
+                         </Tooltip>
+                     </TooltipProvider>
+                ) : (
+                    <CheckSquare className="h-5 w-5 text-primary" />
+                )}
                 <span className="font-medium">{ps.title}</span>
             </div>
             <div className="flex items-center gap-4">
@@ -253,7 +252,7 @@ const PracticeSetItem = ({
                         </>
                     )}
                 </Button>
-                {isLocked ? lockedButton : unlockedButton}
+                <StartButton />
             </div>
         </Card>
     );
@@ -867,4 +866,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
