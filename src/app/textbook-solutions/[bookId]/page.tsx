@@ -71,31 +71,45 @@ const TextbookContentSidebar = ({
 }) => {
   
   const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
+    // 1. Check if the chapter is part of the free allowance
     const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
-    if (index < freeChapterCount) return true;
-    if (chapter.access === 'free') return true;
+    if (index < freeChapterCount) {
+        return true;
+    }
 
+    // 2. If gating is on, check performance on the *previous* chapter
     if (settings?.gateChaptersOnPass) {
-        if (index === 0) return true;
         const prevChapter = chapters[index - 1];
-        if (!prevChapter) return false;
-        
+        if (!prevChapter) return false; // Should not happen, but safe check
+
         const prevChapterTopics = topics[prevChapter.id];
-        if (!prevChapterTopics) return false;
+        if (!prevChapterTopics) {
+             // This might happen if topics for prev chapter haven't been loaded.
+             // Assume locked if we can't verify. The UI should fetch topics on expand.
+            return false;
+        }
 
         const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-        if (prevChapterPracticeSets.length === 0) return true; 
+        if (prevChapterPracticeSets.length === 0) {
+             // If previous chapter has no practice sets, it's considered "passed".
+            return true; 
+        }
 
         const passMark = settings.practiceSetPassMark || 60;
-        const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
+        const allPreviousPassed = prevChapterPracticeSets.every(ps => 
+            (progress?.highestScores?.[ps.id] || 0) >= passMark
+        );
         
         return allPreviousPassed;
     }
 
+    // 3. If gating is off, check subscription status
+    if (chapter.access === 'free') return true;
     if (!userProfile?.subscriptionPlan) return false;
     
     const hasProAccess = userProfile.subscriptionPlan === 'pro';
     const hasPassAccess = userProfile.subscriptionPlan === 'pass';
+    
     if (chapter.access === 'pro' && hasProAccess) return true;
     if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
 
@@ -879,6 +893,7 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
 
