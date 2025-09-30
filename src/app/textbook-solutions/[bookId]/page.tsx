@@ -71,48 +71,38 @@ const TextbookContentSidebar = ({
 }) => {
   
   const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
-    // Free chapters are always unlocked
+    // 1. Check if the chapter is within the free allowance
     const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
     if (index < freeChapterCount) {
-        return true;
+      return true;
     }
-
-    // Performance-gated chapters
+    
+    // 2. Check for performance-based unlock if the feature is enabled
     if (settings?.gateChaptersOnPass) {
-        // The first non-free chapter needs the previous free chapter to be passed
         const prevChapter = chapters[index - 1];
-        if (!prevChapter) return false; // Should not happen for index > 0
+        if (!prevChapter) return false;
 
         const prevChapterTopics = topics[prevChapter.id];
-        if (!prevChapterTopics) {
-            // If topics for previous chapter aren't loaded, we can't determine status yet.
-            // For UI purposes, we might assume locked until topics are loaded.
-            return false;
-        }
+        if (!prevChapterTopics) return false; 
         
         const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-        
         if (prevChapterPracticeSets.length === 0) {
-            // If previous chapter has no practice sets, the next one is unlocked.
+            // If previous chapter has no practice sets, treat it as "passed" to unlock the next one.
             return isChapterUnlocked(prevChapter, index - 1);
         }
-
+        
         const passMark = settings.practiceSetPassMark || 60;
         const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
-
-        if (allPreviousPassed) {
-             return isChapterUnlocked(prevChapter, index - 1);
-        }
+        
+        return allPreviousPassed;
     }
 
-    // Subscription-based access if performance gating is off or not applicable
-    if (!settings?.gateChaptersOnPass) {
-        if (chapter.access === 'free') return true;
-        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-        if (chapter.access === 'pro' && hasProAccess) return true;
-        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
-    }
+    // 3. Fallback to subscription-based access if performance gating is off
+    if (chapter.access === 'free') return true;
+    const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+    const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+    if (chapter.access === 'pro' && hasProAccess) return true;
+    if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
     
     return false;
   }, [chapters, topics, userProfile, settings, progress]);
@@ -136,9 +126,14 @@ const TextbookContentSidebar = ({
             return (
               <AccordionItem value={chapter.id} key={chapter.id} disabled={!isUnlocked}>
                 <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
-                  <div className="flex items-center gap-2 text-left">
-                    {!isUnlocked && <Lock className="w-4 h-4 flex-shrink-0" />}
-                    <span>{chapter.title}</span>
+                  <div className="flex items-center justify-between w-full">
+                      <span className="flex items-center gap-2 text-left">{chapter.title}</span>
+                      {!isUnlocked && (
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground mr-2">
+                              <Lock className="w-3 h-3" />
+                              Locked
+                          </span>
+                      )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -204,9 +199,10 @@ const PracticeSetItem = ({
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            {/* The extra div is needed for Tooltip to correctly attach to a disabled button */}
                             <div>
-                                <Button disabled className="w-full">Start Practice</Button>
+                                <Button disabled className="w-full">
+                                  <Lock className="mr-2 h-4 w-4" /> Locked
+                                </Button>
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -877,6 +873,7 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
 
 
 
