@@ -24,7 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
-import { getUserProfile, getTextbookProgress, getSettings, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
+import { getUserProfile, getTextbookProgress, getSettings, getQuestionsByPracticeSet, getTopicsByChapterId } from '@/lib/firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import jsPDF from 'jspdf';
@@ -188,7 +188,7 @@ const PracticeSetItem = ({
                     )}
                 </Button>
                 {isLocked ? (
-                     <Button disabled>Start Practice</Button>
+                    <Button disabled>Start Practice</Button>
                 ) : (
                     <Button asChild>
                         <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
@@ -261,29 +261,11 @@ export default function TextbookSolutionsPage() {
         
         setChapters(chaptersData);
 
-        const allTopics : { [key: string]: Topic[] } = {};
-
-        for(const chapter of chaptersData) {
-            const topicsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics`));
-            const topicsSnap = await getDocs(topicsQuery);
-            let topicsForChapter: Topic[] = topicsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Topic));
-            
-            topicsForChapter.sort((a, b) => {
-                return a.title.localeCompare(b.title, undefined, { numeric: true });
-            });
-
-             for (let topic of topicsForChapter) {
-                const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
-                const practiceSetsSnap = await getDocs(practiceSetsQuery);
-                topic.practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title, ...doc.data() }));
-                topic.practiceSets.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-             }
-
-             allTopics[chapter.id] = topicsForChapter;
+        // If a chapter is specified in the URL, fetch its topics
+        const initialChapterId = searchParams.get('chapter');
+        if (initialChapterId) {
+            handleChapterToggle(initialChapterId);
         }
-
-        setTopics(allTopics);
-
 
       } else {
         router.push('/');
@@ -301,9 +283,32 @@ export default function TextbookSolutionsPage() {
 
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
-      // Data is now pre-fetched, so this can be a simple state update if needed
-      // Or just rely on the accordion to show/hide content
-  }, []);
+      if (!chapterId || topics[chapterId]) {
+          return;
+      }
+      setLoadingTopics(chapterId);
+      try {
+          const topicsData = await getTopicsByChapterId(textbookId, chapterId);
+          
+           for (let topic of topicsData) {
+              const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
+              const practiceSetsSnap = await getDocs(practiceSetsQuery);
+              (topic as any).practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              (topic as any).practiceSets.sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+           }
+
+          setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
+      } catch (e) {
+          console.error("Failed to fetch topics for chapter:", e);
+          toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Could not load topics for this chapter.",
+          });
+      } finally {
+          setLoadingTopics(null);
+      }
+  }, [textbookId, topics, toast]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());

@@ -27,6 +27,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1799,12 +1800,9 @@ export const getTopicsByChapterId = async (textbookId: string, chapterId: string
         const querySnapshot = await getDocs(q);
         const topicsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { title: string } }));
         
-        // Fetch practice sets for each topic
-        for (let topic of topicsData) {
-            const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
-            const practiceSetsSnap = await getDocs(practiceSetsQuery);
-            (topic as any).practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, title: doc.data().title }));
-        }
+        topicsData.sort((a, b) => {
+            return a.title.localeCompare(b.title, undefined, { numeric: true });
+        });
         
         return topicsData;
     } catch (e) {
@@ -2046,6 +2044,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 
