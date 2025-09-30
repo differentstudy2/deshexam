@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -514,7 +515,7 @@ export default function TextbookSolutionsPage() {
                     <h1 className="text-xl font-bold">{practiceSet.title}</h1>
                     <h2 className="text-lg">{textbook?.title}</h2>
                 </div>
-                 <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-0 my-2">
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-2 my-2">
                     <p><strong>Institute Name:</strong> Deshexam.com</p>
                     {textbook?.board && <p><strong>Board:</strong> {textbook.board}</p>}
                     {textbook?.class && <p><strong>Class:</strong> {textbook.class}</p>}
