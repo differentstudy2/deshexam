@@ -363,7 +363,7 @@ export default function TextbookSolutionsPage() {
         const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
             if (yPos + contentHeight > pageHeight - margin) {
                 pdf.addPage();
-                 pdf.setFontSize(60);
+                pdf.setFontSize(60);
                 pdf.setTextColor(230, 230, 230);
                 pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
                     angle: -45,
@@ -390,12 +390,13 @@ export default function TextbookSolutionsPage() {
                     <h1 className="text-2xl font-bold">{practiceSet.title}</h1>
                     <h2 className="text-lg">{textbook?.title}</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm border-y-2 border-black py-2 my-2">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-1 my-2">
                     <p><strong>Institute Name:</strong> Deshexam.com</p>
-                    <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
-                    <p><strong>Subject:</strong> {textbook?.subject}</p>
-                    <p><strong>Class:</strong> {textbook?.class}</p>
                     <p><strong>Board:</strong> {textbook?.board}</p>
+                    <p><strong>Class:</strong> {textbook?.class}</p>
+                    <p><strong>Subject:</strong> {textbook?.subject}</p>
+                    {chapters.find(c => c.id === activeChapter)?.title && <p><strong>Chapter:</strong> {chapters.find(c => c.id === activeChapter)?.title}</p>}
+                    <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
                     <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                     <p><strong>Full Marks:</strong> {totalMarks}</p>
                     <p><strong>Duration:</strong> {totalMarks} min</p>
