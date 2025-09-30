@@ -68,6 +68,29 @@ const TextbookContentSidebar = ({
   progress: TextbookProgress | null;
   settings: any;
 }) => {
+  
+    const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
+        if (chapter.access === 'free') return true;
+        if (index < (settings?.freeChaptersPerBook || 1)) return true;
+        if (userProfile?.subscriptionPlan && (userProfile.subscriptionPlan === 'pro' || userProfile.subscriptionPlan === chapter.access)) {
+            return true;
+        }
+
+        if (index > 0 && settings?.gateChaptersOnPass) {
+            const prevChapter = chapters[index - 1];
+            const prevChapterTopics = topics[prevChapter.id] || [];
+            if (prevChapterTopics.length === 0) return true; // If prev chapter has no topics/sets, unlock
+
+            const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
+            if (prevChapterPracticeSets.length === 0) return true; // If prev chapter has no sets, unlock
+
+            return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= (settings.practiceSetPassMark || 60));
+        }
+
+        return false;
+    }, [chapters, topics, userProfile, settings, progress]);
+
+
   return (
     <Card>
       <CardHeader>
@@ -82,14 +105,13 @@ const TextbookContentSidebar = ({
           onValueChange={(value) => onChapterToggle(value)}
         >
           {chapters.map((chapter, index) => {
-            const isFree = chapter.access === 'free' || index < (settings?.freeChaptersPerBook || 1);
-            const isChapterLocked = !isFree && !userProfile?.subscriptionPlan;
-
+            const unlocked = isChapterUnlocked(chapter, index);
+            
             return (
               <AccordionItem value={chapter.id} key={chapter.id}>
-                <AccordionTrigger disabled={isChapterLocked} className="hover:no-underline">
+                <AccordionTrigger disabled={!unlocked} className="hover:no-underline">
                   <div className="flex items-center gap-2 text-left">
-                    {isChapterLocked && <Lock className="w-4 h-4 flex-shrink-0" />}
+                    {!unlocked && <Lock className="w-4 h-4 flex-shrink-0" />}
                     <span>{chapter.title}</span>
                   </div>
                 </AccordionTrigger>
@@ -723,7 +745,7 @@ export default function TextbookSolutionsPage() {
                                         <h3 className="mt-6 font-semibold text-2xl">Practice Sets</h3>
                                         <div className="space-y-2 mt-4">
                                             {selectedTopicContent.practiceSets.map((ps, index) => {
-                                                const passMark = settings?.practiceSetPassMark || 40;
+                                                const passMark = settings?.practiceSetPassMark || 60;
                                                 const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
                                                 const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
                                                 

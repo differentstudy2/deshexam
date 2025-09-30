@@ -60,7 +60,7 @@ export default function ManageChaptersPage() {
 
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [newChapter, setNewChapter] = useState({ title: '', content: '', access: 'free' as 'free' | 'pass' | 'pro' });
+  const [newChapter, setNewChapter] = useState({ title: '', content: '', access: 'pass' as 'free' | 'pass' | 'pro' });
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
@@ -120,7 +120,7 @@ export default function ManageChaptersPage() {
             // Add logic
             await addDoc(chaptersCollectionRef, newChapter);
         }
-        setNewChapter({ title: '', content: '', access: 'free' });
+        setNewChapter({ title: '', content: '', access: 'pass' });
         fetchTextbookAndChapters(); // Refetch to get the updated/new chapter
 
     } catch (error) {
@@ -139,7 +139,7 @@ export default function ManageChaptersPage() {
             await addDoc(chaptersCollectionRef, {
                 title: title,
                 content: '',
-                access: 'free'
+                access: 'pass'
             });
         }
         
@@ -164,12 +164,12 @@ export default function ManageChaptersPage() {
 
   const handleEditClick = (chapter: Chapter) => {
     setEditingChapter(chapter);
-    setNewChapter({ title: chapter.title, content: chapter.content || '', access: chapter.access || 'free' });
+    setNewChapter({ title: chapter.title, content: chapter.content || '', access: chapter.access || 'pass' });
   };
   
   const handleCancelEdit = () => {
     setEditingChapter(null);
-    setNewChapter({ title: '', content: '', access: 'free' });
+    setNewChapter({ title: '', content: '', access: 'pass' });
   }
   
   const handleDeleteClick = (chapter: Chapter) => {
@@ -325,7 +325,7 @@ export default function ManageChaptersPage() {
                             <Card key={chapter.id} className="flex flex-col">
                                 <CardHeader className="flex-row items-start justify-between pb-2">
                                     <CardTitle className="text-base font-medium leading-tight">{chapter.title}</CardTitle>
-                                    <ContentBadge type={chapter.access || 'free'} />
+                                    <ContentBadge type={chapter.access || 'pass'} />
                                 </CardHeader>
                                 <CardContent className="flex-grow text-sm text-muted-foreground">
                                     <div className="flex gap-2 flex-wrap">

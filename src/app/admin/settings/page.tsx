@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -115,7 +116,7 @@ const settingsSchema = z.object({
         pro: z.coerce.number().int().min(1).default(99),
     }).default({ free: 3, pass: 10, pro: 99 }),
     enablePracticeSetRetry: z.boolean().default(true),
-    practiceSetPassMark: z.coerce.number().int().min(0).max(100).default(40),
+    practiceSetPassMark: z.coerce.number().int().min(0).max(100).default(60),
     gateChaptersOnPass: z.boolean().default(false),
     practiceSetSubmissionLimit: z.object({
         free: z.coerce.number().int().min(1).default(5),
@@ -422,7 +423,7 @@ export default function AdminSettingsPage() {
         freeChaptersPerBook: 1,
         practiceSetAttempts: { free: 3, pass: 10, pro: 99 },
         enablePracticeSetRetry: true,
-        practiceSetPassMark: 40,
+        practiceSetPassMark: 60,
         gateChaptersOnPass: false,
         practiceSetSubmissionLimit: { free: 5, pass: 50, pro: 200 },
     },
@@ -925,7 +926,7 @@ export default function AdminSettingsPage() {
                                         </div>
                                         <FormControl>
                                             <Slider
-                                                defaultValue={[field.value ?? 40]}
+                                                defaultValue={[field.value ?? 60]}
                                                 max={100}
                                                 step={1}
                                                 onValueChange={(value) => field.onChange(value[0])}
