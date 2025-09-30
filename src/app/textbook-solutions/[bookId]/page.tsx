@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -70,46 +71,48 @@ const TextbookContentSidebar = ({
 }) => {
   
     const isChapterUnlocked = useCallback((chapter: Chapter, index: number) => {
-        // A chapter is always unlocked if it's explicitly set to 'free'.
-        if (chapter.access === 'free') {
+        // The first chapter is always unlocked to start.
+        if (index === 0) {
             return true;
         }
 
-        // The first N chapters can be free, based on admin settings.
-        if (index < (settings?.freeChaptersPerBook || 0)) {
-            return true;
+        // If the feature is disabled, all chapters beyond the first (that aren't free) are essentially locked by this logic.
+        // Other logic paths (subscription, free status) will handle their unlocking.
+        if (!settings?.gateChaptersOnPass) {
+            // Re-introduce subscription/free checks if gating is off
+            if (chapter.access === 'free') return true;
+            if (index < (settings?.freeChaptersPerBook || 0)) return true;
+            const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+            const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+            if (chapter.access === 'pro' && hasProAccess) return true;
+            if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
+            return false;
         }
 
-        // Check for subscription access if the chapter is not free by default.
-        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-        if (chapter.access === 'pro' && hasProAccess) {
-            return true;
-        }
-        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) {
-            return true;
+        // --- Performance Gating Logic ---
+        // Get the previous chapter
+        const prevChapter = chapters[index - 1];
+        if (!prevChapter) return false; // Should not happen if index > 0
+
+        // If previous chapter itself is locked, this one is also locked.
+        if (!isChapterUnlocked(prevChapter, index - 1)) {
+            return false;
         }
         
-        // If gating is enabled, check if the previous chapter's practice sets are passed.
-        if (settings?.gateChaptersOnPass && index > 0) {
-            const prevChapter = chapters[index - 1];
-            // Recursively check if the previous chapter itself is unlocked.
-            if (!isChapterUnlocked(prevChapter, index - 1)) {
-                return false;
-            }
+        // Find all practice sets within the previous chapter
+        const prevChapterTopics = topics[prevChapter.id] || [];
+        const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
 
-            const prevChapterTopics = topics[prevChapter.id] || [];
-            // If the previous chapter has no topics or practice sets, it's considered "passed".
-            if (prevChapterTopics.length === 0) return true;
-            const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-            if (prevChapterPracticeSets.length === 0) return true;
-
-            // Check if all practice sets in the previous chapter meet the pass mark.
-            return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= (settings.practiceSetPassMark || 60));
+        // If the previous chapter has no practice sets, this chapter is unlocked by default.
+        if (prevChapterPracticeSets.length === 0) {
+            return true;
         }
 
-        // If none of the above conditions are met, the chapter is locked.
-        return false;
+        // Check if all practice sets in the previous chapter have been passed.
+        const passMark = settings.practiceSetPassMark || 60;
+        return prevChapterPracticeSets.every(ps => 
+            (progress?.highestScores?.[ps.id] || 0) >= passMark
+        );
     }, [chapters, topics, userProfile, settings, progress]);
 
 
@@ -193,23 +196,46 @@ const PracticeSetItem = ({
     onDownload: () => void;
     isDownloading: boolean;
 }) => {
+    const lockedButton = (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button disabled className="w-full">Start Practice</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+
+    const unlockedButton = (
+         <Button asChild className="w-full">
+            <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                Start Practice
+            </Link>
+        </Button>
+    );
+
     return (
         <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
             <div className="flex items-center gap-3 flex-grow">
-                {isLocked ? (
-                     <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Lock className="h-5 w-5 text-muted-foreground" />
-                            </TooltipTrigger>
+                 <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                             {isLocked ? (
+                                <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
+                            ) : (
+                                <CheckSquare className="h-5 w-5 text-primary" />
+                            )}
+                        </TooltipTrigger>
+                        {isLocked && (
                             <TooltipContent>
                                 <p>You must score at least {passMark}% on the previous practice set to unlock this one.</p>
                             </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                ) : (
-                    <CheckSquare className="h-5 w-5 text-primary" />
-                )}
+                        )}
+                    </Tooltip>
+                </TooltipProvider>
                 <span className="font-medium">{ps.title}</span>
             </div>
             <div className="flex items-center gap-4">
@@ -231,15 +257,7 @@ const PracticeSetItem = ({
                         </>
                     )}
                 </Button>
-                {isLocked ? (
-                    <Button disabled>Start Practice</Button>
-                ) : (
-                    <Button asChild>
-                        <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
-                                Start Practice
-                        </Link>
-                    </Button>
-                )}
+                 {isLocked ? lockedButton : unlockedButton}
             </div>
         </Card>
     );
@@ -326,6 +344,11 @@ export default function TextbookSolutionsPage() {
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
       if (!chapterId || topics[chapterId]) {
+          // If topics for this chapter are already loaded, just update the URL
+          const params = new URLSearchParams(searchParams.toString());
+          params.set('chapter', chapterId);
+          params.delete('topic'); // Clear topic when chapter changes
+          router.push(`?${params.toString()}`, { scroll: false });
           return;
       }
       setLoadingTopics(chapterId);
@@ -340,6 +363,10 @@ export default function TextbookSolutionsPage() {
            }
 
           setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
+          const params = new URLSearchParams(searchParams.toString());
+          params.set('chapter', chapterId);
+          params.delete('topic');
+          router.push(`?${params.toString()}`, { scroll: false });
       } catch (e) {
           console.error("Failed to fetch topics for chapter:", e);
           toast({
@@ -350,7 +377,7 @@ export default function TextbookSolutionsPage() {
       } finally {
           setLoadingTopics(null);
       }
-  }, [textbookId, topics, toast]);
+  }, [textbookId, topics, toast, router, searchParams]);
   
   const handleTopicSelect = (chapterId: string, topicId: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -450,13 +477,17 @@ export default function TextbookSolutionsPage() {
             return yPos;
         };
         
-        pdf.setFontSize(60);
-        pdf.setTextColor(230, 230, 230);
-        pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-            angle: -45,
-            align: 'center',
-        });
-        pdf.setTextColor(0, 0, 0);
+        const drawWatermark = () => {
+            pdf.setFontSize(60);
+            pdf.setTextColor(230, 230, 230);
+            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                angle: -45,
+                align: 'center',
+            });
+            pdf.setTextColor(0, 0, 0);
+        }
+
+        drawWatermark();
         y = margin;
 
         const headerContent = (
@@ -547,7 +578,7 @@ export default function TextbookSolutionsPage() {
                               <h4 className="font-semibold underline">Column A</h4>
                               <h4 className="font-semibold underline">Column B</h4>
                           </div>
-                          <div className="grid grid-cols-2 gap-8">
+                           <div className="grid grid-cols-2 gap-8">
                              <div>
                                 {question.matchingOptions.columnA.map((itemA, index) => (
                                     <div key={index} className="grid grid-cols-[20px_1fr] items-center">
@@ -591,7 +622,11 @@ export default function TextbookSolutionsPage() {
                 const imgWidth = pageWidth - 2 * margin;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                y = addWatermarkAndNewPageIfNeeded(y, imgHeight);
+                if (y + imgHeight > pageHeight - margin) {
+                    pdf.addPage();
+                    drawWatermark();
+                    y = margin;
+                }
 
                 pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
                 y += imgHeight + 0.5;
