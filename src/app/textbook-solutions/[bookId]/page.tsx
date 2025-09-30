@@ -81,13 +81,11 @@ const TextbookContentSidebar = ({
         
         const prevChapterTopics = topics[prevChapter.id];
         if (!prevChapterTopics) {
-            // This case might happen if topics for prev chapter haven't been loaded. 
-            // We assume it's locked until topics are loaded and checked.
             return false;
         }
 
         const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-        if (prevChapterPracticeSets.length === 0) return true; // No barrier, so unlocked.
+        if (prevChapterPracticeSets.length === 0) return true; 
 
         const passMark = settings.practiceSetPassMark || 60;
         const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
@@ -96,8 +94,10 @@ const TextbookContentSidebar = ({
     }
 
     if (chapter.access === 'free') return true;
-    const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-    const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+    if (!userProfile?.subscriptionPlan) return false;
+    
+    const hasProAccess = userProfile.subscriptionPlan === 'pro';
+    const hasPassAccess = userProfile.subscriptionPlan === 'pass';
     if (chapter.access === 'pro' && hasProAccess) return true;
     if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
 
@@ -141,10 +141,10 @@ const TextbookContentSidebar = ({
             
             return (
               <AccordionItem value={chapter.id} key={chapter.id}>
-                <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
-                  <div className="flex flex-col items-start w-full">
+                 <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
+                  <div className="flex flex-col items-start w-full text-left">
                       <div className="flex items-center justify-between w-full">
-                         <span className="flex items-center gap-2 text-left">
+                         <span className="flex items-center gap-2">
                             {chapter.title}
                             {chapterAggregate !== null && (
                                 <ScoreCircle score={chapterAggregate} size={24} />
@@ -221,58 +221,20 @@ const PracticeSetItem = ({
     isDownloading: boolean;
 }) => {
 
-    const StartButton = () => {
+    const ActionArea = () => {
         if (isLocked) {
             return (
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                           <Button disabled className="w-full">
-                              <Lock className="mr-2 h-4 w-4" /> Locked
-                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Get {passMark}% on the previous practice set to unlock.</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-right">
+                    <span className="text-xs font-semibold text-destructive flex items-center gap-1">
+                        <Lock className="w-4 h-4" />
+                        Get {passMark}% on previous set to unlock
+                    </span>
+                </div>
             );
         }
         return (
-            <Button asChild>
-                <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
-                    Start Practice
-                </Link>
-            </Button>
-        );
-    };
-
-    return (
-        <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
-            <div className="flex items-center gap-3 flex-grow">
-                {isLocked ? (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
-                            </TooltipTrigger>
-                             <TooltipContent>
-                                <p>Get {passMark}% on the previous set to unlock</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                ) : (
-                    <CheckSquare className="h-5 w-5 text-primary" />
-                )}
-                <span className="font-medium">{ps.title}</span>
-            </div>
-            <div className="flex items-center gap-4">
-                {highestScore !== undefined && (
-                    <div className="text-center">
-                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {Math.round(highestScore)}%</p>
-                    </div>
-                )}
-                 <Button variant="outline" size="sm" onClick={onDownload} disabled={isLocked || isDownloading}>
+             <div className="flex items-center gap-2">
+                 <Button variant="outline" size="sm" onClick={onDownload} disabled={isDownloading}>
                     {isDownloading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -285,7 +247,32 @@ const PracticeSetItem = ({
                         </>
                     )}
                 </Button>
-                <StartButton />
+                <Button asChild>
+                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                        Start Practice
+                    </Link>
+                </Button>
+            </div>
+        );
+    };
+
+    return (
+        <Card className="p-4 flex flex-col sm:flex-row justify-between items-center not-prose gap-4">
+            <div className="flex items-center gap-3 flex-grow">
+                {isLocked ? (
+                    <Lock className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                    <CheckSquare className="h-5 w-5 text-primary" />
+                )}
+                <span className="font-medium">{ps.title}</span>
+            </div>
+            <div className="flex items-center gap-4">
+                {highestScore !== undefined && (
+                    <div className="text-center">
+                        <p className="font-bold text-sm text-primary flex items-center gap-1"><Award className="w-4 h-4"/> Best: {Math.round(highestScore)}%</p>
+                    </div>
+                )}
+                <ActionArea />
             </div>
         </Card>
     );
@@ -372,10 +359,9 @@ export default function TextbookSolutionsPage() {
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
       if (!chapterId || topics[chapterId]) {
-          // If topics for this chapter are already loaded, just update the URL
           const params = new URLSearchParams(searchParams.toString());
           params.set('chapter', chapterId);
-          params.delete('topic'); // Clear topic when chapter changes
+          params.delete('topic'); 
           router.push(`?${params.toString()}`, { scroll: false });
           return;
       }
@@ -899,3 +885,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
