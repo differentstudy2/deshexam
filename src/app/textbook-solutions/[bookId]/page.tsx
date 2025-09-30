@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -77,34 +76,36 @@ const TextbookContentSidebar = ({
       return true;
     }
     
-    // 2. Check for performance-based unlock if the feature is enabled
-    if (settings?.gateChaptersOnPass) {
-        const prevChapter = chapters[index - 1];
-        if (!prevChapter) return false;
-
-        const prevChapterTopics = topics[prevChapter.id];
-        if (!prevChapterTopics) return false; 
-        
-        const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
-        if (prevChapterPracticeSets.length === 0) {
-            // If previous chapter has no practice sets, treat it as "passed" to unlock the next one.
-            return isChapterUnlocked(prevChapter, index - 1);
-        }
-        
-        const passMark = settings.practiceSetPassMark || 60;
-        const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
-        
-        return allPreviousPassed;
+    // If gating is disabled, access depends on subscription
+    if (!settings?.gateChaptersOnPass) {
+        if (chapter.access === 'free') return true;
+        const hasProAccess = userProfile?.subscriptionPlan === 'pro';
+        const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
+        if (chapter.access === 'pro' && hasProAccess) return true;
+        if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
+        return false; // If none of the above, it's locked.
     }
-
-    // 3. Fallback to subscription-based access if performance gating is off
-    if (chapter.access === 'free') return true;
-    const hasProAccess = userProfile?.subscriptionPlan === 'pro';
-    const hasPassAccess = userProfile?.subscriptionPlan === 'pass';
-    if (chapter.access === 'pro' && hasProAccess) return true;
-    if (chapter.access === 'pass' && (hasProAccess || hasPassAccess)) return true;
     
-    return false;
+    // Performance-based unlocking for chapters beyond the free limit
+    const prevChapter = chapters[index - 1];
+    if (!prevChapter) return false; // Should not happen if index > 0
+
+    const prevChapterTopics = topics[prevChapter.id];
+    // If previous chapter's topics aren't loaded, we can't check, so it's locked.
+    // This assumes topics are loaded sequentially or at least the previous one is loaded.
+    if (!prevChapterTopics) return false; 
+    
+    const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
+    // If previous chapter has no practice sets, it's considered "passed".
+    if (prevChapterPracticeSets.length === 0) {
+        return isChapterUnlocked(prevChapter, index - 1);
+    }
+    
+    const passMark = settings.practiceSetPassMark || 60;
+    // Check if ALL practice sets in the previous chapter are passed
+    const allPreviousPassed = prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
+    
+    return allPreviousPassed;
   }, [chapters, topics, userProfile, settings, progress]);
 
   return (
@@ -124,15 +125,22 @@ const TextbookContentSidebar = ({
             const isUnlocked = isChapterUnlocked(chapter, index);
             
             return (
-              <AccordionItem value={chapter.id} key={chapter.id} disabled={!isUnlocked}>
+              <AccordionItem value={chapter.id} key={chapter.id}>
                 <AccordionTrigger className="hover:no-underline" disabled={!isUnlocked}>
-                  <div className="flex items-center justify-between w-full">
-                      <span className="flex items-center gap-2 text-left">{chapter.title}</span>
-                      {!isUnlocked && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground mr-2">
-                              <Lock className="w-3 h-3" />
-                              Locked
-                          </span>
+                  <div className="flex flex-col items-start w-full">
+                      <div className="flex items-center justify-between w-full">
+                         <span className="flex items-center gap-2 text-left">{chapter.title}</span>
+                         {!isUnlocked && (
+                             <span className="flex items-center gap-1 text-xs text-muted-foreground mr-2">
+                                 <Lock className="w-3 h-3" />
+                                 Locked
+                             </span>
+                         )}
+                      </div>
+                      {!isUnlocked && settings?.gateChaptersOnPass && (
+                         <span className="text-xs text-muted-foreground font-normal mt-1">
+                             Get {settings.practiceSetPassMark || 60}% on previous chapter to unlock
+                         </span>
                       )}
                   </div>
                 </AccordionTrigger>
@@ -206,7 +214,7 @@ const PracticeSetItem = ({
                             </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Get {passMark}% to unlock the chapters</p>
+                            <p>Get {passMark}% to unlock this chapter</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
@@ -231,7 +239,7 @@ const PracticeSetItem = ({
                                 <Lock className="h-5 w-5 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                              <TooltipContent>
-                                <p>Get {passMark}% to unlock the chapters</p>
+                                <p>Get {passMark}% to unlock this chapter</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -873,7 +881,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
-
-
-
