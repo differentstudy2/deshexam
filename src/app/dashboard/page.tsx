@@ -218,6 +218,7 @@ export default function DashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Test Name</TableHead>
+                  <TableHead>Score</TableHead>
                   <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
@@ -229,6 +230,7 @@ export default function DashboardPage() {
                           <Skeleton className="h-5 w-3/4 mb-1"/>
                           <Skeleton className="h-4 w-1/2"/>
                       </TableCell>
+                       <TableCell><Skeleton className="h-5 w-12"/></TableCell>
                        <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto"/></TableCell>
                     </TableRow>
                   ))
@@ -241,6 +243,9 @@ export default function DashboardPage() {
                         {sub.test?.subject} - {sub.testType}
                       </div>
                     </TableCell>
+                    <TableCell className="font-semibold">
+                      {Math.round((sub.score / sub.totalQuestions) * 100)}%
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="sm">
                         <Link href={getUrlForTest(sub.testType, sub.testId, sub.id)}>
@@ -252,7 +257,7 @@ export default function DashboardPage() {
                 ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">You haven't taken any tests yet.</TableCell>
+                        <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">You haven't taken any tests yet.</TableCell>
                     </TableRow>
                 )}
               </TableBody>
