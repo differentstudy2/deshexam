@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -71,39 +70,30 @@ const TextbookContentSidebar = ({
 }) => {
   
   const isChapterUnlocked = useCallback((chapter: Chapter, index: number): boolean => {
-    // 1. Check if the chapter is part of the free allowance
     const freeChapterCount = settings?.freeChaptersPerBook ?? 0;
     if (index < freeChapterCount) {
         return true;
     }
 
-    // 2. If gating is on, check performance on the *previous* chapter
     if (settings?.gateChaptersOnPass) {
+        if (index === 0) return true;
         const prevChapter = chapters[index - 1];
-        if (!prevChapter) return false; // Should not happen, but safe check
+        if (!prevChapter) return true;
 
         const prevChapterTopics = topics[prevChapter.id];
         if (!prevChapterTopics) {
-             // This might happen if topics for prev chapter haven't been loaded.
-             // Assume locked if we can't verify. The UI should fetch topics on expand.
             return false;
         }
 
         const prevChapterPracticeSets = prevChapterTopics.flatMap(t => t.practiceSets || []);
         if (prevChapterPracticeSets.length === 0) {
-             // If previous chapter has no practice sets, it's considered "passed".
             return true; 
         }
 
         const passMark = settings.practiceSetPassMark || 60;
-        const allPreviousPassed = prevChapterPracticeSets.every(ps => 
-            (progress?.highestScores?.[ps.id] || 0) >= passMark
-        );
-        
-        return allPreviousPassed;
+        return prevChapterPracticeSets.every(ps => (progress?.highestScores?.[ps.id] || 0) >= passMark);
     }
-
-    // 3. If gating is off, check subscription status
+    
     if (chapter.access === 'free') return true;
     if (!userProfile?.subscriptionPlan) return false;
     
@@ -151,6 +141,7 @@ const TextbookContentSidebar = ({
             const isUnlocked = isChapterUnlocked(chapter, index);
             const chapterAggregate = calculateChapterAggregate(chapter.id);
             const isGated = settings?.gateChaptersOnPass && index >= (settings?.freeChaptersPerBook ?? 0);
+            const prevChapter = index > 0 ? chapters[index - 1] : null;
 
             return (
               <AccordionItem value={chapter.id} key={chapter.id}>
@@ -170,6 +161,11 @@ const TextbookContentSidebar = ({
                         </Badge>
                       )}
                     </div>
+                     {!isUnlocked && isGated && prevChapter && (
+                        <span className="text-xs text-muted-foreground mt-1 font-normal">
+                            Get {settings.practiceSetPassMark}% on Chapter {prevChapter.title.match(/^\d+/)?.[0] || ''} to unlock
+                        </span>
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -893,7 +889,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
-
-
-
