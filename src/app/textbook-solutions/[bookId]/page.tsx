@@ -375,28 +375,27 @@ export default function TextbookSolutionsPage() {
             return yPos;
         };
 
-        // Draw watermark on the first page
         pdf.setFontSize(60);
-        pdf.setTextColor(230, 230, 230); // Light gray color
+        pdf.setTextColor(230, 230, 230);
         pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
             angle: -45,
             align: 'center',
         });
-        pdf.setTextColor(0, 0, 0); // Reset text color
+        pdf.setTextColor(0, 0, 0);
 
         const headerContent = (
-            <div className="p-1 bg-transparent text-black font-sans w-[700px] text-base">
+            <div className="p-1 bg-transparent text-black font-sans w-[700px] text-sm">
                 <div className="text-center mb-2">
-                    <h1 className="text-2xl font-bold">{practiceSet.title}</h1>
+                    <h1 className="text-xl font-bold">{practiceSet.title}</h1>
                     <h2 className="text-lg">{textbook?.title}</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-1 my-2">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-0 my-2">
                     <p><strong>Institute Name:</strong> Deshexam.com</p>
-                    <p><strong>Board:</strong> {textbook?.board}</p>
-                    <p><strong>Class:</strong> {textbook?.class}</p>
-                    <p><strong>Subject:</strong> {textbook?.subject}</p>
+                    {textbook?.board && <p><strong>Board:</strong> {textbook.board}</p>}
+                    {textbook?.class && <p><strong>Class:</strong> {textbook.class}</p>}
+                    {textbook?.subject && <p><strong>Subject:</strong> {textbook.subject}</p>}
                     {chapters.find(c => c.id === activeChapter)?.title && <p><strong>Chapter:</strong> {chapters.find(c => c.id === activeChapter)?.title}</p>}
-                    <p><strong>Topic:</strong> {selectedTopicContent?.title}</p>
+                    {selectedTopicContent?.title && <p><strong>Topic:</strong> {selectedTopicContent.title}</p>}
                     <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                     <p><strong>Full Marks:</strong> {totalMarks}</p>
                     <p><strong>Duration:</strong> {totalMarks} min</p>
@@ -509,7 +508,7 @@ export default function TextbookSolutionsPage() {
             if (element) {
                 const canvas = await html2canvas(element as HTMLElement, {
                     scale: 2,
-                    backgroundColor: null, // Make background transparent
+                    backgroundColor: null,
                 });
                 const imgData = canvas.toDataURL('image/png');
                 const imgWidth = pageWidth - 2 * margin;
