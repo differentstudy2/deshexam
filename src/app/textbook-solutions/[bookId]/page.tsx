@@ -404,7 +404,7 @@ export default function TextbookSolutionsPage() {
                     <h1 className="text-xl font-bold">{practiceSet.title}</h1>
                     <h2 className="text-lg">{textbook?.title}</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-0 my-2">
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-0 my-2">
                     <p><strong>Institute Name:</strong> Deshexam.com</p>
                     {textbook?.board && <p><strong>Board:</strong> {textbook.board}</p>}
                     {textbook?.class && <p><strong>Class:</strong> {textbook.class}</p>}
@@ -464,7 +464,7 @@ export default function TextbookSolutionsPage() {
                       <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
                   </div>
                    {question.type === 'Multiple Choice' && question.options && (
-                      <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                           {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="grid grid-cols-[20px_1fr] items-start">
                                   <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
