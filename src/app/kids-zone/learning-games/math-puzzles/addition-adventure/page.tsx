@@ -48,11 +48,16 @@ const NumberPad = ({ onNumberClick, onClear, onDelete, onSubmit, isSubmitting }:
 
 
 export default function AdditionAdventurePage() {
-    const [problem, setProblem] = useState(generateProblem());
+    const [problem, setProblem] = useState<{ num1: number, num2: number, answer: number } | null>(null);
     const [userAnswer, setUserAnswer] = useState('');
     const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        // Generate the initial problem on the client side to avoid hydration errors
+        setProblem(generateProblem());
+    }, []);
 
     const handleNewProblem = () => {
         setProblem(generateProblem());
@@ -94,7 +99,7 @@ export default function AdditionAdventurePage() {
     };
 
     const handleSubmit = () => {
-        if (!userAnswer || isSubmitting) return;
+        if (!userAnswer || isSubmitting || !problem) return;
         
         setIsSubmitting(true);
         const answerNum = parseInt(userAnswer, 10);
@@ -131,9 +136,9 @@ export default function AdditionAdventurePage() {
             <Card className="w-full shadow-xl bg-white/60 dark:bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                     <CardTitle className="text-center text-6xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
-                        <span>{problem.num1}</span>
+                        <span>{problem?.num1 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">+</span>
-                        <span>{problem.num2}</span>
+                        <span>{problem?.num2 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">=</span>
                         <span className="inline-block w-36 h-28 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-7xl font-mono shadow-inner">
                             {userAnswer || '?'}
