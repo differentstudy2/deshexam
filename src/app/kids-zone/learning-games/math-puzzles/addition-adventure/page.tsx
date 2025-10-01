@@ -26,7 +26,7 @@ const feedbackMessages = {
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
     const soundUrl = type === 'correct'
-      ? '/audio/mixkit-ending-show-audience-clapping-478.wav'
+      ? '/audio/correct-83487.mp3'
       : '/audio/incorrect-293358.mp3';
       
     const audio = new Audio(soundUrl);
