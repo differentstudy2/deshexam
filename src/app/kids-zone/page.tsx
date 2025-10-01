@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToyBrick, Puzzle, BookHeart } from "lucide-react";
+import { ToyBrick, Puzzle, BookHeart, Gamepad2 } from "lucide-react";
 
 const kidsFeatures = [
   {
@@ -24,6 +24,12 @@ const kidsFeatures = [
     description: "Listen to wonderful stories that take you to magical places.",
     link: "#",
   },
+  {
+    icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
+    title: "Learning Games",
+    description: "Engage with interactive games that make education an adventure.",
+    link: "#",
+  },
 ];
 
 export default function KidsZonePage() {
@@ -39,7 +45,7 @@ export default function KidsZonePage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {kidsFeatures.map((feature, index) => (
             <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
               <CardHeader className="items-center">
