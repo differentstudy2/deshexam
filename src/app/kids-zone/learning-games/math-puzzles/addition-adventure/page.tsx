@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -59,8 +59,13 @@ export default function AdditionAdventurePage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [timerDuration, setTimerDuration] = useState(60); // Default 60 seconds
     const [timeLeft, setTimeLeft] = useState(timerDuration);
+    const [score, setScore] = useState(0);
+    const [totalAttempted, setTotalAttempted] = useState(0);
 
-    const handleNewProblem = useCallback(() => {
+    const handleNewProblem = useCallback((isIncorrectOrTimeout: boolean = false) => {
+        if(isIncorrectOrTimeout) {
+            setTotalAttempted(prev => prev + 1);
+        }
         setProblem(generateProblem());
         setUserAnswer('');
         setFeedback({message: '', type: 'none'});
@@ -76,7 +81,7 @@ export default function AdditionAdventurePage() {
      useEffect(() => {
         if (timerDuration === 0) return; // Timer is off
         if (timeLeft <= 0) {
-            handleNewProblem();
+            handleNewProblem(true);
             return;
         }
 
@@ -100,6 +105,7 @@ export default function AdditionAdventurePage() {
             const timer = setTimeout(() => {
                 setIsSubmitting(false);
                 setFeedback({message: '', type: 'none'});
+                handleNewProblem(true);
             }, 1000);
             return () => clearTimeout(timer);
         }
@@ -108,7 +114,7 @@ export default function AdditionAdventurePage() {
     const handleDurationChange = (value: string) => {
         const newDuration = parseInt(value, 10);
         setTimerDuration(newDuration);
-        setTimeLeft(newDuration); // Immediately update timer for the next problem
+        setTimeLeft(newDuration);
     };
 
     const handleNumberClick = (num: number) => {
@@ -132,6 +138,8 @@ export default function AdditionAdventurePage() {
         const answerNum = parseInt(userAnswer, 10);
         if (answerNum === problem.answer) {
             const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
+            setScore(prev => prev + 1);
+            setTotalAttempted(prev => prev + 1);
             setFeedback({ message: randomMsg, type: 'correct' });
         } else {
              const randomMsg = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
@@ -217,8 +225,12 @@ export default function AdditionAdventurePage() {
                     </div>
                 )}
                 </CardContent>
-                 <CardContent className="flex justify-center">
-                    <Button variant="outline" onClick={handleNewProblem} size="lg">
+                 <CardContent className="flex flex-col items-center gap-4">
+                    <div className="flex items-center gap-2 text-xl font-semibold text-slate-600 dark:text-slate-300">
+                        <Trophy className="w-6 h-6 text-amber-500"/>
+                        Score: {score} / {totalAttempted} ({totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0}%)
+                    </div>
+                    <Button variant="outline" onClick={() => handleNewProblem(true)} size="lg">
                         <RefreshCw className="mr-2 h-4 w-4" />
                         New Problem
                     </Button>
