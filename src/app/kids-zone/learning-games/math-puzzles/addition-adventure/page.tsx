@@ -78,7 +78,7 @@ export default function AdditionAdventurePage() {
     const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [timerDuration, setTimerDuration] = useState(60); 
+    const [timerDuration, setTimerDuration] = useState(10); 
     const [timeLeft, setTimeLeft] = useState(timerDuration);
     const [score, setScore] = useState(0);
     const [totalAttempted, setTotalAttempted] = useState(0);
