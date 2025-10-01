@@ -67,6 +67,11 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: 
     );
 };
 
+const feedbackMessages = {
+    correct: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
+    incorrect: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
+};
+
 export default function AdditionAdventurePage() {
     const [problem, setProblem] = useState<{ num1: number, num2: number, answer: number } | null>(null);
     const [userAnswer, setUserAnswer] = useState('');
@@ -79,6 +84,8 @@ export default function AdditionAdventurePage() {
     const [totalAttempted, setTotalAttempted] = useState(0);
     const [gameMode, setGameMode] = useState<'input' | 'multipleChoice'>('input');
     const [options, setOptions] = useState<number[]>([]);
+    const [mcqLevel, setMcqLevel] = useState(4);
+
 
     const generateProblemWithOptions = useCallback(() => {
         const num1 = Math.floor(Math.random() * 10) + 1;
@@ -90,7 +97,7 @@ export default function AdditionAdventurePage() {
 
         if (gameMode === 'multipleChoice') {
             const incorrectOptions = new Set<number>();
-            while (incorrectOptions.size < 3) {
+            while (incorrectOptions.size < mcqLevel - 1) {
                 const offset = Math.floor(Math.random() * 9) - 4; // -4 to 4
                 const incorrectAnswer = answer + offset;
                 if (incorrectAnswer !== answer && incorrectAnswer > 0) {
@@ -100,7 +107,7 @@ export default function AdditionAdventurePage() {
             const shuffledOptions = [...incorrectOptions, answer].sort(() => Math.random() - 0.5);
             setOptions(shuffledOptions);
         }
-    }, [gameMode]);
+    }, [gameMode, mcqLevel]);
 
 
     const handleNewProblem = useCallback((isIncorrectOrTimeout: boolean = false) => {
@@ -188,7 +195,13 @@ export default function AdditionAdventurePage() {
 
     const handleGameModeChange = (value: 'input' | 'multipleChoice') => {
         setGameMode(value);
-        // Reset game when mode changes
+        setScore(0);
+        setTotalAttempted(0);
+        handleNewProblem();
+    };
+    
+    const handleLevelChange = (value: string) => {
+        setMcqLevel(parseInt(value, 10));
         setScore(0);
         setTotalAttempted(0);
         handleNewProblem();
@@ -224,7 +237,7 @@ export default function AdditionAdventurePage() {
                     Back to Math Puzzles
                 </Link>
             </Button>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                     <Rows className="w-5 h-5 text-slate-600"/>
                     <Label htmlFor="mode-select" className="text-sm font-medium text-slate-700">Mode:</Label>
@@ -238,6 +251,24 @@ export default function AdditionAdventurePage() {
                         </SelectContent>
                     </Select>
                 </div>
+
+                {gameMode === 'multipleChoice' && (
+                    <div className="flex items-center gap-2">
+                        <Trophy className="w-5 h-5 text-slate-600"/>
+                        <Label htmlFor="level-select" className="text-sm font-medium text-slate-700">Level:</Label>
+                        <Select value={mcqLevel.toString()} onValueChange={handleLevelChange}>
+                            <SelectTrigger id="level-select" className="w-[120px] h-9">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="2">Easy (2)</SelectItem>
+                                <SelectItem value="3">Medium (3)</SelectItem>
+                                <SelectItem value="4">Hard (4)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+                
                 <div className="flex items-center gap-2">
                     <Settings className="w-5 h-5 text-slate-600"/>
                     <Label htmlFor="timer-select" className="text-sm font-medium text-slate-700">Timer:</Label>
