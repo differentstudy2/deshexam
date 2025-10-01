@@ -4,10 +4,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 
 const generateProblem = () => {
@@ -55,7 +57,8 @@ export default function AdditionAdventurePage() {
     const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(60);
+    const [timerDuration, setTimerDuration] = useState(60); // Default 60 seconds
+    const [timeLeft, setTimeLeft] = useState(timerDuration);
 
     const handleNewProblem = useCallback(() => {
         setProblem(generateProblem());
@@ -63,14 +66,15 @@ export default function AdditionAdventurePage() {
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
         setIsSubmitting(false);
-        setTimeLeft(60);
-    }, []);
+        setTimeLeft(timerDuration);
+    }, [timerDuration]);
     
     useEffect(() => {
         handleNewProblem();
     }, [handleNewProblem]);
 
      useEffect(() => {
+        if (timerDuration === 0) return; // Timer is off
         if (timeLeft <= 0) {
             handleNewProblem();
             return;
@@ -81,7 +85,7 @@ export default function AdditionAdventurePage() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [timeLeft, handleNewProblem]);
+    }, [timeLeft, handleNewProblem, timerDuration]);
 
     
     useEffect(() => {
@@ -100,6 +104,12 @@ export default function AdditionAdventurePage() {
             return () => clearTimeout(timer);
         }
     }, [feedback.type, handleNewProblem]);
+    
+    const handleDurationChange = (value: string) => {
+        const newDuration = parseInt(value, 10);
+        setTimerDuration(newDuration);
+        setTimeLeft(newDuration); // Immediately update timer for the next problem
+    };
 
     const handleNumberClick = (num: number) => {
         if (userAnswer.length < 3) {
@@ -132,13 +142,28 @@ export default function AdditionAdventurePage() {
   return (
     <div className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/10 dark:to-green-900/10 min-h-screen p-4">
       <div className="container mx-auto py-8">
-        <div className="mb-8">
+        <div className="mb-8 flex justify-between items-center">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone/learning-games/math-puzzles">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Math Puzzles
                 </Link>
             </Button>
+            <div className="flex items-center gap-2">
+                <Settings className="w-5 h-5 text-slate-600"/>
+                <Label htmlFor="timer-select" className="text-sm font-medium text-slate-700">Timer:</Label>
+                <Select value={timerDuration.toString()} onValueChange={handleDurationChange}>
+                    <SelectTrigger id="timer-select" className="w-[120px] h-9">
+                        <SelectValue placeholder="Set time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="30">30 seconds</SelectItem>
+                        <SelectItem value="60">60 seconds</SelectItem>
+                        <SelectItem value="90">90 seconds</SelectItem>
+                        <SelectItem value="0">Off</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
         </div>
         <header className="text-center mb-12">
           <h1 className="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-blue-600">
@@ -152,11 +177,13 @@ export default function AdditionAdventurePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-4xl mx-auto">
             <Card className="w-full shadow-xl bg-white/60 dark:bg-card/60 backdrop-blur-sm">
                 <CardHeader>
-                     <div className="flex items-center gap-3 mb-4">
-                        <Clock className="w-6 h-6 text-slate-500" />
-                        <Progress value={(timeLeft / 60) * 100} className="w-full h-4" />
-                        <span className="text-xl font-bold text-slate-600">{timeLeft}s</span>
-                    </div>
+                    {timerDuration > 0 && (
+                         <div className="flex items-center gap-3 mb-4">
+                            <Clock className="w-6 h-6 text-slate-500" />
+                            <Progress value={(timeLeft / timerDuration) * 100} className="w-full h-4" />
+                            <span className="text-xl font-bold text-slate-600">{timeLeft}s</span>
+                        </div>
+                    )}
                     <CardTitle className="text-center text-6xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
                         <span>{problem?.num1 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">+</span>
