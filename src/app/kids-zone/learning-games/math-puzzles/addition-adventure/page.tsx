@@ -4,8 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 
@@ -19,6 +18,26 @@ const feedbackMessages = {
   correct: ["Great job!", "You got it!", "Awesome!", "Correct!", "Superstar!"],
   incorrect: ["Try again!", "Not quite!", "Keep trying!", "Almost there!"],
 };
+
+const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    return (
+        <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+            {numbers.map(num => (
+                <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 text-3xl font-bold rounded-xl shadow-md active:shadow-inner">
+                    {num}
+                </Button>
+            ))}
+             <Button onClick={onDelete} variant="outline" className="h-16 text-lg col-span-1 rounded-xl shadow-md active:shadow-inner flex items-center justify-center">
+                <Delete className="w-8 h-8" />
+            </Button>
+            <Button onClick={onClear} variant="outline" className="h-16 text-lg col-span-2 rounded-xl shadow-md active:shadow-inner">
+                Clear
+            </Button>
+        </div>
+    );
+};
+
 
 export default function AdditionAdventurePage() {
     const [problem, setProblem] = useState(generateProblem());
@@ -43,9 +62,22 @@ export default function AdditionAdventurePage() {
         }
     }, [feedback.type]);
 
+    const handleNumberClick = (num: number) => {
+        setUserAnswer(prev => prev + num.toString());
+    };
+
+    const handleClear = () => {
+        setUserAnswer('');
+    };
+
+    const handleDelete = () => {
+        setUserAnswer(prev => prev.slice(0, -1));
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!userAnswer) return;
+        
         const answerNum = parseInt(userAnswer, 10);
         if (answerNum === problem.answer) {
             const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
@@ -82,19 +114,25 @@ export default function AdditionAdventurePage() {
                 <span>{problem.num1}</span>
                 <span className="text-blue-500">+</span>
                 <span>{problem.num2}</span>
+                <span className="text-blue-500">=</span>
+                <span className="inline-block w-24 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-5xl font-mono">
+                    {userAnswer || '?'}
+                </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="flex items-center justify-center gap-4">
-              <Input
-                type="number"
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                className="text-center text-3xl font-bold h-16 w-32"
-                placeholder="?"
-                autoFocus
-              />
-              <Button type="submit" size="lg" className="h-16">Check</Button>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <NumberPad 
+                    onNumberClick={handleNumberClick}
+                    onClear={handleClear}
+                    onDelete={handleDelete}
+                />
+                <div className="text-center">
+                    <Button type="submit" size="lg" className="h-16 w-full max-w-xs mx-auto">
+                        <Check className="mr-2"/>
+                        Check Answer
+                    </Button>
+                </div>
             </form>
             <div className="h-10 text-center relative flex justify-center">
                  <Confetti active={isCorrect} config={{
@@ -107,7 +145,7 @@ export default function AdditionAdventurePage() {
 
               {feedback.type === 'correct' && (
                 <div className="flex items-center gap-2 text-green-600 font-semibold text-lg">
-                    <Check className="w-6 h-6" /> {feedback.message}
+                    <Sparkles className="w-6 h-6" /> {feedback.message}
                 </div>
               )}
               {feedback.type === 'incorrect' && (
