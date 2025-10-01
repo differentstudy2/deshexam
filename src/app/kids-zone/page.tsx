@@ -16,7 +16,7 @@ const kidsFeatures = [
     icon: <ToyBrick className="w-12 h-12 text-blue-500" />,
     title: "Learning Games",
     description: "Play engaging games that make learning math and letters fun.",
-    link: "#",
+    link: "/kids-zone/learning-games",
   },
   {
     icon: <BookHeart className="w-12 h-12 text-red-500" />,
@@ -28,7 +28,7 @@ const kidsFeatures = [
     icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
     title: "Learning Games",
     description: "Engage with interactive games that make education an adventure.",
-    link: "#",
+    link: "/kids-zone/learning-games",
   },
 ];
 
