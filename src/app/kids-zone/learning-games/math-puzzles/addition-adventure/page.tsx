@@ -1,12 +1,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
+import { Progress } from '@/components/ui/progress';
+
 
 const generateProblem = () => {
     const num1 = Math.floor(Math.random() * 10) + 1;
@@ -53,19 +55,34 @@ export default function AdditionAdventurePage() {
     const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(60);
 
-    useEffect(() => {
-        // Generate the initial problem on the client side to avoid hydration errors
-        setProblem(generateProblem());
-    }, []);
-
-    const handleNewProblem = () => {
+    const handleNewProblem = useCallback(() => {
         setProblem(generateProblem());
         setUserAnswer('');
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
         setIsSubmitting(false);
-    };
+        setTimeLeft(60);
+    }, []);
+    
+    useEffect(() => {
+        handleNewProblem();
+    }, [handleNewProblem]);
+
+     useEffect(() => {
+        if (timeLeft <= 0) {
+            handleNewProblem();
+            return;
+        }
+
+        const timer = setInterval(() => {
+            setTimeLeft(prevTime => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLeft, handleNewProblem]);
+
     
     useEffect(() => {
         if(feedback.type === 'correct') {
@@ -82,7 +99,7 @@ export default function AdditionAdventurePage() {
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [feedback.type]);
+    }, [feedback.type, handleNewProblem]);
 
     const handleNumberClick = (num: number) => {
         if (userAnswer.length < 3) {
@@ -135,6 +152,11 @@ export default function AdditionAdventurePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-4xl mx-auto">
             <Card className="w-full shadow-xl bg-white/60 dark:bg-card/60 backdrop-blur-sm">
                 <CardHeader>
+                     <div className="flex items-center gap-3 mb-4">
+                        <Clock className="w-6 h-6 text-slate-500" />
+                        <Progress value={(timeLeft / 60) * 100} className="w-full h-4" />
+                        <span className="text-xl font-bold text-slate-600">{timeLeft}s</span>
+                    </div>
                     <CardTitle className="text-center text-6xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
                         <span>{problem?.num1 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">+</span>
