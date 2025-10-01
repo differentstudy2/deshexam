@@ -157,6 +157,9 @@ export default function AdditionAdventurePage() {
                         <SelectValue placeholder="Set time" />
                     </SelectTrigger>
                     <SelectContent>
+                        <SelectItem value="5">5 seconds</SelectItem>
+                        <SelectItem value="10">10 seconds</SelectItem>
+                        <SelectItem value="15">15 seconds</SelectItem>
                         <SelectItem value="30">30 seconds</SelectItem>
                         <SelectItem value="60">60 seconds</SelectItem>
                         <SelectItem value="90">90 seconds</SelectItem>
