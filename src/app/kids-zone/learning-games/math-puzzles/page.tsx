@@ -10,7 +10,7 @@ const puzzles = [
     description: "Add numbers together to solve the puzzle!",
     icon: <Plus className="w-10 h-10 text-green-500" />,
     bgColor: "bg-green-100",
-    link: "#",
+    link: "/kids-zone/learning-games/math-puzzles/addition-adventure",
   },
   {
     title: "Subtraction Submarine",
