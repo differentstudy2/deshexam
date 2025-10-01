@@ -23,7 +23,7 @@ const feedbackMessages = {
   incorrect: ["Try again!", "Not quite!", "Keep trying!", "Almost there!"],
 };
 
-const NumberPad = ({ onNumberClick, onClear, onDelete, onSubmit, isSubmitting }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void, onSubmit: () => void, isSubmitting: boolean }) => {
+const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     return (
         <Card className="w-full max-w-sm mx-auto bg-blue-100/50 dark:bg-blue-900/30">
@@ -41,10 +41,6 @@ const NumberPad = ({ onNumberClick, onClear, onDelete, onSubmit, isSubmitting }:
                         Clear
                     </Button>
                 </div>
-                 <Button onClick={onSubmit} size="lg" className="w-full mt-4 h-20 text-2xl bg-green-500 hover:bg-green-600 shadow-lg" disabled={isSubmitting}>
-                    <Check className="mr-2 h-8 w-8"/>
-                    Check
-                </Button>
             </CardContent>
         </Card>
     );
@@ -74,14 +70,40 @@ export default function AdditionAdventurePage() {
         setTimeLeft(timerDuration);
     }, [timerDuration]);
     
+    const handleSubmit = useCallback(() => {
+        if (!userAnswer || isSubmitting || !problem) return;
+        
+        setIsSubmitting(true);
+        const answerNum = parseInt(userAnswer, 10);
+        if (answerNum === problem.answer) {
+            const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
+            setScore(prev => prev + 1);
+            setTotalAttempted(prev => prev + 1);
+            setFeedback({ message: randomMsg, type: 'correct' });
+        } else {
+             const randomMsg = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
+            setFeedback({ message: randomMsg, type: 'incorrect' });
+        }
+    }, [userAnswer, isSubmitting, problem]);
+
     useEffect(() => {
-        handleNewProblem();
-    }, [handleNewProblem]);
+        if (problem && userAnswer.length === String(problem.answer).length) {
+            handleSubmit();
+        }
+    }, [userAnswer, problem, handleSubmit]);
+
+    useEffect(() => {
+        if (!problem) {
+            handleNewProblem();
+        }
+    }, [problem, handleNewProblem]);
 
      useEffect(() => {
         if (timerDuration === 0) return; // Timer is off
         if (timeLeft <= 0) {
-            handleNewProblem(true);
+            if (!isSubmitting) {
+                handleNewProblem(true);
+            }
             return;
         }
 
@@ -90,7 +112,7 @@ export default function AdditionAdventurePage() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [timeLeft, handleNewProblem, timerDuration]);
+    }, [timeLeft, handleNewProblem, timerDuration, isSubmitting]);
 
     
     useEffect(() => {
@@ -118,7 +140,7 @@ export default function AdditionAdventurePage() {
     };
 
     const handleNumberClick = (num: number) => {
-        if (userAnswer.length < 3) {
+        if (userAnswer.length < 3 && !isSubmitting) {
              setUserAnswer(prev => prev + num.toString());
         }
     };
@@ -129,22 +151,6 @@ export default function AdditionAdventurePage() {
 
     const handleDelete = () => {
         setUserAnswer(prev => prev.slice(0, -1));
-    };
-
-    const handleSubmit = () => {
-        if (!userAnswer || isSubmitting || !problem) return;
-        
-        setIsSubmitting(true);
-        const answerNum = parseInt(userAnswer, 10);
-        if (answerNum === problem.answer) {
-            const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
-            setScore(prev => prev + 1);
-            setTotalAttempted(prev => prev + 1);
-            setFeedback({ message: randomMsg, type: 'correct' });
-        } else {
-             const randomMsg = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
-            setFeedback({ message: randomMsg, type: 'incorrect' });
-        }
     };
 
   return (
@@ -241,8 +247,6 @@ export default function AdditionAdventurePage() {
                 onNumberClick={handleNumberClick}
                 onClear={handleClear}
                 onDelete={handleDelete}
-                onSubmit={handleSubmit}
-                isSubmitting={isSubmitting}
             />
         </div>
       </div>
