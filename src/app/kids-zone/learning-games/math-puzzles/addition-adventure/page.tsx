@@ -87,7 +87,7 @@ export default function AdditionAdventurePage() {
     const [mcqLevel, setMcqLevel] = useState(4);
 
 
-    const generateProblemWithOptions = useCallback(() => {
+    const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice') => {
         const num1 = Math.floor(Math.random() * 10) + 1;
         const num2 = Math.floor(Math.random() * 10) + 1;
         const answer = num1 + num2;
@@ -95,7 +95,7 @@ export default function AdditionAdventurePage() {
         const newProblem = { num1, num2, answer };
         setProblem(newProblem);
 
-        if (gameMode === 'multipleChoice') {
+        if (mode === 'multipleChoice') {
             const incorrectOptions = new Set<number>();
             while (incorrectOptions.size < mcqLevel - 1) {
                 const offset = Math.floor(Math.random() * 9) - 4; // -4 to 4
@@ -107,20 +107,20 @@ export default function AdditionAdventurePage() {
             const shuffledOptions = [...incorrectOptions, answer].sort(() => Math.random() - 0.5);
             setOptions(shuffledOptions);
         }
-    }, [gameMode, mcqLevel]);
+    }, [mcqLevel]);
 
 
     const handleNewProblem = useCallback((isIncorrectOrTimeout: boolean = false) => {
         if(isIncorrectOrTimeout) {
             setTotalAttempted(prev => prev + 1);
         }
-        generateProblemWithOptions();
+        generateProblemWithOptions(gameMode);
         setUserAnswer('');
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
         setIsSubmitting(false);
         setTimeLeft(timerDuration);
-    }, [timerDuration, generateProblemWithOptions]);
+    }, [timerDuration, generateProblemWithOptions, gameMode]);
     
     const handleSubmit = useCallback((answer: string) => {
         if (!answer || isSubmitting || !problem) return;
@@ -148,9 +148,9 @@ export default function AdditionAdventurePage() {
 
     useEffect(() => {
         if (typeof window !== 'undefined' && !problem) {
-            generateProblemWithOptions();
+            generateProblemWithOptions(gameMode);
         }
-    }, [problem, generateProblemWithOptions]);
+    }, [problem, generateProblemWithOptions, gameMode]);
 
      useEffect(() => {
         if (timerDuration === 0) return;
@@ -197,7 +197,12 @@ export default function AdditionAdventurePage() {
         setGameMode(value);
         setScore(0);
         setTotalAttempted(0);
-        handleNewProblem();
+        generateProblemWithOptions(value);
+        setUserAnswer('');
+        setFeedback({message: '', type: 'none'});
+        setIsCorrect(false);
+        setIsSubmitting(false);
+        setTimeLeft(timerDuration);
     };
     
     const handleLevelChange = (value: string) => {
