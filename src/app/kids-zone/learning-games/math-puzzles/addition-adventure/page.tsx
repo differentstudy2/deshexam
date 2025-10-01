@@ -25,10 +25,9 @@ const feedbackMessages = {
 
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
-    // Using a local file for correct and a reliable external file for incorrect.
     const soundUrl = type === 'correct'
       ? '/audio/mixkit-ending-show-audience-clapping-478.wav'
-      : 'https://cdn.pixabay.com/audio/2022/03/10/audio_c3ff08ed43.mp3';
+      : '/audio/incorrect-293358.mp3';
       
     const audio = new Audio(soundUrl);
     audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
