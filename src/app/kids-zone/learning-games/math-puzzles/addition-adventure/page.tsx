@@ -1,10 +1,10 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows, Mic } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -20,6 +20,49 @@ const playSound = (type: 'correct' | 'incorrect') => {
     const audio = new Audio(soundUrl);
     audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
   }
+};
+
+const useSpeechRecognition = () => {
+    const [isListening, setIsListening] = useState(false);
+    const [transcript, setTranscript] = useState('');
+    const recognitionRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window)) {
+            console.warn('Speech recognition not supported in this browser.');
+            return;
+        }
+
+        const recognition = new (window as any).webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            setIsListening(true);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.onresult = (event: any) => {
+            const last = event.results.length - 1;
+            const text = event.results[last][0].transcript;
+            setTranscript(text);
+        };
+        
+        recognitionRef.current = recognition;
+
+    }, []);
+
+    const startListening = () => {
+        if (recognitionRef.current && !isListening) {
+            recognitionRef.current.start();
+        }
+    };
+
+    return { isListening, transcript, startListening, hasSupport: !!recognitionRef.current };
 };
 
 const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
@@ -67,6 +110,26 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: 
     );
 };
 
+const VoiceInputPad = ({ isListening, startListening, transcript }: { isListening: boolean, startListening: () => void, transcript: string }) => {
+    return (
+        <Card className="w-full max-w-sm mx-auto bg-blue-100/50 dark:bg-blue-900/30 flex flex-col items-center justify-center p-4 h-[420px]">
+            <Button 
+                onClick={startListening}
+                variant={isListening ? 'destructive' : 'outline'}
+                className="w-48 h-48 rounded-full shadow-lg text-6xl font-bold transition-all duration-300 ease-in-out"
+                disabled={isListening}
+            >
+                <Mic className="w-24 h-24" />
+            </Button>
+            <p className="mt-6 text-xl font-semibold text-slate-700 dark:text-slate-200">
+                {isListening ? 'Listening...' : 'Tap to Speak'}
+            </p>
+            {transcript && <p className="mt-2 text-sm text-muted-foreground">Last heard: "{transcript}"</p>}
+        </Card>
+    );
+};
+
+
 const feedbackMessages = {
     correct: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
     incorrect: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
@@ -82,12 +145,13 @@ export default function AdditionAdventurePage() {
     const [timeLeft, setTimeLeft] = useState(timerDuration);
     const [score, setScore] = useState(0);
     const [totalAttempted, setTotalAttempted] = useState(0);
-    const [gameMode, setGameMode] = useState<'input' | 'multipleChoice'>('input');
+    const [gameMode, setGameMode] = useState<'input' | 'multipleChoice' | 'voice'>('input');
     const [options, setOptions] = useState<number[]>([]);
     const [mcqLevel, setMcqLevel] = useState(4);
+    
+    const { isListening, transcript, startListening, hasSupport: hasVoiceSupport } = useSpeechRecognition();
 
-
-    const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice') => {
+    const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice') => {
         const num1 = Math.floor(Math.random() * 10) + 1;
         const num2 = Math.floor(Math.random() * 10) + 1;
         const answer = num1 + num2;
@@ -145,6 +209,28 @@ export default function AdditionAdventurePage() {
             handleSubmit(userAnswer);
         }
     }, [userAnswer, problem, handleSubmit, gameMode]);
+    
+    useEffect(() => {
+        if (gameMode !== 'voice' || !transcript) return;
+        
+        const wordsToNumbers: { [key: string]: string } = {
+            'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
+            'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
+            'ten': '10', 'eleven': '11', 'twelve': '12', 'thirteen': '13', 'fourteen': '14',
+            'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19', 'twenty': '20'
+        };
+
+        const spokenAnswer = transcript.toLowerCase().trim();
+        const extractedNumber = spokenAnswer.match(/\d+/) || (wordsToNumbers[spokenAnswer] ? [wordsToNumbers[spokenAnswer]] : null);
+
+        if (extractedNumber) {
+            const numberStr = extractedNumber[0];
+            setUserAnswer(numberStr);
+            handleSubmit(numberStr);
+        } else {
+             setFeedback({ message: "Didn't catch that. Try again!", type: 'incorrect' });
+        }
+    }, [transcript, gameMode, handleSubmit]);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && !problem) {
@@ -181,11 +267,13 @@ export default function AdditionAdventurePage() {
             const timer = setTimeout(() => {
                 setIsSubmitting(false);
                 setFeedback({message: '', type: 'none'});
-                handleNewProblem(true);
+                if (gameMode !== 'voice') {
+                    handleNewProblem(true);
+                }
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [feedback.type, handleNewProblem]);
+    }, [feedback.type, handleNewProblem, gameMode]);
     
     const handleDurationChange = (value: string) => {
         const newDuration = parseInt(value, 10);
@@ -193,7 +281,7 @@ export default function AdditionAdventurePage() {
         setTimeLeft(newDuration);
     };
 
-    const handleGameModeChange = (value: 'input' | 'multipleChoice') => {
+    const handleGameModeChange = (value: 'input' | 'multipleChoice' | 'voice') => {
         setGameMode(value);
         setScore(0);
         setTotalAttempted(0);
@@ -254,6 +342,7 @@ export default function AdditionAdventurePage() {
                         <SelectContent>
                             <SelectItem value="input">Number Pad</SelectItem>
                             <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
+                             {hasVoiceSupport && <SelectItem value="voice">Voice</SelectItem>}
                         </SelectContent>
                     </Select>
                 </div>
@@ -356,17 +445,25 @@ export default function AdditionAdventurePage() {
                 </CardContent>
             </Card>
             
-            {gameMode === 'input' ? (
+            {gameMode === 'input' && (
                 <NumberPad 
                     onNumberClick={handleNumberClick}
                     onClear={handleClear}
                     onDelete={handleDelete}
                 />
-            ) : (
+            )}
+            {gameMode === 'multipleChoice' && (
                 <MultipleChoicePad 
                     options={options}
                     onOptionClick={handleOptionClick}
                     isSubmitting={isSubmitting}
+                />
+            )}
+            {gameMode === 'voice' && (
+                <VoiceInputPad 
+                    isListening={isListening}
+                    startListening={startListening}
+                    transcript={transcript}
                 />
             )}
         </div>
@@ -374,3 +471,4 @@ export default function AdditionAdventurePage() {
     </div>
   );
 }
+
