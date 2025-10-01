@@ -94,7 +94,7 @@ export default function AdditionAdventurePage() {
     }, [userAnswer, isSubmitting, problem, sounds]);
 
     useEffect(() => {
-        if (problem && userAnswer.length === String(problem.answer).length) {
+        if (problem && userAnswer.length > 0 && userAnswer.length === String(problem.answer).length) {
             handleSubmit();
         }
     }, [userAnswer, problem, handleSubmit]);
