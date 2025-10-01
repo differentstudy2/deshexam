@@ -10,18 +10,21 @@ const games = [
     description: "Solve fun math problems and become a numbers wizard!",
     icon: <Calculator className="w-10 h-10 text-blue-500" />,
     bgColor: "bg-blue-100",
+    link: "/kids-zone/learning-games/math-puzzles",
   },
   {
     title: "Word Adventures",
     description: "Learn new words and improve your spelling with exciting word games.",
     icon: <SpellCheck className="w-10 h-10 text-green-500" />,
     bgColor: "bg-green-100",
+    link: "#",
   },
   {
     title: "Logic Challenges",
     description: "Train your brain with tricky puzzles and logic-based challenges.",
     icon: <Brain className="w-10 h-10 text-orange-500" />,
     bgColor: "bg-orange-100",
+    link: "#",
   },
 ];
 
@@ -59,7 +62,9 @@ export default function LearningGamesPage() {
                 <p className="text-muted-foreground">{game.description}</p>
               </CardContent>
               <div className="p-6 pt-0">
-                <Button>Play Now</Button>
+                 <Button asChild>
+                  <Link href={game.link}>Play Now</Link>
+                </Button>
               </div>
             </Card>
           ))}
