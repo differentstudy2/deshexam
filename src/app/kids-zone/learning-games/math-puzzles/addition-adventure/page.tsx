@@ -25,9 +25,10 @@ const feedbackMessages = {
 
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
+    // Assumes you have correct.mp3 and incorrect.mp3 in your /public folder
     const soundUrls = {
-      correct: 'https://cdn.pixabay.com/audio/2022/03/15/audio_a882a16d8a.mp3',
-      incorrect: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c5b28a3f82.mp3',
+      correct: '/correct.mp3',
+      incorrect: '/incorrect.mp3',
     };
     const audio = new Audio(soundUrls[type]);
     audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
