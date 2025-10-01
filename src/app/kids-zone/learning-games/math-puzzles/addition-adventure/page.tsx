@@ -23,13 +23,12 @@ const feedbackMessages = {
   incorrect: ["Try again!", "Not quite!", "Keep trying!", "Almost there!"],
 };
 
-const soundUrls = {
-  correct: 'https://cdn.pixabay.com/audio/2022/03/15/audio_a882a16d8a.mp3',
-  incorrect: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c5b28a3f82.mp3',
-};
-
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
+    const soundUrls = {
+      correct: 'https://cdn.pixabay.com/audio/2022/03/15/audio_a882a16d8a.mp3',
+      incorrect: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c5b28a3f82.mp3',
+    };
     const audio = new Audio(soundUrls[type]);
     audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
   }
