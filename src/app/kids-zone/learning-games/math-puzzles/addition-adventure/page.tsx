@@ -4,24 +4,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-
-
-const generateProblem = () => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    return { num1, num2, answer: num1 + num2 };
-};
-
-const feedbackMessages = {
-  correct: ["Great job!", "You got it!", "Awesome!", "Correct!", "Superstar!"],
-  incorrect: ["Try again!", "Not quite!", "Keep trying!", "Almost there!"],
-};
 
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
@@ -33,7 +21,6 @@ const playSound = (type: 'correct' | 'incorrect') => {
     audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
   }
 };
-
 
 const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
@@ -58,6 +45,27 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
     );
 };
 
+const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: number[], onOptionClick: (num: number) => void, isSubmitting: boolean }) => {
+    return (
+        <Card className="w-full max-w-sm mx-auto bg-blue-100/50 dark:bg-blue-900/30">
+            <CardContent className="p-4">
+                 <div className="grid grid-cols-2 gap-4">
+                    {options.map(option => (
+                        <Button 
+                            key={option} 
+                            onClick={() => onOptionClick(option)} 
+                            variant="outline" 
+                            className="h-24 text-5xl font-bold rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform"
+                            disabled={isSubmitting}
+                        >
+                            {option}
+                        </Button>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
 
 export default function AdditionAdventurePage() {
     const [problem, setProblem] = useState<{ num1: number, num2: number, answer: number } | null>(null);
@@ -65,22 +73,47 @@ export default function AdditionAdventurePage() {
     const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [timerDuration, setTimerDuration] = useState(60); // Default 60 seconds
+    const [timerDuration, setTimerDuration] = useState(60); 
     const [timeLeft, setTimeLeft] = useState(timerDuration);
     const [score, setScore] = useState(0);
     const [totalAttempted, setTotalAttempted] = useState(0);
+    const [gameMode, setGameMode] = useState<'input' | 'multipleChoice'>('input');
+    const [options, setOptions] = useState<number[]>([]);
+
+    const generateProblemWithOptions = useCallback(() => {
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        const answer = num1 + num2;
+
+        const newProblem = { num1, num2, answer };
+        setProblem(newProblem);
+
+        if (gameMode === 'multipleChoice') {
+            const incorrectOptions = new Set<number>();
+            while (incorrectOptions.size < 3) {
+                const offset = Math.floor(Math.random() * 9) - 4; // -4 to 4
+                const incorrectAnswer = answer + offset;
+                if (incorrectAnswer !== answer && incorrectAnswer > 0) {
+                    incorrectOptions.add(incorrectAnswer);
+                }
+            }
+            const shuffledOptions = [...incorrectOptions, answer].sort(() => Math.random() - 0.5);
+            setOptions(shuffledOptions);
+        }
+    }, [gameMode]);
+
 
     const handleNewProblem = useCallback((isIncorrectOrTimeout: boolean = false) => {
         if(isIncorrectOrTimeout) {
             setTotalAttempted(prev => prev + 1);
         }
-        setProblem(generateProblem());
+        generateProblemWithOptions();
         setUserAnswer('');
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
         setIsSubmitting(false);
         setTimeLeft(timerDuration);
-    }, [timerDuration]);
+    }, [timerDuration, generateProblemWithOptions]);
     
     const handleSubmit = useCallback(() => {
         if (!userAnswer || isSubmitting || !problem) return;
@@ -101,20 +134,19 @@ export default function AdditionAdventurePage() {
     }, [userAnswer, isSubmitting, problem]);
 
     useEffect(() => {
-        if (problem && userAnswer.length > 0 && userAnswer.length === String(problem.answer).length) {
+        if (gameMode === 'input' && problem && userAnswer.length > 0 && userAnswer.length === String(problem.answer).length) {
             handleSubmit();
         }
-    }, [userAnswer, problem, handleSubmit]);
+    }, [userAnswer, problem, handleSubmit, gameMode]);
 
     useEffect(() => {
-        // Generate the first problem on the client side to avoid hydration errors
         if (typeof window !== 'undefined' && !problem) {
-            setProblem(generateProblem());
+            generateProblemWithOptions();
         }
-    }, [problem]);
+    }, [problem, generateProblemWithOptions]);
 
      useEffect(() => {
-        if (timerDuration === 0) return; // Timer is off
+        if (timerDuration === 0) return;
         if (timeLeft <= 0) {
             if (!isSubmitting) {
                 handleNewProblem(true);
@@ -154,6 +186,14 @@ export default function AdditionAdventurePage() {
         setTimeLeft(newDuration);
     };
 
+    const handleGameModeChange = (value: 'input' | 'multipleChoice') => {
+        setGameMode(value);
+        // Reset game when mode changes
+        setScore(0);
+        setTotalAttempted(0);
+        handleNewProblem();
+    };
+
     const handleNumberClick = (num: number) => {
         if (userAnswer.length < 3 && !isSubmitting) {
              setUserAnswer(prev => prev + num.toString());
@@ -168,33 +208,54 @@ export default function AdditionAdventurePage() {
         setUserAnswer(prev => prev.slice(0, -1));
     };
 
+    const handleOptionClick = (num: number) => {
+        if (isSubmitting) return;
+        setUserAnswer(num.toString());
+        handleSubmit();
+    }
+
   return (
     <div className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/10 dark:to-green-900/10 min-h-screen p-4">
       <div className="container mx-auto py-8">
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-8 flex justify-between items-center flex-wrap gap-4">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone/learning-games/math-puzzles">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Math Puzzles
                 </Link>
             </Button>
-            <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-slate-600"/>
-                <Label htmlFor="timer-select" className="text-sm font-medium text-slate-700">Timer:</Label>
-                <Select value={timerDuration.toString()} onValueChange={handleDurationChange}>
-                    <SelectTrigger id="timer-select" className="w-[120px] h-9">
-                        <SelectValue placeholder="Set time" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="5">5 seconds</SelectItem>
-                        <SelectItem value="10">10 seconds</SelectItem>
-                        <SelectItem value="15">15 seconds</SelectItem>
-                        <SelectItem value="30">30 seconds</SelectItem>
-                        <SelectItem value="60">60 seconds</SelectItem>
-                        <SelectItem value="90">90 seconds</SelectItem>
-                        <SelectItem value="0">Off</SelectItem>
-                    </SelectContent>
-                </Select>
+            <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <Rows className="w-5 h-5 text-slate-600"/>
+                    <Label htmlFor="mode-select" className="text-sm font-medium text-slate-700">Mode:</Label>
+                    <Select value={gameMode} onValueChange={handleGameModeChange}>
+                        <SelectTrigger id="mode-select" className="w-[180px] h-9">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="input">Number Pad</SelectItem>
+                            <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-slate-600"/>
+                    <Label htmlFor="timer-select" className="text-sm font-medium text-slate-700">Timer:</Label>
+                    <Select value={timerDuration.toString()} onValueChange={handleDurationChange}>
+                        <SelectTrigger id="timer-select" className="w-[120px] h-9">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="5">5 seconds</SelectItem>
+                            <SelectItem value="10">10 seconds</SelectItem>
+                            <SelectItem value="15">15 seconds</SelectItem>
+                            <SelectItem value="30">30 seconds</SelectItem>
+                            <SelectItem value="60">60 seconds</SelectItem>
+                            <SelectItem value="90">90 seconds</SelectItem>
+                            <SelectItem value="0">Off</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
         </div>
         <header className="text-center mb-12">
@@ -202,7 +263,7 @@ export default function AdditionAdventurePage() {
             Addition Adventure
           </h1>
           <p className="text-lg text-blue-700/80 mt-4 max-w-2xl mx-auto">
-            Add the numbers and type the correct answer!
+            Add the numbers and choose the correct answer!
           </p>
         </header>
 
@@ -257,12 +318,20 @@ export default function AdditionAdventurePage() {
                     </Button>
                 </CardContent>
             </Card>
-
-             <NumberPad 
-                onNumberClick={handleNumberClick}
-                onClear={handleClear}
-                onDelete={handleDelete}
-            />
+            
+            {gameMode === 'input' ? (
+                <NumberPad 
+                    onNumberClick={handleNumberClick}
+                    onClear={handleClear}
+                    onDelete={handleDelete}
+                />
+            ) : (
+                <MultipleChoicePad 
+                    options={options}
+                    onOptionClick={handleOptionClick}
+                    isSubmitting={isSubmitting}
+                />
+            )}
         </div>
       </div>
     </div>
