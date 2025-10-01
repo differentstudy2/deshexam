@@ -24,8 +24,8 @@ const feedbackMessages = {
 };
 
 const soundUrls = {
-  correct: 'https://actions.google.com/sounds/v1/positive/bell_toll_positive.ogg',
-  incorrect: 'https://actions.google.com/sounds/v1/errors/buzz_error.ogg',
+  correct: 'https://cdn.pixabay.com/audio/2022/03/15/audio_a882a16d8a.mp3',
+  incorrect: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c5b28a3f82.mp3',
 };
 
 const playSound = (type: 'correct' | 'incorrect') => {
