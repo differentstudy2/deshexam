@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy } from "lucide-react";
@@ -57,6 +57,11 @@ export default function AdditionAdventurePage() {
     const [timeLeft, setTimeLeft] = useState(timerDuration);
     const [score, setScore] = useState(0);
     const [totalAttempted, setTotalAttempted] = useState(0);
+    
+    const sounds = useMemo(() => ({
+        correct: typeof Audio !== 'undefined' ? new Audio('https://actions.google.com/sounds/v1/positive/bell_toll_positive.ogg') : null,
+        incorrect: typeof Audio !== 'undefined' ? new Audio('https://actions.google.com/sounds/v1/errors/buzz_error.ogg') : null,
+    }), []);
 
     const handleNewProblem = useCallback((isIncorrectOrTimeout: boolean = false) => {
         if(isIncorrectOrTimeout) {
@@ -76,15 +81,17 @@ export default function AdditionAdventurePage() {
         setIsSubmitting(true);
         const answerNum = parseInt(userAnswer, 10);
         if (answerNum === problem.answer) {
+            sounds.correct?.play();
             const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
             setScore(prev => prev + 1);
             setTotalAttempted(prev => prev + 1);
             setFeedback({ message: randomMsg, type: 'correct' });
         } else {
+            sounds.incorrect?.play();
              const randomMsg = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
             setFeedback({ message: randomMsg, type: 'incorrect' });
         }
-    }, [userAnswer, isSubmitting, problem]);
+    }, [userAnswer, isSubmitting, problem, sounds]);
 
     useEffect(() => {
         if (problem && userAnswer.length === String(problem.answer).length) {
@@ -93,10 +100,11 @@ export default function AdditionAdventurePage() {
     }, [userAnswer, problem, handleSubmit]);
 
     useEffect(() => {
+        // Generate the first problem on the client side to avoid hydration errors
         if (!problem) {
-            handleNewProblem();
+            setProblem(generateProblem());
         }
-    }, [problem, handleNewProblem]);
+    }, [problem]);
 
      useEffect(() => {
         if (timerDuration === 0) return; // Timer is off
