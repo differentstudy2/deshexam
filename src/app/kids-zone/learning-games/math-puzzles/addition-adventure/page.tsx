@@ -122,11 +122,11 @@ export default function AdditionAdventurePage() {
         setTimeLeft(timerDuration);
     }, [timerDuration, generateProblemWithOptions]);
     
-    const handleSubmit = useCallback(() => {
-        if (!userAnswer || isSubmitting || !problem) return;
+    const handleSubmit = useCallback((answer: string) => {
+        if (!answer || isSubmitting || !problem) return;
         
         setIsSubmitting(true);
-        const answerNum = parseInt(userAnswer, 10);
+        const answerNum = parseInt(answer, 10);
         if (answerNum === problem.answer) {
             playSound('correct');
             const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
@@ -138,11 +138,11 @@ export default function AdditionAdventurePage() {
              const randomMsg = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
             setFeedback({ message: randomMsg, type: 'incorrect' });
         }
-    }, [userAnswer, isSubmitting, problem]);
+    }, [isSubmitting, problem]);
 
     useEffect(() => {
         if (gameMode === 'input' && problem && userAnswer.length > 0 && userAnswer.length === String(problem.answer).length) {
-            handleSubmit();
+            handleSubmit(userAnswer);
         }
     }, [userAnswer, problem, handleSubmit, gameMode]);
 
@@ -223,8 +223,9 @@ export default function AdditionAdventurePage() {
 
     const handleOptionClick = (num: number) => {
         if (isSubmitting) return;
-        setUserAnswer(num.toString());
-        handleSubmit();
+        const answerString = num.toString();
+        setUserAnswer(answerString);
+        handleSubmit(answerString);
     }
 
   return (
