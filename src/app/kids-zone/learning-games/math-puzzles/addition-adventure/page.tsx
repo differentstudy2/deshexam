@@ -61,8 +61,12 @@ const useSpeechRecognition = () => {
             recognitionRef.current.start();
         }
     };
+    
+    const resetTranscript = () => {
+        setTranscript('');
+    }
 
-    return { isListening, transcript, startListening, hasSupport: !!recognitionRef.current };
+    return { isListening, transcript, startListening, resetTranscript, hasSupport: !!recognitionRef.current };
 };
 
 const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
@@ -149,7 +153,7 @@ export default function AdditionAdventurePage() {
     const [options, setOptions] = useState<number[]>([]);
     const [mcqLevel, setMcqLevel] = useState(4);
     
-    const { isListening, transcript, startListening, hasSupport: hasVoiceSupport } = useSpeechRecognition();
+    const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition();
 
     const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice') => {
         const num1 = Math.floor(Math.random() * 10) + 1;
@@ -184,7 +188,8 @@ export default function AdditionAdventurePage() {
         setIsCorrect(false);
         setIsSubmitting(false);
         setTimeLeft(timerDuration);
-    }, [timerDuration, generateProblemWithOptions, gameMode]);
+        resetTranscript();
+    }, [timerDuration, generateProblemWithOptions, gameMode, resetTranscript]);
     
     const handleSubmit = useCallback((answer: string) => {
         if (!answer || isSubmitting || !problem) return;
@@ -471,4 +476,3 @@ export default function AdditionAdventurePage() {
     </div>
   );
 }
-
