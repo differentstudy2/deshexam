@@ -63,17 +63,17 @@ export default function BengaliMatraPage() {
                     )}
                 >
                     <CardContent className="p-4 w-full flex flex-col items-center justify-center">
-                        <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-4 w-full text-2xl sm:text-4xl md:text-5xl font-bold text-slate-800">
+                        <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 w-full text-4xl sm:text-5xl font-bold text-slate-800">
                             <div className="flex flex-col items-center">
                                 <span>ক</span>
                                 <span className="text-xs font-normal">Kaw</span>
                             </div>
-                            <Plus className="w-5 h-5 sm:w-8 sm:h-8 text-blue-500" />
+                            <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
                              <div className="flex flex-col items-center">
                                 <span className="text-blue-600">{item.matra || 'অ'}</span>
                                 <span className="text-xs font-normal">{item.name}</span>
                             </div>
-                            <Equal className="w-5 h-5 sm:w-8 sm:h-8 text-blue-500" />
+                            <Equal className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
                              <div className="flex flex-col items-center">
                                 <span className="text-green-600">{item.example}</span>
                                 <span className="text-xs font-normal">{item.sound}</span>
