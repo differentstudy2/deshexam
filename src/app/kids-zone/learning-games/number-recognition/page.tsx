@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Eye, BookHeart } from "lucide-react";
+import { ArrowLeft, Eye, BookHeart, Ear, Hand, Palmtree } from "lucide-react";
 import Link from "next/link";
 
 const stages = [
@@ -13,11 +13,35 @@ const stages = [
     link: "/kids-zone/learning-games/number-recognition/learn-numbers",
   },
   {
-    title: "Numbers 0-9",
-    description: "Learn to identify the basic numbers from zero to nine.",
+    title: "Recognize Numbers",
+    description: "Look at the number and find the matching one.",
     icon: <Eye className="w-10 h-10 text-red-500" />,
     bgColor: "bg-red-100",
     link: "/kids-zone/learning-games/number-recognition/numbers-0-9",
+  },
+  {
+    title: "Listen & Find",
+    description: "Listen to the number and find the correct one.",
+    icon: <Ear className="w-10 h-10 text-green-500" />,
+    bgColor: "bg-green-100",
+    link: "#",
+    comingSoon: true,
+  },
+    {
+    title: "How Many?",
+    description: "Count the objects and choose the right number.",
+    icon: <Palmtree className="w-10 h-10 text-yellow-500" />,
+    bgColor: "bg-yellow-100",
+    link: "#",
+    comingSoon: true,
+  },
+  {
+    title: "Number Tracing",
+    description: "Practice writing the numbers with your finger.",
+    icon: <Hand className="w-10 h-10 text-purple-500" />,
+    bgColor: "bg-purple-100",
+    link: "#",
+    comingSoon: true,
   },
 ];
 
@@ -42,9 +66,14 @@ export default function NumberRecognitionMenuPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
           {stages.map((stage, index) => (
-            <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
+            <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center relative">
+               {stage.comingSoon && (
+                  <div className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    Coming Soon
+                  </div>
+                )}
               <CardHeader className="items-center">
                 <div className={`p-4 rounded-full mb-4 ${stage.bgColor}`}>
                     {stage.icon}
@@ -55,7 +84,7 @@ export default function NumberRecognitionMenuPage() {
                 <p className="text-muted-foreground">{stage.description}</p>
               </CardContent>
               <div className="p-6 pt-0">
-                 <Button asChild>
+                 <Button asChild disabled={stage.comingSoon}>
                   <Link href={stage.link}>Start</Link>
                 </Button>
               </div>
