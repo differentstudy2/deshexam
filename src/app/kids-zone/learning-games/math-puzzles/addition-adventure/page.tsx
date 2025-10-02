@@ -298,7 +298,7 @@ export default function AdditionAdventurePage() {
         }
         if (mode === 'voice') {
             const promptText = t.ttsPrompt(num1, num2);
-            textToSpeech({ text: promptText, lang: language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-IN' }).then(result => {
+            textToSpeech({ text: promptText, lang: language === 'en' ? 'en-US' : 'hi-IN' }).then(result => {
                 setAudioUrl(result.audioUrl);
             }).catch(err => console.error("TTS error:", err));
         } else {
