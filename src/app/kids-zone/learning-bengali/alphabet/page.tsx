@@ -2,12 +2,14 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Confetti from 'react-dom-confetti';
+
 
 const vowels = [
   { char: 'অ', name: 'Aw' }, { char: 'আ', name: 'A' }, { char: 'ই', name: 'E' },
@@ -29,6 +31,17 @@ const consonants = [
 
 const allLetters = [...vowels, ...consonants];
 
+const playSound = (type: 'correct' | 'incorrect') => {
+  if (typeof window !== 'undefined') {
+    const soundUrl = type === 'correct'
+      ? '/audio/correct-83487.mp3'
+      : '/audio/incorrect-293358.mp3';
+      
+    const audio = new Audio(soundUrl);
+    audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
+  }
+};
+
 const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8" }: { letters: { char: string; name: string; }[], gridClass?: string }) => {
     const [shuffledAlphabet, setShuffledAlphabet] = useState<{ char: string; name: string; }[]>([]);
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
@@ -42,7 +55,7 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
         shuffleLetters();
     }, [shuffleLetters]);
 
-    const playSound = (letter: string) => {
+    const playLetterSound = (letter: string) => {
         console.log(`Playing sound for ${letter}`);
         setActiveLetter(letter);
         setTimeout(() => setActiveLetter(null), 1000);
@@ -60,7 +73,7 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
                 {shuffledAlphabet.map((letter, index) => (
                      <Card 
                         key={`${letter.char}-${index}`} 
-                        onClick={() => playSound(letter.char)}
+                        onClick={() => playLetterSound(letter.char)}
                         className={cn(
                             "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
                             activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
@@ -77,11 +90,151 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
     );
 };
 
+const useSpeechRecognition = (lang: string) => {
+    const [isListening, setIsListening] = useState(false);
+    const [transcript, setTranscript] = useState('');
+    const recognitionRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window)) {
+            console.warn('Speech recognition not supported in this browser.');
+            return;
+        }
+
+        const recognition = new (window as any).webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = lang;
+
+        recognition.onstart = () => {
+            setIsListening(true);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.onresult = (event: any) => {
+            const last = event.results.length - 1;
+            const text = event.results[last][0].transcript;
+            setTranscript(text);
+        };
+        
+        recognitionRef.current = recognition;
+
+    }, [lang]);
+
+    const startListening = () => {
+        if (recognitionRef.current && !isListening) {
+            recognitionRef.current.start();
+        }
+    };
+    
+    const resetTranscript = () => {
+        setTranscript('');
+    }
+
+    return { isListening, transcript, startListening, resetTranscript, hasSupport: !!recognitionRef.current };
+};
+
+const VoiceRecognitionGame = () => {
+    const [currentLetter, setCurrentLetter] = useState<{ char: string; name: string; } | null>(null);
+    const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
+    const [isCorrect, setIsCorrect] = useState(false);
+    
+    const { isListening, transcript, startListening, resetTranscript, hasSupport } = useSpeechRecognition('bn-IN');
+
+    const startNewRound = useCallback(() => {
+        const randomIndex = Math.floor(Math.random() * allLetters.length);
+        setCurrentLetter(allLetters[randomIndex]);
+        setFeedback({message: '', type: 'none'});
+        setIsCorrect(false);
+        resetTranscript();
+    }, [resetTranscript]);
+    
+    useEffect(() => {
+        startNewRound();
+    }, [startNewRound]);
+
+    useEffect(() => {
+        if (!transcript || !currentLetter || isCorrect) return;
+
+        const spokenAnswer = transcript.toLowerCase().trim().replace(/[.]$/, '');
+        const correctAnswer = currentLetter.name.toLowerCase();
+        
+        if (spokenAnswer === correctAnswer) {
+            setFeedback({ message: 'Great job!', type: 'correct' });
+            setIsCorrect(true);
+            playSound('correct');
+        } else {
+            setFeedback({ message: 'Try again!', type: 'incorrect' });
+            playSound('incorrect');
+            setTimeout(() => {
+                setFeedback({ message: '', type: 'none' });
+                resetTranscript();
+            }, 1500);
+        }
+    }, [transcript, currentLetter, isCorrect, resetTranscript]);
+
+    if (!hasSupport) {
+        return <p className="text-center text-red-500 mt-8">Voice recognition is not supported by your browser. Please try Google Chrome.</p>
+    }
+
+    return (
+        <div className="relative flex flex-col items-center justify-center mt-8">
+            <Card className="w-full max-w-md shadow-2xl bg-white/70 backdrop-blur-sm">
+                <CardHeader>
+                    <CardTitle className="text-center text-9xl font-bold text-slate-800" style={{fontFamily: "'Lexend', sans-serif"}}>
+                        {currentLetter?.char}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="h-20 text-center relative flex justify-center items-center">
+                    <Confetti active={isCorrect} config={{
+                        angle: 90,
+                        spread: 360,
+                        startVelocity: 40,
+                        elementCount: 100,
+                        decay: 0.9,
+                    }}/>
+                    {feedback.message && (
+                         <div className={`flex items-center gap-2 font-bold text-2xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
+                            {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
+                            {feedback.message}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <div className="mt-8 flex flex-col items-center gap-4">
+                 <Button 
+                    onClick={startListening}
+                    variant={isListening ? 'destructive' : 'outline'}
+                    className="w-32 h-32 rounded-full shadow-lg text-6xl font-bold transition-all duration-300 ease-in-out"
+                    disabled={isListening || isCorrect}
+                >
+                    <Mic className="w-16 h-16" />
+                </Button>
+                <p className="mt-2 text-lg font-semibold text-slate-700 dark:text-slate-200">
+                    {isListening ? 'Listening...' : 'Tap to Speak'}
+                </p>
+                {transcript && <p className="text-sm text-muted-foreground">Last heard: "{transcript}"</p>}
+            </div>
+
+             <div className="mt-8">
+                <Button variant="outline" onClick={startNewRound} size="lg">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    New Letter
+                </Button>
+            </div>
+        </div>
+    );
+};
+
 
 export default function BengaliAlphabetPage() {
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
-    const playSound = (letter: string) => {
+    const playLetterSound = (letter: string) => {
         console.log(`Playing sound for ${letter}`);
         setActiveLetter(letter);
         setTimeout(() => setActiveLetter(null), 1000);
@@ -103,14 +256,15 @@ export default function BengaliAlphabetPage() {
             Bengali Alphabet (বাংলা বর্ণমালা)
           </h1>
           <p className="text-lg text-orange-700/80 mt-4 max-w-2xl mx-auto">
-            Click on a letter to learn its sound.
+            Click on a letter to learn its sound or test your pronunciation.
           </p>
         </header>
 
         <Tabs defaultValue="alphabet" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
                 <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
-                <TabsTrigger value="recognize">Recognize Alphabet (বর্ণমালা চিনুন)</TabsTrigger>
+                <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
+                <TabsTrigger value="voice">Voice Recognition (কণ্ঠস্বর)</TabsTrigger>
             </TabsList>
             <TabsContent value="alphabet" className="mt-8">
                 <section className="mb-12">
@@ -119,7 +273,7 @@ export default function BengaliAlphabetPage() {
                         {vowels.map((letter, index) => (
                             <Card 
                                 key={`${letter.char}-${index}`} 
-                                onClick={() => playSound(letter.char)}
+                                onClick={() => playLetterSound(letter.char)}
                                 className={cn(
                                     "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
                                     activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
@@ -140,7 +294,7 @@ export default function BengaliAlphabetPage() {
                         {consonants.map((letter, index) => (
                             <Card 
                                 key={`${letter.char}-${index}`}
-                                onClick={() => playSound(letter.char)}
+                                onClick={() => playLetterSound(letter.char)}
                                 className={cn(
                                     "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
                                     activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
@@ -172,6 +326,9 @@ export default function BengaliAlphabetPage() {
                     <AlphabetRecognitionGame letters={consonants} />
                 </TabsContent>
               </Tabs>
+            </TabsContent>
+            <TabsContent value="voice">
+                <VoiceRecognitionGame />
             </TabsContent>
         </Tabs>
       </div>
