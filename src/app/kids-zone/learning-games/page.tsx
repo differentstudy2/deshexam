@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Brain, Calculator, SpellCheck } from "lucide-react";
+import { ArrowLeft, Brain, Calculator, SpellCheck, Eye } from "lucide-react";
 import Link from "next/link";
 
 const games = [
@@ -11,6 +11,13 @@ const games = [
     icon: <Calculator className="w-10 h-10 text-blue-500" />,
     bgColor: "bg-blue-100",
     link: "/kids-zone/learning-games/math-puzzles",
+  },
+  {
+    title: "Number Recognition",
+    description: "Learn to identify numbers with this fun recognition game.",
+    icon: <Eye className="w-10 h-10 text-red-500" />,
+    bgColor: "bg-red-100",
+    link: "/kids-zone/learning-games/number-recognition",
   },
   {
     title: "Word Adventures",
@@ -49,7 +56,7 @@ export default function LearningGamesPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {games.map((game, index) => (
             <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
               <CardHeader className="items-center">
