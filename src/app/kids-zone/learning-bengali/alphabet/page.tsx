@@ -192,7 +192,7 @@ const VoiceRecognitionGame = () => {
                         {currentLetter?.name}
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="h-20 text-center relative flex justify-center items-center">
+                <CardContent className="h-32 text-center relative flex flex-col justify-center items-center">
                     <Confetti active={isCorrect} config={{
                         angle: 90,
                         spread: 360,
@@ -200,12 +200,22 @@ const VoiceRecognitionGame = () => {
                         elementCount: 100,
                         decay: 0.9,
                     }}/>
-                    {feedback.message && (
-                         <div className={`flex items-center gap-2 font-bold text-2xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
-                            {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
-                            {feedback.message}
-                        </div>
-                    )}
+
+                    <div className="absolute top-0 w-full px-4">
+                        {feedback.message && (
+                             <div className={`flex items-center justify-center gap-2 font-bold text-2xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
+                                {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
+                                {feedback.message}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="h-16 w-full mt-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                        <p className="text-2xl font-mono text-gray-500 dark:text-gray-400">
+                            {transcript || (isListening ? '...' : 'Speak here')}
+                        </p>
+                    </div>
+
                 </CardContent>
             </Card>
 
@@ -221,7 +231,6 @@ const VoiceRecognitionGame = () => {
                 <p className="mt-2 text-lg font-semibold text-slate-700 dark:text-slate-200">
                     {isListening ? 'Listening...' : 'Tap to Speak'}
                 </p>
-                {transcript && <p className="text-sm text-muted-foreground">Last heard: "{transcript}"</p>}
             </div>
 
              <div className="mt-8">
