@@ -79,16 +79,16 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
-                 <div className="grid grid-cols-3 gap-2 md:gap-3">
+                 <div className="grid grid-cols-4 gap-2 md:gap-3">
                     {numbers.map(num => (
-                        <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
+                        <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform col-span-1">
                             {num}
                         </Button>
                     ))}
-                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
+                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform col-span-2">
                         <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
                     </Button>
-                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
+                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform col-span-2">
                         Clear
                     </Button>
                 </div>
@@ -162,8 +162,16 @@ export default function AdditionAdventurePage() {
             num2 = Math.floor(Math.random() * (10 - num1)) + 1; // Ensure sum is <= 10
         } else {
             const maxNumber = level * 10;
-            num1 = Math.floor(Math.random() * maxNumber) + 1;
-            num2 = Math.floor(Math.random() * maxNumber) + 1;
+            const singleDigit = Math.floor(Math.random() * 9) + 1; // 1 to 9
+            const doubleDigit = Math.floor(Math.random() * (maxNumber - 10)) + 10; // 10 to maxNumber
+
+            if (Math.random() > 0.5) {
+                num1 = singleDigit;
+                num2 = doubleDigit;
+            } else {
+                num1 = doubleDigit;
+                num2 = singleDigit;
+            }
         }
         const answer = num1 + num2;
 
@@ -276,11 +284,11 @@ export default function AdditionAdventurePage() {
         if (feedback.type === 'incorrect') {
             const timer = setTimeout(() => {
                 setIsSubmitting(false);
-                setFeedback({message: '', type: 'none'});
                 if (gameMode !== 'voice') {
                     handleNewProblem(true);
                 } else {
                     resetTranscript();
+                    setFeedback({message: '', type: 'none'});
                 }
             }, 1000);
             return () => clearTimeout(timer);
@@ -443,7 +451,7 @@ export default function AdditionAdventurePage() {
                             <span className="text-xl font-bold text-slate-600">{timeLeft}s</span>
                         </div>
                     )}
-                    <CardTitle className="text-center text-5xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-2 md:gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
+                    <CardTitle className="text-center text-4xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-2 md:gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
                         <span>{problem?.num1 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">+</span>
                         <span>{problem?.num2 ?? '?'}</span>
@@ -453,7 +461,7 @@ export default function AdditionAdventurePage() {
                         </span>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="h-16 md:h-20 text-center relative flex justify-center items-center">
+                <CardContent className="h-12 md:h-20 text-center relative flex justify-center items-center">
                     <Confetti active={isCorrect} config={{
                         angle: 90,
                         spread: 360,
