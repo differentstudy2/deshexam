@@ -1,10 +1,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Eye } from "lucide-react";
+import { ArrowLeft, Eye, BookHeart } from "lucide-react";
 import Link from "next/link";
 
 const stages = [
+    {
+    title: "Learn Numbers",
+    description: "Start by learning what the numbers look and sound like.",
+    icon: <BookHeart className="w-10 h-10 text-blue-500" />,
+    bgColor: "bg-blue-100",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers",
+  },
   {
     title: "Numbers 0-9",
     description: "Learn to identify the basic numbers from zero to nine.",
@@ -49,7 +56,7 @@ export default function NumberRecognitionMenuPage() {
               </CardContent>
               <div className="p-6 pt-0">
                  <Button asChild>
-                  <Link href={stage.link}>Play</Link>
+                  <Link href={stage.link}>Start</Link>
                 </Button>
               </div>
             </Card>
