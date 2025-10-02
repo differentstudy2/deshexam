@@ -130,9 +130,9 @@ const useSpeechRecognition = (lang: string) => {
         }
     };
     
-    const resetTranscript = () => {
+    const resetTranscript = useCallback(() => {
         setTranscript('');
-    }
+    }, []);
 
     return { isListening, transcript, startListening, resetTranscript, hasSupport: !!recognitionRef.current };
 };
