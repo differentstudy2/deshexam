@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Volume2 } from "lucide-react";
@@ -24,22 +24,28 @@ export default function LearnNumbers0To10Page() {
             setActiveNumber(number);
             const result = await textToSpeech({ text: number.toString(), lang: 'en-US' });
             setAudioUrl(result.audioUrl);
-            const audio = new Audio(result.audioUrl);
-            audio.play();
-            audio.onended = () => {
-                setActiveNumber(null);
-                setAudioUrl(null);
-            };
-
         } catch (error) {
-            console.error(`Could not generate or play sound for number ${number}:`, error);
+            console.error(`Could not generate sound for number ${number}:`, error);
             setActiveNumber(null);
         }
     };
+    
+    useEffect(() => {
+        if (audioUrl && audioRef.current) {
+            audioRef.current.src = audioUrl;
+            audioRef.current.play().catch(e => console.error("Audio playback error:", e));
+        }
+    }, [audioUrl]);
+    
+    const handleAudioEnd = () => {
+        setActiveNumber(null);
+        setAudioUrl(null);
+    };
+
 
   return (
-    <div className="bg-gradient-to-br from-green-50 to-cyan-50 dark:from-green-900/10 dark:to-cyan-900/10 min-h-screen">
-       {audioUrl && <audio ref={audioRef} src={audioUrl} autoPlay />}
+    <div className="bg-gradient-to-br from-green-50 to-cyan-50 dark:from-green-900/10 min-h-screen">
+       {audioUrl && <audio ref={audioRef} onEnded={handleAudioEnd} />}
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
             <Button asChild variant="ghost">
