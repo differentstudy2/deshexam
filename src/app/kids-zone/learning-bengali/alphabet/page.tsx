@@ -60,9 +60,9 @@ export default function BengaliAlphabetPage() {
         <section className="mb-12">
             <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Vowels (স্বরবর্ণ)</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
-                {vowels.map(letter => (
+                {vowels.map((letter, index) => (
                     <Card 
-                        key={letter.char} 
+                        key={`${letter.char}-${index}`} 
                         onClick={() => playSound(letter.char)}
                         className={cn(
                             "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
@@ -81,9 +81,9 @@ export default function BengaliAlphabetPage() {
         <section>
             <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Consonants (ব্যঞ্জনবর্ণ)</h2>
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-4 max-w-6xl mx-auto">
-                {consonants.map(letter => (
+                {consonants.map((letter, index) => (
                     <Card 
-                        key={letter.char} 
+                        key={`${letter.char}-${index}`} 
                         onClick={() => playSound(letter.char)}
                         className={cn(
                             "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
