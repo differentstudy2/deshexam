@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Volume2, Languages } from "lucide-react";
+import { ArrowLeft, Volume2, Languages, Gamepad2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,7 +16,9 @@ const translations = {
         description: "Click on a number to hear its name.",
         tapToListen: "Tap to listen",
         numberNames: ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'],
-        ttsPrompt: (numName: string) => `Its name is ${numName}`
+        ttsPrompt: (numName: string) => `Its name is ${numName}`,
+        testYourself: "Test Yourself!",
+        testDescription: "Ready to test your knowledge? Play the number recognition game for 0-10."
     },
     hi: {
         back: "नंबर सीखें पर वापस जाएं",
@@ -24,7 +26,9 @@ const translations = {
         description: "किसी संख्या का नाम सुनने के लिए उस पर क्लिक करें।",
         tapToListen: "सुनने के लिए टैप करें",
         numberNames: ['शून्य', 'एक', 'दो', 'तीन', 'चार', 'पांच', 'छह', 'सात', 'आठ', 'नौ', 'दस'],
-        ttsPrompt: (numName: string) => `इसका नाम है ${numName}`
+        ttsPrompt: (numName: string) => `इसका नाम है ${numName}`,
+        testYourself: "खुद को परखें!",
+        testDescription: "क्या आप अपना ज्ञान परखने के लिए तैयार हैं? 0-10 के लिए संख्या पहचान का खेल खेलें।"
     },
     bn: {
         back: "সংখ্যা শেখা পৃষ্ঠায় ফিরে যান",
@@ -32,7 +36,9 @@ const translations = {
         description: "সংখ্যার নাম শুনতে সেটির উপর ক্লিক করুন।",
         tapToListen: "শুনতে ট্যাপ করুন",
         numberNames: ['শূন্য', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ'],
-        ttsPrompt: (numName: string) => `এর নাম ${numName}`
+        ttsPrompt: (numName: string) => `এর নাম ${numName}`,
+        testYourself: "নিজেকে পরীক্ষা করুন!",
+        testDescription: "আপনার জ্ঞান পরীক্ষা করতে প্রস্তুত? ০-১০ এর জন্য সংখ্যা চেনার খেলা খেলুন।"
     }
 };
 
@@ -72,6 +78,11 @@ export default function LearnNumbers0To10Page() {
         try {
             setActiveNumber(number);
             const langCode = language === 'en' ? 'en-us' : language === 'hi' ? 'hi-in' : 'bn-in';
+            const numName = translations[language].numberNames[number]
+            const prompt = translations[language].ttsPrompt(numName);
+
+            // Since we don't have a TTS service, we'll rely on the pre-recorded number sounds.
+            // A more advanced version would generate "Its name is..." dynamically.
             const audioSrc = `/audio/numbers/${langCode}/${number}.mp3`;
             
             if (audioRef.current.src !== audioSrc) {
@@ -134,7 +145,7 @@ export default function LearnNumbers0To10Page() {
           </p>
         </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
           {numbers.map((number) => (
             <Card 
                 key={number} 
@@ -158,6 +169,16 @@ export default function LearnNumbers0To10Page() {
               </CardContent>
             </Card>
           ))}
+           <Card className="transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer bg-green-100/50 border-green-300">
+                <CardContent className="p-4 flex flex-col items-center justify-center gap-4">
+                    <Gamepad2 className="w-16 h-16 text-green-600" />
+                    <h3 className="text-2xl font-bold font-headline text-green-800">{t.testYourself}</h3>
+                    <p className="text-sm text-green-700">{t.testDescription}</p>
+                    <Button asChild>
+                        <Link href="/kids-zone/learning-games/number-recognition/numbers-0-9">Play Game</Link>
+                    </Button>
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>
