@@ -12,8 +12,8 @@ const bengaliActivities = [
     description: "Learn the Bengali alphabet with sounds and examples.",
     icon: <Book className="w-10 h-10 text-orange-500" />,
     bgColor: "bg-orange-100",
-    link: "#",
-    comingSoon: true,
+    link: "/kids-zone/learning-bengali/alphabet",
+    comingSoon: false,
   },
   {
     title: "শব্দ ভান্ডার (Vocabulary)",
