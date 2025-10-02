@@ -244,11 +244,9 @@ export default function AdditionAdventurePage() {
     }, [problem, generateProblemWithOptions, gameMode]);
 
      useEffect(() => {
-        if (timerDuration === 0) return;
+        if (timerDuration === 0 || isSubmitting) return; // Stop timer if disabled or during submission
         if (timeLeft <= 0) {
-            if (!isSubmitting) {
-                handleNewProblem(true);
-            }
+            handleNewProblem(true);
             return;
         }
 
