@@ -71,15 +71,17 @@ export default function LearnNumbers0To10Page() {
                 key={number} 
                 onClick={() => playSound(number)}
                 className={cn(
-                    "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
+                    "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-start aspect-square cursor-pointer",
                     activeNumber === number ? "scale-110 shadow-2xl ring-4 ring-cyan-400" : "shadow-lg"
                 )}
             >
-              <CardContent className="p-2 flex flex-col items-center justify-center">
-                <p className="text-xl font-semibold text-slate-500 dark:text-slate-400 mb-2">{numberNames[number]}</p>
-                <p className="text-8xl font-bold text-slate-800 dark:text-slate-100" style={{fontFamily: "'Lexend', sans-serif"}}>
-                    {number}
-                </p>
+              <CardContent className="p-2 w-full flex flex-col items-center justify-center">
+                <p className="text-xl font-semibold text-slate-500 dark:text-slate-400 mb-2 pb-2 border-b w-full">{numberNames[number]}</p>
+                <div className="flex-grow flex items-center justify-center">
+                    <p className="text-8xl font-bold text-slate-800 dark:text-slate-100" style={{fontFamily: "'Lexend', sans-serif"}}>
+                        {number}
+                    </p>
+                </div>
                 <div className="flex items-center text-muted-foreground mt-2">
                     <Volume2 className="w-4 h-4 mr-1"/>
                     <span>Tap to listen</span>
