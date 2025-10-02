@@ -1,31 +1,45 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Volume2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 const numbers = Array.from({ length: 11 }, (_, i) => i); // 0 to 10
 
 export default function LearnNumbers0To10Page() {
     const [activeNumber, setActiveNumber] = useState<number | null>(null);
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const audioRef = useRef<HTMLAudioElement>(null);
 
-    const playSound = (number: number) => {
+
+    const playSound = async (number: number) => {
+        if (activeNumber !== null) return; 
+
         try {
-            const audio = new Audio(`/audio/numbers/en/${number}.mp3`);
-            audio.play();
             setActiveNumber(number);
-            audio.onended = () => setActiveNumber(null);
+            const result = await textToSpeech({ text: number.toString() });
+            setAudioUrl(result.audioUrl);
+            const audio = new Audio(result.audioUrl);
+            audio.play();
+            audio.onended = () => {
+                setActiveNumber(null);
+                setAudioUrl(null);
+            };
+
         } catch (error) {
-            console.error(`Could not play sound for number ${number}:`, error);
+            console.error(`Could not generate or play sound for number ${number}:`, error);
+            setActiveNumber(null);
         }
     };
 
   return (
     <div className="bg-gradient-to-br from-green-50 to-cyan-50 dark:from-green-900/10 dark:to-cyan-900/10 min-h-screen">
+       {audioUrl && <audio ref={audioRef} src={audioUrl} autoPlay />}
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
             <Button asChild variant="ghost">
