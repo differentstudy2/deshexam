@@ -118,19 +118,20 @@ const useSpeechRecognition = (lang: string) => {
     return { isListening, transcript, startListening, resetTranscript, hasSupport: !!recognitionRef.current };
 };
 
-const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
+const NumberPad = ({ onNumberClick, onClear, onDelete, lang }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void, lang: 'en' | 'hi' }) => {
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    const t = translations[lang];
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
-                 <div className="grid grid-cols-3 gap-2 md:gap-3">
+                 <div className="grid grid-cols-3 gap-2 md:gap-4">
                     {numbers.map(num => (
                         <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
-                            {num}
+                            {lang === 'hi' ? num.toLocaleString('hi-IN') : num}
                         </Button>
                     ))}
-                    <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
-                        Clear
+                    <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform col-span-2">
+                        {t.newProblem.split(' ')[0]}
                     </Button>
                     <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
                         <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
@@ -141,7 +142,7 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
     );
 };
 
-const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: number[], onOptionClick: (num: number) => void, isSubmitting: boolean }) => {
+const MultipleChoicePad = ({ options, onOptionClick, isSubmitting, lang }: { options: number[], onOptionClick: (num: number) => void, isSubmitting: boolean, lang: 'en' | 'hi' }) => {
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
@@ -154,7 +155,7 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: 
                             className="h-20 md:h-24 text-4xl md:text-5xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform"
                             disabled={isSubmitting}
                         >
-                            {option}
+                            {lang === 'hi' ? option.toLocaleString('hi-IN') : option}
                         </Button>
                     ))}
                 </div>
@@ -181,6 +182,12 @@ const VoiceInputPad = ({ isListening, startListening, transcript, lang }: { isLi
             {transcript && <p className="mt-2 text-sm text-muted-foreground">{t.lastHeard} "{transcript}"</p>}
         </Card>
     );
+};
+
+const toDevanagari = (num: number | string) => {
+    const n = num.toString();
+    const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+    return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
 };
 
 export default function AdditionAdventurePage() {
@@ -411,6 +418,14 @@ export default function AdditionAdventurePage() {
         setLanguage(lang);
         handleNewProblem();
     }
+    
+    const displayNum = (num: number | string | undefined) => {
+        if (num === undefined) return '?';
+        if (language === 'hi') {
+            return toDevanagari(num);
+        }
+        return num.toString();
+    }
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/10 dark:to-green-900/10 min-h-screen p-4">
@@ -459,7 +474,7 @@ export default function AdditionAdventurePage() {
                         </SelectTrigger>
                         <SelectContent>
                             {[...Array(10)].map((_, i) => (
-                                <SelectItem key={i + 1} value={(i + 1).toString()}>{t.level} {i + 1}</SelectItem>
+                                <SelectItem key={i + 1} value={(i + 1).toString()}>{t.level} {displayNum(i + 1)}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -474,9 +489,9 @@ export default function AdditionAdventurePage() {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="2">2</SelectItem>
-                                <SelectItem value="3">3</SelectItem>
-                                <SelectItem value="4">4</SelectItem>
+                                <SelectItem value="2">{displayNum(2)}</SelectItem>
+                                <SelectItem value="3">{displayNum(3)}</SelectItem>
+                                <SelectItem value="4">{displayNum(4)}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -518,16 +533,16 @@ export default function AdditionAdventurePage() {
                          <div className="flex items-center gap-3 mb-4">
                             <Clock className="w-6 h-6 text-slate-500" />
                             <Progress value={(timeLeft / timerDuration) * 100} className="w-full h-4" />
-                            <span className="text-xl font-bold text-slate-600">{timeLeft}s</span>
+                            <span className="text-xl font-bold text-slate-600">{displayNum(timeLeft)}s</span>
                         </div>
                     )}
                     <CardTitle className="text-center text-4xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-2 md:gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
-                        <span>{problem?.num1 ?? '?'}</span>
+                        <span>{displayNum(problem?.num1)}</span>
                         <span className="text-blue-500 font-normal">+</span>
-                        <span>{problem?.num2 ?? '?'}</span>
+                        <span>{displayNum(problem?.num2)}</span>
                         <span className="text-blue-500 font-normal">=</span>
                         <span className="inline-block w-24 h-24 md:w-36 md:h-28 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-5xl md:text-7xl font-mono shadow-inner">
-                            {userAnswer || '?'}
+                            {displayNum(userAnswer) || '?'}
                         </span>
                     </CardTitle>
                 </CardHeader>
@@ -554,7 +569,7 @@ export default function AdditionAdventurePage() {
                  <CardContent className="flex flex-col items-center gap-4">
                     <div className="flex items-center gap-2 text-lg md:text-xl font-semibold text-slate-600 dark:text-slate-300">
                         <Trophy className="w-5 h-5 md:w-6 md:h-6 text-amber-500"/>
-                        {t.score} {score} / {totalAttempted} ({totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0}%)
+                        {t.score} {displayNum(score)} / {displayNum(totalAttempted)} ({displayNum(totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0)}%)
                     </div>
                     <Button variant="outline" onClick={() => handleNewProblem(true)} size="lg">
                         <RefreshCw className="mr-2 h-4 w-4" />
@@ -568,6 +583,7 @@ export default function AdditionAdventurePage() {
                     onNumberClick={handleNumberClick}
                     onClear={handleClear}
                     onDelete={handleDelete}
+                    lang={language}
                 />
             )}
             {gameMode === 'multipleChoice' && (
@@ -575,6 +591,7 @@ export default function AdditionAdventurePage() {
                     options={options}
                     onOptionClick={handleOptionClick}
                     isSubmitting={isSubmitting}
+                    lang={language}
                 />
             )}
             {gameMode === 'voice' && (
