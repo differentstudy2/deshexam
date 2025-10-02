@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToyBrick, Puzzle, BookHeart, Gamepad2 } from "lucide-react";
+import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen } from "lucide-react";
 
 const kidsFeatures = [
   {
@@ -13,22 +13,22 @@ const kidsFeatures = [
     link: "#",
   },
   {
-    icon: <ToyBrick className="w-12 h-12 text-blue-500" />,
+    icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
     title: "Learning Games",
-    description: "Play engaging games that make learning math and letters fun.",
+    description: "Play engaging games that make education an adventure.",
     link: "/kids-zone/learning-games",
   },
-  {
-    icon: <BookHeart className="w-12 h-12 text-red-500" />,
-    title: "Story Time",
-    description: "Listen to wonderful stories that take you to magical places.",
+    {
+    icon: <BookHeart className="w-12 h-12 text-blue-500" />,
+    title: "Learning English",
+    description: "Learn the English alphabet, words, and grammar in a fun way.",
     link: "#",
   },
   {
-    icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
-    title: "Learning Games",
-    description: "Engage with interactive games that make education an adventure.",
-    link: "/kids-zone/learning-games",
+    icon: <BookOpen className="w-12 h-12 text-orange-500" />,
+    title: "Learning Bengali",
+    description: "Explore the Bengali language with interactive lessons and games.",
+    link: "#",
   },
 ];
 
