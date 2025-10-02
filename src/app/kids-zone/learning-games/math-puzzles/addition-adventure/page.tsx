@@ -265,7 +265,7 @@ export default function AdditionAdventurePage() {
             setIsCorrect(true);
             const timer = setTimeout(() => {
                 handleNewProblem();
-            }, 1500);
+            }, 3000);
             return () => clearTimeout(timer);
         }
         if (feedback.type === 'incorrect') {
@@ -274,11 +274,13 @@ export default function AdditionAdventurePage() {
                 setFeedback({message: '', type: 'none'});
                 if (gameMode !== 'voice') {
                     handleNewProblem(true);
+                } else {
+                    resetTranscript();
                 }
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [feedback.type, handleNewProblem, gameMode]);
+    }, [feedback.type, handleNewProblem, gameMode, resetTranscript]);
     
     const handleDurationChange = (value: string) => {
         const newDuration = parseInt(value, 10);
