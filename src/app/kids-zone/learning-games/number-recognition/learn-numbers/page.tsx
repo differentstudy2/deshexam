@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, BookHeart } from "lucide-react";
 import Link from "next/link";
 
 const numberRanges = [
@@ -15,7 +15,7 @@ const numberRanges = [
   {
     title: "Numbers 11-20",
     description: "Continue your learning journey.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/11-20",
   },
   {
     title: "Numbers 21-30",
