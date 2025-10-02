@@ -79,13 +79,13 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
-                 <div className="grid grid-cols-4 gap-2 md:gap-3">
+                 <div className="grid grid-cols-3 gap-2 md:gap-3">
                     {numbers.map(num => (
-                        <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform col-span-1">
+                        <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
                             {num}
                         </Button>
                     ))}
-                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform col-span-2">
+                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform col-span-1">
                         <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
                     </Button>
                      <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform col-span-2">
