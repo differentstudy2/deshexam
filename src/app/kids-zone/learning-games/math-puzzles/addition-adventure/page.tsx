@@ -258,7 +258,9 @@ export default function AdditionAdventurePage() {
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
         setIsSubmitting(false);
-        setTimeLeft(timerDuration);
+        if (timerDuration > 0) {
+            setTimeLeft(timerDuration);
+        }
         resetTranscript();
     }, [timerDuration, generateProblemWithOptions, gameMode, difficultyLevel, resetTranscript]);
     
@@ -289,29 +291,43 @@ export default function AdditionAdventurePage() {
     useEffect(() => {
         if (gameMode !== 'voice' || !transcript) return;
         
-        const wordsToNumbers: { [key: string]: string } = {
-            // English
-            'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
-            'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
-            'ten': '10', 'eleven': '11', 'twelve': '12', 'thirteen': '13', 'fourteen': '14',
-            'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19', 'twenty': '20',
-            // Hindi
-            'शून्य': '0', 'एक': '1', 'दो': '2', 'तीन': '3', 'चार': '4',
-            'पांच': '5', 'पाँच': '5', 'छह': '6', 'सात': '7', 'आठ': '8', 'नौ': '9',
-            'दस': '10', 'ग्यारह': '11', 'बारह': '12', 'तेरह': '13', 'चौदह': '14',
-            'पंद्रह': '15', 'सोलह': '16', 'सत्रह': '17', 'अठारह': '18', 'उन्नीस': '19', 'बीस': '20'
+       const wordsToNumbers: { [key: string]: string } = {
+            'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10',
+            'eleven': '11', 'twelve': '12', 'thirteen': '13', 'fourteen': '14', 'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19',
+            'twenty': '20', 'thirty': '30', 'forty': '40', 'fifty': '50', 'sixty': '60', 'seventy': '70', 'eighty': '80', 'ninety': '90', 'hundred': '100',
+            'शून्य': '0', 'एक': '1', 'दो': '2', 'तीन': '3', 'चार': '4', 'पांच': '5', 'पाँच': '5', 'छह': '6', 'सात': '7', 'आठ': '8', 'नौ': '9', 'दस': '10',
+            'ग्यारह': '11', 'बारह': '12', 'तेरह': '13', 'चौदह': '14', 'पंद्रह': '15', 'सोलह': '16', 'सत्रह': '17', 'अठारह': '18', 'उन्नीस': '19', 'बीस': '20',
+            'इक्कीस': '21', 'बाईस': '22', 'तेईस': '23', 'चौबीस': '24', 'पच्चीस': '25', 'छब्बीस': '26', 'सत्ताईस': '27', 'अट्ठाईस': '28', 'उनतीस': '29', 'तीस': '30',
+            'इकतीस': '31', 'बत्तीस': '32', 'तैंतीस': '33', 'चौंतीस': '34', 'पैंतीस': '35', 'छत्तीस': '36', 'सैंतीस': '37', 'अड़तीस': '38', 'उनतालीस': '39', 'चालीस': '40',
+            'इकतालीस': '41', 'बयालीस': '42', 'तैंतालीस': '43', 'चौवालीस': '44', 'पैंतालीस': '45', 'छियालीस': '46', 'सैंतालीस': '47', 'अड़तालीस': '48', 'उनचास': '49', 'पचास': '50',
+            'इक्यावन': '51', 'बावन': '52', 'तिरपन': '53', 'चौवन': '54', 'पचपन': '55', 'छप्पन': '56', 'सत्तावन': '57', 'अट्ठावन': '58', 'उनसठ': '59', 'साठ': '60',
+            'इकसठ': '61', 'बासठ': '62', 'तिरसठ': '63', 'चौंसठ': '64', 'पैंसठ': '65', 'छियासठ': '66', 'सड़सठ': '67', 'अड़सठ': '68', 'उनहत्तर': '69', 'सत्तर': '70',
+            'इकहत्तर': '71', 'बहत्तर': '72', 'तिहत्तर': '73', 'चौहत्तर': '74', 'पचहत्तर': '75', 'छिहत्तर': '76', 'सतहत्तर': '77', 'अठहत्तर': '78', 'उनासी': '79', 'अस्सी': '80',
+            'इक्यासी': '81', 'बयासी': '82', 'तिरासी': '83', 'चौरासी': '84', 'पचासी': '85', 'छियासी': '86', 'सत्तासी': '87', 'अट्ठासी': '88', 'नवासी': '89', 'नब्बे': '90',
+            'इक्यानबे': '91', 'बानबे': '92', 'तिरानबे': '93', 'चौरानबे': '94', 'पंचानबे': '95', 'छियानबे': '96', 'सत्तानबे': '97', 'अट्ठानबे': '98', 'निन्यानबे': '99', 'सौ': '100'
         };
 
         const spokenAnswer = transcript.toLowerCase().trim().replace(/[.]$/, '');
-        const extractedNumber = spokenAnswer.match(/\d+/) || (wordsToNumbers[spokenAnswer] ? [wordsToNumbers[spokenAnswer]] : null);
+        
+        // First, check for direct number match
+        const directNumberMatch = spokenAnswer.match(/\d+/);
+        if (directNumberMatch) {
+            setUserAnswer(directNumberMatch[0]);
+            handleSubmit(directNumberMatch[0]);
+            return;
+        }
 
-        if (extractedNumber) {
-            const numberStr = extractedNumber[0];
+        // Then, check for word-to-number mapping
+        if (wordsToNumbers[spokenAnswer]) {
+            const numberStr = wordsToNumbers[spokenAnswer];
             setUserAnswer(numberStr);
             handleSubmit(numberStr);
-        } else {
-             setFeedback({ message: t.didntCatch, type: 'incorrect' });
+            return;
         }
+        
+        // If no match found
+        setFeedback({ message: t.didntCatch, type: 'incorrect' });
+        
     }, [transcript, gameMode, handleSubmit, t]);
 
     useEffect(() => {
@@ -321,7 +337,11 @@ export default function AdditionAdventurePage() {
     }, [problem, generateProblemWithOptions, gameMode, difficultyLevel]);
 
      useEffect(() => {
-        if (timerDuration === 0 || isSubmitting) return; // Stop timer if disabled or during submission
+        if (timerDuration === 0 || isSubmitting) {
+            // No need to clear interval if it's already paused or disabled
+            return;
+        }
+
         if (timeLeft <= 0) {
             handleNewProblem(true);
             return;
@@ -345,13 +365,18 @@ export default function AdditionAdventurePage() {
         }
         if (feedback.type === 'incorrect') {
             const timer = setTimeout(() => {
-                if (gameMode !== 'voice') {
+                // For multiple choice, just reset for next attempt on same problem
+                if (gameMode !== 'multipleChoice' && gameMode !== 'voice') {
+                    setUserAnswer('');
+                }
+                // For other modes, or if we decide to auto-advance on incorrect
+                if (gameMode === 'multipleChoice' || gameMode === 'voice') {
                     handleNewProblem(true);
                 } else {
                     resetTranscript();
                     setFeedback({message: '', type: 'none'});
+                    setIsSubmitting(false); // Allow new input after feedback
                 }
-                setIsSubmitting(false); // Allow new input after feedback
             }, 1000);
             return () => clearTimeout(timer);
         }
