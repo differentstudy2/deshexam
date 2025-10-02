@@ -10,7 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import { googleAI } from '@genkit-ai/googleai';
 import wav from 'wav';
 
@@ -85,3 +85,4 @@ const textToSpeechFlow = ai.defineFlow(
     return { audioUrl };
   }
 );
+
