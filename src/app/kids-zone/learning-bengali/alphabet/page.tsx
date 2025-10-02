@@ -29,14 +29,14 @@ const consonants = [
 
 const allLetters = [...vowels, ...consonants];
 
-const AlphabetRecognitionGame = () => {
+const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8" }: { letters: { char: string; name: string; }[], gridClass?: string }) => {
     const [shuffledAlphabet, setShuffledAlphabet] = useState<{ char: string; name: string; }[]>([]);
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
     const shuffleLetters = useCallback(() => {
-        const shuffled = [...allLetters].sort(() => Math.random() - 0.5);
+        const shuffled = [...letters].sort(() => Math.random() - 0.5);
         setShuffledAlphabet(shuffled);
-    }, []);
+    }, [letters]);
 
     useEffect(() => {
         shuffleLetters();
@@ -56,7 +56,7 @@ const AlphabetRecognitionGame = () => {
                     Reset (পুনরায় সাজান)
                 </Button>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-w-7xl mx-auto">
+            <div className={cn("gap-4 max-w-7xl mx-auto grid", gridClass)}>
                 {shuffledAlphabet.map((letter, index) => (
                      <Card 
                         key={`${letter.char}-${index}`} 
@@ -155,8 +155,23 @@ export default function BengaliAlphabetPage() {
                     </div>
                 </section>
             </TabsContent>
-             <TabsContent value="recognize">
-                <AlphabetRecognitionGame />
+            <TabsContent value="recognize">
+              <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
+                    <TabsTrigger value="all">All (সব বর্ণ)</TabsTrigger>
+                    <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
+                    <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
+                </TabsList>
+                <TabsContent value="all">
+                    <AlphabetRecognitionGame letters={allLetters} />
+                </TabsContent>
+                 <TabsContent value="vowels">
+                    <AlphabetRecognitionGame letters={vowels} gridClass="grid-cols-2 sm:grid-cols-4 md:grid-cols-6" />
+                </TabsContent>
+                 <TabsContent value="consonants">
+                    <AlphabetRecognitionGame letters={consonants} />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
         </Tabs>
       </div>
