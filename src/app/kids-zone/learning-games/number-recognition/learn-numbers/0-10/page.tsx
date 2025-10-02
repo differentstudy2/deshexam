@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Volume2, Languages } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const translations = {
@@ -52,44 +51,47 @@ const toBengaliNumerals = (num: number | string) => {
 
 export default function LearnNumbers0To10Page() {
     const [activeNumber, setActiveNumber] = useState<number | null>(null);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
-    const audioRef = useRef<HTMLAudioElement>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
     const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('en');
+
+    useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
+            audioRef.current.onended = () => {
+                setActiveNumber(null);
+            };
+        }
+    }, []);
 
     const t = translations[language];
     const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     const playSound = async (number: number) => {
-        if (activeNumber !== null) return; 
+        if (activeNumber !== null || !audioRef.current) return; 
 
         try {
             setActiveNumber(number);
-            const languageCode = language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-IN';
-            const numberName = t.numberNames[number];
-            const promptText = t.ttsPrompt(numberName);
-            const result = await textToSpeech({ text: promptText, lang: languageCode });
-            setAudioUrl(result.audioUrl);
+            const langCode = language === 'en' ? 'en-us' : language === 'hi' ? 'hi-in' : 'bn-in';
+            const audioSrc = `/audio/numbers/${langCode}/${number}.mp3`;
+            
+            if (audioRef.current.src !== audioSrc) {
+                audioRef.current.src = audioSrc;
+            }
+            audioRef.current.play().catch(e => console.error("Audio playback error:", e));
+
         } catch (error) {
-            console.error(`Could not generate sound for number ${number}:`, error);
+            console.error(`Could not play sound for number ${number}:`, error);
             setActiveNumber(null);
         }
     };
     
-    useEffect(() => {
-        if (audioUrl && audioRef.current) {
-            audioRef.current.load();
-            audioRef.current.play().catch(e => console.error("Audio playback error:", e));
-        }
-    }, [audioUrl]);
-    
-    const handleAudioEnd = () => {
-        setActiveNumber(null);
-    };
-
     const handleLanguageChange = (lang: 'en' | 'hi' | 'bn') => {
         setLanguage(lang);
         setActiveNumber(null);
-        setAudioUrl(null);
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = '';
+        }
     }
     
     const displayNum = (num: number | string) => {
@@ -101,7 +103,6 @@ export default function LearnNumbers0To10Page() {
 
   return (
     <div className="bg-gradient-to-br from-green-50 to-cyan-50 dark:from-green-900/10 min-h-screen">
-       {audioUrl && <audio ref={audioRef} onEnded={handleAudioEnd} src={audioUrl} />}
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8 flex justify-between items-center">
             <Button asChild variant="ghost">
