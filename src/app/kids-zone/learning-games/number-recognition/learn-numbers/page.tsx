@@ -20,42 +20,42 @@ const numberRanges = [
   {
     title: "Numbers 21-30",
     description: "Explore the twenties.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/21-30",
   },
   {
     title: "Numbers 31-40",
     description: "Learn the thirties.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/31-40",
   },
     {
     title: "Numbers 41-50",
     description: "Discover the forties.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/41-50",
   },
     {
     title: "Numbers 51-60",
     description: "Get to know the fifties.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/51-60",
   },
     {
     title: "Numbers 61-70",
     description: "Learn the sixties.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/61-70",
   },
     {
     title: "Numbers 71-80",
     description: "Explore the seventies.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/71-80",
   },
     {
     title: "Numbers 81-90",
     description: "Challenge yourself with the eighties.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/81-90",
   },
     {
     title: "Numbers 91-100",
     description: "Master all the numbers up to one hundred.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/91-100",
   },
 ];
 
