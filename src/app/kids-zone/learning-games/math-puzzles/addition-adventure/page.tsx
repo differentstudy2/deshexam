@@ -73,6 +73,12 @@ const translations = {
     }
 }
 
+const toDevanagari = (num: number | string) => {
+    const n = num.toString();
+    const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+    return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
+};
+
 const useSpeechRecognition = (lang: string) => {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
@@ -129,7 +135,7 @@ const NumberPad = ({ onNumberClick, onClear, onDelete, lang }: { onNumberClick: 
                  <div className="grid grid-cols-3 gap-2 md:gap-4">
                     {numbers.map(num => (
                         <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
-                            {lang === 'hi' ? num.toLocaleString('hi-IN') : num}
+                            {lang === 'hi' ? toDevanagari(num) : num}
                         </Button>
                     ))}
                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
@@ -157,7 +163,7 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting, lang }: { opt
                             className="h-20 md:h-24 text-4xl md:text-5xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform"
                             disabled={isSubmitting}
                         >
-                            {lang === 'hi' ? option.toLocaleString('hi-IN') : option}
+                            {lang === 'hi' ? toDevanagari(option) : option}
                         </Button>
                     ))}
                 </div>
@@ -184,12 +190,6 @@ const VoiceInputPad = ({ isListening, startListening, transcript, lang }: { isLi
             {transcript && <p className="mt-2 text-sm text-muted-foreground">{t.lastHeard} "{transcript}"</p>}
         </Card>
     );
-};
-
-const toDevanagari = (num: number | string) => {
-    const n = num.toString();
-    const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
-    return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
 };
 
 export default function AdditionAdventurePage() {
