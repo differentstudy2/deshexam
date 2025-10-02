@@ -372,7 +372,7 @@ export default function BengaliAlphabetPage() {
         </header>
 
         <Tabs defaultValue="alphabet" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-3xl mx-auto h-auto md:h-10">
                 <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
                 <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
                 <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
