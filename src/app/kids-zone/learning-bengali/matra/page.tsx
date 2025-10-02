@@ -11,17 +11,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
 const matras = [
-  { vowel: 'অ', name: 'Aw', matra: '', example: 'ক', sound: 'Kaw' },
-  { vowel: 'আ', name: 'A', matra: 'া', example: 'কা', sound: 'Ka' },
-  { vowel: 'ই', name: 'I', matra: 'ি', example: 'কি', sound: 'Ki' },
-  { vowel: 'ঈ', name: 'Ee', matra: 'ী', example: 'কী', sound: 'Kee' },
-  { vowel: 'উ', name: 'U', matra: 'ু', example: 'কু', sound: 'Ku' },
-  { vowel: 'ঊ', name: 'Oo', matra: 'ূ', example: 'কূ', sound: 'Koo' },
-  { vowel: 'ঋ', name: 'Ri', matra: 'ৃ', example: 'কৃ', sound: 'Kri' },
-  { vowel: 'এ', name: 'E', matra: 'ে', example: 'কে', sound: 'Ke' },
-  { vowel: 'ঐ', name: 'Oi', matra: 'ৈ', example: 'কৈ', sound: 'Koi' },
-  { vowel: 'ও', name: 'O', matra: 'ো', example: 'কো', sound: 'Ko' },
-  { vowel: 'ঔ', name: 'Ou', matra: 'ৌ', example: 'কৌ', sound: 'Kou' }
+  { vowel: 'অ', name: 'Aw', matra: '', matraName: 'No Matra', example: 'ক', sound: 'Kaw' },
+  { vowel: 'আ', name: 'A', matra: 'া', matraName: 'A-kar', example: 'কা', sound: 'Ka' },
+  { vowel: 'ই', name: 'I', matra: 'ি', matraName: 'E-kar', example: 'কি', sound: 'Ki' },
+  { vowel: 'ঈ', name: 'Ee', matra: 'ী', matraName: 'Ee-kar', example: 'কী', sound: 'Kee' },
+  { vowel: 'উ', name: 'U', matra: 'ু', matraName: 'U-kar', example: 'কু', sound: 'Ku' },
+  { vowel: 'ঊ', name: 'Oo', matra: 'ূ', matraName: 'Oo-kar', example: 'কূ', sound: 'Koo' },
+  { vowel: 'ঋ', name: 'Ri', matra: 'ৃ', matraName: 'Ri-kar', example: 'কৃ', sound: 'Kri' },
+  { vowel: 'এ', name: 'E', matra: 'ে', matraName: 'E-kar', example: 'কে', sound: 'Ke' },
+  { vowel: 'ঐ', name: 'Oi', matra: 'ৈ', matraName: 'Oi-kar', example: 'কৈ', sound: 'Koi' },
+  { vowel: 'ও', name: 'O', matra: 'ো', matraName: 'O-kar', example: 'কো', sound: 'Ko' },
+  { vowel: 'ঔ', name: 'Ou', matra: 'ৌ', matraName: 'Ou-kar', example: 'কৌ', sound: 'Kou' }
 ];
 
 export default function BengaliMatraPage() {
@@ -62,16 +62,29 @@ export default function BengaliMatraPage() {
           <TabsContent value="porichoy" className="mt-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {matras.map((item, index) => (
-                <Card key={`porichoy-${index}`} className="shadow-lg bg-white/70 backdrop-blur-sm">
-                  <CardContent className="p-4 flex items-center justify-center gap-4 text-center">
-                      <div className="flex flex-col items-center">
-                          <span className="text-5xl font-bold text-slate-800">{item.vowel}</span>
-                          <span className="text-sm font-semibold text-slate-500">{item.name}</span>
+                <Card 
+                    key={`porichoy-${index}`} 
+                    onClick={() => playSound(item.matraName)}
+                    className={cn(
+                        "transform transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center items-center justify-center cursor-pointer",
+                        activeCard === item.matraName ? "scale-105 shadow-2xl ring-4 ring-blue-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
+                    )}
+                >
+                  <CardContent className="p-4 flex flex-col items-center justify-center gap-4 text-center">
+                      <div className="flex items-center gap-4">
+                        <div className="flex flex-col items-center">
+                            <span className="text-5xl font-bold text-slate-800">{item.vowel}</span>
+                            <span className="text-sm font-semibold text-slate-500">{item.name}</span>
+                        </div>
+                        <Equal className="w-8 h-8 text-blue-500"/>
+                         <div className="flex flex-col items-center">
+                            <span className="text-5xl font-bold text-blue-600">{item.matra || '—'}</span>
+                            <span className="text-sm font-semibold text-slate-500">{item.matraName}</span>
+                        </div>
                       </div>
-                      <Equal className="w-8 h-8 text-blue-500"/>
-                       <div className="flex flex-col items-center">
-                          <span className="text-5xl font-bold text-blue-600">{item.matra || '—'}</span>
-                          <span className="text-sm font-semibold text-slate-500">Matra</span>
+                      <div className="flex items-center text-muted-foreground mt-2 pt-2 border-t w-full justify-center text-xs">
+                          <Volume2 className="w-4 h-4 mr-1"/>
+                          <span>Tap to listen</span>
                       </div>
                   </CardContent>
                 </Card>
@@ -82,7 +95,7 @@ export default function BengaliMatraPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                 {matras.map((item, index) => (
                     <Card 
-                        key={index} 
+                        key={`jog-${index}`} 
                         onClick={() => playSound(item.sound)}
                         className={cn(
                             "transform transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center items-center justify-center cursor-pointer",
