@@ -20,8 +20,8 @@ const bengaliActivities = [
     description: "Learn how vowels combine with consonants.",
     icon: <Combine className="w-10 h-10 text-blue-500" />,
     bgColor: "bg-blue-100",
-    link: "#",
-    comingSoon: true,
+    link: "/kids-zone/learning-bengali/matra",
+    comingSoon: false,
   },
   {
     title: "শব্দ ভান্ডার (Vocabulary)",
