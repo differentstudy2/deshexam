@@ -22,6 +22,11 @@ const playSound = (type: 'correct' | 'incorrect') => {
   }
 };
 
+const feedbackMessages = {
+    correct: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
+    incorrect: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
+};
+
 const useSpeechRecognition = () => {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
@@ -72,18 +77,18 @@ const useSpeechRecognition = () => {
 const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     return (
-        <Card className="w-full max-w-sm mx-auto bg-blue-100/50 dark:bg-blue-900/30">
-            <CardContent className="p-4">
-                 <div className="grid grid-cols-3 gap-3">
+        <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
+            <CardContent className="p-2 md:p-4">
+                 <div className="grid grid-cols-3 gap-2 md:gap-3">
                     {numbers.map(num => (
-                        <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-20 text-4xl font-bold rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
+                        <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
                             {num}
                         </Button>
                     ))}
-                    <Button onClick={onDelete} variant="outline" className="h-20 text-lg rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
-                        <Delete className="w-8 h-8 text-destructive" />
+                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
+                        <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
                     </Button>
-                     <Button onClick={onClear} variant="outline" className="h-20 text-lg rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
+                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
                         Clear
                     </Button>
                 </div>
@@ -94,15 +99,15 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
 
 const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: number[], onOptionClick: (num: number) => void, isSubmitting: boolean }) => {
     return (
-        <Card className="w-full max-w-sm mx-auto bg-blue-100/50 dark:bg-blue-900/30">
-            <CardContent className="p-4">
-                 <div className="grid grid-cols-2 gap-4">
+        <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
+            <CardContent className="p-2 md:p-4">
+                 <div className="grid grid-cols-2 gap-2 md:gap-4">
                     {options.map(option => (
                         <Button 
                             key={option} 
                             onClick={() => onOptionClick(option)} 
                             variant="outline" 
-                            className="h-24 text-5xl font-bold rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform"
+                            className="h-20 md:h-24 text-4xl md:text-5xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform"
                             disabled={isSubmitting}
                         >
                             {option}
@@ -116,27 +121,21 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: 
 
 const VoiceInputPad = ({ isListening, startListening, transcript }: { isListening: boolean, startListening: () => void, transcript: string }) => {
     return (
-        <Card className="w-full max-w-sm mx-auto bg-blue-100/50 dark:bg-blue-900/30 flex flex-col items-center justify-center p-4 h-[420px]">
+        <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30 flex flex-col items-center justify-center p-4 min-h-[300px] md:min-h-[420px]">
             <Button 
                 onClick={startListening}
                 variant={isListening ? 'destructive' : 'outline'}
-                className="w-48 h-48 rounded-full shadow-lg text-6xl font-bold transition-all duration-300 ease-in-out"
+                className="w-32 h-32 md:w-48 md:h-48 rounded-full shadow-lg text-6xl font-bold transition-all duration-300 ease-in-out"
                 disabled={isListening}
             >
-                <Mic className="w-24 h-24" />
+                <Mic className="w-16 h-16 md:w-24 md:h-24" />
             </Button>
-            <p className="mt-6 text-xl font-semibold text-slate-700 dark:text-slate-200">
+            <p className="mt-4 md:mt-6 text-lg md:text-xl font-semibold text-slate-700 dark:text-slate-200">
                 {isListening ? 'Listening...' : 'Tap to Speak'}
             </p>
             {transcript && <p className="mt-2 text-sm text-muted-foreground">Last heard: "{transcript}"</p>}
         </Card>
     );
-};
-
-
-const feedbackMessages = {
-    correct: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
-    incorrect: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
 };
 
 export default function AdditionAdventurePage() {
@@ -145,7 +144,7 @@ export default function AdditionAdventurePage() {
     const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [timerDuration, setTimerDuration] = useState(10); 
+    const [timerDuration, setTimerDuration] = useState(60); 
     const [timeLeft, setTimeLeft] = useState(timerDuration);
     const [score, setScore] = useState(0);
     const [totalAttempted, setTotalAttempted] = useState(0);
@@ -408,17 +407,17 @@ export default function AdditionAdventurePage() {
                             <span className="text-xl font-bold text-slate-600">{timeLeft}s</span>
                         </div>
                     )}
-                    <CardTitle className="text-center text-6xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
+                    <CardTitle className="text-center text-5xl md:text-7xl font-bold tracking-wider flex items-center justify-center flex-wrap gap-x-2 md:gap-x-4 gap-y-2 text-slate-700 dark:text-slate-200" style={{fontFamily: "'Lexend', sans-serif"}}>
                         <span>{problem?.num1 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">+</span>
                         <span>{problem?.num2 ?? '?'}</span>
                         <span className="text-blue-500 font-normal">=</span>
-                        <span className="inline-block w-36 h-28 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-7xl font-mono shadow-inner">
+                        <span className="inline-block w-24 h-24 md:w-36 md:h-28 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-5xl md:text-7xl font-mono shadow-inner">
                             {userAnswer || '?'}
                         </span>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="h-20 text-center relative flex justify-center items-center">
+                <CardContent className="h-16 md:h-20 text-center relative flex justify-center items-center">
                     <Confetti active={isCorrect} config={{
                         angle: 90,
                         spread: 360,
@@ -428,19 +427,19 @@ export default function AdditionAdventurePage() {
                     }}/>
 
                 {feedback.type === 'correct' && (
-                    <div className="flex items-center gap-2 text-green-600 font-bold text-2xl animate-pulse">
-                        <Sparkles className="w-8 h-8" /> {feedback.message}
+                    <div className="flex items-center gap-2 text-green-600 font-bold text-xl md:text-2xl animate-pulse">
+                        <Sparkles className="w-6 h-6 md:w-8 md:h-8" /> {feedback.message}
                     </div>
                 )}
                 {feedback.type === 'incorrect' && (
-                    <div className="flex items-center gap-2 text-destructive font-bold text-2xl">
-                        <X className="w-8 h-8" /> {feedback.message}
+                    <div className="flex items-center gap-2 text-destructive font-bold text-xl md:text-2xl">
+                        <X className="w-6 h-6 md:w-8 md:h-8" /> {feedback.message}
                     </div>
                 )}
                 </CardContent>
                  <CardContent className="flex flex-col items-center gap-4">
-                    <div className="flex items-center gap-2 text-xl font-semibold text-slate-600 dark:text-slate-300">
-                        <Trophy className="w-6 h-6 text-amber-500"/>
+                    <div className="flex items-center gap-2 text-lg md:text-xl font-semibold text-slate-600 dark:text-slate-300">
+                        <Trophy className="w-5 h-5 md:w-6 md:h-6 text-amber-500"/>
                         Score: {score} / {totalAttempted} ({totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0}%)
                     </div>
                     <Button variant="outline" onClick={() => handleNewProblem(true)} size="lg">
