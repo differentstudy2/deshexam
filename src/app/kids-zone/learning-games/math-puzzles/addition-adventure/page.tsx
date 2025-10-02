@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows, Mic } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows, Mic, BarChart4 } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -151,12 +151,14 @@ export default function AdditionAdventurePage() {
     const [gameMode, setGameMode] = useState<'input' | 'multipleChoice' | 'voice'>('input');
     const [options, setOptions] = useState<number[]>([]);
     const [mcqLevel, setMcqLevel] = useState(4);
+    const [difficultyLevel, setDifficultyLevel] = useState(1);
     
     const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition();
 
-    const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice') => {
-        const num1 = Math.floor(Math.random() * 10) + 1;
-        const num2 = Math.floor(Math.random() * 10) + 1;
+    const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice', level: number) => {
+        const maxNumber = level * 10;
+        const num1 = Math.floor(Math.random() * maxNumber) + 1;
+        const num2 = Math.floor(Math.random() * maxNumber) + 1;
         const answer = num1 + num2;
 
         const newProblem = { num1, num2, answer };
@@ -181,14 +183,14 @@ export default function AdditionAdventurePage() {
         if(isIncorrectOrTimeout) {
             setTotalAttempted(prev => prev + 1);
         }
-        generateProblemWithOptions(gameMode);
+        generateProblemWithOptions(gameMode, difficultyLevel);
         setUserAnswer('');
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
         setIsSubmitting(false);
         setTimeLeft(timerDuration);
         resetTranscript();
-    }, [timerDuration, generateProblemWithOptions, gameMode, resetTranscript]);
+    }, [timerDuration, generateProblemWithOptions, gameMode, difficultyLevel, resetTranscript]);
     
     const handleSubmit = useCallback((answer: string) => {
         if (!answer || isSubmitting || !problem) return;
@@ -238,9 +240,9 @@ export default function AdditionAdventurePage() {
 
     useEffect(() => {
         if (typeof window !== 'undefined' && !problem) {
-            generateProblemWithOptions(gameMode);
+            generateProblemWithOptions(gameMode, difficultyLevel);
         }
-    }, [problem, generateProblemWithOptions, gameMode]);
+    }, [problem, generateProblemWithOptions, gameMode, difficultyLevel]);
 
      useEffect(() => {
         if (timerDuration === 0 || isSubmitting) return; // Stop timer if disabled or during submission
@@ -289,7 +291,7 @@ export default function AdditionAdventurePage() {
         setGameMode(value);
         setScore(0);
         setTotalAttempted(0);
-        generateProblemWithOptions(value);
+        generateProblemWithOptions(value, difficultyLevel);
         setUserAnswer('');
         setFeedback({message: '', type: 'none'});
         setIsCorrect(false);
@@ -297,11 +299,24 @@ export default function AdditionAdventurePage() {
         setTimeLeft(timerDuration);
     };
     
-    const handleLevelChange = (value: string) => {
+    const handleMcqLevelChange = (value: string) => {
         setMcqLevel(parseInt(value, 10));
         setScore(0);
         setTotalAttempted(0);
         handleNewProblem();
+    };
+
+    const handleDifficultyChange = (value: string) => {
+        const newLevel = parseInt(value, 10);
+        setDifficultyLevel(newLevel);
+        setScore(0);
+        setTotalAttempted(0);
+        generateProblemWithOptions(gameMode, newLevel);
+        setUserAnswer('');
+        setFeedback({message: '', type: 'none'});
+        setIsCorrect(false);
+        setIsSubmitting(false);
+        setTimeLeft(timerDuration);
     };
 
     const handleNumberClick = (num: number) => {
@@ -351,18 +366,33 @@ export default function AdditionAdventurePage() {
                     </Select>
                 </div>
 
+                <div className="flex items-center gap-2">
+                    <BarChart4 className="w-5 h-5 text-slate-600"/>
+                    <Label htmlFor="difficulty-select" className="text-sm font-medium text-slate-700">Difficulty:</Label>
+                    <Select value={difficultyLevel.toString()} onValueChange={handleDifficultyChange}>
+                        <SelectTrigger id="difficulty-select" className="w-[120px] h-9">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[...Array(10)].map((_, i) => (
+                                <SelectItem key={i + 1} value={(i + 1).toString()}>Level {i + 1}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 {gameMode === 'multipleChoice' && (
                     <div className="flex items-center gap-2">
                         <Trophy className="w-5 h-5 text-slate-600"/>
-                        <Label htmlFor="level-select" className="text-sm font-medium text-slate-700">Level:</Label>
-                        <Select value={mcqLevel.toString()} onValueChange={handleLevelChange}>
+                        <Label htmlFor="level-select" className="text-sm font-medium text-slate-700">Options:</Label>
+                        <Select value={mcqLevel.toString()} onValueChange={handleMcqLevelChange}>
                             <SelectTrigger id="level-select" className="w-[120px] h-9">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="2">Easy (2)</SelectItem>
-                                <SelectItem value="3">Medium (3)</SelectItem>
-                                <SelectItem value="4">Hard (4)</SelectItem>
+                                <SelectItem value="2">2</SelectItem>
+                                <SelectItem value="3">3</SelectItem>
+                                <SelectItem value="4">4</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
