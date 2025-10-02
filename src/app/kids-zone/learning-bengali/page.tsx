@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Book, SpellCheck, Mic } from "lucide-react";
+import { ArrowLeft, Book, SpellCheck, Mic, Combine } from "lucide-react";
 import Link from "next/link";
 
 const bengaliActivities = [
@@ -14,6 +14,14 @@ const bengaliActivities = [
     bgColor: "bg-orange-100",
     link: "/kids-zone/learning-bengali/alphabet",
     comingSoon: false,
+  },
+  {
+    title: "মাত্রা (Matra)",
+    description: "Learn how vowels combine with consonants.",
+    icon: <Combine className="w-10 h-10 text-blue-500" />,
+    bgColor: "bg-blue-100",
+    link: "#",
+    comingSoon: true,
   },
   {
     title: "শব্দ ভান্ডার (Vocabulary)",
@@ -54,7 +62,7 @@ export default function LearningBengaliPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {bengaliActivities.map((activity, index) => (
             <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center relative">
                {activity.comingSoon && (
