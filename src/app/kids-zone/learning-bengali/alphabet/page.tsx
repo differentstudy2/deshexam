@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -155,7 +155,7 @@ const VoiceRecognitionGame = () => {
     
     useEffect(() => {
         startNewRound();
-    }, []);
+    }, [startNewRound]);
 
     useEffect(() => {
         if (!transcript || !currentLetter || isCorrect) return;
