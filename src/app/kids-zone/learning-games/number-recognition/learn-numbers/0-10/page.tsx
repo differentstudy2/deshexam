@@ -16,21 +16,24 @@ const translations = {
         title: "Learn Numbers 0 to 10",
         description: "Click on a number to hear its name.",
         tapToListen: "Tap to listen",
-        numberNames: ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']
+        numberNames: ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'],
+        ttsPrompt: (numName: string) => `Its name is ${numName}`
     },
     hi: {
         back: "नंबर सीखें पर वापस जाएं",
         title: "संख्याएँ 0 से 10 सीखें",
         description: "किसी संख्या का नाम सुनने के लिए उस पर क्लिक करें।",
         tapToListen: "सुनने के लिए टैप करें",
-        numberNames: ['शून्य', 'एक', 'दो', 'तीन', 'चार', 'पांच', 'छह', 'सात', 'आठ', 'नौ', 'दस']
+        numberNames: ['शून्य', 'एक', 'दो', 'तीन', 'चार', 'पांच', 'छह', 'सात', 'आठ', 'नौ', 'दस'],
+        ttsPrompt: (numName: string) => `इसका नाम है ${numName}`
     },
     bn: {
         back: "সংখ্যা শেখা পৃষ্ঠায় ফিরে যান",
         title: "সংখ্যা ০ থেকে ১০ শিখুন",
         description: "সংখ্যার নাম শুনতে সেটির উপর ক্লিক করুন।",
         tapToListen: "শুনতে ট্যাপ করুন",
-        numberNames: ['শূন্য', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ']
+        numberNames: ['শূন্য', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ'],
+        ttsPrompt: (numName: string) => `এর নাম ${numName}`
     }
 };
 
@@ -62,7 +65,9 @@ export default function LearnNumbers0To10Page() {
         try {
             setActiveNumber(number);
             const languageCode = language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-IN';
-            const result = await textToSpeech({ text: t.numberNames[number], lang: languageCode });
+            const numberName = t.numberNames[number];
+            const promptText = t.ttsPrompt(numberName);
+            const result = await textToSpeech({ text: promptText, lang: languageCode });
             setAudioUrl(result.audioUrl);
         } catch (error) {
             console.error(`Could not generate sound for number ${number}:`, error);
