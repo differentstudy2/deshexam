@@ -22,7 +22,7 @@ export default function LearnNumbers0To10Page() {
 
         try {
             setActiveNumber(number);
-            const result = await textToSpeech({ text: number.toString() });
+            const result = await textToSpeech({ text: number.toString(), lang: 'en-US' });
             setAudioUrl(result.audioUrl);
             const audio = new Audio(result.audioUrl);
             audio.play();

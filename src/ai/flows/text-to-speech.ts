@@ -16,6 +16,7 @@ import wav from 'wav';
 
 const TextToSpeechInputSchema = z.object({
   text: z.string().describe('The text to convert to speech.'),
+  lang: z.string().describe('The language of the text, e.g., "en-US", "hi-IN", "bn-IN".'),
 });
 export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
 
@@ -61,7 +62,7 @@ const textToSpeechFlow = ai.defineFlow(
     inputSchema: TextToSpeechInputSchema,
     outputSchema: TextToSpeechOutputSchema,
   },
-  async ({ text }) => {
+  async ({ text, lang }) => {
     const { media } = await ai.generate({
       model: googleAI.model('gemini-2.5-flash-preview-tts'),
       config: {
@@ -70,6 +71,7 @@ const textToSpeechFlow = ai.defineFlow(
           voiceConfig: {
             prebuiltVoiceConfig: { voiceName: 'Algenib' },
           },
+          languageCode: lang,
         },
       },
       prompt: text,
@@ -85,4 +87,3 @@ const textToSpeechFlow = ai.defineFlow(
     return { audioUrl };
   }
 );
-
