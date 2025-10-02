@@ -70,6 +70,30 @@ const translations = {
         correctMessages: ["बहुत बढ़िया!", "शानदार!", "सही है!", "अद्भुत!", "सुपरस्टार!"],
         incorrectMessages: ["पुनः प्रयास करें!", "लगभग सही!", "थोड़ा और!", "ओह!"],
         clear: "नया"
+    },
+    bn: {
+        backToPuzzles: "গণিত ধাঁধায় ফিরে যান",
+        pageTitle: "যোগের অভিযান",
+        pageDescription: "সংখ্যাগুলো যোগ করুন এবং সঠিক উত্তরটি বেছে নিন!",
+        mode: "মোড:",
+        inputMode: "নাম্বার প্যাড",
+        mcqMode: "বহুনির্বাচনী",
+        voiceMode: "ভয়েস",
+        difficulty: "কঠিনতা:",
+        level: "স্তর",
+        options: "অপশন:",
+        timer: "টাইমার:",
+        seconds: "সেকেন্ড",
+        off: "বন্ধ",
+        score: "স্কোর:",
+        newProblem: "নতুন সমস্যা",
+        listening: "শুনছি...",
+        tapToSpeak: "বলতে ট্যাপ করুন",
+        lastHeard: "শেষ শোনা:",
+        didntCatch: "বুঝতে পারিনি। আবার চেষ্টা করুন!",
+        correctMessages: ["খুব ভালো!", "অসাধারণ!", "সঠিক হয়েছে!", "চমৎকার!", "সুপারস্টার!"],
+        incorrectMessages: ["আবার চেষ্টা করুন!", "ঠিক হয়নি!", "প্রায় কাছাকাছি!", "উফ!"],
+        clear: "মুছুন"
     }
 }
 
@@ -77,6 +101,12 @@ const toDevanagari = (num: number | string) => {
     const n = num.toString();
     const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
     return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
+};
+
+const toBengaliNumerals = (num: number | string) => {
+    const n = num.toString();
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '۶', '৭', '৮', '৯'];
+    return n.split('').map(digit => bengaliDigits[parseInt(digit, 10)]).join('');
 };
 
 const useSpeechRecognition = (lang: string) => {
@@ -126,16 +156,23 @@ const useSpeechRecognition = (lang: string) => {
     return { isListening, transcript, startListening, resetTranscript, hasSupport: !!recognitionRef.current };
 };
 
-const NumberPad = ({ onNumberClick, onClear, onDelete, lang }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void, lang: 'en' | 'hi' }) => {
+const NumberPad = ({ onNumberClick, onClear, onDelete, lang }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void, lang: 'en' | 'hi' | 'bn' }) => {
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     const t = translations[lang];
+
+    const displayNum = (num: number) => {
+        if (lang === 'hi') return toDevanagari(num);
+        if (lang === 'bn') return toBengaliNumerals(num);
+        return num;
+    }
+
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
                  <div className="grid grid-cols-3 gap-2 md:gap-4">
                     {numbers.map(num => (
                         <Button key={num} onClick={() => onNumberClick(num)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
-                            {lang === 'hi' ? toDevanagari(num) : num}
+                            {displayNum(num)}
                         </Button>
                     ))}
                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
@@ -150,7 +187,12 @@ const NumberPad = ({ onNumberClick, onClear, onDelete, lang }: { onNumberClick: 
     );
 };
 
-const MultipleChoicePad = ({ options, onOptionClick, isSubmitting, lang }: { options: number[], onOptionClick: (num: number) => void, isSubmitting: boolean, lang: 'en' | 'hi' }) => {
+const MultipleChoicePad = ({ options, onOptionClick, isSubmitting, lang }: { options: number[], onOptionClick: (num: number) => void, isSubmitting: boolean, lang: 'en' | 'hi' | 'bn' }) => {
+    const displayNum = (num: number) => {
+        if (lang === 'hi') return toDevanagari(num);
+        if (lang === 'bn') return toBengaliNumerals(num);
+        return num;
+    }
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
@@ -163,7 +205,7 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting, lang }: { opt
                             className="h-20 md:h-24 text-4xl md:text-5xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform"
                             disabled={isSubmitting}
                         >
-                            {lang === 'hi' ? toDevanagari(option) : option}
+                            {displayNum(option)}
                         </Button>
                     ))}
                 </div>
@@ -172,7 +214,7 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting, lang }: { opt
     );
 };
 
-const VoiceInputPad = ({ isListening, startListening, transcript, lang }: { isListening: boolean, startListening: () => void, transcript: string, lang: 'en' | 'hi' }) => {
+const VoiceInputPad = ({ isListening, startListening, transcript, lang }: { isListening: boolean, startListening: () => void, transcript: string, lang: 'en' | 'hi' | 'bn' }) => {
     const t = translations[lang];
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30 flex flex-col items-center justify-center p-4 min-h-[300px] md:min-h-[420px]">
@@ -206,10 +248,12 @@ export default function AdditionAdventurePage() {
     const [options, setOptions] = useState<number[]>([]);
     const [mcqLevel, setMcqLevel] = useState(4);
     const [difficultyLevel, setDifficultyLevel] = useState(1);
-    const [language, setLanguage] = useState<'en' | 'hi'>('en');
+    const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('en');
     
     const t = translations[language];
-    const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition(language === 'en' ? 'en-US' : 'hi-IN');
+    const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition(
+        language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-BD'
+    );
 
     const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice', level: number) => {
         let num1, num2;
@@ -304,12 +348,21 @@ export default function AdditionAdventurePage() {
             'इकसठ': '61', 'बासठ': '62', 'तिरसठ': '63', 'चौंसठ': '64', 'पैंसठ': '65', 'छियासठ': '66', 'सड़सठ': '67', 'अड़सठ': '68', 'उनहत्तर': '69', 'सत्तर': '70',
             'इकहत्तर': '71', 'बहत्तर': '72', 'तिहत्तर': '73', 'चौहत्तर': '74', 'पचहत्तर': '75', 'छिहत्तर': '76', 'सतहत्तर': '77', 'अठहत्तर': '78', 'उनासी': '79', 'अस्सी': '80',
             'इक्यासी': '81', 'बयासी': '82', 'तिरासी': '83', 'चौरासी': '84', 'पचासी': '85', 'छियासी': '86', 'सत्तासी': '87', 'अट्ठासी': '88', 'नवासी': '89', 'नब्बे': '90',
-            'इक्यानबे': '91', 'बानबे': '92', 'तिरानबे': '93', 'चौरानबे': '94', 'पंचानबे': '95', 'छियानबे': '96', 'सत्तानबे': '97', 'अट्ठानबे': '98', 'निन्यानबे': '99', 'सौ': '100'
+            'इक्यानबे': '91', 'बानबे': '92', 'तिरानबे': '93', 'चौरानबे': '94', 'पंचानबे': '95', 'छियानबे': '96', 'सत्तानबे': '97', 'अट्ठानबे': '98', 'निन्यानबे': '99', 'सौ': '100',
+            'শূন্য': '0', 'এক': '1', 'দুই': '2', 'তিন': '3', 'চার': '4', 'পাঁচ': '5', 'ছয়': '6', 'সাত': '7', 'আট': '8', 'নয়': '9', 'দশ': '10',
+            'এগারো': '11', 'বারো': '12', 'তেরো': '13', 'চোদ্দ': '14', 'পনেরো': '15', 'ষোল': '16', 'সতেরো': '17', 'আঠারো': '18', 'উনিশ': '19', 'কুড়ি': '20',
+            'একুশ': '21', 'বাইশ': '22', 'তেইש': '23', 'চব্বিশ': '24', 'পঁচিশ': '25', 'ছাব্বিশ': '26', 'সাতাশ': '27', 'আঠাশ': '28', 'উনત્રીশ': '29', ' ত্রিশ': '30',
+            'একત્રીש': '31', 'বત્રીש': '32', 'তেત્રીש': '33', 'চৌત્રીש': '34', 'পঁয়ત્રીש': '35', 'ছત્રીש': '36', 'সাঁইત્રીש': '37', 'আটત્રીש': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
+            'একচল্লিশ': '41', 'বিয়াল্লিশ': '42', 'তেতাল্লিশ': '43', 'চুয়াল্লিশ': '44', 'পঁয়তাল্লিশ': '45', 'ছেচল্লিশ': '46', 'সাতচল্লিশ': '47', 'আটচল্লিশ': '48', 'উনপঞ্চاش': '49', 'পঞ্চاش': '50',
+            'একান্ন': '51', 'বায়ান্ন': '52', 'তিপ্পান্ন': '53', 'চুয়ান্ন': '54', 'পঞ্চান্ন': '55', 'ছাপ্পান্ন': '56', 'সাতান্ন': '57', 'আটান্ন': '58', 'উনষাট': '59', 'ষাট': '60',
+            'একষট্টি': '61', 'বাষট্টি': '62', 'তেষট্টি': '63', 'চৌষট্টি': '64', 'পঁয়ষট্টি': '65', 'ছেষট্টি': '66', 'সাতষট্টি': '67', 'আটষট্টি': '68', 'উনসত্তর': '69', 'সত্তর': '70',
+            'একাত্তর': '71', 'বাহাত্তর': '72', 'তিয়াত্তר': '73', 'চুয়াত্তר': '74', 'পঁচাত্তر': '75', 'ছিয়াত্তر': '76', 'সাতাত্তর': '77', 'আটাত্তর': '78', 'উনআশি': '79', 'আশি': '80',
+            'একাশি': '81', 'বিরাশি': '82', 'তিরাশি': '83', 'চুরাশি': '84', 'পঁচাশি': '85', 'ছিয়াশি': '86', 'সাতাশি': '87', 'আটাশি': '88', 'উননব্বই': '89', 'নব্বই': '90',
+            'একানব্বই': '91', 'বিরানব্বই': '92', 'তিরানব্বই': '93', 'চুরানব্বই': '94', 'পંચানব্বই': '95', 'ছিয়ানব্বই': '96', 'সাতানব্বই': '97', 'আটানব্বই': '98', 'নিরানব্বই': '99', 'একশো': '100'
         };
 
         const spokenAnswer = transcript.toLowerCase().trim().replace(/[.]$/, '');
         
-        // First, check for direct number match
         const directNumberMatch = spokenAnswer.match(/\d+/);
         if (directNumberMatch) {
             setUserAnswer(directNumberMatch[0]);
@@ -317,7 +370,6 @@ export default function AdditionAdventurePage() {
             return;
         }
 
-        // Then, check for word-to-number mapping
         if (wordsToNumbers[spokenAnswer]) {
             const numberStr = wordsToNumbers[spokenAnswer];
             setUserAnswer(numberStr);
@@ -325,7 +377,6 @@ export default function AdditionAdventurePage() {
             return;
         }
         
-        // If no match found
         setFeedback({ message: t.didntCatch, type: 'incorrect' });
         
     }, [transcript, gameMode, handleSubmit, t]);
@@ -338,7 +389,6 @@ export default function AdditionAdventurePage() {
 
      useEffect(() => {
         if (timerDuration === 0 || isSubmitting) {
-            // No need to clear interval if it's already paused or disabled
             return;
         }
 
@@ -365,17 +415,15 @@ export default function AdditionAdventurePage() {
         }
         if (feedback.type === 'incorrect') {
             const timer = setTimeout(() => {
-                // For multiple choice, just reset for next attempt on same problem
                 if (gameMode !== 'multipleChoice' && gameMode !== 'voice') {
                     setUserAnswer('');
                 }
-                // For other modes, or if we decide to auto-advance on incorrect
                 if (gameMode === 'multipleChoice' || gameMode === 'voice') {
                     handleNewProblem(true);
                 } else {
                     resetTranscript();
                     setFeedback({message: '', type: 'none'});
-                    setIsSubmitting(false); // Allow new input after feedback
+                    setIsSubmitting(false); 
                 }
             }, 1000);
             return () => clearTimeout(timer);
@@ -441,16 +489,15 @@ export default function AdditionAdventurePage() {
         handleSubmit(answerString);
     }
     
-    const handleLanguageChange = (lang: 'en' | 'hi') => {
+    const handleLanguageChange = (lang: 'en' | 'hi' | 'bn') => {
         setLanguage(lang);
         handleNewProblem();
     }
     
     const displayNum = (num: number | string | undefined) => {
         if (num === undefined) return '?';
-        if (language === 'hi') {
-            return toDevanagari(num);
-        }
+        if (language === 'hi') return toDevanagari(num);
+        if (language === 'bn') return toBengaliNumerals(num);
         return num.toString();
     }
 
@@ -474,6 +521,7 @@ export default function AdditionAdventurePage() {
                         <SelectContent>
                             <SelectItem value="en">English</SelectItem>
                             <SelectItem value="hi">हिन्दी</SelectItem>
+                            <SelectItem value="bn">বাংলা</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
