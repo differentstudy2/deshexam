@@ -192,7 +192,7 @@ const VoiceRecognitionGame = () => {
                         {currentLetter?.name}
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="h-32 text-center relative flex flex-col justify-center items-center">
+                <CardContent className="h-44 text-center relative flex flex-col justify-center items-center">
                     <Confetti active={isCorrect} config={{
                         angle: 90,
                         spread: 360,
@@ -372,7 +372,7 @@ export default function BengaliAlphabetPage() {
         </header>
 
         <Tabs defaultValue="alphabet" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-3xl mx-auto h-auto md:h-10">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 max-w-3xl mx-auto h-auto">
                 <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
                 <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
                 <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
@@ -423,7 +423,7 @@ export default function BengaliAlphabetPage() {
             </TabsContent>
             <TabsContent value="recognize">
               <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto">
+                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 max-w-lg mx-auto h-auto sm:h-10">
                     <TabsTrigger value="all">All (সব বর্ণ)</TabsTrigger>
                     <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
                     <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
