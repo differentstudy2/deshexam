@@ -3,10 +3,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Volume2 } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const vowels = [
   { char: 'অ', name: 'Aw' }, { char: 'আ', name: 'A' }, { char: 'ই', name: 'E' },
@@ -26,12 +27,61 @@ const consonants = [
   { char: 'ৎ', name: 'T' }, { char: 'ং', name: 'Ong' }, { char: 'ঃ', name: 'Oh' }, { char: 'ঁ', name: 'Chandrabindu' }
 ];
 
+const allLetters = [...vowels, ...consonants];
+
+const AlphabetRecognitionGame = () => {
+    const [shuffledAlphabet, setShuffledAlphabet] = useState<{ char: string; name: string; }[]>([]);
+    const [activeLetter, setActiveLetter] = useState<string | null>(null);
+
+    const shuffleLetters = useCallback(() => {
+        const shuffled = [...allLetters].sort(() => Math.random() - 0.5);
+        setShuffledAlphabet(shuffled);
+    }, []);
+
+    useEffect(() => {
+        shuffleLetters();
+    }, [shuffleLetters]);
+
+    const playSound = (letter: string) => {
+        console.log(`Playing sound for ${letter}`);
+        setActiveLetter(letter);
+        setTimeout(() => setActiveLetter(null), 1000);
+    }
+    
+    return (
+        <div className="mt-8">
+            <div className="flex justify-center mb-6">
+                <Button onClick={shuffleLetters}>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Reset (পুনরায় সাজান)
+                </Button>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-w-7xl mx-auto">
+                {shuffledAlphabet.map((letter, index) => (
+                     <Card 
+                        key={`${letter.char}-${index}`} 
+                        onClick={() => playSound(letter.char)}
+                        className={cn(
+                            "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
+                            activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
+                        )}
+                    >
+                        <CardContent className="p-2 w-full flex flex-col items-center justify-center">
+                            <p className="text-5xl md:text-7xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
+                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{letter.name}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 
 export default function BengaliAlphabetPage() {
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
     const playSound = (letter: string) => {
-        // Placeholder for audio playback logic
         console.log(`Playing sound for ${letter}`);
         setActiveLetter(letter);
         setTimeout(() => setActiveLetter(null), 1000);
@@ -57,48 +107,58 @@ export default function BengaliAlphabetPage() {
           </p>
         </header>
 
-        <section className="mb-12">
-            <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Vowels (স্বরবর্ণ)</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
-                {vowels.map((letter, index) => (
-                    <Card 
-                        key={`${letter.char}-${index}`} 
-                        onClick={() => playSound(letter.char)}
-                        className={cn(
-                            "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
-                            activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
-                        )}
-                    >
-                        <CardContent className="p-2 w-full flex flex-col items-center justify-center">
-                            <p className="text-6xl md:text-8xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
-                            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-2">{letter.name}</p>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </section>
+        <Tabs defaultValue="alphabet" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+                <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
+                <TabsTrigger value="recognize">Recognize Alphabet (বর্ণমালা চিনুন)</TabsTrigger>
+            </TabsList>
+            <TabsContent value="alphabet" className="mt-8">
+                <section className="mb-12">
+                    <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Vowels (স্বরবর্ণ)</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
+                        {vowels.map((letter, index) => (
+                            <Card 
+                                key={`${letter.char}-${index}`} 
+                                onClick={() => playSound(letter.char)}
+                                className={cn(
+                                    "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
+                                    activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
+                                )}
+                            >
+                                <CardContent className="p-2 w-full flex flex-col items-center justify-center">
+                                    <p className="text-6xl md:text-8xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
+                                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-2">{letter.name}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
 
-        <section>
-            <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Consonants (ব্যঞ্জনবর্ণ)</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-4 max-w-6xl mx-auto">
-                {consonants.map((letter, index) => (
-                    <Card 
-                        key={`${letter.char}-${index}`}
-                        onClick={() => playSound(letter.char)}
-                        className={cn(
-                            "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
-                            activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
-                        )}
-                    >
-                        <CardContent className="p-2 w-full flex flex-col items-center justify-center">
-                            <p className="text-5xl md:text-7xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
-                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{letter.name}</p>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </section>
-
+                <section>
+                    <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Consonants (ব্যঞ্জনবর্ণ)</h2>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-w-7xl mx-auto">
+                        {consonants.map((letter, index) => (
+                            <Card 
+                                key={`${letter.char}-${index}`}
+                                onClick={() => playSound(letter.char)}
+                                className={cn(
+                                    "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
+                                    activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
+                                )}
+                            >
+                                <CardContent className="p-2 w-full flex flex-col items-center justify-center">
+                                    <p className="text-5xl md:text-7xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
+                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{letter.name}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
+            </TabsContent>
+             <TabsContent value="recognize">
+                <AlphabetRecognitionGame />
+            </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
