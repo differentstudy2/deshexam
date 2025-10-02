@@ -34,6 +34,18 @@ const translations = {
     }
 };
 
+const toDevanagari = (num: number | string) => {
+    const n = num.toString();
+    const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+    return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
+};
+
+const toBengaliNumerals = (num: number | string) => {
+    const n = num.toString();
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return n.split('').map(digit => bengaliDigits[parseInt(digit, 10)]).join('');
+};
+
 
 export default function LearnNumbers0To10Page() {
     const [activeNumber, setActiveNumber] = useState<number | null>(null);
@@ -73,6 +85,12 @@ export default function LearnNumbers0To10Page() {
         setLanguage(lang);
         setActiveNumber(null);
         setAudioUrl(null);
+    }
+    
+    const displayNum = (num: number | string) => {
+        if (language === 'hi') return toDevanagari(num);
+        if (language === 'bn') return toBengaliNumerals(num);
+        return num.toString();
     }
 
 
@@ -124,7 +142,7 @@ export default function LearnNumbers0To10Page() {
                 <p className="text-xl font-semibold text-slate-500 dark:text-slate-400 mb-2 pb-2 border-b w-full">{t.numberNames[number]}</p>
                 <div className="flex-grow flex items-center justify-center">
                     <p className="text-8xl font-bold text-slate-800 dark:text-slate-100" style={{fontFamily: "'Lexend', sans-serif"}}>
-                        {number}
+                        {displayNum(number)}
                     </p>
                 </div>
                 <div className="flex items-center text-muted-foreground mt-2 pt-2 border-t">
