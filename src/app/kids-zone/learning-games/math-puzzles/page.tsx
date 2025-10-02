@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Plus, Minus, Shapes } from "lucide-react";
+import { ArrowLeft, Plus, Minus, Shapes, Eye } from "lucide-react";
 import Link from "next/link";
 
 const puzzles = [
@@ -48,6 +48,18 @@ export default function MathPuzzlesPage() {
             Let's have fun with numbers! Choose a puzzle to begin.
           </p>
         </header>
+
+        <Card className="mb-8 bg-blue-50 border-blue-200 text-center">
+            <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+                    <Eye className="w-8 h-8 text-blue-500"/>
+                    <p className="font-medium text-blue-800">New to numbers? Try our Number Recognition game first!</p>
+                    <Button asChild>
+                        <Link href="/kids-zone/learning-games/number-recognition">Start Here</Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {puzzles.map((puzzle, index) => (

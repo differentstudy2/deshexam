@@ -6,18 +6,18 @@ import Link from "next/link";
 
 const games = [
   {
-    title: "Math Puzzles",
-    description: "Solve fun math problems and become a numbers wizard!",
-    icon: <Calculator className="w-10 h-10 text-blue-500" />,
-    bgColor: "bg-blue-100",
-    link: "/kids-zone/learning-games/math-puzzles",
-  },
-  {
     title: "Number Recognition",
     description: "Learn to identify numbers with this fun recognition game.",
     icon: <Eye className="w-10 h-10 text-red-500" />,
     bgColor: "bg-red-100",
     link: "/kids-zone/learning-games/number-recognition",
+  },
+  {
+    title: "Math Puzzles",
+    description: "Solve fun math problems and become a numbers wizard!",
+    icon: <Calculator className="w-10 h-10 text-blue-500" />,
+    bgColor: "bg-blue-100",
+    link: "/kids-zone/learning-games/math-puzzles",
   },
   {
     title: "Word Adventures",
