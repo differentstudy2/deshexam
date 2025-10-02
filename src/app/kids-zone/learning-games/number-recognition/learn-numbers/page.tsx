@@ -10,7 +10,7 @@ const numberRanges = [
   {
     title: "Numbers 0-10",
     description: "Learn the first ten numbers.",
-    link: "#",
+    link: "/kids-zone/learning-games/number-recognition/learn-numbers/0-10",
   },
   {
     title: "Numbers 11-20",
