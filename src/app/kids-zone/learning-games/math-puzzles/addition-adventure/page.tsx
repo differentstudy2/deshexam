@@ -75,7 +75,7 @@ const useSpeechRecognition = () => {
 };
 
 const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
-    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
@@ -85,11 +85,14 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
                             {num}
                         </Button>
                     ))}
-                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform col-span-1">
-                        <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
-                    </Button>
-                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform col-span-2">
+                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
                         Clear
+                    </Button>
+                    <Button onClick={() => onNumberClick(0)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
+                        0
+                    </Button>
+                    <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
+                        <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
                     </Button>
                 </div>
             </CardContent>
