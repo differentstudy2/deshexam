@@ -156,9 +156,15 @@ export default function AdditionAdventurePage() {
     const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition();
 
     const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice', level: number) => {
-        const maxNumber = level * 10;
-        const num1 = Math.floor(Math.random() * maxNumber) + 1;
-        const num2 = Math.floor(Math.random() * maxNumber) + 1;
+        let num1, num2;
+        if (level === 1) {
+            num1 = Math.floor(Math.random() * 9) + 1; // 1 to 9
+            num2 = Math.floor(Math.random() * (10 - num1)) + 1; // Ensure sum is <= 10
+        } else {
+            const maxNumber = level * 10;
+            num1 = Math.floor(Math.random() * maxNumber) + 1;
+            num2 = Math.floor(Math.random() * maxNumber) + 1;
+        }
         const answer = num1 + num2;
 
         const newProblem = { num1, num2, answer };
