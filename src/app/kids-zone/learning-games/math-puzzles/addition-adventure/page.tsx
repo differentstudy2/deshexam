@@ -44,7 +44,8 @@ const translations = {
         lastHeard: "Last heard:",
         didntCatch: "Didn't catch that. Try again!",
         correctMessages: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
-        incorrectMessages: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
+        incorrectMessages: ["Try again!", "Not quite!", "Almost there!", "Oops!"],
+        clear: "Clear"
     },
     hi: {
         backToPuzzles: "गणित पहेलियों पर वापस जाएं",
@@ -67,7 +68,8 @@ const translations = {
         lastHeard: "अंतिम सुना:",
         didntCatch: "समझ नहीं आया। फिर से कोशिश करें!",
         correctMessages: ["बहुत बढ़िया!", "शानदार!", "सही है!", "अद्भुत!", "सुपरस्टार!"],
-        incorrectMessages: ["पुनः प्रयास करें!", "लगभग सही!", "थोड़ा और!", "ओह!"]
+        incorrectMessages: ["पुनः प्रयास करें!", "लगभग सही!", "थोड़ा और!", "ओह!"],
+        clear: "नया"
     }
 }
 
@@ -130,8 +132,8 @@ const NumberPad = ({ onNumberClick, onClear, onDelete, lang }: { onNumberClick: 
                             {lang === 'hi' ? num.toLocaleString('hi-IN') : num}
                         </Button>
                     ))}
-                    <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform col-span-2">
-                        {t.newProblem.split(' ')[0]}
+                    <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
+                        {t.clear}
                     </Button>
                     <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
                         <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
@@ -343,13 +345,13 @@ export default function AdditionAdventurePage() {
         }
         if (feedback.type === 'incorrect') {
             const timer = setTimeout(() => {
-                setIsSubmitting(false);
                 if (gameMode !== 'voice') {
                     handleNewProblem(true);
                 } else {
                     resetTranscript();
                     setFeedback({message: '', type: 'none'});
                 }
+                setIsSubmitting(false); // Allow new input after feedback
             }, 1000);
             return () => clearTimeout(timer);
         }
