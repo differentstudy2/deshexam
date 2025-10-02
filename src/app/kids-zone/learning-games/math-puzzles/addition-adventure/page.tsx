@@ -83,7 +83,7 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
                     <Button onClick={onDelete} variant="outline" className="h-20 text-lg rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
                         <Delete className="w-8 h-8 text-destructive" />
                     </Button>
-                     <Button onClick={onClear} variant="outline" className="h-20 text-lg col-span-2 rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
+                     <Button onClick={onClear} variant="outline" className="h-20 text-lg rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
                         Clear
                     </Button>
                 </div>
