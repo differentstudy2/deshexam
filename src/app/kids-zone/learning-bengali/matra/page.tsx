@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Volume2, Plus, Equal } from "lucide-react";
+import { ArrowLeft, Volume2, Plus, Equal, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useState } from 'react';
 import { cn } from "@/lib/utils";
@@ -53,6 +53,15 @@ export default function BengaliMatraPage() {
             Learn how Bengali vowels change their form when attached to consonants.
           </p>
         </header>
+
+         <div className="flex justify-center mb-8">
+            <Button asChild size="lg">
+                <Link href="/kids-zone/learning-bengali/matra/matra-pronounsation">
+                    <BookOpen className="mr-2 h-5 w-5" />
+                    Practice Pronunciation
+                </Link>
+            </Button>
+        </div>
 
         <Tabs defaultValue="porichoy" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
