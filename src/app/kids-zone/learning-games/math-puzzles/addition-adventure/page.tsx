@@ -10,6 +10,7 @@ import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
@@ -45,7 +46,8 @@ const translations = {
         didntCatch: "Didn't catch that. Try again!",
         correctMessages: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
         incorrectMessages: ["Try again!", "Not quite!", "Almost there!", "Oops!"],
-        clear: "Clear"
+        clear: "Clear",
+        ttsPrompt: (num1: number, num2: number) => `Tell me, what is ${num1} plus ${num2}?`
     },
     hi: {
         backToPuzzles: "गणित पहेलियों पर वापस जाएं",
@@ -69,7 +71,8 @@ const translations = {
         didntCatch: "समझ नहीं आया। फिर से कोशिश करें!",
         correctMessages: ["बहुत बढ़िया!", "शानदार!", "सही है!", "अद्भुत!", "सुपरस्टार!"],
         incorrectMessages: ["पुनः प्रयास करें!", "लगभग सही!", "थोड़ा और!", "ओह!"],
-        clear: "नया"
+        clear: "नया",
+        ttsPrompt: (num1: number, num2: number) => `बताओ, ${toDevanagari(num1)} और ${toDevanagari(num2)} कितना होता है?`
     },
     bn: {
         backToPuzzles: "গণিত ধাঁধায় ফিরে যান",
@@ -93,7 +96,8 @@ const translations = {
         didntCatch: "বুঝতে পারিনি। আবার চেষ্টা করুন!",
         correctMessages: ["খুব ভালো!", "অসাধারণ!", "সঠিক হয়েছে!", "চমৎকার!", "সুপারস্টার!"],
         incorrectMessages: ["আবার চেষ্টা করুন!", "ঠিক হয়নি!", "প্রায় কাছাকাছি!", "উফ!"],
-        clear: "মুছুন"
+        clear: "মুছুন",
+        ttsPrompt: (num1: number, num2: number) => `বলো, ${toBengaliNumerals(num1)} আর ${toBengaliNumerals(num2)} যোগ করলে কত হয়?`
     }
 }
 
@@ -249,11 +253,13 @@ export default function AdditionAdventurePage() {
     const [mcqLevel, setMcqLevel] = useState(4);
     const [difficultyLevel, setDifficultyLevel] = useState(1);
     const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('en');
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
     
     const t = translations[language];
     const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition(
         language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-BD'
     );
+    const audioRef = useRef<HTMLAudioElement>(null);
 
     const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice', level: number) => {
         let num1, num2;
@@ -290,7 +296,21 @@ export default function AdditionAdventurePage() {
             const shuffledOptions = [...incorrectOptions, answer].sort(() => Math.random() - 0.5);
             setOptions(shuffledOptions);
         }
-    }, [mcqLevel]);
+        if (mode === 'voice') {
+            const promptText = t.ttsPrompt(num1, num2);
+            textToSpeech({ text: promptText }).then(result => {
+                setAudioUrl(result.audioUrl);
+            }).catch(err => console.error("TTS error:", err));
+        } else {
+            setAudioUrl(null);
+        }
+    }, [mcqLevel, t]);
+
+    useEffect(() => {
+        if (audioUrl && audioRef.current) {
+            audioRef.current.play().catch(e => console.error("Audio playback error", e));
+        }
+    }, [audioUrl]);
 
 
     const handleNewProblem = useCallback((isIncorrectOrTimeout: boolean = false) => {
@@ -351,12 +371,12 @@ export default function AdditionAdventurePage() {
             'इक्यानबे': '91', 'बानबे': '92', 'तिरानबे': '93', 'चौरानबे': '94', 'पंचानबे': '95', 'छियानबे': '96', 'सत्तानबे': '97', 'अट्ठानबे': '98', 'निन्यानबे': '99', 'सौ': '100',
             'শূন্য': '0', 'এক': '1', 'দুই': '2', 'তিন': '3', 'চার': '4', 'পাঁচ': '5', 'ছয়': '6', 'সাত': '7', 'আট': '8', 'নয়': '9', 'দশ': '10',
             'এগারো': '11', 'বারো': '12', 'তেরো': '13', 'চোদ্দ': '14', 'পনেরো': '15', 'ষোল': '16', 'সতেরো': '17', 'আঠারো': '18', 'উনিশ': '19', 'কুড়ি': '20',
-            'একুশ': '21', 'বাইশ': '22', 'তেইש': '23', 'চব্বিশ': '24', 'পঁচিশ': '25', 'ছাব্বিশ': '26', 'সাতাশ': '27', 'আঠাশ': '28', 'উনત્રીশ': '29', ' ত্রিশ': '30',
-            'একત્રીশ': '31', 'বત્રીש': '32', 'তেત્રીש': '33', 'চৌત્રીש': '34', 'পঁয়ત્રીש': '35', 'ছત્રીש': '36', 'সাঁইત્રીש': '37', 'আটત્રીש': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
-            'একচল্লিশ': '41', 'বিয়াল্লিশ': '42', 'তেতাল্লিশ': '43', 'চুয়াল্লিশ': '44', 'পঁয়তাল্লিশ': '45', 'ছেচল্লিশ': '46', 'সাতচল্লিশ': '47', 'আটচল্লিশ': '48', 'উনপঞ্চাশ': '49', 'পঞ্চاش': '50',
+            'একুশ': '21', 'বাইশ': '22', 'তেইশ': '23', 'চব্বিশ': '24', 'পঁচিশ': '25', 'ছাব্বিশ': '26', 'সাতাশ': '27', 'আঠাশ': '28', 'উনત્રીশ': '29', 'ত্রিশ': '30',
+            'একત્રીশ': '31', 'বત્રીশ': '32', 'তেત્રીש': '33', 'চৌત્રીש': '34', 'পঁয়ત્રીশ': '35', 'ছત્રીশ': '36', 'সাঁইત્રીশ': '37', 'আটત્રીש': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
+            'একচল্লিশ': '41', 'বিয়াল্লিশ': '42', 'তেতাল্লিশ': '43', 'চুয়াল্লিশ': '44', 'পঁয়তাল্লিশ': '45', 'ছেচল্লিশ': '46', 'সাতচল্লিশ': '47', 'আটচল্লিশ': '48', 'উনপঞ্চাশ': '49', 'পঞ্চাশ': '50',
             'একান্ন': '51', 'বায়ান্ন': '52', 'তিপ্পান্ন': '53', 'চুয়ান্ন': '54', 'পঞ্চান্ন': '55', 'ছাপ্পান্ন': '56', 'সাতান্ন': '57', 'আটান্ন': '58', 'উনষাট': '59', 'ষাট': '60',
             'একষট্টি': '61', 'বাষট্টি': '62', 'তেষট্টি': '63', 'চৌষট্টি': '64', 'পঁয়ষট্টি': '65', 'ছেষট্টি': '66', 'সাতষট্টি': '67', 'আটষট্টি': '68', 'উনসত্তর': '69', 'সত্তর': '70',
-            'একাত্তর': '71', 'বাহাত্তর': '72', 'তিয়াত্তর': '73', 'চুয়াত্তר': '74', 'পঁচাত্তর': '75', 'ছিয়াত্তর': '76', 'সাতাত্তর': '77', 'আটাত্তর': '78', 'উনআশি': '79', 'আশি': '80',
+            'একাত্তর': '71', 'বাহাত্তর': '72', 'তিয়াত্তর': '73', 'চুয়াত্তর': '74', 'পঁচাত্তর': '75', 'ছিয়াত্তর': '76', 'সাতাত্তর': '77', 'আটাত্তর': '78', 'উনআশি': '79', 'আশি': '80',
             'একাশি': '81', 'বিরাশি': '82', 'তিরাশি': '83', 'চুরাশি': '84', 'পঁচাশি': '85', 'ছিয়াশি': '86', 'সাতাশি': '87', 'আটাশি': '88', 'উননব্বই': '89', 'নব্বই': '90',
             'একানব্বই': '91', 'বিরানব্বই': '92', 'তিরানব্বই': '93', 'চুরানব্বই': '94', 'পંચানব্বই': '95', 'ছিয়ানব্বই': '96', 'সাতানব্বই': '97', 'আটানব্বই': '98', 'নিরানব্বই': '99', 'একশো': '100'
         };
@@ -503,6 +523,7 @@ export default function AdditionAdventurePage() {
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/10 dark:to-green-900/10 min-h-screen p-4">
+      <audio ref={audioRef} src={audioUrl || ''} />
       <div className="container mx-auto py-8">
         <div className="mb-8 flex justify-between items-center flex-wrap gap-4">
             <Button asChild variant="ghost">
