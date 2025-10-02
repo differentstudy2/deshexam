@@ -22,13 +22,13 @@ const kidsFeatures = [
     icon: <BookHeart className="w-12 h-12 text-blue-500" />,
     title: "Learning English",
     description: "Learn the English alphabet, words, and grammar in a fun way.",
-    link: "#",
+    link: "/kids-zone/learning-english",
   },
   {
     icon: <BookOpen className="w-12 h-12 text-orange-500" />,
     title: "Learning Bengali",
     description: "Explore the Bengali language with interactive lessons and games.",
-    link: "#",
+    link: "/kids-zone/learning-bengali",
   },
 ];
 
