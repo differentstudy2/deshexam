@@ -298,13 +298,13 @@ export default function AdditionAdventurePage() {
         }
         if (mode === 'voice') {
             const promptText = t.ttsPrompt(num1, num2);
-            textToSpeech({ text: promptText }).then(result => {
+            textToSpeech({ text: promptText, lang: language }).then(result => {
                 setAudioUrl(result.audioUrl);
             }).catch(err => console.error("TTS error:", err));
         } else {
             setAudioUrl(null);
         }
-    }, [mcqLevel, t]);
+    }, [mcqLevel, t, language]);
 
     useEffect(() => {
         if (audioUrl && audioRef.current) {
@@ -357,8 +357,15 @@ export default function AdditionAdventurePage() {
         
        const wordsToNumbers: { [key: string]: string } = {
             'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10',
-            'eleven': '11', 'twelve': '12', 'thirteen': '13', 'fourteen': '14', 'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19',
-            'twenty': '20', 'thirty': '30', 'forty': '40', 'fifty': '50', 'sixty': '60', 'seventy': '70', 'eighty': '80', 'ninety': '90', 'hundred': '100',
+            'eleven': '11', 'twelve': '12', 'thirteen': '13', 'fourteen': '14', 'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19', 'twenty': '20',
+            'twenty-one': '21', 'twenty-two': '22', 'twenty-three': '23', 'twenty-four': '24', 'twenty-five': '25', 'twenty-six': '26', 'twenty-seven': '27', 'twenty-eight': '28', 'twenty-nine': '29', 'thirty': '30',
+            'thirty-one': '31', 'thirty-two': '32', 'thirty-three': '33', 'thirty-four': '34', 'thirty-five': '35', 'thirty-six': '36', 'thirty-seven': '37', 'thirty-eight': '38', 'thirty-nine': '39', 'forty': '40',
+            'forty-one': '41', 'forty-two': '42', 'forty-three': '43', 'forty-four': '44', 'forty-five': '45', 'forty-six': '46', 'forty-seven': '47', 'forty-eight': '48', 'forty-nine': '49', 'fifty': '50',
+            'fifty-one': '51', 'fifty-two': '52', 'fifty-three': '53', 'fifty-four': '54', 'fifty-five': '55', 'fifty-six': '56', 'fifty-seven': '57', 'fifty-eight': '58', 'fifty-nine': '59', 'sixty': '60',
+            'sixty-one': '61', 'sixty-two': '62', 'sixty-three': '63', 'sixty-four': '64', 'sixty-five': '65', 'sixty-six': '66', 'sixty-seven': '67', 'sixty-eight': '68', 'sixty-nine': '69', 'seventy': '70',
+            'seventy-one': '71', 'seventy-two': '72', 'seventy-three': '73', 'seventy-four': '74', 'seventy-five': '75', 'seventy-six': '76', 'seventy-seven': '77', 'seventy-eight': '78', 'seventy-nine': '79', 'eighty': '80',
+            'eighty-one': '81', 'eighty-two': '82', 'eighty-three': '83', 'eighty-four': '84', 'eighty-five': '85', 'eighty-six': '86', 'eighty-seven': '87', 'eighty-eight': '88', 'eighty-nine': '89', 'ninety': '90',
+            'ninety-one': '91', 'ninety-two': '92', 'ninety-three': '93', 'ninety-four': '94', 'ninety-five': '95', 'ninety-six': '96', 'ninety-seven': '97', 'ninety-eight': '98', 'ninety-nine': '99', 'hundred': '100',
             'शून्य': '0', 'एक': '1', 'दो': '2', 'तीन': '3', 'चार': '4', 'पांच': '5', 'पाँच': '5', 'छह': '6', 'सात': '7', 'आठ': '8', 'नौ': '9', 'दस': '10',
             'ग्यारह': '11', 'बारह': '12', 'तेरह': '13', 'चौदह': '14', 'पंद्रह': '15', 'सोलह': '16', 'सत्रह': '17', 'अठारह': '18', 'उन्नीस': '19', 'बीस': '20',
             'इक्कीस': '21', 'बाईस': '22', 'तेईस': '23', 'चौबीस': '24', 'पच्चीस': '25', 'छब्बीस': '26', 'सत्ताईस': '27', 'अट्ठाईस': '28', 'उनतीस': '29', 'तीस': '30',
@@ -371,8 +378,8 @@ export default function AdditionAdventurePage() {
             'इक्यानबे': '91', 'बानबे': '92', 'तिरानबे': '93', 'चौरानबे': '94', 'पंचानबे': '95', 'छियानबे': '96', 'सत्तानबे': '97', 'अट्ठानबे': '98', 'निन्यानबे': '99', 'सौ': '100',
             'শূন্য': '0', 'এক': '1', 'দুই': '2', 'তিন': '3', 'চার': '4', 'পাঁচ': '5', 'ছয়': '6', 'সাত': '7', 'আট': '8', 'নয়': '9', 'দশ': '10',
             'এগারো': '11', 'বারো': '12', 'তেরো': '13', 'চোদ্দ': '14', 'পনেরো': '15', 'ষোল': '16', 'সতেরো': '17', 'আঠারো': '18', 'উনিশ': '19', 'কুড়ি': '20',
-            'একুশ': '21', 'বাইশ': '22', 'তেইশ': '23', 'চব্বিশ': '24', 'পঁচিশ': '25', 'ছাব্বিশ': '26', 'সাতাশ': '27', 'আঠাশ': '28', 'উনત્રીশ': '29', 'ত্রিশ': '30',
-            'একત્રીশ': '31', 'বત્રીশ': '32', 'তেત્રીש': '33', 'চৌત્રીশ': '34', 'পঁয়ત્રીশ': '35', 'ছત્રીশ': '36', 'সাঁইત્રીশ': '37', 'আটત્રીশ': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
+            'একুশ': '21', 'বাইশ': '22', 'তেইশ': '23', 'চব্বিশ': '24', 'পঁচিশ': '25', 'ছাব্বিশ': '26', 'সাতাש': '27', 'আঠাশ': '28', 'উনત્રીশ': '29', 'ত্রিশ': '30',
+            'একત્રીশ': '31', 'বત્રીশ': '32', 'তেત્રીש': '33', 'চৌત્રીশ': '34', 'পঁয়ત્રીש': '35', 'ছત્રીশ': '36', 'সাঁইત્રીশ': '37', 'আটત્રીশ': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
             'একচল্লিশ': '41', 'বিয়াল্লিশ': '42', 'তেতাল্লিশ': '43', 'চুয়াল্লিশ': '44', 'পঁয়তাল্লিশ': '45', 'ছেচল্লিশ': '46', 'সাতচল্লিশ': '47', 'আটচল্লিশ': '48', 'উনপঞ্চাশ': '49', 'পঞ্চাশ': '50',
             'একান্ন': '51', 'বায়ান্ন': '52', 'তিপ্পান্ন': '53', 'চুয়ান্ন': '54', 'পঞ্চান্ন': '55', 'ছাপ্পান্ন': '56', 'সাতান্ন': '57', 'আটান্ন': '58', 'উনষাট': '59', 'ষাট': '60',
             'একষট্টি': '61', 'বাষট্টি': '62', 'তেষট্টি': '63', 'চৌষট্টি': '64', 'পঁয়ষট্টি': '65', 'ছেষট্টি': '66', 'সাতষট্টি': '67', 'আটষট্টি': '68', 'উনসত্তর': '69', 'সত্তর': '70',
