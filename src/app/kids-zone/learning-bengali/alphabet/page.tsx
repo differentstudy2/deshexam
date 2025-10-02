@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
@@ -243,6 +243,104 @@ const VoiceRecognitionGame = () => {
     );
 };
 
+const MatchingGame = () => {
+    const [targetLetter, setTargetLetter] = useState<{ char: string; name: string } | null>(null);
+    const [options, setOptions] = useState<{ char: string; name: string }[]>([]);
+    const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
+    const [isCorrect, setIsCorrect] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const startNewRound = useCallback(() => {
+        const targetIndex = Math.floor(Math.random() * allLetters.length);
+        const newTargetLetter = allLetters[targetIndex];
+        setTargetLetter(newTargetLetter);
+        
+        const incorrectOptions = new Set<{ char: string; name: string }>();
+        while(incorrectOptions.size < 3) {
+            const randomIndex = Math.floor(Math.random() * allLetters.length);
+            const randomLetter = allLetters[randomIndex];
+            if (randomLetter.char !== newTargetLetter.char) {
+                incorrectOptions.add(randomLetter);
+            }
+        }
+        
+        const shuffledOptions = [...Array.from(incorrectOptions), newTargetLetter].sort(() => Math.random() - 0.5);
+        setOptions(shuffledOptions);
+
+        setFeedback({ message: '', type: 'none' });
+        setIsCorrect(false);
+        setIsSubmitting(false);
+    }, []);
+
+    useEffect(() => {
+        startNewRound();
+    }, [startNewRound]);
+
+    const handleAnswer = (selectedLetter: { char: string; name: string }) => {
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
+        if (selectedLetter.char === targetLetter?.char) {
+            setFeedback({ message: 'Correct!', type: 'correct' });
+            setIsCorrect(true);
+            playSound('correct');
+            setTimeout(startNewRound, 1500);
+        } else {
+            setFeedback({ message: 'Try Again!', type: 'incorrect' });
+            playSound('incorrect');
+            setTimeout(() => {
+                setFeedback({ message: '', type: 'none' });
+                setIsSubmitting(false);
+            }, 1000);
+        }
+    };
+
+    return (
+        <div className="relative flex flex-col items-center justify-center mt-8">
+            <Card className="w-full max-w-md shadow-2xl bg-white/70 backdrop-blur-sm">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-9xl font-bold text-slate-800" style={{ fontFamily: "'Lexend', sans-serif" }}>
+                        {targetLetter?.char}
+                    </CardTitle>
+                    <CardDescription className="text-xl font-semibold text-slate-500 pt-2">
+                        Find this letter below
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="h-20 text-center relative flex justify-center items-center">
+                    <Confetti active={isCorrect} />
+                    {feedback.message && (
+                        <div className={`flex items-center justify-center gap-2 font-bold text-2xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
+                            {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
+                            {feedback.message}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-2xl">
+                {options.map((letter, index) => (
+                    <Button
+                        key={`${letter.char}-${index}`}
+                        onClick={() => handleAnswer(letter)}
+                        disabled={isSubmitting}
+                        className="h-24 md:h-32 text-5xl font-bold rounded-2xl shadow-lg transform transition-transform hover:scale-105"
+                        variant="outline"
+                    >
+                        {letter.char}
+                    </Button>
+                ))}
+            </div>
+
+            <div className="mt-12">
+                <Button variant="outline" onClick={startNewRound} size="lg">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    New Letter
+                </Button>
+            </div>
+        </div>
+    );
+};
+
 
 export default function BengaliAlphabetPage() {
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
@@ -274,10 +372,11 @@ export default function BengaliAlphabetPage() {
         </header>
 
         <Tabs defaultValue="alphabet" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
+            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
                 <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
                 <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
-                <TabsTrigger value="voice">Voice Recognition (কণ্ঠস্বর)</TabsTrigger>
+                <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
+                <TabsTrigger value="voice">Voice (কণ্ঠস্বর)</TabsTrigger>
             </TabsList>
             <TabsContent value="alphabet" className="mt-8">
                 <section className="mb-12">
@@ -339,6 +438,9 @@ export default function BengaliAlphabetPage() {
                     <AlphabetRecognitionGame letters={consonants} />
                 </TabsContent>
               </Tabs>
+            </TabsContent>
+            <TabsContent value="match">
+                <MatchingGame />
             </TabsContent>
             <TabsContent value="voice">
                 <VoiceRecognitionGame />
