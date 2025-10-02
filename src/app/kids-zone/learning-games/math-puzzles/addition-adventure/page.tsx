@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows, Mic, BarChart4 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Delete, Clock, Settings, Trophy, Rows, Mic, BarChart4, Languages } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -22,12 +22,56 @@ const playSound = (type: 'correct' | 'incorrect') => {
   }
 };
 
-const feedbackMessages = {
-    correct: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
-    incorrect: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
-};
+const translations = {
+    en: {
+        backToPuzzles: "Back to Math Puzzles",
+        pageTitle: "Addition Adventure",
+        pageDescription: "Add the numbers and choose the correct answer!",
+        mode: "Mode:",
+        inputMode: "Number Pad",
+        mcqMode: "Multiple Choice",
+        voiceMode: "Voice",
+        difficulty: "Difficulty:",
+        level: "Level",
+        options: "Options:",
+        timer: "Timer:",
+        seconds: "seconds",
+        off: "Off",
+        score: "Score:",
+        newProblem: "New Problem",
+        listening: "Listening...",
+        tapToSpeak: "Tap to Speak",
+        lastHeard: "Last heard:",
+        didntCatch: "Didn't catch that. Try again!",
+        correctMessages: ["Great job!", "Awesome!", "You got it!", "Amazing!", "Superstar!"],
+        incorrectMessages: ["Try again!", "Not quite!", "Almost there!", "Oops!"]
+    },
+    hi: {
+        backToPuzzles: "गणित पहेलियों पर वापस जाएं",
+        pageTitle: "जोड़ का रोमांच",
+        pageDescription: "संख्याओं को जोड़ें और सही उत्तर चुनें!",
+        mode: "मोड:",
+        inputMode: "नंबर पैड",
+        mcqMode: "बहुविकल्पी",
+        voiceMode: "आवाज",
+        difficulty: "कठिनाई:",
+        level: "स्तर",
+        options: "विकल्प:",
+        timer: "टाइमर:",
+        seconds: "सेकंड",
+        off: "बंद",
+        score: "स्कोर:",
+        newProblem: "नई समस्या",
+        listening: "सुन रहा है...",
+        tapToSpeak: "बोलने के लिए टैप करें",
+        lastHeard: "अंतिम सुना:",
+        didntCatch: "समझ नहीं आया। फिर से कोशिश करें!",
+        correctMessages: ["बहुत बढ़िया!", "शानदार!", "सही है!", "अद्भुत!", "सुपरस्टार!"],
+        incorrectMessages: ["पुनः प्रयास करें!", "लगभग सही!", "थोड़ा और!", "ओह!"]
+    }
+}
 
-const useSpeechRecognition = () => {
+const useSpeechRecognition = (lang: string) => {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
     const recognitionRef = useRef<any>(null);
@@ -41,7 +85,7 @@ const useSpeechRecognition = () => {
         const recognition = new (window as any).webkitSpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = 'en-US';
+        recognition.lang = lang;
 
         recognition.onstart = () => {
             setIsListening(true);
@@ -59,7 +103,7 @@ const useSpeechRecognition = () => {
         
         recognitionRef.current = recognition;
 
-    }, []);
+    }, [lang]);
 
     const startListening = () => {
         if (recognitionRef.current && !isListening) {
@@ -75,7 +119,7 @@ const useSpeechRecognition = () => {
 };
 
 const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: number) => void, onClear: () => void, onDelete: () => void }) => {
-    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30">
             <CardContent className="p-2 md:p-4">
@@ -85,11 +129,8 @@ const NumberPad = ({ onNumberClick, onClear, onDelete }: { onNumberClick: (num: 
                             {num}
                         </Button>
                     ))}
-                     <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
+                    <Button onClick={onClear} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 active:scale-95 transition-transform">
                         Clear
-                    </Button>
-                    <Button onClick={() => onNumberClick(0)} variant="outline" className="h-16 md:h-20 text-3xl md:text-4xl font-bold rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 hover:bg-slate-50 active:shadow-inner active:scale-95 transition-transform">
-                        0
                     </Button>
                     <Button onClick={onDelete} variant="outline" className="h-16 md:h-20 text-lg rounded-lg md:rounded-xl shadow-lg bg-white dark:bg-slate-800 flex items-center justify-center active:scale-95 transition-transform">
                         <Delete className="w-6 h-6 md:w-8 md:h-8 text-destructive" />
@@ -122,7 +163,8 @@ const MultipleChoicePad = ({ options, onOptionClick, isSubmitting }: { options: 
     );
 };
 
-const VoiceInputPad = ({ isListening, startListening, transcript }: { isListening: boolean, startListening: () => void, transcript: string }) => {
+const VoiceInputPad = ({ isListening, startListening, transcript, lang }: { isListening: boolean, startListening: () => void, transcript: string, lang: 'en' | 'hi' }) => {
+    const t = translations[lang];
     return (
         <Card className="w-full max-w-xs mx-auto bg-blue-100/50 dark:bg-blue-900/30 flex flex-col items-center justify-center p-4 min-h-[300px] md:min-h-[420px]">
             <Button 
@@ -134,9 +176,9 @@ const VoiceInputPad = ({ isListening, startListening, transcript }: { isListenin
                 <Mic className="w-16 h-16 md:w-24 md:h-24" />
             </Button>
             <p className="mt-4 md:mt-6 text-lg md:text-xl font-semibold text-slate-700 dark:text-slate-200">
-                {isListening ? 'Listening...' : 'Tap to Speak'}
+                {isListening ? t.listening : t.tapToSpeak}
             </p>
-            {transcript && <p className="mt-2 text-sm text-muted-foreground">Last heard: "{transcript}"</p>}
+            {transcript && <p className="mt-2 text-sm text-muted-foreground">{t.lastHeard} "{transcript}"</p>}
         </Card>
     );
 };
@@ -155,8 +197,10 @@ export default function AdditionAdventurePage() {
     const [options, setOptions] = useState<number[]>([]);
     const [mcqLevel, setMcqLevel] = useState(4);
     const [difficultyLevel, setDifficultyLevel] = useState(1);
+    const [language, setLanguage] = useState<'en' | 'hi'>('en');
     
-    const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition();
+    const t = translations[language];
+    const { isListening, transcript, startListening, resetTranscript, hasSupport: hasVoiceSupport } = useSpeechRecognition(language === 'en' ? 'en-US' : 'hi-IN');
 
     const generateProblemWithOptions = useCallback((mode: 'input' | 'multipleChoice' | 'voice', level: number) => {
         let num1, num2;
@@ -216,16 +260,16 @@ export default function AdditionAdventurePage() {
         const answerNum = parseInt(answer, 10);
         if (answerNum === problem.answer) {
             playSound('correct');
-            const randomMsg = feedbackMessages.correct[Math.floor(Math.random() * feedbackMessages.correct.length)];
+            const randomMsg = t.correctMessages[Math.floor(Math.random() * t.correctMessages.length)];
             setScore(prev => prev + 1);
             setTotalAttempted(prev => prev + 1);
             setFeedback({ message: randomMsg, type: 'correct' });
         } else {
             playSound('incorrect');
-             const randomMsg = feedbackMessages.incorrect[Math.floor(Math.random() * feedbackMessages.incorrect.length)];
+             const randomMsg = t.incorrectMessages[Math.floor(Math.random() * t.incorrectMessages.length)];
             setFeedback({ message: randomMsg, type: 'incorrect' });
         }
-    }, [isSubmitting, problem]);
+    }, [isSubmitting, problem, t]);
 
     useEffect(() => {
         if (gameMode === 'input' && problem && userAnswer.length > 0 && userAnswer.length === String(problem.answer).length) {
@@ -237,13 +281,19 @@ export default function AdditionAdventurePage() {
         if (gameMode !== 'voice' || !transcript) return;
         
         const wordsToNumbers: { [key: string]: string } = {
+            // English
             'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
             'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
             'ten': '10', 'eleven': '11', 'twelve': '12', 'thirteen': '13', 'fourteen': '14',
-            'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19', 'twenty': '20'
+            'fifteen': '15', 'sixteen': '16', 'seventeen': '17', 'eighteen': '18', 'nineteen': '19', 'twenty': '20',
+            // Hindi
+            'शून्य': '0', 'एक': '1', 'दो': '2', 'तीन': '3', 'चार': '4',
+            'पांच': '5', 'पाँच': '5', 'छह': '6', 'सात': '7', 'आठ': '8', 'नौ': '9',
+            'दस': '10', 'ग्यारह': '11', 'बारह': '12', 'तेरह': '13', 'चौदह': '14',
+            'पंद्रह': '15', 'सोलह': '16', 'सत्रह': '17', 'अठारह': '18', 'उन्नीस': '19', 'बीस': '20'
         };
 
-        const spokenAnswer = transcript.toLowerCase().trim();
+        const spokenAnswer = transcript.toLowerCase().trim().replace(/[.]$/, '');
         const extractedNumber = spokenAnswer.match(/\d+/) || (wordsToNumbers[spokenAnswer] ? [wordsToNumbers[spokenAnswer]] : null);
 
         if (extractedNumber) {
@@ -251,9 +301,9 @@ export default function AdditionAdventurePage() {
             setUserAnswer(numberStr);
             handleSubmit(numberStr);
         } else {
-             setFeedback({ message: "Didn't catch that. Try again!", type: 'incorrect' });
+             setFeedback({ message: t.didntCatch, type: 'incorrect' });
         }
-    }, [transcript, gameMode, handleSubmit]);
+    }, [transcript, gameMode, handleSubmit, t]);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && !problem) {
@@ -356,6 +406,11 @@ export default function AdditionAdventurePage() {
         setUserAnswer(answerString);
         handleSubmit(answerString);
     }
+    
+    const handleLanguageChange = (lang: 'en' | 'hi') => {
+        setLanguage(lang);
+        handleNewProblem();
+    }
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/10 dark:to-green-900/10 min-h-screen p-4">
@@ -364,35 +419,47 @@ export default function AdditionAdventurePage() {
             <Button asChild variant="ghost">
                 <Link href="/kids-zone/learning-games/math-puzzles">
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Math Puzzles
+                    {t.backToPuzzles}
                 </Link>
             </Button>
             <div className="flex items-center gap-4 flex-wrap">
+                 <div className="flex items-center gap-2">
+                    <Languages className="w-5 h-5 text-slate-600"/>
+                    <Select value={language} onValueChange={handleLanguageChange}>
+                        <SelectTrigger className="w-[120px] h-9">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="hi">हिन्दी</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
                 <div className="flex items-center gap-2">
                     <Rows className="w-5 h-5 text-slate-600"/>
-                    <Label htmlFor="mode-select" className="text-sm font-medium text-slate-700">Mode:</Label>
+                    <Label htmlFor="mode-select" className="text-sm font-medium text-slate-700">{t.mode}</Label>
                     <Select value={gameMode} onValueChange={handleGameModeChange}>
                         <SelectTrigger id="mode-select" className="w-[180px] h-9">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="input">Number Pad</SelectItem>
-                            <SelectItem value="multipleChoice">Multiple Choice</SelectItem>
-                             {hasVoiceSupport && <SelectItem value="voice">Voice</SelectItem>}
+                            <SelectItem value="input">{t.inputMode}</SelectItem>
+                            <SelectItem value="multipleChoice">{t.mcqMode}</SelectItem>
+                             {hasVoiceSupport && <SelectItem value="voice">{t.voiceMode}</SelectItem>}
                         </SelectContent>
                     </Select>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <BarChart4 className="w-5 h-5 text-slate-600"/>
-                    <Label htmlFor="difficulty-select" className="text-sm font-medium text-slate-700">Difficulty:</Label>
+                    <Label htmlFor="difficulty-select" className="text-sm font-medium text-slate-700">{t.difficulty}</Label>
                     <Select value={difficultyLevel.toString()} onValueChange={handleDifficultyChange}>
                         <SelectTrigger id="difficulty-select" className="w-[120px] h-9">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                             {[...Array(10)].map((_, i) => (
-                                <SelectItem key={i + 1} value={(i + 1).toString()}>Level {i + 1}</SelectItem>
+                                <SelectItem key={i + 1} value={(i + 1).toString()}>{t.level} {i + 1}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -401,7 +468,7 @@ export default function AdditionAdventurePage() {
                 {gameMode === 'multipleChoice' && (
                     <div className="flex items-center gap-2">
                         <Trophy className="w-5 h-5 text-slate-600"/>
-                        <Label htmlFor="level-select" className="text-sm font-medium text-slate-700">Options:</Label>
+                        <Label htmlFor="level-select" className="text-sm font-medium text-slate-700">{t.options}</Label>
                         <Select value={mcqLevel.toString()} onValueChange={handleMcqLevelChange}>
                             <SelectTrigger id="level-select" className="w-[120px] h-9">
                                 <SelectValue />
@@ -417,19 +484,19 @@ export default function AdditionAdventurePage() {
                 
                 <div className="flex items-center gap-2">
                     <Settings className="w-5 h-5 text-slate-600"/>
-                    <Label htmlFor="timer-select" className="text-sm font-medium text-slate-700">Timer:</Label>
+                    <Label htmlFor="timer-select" className="text-sm font-medium text-slate-700">{t.timer}</Label>
                     <Select value={timerDuration.toString()} onValueChange={handleDurationChange}>
                         <SelectTrigger id="timer-select" className="w-[120px] h-9">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="5">5 seconds</SelectItem>
-                            <SelectItem value="10">10 seconds</SelectItem>
-                            <SelectItem value="15">15 seconds</SelectItem>
-                            <SelectItem value="30">30 seconds</SelectItem>
-                            <SelectItem value="60">60 seconds</SelectItem>
-                            <SelectItem value="90">90 seconds</SelectItem>
-                            <SelectItem value="0">Off</SelectItem>
+                            <SelectItem value="5">5 {t.seconds}</SelectItem>
+                            <SelectItem value="10">10 {t.seconds}</SelectItem>
+                            <SelectItem value="15">15 {t.seconds}</SelectItem>
+                            <SelectItem value="30">30 {t.seconds}</SelectItem>
+                            <SelectItem value="60">60 {t.seconds}</SelectItem>
+                            <SelectItem value="90">90 {t.seconds}</SelectItem>
+                            <SelectItem value="0">{t.off}</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -437,10 +504,10 @@ export default function AdditionAdventurePage() {
         </div>
         <header className="text-center mb-12">
           <h1 className="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-blue-600">
-            Addition Adventure
+            {t.pageTitle}
           </h1>
           <p className="text-lg text-blue-700/80 mt-4 max-w-2xl mx-auto">
-            Add the numbers and choose the correct answer!
+            {t.pageDescription}
           </p>
         </header>
 
@@ -487,11 +554,11 @@ export default function AdditionAdventurePage() {
                  <CardContent className="flex flex-col items-center gap-4">
                     <div className="flex items-center gap-2 text-lg md:text-xl font-semibold text-slate-600 dark:text-slate-300">
                         <Trophy className="w-5 h-5 md:w-6 md:h-6 text-amber-500"/>
-                        Score: {score} / {totalAttempted} ({totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0}%)
+                        {t.score} {score} / {totalAttempted} ({totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0}%)
                     </div>
                     <Button variant="outline" onClick={() => handleNewProblem(true)} size="lg">
                         <RefreshCw className="mr-2 h-4 w-4" />
-                        New Problem
+                        {t.newProblem}
                     </Button>
                 </CardContent>
             </Card>
@@ -515,6 +582,7 @@ export default function AdditionAdventurePage() {
                     isListening={isListening}
                     startListening={startListening}
                     transcript={transcript}
+                    lang={language}
                 />
             )}
         </div>
