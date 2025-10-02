@@ -7,6 +7,8 @@ import { ArrowLeft, Volume2, Plus, Equal } from "lucide-react";
 import Link from "next/link";
 import { useState } from 'react';
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 const matras = [
   { vowel: 'অ', name: 'Aw', matra: '', example: 'ক', sound: 'Kaw' },
@@ -52,42 +54,68 @@ export default function BengaliMatraPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {matras.map((item, index) => (
-                <Card 
-                    key={index} 
-                    onClick={() => playSound(item.sound)}
-                    className={cn(
-                        "transform transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center items-center justify-center cursor-pointer",
-                        activeCard === item.sound ? "scale-105 shadow-2xl ring-4 ring-blue-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
-                    )}
-                >
-                    <CardContent className="p-4 w-full flex flex-col items-center justify-center">
-                        <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 w-full text-4xl sm:text-5xl font-bold text-slate-800">
-                            <div className="flex flex-col items-center">
-                                <span>ক</span>
-                                <span className="text-xs font-normal">Kaw</span>
-                            </div>
-                            <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
-                             <div className="flex flex-col items-center">
-                                <span className="text-blue-600">{item.matra || 'অ'}</span>
-                                <span className="text-xs font-normal">{item.name}</span>
-                            </div>
-                            <Equal className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
-                             <div className="flex flex-col items-center">
-                                <span className="text-green-600">{item.example}</span>
-                                <span className="text-xs font-normal">{item.sound}</span>
-                            </div>
-                        </div>
-                         <div className="flex items-center text-muted-foreground mt-4 pt-2 border-t w-full justify-center text-sm">
-                            <Volume2 className="w-4 h-4 mr-1"/>
-                            <span>Tap to listen to the result</span>
-                        </div>
-                    </CardContent>
+        <Tabs defaultValue="porichoy" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+            <TabsTrigger value="porichoy">মাত্রা পরিচয় (Introduction)</TabsTrigger>
+            <TabsTrigger value="jog">মাত্রা যোগ (Application)</TabsTrigger>
+          </TabsList>
+          <TabsContent value="porichoy" className="mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {matras.map((item, index) => (
+                <Card key={`porichoy-${index}`} className="shadow-lg bg-white/70 backdrop-blur-sm">
+                  <CardContent className="p-4 flex items-center justify-center gap-4 text-center">
+                      <div className="flex flex-col items-center">
+                          <span className="text-5xl font-bold text-slate-800">{item.vowel}</span>
+                          <span className="text-sm font-semibold text-slate-500">{item.name}</span>
+                      </div>
+                      <Equal className="w-8 h-8 text-blue-500"/>
+                       <div className="flex flex-col items-center">
+                          <span className="text-5xl font-bold text-blue-600">{item.matra || '—'}</span>
+                          <span className="text-sm font-semibold text-slate-500">Matra</span>
+                      </div>
+                  </CardContent>
                 </Card>
-            ))}
-        </div>
-
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="jog" className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {matras.map((item, index) => (
+                    <Card 
+                        key={index} 
+                        onClick={() => playSound(item.sound)}
+                        className={cn(
+                            "transform transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center items-center justify-center cursor-pointer",
+                            activeCard === item.sound ? "scale-105 shadow-2xl ring-4 ring-blue-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
+                        )}
+                    >
+                        <CardContent className="p-4 w-full flex flex-col items-center justify-center">
+                            <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 w-full text-4xl sm:text-5xl font-bold text-slate-800">
+                                <div className="flex flex-col items-center">
+                                    <span>ক</span>
+                                    <span className="text-xs font-normal">Kaw</span>
+                                </div>
+                                <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+                                <div className="flex flex-col items-center">
+                                    <span className="text-blue-600">{item.matra || 'অ'}</span>
+                                    <span className="text-xs font-normal">{item.name}</span>
+                                </div>
+                                <Equal className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+                                <div className="flex flex-col items-center">
+                                    <span className="text-green-600">{item.example}</span>
+                                    <span className="text-xs font-normal">{item.sound}</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center text-muted-foreground mt-4 pt-2 border-t w-full justify-center text-sm">
+                                <Volume2 className="w-4 h-4 mr-1"/>
+                                <span>Tap to listen to the result</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
