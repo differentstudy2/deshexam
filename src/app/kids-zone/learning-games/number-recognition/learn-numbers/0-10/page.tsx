@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 const numbers = Array.from({ length: 11 }, (_, i) => i); // 0 to 10
+const numberNames = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+
 
 export default function LearnNumbers0To10Page() {
     const [activeNumber, setActiveNumber] = useState<number | null>(null);
@@ -32,14 +34,13 @@ export default function LearnNumbers0To10Page() {
     
     useEffect(() => {
         if (audioUrl && audioRef.current) {
-            audioRef.current.src = audioUrl;
+            audioRef.current.load();
             audioRef.current.play().catch(e => console.error("Audio playback error:", e));
         }
     }, [audioUrl]);
     
     const handleAudioEnd = () => {
         setActiveNumber(null);
-        setAudioUrl(null);
     };
 
 
@@ -74,7 +75,8 @@ export default function LearnNumbers0To10Page() {
                     activeNumber === number ? "scale-110 shadow-2xl ring-4 ring-cyan-400" : "shadow-lg"
                 )}
             >
-              <CardContent className="p-0 flex flex-col items-center justify-center">
+              <CardContent className="p-2 flex flex-col items-center justify-center">
+                <p className="text-xl font-semibold text-slate-500 dark:text-slate-400 mb-2">{numberNames[number]}</p>
                 <p className="text-8xl font-bold text-slate-800 dark:text-slate-100" style={{fontFamily: "'Lexend', sans-serif"}}>
                     {number}
                 </p>
