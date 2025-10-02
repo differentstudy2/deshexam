@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -46,7 +45,7 @@ export default function LearnNumbers0To10Page() {
 
   return (
     <div className="bg-gradient-to-br from-green-50 to-cyan-50 dark:from-green-900/10 min-h-screen">
-       {audioUrl && <audio ref={audioRef} onEnded={handleAudioEnd} />}
+       {audioUrl && <audio ref={audioRef} onEnded={handleAudioEnd} src={audioUrl} />}
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
             <Button asChild variant="ghost">
@@ -82,7 +81,7 @@ export default function LearnNumbers0To10Page() {
                         {number}
                     </p>
                 </div>
-                <div className="flex items-center text-muted-foreground mt-2">
+                <div className="flex items-center text-muted-foreground mt-2 pt-2 border-t">
                     <Volume2 className="w-4 h-4 mr-1"/>
                     <span>Tap to listen</span>
                 </div>
