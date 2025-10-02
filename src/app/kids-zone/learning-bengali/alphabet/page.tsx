@@ -126,6 +126,7 @@ const useSpeechRecognition = (lang: string) => {
 
     const startListening = () => {
         if (recognitionRef.current && !isListening) {
+            setTranscript('');
             recognitionRef.current.start();
         }
     };
@@ -154,7 +155,7 @@ const VoiceRecognitionGame = () => {
     
     useEffect(() => {
         startNewRound();
-    }, [startNewRound]);
+    }, []);
 
     useEffect(() => {
         if (!transcript || !currentLetter || isCorrect) return;
@@ -183,10 +184,13 @@ const VoiceRecognitionGame = () => {
     return (
         <div className="relative flex flex-col items-center justify-center mt-8">
             <Card className="w-full max-w-md shadow-2xl bg-white/70 backdrop-blur-sm">
-                <CardHeader>
-                    <CardTitle className="text-center text-9xl font-bold text-slate-800" style={{fontFamily: "'Lexend', sans-serif"}}>
+                <CardHeader className="text-center">
+                    <CardTitle className="text-9xl font-bold text-slate-800" style={{fontFamily: "'Lexend', sans-serif"}}>
                         {currentLetter?.char}
                     </CardTitle>
+                    <CardDescription className="text-2xl font-semibold text-slate-500 pt-2">
+                        {currentLetter?.name}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="h-20 text-center relative flex justify-center items-center">
                     <Confetti active={isCorrect} config={{
