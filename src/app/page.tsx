@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "PDF FOREST – Free Books, Notes & Journals Online",
+  title: "DeshExam | Ace Your Competitive Exams",
 };
 
 
