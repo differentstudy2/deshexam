@@ -125,19 +125,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 6. Fetch all textbook and their chapter/topic routes
   const allTextbooks = await getAllTextbooks();
   const textbookRoutes = allTextbooks.map(book => ({
-    url: `${baseUrl}/textbook-solutions/${book.id}`,
+    url: `${baseUrl}/textbook-solutions/${(book as any).id}`,
     lastModified: new Date(), // Assuming textbook document has no lastModified timestamp
     priority: 0.8,
   }));
 
   const textbookChapterTopicRoutes: MetadataRoute.Sitemap = [];
   for (const book of allTextbooks) {
-      const chapters = await getChaptersByTextbookId(book.id);
+      const chapters = await getChaptersByTextbookId((book as any).id);
       for (const chapter of chapters) {
-          const topics = await getTopicsByChapterId(book.id, chapter.id);
+          const topics = await getTopicsByChapterId((book as any).id, (chapter as any).id);
           for (const topic of topics) {
               textbookChapterTopicRoutes.push({
-                  url: `${baseUrl}/textbook-solutions/${book.id}?chapter=${chapter.id}&topic=${topic.id}`,
+                  url: `${baseUrl}/textbook-solutions/${(book as any).id}?chapter=${(chapter as any).id}&amp;topic=${(topic as any).id}`,
                   lastModified: new Date(),
                   priority: 0.6
               });
