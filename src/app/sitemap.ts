@@ -1,6 +1,6 @@
 
 import { MetadataRoute } from 'next';
-import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses, getExamTypes, getSubjects, getAllTextbooks, getChaptersByTextbookId, getTopicsByChapterId, getAllUsers } from '@/lib/firebase/firestore';
+import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses, getExamTypes, getSubjects, getAllTextbooks, getChaptersByTextbookId, getTopicsByChapterId, getAllUsers, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
@@ -122,7 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const examTypeRoutes = generateMetafieldRoutes(examTypes, 'exam-types');
   const subjectRoutes = generateMetafieldRoutes(subjects, 'subjects');
 
-  // 6. Fetch all textbook and their chapter/topic routes
+  // 6. Fetch all textbook and their chapter/topic/practice set routes
   const allTextbooks = await getAllTextbooks();
   const textbookRoutes = allTextbooks.map(book => ({
     url: `${baseUrl}/textbook-solutions/${(book as any).id}`,
@@ -131,6 +131,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const textbookChapterTopicRoutes: MetadataRoute.Sitemap = [];
+  const practiceSetRoutes: MetadataRoute.Sitemap = [];
+
   for (const book of allTextbooks) {
       const chapters = await getChaptersByTextbookId((book as any).id);
       for (const chapter of chapters) {
@@ -141,6 +143,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                   lastModified: new Date(),
                   priority: 0.6
               });
+              
+              const practiceSets = await getPracticeSetsByTopicId((book as any).id, (chapter as any).id, (topic as any).id);
+              for (const practiceSet of practiceSets) {
+                  practiceSetRoutes.push({
+                      url: `${baseUrl}/textbook-solutions/practice-set/${(practiceSet as any).id}?textbook=${(book as any).id}&chapter=${(chapter as any).id}&topic=${(topic as any).id}`,
+                      lastModified: new Date(),
+                      priority: 0.5,
+                  });
+              }
           }
       }
   }
@@ -166,6 +177,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...subjectRoutes,
     ...textbookRoutes,
     ...textbookChapterTopicRoutes,
+    ...practiceSetRoutes,
     ...userProfileRoutes,
   ];
 }
