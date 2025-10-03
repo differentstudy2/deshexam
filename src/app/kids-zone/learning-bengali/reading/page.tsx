@@ -2,9 +2,34 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, BookOpenCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+
+const stories = [
+  {
+    title: "শেয়ালের চালাকি",
+    description: "এক চালাক শেয়ালের গল্প যে তার বুদ্ধির জোরে বিপদ থেকে রক্ষা পায়।",
+    image: "https://picsum.photos/seed/fox/400/300",
+    imageHint: "fox illustration",
+    link: "#"
+  },
+  {
+    title: "কচ্ছপ ও খরগোশ",
+    description: "ধীর ও স্থির কচ্ছপের কাছে অহংকারী খরগোশের হারের গল্প।",
+    image: "https://picsum.photos/seed/tortoise/400/300",
+    imageHint: "tortoise hare",
+    link: "#"
+  },
+  {
+    title: " তৃষ্ণার্ত কাক",
+    description: "এক তৃষ্ণার্ত কাকের বুদ্ধির গল্প যে কলসির জল উপরে তুলে আনে।",
+    image: "https://picsum.photos/seed/crow/400/300",
+    imageHint: "crow water",
+    link: "#"
+  },
+];
 
 export default function BengaliReadingPage() {
   return (
@@ -26,15 +51,31 @@ export default function BengaliReadingPage() {
             Practice reading Bengali with short stories and passages.
           </p>
         </header>
-        <Card className="max-w-2xl mx-auto text-center p-8 shadow-xl bg-white/70 backdrop-blur-sm">
-            <CardContent>
-                <BookOpenCheck className="w-16 h-16 mx-auto text-lime-400 mb-4"/>
-                <h3 className="text-2xl font-bold text-slate-800">Coming Soon!</h3>
-                <p className="text-muted-foreground mt-2">
-                    A library of fun stories and reading exercises is on its way. Check back soon!
-                </p>
-            </CardContent>
-        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {stories.map((story, index) => (
+                <Card key={index} className="overflow-hidden flex flex-col group transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+                    <CardHeader className="p-0 relative h-48">
+                        <Image
+                            src={story.image}
+                            alt={story.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-300"
+                            data-ai-hint={story.imageHint}
+                        />
+                    </CardHeader>
+                    <CardContent className="p-4 flex-grow">
+                        <CardTitle className="font-headline text-xl text-slate-800">{story.title}</CardTitle>
+                        <CardDescription className="mt-2 text-slate-600">{story.description}</CardDescription>
+                    </CardContent>
+                    <CardFooter className="p-4 pt-0">
+                        <Button asChild className="w-full">
+                            <Link href={story.link}>Read Story</Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+            ))}
+        </div>
       </div>
     </div>
   );
