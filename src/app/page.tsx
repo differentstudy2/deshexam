@@ -15,6 +15,12 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "PDF FOREST – Free Books, Notes & Journals Online",
+};
+
 
 const features = [
   {
