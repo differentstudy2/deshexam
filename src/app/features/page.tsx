@@ -10,6 +10,7 @@ import {
   MessagesSquare,
   Sparkles,
   Lock,
+  ToyBrick,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,12 @@ const currentFeatures = [
     description: "Dive deep into complex subjects with our curated collection of in-depth articles, tutorials, and study guides. Written by experts, these resources are designed to build a strong foundational understanding of key topics.",
     link: "/learn",
   },
+  {
+    icon: <ToyBrick className="w-10 h-10 text-primary" />,
+    title: "Kids Zone",
+    description: "A fun and safe place for young learners to explore, play, and grow with interactive games for learning languages and math.",
+    link: "/kids-zone",
+  },
 ];
 
 const upcomingFeatures = [
@@ -90,7 +97,7 @@ export default function FeaturesPage() {
              <h2 className="font-headline text-3xl font-bold tracking-tighter text-center mb-10">
               Available Now
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {currentFeatures.map((feature) => (
                 <Link href={feature.link} key={feature.title} className="block group">
                     <Card className="h-full transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-primary/50 flex flex-col">
