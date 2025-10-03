@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Kids Zone - Fun Learning Activities | DeshExam',
   description: 'A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.',
+  keywords: ['kids learning', 'educational games', 'learning for kids', 'kids zone', 'fun learning', 'online learning for children', 'kids activities'],
 };
 
 
