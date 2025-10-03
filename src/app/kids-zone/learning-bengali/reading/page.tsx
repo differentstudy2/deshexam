@@ -13,21 +13,21 @@ const stories = [
     description: "এক চালাক শেয়ালের গল্প যে তার বুদ্ধির জোরে বিপদ থেকে রক্ষা পায়।",
     image: "https://picsum.photos/seed/fox/400/300",
     imageHint: "fox illustration",
-    link: "#"
+    link: "/kids-zone/learning-bengali/reading/sheyaler-chalaki"
   },
   {
     title: "কচ্ছপ ও খরগোশ",
     description: "ধীর ও স্থির কচ্ছপের কাছে অহংকারী খরগোশের হারের গল্প।",
     image: "https://picsum.photos/seed/tortoise/400/300",
     imageHint: "tortoise hare",
-    link: "#"
+    link: "/kids-zone/learning-bengali/reading/kocchop-o-khorgosh"
   },
   {
-    title: " তৃষ্ণার্ত কাক",
+    title: "তৃষ্ণার্ত কাক",
     description: "এক তৃষ্ণার্ত কাকের বুদ্ধির গল্প যে কলসির জল উপরে তুলে আনে।",
     image: "https://picsum.photos/seed/crow/400/300",
     imageHint: "crow water",
-    link: "#"
+    link: "/kids-zone/learning-bengali/reading/trishnarto-kak"
   },
 ];
 
