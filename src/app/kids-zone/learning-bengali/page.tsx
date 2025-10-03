@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Book, SpellCheck, Mic, Combine } from "lucide-react";
+import { ArrowLeft, Book, SpellCheck, Mic, Combine, PenTool, BookOpenCheck } from "lucide-react";
 import Link from "next/link";
 
 const bengaliActivities = [
@@ -28,6 +28,22 @@ const bengaliActivities = [
     description: "Build your Bengali vocabulary with fun word games.",
     icon: <SpellCheck className="w-10 h-10 text-teal-500" />,
     bgColor: "bg-teal-100",
+    link: "#",
+    comingSoon: true,
+  },
+  {
+    title: "বানান কৌশল (Spelling)",
+    description: "Master Bengali spelling with interactive exercises.",
+    icon: <PenTool className="w-10 h-10 text-indigo-500" />,
+    bgColor: "bg-indigo-100",
+    link: "#",
+    comingSoon: true,
+  },
+  {
+    title: "পড়ার অভ্যাস (Reading)",
+    description: "Practice reading Bengali with short stories and passages.",
+    icon: <BookOpenCheck className="w-10 h-10 text-lime-500" />,
+    bgColor: "bg-lime-100",
     link: "#",
     comingSoon: true,
   },
@@ -62,7 +78,7 @@ export default function LearningBengaliPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {bengaliActivities.map((activity, index) => (
             <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center relative">
                {activity.comingSoon && (
