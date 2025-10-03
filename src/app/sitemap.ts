@@ -147,7 +147,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               const practiceSets = await getPracticeSetsByTopicId((book as any).id, (chapter as any).id, (topic as any).id);
               for (const practiceSet of practiceSets) {
                   practiceSetRoutes.push({
-                      url: `${baseUrl}/textbook-solutions/practice-set/${(practiceSet as any).id}?textbook=${(book as any).id}&chapter=${(chapter as any).id}&topic=${(topic as any).id}`,
+                      url: `${baseUrl}/textbook-solutions/practice-set/${(practiceSet as any).id}?textbook=${(book as any).id}&amp;chapter=${(chapter as any).id}&amp;topic=${(topic as any).id}`,
                       lastModified: new Date(),
                       priority: 0.5,
                   });
