@@ -29,6 +29,20 @@ const stories = [
     imageHint: "crow water",
     link: "/kids-zone/learning-bengali/reading/trishnarto-kak"
   },
+  {
+    title: "সিংহ এবং ইঁদুর",
+    description: "ছোট প্রাণীরও যে বড় উপকার করার ক্ষমতা থাকে, সেই গল্প।",
+    image: "https://picsum.photos/seed/lion-mouse/400/300",
+    imageHint: "lion mouse",
+    link: "/kids-zone/learning-bengali/reading/lion-and-mouse"
+  },
+  {
+    title: "দুই বন্ধু ও ভাল্লুক",
+    description: "বিপদের সময় কে আসল বন্ধু তা চেনার গল্প।",
+    image: "https://picsum.photos/seed/friends-bear/400/300",
+    imageHint: "friends bear forest",
+    link: "/kids-zone/learning-bengali/reading/two-friends-and-bear"
+  },
 ];
 
 export default function BengaliReadingPage() {
