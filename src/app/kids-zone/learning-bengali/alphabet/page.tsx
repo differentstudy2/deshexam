@@ -26,7 +26,7 @@ const consonants = [
   { char: 'প', name: 'Paw' }, { char: 'ফ', name: 'Faw' }, { char: 'ব', name: 'Baw' }, { char: 'ভ', name: 'Bhaw' }, { char: 'ম', name: 'Maw' },
   { char: 'য', name: 'Jaw' }, { char: 'র', name: 'Raw' }, { char: 'ল', name: 'Law' }, { char: 'ব', name: 'Baw' }, { char: 'শ', name: 'Shaw' }, { char: 'ষ', name: 'Shaw' },
   { char: 'স', name: 'Saw' }, { char: 'হ', name: 'Haw' }, { char: 'ক্ষ', name: 'Kkhaw' }, { char: 'ড়', name: 'Raw' }, { char: 'ঢ়', name: 'Rhaw' }, { char: 'য়', name: 'Yaw' },
-  { char: 'ৎ', name: 'T' }, { char: 'ং', name: 'Ong' }, { char: 'ঃ', name: 'Oh' }, { char: 'ঁ', name: 'Chandrabindu' }
+  { char: 'ৎ', name: 'T ' }, { char: 'ং', name: 'Ong' }, { char: 'ঃ', name: 'Oh' }, { char: 'ঁ', name: 'Chandrabindu' }
 ];
 
 const allLetters = [...vowels, ...consonants];
