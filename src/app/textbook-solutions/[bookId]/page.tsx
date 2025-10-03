@@ -305,8 +305,8 @@ export default function TextbookSolutionsPage() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerResource, setViewerResource] = useState<Resource | null>(null);
 
-  const activeChapter = searchParams.get('chapter');
-  const activeTopic = searchParams.get('topic');
+  const activeChapterId = searchParams.get('chapter');
+  const activeTopicId = searchParams.get('topic');
   
   const [areResourcesFetched, setAreResourcesFetched] = useState(false);
   const [areResourcesLoading, setAreResourcesLoading] = useState(false);
@@ -356,10 +356,81 @@ export default function TextbookSolutionsPage() {
 
     fetchTextbookAndChapters();
   }, [textbookId, router, user]);
+
+  const activeChapter = chapters.find(c => c.id === activeChapterId);
+  const selectedTopicContent = useMemo(() => {
+    if (!activeChapterId || !activeTopicId || !topics[activeChapterId]) return null;
+    return topics[activeChapterId]?.find(t => t.id === activeTopicId) || null;
+  }, [activeChapterId, activeTopicId, topics]);
+
+  useEffect(() => {
+    // Dynamically update metadata when textbook, chapter, or topic changes
+    const updateMetadata = () => {
+        let title = "Textbook Solutions";
+        let description = "Find detailed solutions for your textbook exercises.";
+        let keywords = "textbook solutions, exam preparation, practice sets";
+        const jsonLdScript = document.getElementById('structured-data');
+
+        if (textbook) {
+            title = `${textbook.title} Solutions | DeshExam`;
+            description = `Get complete solutions for ${textbook.title}. Covers all chapters and topics with practice sets.`;
+            keywords = `${textbook.title}, ${textbook.subject}, ${textbook.class}, textbook solutions, NCERT solutions`;
+        }
+        if (activeChapter) {
+            title = `${activeChapter.title} - ${textbook?.title} Solutions | DeshExam`;
+            description = `Solutions for ${activeChapter.title}, part of the ${textbook?.title} textbook. Includes detailed explanations and practice questions.`;
+            keywords += `, ${activeChapter.title}`;
+        }
+        if (selectedTopicContent) {
+            title = `${selectedTopicContent.title} - ${activeChapter?.title} | DeshExam`;
+            description = `Practice sets and resources for ${selectedTopicContent.title}, from chapter ${activeChapter?.title}.`;
+            keywords += `, ${selectedTopicContent.title}`;
+        }
+
+        document.title = title;
+        document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', keywords);
+
+        // Update or create JSON-LD script
+        const jsonLd = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": title,
+            "url": window.location.href,
+            "description": description,
+            "image": textbook?.featureImage || "https://picsum.photos/seed/bookcover/800/400",
+            "author": {
+              "@type": "Organization",
+              "name": "DeshExam",
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "DeshExam",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://deshexam.com/logo.png"
+              }
+            },
+            "datePublished": textbook ? new Date().toISOString() : '',
+            "dateModified": new Date().toISOString(),
+          };
+
+        if(jsonLdScript) {
+            jsonLdScript.innerHTML = JSON.stringify(jsonLd);
+        } else {
+            const script = document.createElement('script');
+            script.id = 'structured-data';
+            script.type = 'application/ld+json';
+            script.innerHTML = JSON.stringify(jsonLd);
+            document.head.appendChild(script);
+        }
+    };
+    updateMetadata();
+}, [textbook, activeChapter, selectedTopicContent]);
   
   useEffect(() => {
     setAreResourcesFetched(false);
-  }, [activeTopic]);
+  }, [activeTopicId]);
 
 
   const handleChapterToggle = useCallback(async (chapterId: string) => {
@@ -405,18 +476,6 @@ export default function TextbookSolutionsPage() {
       router.push(`?${params.toString()}`, { scroll: false });
   };
   
-  const selectedTopicContent = useMemo(() => {
-    if (!activeChapter || !activeTopic || !topics[activeChapter]) return null;
-    const topic = topics[activeChapter]?.find(t => t.id === activeTopic);
-    if (!topic) return null;
-  
-    const sortedPracticeSets = [...(topic.practiceSets || [])].sort((a, b) =>
-      a.title.localeCompare(b.title, undefined, { numeric: true })
-    );
-  
-    return { ...topic, practiceSets: sortedPracticeSets };
-  }, [activeChapter, activeTopic, topics]);
-  
   const topicAggregateScore = useMemo(() => {
     if (!selectedTopicContent || !progress || !selectedTopicContent.practiceSets || selectedTopicContent.practiceSets.length === 0) {
         return null;
@@ -437,18 +496,18 @@ export default function TextbookSolutionsPage() {
   };
   
   const fetchResources = async () => {
-    if (!activeChapter || !activeTopic || areResourcesFetched) return;
+    if (!activeChapterId || !activeTopicId || areResourcesFetched) return;
     
     setAreResourcesLoading(true);
     try {
-        const topicRef = doc(db, `textbooks/${textbookId}/chapters/${activeChapter}/topics`, activeTopic);
+        const topicRef = doc(db, `textbooks/${textbookId}/chapters/${activeChapterId}/topics`, activeTopicId);
         const topicSnap = await getDoc(topicRef);
         if(topicSnap.exists()) {
             const topicData = topicSnap.data();
             setTopics(prevTopics => ({
                 ...prevTopics,
-                [activeChapter]: prevTopics[activeChapter].map(t => 
-                    t.id === activeTopic ? { ...t, resources: topicData.resources || [] } : t
+                [activeChapterId]: prevTopics[activeChapterId].map(t => 
+                    t.id === activeTopicId ? { ...t, resources: topicData.resources || [] } : t
                 )
             }));
             setAreResourcesFetched(true);
@@ -461,7 +520,7 @@ export default function TextbookSolutionsPage() {
   }
 
  const handleDownloadPdf = async (practiceSet: any) => {
-    if (!activeChapter || !activeTopic) return;
+    if (!activeChapterId || !activeTopicId) return;
     setIsDownloading(practiceSet.id);
     toast({
         title: "Generating PDF...",
@@ -469,7 +528,7 @@ export default function TextbookSolutionsPage() {
     });
 
     try {
-        const questions = await getQuestionsByPracticeSet(textbookId, activeChapter, activeTopic, practiceSet.id);
+        const questions = await getQuestionsByPracticeSet(textbookId, activeChapterId, activeTopicId, practiceSet.id);
         const totalMarks = questions.reduce((total: number, q: any) => {
             if (q.type === 'Matching') return total + (q.correctAnswer?.length || 0);
             return total + (q.marks || 1);
@@ -520,7 +579,7 @@ export default function TextbookSolutionsPage() {
                     {textbook?.board && <p><strong>Board:</strong> {textbook.board}</p>}
                     {textbook?.class && <p><strong>Class:</strong> {textbook.class}</p>}
                     {textbook?.subject && <p><strong>Subject:</strong> {textbook.subject}</p>}
-                    {chapters.find(c => c.id === activeChapter)?.title && <p><strong>Chapter:</strong> {chapters.find(c => c.id === activeChapter)?.title}</p>}
+                    {chapters.find(c => c.id === activeChapterId)?.title && <p><strong>Chapter:</strong> {chapters.find(c => c.id === activeChapterId)?.title}</p>}
                     {selectedTopicContent?.title && <p><strong>Topic:</strong> {selectedTopicContent.title}</p>}
                     <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                     <p><strong>Full Marks:</strong> {totalMarks}</p>
@@ -728,8 +787,8 @@ export default function TextbookSolutionsPage() {
                         <TextbookContentSidebar
                             chapters={chapters}
                             topics={topics}
-                            activeChapter={activeChapter}
-                            activeTopic={activeTopic}
+                            activeChapter={activeChapterId}
+                            activeTopic={activeTopicId}
                             onTopicSelect={handleTopicSelect}
                             onChapterToggle={handleChapterToggle}
                             onSheetClose={() => setIsSheetOpen(false)}
@@ -766,8 +825,8 @@ export default function TextbookSolutionsPage() {
           <TextbookContentSidebar
             chapters={chapters}
             topics={topics}
-            activeChapter={activeChapter}
-            activeTopic={activeTopic}
+            activeChapter={activeChapterId}
+            activeTopic={activeTopicId}
             onTopicSelect={handleTopicSelect}
             onChapterToggle={handleChapterToggle}
             userProfile={userProfile}
@@ -851,8 +910,8 @@ export default function TextbookSolutionsPage() {
                                                     key={ps.id}
                                                     ps={ps}
                                                     textbookId={textbookId}
-                                                    chapterId={activeChapter!}
-                                                    topicId={activeTopic!}
+                                                    chapterId={activeChapterId!}
+                                                    topicId={activeTopicId!}
                                                     isLocked={isLocked}
                                                     passMark={passMark}
                                                     highestScore={progress?.highestScores?.[ps.id]}

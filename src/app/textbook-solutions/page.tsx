@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -112,6 +113,31 @@ export default function TextbookSolutionsListPage() {
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedBoard, setSelectedBoard] = useState('all');
   const [selectedSchool, setSelectedSchool] = useState('all');
+  
+  useEffect(() => {
+    document.title = "Textbook Solutions | DeshExam";
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    descriptionMeta?.setAttribute('content', "Find free and comprehensive solutions for your school textbooks. Covers all subjects and boards like NCERT, CBSE, etc.");
+    const keywordsMeta = document.querySelector('meta[name="keywords"]');
+    keywordsMeta?.setAttribute('content', 'textbook solutions, ncert solutions, cbse solutions, free textbook solutions, exam preparation');
+    
+    // Add structured data
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.innerHTML = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Textbook Solutions | DeshExam",
+        "description": "Find free and comprehensive solutions for your school textbooks.",
+        "url": "https://deshexam.com/textbook-solutions"
+    });
+    document.head.appendChild(script);
+
+    return () => {
+        document.head.removeChild(script);
+    }
+}, []);
+
 
   useEffect(() => {
     const fetchInitialData = async () => {
