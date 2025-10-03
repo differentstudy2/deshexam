@@ -7,7 +7,7 @@ import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen } from "lucide-react";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Kids Zone - Fun Learning Activities',
+  title: 'Kids Zone - Fun Learning Activities | DeshExam',
   description: 'A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.',
 };
 
