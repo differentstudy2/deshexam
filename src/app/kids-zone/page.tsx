@@ -43,16 +43,19 @@ export default function KidsZonePage() {
     const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "Welcome to the Kids Zone!",
+    "headline": "Welcome to the Kids Zone! - DeshExam",
+    "url": "https://deshexam.com/kids-zone",
     "description": "A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.",
     "image": "https://picsum.photos/seed/kids-fun/800/400",
     "author": {
       "@type": "Organization",
-      "name": "DeshExam"
+      "name": "DeshExam",
+      "url": "https://deshexam.com"
     },
     "publisher": {
       "@type": "Organization",
       "name": "DeshExam",
+      "url": "https://deshexam.com",
       "logo": {
         "@type": "ImageObject",
         "url": "https://deshexam.com/logo.png"
