@@ -4,6 +4,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen } from "lucide-react";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Kids Zone - Fun Learning Activities',
+  description: 'A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.',
+};
+
 
 const kidsFeatures = [
   {
