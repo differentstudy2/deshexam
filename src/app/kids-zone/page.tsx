@@ -40,8 +40,34 @@ const kidsFeatures = [
 ];
 
 export default function KidsZonePage() {
+    const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Welcome to the Kids Zone!",
+    "description": "A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.",
+    "image": "https://picsum.photos/seed/kids-fun/800/400",
+    "author": {
+      "@type": "Organization",
+      "name": "DeshExam"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "DeshExam",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://deshexam.com/logo.png"
+      }
+    },
+    "datePublished": new Date().toISOString(),
+    "dateModified": new Date().toISOString()
+  };
+
   return (
     <div className="bg-yellow-50 dark:bg-yellow-900/20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto px-4 py-16">
         <header className="text-center mb-12">
           <h1 className="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-amber-600">
