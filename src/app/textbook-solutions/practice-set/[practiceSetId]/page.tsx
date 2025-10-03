@@ -133,6 +133,44 @@ export default function PracticeSetPage() {
     fetchTest();
   }, [practiceSetId, textbookId, chapterId, topicId, toast, router]);
   
+    useEffect(() => {
+        // Dynamically update metadata
+        if (test && textbook && chapter && topic) {
+            const title = `${test.title} | ${topic.title} | DeshExam`;
+            const description = `Practice set for ${topic.title}, part of the ${textbook.title} textbook. Test your knowledge on ${chapter.title}.`;
+            const keywords = `${test.title}, ${topic.title}, ${chapter.title}, ${textbook.subject}, practice questions, quiz`;
+            
+            document.title = title;
+            document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+            document.querySelector('meta[name="keywords"]')?.setAttribute('content', keywords);
+
+            // Update or create JSON-LD script
+            const jsonLdScriptId = 'structured-data-practice-set';
+            let jsonLdScript = document.getElementById(jsonLdScriptId);
+            if (!jsonLdScript) {
+                jsonLdScript = document.createElement('script');
+                jsonLdScript.id = jsonLdScriptId;
+                jsonLdScript.type = 'application/ld+json';
+                document.head.appendChild(jsonLdScript);
+            }
+
+            const jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": title,
+                "url": window.location.href,
+                "description": description,
+                "image": textbook.featureImage || `https://picsum.photos/seed/${textbook.id}/800/400`,
+                "author": { "@type": "Organization", "name": "DeshExam" },
+                "publisher": { "@type": "Organization", "name": "DeshExam", "logo": { "@type": "ImageObject", "url": "/logo.png" } },
+                "datePublished": new Date().toISOString(),
+                "dateModified": new Date().toISOString(),
+            };
+            jsonLdScript.innerHTML = JSON.stringify(jsonLd);
+        }
+    }, [test, textbook, chapter, topic]);
+
+
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) {
       if (timeLeft === 0) {
