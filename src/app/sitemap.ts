@@ -1,6 +1,6 @@
 
 import { MetadataRoute } from 'next';
-import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses, getExamTypes, getSubjects } from '@/lib/firebase/firestore';
+import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses, getExamTypes, getSubjects, getAllTextbooks, getChaptersByTextbookId, getTopicsByChapterId, getAllUsers } from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
@@ -122,7 +122,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const examTypeRoutes = generateMetafieldRoutes(examTypes, 'exam-types');
   const subjectRoutes = generateMetafieldRoutes(subjects, 'subjects');
 
-  // 6. Combine all routes
+  // 6. Fetch all textbook and their chapter/topic routes
+  const allTextbooks = await getAllTextbooks();
+  const textbookRoutes = allTextbooks.map(book => ({
+    url: `${baseUrl}/textbook-solutions/${book.id}`,
+    lastModified: new Date(), // Assuming textbook document has no lastModified timestamp
+    priority: 0.8,
+  }));
+
+  const textbookChapterTopicRoutes: MetadataRoute.Sitemap = [];
+  for (const book of allTextbooks) {
+      const chapters = await getChaptersByTextbookId(book.id);
+      for (const chapter of chapters) {
+          const topics = await getTopicsByChapterId(book.id, chapter.id);
+          for (const topic of topics) {
+              textbookChapterTopicRoutes.push({
+                  url: `${baseUrl}/textbook-solutions/${book.id}?chapter=${chapter.id}&topic=${topic.id}`,
+                  lastModified: new Date(),
+                  priority: 0.6
+              });
+          }
+      }
+  }
+
+  // 7. Fetch all user profiles for dynamic routes
+  const allUsers = await getAllUsers();
+  const userProfileRoutes = allUsers.map((user: any) => ({
+      url: `${baseUrl}/profile/${user.username}`,
+      lastModified: new Date(user.createdAt),
+      priority: 0.5,
+  }));
+
+
+  // 8. Combine all routes
   return [
     ...staticRoutes, 
     ...contentTypeRoutes, 
@@ -132,5 +164,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...classRoutes,
     ...examTypeRoutes,
     ...subjectRoutes,
+    ...textbookRoutes,
+    ...textbookChapterTopicRoutes,
+    ...userProfileRoutes,
   ];
 }
