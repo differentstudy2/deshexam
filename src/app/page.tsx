@@ -94,8 +94,29 @@ const testimonials = [
 ];
 
 export default function Home() {
+    const localBusinessJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "DeshExam",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Learning Lane",
+      "addressLocality": "Education City",
+      "addressRegion": "KA",
+      "postalCode": "560001",
+      "addressCountry": "IN"
+    },
+    "telephone": "+91 123 456 7890",
+    "url": "https://deshexam.com",
+    "logo": "https://deshexam.com/logo.png",
+    "image": "https://picsum.photos/seed/hero/1920/1080"
+  };
   return (
     <div className="flex flex-col min-h-screen">
+       <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+      />
       <section className="relative w-full pt-20 pb-12 md:pt-32 md:pb-24 lg:pt-40 lg:pb-32">
         <div className="absolute inset-0 z-0">
            <Image
