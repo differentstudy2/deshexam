@@ -170,7 +170,7 @@ export default function ManageTextbooksPage() {
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {textbooks.map((book) => (
-          <Card key={book.id} className="flex flex-col max-h-[550px]">
+          <Card key={book.id} className="flex flex-col">
             <CardHeader className="p-0 relative h-48 flex-shrink-0">
                <Image 
                 src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
@@ -183,8 +183,8 @@ export default function ManageTextbooksPage() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden">
-                                <Book /> <span>{book.title.length > 40 ? `${book.title.substring(0, 40)}...` : book.title}</span>
+                             <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden line-clamp-2">
+                                <Book /> <span>{book.title}</span>
                             </h3>
                         </TooltipTrigger>
                         <TooltipContent>
