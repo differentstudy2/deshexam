@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import {
@@ -32,6 +31,7 @@ import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ScoreCircle } from '@/components/feature/score-circle';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 type UserProfile = {
@@ -728,8 +728,35 @@ export default function TextbookSolutionsPage() {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <Loader2 className="w-8 h-8 animate-spin"/>
+        <div className="container mx-auto py-8 max-w-7xl">
+            <Skeleton className="h-8 w-1/3 mb-6" />
+            <div className="mb-8 p-6 flex flex-col md:flex-row items-center gap-6 md:gap-8 rounded-lg bg-card">
+                <Skeleton className="w-36 h-48 md:w-40 md:h-56 flex-shrink-0" />
+                <div className="flex-1 space-y-4">
+                    <Skeleton className="h-10 w-3/4" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-4/5" />
+                    <div className="flex gap-2">
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                    </div>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
+                <Card>
+                    <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
+                    <CardContent className="space-y-2">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-6 text-center">
+                        <Loader2 className="w-8 h-8 animate-spin mx-auto" />
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
   }
@@ -949,3 +976,5 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
+    
