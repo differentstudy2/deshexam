@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -24,6 +23,12 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 
 const TextbookStats = ({ textbookId }: { textbookId: string }) => {
@@ -175,7 +180,18 @@ export default function ManageTextbooksPage() {
                />
             </CardHeader>
             <CardContent className="flex-grow p-4 flex flex-col overflow-y-auto">
-              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow"><Book /> {book.title}</h3>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <h3 className="font-bold text-lg flex items-center gap-2 flex-grow truncate">
+                                <Book /> {book.title}
+                            </h3>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{book.title}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
               {book.board && <Badge variant="outline">{book.board}</Badge>}
               <TextbookStats textbookId={book.id} />
             </CardContent>
