@@ -11,7 +11,7 @@ import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
-import { Inter, Lexend } from 'next/font/google';
+import { Inter, Lexend, Hind_Siliguri } from 'next/font/google';
 import { FirebaseProvider } from "@/hooks/use-firebase";
 
 const inter = Inter({
@@ -25,6 +25,13 @@ const lexend = Lexend({
   weight: ['400', '700'],
 });
 
+const hindSiliguri = Hind_Siliguri({
+  subsets: ['bengali'],
+  variable: '--font-hind-siliguri',
+  weight: ['400', '600', '700'],
+});
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +40,11 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("antialiased", inter.variable, lexend.variable)}>
+       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className={cn("antialiased", inter.variable, lexend.variable, hindSiliguri.variable)}>
         <FirebaseProvider>
           <ThemeProvider
               attribute="class"
