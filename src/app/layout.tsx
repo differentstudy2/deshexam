@@ -25,6 +25,7 @@ const lexend = Lexend({
   weight: ['400', '700'],
 });
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
