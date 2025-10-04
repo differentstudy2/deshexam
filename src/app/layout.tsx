@@ -1,17 +1,16 @@
 
-"use client";
-
+import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { AuthProvider } from "@/hooks/use-auth";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
-import { usePathname } from "next/navigation";
+import { AppLayout } from "@/components/layout/app-layout";
 import { Inter, Lexend } from 'next/font/google';
 
 const inter = Inter({
@@ -25,14 +24,13 @@ const lexend = Lexend({
   weight: ['400', '700'],
 });
 
+export { metadata } from "@/app/metadata";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const showFooter = !pathname.startsWith('/admin') && !pathname.startsWith('/dashboard') && !pathname.startsWith('/sign-in') && !pathname.startsWith('/sign-up');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -45,11 +43,9 @@ export default function RootLayout({
         >
           <AuthProvider>
             <AuthDialogProvider>
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow">{children}</main>
-                {showFooter && <Footer />}
-              </div>
+              <AppLayout>
+                {children}
+              </AppLayout>
               <AuthDialog />
             </AuthDialogProvider>
           </AuthProvider>
