@@ -22,6 +22,12 @@ export async function generateMetadata(
   }
 
   const previousImages = (await parent).openGraph?.images || [];
+  
+  // Ensure createdAt is a string for metadata
+  const publishedTime = article.createdAt && typeof article.createdAt.toDate === 'function' 
+    ? article.createdAt.toDate().toISOString() 
+    : new Date().toISOString();
+
 
   return {
     title: article.title,
@@ -32,7 +38,7 @@ export async function generateMetadata(
       description: article.description,
       images: [`https://picsum.photos/seed/${id}/800/450`, ...previousImages],
       type: 'article',
-      publishedTime: article.createdAt,
+      publishedTime: publishedTime,
       authors: [article.authorName],
     },
   };
@@ -40,11 +46,19 @@ export async function generateMetadata(
 
 
 export default async function LearnArticlePage({ params }: Props) {
-    const article = await getContentById(params.id);
+    const articleData = await getContentById(params.id);
 
-    if (!article || article.testType !== 'Learn') {
+    if (!articleData || articleData.testType !== 'Learn') {
         notFound();
     }
+    
+    // Serialize the article object to make it a "plain object"
+    const article = {
+      ...articleData,
+      // Convert Firestore Timestamp to a string.
+      createdAt: articleData.createdAt?.toDate ? articleData.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString(),
+    };
+
 
     const jsonLd = {
         '@context': 'https://schema.org',
