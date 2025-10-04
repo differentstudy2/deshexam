@@ -30,12 +30,11 @@ function getUrlForTest(testType: string, testId: string) {
   return `/${typeSlug}/${testId}`;
 }
 
-export default function ClassPage() {
+export default function ClassPage({ params }: { params: { slug: string } }) {
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const params = useParams();
-  const slug = params.slug as string;
+  const { slug } = params;
 
   const pageTitle = slug ? slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ') : 'Class';
 

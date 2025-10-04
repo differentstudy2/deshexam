@@ -53,7 +53,7 @@ type Submission = {
 };
 
 
-export default function UserProfilePage() {
+export default function UserProfilePage({ params }: { params: { username: string } }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [createdContent, setCreatedContent] = useState<Content[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -64,8 +64,7 @@ export default function UserProfilePage() {
   const { toast } = useToast();
   const router = useRouter();
   const { user: currentUser } = useAuth();
-  const params = useParams();
-  const username = params.username as string;
+  const { username } = params;
 
   useEffect(() => {
     if (!username) return;

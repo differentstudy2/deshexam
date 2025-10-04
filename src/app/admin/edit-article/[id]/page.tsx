@@ -40,11 +40,10 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function EditArticlePage() {
+export default function EditArticlePage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const router = useRouter();
-  const params = useParams();
-  const contentId = params.id as string;
+  const { id: contentId } = params;
   const [loading, setLoading] = useState(true);
 
   const form = useForm<FormValues>({
