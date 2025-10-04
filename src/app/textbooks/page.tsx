@@ -179,12 +179,12 @@ export default function ManageTextbooksPage() {
                 className="object-cover rounded-t-lg"
                />
             </CardHeader>
-            <CardContent className="flex-grow p-4 flex flex-col overflow-y-auto">
+            <CardContent className="p-4 flex-grow flex flex-col overflow-y-auto">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <h3 className="font-bold text-lg flex items-center gap-2 flex-grow">
-                                <Book /> {book.title.length > 50 ? `${book.title.substring(0, 50)}...` : book.title}
+                            <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden text-ellipsis">
+                                <Book /> <span>{book.title}</span>
                             </h3>
                         </TooltipTrigger>
                         <TooltipContent>
