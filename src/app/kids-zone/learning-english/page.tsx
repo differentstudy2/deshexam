@@ -12,8 +12,8 @@ const englishActivities = [
     description: "Learn the ABCs with sounds and pictures.",
     icon: <Book className="w-10 h-10 text-blue-500" />,
     bgColor: "bg-blue-100",
-    link: "#",
-    comingSoon: true,
+    link: "/kids-zone/learning-english/alphabet",
+    comingSoon: false,
   },
   {
     title: "Word Builder",
