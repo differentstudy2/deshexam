@@ -30,6 +30,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1340,7 +1341,7 @@ export const getUserProfile = async (userId: string): Promise<any> => {
 
     } catch (error) {
         console.error("Error fetching user profile:", error);
-        throw new Error("Failed to fetch user profile.");
+        return null;
     }
 };
 
@@ -2101,6 +2102,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 
