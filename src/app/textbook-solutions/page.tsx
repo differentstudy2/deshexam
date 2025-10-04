@@ -5,6 +5,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
+import { deleteTextbook } from '@/lib/firebase/firestore';
+import type { Textbook } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
 import { Book, Layers, FileText, CheckSquare, Library } from 'lucide-react';
 import Link from 'next/link';
@@ -16,7 +18,7 @@ import { ContentBadge } from '@/components/content-badge';
 import { getSubjects, getClasses, getBoards, getGradesByClass } from '@/lib/firebase/firestore';
 import { TextbookFilters } from '@/components/feature/textbook-filters';
 
-type Textbook = {
+type TextbookStats = {
     id: string;
     title: string;
     description: string;
@@ -283,7 +285,7 @@ export default function TextbookSolutionsListPage() {
                   {book.class && <Badge variant="secondary">{book.class}</Badge>}
                   {book.board && <Badge variant="outline">{book.board}</Badge>}
               </div>
-              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow">{book.title}</h3>
+              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow">{book.title.length > 20 ? `${book.title.substring(0, 20)}...` : book.title}</h3>
               <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardContent className="p-4 pt-0">
