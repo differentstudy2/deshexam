@@ -10,7 +10,6 @@ import Script from "next/script";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
-import { AppLayout } from "@/components/layout/app-layout";
 import { Inter, Lexend } from 'next/font/google';
 
 const inter = Inter({
@@ -43,9 +42,11 @@ export default function RootLayout({
         >
           <AuthProvider>
             <AuthDialogProvider>
-              <AppLayout>
-                {children}
-              </AppLayout>
+              <div className="flex flex-col min-h-screen">
+                <Header />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+              </div>
               <AuthDialog />
             </AuthDialogProvider>
           </AuthProvider>
