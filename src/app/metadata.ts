@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   },
   description: "The ultimate platform for mock tests, quizzes, and AI-powered personalized learning paths for NEET, JEE, UPSC, and more. Boost your exam preparation with DeshExam.",
   keywords: ["mock tests", "online quiz", "exam preparation", "NEET", "JEE", "UPSC", "competitive exams", "AI learning"],
+  verification: {
+    google: 'YOUR_GOOGLE_VERIFICATION_CODE_HERE',
+  },
   openGraph: {
     type: "website",
     url: "https://deshexam.com/",
