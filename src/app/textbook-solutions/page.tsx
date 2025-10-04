@@ -232,7 +232,7 @@ export default function TextbookSolutionsListPage() {
                 Select a textbook to view its solutions, topics, and practice questions.
                 </p>
             </header>
-            <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 {Array.from({length: 5}).map((_, i) => (
                     <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
                 ))}
@@ -270,7 +270,7 @@ export default function TextbookSolutionsListPage() {
         onSchoolChange={setSelectedSchool}
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
             <div className="relative w-full aspect-[3/4] overflow-hidden bg-secondary">
@@ -285,10 +285,12 @@ export default function TextbookSolutionsListPage() {
                 </div>
             </div>
             <CardContent className="p-3 flex-grow flex flex-col">
-              <div className="flex flex-wrap gap-1 mb-2">
-                  {book.subject && <Badge variant="secondary" className="text-xs">{book.subject}</Badge>}
-                  {book.class && <Badge variant="secondary" className="text-xs">{book.class}</Badge>}
+              <div className="flex flex-wrap gap-1 mb-1">
                   {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
+                  {book.subject && <Badge variant="secondary" className="text-xs">{book.subject}</Badge>}
+              </div>
+              <div className="flex flex-wrap gap-1 mb-2">
+                  {book.class && <Badge variant="secondary" className="text-xs">{book.class}</Badge>}
               </div>
                <TooltipProvider>
                   <Tooltip>
