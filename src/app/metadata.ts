@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     title: "DeshExam | Ace Your Competitive Exams",
     description: "The ultimate platform for mock tests, quizzes, and AI-powered personalized learning paths for NEET, JEE, UPSC, and more. Boost your exam preparation with DeshExam.",
     images: [{
-      url: "/image/logo.png",
+      url: "https://deshexam.com/image/logo.png",
     }],
   },
   twitter: {
@@ -25,6 +25,6 @@ export const metadata: Metadata = {
     url: "https://deshexam.com/",
     title: "DeshExam | Ace Your Competitive Exams",
     description: "The ultimate platform for mock tests, quizzes, and AI-powered personalized learning paths for NEET, JEE, UPSC, and more. Boost your exam preparation with DeshExam.",
-    images: ["/image/logo.png"],
+    images: ["https://deshexam.com/image/logo.png"],
   },
 };
