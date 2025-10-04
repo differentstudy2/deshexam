@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -227,8 +226,8 @@ export default function TextbookSolutionsListPage() {
                 Select a textbook to view its solutions, topics, and practice questions.
                 </p>
             </header>
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {Array.from({length: 4}).map((_, i) => (
+            <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {Array.from({length: 5}).map((_, i) => (
                     <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
                 ))}
             </div>
@@ -265,7 +264,7 @@ export default function TextbookSolutionsListPage() {
         onSchoolChange={setSelectedSchool}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
             <div className="relative w-full h-48 overflow-hidden bg-secondary">
@@ -285,7 +284,9 @@ export default function TextbookSolutionsListPage() {
                   {book.class && <Badge variant="secondary">{book.class}</Badge>}
                   {book.board && <Badge variant="outline">{book.board}</Badge>}
               </div>
-              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow">{book.title.length > 45 ? `${book.title.substring(0, 45)}...` : book.title}</h3>
+              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden line-clamp-2">
+                {book.title.length > 45 ? `${book.title.substring(0, 45)}...` : book.title}
+              </h3>
               <TextbookStats textbookId={book.id} />
             </CardContent>
             <CardContent className="p-4 pt-0">
