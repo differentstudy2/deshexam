@@ -55,8 +55,9 @@ export default async function LearnArticlePage({ params }: Props) {
     // Serialize the article object to make it a "plain object"
     const article = {
       ...articleData,
-      // Convert Firestore Timestamp to a string.
+      // Convert Firestore Timestamps to simple strings.
       createdAt: articleData.createdAt?.toDate ? articleData.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString(),
+      updatedAt: articleData.updatedAt?.toDate ? articleData.updatedAt.toDate().toLocaleDateString() : null,
     };
 
 
