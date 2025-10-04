@@ -183,8 +183,8 @@ export default function ManageTextbooksPage() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden text-ellipsis">
-                                <Book /> <span>{book.title}</span>
+                            <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden">
+                                <Book /> <span>{book.title.length > 50 ? `${book.title.substring(0, 50)}...` : book.title}</span>
                             </h3>
                         </TooltipTrigger>
                         <TooltipContent>
