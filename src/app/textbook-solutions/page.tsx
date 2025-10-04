@@ -273,17 +273,17 @@ export default function TextbookSolutionsListPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
-            <div className="relative w-full aspect-[3/4] overflow-hidden bg-secondary">
+            <Link href={`/textbook-solutions/${book.id}`} className="relative w-full aspect-[3/4] overflow-hidden bg-secondary block">
                 <Image
                     src={book.featureImage || `https://picsum.photos/seed/${book.id}/300/400`}
                     alt={book.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                 <div className="absolute top-2 right-2">
+                <div className="absolute top-2 right-2">
                     <ContentBadge type={book.access} />
                 </div>
-            </div>
+            </Link>
             <CardContent className="p-3 flex-grow flex flex-col">
               <div className="flex flex-wrap gap-1 mb-1">
                   {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
@@ -295,9 +295,11 @@ export default function TextbookSolutionsListPage() {
                <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                        <h3 className="font-bold text-sm md:text-base line-clamp-2 h-10 md:h-12">
+                      <Link href={`/textbook-solutions/${book.id}`}>
+                        <h3 className="font-bold text-sm md:text-base line-clamp-2 h-10 md:h-12 hover:text-primary">
                             {book.title}
                         </h3>
+                      </Link>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>{book.title}</p>
