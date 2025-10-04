@@ -1,3 +1,8 @@
+
+// This file is now deprecated in favor of the use-firebase.tsx hook.
+// It is kept for potential legacy imports but should not be used for new development.
+// All firebase instances should be retrieved from the useFirebase() or related hooks.
+
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';

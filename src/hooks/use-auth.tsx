@@ -9,7 +9,6 @@ import {
   ReactNode,
 } from "react";
 import {
-  getAuth,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -19,10 +18,8 @@ import {
   signInWithPopup,
   UserCredential,
 } from "firebase/auth";
-import { app } from "@/lib/firebase/client";
+import { useFirebaseAuth } from "@/hooks/use-firebase";
 import { updateUserProfile } from "@/lib/firebase/firestore";
-
-const auth = getAuth(app);
 
 interface AuthContextType {
   user: User | null;
@@ -60,20 +57,24 @@ const handleNewUser = async (credential: UserCredential) => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const auth = useFirebaseAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const signUp = async (email: string, password: string) => {
+    if (!auth) throw new Error("Auth service is not available");
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await handleNewUser(credential);
     return credential;
   };
 
   const signIn = (email: string, password: string) => {
+    if (!auth) throw new Error("Auth service is not available");
     return signInWithEmailAndPassword(auth, email, password);
   };
 
   const signInWithGoogle = async () => {
+    if (!auth) throw new Error("Auth service is not available");
     const provider = new GoogleAuthProvider();
     const credential = await signInWithPopup(auth, provider);
     await handleNewUser(credential);
@@ -81,17 +82,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logOut = () => {
+    if (!auth) throw new Error("Auth service is not available");
     return signOut(auth);
   };
 
   useEffect(() => {
+    if (!auth) {
+        // Auth might not be initialized yet, so we wait.
+        return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
   return (
     <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, logOut }}>
