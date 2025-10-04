@@ -40,6 +40,12 @@ export default function MockTestsPage() {
   const { user } = useAuth();
 
   useEffect(() => {
+    document.title = "Mock Tests | DeshExam";
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    descriptionMeta?.setAttribute('content', 'Practice with our extensive library of mock tests for NEET, JEE, UPSC and more. Simulate real exam conditions and get detailed performance analysis.');
+  }, []);
+
+  useEffect(() => {
     const fetchInitialTests = async () => {
       try {
         const fetchedTests = (await getAllContent("Mock Test")) as Test[];

@@ -51,6 +51,12 @@ export default function PricingPage() {
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
     const [couponDiscount, setCouponDiscount] = useState(0);
 
+    useEffect(() => {
+        document.title = "Pricing Plans | DeshExam";
+        const descriptionMeta = document.querySelector('meta[name="description"]');
+        descriptionMeta?.setAttribute('content', 'Choose the perfect plan for your exam preparation. Compare DeshExam Pass and Pass Pro to unlock mock tests, previous year papers, and premium features.');
+    }, []);
+
     
     useEffect(() => {
         const newPlans = pricingData.plans[planType];

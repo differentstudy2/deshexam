@@ -40,6 +40,12 @@ export default function QuizzesPage() {
   const { user } = useAuth();
 
   useEffect(() => {
+    document.title = "Quizzes | DeshExam";
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    descriptionMeta?.setAttribute('content', 'Test your knowledge with fun and challenging quizzes on a variety of subjects. Perfect for quick practice sessions and learning on the go.');
+  }, []);
+
+  useEffect(() => {
     const fetchInitialQuizzes = async () => {
       try {
         const fetchedQuizzes = (await getAllContent("Quiz")) as Quiz[];

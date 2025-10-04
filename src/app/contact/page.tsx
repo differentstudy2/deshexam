@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Mail, Phone, MapPin } from 'lucide-react';
 import { addContactMessage } from '@/lib/firebase/firestore';
+import { useEffect } from 'react';
 
 
 const contactSchema = z.object({
@@ -34,6 +35,14 @@ export default function ContactPage() {
             message: '',
         },
     });
+
+    useEffect(() => {
+        document.title = "Contact Us | DeshExam";
+        const descriptionMeta = document.querySelector('meta[name="description"]');
+        descriptionMeta?.setAttribute('content', "Get in touch with the DeshExam team. We'd love to hear from you for any questions, feedback, or support inquiries.");
+        const keywordsMeta = document.querySelector('meta[name="keywords"]');
+        keywordsMeta?.setAttribute('content', 'contact deshexam, deshexam support, contact us, customer service');
+    }, []);
 
     const onSubmit: SubmitHandler<ContactFormValues> = async (data) => {
         try {

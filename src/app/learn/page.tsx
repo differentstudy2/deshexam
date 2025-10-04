@@ -6,6 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Clock, User, Calendar } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { getAllContent } from "@/lib/firebase/firestore";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Learn',
+  description: 'Expand your knowledge with our curated collection of in-depth articles and tutorials on a wide range of subjects. Perfect for building a strong foundation.',
+  keywords: ['learn', 'articles', 'tutorials', 'study guides', 'educational content'],
+};
 
 function getUrlForLearnArticle(articleId: string) {
   return `/learn/${articleId}`;
@@ -71,5 +78,3 @@ export default async function LearnPage() {
     </div>
   );
 }
-
-    

@@ -15,6 +15,13 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Features',
+  description: 'Explore the powerful features of DeshExam, including realistic mock tests, AI-powered learning paths, solved textbooks, quizzes, leaderboards, and more, all designed to help you succeed.',
+  keywords: ['deshexam features', 'mock tests', 'ai learning path', 'solved textbooks', 'online quizzes', 'leaderboards'],
+};
 
 const currentFeatures = [
   {

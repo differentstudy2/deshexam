@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BarChart, Users, TrendingUp, Target, Lightbulb, Heart } from "lucide-react";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn about the passionate team of educators and technologists behind DeshExam, dedicated to revolutionizing exam preparation in India with high-quality, accessible, and affordable education.',
+  keywords: ['about deshexam', 'education team', 'edtech mission', 'exam preparation india'],
+};
 
 const teamMembers = [
   {

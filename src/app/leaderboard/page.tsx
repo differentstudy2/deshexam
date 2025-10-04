@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import {
   Table,
@@ -12,6 +13,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Crown, Trophy } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { leaderboardData } from "@/lib/mock-data";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Leaderboard',
+  description: 'See how you stack up against other aspirants on the DeshExam leaderboard. Compete, climb the ranks, and stay motivated on your path to success.',
+  keywords: ['leaderboard', 'exam ranks', 'mock test leaderboard', 'top students', 'competitive ranking'],
+};
 
 export default function LeaderboardPage() {
   const topThree = leaderboardData.slice(0, 3);
