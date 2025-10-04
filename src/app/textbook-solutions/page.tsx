@@ -232,9 +232,33 @@ export default function TextbookSolutionsListPage() {
                 Select a textbook to view its solutions, topics, and practice questions.
                 </p>
             </header>
-            <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-                {Array.from({length: 5}).map((_, i) => (
-                    <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
+            <div className="mb-8 p-4 bg-card border rounded-lg">
+                <div className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+                {Array.from({length: 10}).map((_, i) => (
+                    <Card key={i} className="overflow-hidden flex flex-col">
+                        <Skeleton className="w-full aspect-[3/4]" />
+                        <CardContent className="p-3 flex-grow flex flex-col space-y-2">
+                            <Skeleton className="h-4 w-1/2" />
+                            <Skeleton className="h-4 w-1/3" />
+                            <Skeleton className="h-6 w-full" />
+                            <div className="flex-grow"></div>
+                            <Skeleton className="h-12 w-full" />
+                        </CardContent>
+                        <CardFooter className="p-3 pt-0">
+                             <Skeleton className="h-10 w-full" />
+                        </CardFooter>
+                    </Card>
                 ))}
             </div>
         </div>
