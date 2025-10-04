@@ -16,6 +16,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ContentBadge } from '@/components/content-badge';
 import { getSubjects, getClasses, getBoards, getGradesByClass } from '@/lib/firebase/firestore';
 import { TextbookFilters } from '@/components/feature/textbook-filters';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 type TextbookStats = {
     id: string;
@@ -66,7 +72,7 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
                 <div className="flex flex-col items-center gap-1">
                     <Layers className="h-4 w-4" />
-                    <span>... Chapters</span>
+                    <span>... Ch.</span>
                 </div>
                 <div className="flex flex-col items-center gap-1">
                     <FileText className="h-4 w-4" />
@@ -84,7 +90,7 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
         <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
             <div className="flex flex-col items-center gap-1">
                 <Layers className="h-4 w-4" />
-                <span>{stats.chapterCount} Chapters</span>
+                <span>{stats.chapterCount} Ch.</span>
             </div>
             <div className="flex flex-col items-center gap-1">
                 <FileText className="h-4 w-4" />
@@ -264,41 +270,53 @@ export default function TextbookSolutionsListPage() {
         onSchoolChange={setSelectedSchool}
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
         {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
-            <div className="relative w-full h-48 overflow-hidden bg-secondary">
+            <div className="relative w-full aspect-[3/4] overflow-hidden bg-secondary">
                 <Image
-                    src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
+                    src={book.featureImage || `https://picsum.photos/seed/${book.id}/300/400`}
                     alt={book.title}
                     fill
-                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                  <div className="absolute top-2 right-2">
                     <ContentBadge type={book.access} />
                 </div>
             </div>
-            <CardContent className="p-4 flex-grow flex flex-col">
-              <div className="flex flex-wrap gap-2 mb-2">
-                  {book.subject && <Badge variant="secondary">{book.subject}</Badge>}
-                  {book.class && <Badge variant="secondary">{book.class}</Badge>}
-                  {book.board && <Badge variant="outline">{book.board}</Badge>}
+            <CardContent className="p-3 flex-grow flex flex-col">
+              <div className="flex flex-wrap gap-1 mb-2">
+                  {book.subject && <Badge variant="secondary" className="text-xs">{book.subject}</Badge>}
+                  {book.class && <Badge variant="secondary" className="text-xs">{book.class}</Badge>}
+                  {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
               </div>
-              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow h-14 overflow-hidden line-clamp-2">
-                {book.title.length > 45 ? `${book.title.substring(0, 45)}...` : book.title}
-              </h3>
+               <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                        <h3 className="font-bold text-sm md:text-base line-clamp-2 h-10 md:h-12">
+                            {book.title}
+                        </h3>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{book.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              <div className="flex-grow"></div>
               <TextbookStats textbookId={book.id} />
             </CardContent>
-            <CardContent className="p-4 pt-0">
+            <CardFooter className="p-3 pt-0">
                 <Button asChild className="w-full">
                     <Link href={`/textbook-solutions/${book.id}`}>View Solutions</Link>
                 </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
         ))}
          {filteredTextbooks.length === 0 && (
             <div className="col-span-full text-center text-muted-foreground py-10">
-                <p>No textbooks found matching your filters.</p>
+                <Library className="mx-auto h-12 w-12 mb-4 text-gray-300" />
+                <p className="font-semibold">No textbooks found</p>
+                <p className="text-sm">Try adjusting your filters to find what you're looking for.</p>
             </div>
         )}
       </div>
