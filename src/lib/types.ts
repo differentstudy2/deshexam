@@ -26,6 +26,7 @@ export type Chapter = {
     content?: string;
     topics: Topic[];
     resources?: Resource[];
+    textbookQuestions?: Question[];
     access: 'free' | 'pass' | 'pro';
 };
 

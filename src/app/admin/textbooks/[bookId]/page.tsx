@@ -25,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic, FileQuestion } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -335,6 +335,11 @@ export default function ManageChaptersPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
+                                     <Button variant="secondary" size="sm" asChild>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/questions`}>
+                                            <FileQuestion className="h-3 w-3 mr-1"/> Manage Questions
+                                        </Link>
+                                    </Button>
                                     <Button variant="secondary" size="sm" asChild>
                                         <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics & Practice Sets</Link>
                                     </Button>
