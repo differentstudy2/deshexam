@@ -1,14 +1,10 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getQuestionById, addComment, getComments, handleQuestionVote } from '@/lib/firebase/firestore';
+import { getComments, addComment, handleQuestionVote } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -49,7 +45,7 @@ type Question = {
   dislikes: number;
   likedBy: string[];
   dislikedBy: string[];
-  createdAt: Date;
+  createdAt: string; // Serialized Date
   authorName: string;
   subject?: string;
 };
@@ -63,50 +59,38 @@ type Comment = {
     createdAt: Date;
 }
 
-export default function QuestionClientPage({ questionId }: { questionId: string }) {
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function QuestionClientPage({ initialQuestion }: { initialQuestion: Question }) {
+  const [question, setQuestion] = useState<Question>(initialQuestion);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(true);
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
+  const questionId = initialQuestion.id;
 
   useEffect(() => {
-    if (!questionId) return;
-
-    const fetchQuestionAndComments = async () => {
+    const fetchComments = async () => {
+      if (!questionId) return;
       try {
-        setLoading(true);
-        const [questionData, commentsData] = await Promise.all([
-          getQuestionById(questionId),
-          getComments('questions', questionId),
-        ]);
-        if (!questionData) {
-            toast({
-              variant: "destructive",
-              title: 'Question not found',
-            });
-            router.push('/dashboard/all-questions');
-            return;
-        }
-        setQuestion(questionData as Question);
+        setLoadingComments(true);
+        const commentsData = await getComments('questions', questionId);
         setComments(commentsData as Comment[]);
       } catch (error) {
         toast({
           variant: "destructive",
-          title: 'Error fetching data',
+          title: 'Error fetching comments',
           description: (error as Error).message,
         });
       } finally {
-        setLoading(false);
+        setLoadingComments(false);
       }
     };
 
-    fetchQuestionAndComments();
-  }, [questionId, toast, router]);
+    fetchComments();
+  }, [questionId, toast]);
 
   const handleVote = async (type: 'like' | 'dislike') => {
     if (!user || !question) {
@@ -117,7 +101,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
     setIsVoting(true);
     
-    // Optimistic UI update
     const originalQuestion = { ...question };
     const hasLiked = question.likedBy?.includes(user.uid);
     const hasDisliked = question.dislikedBy?.includes(user.uid);
@@ -126,20 +109,20 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     let newDislikedBy = [...(question.dislikedBy || [])];
 
     if (type === 'like') {
-        if (hasLiked) { // User is un-liking
+        if (hasLiked) { 
             newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-        } else { // User is liking
+        } else { 
             newLikedBy.push(user.uid);
-            if (hasDisliked) { // If they previously disliked, remove dislike
+            if (hasDisliked) { 
                 newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
             }
         }
     } else { // dislike
-        if (hasDisliked) { // User is un-disliking
+        if (hasDisliked) { 
             newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-        } else { // User is disliking
+        } else { 
             newDislikedBy.push(user.uid);
-            if (hasLiked) { // If they previously liked, remove like
+            if (hasLiked) { 
                 newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
             }
         }
@@ -157,7 +140,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     try {
         await handleQuestionVote(questionId, type);
     } catch (error) {
-        // Revert UI on error
         setQuestion(originalQuestion);
         toast({
           variant: "destructive",
@@ -181,7 +163,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     try {
         await addComment('questions', questionId, { text: newComment });
         setNewComment('');
-        // Refetch comments to show the new one
         const updatedComments = await getComments('questions', questionId);
         setComments(updatedComments as Comment[]);
         toast({ title: "Comment posted!" });
@@ -194,30 +175,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     } finally {
         setIsSubmittingComment(false);
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="ml-4 text-lg">Loading Question...</p>
-      </div>
-    );
-  }
-
-  if (!question) {
-    return (
-      <div className="text-center min-h-[calc(100vh-200px)] flex flex-col justify-center">
-        <h2 className="text-2xl font-bold">Question not found</h2>
-        <p className="text-muted-foreground">The question you are looking for does not exist.</p>
-        <Button asChild className="mt-4 mx-auto" variant="outline" onClick={() => router.back()}>
-            <Link href="#">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Go Back
-            </Link>
-        </Button>
-      </div>
-    );
   }
 
   const userHasLiked = user && question.likedBy?.includes(user.uid);
@@ -327,7 +284,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </form>
                                 <Separator className="my-6" />
                                 <div className="space-y-6">
-                                    {comments.length > 0 ? comments.map(comment => (
+                                    {loadingComments ? (
+                                        <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
+                                    ) : comments.length > 0 ? comments.map(comment => (
                                         <div key={comment.id} className="flex items-start gap-4">
                                             <Avatar>
                                                <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
@@ -362,7 +321,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                                    <span>Asked on: <span className="font-semibold">{question.createdAt.toLocaleDateString()}</span></span>
+                                    <span>Asked on: {new Date(question.createdAt).toLocaleDateString()}</span>
                                 </div>
                             </CardContent>
                         </Card>

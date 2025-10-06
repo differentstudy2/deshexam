@@ -730,8 +730,9 @@ export default function TextbookSolutionsPage() {
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <Loader2 className="w-8 h-8 animate-spin"/>
+        <div className="flex items-center justify-center h-screen">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <p className="ml-4 text-lg">Loading Textbook...</p>
         </div>
     );
   }
