@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/privacy', 
     '/about',
     '/kids-zone',
+    '/kids-zone/fun-quizzes',
     '/kids-zone/learning-games',
     '/kids-zone/learning-games/math-puzzles',
     '/kids-zone/learning-games/math-puzzles/addition-adventure',

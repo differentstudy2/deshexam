@@ -18,7 +18,7 @@ const kidsFeatures = [
     icon: <Puzzle className="w-12 h-12 text-primary" />,
     title: "Fun Quizzes",
     description: "Test your knowledge with exciting quizzes on animals, space, and more!",
-    link: "#",
+    link: "/kids-zone/fun-quizzes",
   },
   {
     icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
@@ -41,36 +41,43 @@ const kidsFeatures = [
 ];
 
 export default function KidsZonePage() {
-    const jsonLd = {
+    const organizationJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": "Welcome to the Kids Zone! - DeshExam",
-    "url": "https://deshexam.com/kids-zone",
-    "description": "A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.",
-    "image": "https://picsum.photos/seed/kids-fun/800/400",
-    "author": {
-      "@type": "Organization",
-      "name": "DeshExam",
-      "url": "https://deshexam.com"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "DeshExam",
-      "url": "https://deshexam.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://deshexam.com/logo.png"
-      }
-    },
-    "datePublished": new Date().toISOString(),
-    "dateModified": new Date().toISOString()
+    "@type": "Organization",
+    "name": "DeshExam",
+    "url": "https://deshexam.com",
+    "logo": "https://deshexam.com/logo.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91-123-456-7890",
+      "contactType": "Customer Service"
+    }
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "DeshExam",
+    "url": "https://deshexam.com/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://deshexam.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
   };
 
   return (
     <div className="bg-yellow-50 dark:bg-yellow-900/20">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
       <div className="container mx-auto px-4 py-16">
         <header className="text-center mb-12">
