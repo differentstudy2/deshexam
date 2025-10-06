@@ -17,7 +17,7 @@ const puzzles = [
     description: "Take away numbers to find the answer deep in the sea.",
     icon: <Minus className="w-10 h-10 text-red-500" />,
     bgColor: "bg-red-100",
-    link: "#",
+    link: "/kids-zone/learning-games/math-puzzles/subtraction-submarine",
   },
   {
     title: "Shape Sorter",

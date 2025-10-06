@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/kids-zone/learning-games',
     '/kids-zone/learning-games/math-puzzles',
     '/kids-zone/learning-games/math-puzzles/addition-adventure',
+    '/kids-zone/learning-games/math-puzzles/subtraction-submarine',
     '/kids-zone/learning-games/number-recognition',
     '/kids-zone/learning-games/number-recognition/learn-numbers',
     '/kids-zone/learning-games/number-recognition/learn-numbers/0-10',
