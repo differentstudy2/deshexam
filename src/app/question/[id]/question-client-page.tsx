@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -221,7 +222,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   return (
     <div className="container py-12">
        <header className="mb-8">
-        <h1 className="font-headline text-4xl font-bold tracking-tighter">Question Details</h1>
+        <h1 className="font-headline text-4xl font-bold tracking-tighter">{question.text}</h1>
         <p className="text-muted-foreground mt-2 max-w-3xl">Review the question, its answer, and community feedback.</p>
       </header>
 
