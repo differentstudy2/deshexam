@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical } from 'lucide-react';
+import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -20,9 +20,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 type Option = {
   text: string;
+  explanation?: string;
 };
 
 type MatchingItem = {
@@ -42,12 +44,14 @@ type Question = {
   options?: Option[];
   matchingOptions?: MatchingOptions;
   correctAnswer: any;
+  explanation?: string;
   likes: number;
   dislikes: number;
   likedBy: string[];
   dislikedBy: string[];
   createdAt: Date;
   authorName: string;
+  subject?: string;
 };
 
 type Comment = {
@@ -220,169 +224,180 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const userHasDisliked = user && question.dislikedBy?.includes(user.uid);
 
   return (
-    <div className="container py-12">
-       <header className="mb-8">
-        <h1 className="font-headline text-4xl font-bold tracking-tighter">{question.text}</h1>
-        <p className="text-muted-foreground mt-2 max-w-3xl">Review the question, its answer, and community feedback.</p>
-      </header>
+    <div className="bg-secondary/30">
+        <div className="container py-12">
+            <div className="max-w-6xl mx-auto">
+                <header className="mb-8">
+                    {question.subject && <Badge className="mb-2">{question.subject}</Badge>}
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{question.text}</h1>
+                </header>
 
-        <Card>
-            <CardHeader>
-              <CardTitle>Question</CardTitle>
-              <CardDescription className="text-lg text-foreground pt-2">{question.text}</CardDescription>
-               <div className="text-sm text-muted-foreground pt-2">
-                Asked by {question.authorName} on {question.createdAt.toLocaleDateString()}
-               </div>
-            </CardHeader>
-            <CardContent>
-              {question.type === 'Multiple Choice' && question.options && (
-                  <RadioGroup value={question.correctAnswer} disabled className="space-y-2">
-                  {question.options.map((option, optIndex) => (
-                      <div key={optIndex} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option.text} id={`q-opt${optIndex}`} />
-                      <Label htmlFor={`q-opt${optIndex}`} className="text-base">{option.text}</Label>
-                      </div>
-                  ))}
-                  </RadioGroup>
-              )}
-              {question.type === 'True/False' && (
-                  <RadioGroup value={question.correctAnswer} disabled className="flex space-x-4">
-                  <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="True" id={`q-true`} />
-                      <Label htmlFor={`q-true`}>True</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="False" id={`q-false`} />
-                      <Label htmlFor={`q-false`}>False</Label>
-                  </div>
-                  </RadioGroup>
-              )}
-              {question.type === 'Short Answer' && (
-                  <div>
-                      <Label className="text-base font-semibold">Correct Answer:</Label>
-                      <p className="text-lg p-2 bg-secondary rounded-md mt-1">{question.correctAnswer}</p>
-                  </div>
-              )}
-               {question.type === 'Matching' && question.matchingOptions && (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-8">
-                            <div>
-                                <h4 className="font-bold text-center mb-2">Column A</h4>
-                                <div className="space-y-2">
-                                {question.matchingOptions.columnA.map((item, index) => (
-                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">
-                                      {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md object-cover" />}
-                                      {item.text}
-                                    </div>
-                                ))}
-                                </div>
-                            </div>
-                             <div>
-                                <h4 className="font-bold text-center mb-2">Column B</h4>
-                                <div className="space-y-2">
-                                {question.matchingOptions.columnB.map((item, index) => (
-                                    <div key={index} className="p-3 border rounded-md bg-secondary text-center">
-                                      {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md object-cover" />}
-                                      {item.text}
-                                    </div>
-                                ))}
-                                </div>
-                            </div>
-                        </div>
-                         <div>
-                            <h4 className="font-bold mb-2">Correct Answer</h4>
-                            <div className="space-y-2">
-                                {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair, index) => (
-                                    <div key={index} className="flex items-center justify-center gap-2 p-2 border rounded-md bg-green-50 dark:bg-green-900/20">
-                                        <div className="flex-1 text-center">
-                                          {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={80} height={80} className="mx-auto mb-2 rounded-md object-cover" />}
-                                          <span className="font-medium">{pair.a}</span>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    {/* Main Content */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <Card>
+                            <CardContent className="pt-6">
+                            {question.type === 'Multiple Choice' && question.options && (
+                                <div className="space-y-3">
+                                {question.options.map((option, optIndex) => {
+                                    const isCorrect = question.correctAnswer === option.text;
+                                    return (
+                                        <div key={optIndex} className={cn(
+                                            "p-4 rounded-lg border-2 flex items-start gap-3 transition-colors",
+                                            isCorrect 
+                                                ? "bg-green-100 dark:bg-green-900/30 border-green-500"
+                                                : "bg-secondary/30"
+                                        )}>
+                                            {isCorrect 
+                                                ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
+                                                : <div className="w-5 h-5 mt-0.5 shrink-0" />
+                                            }
+                                            <div className="flex-1">
+                                                <span className="font-medium">{option.text}</span>
+                                                {option.explanation && <p className="text-xs text-muted-foreground mt-1">{option.explanation}</p>}
+                                            </div>
                                         </div>
-                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                        <div className="flex-1 text-center">
-                                          {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={80} height={80} className="mx-auto mb-2 rounded-md object-cover" />}
-                                          <span className="font-medium">{pair.b}</span>
-                                        </div>
+                                    )
+                                })}
+                                </div>
+                            )}
+                             {question.type === 'True/False' && (
+                                <div className="space-y-3">
+                                {['True', 'False'].map((tf) => {
+                                    const isCorrect = question.correctAnswer === tf;
+                                    return (
+                                    <div key={tf} className={cn("p-4 rounded-lg border-2 flex items-center gap-3", isCorrect ? "bg-green-100 dark:bg-green-900/30 border-green-500" : "bg-secondary/30")}>
+                                        {isCorrect && <CheckCircle className="w-5 h-5 text-green-600" />}
+                                        <span className="font-medium">{tf}</span>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                    )
+                                })}
+                                </div>
+                            )}
+                            {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                                <div className="p-4 rounded-lg border-2 bg-green-100 dark:bg-green-900/30 border-green-500">
+                                    <Label className="text-sm font-semibold text-green-800 dark:text-green-300">Correct Answer</Label>
+                                    <p className="text-lg font-medium mt-1">{question.correctAnswer}</p>
+                                </div>
+                            )}
+                            {question.type === 'Matching' && (
+                                 <div className="space-y-4">
+                                    <h4 className="font-bold">Correct Matches</h4>
+                                    {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair, index) => (
+                                        <div key={index} className="flex items-center justify-between gap-2 p-3 border rounded-md bg-green-50 dark:bg-green-900/20">
+                                            <div className="flex flex-col items-center text-center">
+                                                {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
+                                                <span className="font-medium">{pair.a}</span>
+                                            </div>
+                                            <GripVertical className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                            <div className="flex flex-col items-center text-center">
+                                                {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={50} height={50} className="rounded-md object-cover mb-1" />}
+                                                <span className="font-medium">{pair.b}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                 </div>
+                            )}
+                            </CardContent>
+                        </Card>
+                        
+                        {question.explanation && (
+                            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
+                                        <Info /> Explanation
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p>{question.explanation}</p>
+                                </CardContent>
+                            </Card>
+                        )}
+                        
+                        <Card>
+                            <CardHeader><CardTitle className="flex items-center gap-2"><MessageSquare /> Comments ({comments.length})</CardTitle></CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleCommentSubmit} className="space-y-4">
+                                    <Textarea placeholder={user ? "Share your thoughts or ask a question..." : "Please log in to comment."} value={newComment} onChange={(e) => setNewComment(e.target.value)} disabled={!user || isSubmittingComment} />
+                                    <div className="flex justify-end">
+                                        <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
+                                            {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Comment"}
+                                        </Button>
+                                    </div>
+                                </form>
+                                <Separator className="my-6" />
+                                <div className="space-y-6">
+                                    {comments.length > 0 ? comments.map(comment => (
+                                        <div key={comment.id} className="flex items-start gap-4">
+                                            <Avatar>
+                                               <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
+                                                <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
+                                                    <span className="text-muted-foreground">{formatDistanceToNow(comment.createdAt, { addSuffix: true })}</span>
+                                                </div>
+                                                <p className="text-foreground mt-1">{comment.text}</p>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <p className="text-center text-muted-foreground">No comments yet. Be the first to start the discussion!</p>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
-                )}
-            </CardContent>
-            <CardFooter className="flex-col items-start gap-4">
-              <div className="flex items-center gap-4">
-                <Button 
-                    variant={userHasLiked ? "default" : "outline"}
-                    size="sm" 
-                    onClick={() => handleVote('like')} 
-                    disabled={isVoting}
-                    className={cn(userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
-                >
-                    <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
-                </Button>
-                <Button 
-                    variant={userHasDisliked ? "destructive" : "outline"} 
-                    size="sm" 
-                    onClick={() => handleVote('dislike')} 
-                    disabled={isVoting}
-                >
-                    <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
-                </Button>
-              </div>
-            </CardFooter>
-        </Card>
-        
-        <Card className="mt-8">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare /> Comments ({comments.length})
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleCommentSubmit} className="space-y-4">
-                    <Textarea 
-                        placeholder={user ? "Write a comment..." : "Please log in to write a comment."}
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        disabled={!user || isSubmittingComment}
-                    />
-                    <div className="flex justify-end">
-                        <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
-                            {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Comment"}
+
+                    {/* Sidebar */}
+                    <aside className="space-y-6">
+                        <Card>
+                             <CardHeader>
+                                <CardTitle>Question Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                    <User className="w-4 h-4 text-muted-foreground" />
+                                    <span>Asked by: <span className="font-semibold">{question.authorName}</span></span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                                    <span>Asked on: <span className="font-semibold">{question.createdAt.toLocaleDateString()}</span></span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                             <CardHeader>
+                                <CardTitle>Community Feedback</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex items-center gap-2">
+                                <Button 
+                                    variant={userHasLiked ? "default" : "outline"}
+                                    size="sm" 
+                                    onClick={() => handleVote('like')} 
+                                    disabled={isVoting}
+                                    className={cn("flex-1", userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
+                                >
+                                    <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
+                                </Button>
+                                <Button 
+                                    variant={userHasDisliked ? "destructive" : "outline"} 
+                                    size="sm" 
+                                    onClick={() => handleVote('dislike')} 
+                                    disabled={isVoting}
+                                    className="flex-1"
+                                >
+                                    <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        <Button variant="outline" onClick={() => router.back()} className="w-full">
+                            <ArrowLeft className="mr-2 h-4 w-4"/>
+                            Go Back
                         </Button>
-                    </div>
-                </form>
-                <Separator className="my-6" />
-                <div className="space-y-6">
-                    {comments.length > 0 ? comments.map(comment => (
-                        <div key={comment.id} className="flex items-start gap-4">
-                            <Avatar>
-                               <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
-                                <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
-                                    <span className="text-muted-foreground">
-                                        {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
-                                    </span>
-                                </div>
-                                <p className="text-foreground mt-1">{comment.text}</p>
-                            </div>
-                        </div>
-                    )) : (
-                        <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
-                    )}
+                    </aside>
                 </div>
-            </CardContent>
-        </Card>
-
-        <div className="mt-8 flex justify-start">
-             <Button variant="outline" onClick={() => router.back()}>
-                <ArrowLeft className="mr-2 h-4 w-4"/>
-                Go Back
-            </Button>
+            </div>
         </div>
     </div>
   );
