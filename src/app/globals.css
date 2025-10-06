@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -80,6 +81,84 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
+  }
+
+  /* Custom Prose styles for Markdown */
+  .prose {
+    @apply text-foreground text-base leading-relaxed;
+  }
+
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply font-headline font-bold tracking-tight mb-4 mt-8 first:mt-0;
+  }
+
+  .prose h1 { @apply text-4xl; }
+  .prose h2 { @apply text-3xl; }
+  .prose h3 { @apply text-2xl; }
+  .prose h4 { @apply text-xl; }
+
+  .prose p {
+    @apply mb-4;
+  }
+
+  .prose a {
+    @apply text-primary underline hover:no-underline;
+  }
+
+  .prose strong {
+    @apply font-semibold;
+  }
+
+  .prose ul, .prose ol {
+    @apply pl-6 mb-4 space-y-2;
+  }
+  
+  .prose ul {
+      @apply list-disc;
+  }
+
+  .prose ol {
+      @apply list-decimal;
+  }
+
+  .prose li::marker {
+    @apply text-muted-foreground;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary pl-4 italic text-muted-foreground my-6;
+  }
+
+  .prose hr {
+    @apply my-8;
+  }
+
+  .prose table {
+    @apply w-full my-6 border-collapse border border-border;
+  }
+
+  .prose th {
+    @apply bg-secondary px-4 py-2 border border-border font-semibold text-left;
+  }
+  
+  .prose td {
+    @apply px-4 py-2 border border-border;
+  }
+
+  .prose tr:nth-child(even) {
+    @apply bg-secondary/50;
+  }
+
+  .prose pre {
+    @apply bg-secondary text-secondary-foreground rounded-md p-4 my-6 overflow-x-auto;
+  }
+
+  .prose code {
+    @apply bg-muted text-muted-foreground px-1.5 py-0.5 rounded-sm font-mono text-sm;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0 rounded-none;
   }
 }
 
