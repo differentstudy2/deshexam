@@ -12,8 +12,8 @@ const quizCategories = [
     description: "How much do you know about the animal kingdom?",
     icon: <PawPrint className="w-10 h-10 text-orange-500" />,
     bgColor: "bg-orange-100",
-    link: "#",
-    comingSoon: true,
+    link: "/kids-zone/fun-quizzes/amazing-animals",
+    comingSoon: false,
   },
   {
     title: "Space Adventure",
