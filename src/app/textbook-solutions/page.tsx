@@ -1,11 +1,12 @@
 
-
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
-import { collection, getDocs } from 'firebase/firestore';
+import { deleteTextbook } from '@/lib/firebase/firestore';
+import type { Textbook } from '@/lib/types';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { Book, Layers, FileText, CheckSquare, Library } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
@@ -15,8 +16,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ContentBadge } from '@/components/content-badge';
 import { getSubjects, getClasses, getBoards, getGradesByClass } from '@/lib/firebase/firestore';
 import { TextbookFilters } from '@/components/feature/textbook-filters';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
-type Textbook = {
+type TextbookStats = {
     id: string;
     title: string;
     description: string;
@@ -65,7 +72,7 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
                 <div className="flex flex-col items-center gap-1">
                     <Layers className="h-4 w-4" />
-                    <span>... Chapters</span>
+                    <span>... Ch.</span>
                 </div>
                 <div className="flex flex-col items-center gap-1">
                     <FileText className="h-4 w-4" />
@@ -83,7 +90,7 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
         <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
             <div className="flex flex-col items-center gap-1">
                 <Layers className="h-4 w-4" />
-                <span>{stats.chapterCount} Chapters</span>
+                <span>{stats.chapterCount} Ch.</span>
             </div>
             <div className="flex flex-col items-center gap-1">
                 <FileText className="h-4 w-4" />
@@ -225,9 +232,33 @@ export default function TextbookSolutionsListPage() {
                 Select a textbook to view its solutions, topics, and practice questions.
                 </p>
             </header>
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {Array.from({length: 4}).map((_, i) => (
-                    <Card key={i}><CardContent className="p-4"><Skeleton className="h-64 w-full" /></CardContent></Card>
+            <div className="mb-8 p-4 bg-card border rounded-lg">
+                <div className="space-y-4">
+                    <Skeleton className="h-10 w-full" />
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+                {Array.from({length: 10}).map((_, i) => (
+                    <Card key={i} className="overflow-hidden flex flex-col">
+                        <Skeleton className="w-full aspect-[3/4]" />
+                        <CardContent className="p-3 flex-grow flex flex-col space-y-2">
+                            <Skeleton className="h-4 w-1/2" />
+                            <Skeleton className="h-4 w-1/3" />
+                            <Skeleton className="h-6 w-full" />
+                            <div className="flex-grow"></div>
+                            <Skeleton className="h-12 w-full" />
+                        </CardContent>
+                        <CardFooter className="p-3 pt-0">
+                             <Skeleton className="h-10 w-full" />
+                        </CardFooter>
+                    </Card>
                 ))}
             </div>
         </div>
@@ -263,39 +294,57 @@ export default function TextbookSolutionsListPage() {
         onSchoolChange={setSelectedSchool}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {filteredTextbooks.map((book) => (
           <Card key={book.id} className="overflow-hidden flex flex-col group">
-            <div className="relative w-full h-48 overflow-hidden bg-secondary">
+            <Link href={`/textbook-solutions/${book.id}`} className="relative w-full aspect-[3/4] overflow-hidden bg-secondary block">
                 <Image
-                    src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/300`}
+                    src={book.featureImage || `https://picsum.photos/seed/${book.id}/300/400`}
                     alt={book.title}
                     fill
-                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                 <div className="absolute top-2 right-2">
+                <div className="absolute top-2 right-2">
                     <ContentBadge type={book.access} />
                 </div>
-            </div>
-            <CardContent className="p-4 flex-grow flex flex-col">
-              <div className="flex flex-wrap gap-2 mb-2">
-                  {book.subject && <Badge variant="secondary">{book.subject}</Badge>}
-                  {book.class && <Badge variant="secondary">{book.class}</Badge>}
-                  {book.board && <Badge variant="outline">{book.board}</Badge>}
+            </Link>
+            <CardContent className="p-3 flex-grow flex flex-col">
+              <div className="flex flex-wrap gap-1 mb-1">
+                  {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
+                  {book.subject && <Badge variant="secondary" className="text-xs">{book.subject}</Badge>}
               </div>
-              <h3 className="font-bold text-lg flex items-center gap-2 flex-grow">{book.title}</h3>
+              <div className="flex flex-wrap gap-1 mb-2">
+                  {book.class && <Badge variant="secondary" className="text-xs">{book.class}</Badge>}
+              </div>
+               <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href={`/textbook-solutions/${book.id}`}>
+                        <h3 className="font-bold text-sm md:text-base line-clamp-2 h-10 md:h-12 hover:text-primary">
+                            {book.title}
+                        </h3>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{book.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              <div className="flex-grow"></div>
               <TextbookStats textbookId={book.id} />
             </CardContent>
-            <CardContent className="p-4 pt-0">
+            <CardFooter className="p-3 pt-0">
                 <Button asChild className="w-full">
                     <Link href={`/textbook-solutions/${book.id}`}>View Solutions</Link>
                 </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
         ))}
          {filteredTextbooks.length === 0 && (
             <div className="col-span-full text-center text-muted-foreground py-10">
-                <p>No textbooks found matching your filters.</p>
+                <Library className="mx-auto h-12 w-12 mb-4 text-gray-300" />
+                <p className="font-semibold">No textbooks found</p>
+                <p className="text-sm">Try adjusting your filters to find what you're looking for.</p>
             </div>
         )}
       </div>

@@ -25,6 +25,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/hooks/use-auth';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'All Questions',
+  description: 'Browse the entire question bank. View questions, see answers, and engage with the community.',
+  keywords: ['question bank', 'all questions', 'exam questions', 'practice problems'],
+};
+
 
 type Question = {
     id: string;
@@ -48,7 +56,7 @@ export default function AllQuestionsPage() {
   const fetchQuestions = async (page: number, startAfterDoc: DocumentSnapshot | null) => {
       try {
         setLoading(true);
-        const { questions: fetchedQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(ITEMS_PER_PAGE, startAfterDoc);
+        const { questions: fetchedQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(itemsPerPage, startAfterDoc);
         setQuestions(fetchedQuestions as Question[]);
         setLastVisible(newLastVisible);
         setHasMore(newHasMore);

@@ -43,26 +43,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/mock-test/:id*',
-        destination: '/content/:id*',
-      },
-      {
-        source: '/quiz/:id*',
-        destination: '/content/:id*',
-      },
-      {
-        source: '/practice-questions/:id*',
-        destination: '/content/:id*',
-      },
-      {
-        source: '/practice-set/:id*',
-        destination: '/textbook-solutions/practice-set/:id*',
-      }
-    ];
-  }
 };
 
 export default nextConfig;
