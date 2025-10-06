@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -232,10 +232,10 @@ export default function ManageChapterQuestionsPage() {
         }
     }
 
-    const handleDeleteQuestion = async () => {
-        if(!questionToDelete) return;
+    const handleDeleteQuestion = async (questionId: string) => {
+        if(!questionId) return;
         try {
-            const updatedQuestions = questions.filter(q => q.id !== questionToDelete.id);
+            const updatedQuestions = questions.filter(q => q.id !== questionId);
             await saveQuestionsToFirestore(updatedQuestions);
             setQuestions(updatedQuestions);
             toast({ title: 'Question Deleted' });
@@ -393,11 +393,16 @@ export default function ManageChapterQuestionsPage() {
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
                                         <Button variant="ghost" size="icon" onClick={() => openQuestionDialog(q)}><Edit className="h-4 w-4"/></Button>
-                                        <AlertDialog><AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4"/></Button></AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone and will permanently delete this question.</AlertDialogDescription></AlertDialogHeader>
-                                            <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteQuestion(q.id)}>Delete</AlertDialogAction></AlertDialogFooter>
-                                        </AlertDialogContent></AlertDialog>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4"/></Button></AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone and will permanently delete this question.</AlertDialogDescription></AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDeleteQuestion(q.id)}>Delete</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </div>
                                 </li>
                             ))}
