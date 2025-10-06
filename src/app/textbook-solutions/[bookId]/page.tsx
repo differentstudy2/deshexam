@@ -837,7 +837,21 @@ export default function TextbookSolutionsPage() {
         </aside>
 
         <main>
-           {selectedTopicContent ? (
+           {activeChapter && !activeTopicId ? (
+                <Card className="min-h-[60vh]">
+                    <CardHeader>
+                        <CardTitle className="text-2xl">{activeChapter.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {activeChapter.content ? (
+                             <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: activeChapter.content }}/>
+                        ) : (
+                            <p>No summary available for this chapter.</p>
+                        )}
+                        <p className="mt-8 text-muted-foreground font-semibold">Please select a topic from the sidebar to view its content and practice sets.</p>
+                    </CardContent>
+                </Card>
+            ) : selectedTopicContent ? (
              <Card>
                 <CardContent className="p-4">
                      <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
@@ -949,3 +963,4 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
+
