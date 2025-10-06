@@ -246,11 +246,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             "p-4 rounded-lg border-2 flex items-start gap-3 transition-colors",
                                             isCorrect 
                                                 ? "bg-green-100 dark:bg-green-900/30 border-green-500"
-                                                : "bg-secondary/30"
+                                                : "bg-red-100 dark:bg-red-900/20 border-destructive/30"
                                         )}>
                                             {isCorrect 
                                                 ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
-                                                : <div className="w-5 h-5 mt-0.5 shrink-0" />
+                                                : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                                             }
                                             <div className="flex-1">
                                                 <span className="font-medium">{option.text}</span>
@@ -266,8 +266,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 {['True', 'False'].map((tf) => {
                                     const isCorrect = question.correctAnswer === tf;
                                     return (
-                                    <div key={tf} className={cn("p-4 rounded-lg border-2 flex items-center gap-3", isCorrect ? "bg-green-100 dark:bg-green-900/30 border-green-500" : "bg-secondary/30")}>
-                                        {isCorrect && <CheckCircle className="w-5 h-5 text-green-600" />}
+                                    <div key={tf} className={cn("p-4 rounded-lg border-2 flex items-center gap-3", isCorrect ? "bg-green-100 dark:bg-green-900/30 border-green-500" : "bg-red-100 dark:bg-red-900/20 border-destructive/30")}>
+                                        {isCorrect ? <CheckCircle className="w-5 h-5 text-green-600" /> : <XCircle className="w-5 h-5 text-destructive" />}
                                         <span className="font-medium">{tf}</span>
                                     </div>
                                     )
