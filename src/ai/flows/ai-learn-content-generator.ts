@@ -19,7 +19,7 @@ export type AILearnContentGeneratorInput = z.infer<typeof AILearnContentGenerato
 const AILearnContentGeneratorOutputSchema = z.object({
   title: z.string().describe('A suitable title for the generated article.'),
   description: z.string().describe('A brief, engaging summary of the article.'),
-  body: z.string().describe('The full content of the article, written as a well-structured HTML string.'),
+  body: z.string().describe('The full content of the article, written in GitHub-flavored Markdown.'),
 });
 export type AILearnContentGeneratorOutput = z.infer<typeof AILearnContentGeneratorOutputSchema>;
 
@@ -38,15 +38,15 @@ The article must be well-structured, visually appealing, and easy for students t
 Please generate the following:
 1.  A compelling and SEO-friendly title for the article.
 2.  A short, one-paragraph description or summary to be used as a meta description.
-3.  The full body of the article as a well-formed HTML string. Do not include <html> or <body> tags.
+3.  The full body of the article as a well-formed GitHub-flavored Markdown string.
 
-For the HTML body, you must use a variety of tags to make the post stylish and organized. Specifically include:
-- A main heading using <h1>.
-- Multiple sub-sections using <h2>, <h3>, and <h4> tags to create a clear hierarchy.
-- Paragraphs using <p> tags for the main text.
-- Unordered lists (<ul> with <li>) for bullet points to break down information.
-- A data table (<table> with <thead>, <tbody>, <tr>, <th>, and <td>) to present structured information where appropriate (e.g., for comparisons, definitions, or key data).
-- Use text formatting tags like <strong> for emphasis, <em> for italics, and <blockquote> for quoting key concepts or definitions.
+For the Markdown body, you must use a variety of elements to make the post stylish and organized. Specifically include:
+- A main heading using a '#'.
+- Multiple sub-sections using '##', '###', and '####' to create a clear hierarchy.
+- Paragraphs for the main text.
+- Unordered lists (using '*') for bullet points to break down information.
+- A data table to present structured information where appropriate (e.g., for comparisons, definitions, or key data).
+- Use text formatting like **bold** for emphasis, *italics*, and > for blockquotes for quoting key concepts or definitions.
 
 Ensure the content is accurate, informative, and exceptionally well-written. The structure should be logical, flowing from an introduction to detailed sections and a concluding summary.
 `,

@@ -16,6 +16,8 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 
 type Article = {
@@ -299,10 +301,13 @@ export default function ArticleClientPage({ article }: { article: Article }) {
                 priority
             />
 
-            <div 
+            <article 
               className="prose dark:prose-invert lg:prose-xl max-w-none"
-              dangerouslySetInnerHTML={{ __html: article.body }}
-            />
+            >
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {article.body}
+                </ReactMarkdown>
+            </article>
 
             <Separator className="my-12" />
 

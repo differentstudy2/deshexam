@@ -32,6 +32,8 @@ import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ScoreCircle } from '@/components/feature/score-circle';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 
 type UserProfile = {
@@ -844,7 +846,11 @@ export default function TextbookSolutionsPage() {
                     </CardHeader>
                     <CardContent>
                         {activeChapter.content ? (
-                             <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: activeChapter.content }}/>
+                             <article className="prose dark:prose-invert max-w-none">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {activeChapter.content}
+                                </ReactMarkdown>
+                             </article>
                         ) : (
                             <p>No summary available for this chapter.</p>
                         )}
@@ -858,7 +864,9 @@ export default function TextbookSolutionsPage() {
                         <AccordionItem value="item-1">
                             <AccordionTrigger className="text-xl font-headline">{selectedTopicContent.title}</AccordionTrigger>
                             <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
-                                <div dangerouslySetInnerHTML={{ __html: selectedTopicContent.content || '<p>No content available for this topic yet.</p>' }} />
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {selectedTopicContent.content || 'No content available for this topic yet.'}
+                                </ReactMarkdown>
                                 
                                 <Accordion type="single" collapsible className="w-full not-prose mt-8" onValueChange={(value) => {if(value) fetchResources()}}>
                                     <AccordionItem value="resources">
@@ -963,4 +971,3 @@ export default function TextbookSolutionsPage() {
     </div>
   );
 }
-
