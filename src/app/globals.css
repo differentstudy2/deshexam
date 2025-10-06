@@ -101,9 +101,7 @@
     @apply mb-4;
   }
 
-  .prose a {
-    @apply text-primary underline hover:no-underline;
-  }
+  
 
   .prose strong {
     @apply font-semibold;
