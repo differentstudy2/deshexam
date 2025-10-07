@@ -29,7 +29,7 @@ import {
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -178,7 +178,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             name="correctAnswer"
                             render={({ field }) => (
                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-2">
-                                    {[0, 1, 2, 3].map(optionIndex => (
+                                    {[0, 1, 2, 3].map((optionIndex) => (
                                         <div key={optionIndex} className="flex items-start gap-3">
                                             <FormControl className="mt-2.5">
                                                 <RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} />
@@ -529,10 +529,7 @@ export default function ManageChapterPracticeSetQuestionsPage() {
                                 <AlertDialogTrigger asChild><Button variant="destructive" size="sm"><Trash2 className="mr-2 h-4 w-4"/>Delete Selected ({selectedQuestions.length})</Button></AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will permanently delete {selectedQuestions.length} question(s). This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleDeleteSelected}>Delete</AlertDialogAction>
-                                    </AlertDialogFooter>
+                                    <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDeleteSelected}>Delete</AlertDialogAction></AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
                         </div>
@@ -579,3 +576,4 @@ export default function ManageChapterPracticeSetQuestionsPage() {
     );
 }
 
+    
