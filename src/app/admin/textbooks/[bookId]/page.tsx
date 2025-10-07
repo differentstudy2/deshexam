@@ -340,8 +340,13 @@ export default function ManageChaptersPage() {
                                             <FileQuestion className="h-3 w-3 mr-1"/> Manage Questions
                                         </Link>
                                     </Button>
+                                     <Button variant="secondary" size="sm" asChild>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/practice-sets`}>
+                                            Manage Practice Sets
+                                        </Link>
+                                    </Button>
                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics & Practice Sets</Link>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics & Resources</Link>
                                     </Button>
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">

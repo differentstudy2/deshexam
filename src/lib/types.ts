@@ -27,6 +27,7 @@ export type Chapter = {
     topics: Topic[];
     resources?: Resource[];
     textbookQuestions?: Question[];
+    practiceSets?: PracticeSet[];
     access: 'free' | 'pass' | 'pro';
 };
 
@@ -64,4 +65,3 @@ export type Question = {
     correctAnswer: any;
     explanation?: string;
 };
-
