@@ -1,6 +1,7 @@
 
 'use client';
 
+import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -8,109 +9,20 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Question, Resource } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, Suspense, useMemo } from 'react';
-import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
-import { useAuth } from '@/hooks/use-auth';
-import { getUserProfile, getTextbookProgress, getSettings, getTopicsByChapterId } from '@/lib/firebase/firestore';
-import { Tooltip, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { getTopicsByChapterId } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Separator } from '@/components/ui/separator';
+import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-type UserProfile = {
-  subscriptionPlan?: 'pass' | 'pro';
-};
-
-type TextbookProgress = {
-    highestScores: { [practiceSetId: string]: number };
-    allAttempts: { [practiceSetId: string]: number };
-}
-
-const getResourceIcon = (type: string) => {
-    switch(type) {
-        case 'video': return <Video className="w-4 h-4 text-muted-foreground" />;
-        case 'audio': return <Mic className="w-4 h-4 text-muted-foreground" />;
-        case 'pdf': return <FileIcon className="w-4 h-4 text-muted-foreground" />;
-        default: return <ExternalLink className="w-4 h-4 text-muted-foreground" />;
-    }
-};
-
-
-const SidebarNav = ({
-  chapters,
-  topics,
-  activeChapter,
-  activeTopic,
-  onChapterToggle,
-  onTopicSelect,
-  isChapterUnlocked,
-  loadingTopics,
-}: {
-  chapters: Chapter[];
-  topics: { [key: string]: Topic[] };
-  activeChapter: string | null;
-  activeTopic: string | null;
-  onChapterToggle: (chapterId: string) => void;
-  onTopicSelect: (chapterId: string, topicId: string) => void;
-  isChapterUnlocked: (chapter: Chapter, index: number) => boolean;
-  loadingTopics: string | null;
-}) => (
-    <Accordion type="single" collapsible defaultValue={activeChapter || undefined} className="w-full">
-      {chapters.map((chapter, index) => (
-        <AccordionItem value={chapter.id} key={chapter.id}>
-          <AccordionTrigger
-            disabled={!isChapterUnlocked(chapter, index)}
-            className="hover:no-underline [&[data-state=open]]:bg-accent/50"
-          >
-             <div className="flex items-center gap-2">
-                {!isChapterUnlocked(chapter, index) && <Lock className="w-4 h-4 text-muted-foreground" />}
-                <span className={cn(!isChapterUnlocked(chapter, index) && "text-muted-foreground")}>{chapter.title}</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-0">
-            {loadingTopics === chapter.id ? (
-                <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
-            ) : (
-                <ul className="space-y-1 pl-4 border-l">
-                 {(topics[chapter.id] || []).map(topic => (
-                   <li key={topic.id}>
-                     <Button
-                       variant="ghost"
-                       asChild
-                       className={cn(
-                         "w-full justify-start text-left h-auto py-1 px-2 text-base",
-                         activeTopic === topic.id ? "bg-accent text-accent-foreground" : ""
-                       )}
-                     >
-                       <Link href={`/textbook-solutions/${useParams().bookId}/chapter/${chapter.id}/topic/${topic.id}`}>
-                         {topic.title}
-                       </Link>
-                     </Button>
-                   </li>
-                 ))}
-                 {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
-                    <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
-                 )}
-               </ul>
-            )}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
-);
-
 
 function TextbookMainContent() {
     const params = useParams();
@@ -137,9 +49,10 @@ function TextbookMainContent() {
                 }
                 setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
 
-                const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'));
+                const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`));
                 const chaptersSnap = await getDocs(chaptersQuery);
                 const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+                chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
 
                 const chaptersWithTopicsData = await Promise.all(chaptersData.map(async (chapter) => {
                     const topicsData = await getTopicsByChapterId(textbookId, chapter.id);
@@ -223,18 +136,19 @@ function TextbookMainContent() {
     );
 }
 
-export default function TextbookSolutionsPage({ children }: { children: React.ReactNode }) {
+// This is the new layout component
+const TextbookSolutionsLayout = ({ children }: { children: React.ReactNode }) => {
     const params = useParams();
-    const textbookId = params.bookId;
+    const hasChapterId = !!params.chapterId;
 
-    if (!textbookId) {
-        // This case should ideally not be hit due to Next.js routing, but as a fallback
-        return <div>Textbook not found.</div>;
+    if (hasChapterId) {
+        return <>{children}</>;
     }
 
-    if (children) {
-        return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}>{children}</Suspense>;
-    }
-    
-    return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TextbookMainContent /></Suspense>
+    return <TextbookMainContent />;
+}
+
+
+export default function TextbookSolutionsPage({ children }: { children: React.ReactNode }) {
+    return <Suspense fallback={<div>Loading...</div>}><TextbookSolutionsLayout>{children}</TextbookSolutionsLayout></Suspense>
 }
