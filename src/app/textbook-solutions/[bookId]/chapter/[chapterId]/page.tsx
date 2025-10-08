@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -307,10 +308,19 @@ function ChapterPageContent() {
 
                         </div>
                     ) : (
-                         <div className="text-center text-muted-foreground pt-16">
-                            <BookOpen className="w-16 h-16 mx-auto mb-4"/>
-                            <h2 className="text-xl font-semibold">Select a topic</h2>
-                            <p>Choose a topic from the sidebar to view its content.</p>
+                         <div>
+                            <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeChapter?.title}</h1>
+                            {activeChapter?.content ? (
+                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeChapter.content}</ReactMarkdown>
+                                </article>
+                            ) : (
+                                <div className="text-center text-muted-foreground pt-16">
+                                    <BookOpen className="w-16 h-16 mx-auto mb-4"/>
+                                    <h2 className="text-xl font-semibold">Select a topic</h2>
+                                    <p>Choose a topic from the sidebar to view its specific content.</p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </main>
