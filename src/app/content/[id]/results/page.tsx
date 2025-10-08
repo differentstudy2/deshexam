@@ -101,7 +101,7 @@ function ResultsDisplay() {
   const { score, totalQuestions, testType } = submission;
   const percentage = Math.round((score / totalQuestions) * 100);
   const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
-  const contentBaseUrl = `/${typeSlug}`;
+  const contentBaseUrl = `/${typeSlug}s`; // Make it plural for the link
   const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
 
@@ -174,13 +174,13 @@ function ResultsDisplay() {
             <Separator />
              <div className="flex gap-4 justify-center pt-2">
                 <Button asChild>
-                <Link href={`${contentBaseUrl}/${test.id}/review?submissionId=${submissionId}`}>
+                <Link href={`${typeSlug}/${test.id}/review?submissionId=${submissionId}`}>
                     <FileQuestion className="mr-2"/>
                     Review Answers
                 </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                <Link href={`${contentBaseUrl}/${test.id}`}>Try Again</Link>
+                <Link href={`${typeSlug}/${test.id}`}>Try Again</Link>
                 </Button>
             </div>
             <div className="pt-2 text-center">
