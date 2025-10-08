@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -13,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
-import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -93,6 +92,7 @@ const SidebarNav = ({
       ))}
     </Accordion>
 );
+
 
 function TopicPageLayout() {
     const params = useParams();
@@ -203,7 +203,7 @@ function TopicPageLayout() {
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm">
-                    <ol className="flex items-center gap-1">
+                    <ol className="flex items-center gap-1 truncate">
                         {breadcrumbs.slice(0, -1).map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1">
                                <Link href={crumb.href} className="text-muted-foreground hover:text-foreground">{crumb.name}</Link>
@@ -240,7 +240,7 @@ function TopicPageLayout() {
                                 </article>
                             )}
 
-                            {activeTopic.resources && activeTopic.resources.length > 0 && (
+                             {activeTopic.resources && activeTopic.resources.length > 0 && (
                                 <>
                                  <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Resources</h2>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -297,5 +297,5 @@ function TopicPageLayout() {
 
 
 export default function TopicPage() {
-    return <Suspense fallback={<div>Loading Topic...</div>}><TopicPageLayout/></Suspense>
+    return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageLayout/></Suspense>
 }
