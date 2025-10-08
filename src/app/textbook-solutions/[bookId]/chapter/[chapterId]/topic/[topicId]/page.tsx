@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -81,8 +82,9 @@ const SidebarNav = ({
                          activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
                        )}
                      >
-                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`}>
-                         {topic.title}
+                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-muted-foreground" />
+                        <span>{topic.title}</span>
                        </Link>
                      </Button>
                    </li>

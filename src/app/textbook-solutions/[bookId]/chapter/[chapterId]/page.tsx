@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -79,8 +80,9 @@ const SidebarNav = ({
                          activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
                        )}
                      >
-                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`}>
-                         {topic.title}
+                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
+                         <FileText className="w-4 h-4 text-muted-foreground" />
+                         <span>{topic.title}</span>
                        </Link>
                      </Button>
                    </li>
@@ -223,10 +225,11 @@ function ChapterPageContent() {
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
                          <SheetHeader className="p-4 border-b">
-                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
-                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-                            </Link>
+                            <SheetTitle>
+                                <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                                    <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                                </Link>
+                            </SheetTitle>
                         </SheetHeader>
                         {sidebarContent}
                     </SheetContent>
