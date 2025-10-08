@@ -137,7 +137,6 @@ function ChapterPageContent() {
     }
     
     const breadcrumbs = [
-        { name: 'Home', href: '/' },
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
         { name: chapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
@@ -145,6 +144,9 @@ function ChapterPageContent() {
 
     const sidebar = (
         <aside className="h-full bg-card border-r">
+             <SheetHeader>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            </SheetHeader>
             <div className="p-4 border-b">
                 <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                     <ArrowLeft className="w-4 h-4" /> {textbook?.title}
@@ -170,16 +172,13 @@ function ChapterPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader className="sr-only">
-                            <SheetTitle>Navigation Menu</SheetTitle>
-                        </SheetHeader>
                         {sidebar}
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm">
-                     <ol className="flex items-center gap-1 truncate">
+                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         {breadcrumbs.map((crumb, index) => (
-                           <li key={index} className="flex items-center gap-1">
+                           <li key={index} className="flex items-center gap-1.5">
                                <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate">{crumb.name}</Link>
                                {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                            </li>
@@ -196,8 +195,8 @@ function ChapterPageContent() {
                          <ol className="flex items-center gap-1.5">
                             {breadcrumbs.map((crumb, index) => (
                                <li key={index} className="flex items-center gap-1.5">
-                                   <Link href={crumb.href} className={cn("hover:text-foreground", index === breadcrumbs.length ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{crumb.name}</Link>
-                                   {index < breadcrumbs.length && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
+                                   <Link href={crumb.href} className={cn("hover:text-foreground", index === breadcrumbs.length - 1 ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{crumb.name}</Link>
+                                   {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
                                </li>
                             ))}
                         </ol>

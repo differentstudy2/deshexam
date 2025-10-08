@@ -206,6 +206,9 @@ function TopicPageContent() {
 
     const sidebar = (
         <aside className="h-full bg-card border-r">
+             <SheetHeader>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            </SheetHeader>
             <div className="p-4 border-b">
                 <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                     <ArrowLeft className="w-4 h-4" /> {textbook?.title}
@@ -226,22 +229,24 @@ function TopicPageContent() {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="md:hidden p-4 border-b flex items-center gap-2">
+            <div className="md:hidden p-4 border-b flex items-center gap-4">
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                     <SheetTrigger asChild>
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader>
-                           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                        </SheetHeader>
                         {sidebar}
                     </SheetContent>
                 </Sheet>
-                <nav className="text-sm font-medium text-muted-foreground overflow-hidden">
-                    <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}`} className="hover:text-foreground truncate">
-                        {activeChapter?.title || "Chapter"}
-                    </Link>
+                 <nav className="text-sm">
+                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
+                        {breadcrumbs.map((crumb, index) => (
+                           <li key={index} className="flex items-center gap-1.5">
+                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate">{crumb.name}</Link>
+                               {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
+                           </li>
+                        ))}
+                    </ol>
                 </nav>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
@@ -370,5 +375,3 @@ function TopicPageContent() {
 export default function TopicPage() {
     return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
-
-    
