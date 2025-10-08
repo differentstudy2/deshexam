@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo, Suspense } from 'react';
+import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, Loader2, Menu, ChevronRight, FileText, CheckSquare, Edit } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Menu, ChevronRight, File as FileIcon, Video, Mic, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -87,7 +87,10 @@ function ChapterPageContent() {
     const [viewerOpen, setViewerOpen] = useState(false);
     const [viewerResource, setViewerResource] = useState<Resource | null>(null);
 
-    const activeTopic = useMemo(() => topics.find(t => t.id === activeTopicId) || topics[0], [topics, activeTopicId]);
+    const activeTopic = useMemo(() => {
+        if (!topics || topics.length === 0 || !activeTopicId) return null;
+        return topics.find(t => t.id === activeTopicId);
+    }, [topics, activeTopicId]);
 
     useEffect(() => {
         const fetchPageData = async () => {
@@ -104,7 +107,7 @@ function ChapterPageContent() {
                 
                 setTopics(topicsData);
 
-                // If no topic is selected in URL, redirect to the first topic
+                // If no topic is selected in URL and topics exist, redirect to the first topic
                 if (!activeTopicId && topicsData.length > 0) {
                     router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topicsData[0].id}`);
                 }
@@ -146,7 +149,7 @@ function ChapterPageContent() {
                  <h4 className="font-semibold text-lg mb-2">{chapter?.title}</h4>
                 <SidebarNav 
                     topics={topics}
-                    activeTopic={activeTopicId || (topics.length > 0 ? topics[0].id : null)}
+                    activeTopic={activeTopicId}
                     textbookId={textbookId}
                     chapterId={chapterId}
                 />
