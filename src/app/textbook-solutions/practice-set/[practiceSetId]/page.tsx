@@ -86,7 +86,20 @@ export default function PracticeSetPage() {
         if (practiceSetData) {
             let questionsData = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
             
-            questionsData = questionsData.map((q: any) => {
+            // Group questions by type
+            const groupedQuestions = questionsData.reduce((acc, q) => {
+                const type = q.type || 'unknown';
+                if (!acc[type]) {
+                    acc[type] = [];
+                }
+                acc[type].push(q);
+                return acc;
+            }, {} as Record<string, typeof questionsData>);
+
+            // Shuffle within each group and then combine
+            const shuffledQuestions = Object.values(groupedQuestions).flatMap(group => shuffleArray(group));
+
+            const questionsWithMatchingOptions = shuffledQuestions.map((q: any) => {
                 if (q.type === 'Matching' && q.correctAnswer) {
                     const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
                     const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
@@ -102,8 +115,7 @@ export default function PracticeSetPage() {
                 return q;
             });
 
-            const shuffledQuestions = shuffleArray(questionsData);
-            const calculatedTotalMarks = shuffledQuestions.reduce((total, q) => {
+            const calculatedTotalMarks = questionsWithMatchingOptions.reduce((total, q) => {
                 if (q.type === 'Matching') {
                     return total + (q.correctAnswer?.length || 0);
                 }
@@ -114,7 +126,7 @@ export default function PracticeSetPage() {
 
             setTest({ 
                 ...practiceSetData, 
-                questions: shuffledQuestions,
+                questions: questionsWithMatchingOptions,
                 testType: 'Practice Set' 
             } as Test);
             
@@ -331,7 +343,7 @@ export default function PracticeSetPage() {
                 {test.questions && test.questions.map((question, index) => {
                     const questionIndex = index;
                     return (
-                        <Card key={question.id} className="p-6 shadow-none border">
+                        <Card key={question.id || question.originalIndex} className="p-6 shadow-none border">
                             <CardHeader className="p-0 mb-4">
                                 <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
                                     <span>{questionIndex + 1}.</span> <span>{question.text}</span>
