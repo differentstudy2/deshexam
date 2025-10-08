@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,6 +29,7 @@ const mainNavLinks = [
     { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
     { href: "/kids-zone", label: "Kids Zone", icon: <ToyBrick className="h-5 w-5" /> },
     { href: "/mock-tests", label: "Mock Tests", icon: <BookOpen className="h-5 w-5" /> },
+    { href: "/exams", label: "Exams", icon: <Award className="h-5 w-5" /> },
     { href: "/quizzes", label: "Quizzes", icon: <Gem className="h-5 w-5" /> },
     { href: "/learn", label: "Learn", icon: <LayoutDashboard className="h-5 w-5" /> },
     { href: "/textbook-solutions", label: "Textbook Solutions", icon: <Book className="h-5 w-5" /> },
