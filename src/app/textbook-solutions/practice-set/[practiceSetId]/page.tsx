@@ -340,7 +340,7 @@ export default function PracticeSetPage() {
                         <Card key={question.id}>
                             <CardHeader>
                                 <CardTitle className="flex items-baseline gap-2 text-2xl font-bold">
-                                    Q. {questionIndex + 1} {question.text}
+                                    {questionIndex + 1}. Q - {question.text}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
