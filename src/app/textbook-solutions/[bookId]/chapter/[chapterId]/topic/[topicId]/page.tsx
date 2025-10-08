@@ -232,7 +232,7 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                        <SheetHeader>
+                         <SheetHeader>
                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                         </SheetHeader>
                         {sidebar}
@@ -254,7 +254,7 @@ function TopicPageContent() {
                             {breadcrumbs.map((crumb, index) => (
                                <li key={index} className="flex items-center gap-1.5">
                                    <Link href={crumb.href} className={cn("hover:text-foreground", index === breadcrumbs.length - 1 ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{crumb.name}</Link>
-                                   {index < breadcrumbs.length -1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
+                                   {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
                                </li>
                             ))}
                         </ol>
@@ -287,15 +287,15 @@ function TopicPageContent() {
                                 <>
                                  <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Practice Sets</h2>
                                  <div className="space-y-4">
-                                     {activeTopic.practiceSets.map(ps => (
-                                         <Link key={ps.id} href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
-                                             <div className="p-4 border rounded-lg hover:bg-accent flex justify-between items-center">
-                                                 <span className="font-semibold">{ps.title}</span>
-                                                 <Button size="sm">Start Practice</Button>
-                                             </div>
-                                         </Link>
-                                     ))}
-                                 </div>
+                                      {activeTopic.practiceSets.map(ps => (
+                                          <Link key={ps.id} href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                                              <div className="p-4 border rounded-lg hover:bg-accent flex justify-between items-center">
+                                                  <span className="font-semibold">{ps.title}</span>
+                                                  <Button size="sm">Start Practice</Button>
+                                              </div>
+                                          </Link>
+                                      ))}
+                                  </div>
                                  </>
                              )}
 
