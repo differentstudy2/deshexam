@@ -11,19 +11,22 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource, PracticeSet } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -121,6 +124,9 @@ function TopicPageContent() {
     const [viewerOpen, setViewerOpen] = useState(false);
     const [viewerResource, setViewerResource] = useState<Resource | null>(null);
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
+    const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
+
 
     useEffect(() => {
       if (activeTopic?.content) {
@@ -166,7 +172,7 @@ function TopicPageContent() {
         try {
             const [textbookSnap, chaptersQuerySnap] = await Promise.all([
                 getDoc(doc(db, 'textbooks', textbookId)),
-                getDocs(query(collection(db, `textbooks/${textbookId}/chapters`))),
+                getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
             ]);
 
             if (textbookSnap.exists()) {
@@ -214,6 +220,57 @@ function TopicPageContent() {
         setViewerOpen(true);
     };
 
+    const handleDownloadPdf = async (practiceSet: PracticeSet) => {
+        if (!activeTopic) return;
+        setIsGeneratingPdf(practiceSet.id);
+        try {
+            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, activeTopic.id, practiceSet.id);
+            setPdfContent({ practiceSet, questions });
+
+            // Allow time for the PDF content to render in the hidden div
+            setTimeout(async () => {
+                const pdfElement = document.getElementById('pdf-content');
+                if (pdfElement) {
+                    const canvas = await html2canvas(pdfElement, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = imgWidth / imgHeight;
+                    const width = pdfWidth;
+                    const height = width / ratio;
+                    let position = 0;
+                    let heightLeft = height;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                    heightLeft -= pdfHeight;
+
+                    while (heightLeft > 0) {
+                        position = heightLeft - height;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                        heightLeft -= pdfHeight;
+                    }
+
+                    pdf.save(`${practiceSet.title}.pdf`);
+                }
+                setPdfContent(null);
+                setIsGeneratingPdf(null);
+            }, 500);
+
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error generating PDF',
+                description: (error as Error).message,
+            });
+            setIsGeneratingPdf(null);
+        }
+    };
+
+
     if (loading) {
         return <div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>;
     }
@@ -248,13 +305,15 @@ function TopicPageContent() {
                     <SheetTrigger asChild>
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="p-0 w-80">
+                     <SheetContent side="left" className="p-0 w-80">
                        <SheetHeader className="p-4 border-b">
                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
+                       </SheetHeader>
+                       <div className="p-4 border-b">
                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                            </Link>
-                       </SheetHeader>
+                       </div>
                        {sidebarContent}
                     </SheetContent>
                 </Sheet>
@@ -326,8 +385,14 @@ function TopicPageContent() {
                                                 <Button size="sm" asChild className="flex-1">
                                                     <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>Start Practice</Link>
                                                 </Button>
-                                                <Button size="sm" variant="outline" className="flex-1">
-                                                    <FileDown className="mr-2 h-4 w-4"/>
+                                                <Button 
+                                                    size="sm" 
+                                                    variant="outline" 
+                                                    className="flex-1"
+                                                    onClick={() => handleDownloadPdf(ps)}
+                                                    disabled={isGeneratingPdf === ps.id}
+                                                >
+                                                    {isGeneratingPdf === ps.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
                                                     Download PDF
                                                 </Button>
                                               </div>
@@ -400,6 +465,19 @@ function TopicPageContent() {
                 open={viewerOpen} 
                 onOpenChange={setViewerOpen} 
             />
+             {pdfContent && (
+                <div style={{ position: 'fixed', left: '-9999px', top: 0, zIndex: -10 }}>
+                    <div id="pdf-content">
+                        <PracticeSetPDF 
+                            practiceSet={pdfContent.practiceSet} 
+                            questions={pdfContent.questions} 
+                            textbookTitle={textbook?.title || ''} 
+                            chapterTitle={activeChapter?.title || ''}
+                            topicTitle={activeTopic?.title || ''}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
