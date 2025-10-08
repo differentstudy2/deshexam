@@ -106,8 +106,7 @@ function ChapterPageContent() {
     
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
-    const activeTopicId = searchParams.get('topic');
-
+    
     const [textbook, setTextbook] = useState<Textbook | null>(null);
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
@@ -118,6 +117,16 @@ function ChapterPageContent() {
     
     const [viewerOpen, setViewerOpen] = useState(false);
     const [viewerResource, setViewerResource] = useState<Resource | null>(null);
+
+    const activeTopicId = useMemo(() => {
+        const topicId = searchParams.get('topic');
+        if (topicId) return topicId;
+        // If no topic is in the URL, default to the first one of the current chapter
+        if (topics[chapterId] && topics[chapterId].length > 0) {
+            return topics[chapterId][0].id;
+        }
+        return null;
+    }, [searchParams, topics, chapterId]);
 
     const activeTopic = useMemo(() => {
         if (!topics[chapterId] || !activeTopicId) return null;
@@ -183,25 +192,18 @@ function ChapterPageContent() {
         { name: activeChapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
     ];
 
-    const sidebar = (
-        <>
-            <div className="p-4 border-b">
-                <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-                    <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-                </Link>
-            </div>
-             <div className="p-2">
-                <SidebarNav 
-                    chapters={chapters}
-                    topics={topics}
-                    activeChapterId={chapterId}
-                    activeTopicId={activeTopicId}
-                    onChapterToggle={fetchChapterTopics}
-                    loadingTopics={loadingTopics}
-                    textbookId={textbookId}
-                />
-            </div>
-        </>
+    const sidebarContent = (
+         <div className="p-2">
+            <SidebarNav 
+                chapters={chapters}
+                topics={topics}
+                activeChapterId={chapterId}
+                activeTopicId={activeTopicId}
+                onChapterToggle={fetchChapterTopics}
+                loadingTopics={loadingTopics}
+                textbookId={textbookId}
+            />
+        </div>
     );
 
     return (
@@ -212,11 +214,14 @@ function ChapterPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader>
+                         <SheetHeader className="p-4 border-b">
                             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                            </Link>
                         </SheetHeader>
                         <aside className="h-full bg-card">
-                            {sidebar}
+                            {sidebarContent}
                         </aside>
                     </SheetContent>
                 </Sheet>
@@ -233,7 +238,14 @@ function ChapterPageContent() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
                 <aside className="hidden md:block h-full bg-card border-r">
-                    {sidebar}
+                    <div className="sticky top-0 h-screen overflow-y-auto">
+                         <div className="p-4 border-b">
+                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                            </Link>
+                        </div>
+                        {sidebarContent}
+                    </div>
                 </aside>
                 <main className="p-6 md:p-8">
                     <nav className="text-sm mb-6 hidden md:block">

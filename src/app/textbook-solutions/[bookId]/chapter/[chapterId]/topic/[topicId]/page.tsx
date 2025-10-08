@@ -214,30 +214,22 @@ function TopicPageContent() {
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []), // Link to current page
+        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` }] : []),
         ...(activeTopic ? [{ name: activeTopic.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []),
     ];
 
-    const sidebar = (
-      <>
-        <SheetHeader className="p-4 border-b">
-          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-          <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-              <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-          </Link>
-        </SheetHeader>
-        <div className="p-2">
-            <SidebarNav 
-                chapters={chapters}
-                topics={topics}
-                activeChapterId={chapterId}
-                activeTopicId={topicId}
-                onChapterToggle={fetchChapterTopics}
-                loadingTopics={loadingTopics}
-                textbookId={textbookId}
-            />
-        </div>
-      </>
+    const sidebarContent = (
+      <div className="p-2">
+          <SidebarNav 
+              chapters={chapters}
+              topics={topics}
+              activeChapterId={chapterId}
+              activeTopicId={topicId}
+              onChapterToggle={fetchChapterTopics}
+              loadingTopics={loadingTopics}
+              textbookId={textbookId}
+          />
+      </div>
     );
 
     return (
@@ -248,26 +240,37 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
+                        <SheetHeader className="p-4 border-b">
+                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                            </Link>
+                        </SheetHeader>
                         <aside className="h-full bg-card">
-                            {sidebar}
+                            {sidebarContent}
                         </aside>
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm overflow-hidden">
-                     <ol className="flex items-center gap-1 whitespace-nowrap">
-                        {breadcrumbs.map((crumb, index) => (
-                           <li key={index} className="flex items-center gap-1">
-                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[80px] sm:max-w-none">{crumb.name}</Link>
-                               {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
-                           </li>
-                        ))}
+                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
+                        <li className="flex items-center gap-1.5">
+                            <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}`} className="text-muted-foreground hover:text-foreground">
+                                <ArrowLeft className="w-4 h-4 inline-block mr-1" />
+                                <span className="truncate max-w-[150px] sm:max-w-none">{activeChapter?.title || "Chapter"}</span>
+                            </Link>
+                        </li>
                     </ol>
                 </nav>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
                 <aside className="hidden md:block h-full bg-card border-r">
                     <div className="sticky top-0 h-screen overflow-y-auto">
-                        {sidebar}
+                        <div className="p-4 border-b">
+                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                            </Link>
+                        </div>
+                        {sidebarContent}
                     </div>
                 </aside>
                 <main className="p-6 md:p-8">
