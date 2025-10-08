@@ -112,25 +112,29 @@ function TextbookMainContent() {
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {chaptersWithTopics.map((chapter, index) => (
                     <Card key={chapter.id} className="flex flex-col">
-                        <CardHeader className="bg-primary text-primary-foreground p-4 flex-row items-center gap-3">
-                            <ChapterIcon index={index} />
-                            <CardTitle className="text-lg font-semibold hover:underline">
-                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
-                                    {chapter.title}
-                                </Link>
-                            </CardTitle>
-                        </CardHeader>
+                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
+                            <CardHeader className="bg-primary text-primary-foreground p-4 flex-row items-center gap-3 hover:bg-primary/90 transition-colors">
+                                <ChapterIcon index={index} />
+                                <CardTitle className="text-lg font-semibold flex-grow">{chapter.title}</CardTitle>
+                                <ChevronRight className="w-5 h-5 flex-shrink-0" />
+                            </CardHeader>
+                        </Link>
                         <CardContent className="p-0 flex-grow">
                            <ul className="divide-y">
-                               {chapter.topics.map(topic => (
+                               {chapter.topics.slice(0, 5).map(topic => ( // Limiting to 5 topics for preview
                                    <li key={topic.id}>
                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
                                             <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                            <span className="flex-grow">{topic.title}</span>
+                                            <span className="flex-grow truncate">{topic.title}</span>
                                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                        </Link>
                                    </li>
                                ))}
+                               {chapter.topics.length > 5 && (
+                                    <li className="p-3 text-sm text-center text-muted-foreground">
+                                        ...and {chapter.topics.length - 5} more topics
+                                    </li>
+                               )}
                                {chapter.topics.length === 0 && <p className="p-4 text-sm text-center text-muted-foreground">No topics in this chapter.</p>}
                            </ul>
                         </CardContent>
