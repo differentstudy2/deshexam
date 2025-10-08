@@ -26,13 +26,13 @@ export const PracticeSetPDF = ({ practiceSet, questions, textbookTitle, chapterT
                     <div key={q.id} style={{ marginBottom: '25px', pageBreakInside: 'avoid' }}>
                         <p style={{ fontWeight: 'bold', marginBottom: '10px' }}>{index + 1}. {q.text}</p>
                         {q.type === 'Multiple Choice' && q.options && (
-                            <ul style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+                            <div style={{ paddingLeft: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px 20px' }}>
                                 {q.options.map((opt, i) => (
-                                    <li key={i} style={{ marginBottom: '5px' }}>
+                                    <div key={i} style={{ marginBottom: '5px' }}>
                                         ({String.fromCharCode(97 + i)}) {opt.text}
-                                    </li>
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         )}
                         {q.type === 'True/False' && (
                              <ul style={{ listStyleType: 'none', paddingLeft: '20px' }}>
