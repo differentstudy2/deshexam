@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -25,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic, FileQuestion } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -346,7 +346,7 @@ export default function ManageChaptersPage() {
                                         </Link>
                                     </Button>
                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Topics & Resources</Link>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`}>Manage Topics & Resources</Link>
                                     </Button>
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
