@@ -9,11 +9,11 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, Loader2, Menu, ChevronRight, File as FileIcon, Video, Mic, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +30,11 @@ const getResourceIcon = (type: string) => {
         case 'pdf': return <FileIcon className="w-4 h-4 text-muted-foreground" />;
         default: return <ExternalLink className="w-4 h-4 text-muted-foreground" />;
     }
+};
+
+const getChapterIcon = (index: number) => {
+    const icons = [<BookOpen />, <FileText />, <CheckSquare />, <Award />, <Video/>, <Mic/>];
+    return icons[index % icons.length];
 };
 
 const SidebarNav = ({
@@ -54,7 +59,7 @@ const SidebarNav = ({
              activeTopic === topic.id ? "bg-accent text-accent-foreground" : ""
            )}
          >
-           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topic.id}`}>
+           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
              {topic.title}
            </Link>
          </Button>
@@ -109,7 +114,7 @@ function ChapterPageContent() {
 
                 // If no topic is selected in URL and topics exist, redirect to the first topic
                 if (!activeTopicId && topicsData.length > 0) {
-                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topicsData[0].id}`);
+                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsData[0].id}`);
                 }
 
             } catch (e) {
@@ -165,6 +170,9 @@ function ChapterPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
+                         <SheetHeader className="sr-only">
+                            <SheetTitle>Navigation Menu</SheetTitle>
+                        </SheetHeader>
                         {sidebar}
                     </SheetContent>
                 </Sheet>
@@ -267,4 +275,3 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
-

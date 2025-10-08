@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
@@ -122,11 +122,21 @@ function TopicPageContent() {
 
     useEffect(() => {
       if (activeTopic?.content) {
+        const idMap = new Map();
         const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
         const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
-          const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+          
+          let id = baseId;
+          let count = 1;
+          while(idMap.has(id)) {
+            id = `${baseId}-${count}`;
+            count++;
+          }
+          idMap.set(id, true);
+
           return { id, text, level };
         });
         setHeadings(newHeadings);
@@ -150,6 +160,7 @@ function TopicPageContent() {
             }
 
             const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+            chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
             setChapters(chaptersData);
 
             if (chapterId) {
@@ -215,12 +226,15 @@ function TopicPageContent() {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="md:hidden p-4 border-b flex items-center gap-4">
+            <div className="md:hidden p-4 border-b flex items-center gap-2">
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                     <SheetTrigger asChild>
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
+                        <SheetHeader className="sr-only">
+                            <SheetTitle>Navigation Menu</SheetTitle>
+                        </SheetHeader>
                         {sidebar}
                     </SheetContent>
                 </Sheet>
@@ -247,7 +261,7 @@ function TopicPageContent() {
                             {breadcrumbs.map((crumb, index) => (
                                <li key={index} className="flex items-center gap-1.5">
                                    <Link href={crumb.href} className={cn("hover:text-foreground", index === breadcrumbs.length - 1 ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{crumb.name}</Link>
-                                   {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
+                                   {index < breadcrumbs.length -1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
                                </li>
                             ))}
                         </ol>
