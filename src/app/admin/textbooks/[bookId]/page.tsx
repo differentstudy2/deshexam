@@ -25,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Lock, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -53,6 +53,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { TextbookStats } from '@/components/feature/textbook-stats';
 
 export default function ManageChaptersPage() {
   const params = useParams();
@@ -253,6 +254,12 @@ export default function ManageChaptersPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+           <Button variant="outline" asChild>
+            <Link href={`/admin/textbooks/${textbookId}/exams`}>
+              <Award className="mr-2 h-4 w-4" />
+              Manage Exams
+            </Link>
+          </Button>
           <Button variant="outline" asChild>
             <Link href={`/admin/textbooks/${textbookId}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
