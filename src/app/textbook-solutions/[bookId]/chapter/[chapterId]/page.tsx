@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -38,37 +38,63 @@ const getChapterIcon = (index: number) => {
 };
 
 const SidebarNav = ({
+  chapters,
   topics,
-  activeTopic,
+  activeChapterId,
+  activeTopicId,
+  onChapterToggle,
+  loadingTopics,
   textbookId,
-  chapterId,
 }: {
-  topics: Topic[];
-  activeTopic: string | null;
+  chapters: Chapter[];
+  topics: { [key: string]: Topic[] };
+  activeChapterId: string | null;
+  activeTopicId: string | null;
+  onChapterToggle: (chapterId: string) => void;
+  loadingTopics: string | null;
   textbookId: string;
-  chapterId: string;
 }) => (
-    <ul className="space-y-1">
-     {topics.map(topic => (
-       <li key={topic.id}>
-         <Button
-           variant="ghost"
-           asChild
-           className={cn(
-             "w-full justify-start text-left h-auto py-2 px-3 text-sm",
-             activeTopic === topic.id ? "bg-accent text-accent-foreground" : ""
-           )}
-         >
-           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
-             {topic.title}
-           </Link>
-         </Button>
-       </li>
-     ))}
-     {!topics || topics.length === 0 && (
-        <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
-     )}
-   </ul>
+    <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
+      {chapters.map((chapter, index) => (
+        <AccordionItem value={chapter.id} key={chapter.id}>
+          <AccordionTrigger
+            className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
+          >
+             <div className="flex items-center gap-3">
+                {getChapterIcon(index)}
+                <span>{chapter.title}</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pt-2 pb-0">
+            {loadingTopics === chapter.id ? (
+                <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
+            ) : (
+                <ul className="space-y-1 pl-4 border-l">
+                 {(topics[chapter.id] || []).map(topic => (
+                   <li key={topic.id}>
+                     <Button
+                       variant="ghost"
+                       asChild
+                       className={cn(
+                         "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
+                         activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
+                       )}
+                     >
+                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`}>
+                         {topic.title}
+                       </Link>
+                     </Button>
+                   </li>
+                 ))}
+                 {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
+                    <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
+                 )}
+               </ul>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
 );
 
 
@@ -83,38 +109,51 @@ function ChapterPageContent() {
     const activeTopicId = searchParams.get('topic');
 
     const [textbook, setTextbook] = useState<Textbook | null>(null);
-    const [chapter, setChapter] = useState<Chapter | null>(null);
-    const [topics, setTopics] = useState<Topic[]>([]);
+    const [chapters, setChapters] = useState<Chapter[]>([]);
+    const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
     
     const [loading, setLoading] = useState(true);
+    const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     
     const [viewerOpen, setViewerOpen] = useState(false);
     const [viewerResource, setViewerResource] = useState<Resource | null>(null);
 
     const activeTopic = useMemo(() => {
-        if (!topics || topics.length === 0 || !activeTopicId) return null;
-        return topics.find(t => t.id === activeTopicId);
-    }, [topics, activeTopicId]);
+        if (!topics[chapterId] || !activeTopicId) return null;
+        return topics[chapterId].find(t => t.id === activeTopicId);
+    }, [topics, chapterId, activeTopicId]);
+
+    const fetchChapterTopics = useCallback(async (cId: string) => {
+        if (topics[cId]) return; // Already fetched
+        setLoadingTopics(cId);
+        try {
+            const topicsData = await getTopicsByChapterId(textbookId, cId);
+            setTopics(prev => ({ ...prev, [cId]: topicsData }));
+        } catch (e) {
+            toast({ variant: "destructive", title: "Error loading topics", description: (e as Error).message });
+        } finally {
+            setLoadingTopics(null);
+        }
+    }, [textbookId, topics, toast]);
 
     useEffect(() => {
         const fetchPageData = async () => {
             setLoading(true);
             try {
-                const [textbookSnap, chapterSnap, topicsData] = await Promise.all([
+                const [textbookSnap, chaptersQuerySnap] = await Promise.all([
                     getDoc(doc(db, 'textbooks', textbookId)),
-                    getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId)),
-                    getTopicsByChapterId(textbookId, chapterId),
+                    getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
                 ]);
 
                 if (textbookSnap.exists()) setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
-                if (chapterSnap.exists()) setChapter({ id: chapterSnap.id, ...chapterSnap.data() } as Chapter);
                 
-                setTopics(topicsData);
+                const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+                chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+                setChapters(chaptersData);
 
-                // If no topic is selected in URL and topics exist, redirect to the first topic
-                if (!activeTopicId && topicsData.length > 0) {
-                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsData[0].id}`);
+                if (chapterId) {
+                    await fetchChapterTopics(chapterId);
                 }
 
             } catch (e) {
@@ -125,21 +164,23 @@ function ChapterPageContent() {
         };
 
         fetchPageData();
-    }, [textbookId, chapterId, toast, router, activeTopicId]);
+    }, [textbookId, chapterId, toast, fetchChapterTopics]);
 
     const handleResourceClick = (resource: Resource) => {
         setViewerResource(resource);
         setViewerOpen(true);
     };
 
-    if (loading) {
+    if (loading && !textbook) {
         return <div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>;
     }
     
+    const activeChapter = chapters.find(c => c.id === chapterId);
+
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        { name: chapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
+        { name: activeChapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
     ];
 
     const sidebar = (
@@ -149,13 +190,15 @@ function ChapterPageContent() {
                     <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                 </Link>
             </div>
-             <div className="p-4">
-                 <h4 className="font-semibold text-lg mb-2">{chapter?.title}</h4>
+             <div className="p-2">
                 <SidebarNav 
+                    chapters={chapters}
                     topics={topics}
-                    activeTopic={activeTopicId}
+                    activeChapterId={chapterId}
+                    activeTopicId={activeTopicId}
+                    onChapterToggle={fetchChapterTopics}
+                    loadingTopics={loadingTopics}
                     textbookId={textbookId}
-                    chapterId={chapterId}
                 />
             </div>
         </>
@@ -177,11 +220,11 @@ function ChapterPageContent() {
                         </aside>
                     </SheetContent>
                 </Sheet>
-                 <nav className="text-sm">
+                 <nav className="text-sm overflow-hidden">
                      <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         {breadcrumbs.map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1.5">
-                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate">{crumb.name}</Link>
+                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[100px] sm:max-w-none">{crumb.name}</Link>
                                {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                            </li>
                         ))}

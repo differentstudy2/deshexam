@@ -44,6 +44,7 @@ const SidebarNav = ({
   topics,
   activeChapterId,
   activeTopicId,
+  onChapterToggle,
   loadingTopics,
   textbookId,
 }: {
@@ -51,10 +52,11 @@ const SidebarNav = ({
   topics: { [key: string]: Topic[] };
   activeChapterId: string | null;
   activeTopicId: string | null;
+  onChapterToggle: (chapterId: string) => void;
   loadingTopics: string | null;
   textbookId: string;
 }) => (
-    <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full">
+    <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
       {chapters.map((chapter, index) => (
         <AccordionItem value={chapter.id} key={chapter.id}>
           <AccordionTrigger
@@ -146,17 +148,29 @@ function TopicPageContent() {
     }, [activeTopic]);
 
 
+    const fetchChapterTopics = useCallback(async (cId: string) => {
+        if (!cId || topics[cId]) return; // Don't fetch if no ID or already fetched
+        setLoadingTopics(cId);
+        try {
+            const topicsData = await getTopicsByChapterId(textbookId, cId);
+            setTopics(prev => ({ ...prev, [cId]: topicsData }));
+        } catch (e) {
+            toast({ variant: "destructive", title: "Error loading topics", description: (e as Error).message });
+        } finally {
+            setLoadingTopics(null);
+        }
+    }, [textbookId, topics, toast]);
+
     const fetchPageData = useCallback(async () => {
         setLoading(true);
         try {
-            const textbookDocRef = doc(db, 'textbooks', textbookId);
-            const [textbookDocSnap, chaptersQuerySnap] = await Promise.all([
-                getDoc(textbookDocRef),
+            const [textbookSnap, chaptersQuerySnap] = await Promise.all([
+                getDoc(doc(db, 'textbooks', textbookId)),
                 getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title')))
             ]);
 
-            if (textbookDocSnap.exists()) {
-                setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
+            if (textbookSnap.exists()) {
+                setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
             }
 
             const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
@@ -164,15 +178,16 @@ function TopicPageContent() {
             setChapters(chaptersData);
 
             if (chapterId) {
-                setLoadingTopics(chapterId);
                 const topicsData = await getTopicsByChapterId(textbookId, chapterId);
                 setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
                 
                 const currentTopic = topicsData.find(t => t.id === topicId);
                 if (currentTopic) {
                     setActiveTopic(currentTopic);
+                } else if(topicsData.length > 0 && !topicId) {
+                    // Redirect to the first topic if no topic ID is in the URL
+                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsData[0].id}`);
                 }
-                setLoadingTopics(null);
             }
 
         } catch (e) {
@@ -180,7 +195,7 @@ function TopicPageContent() {
         } finally {
             setLoading(false);
         }
-    }, [textbookId, chapterId, topicId, toast]);
+    }, [textbookId, chapterId, topicId, toast, router]);
 
     useEffect(() => {
         fetchPageData();
@@ -200,7 +215,7 @@ function TopicPageContent() {
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` }] : []),
+        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []), // Link to current page
         ...(activeTopic ? [{ name: activeTopic.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []),
     ];
 
@@ -213,10 +228,11 @@ function TopicPageContent() {
             </div>
              <div className="p-2">
                 <SidebarNav 
-                    chapters={chapters} 
+                    chapters={chapters}
                     topics={topics}
                     activeChapterId={chapterId}
                     activeTopicId={topicId}
+                    onChapterToggle={fetchChapterTopics}
                     loadingTopics={loadingTopics}
                     textbookId={textbookId}
                 />
@@ -240,14 +256,17 @@ function TopicPageContent() {
                         </aside>
                     </SheetContent>
                 </Sheet>
-                 <nav className="text-sm overflow-hidden">
+                <nav className="text-sm overflow-hidden">
                      <ol className="flex items-center gap-1.5 whitespace-nowrap">
-                        {breadcrumbs.map((crumb, index) => (
+                        {breadcrumbs.slice(0, -1).map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1.5">
-                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[100px] sm:max-w-none">{crumb.name}</Link>
-                               {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
+                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[80px] sm:max-w-none">{crumb.name}</Link>
+                               <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>
                            </li>
                         ))}
+                        <li className="font-semibold text-foreground truncate max-w-[100px] sm:max-w-none">
+                            {breadcrumbs[breadcrumbs.length - 1]?.name}
+                        </li>
                     </ol>
                 </nav>
             </div>
