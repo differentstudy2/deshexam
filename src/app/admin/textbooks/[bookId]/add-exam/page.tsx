@@ -33,9 +33,9 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, uploadFile } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, Image as ImageIcon } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { addContent } from '@/lib/firebase/firestore';
+import { PlusCircle, Trash2, Loader2, Save } from 'lucide-react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -60,16 +60,13 @@ const questionSchema = z.object({
 });
 
 const formSchema = z.object({
-  title: z.string().optional(),
+  title: z.string().min(1, "Title is required."),
   description: z.string().optional(),
   duration: z.coerce
     .number()
     .int()
-    .positive('Duration must be a positive number of minutes.').optional(),
+    .min(0, 'Duration must be a positive number of minutes.').optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
-  access: z.enum(['free', 'premium', 'pro']),
-  price: z.coerce.number().optional(),
-  subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).optional(),
 });
 
@@ -89,19 +86,25 @@ export default function AddTextbookExamPage() {
       description: '',
       duration: 0,
       difficulty: 'Medium',
-      access: 'free',
-      price: undefined,
-      subscriptionPlan: 'pass',
       questions: [],
     },
   });
 
-  const { fields, append, remove, replace } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'questions',
   });
   
   const questions = form.watch('questions');
+  useEffect(() => {
+    const totalMarks = questions?.reduce((total, q) => {
+        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+            return total + (q.correctAnswer.length || 0);
+        }
+        return total + (q.marks || 1);
+    }, 0) || 0;
+    form.setValue('duration', totalMarks, { shouldValidate: true });
+  }, [questions, form]);
   
   const handleFormSubmit = async (data: FormValues) => {
     try {
@@ -109,6 +112,7 @@ export default function AddTextbookExamPage() {
         ...data, 
         testType: 'Exam',
         textbookId: textbookId,
+        access: 'free', // Default access for textbook exams
       };
       
       await addContent(contentToSave);
@@ -192,9 +196,9 @@ export default function AddTextbookExamPage() {
                     name="duration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration (in minutes)</FormLabel>
+                        <FormLabel>Duration / Total Marks</FormLabel>
                         <FormControl>
-                          <Input type="number" {...field} />
+                          <Input type="number" {...field} readOnly disabled />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -273,21 +277,77 @@ export default function AddTextbookExamPage() {
                                     Remove
                                 </Button>
                             </div>
-                            <div className="space-y-4">
+                             <div className="space-y-4">
+                                  <FormField
+                                      control={form.control}
+                                      name={`questions.${index}.text`}
+                                      render={({ field }) => (
+                                          <FormItem>
+                                              <FormLabel>Question Text</FormLabel>
+                                              <FormControl>
+                                                  <Input {...field} />
+                                              </FormControl>
+                                              <FormMessage />
+                                          </FormItem>
+                                      )}
+                                  />
+                                   {form.watch(`questions.${index}.type`) === 'Multiple Choice' && (
+                                    <div className="space-y-4">
+                                        <FormLabel>Options</FormLabel>
+                                        <Controller
+                                            control={form.control}
+                                            name={`questions.${index}.correctAnswer`}
+                                            render={({ field }) => (
+                                                <RadioGroup
+                                                    onValueChange={field.onChange}
+                                                    value={field.value}
+                                                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                                >
+                                                    {[0, 1, 2, 3].map(optionIndex => (
+                                                        <div key={optionIndex} className="flex items-start gap-4">
+                                                            <FormControl>
+                                                                <RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" />
+                                                            </FormControl>
+                                                            <div className="space-y-2 flex-1">
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name={`questions.${index}.options.${optionIndex}.text`}
+                                                                    render={({ field: optionField }) => (
+                                                                        <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </RadioGroup>
+                                            )}
+                                        />
+                                    </div>
+                                )}
+                                {(form.watch(`questions.${index}.type`) === 'Short Answer' || form.watch(`questions.${index}.type`) === 'Fill in the Blank') && (
+                                    <FormField
+                                        control={form.control}
+                                        name={`questions.${index}.correctAnswer`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Answer</FormLabel>
+                                                <FormControl><Input {...field} placeholder="Enter the correct answer" /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
                                 <FormField
                                     control={form.control}
-                                    name={`questions.${index}.text`}
+                                    name={`questions.${index}.explanation`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Question Text</FormLabel>
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
+                                            <FormLabel>Explanation</FormLabel>
+                                            <FormControl><Textarea {...field} placeholder="Explain why the answer is correct." /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                {/* ... More question type fields will be added here ... */}
                             </div>
                         </Card>
                     );
@@ -319,6 +379,7 @@ export default function AddTextbookExamPage() {
                     type="submit"
                     disabled={form.formState.isSubmitting}
                 >
+                    <Save className="mr-2 h-4 w-4"/>
                     {form.formState.isSubmitting ? "Saving Exam..." : "Save Exam"}
                 </Button>
            </div>
