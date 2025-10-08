@@ -292,6 +292,220 @@ const PracticeSetItem = ({
 };
 
 
+const MainContent = ({ textbook, chapters, topics, activeChapter, activeTopic, selectedTopicContent, topicAggregateScore, settings, progress, handleResourceClick, fetchResources, handleDownloadPdf, isDownloading, areResourcesLoading, areResourcesFetched }: any) => {
+    
+    const getResourceIcon = (type: string) => {
+        switch (type) {
+        case 'video': return <Video className="w-4 h-4 text-primary" />;
+        case 'audio': return <Mic className="w-4 h-4 text-primary" />;
+        case 'pdf': return <FileIcon className="w-4 h-4 text-primary" />;
+        case 'doc': return <FileText className="w-4 h-4 text-primary" />;
+        default: return <FileText className="w-4 h-4 text-primary" />;
+        }
+    };
+
+    const groupedResources = (selectedTopicContent?.resources || []).reduce((acc: any, resource: any) => {
+        const type = resource.type;
+        if (!acc[type]) {
+            acc[type] = [];
+        }
+        acc[type].push(resource);
+        return acc;
+    }, {} as { [key: string]: Resource[] });
+    
+    const resourceOrder: ('video' | 'audio' | 'pdf' | 'doc')[] = ['video', 'audio', 'pdf', 'doc'];
+
+    return (
+         <main>
+           {activeChapter && !activeTopic ? (
+                <Card className="min-h-[60vh]">
+                    <CardHeader>
+                        <CardTitle className="text-2xl">{activeChapter.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {activeChapter.content ? (
+                             <article className="prose dark:prose-invert max-w-none">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {activeChapter.content}
+                                </ReactMarkdown>
+                             </article>
+                        ) : (
+                            <p>No summary available for this chapter.</p>
+                        )}
+                        
+                        {activeChapter.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
+                            <div className="mt-8">
+                                <Separator />
+                                <h3 className="font-semibold text-2xl mt-6">Chapter Questions</h3>
+                                <Accordion type="single" collapsible className="w-full mt-4">
+                                {activeChapter.textbookQuestions.map((q: Question, index: number) => (
+                                    <AccordionItem value={`item-${index}`} key={q.id}>
+                                        <AccordionTrigger>{index + 1}. {q.text}</AccordionTrigger>
+                                        <AccordionContent className="prose dark:prose-invert max-w-none">
+                                            {q.type === 'Multiple Choice' && q.options?.map((option, optIndex) => {
+                                                const isCorrectAnswer = q.correctAnswer === option.text;
+                                                return (
+                                                    <div key={optIndex} className={cn("p-3 rounded-lg border flex items-start gap-3", isCorrectAnswer ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" : "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800")}>
+                                                        {isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />}
+                                                        <div className="flex-1">
+                                                            <span className="font-medium">{option.text}</span>
+                                                            {option.explanation && <p className="text-xs text-muted-foreground mt-1">{option.explanation}</p>}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {(q.type === 'Short Answer' || q.type === 'Fill in the Blank' || q.type === 'True/False') && (
+                                                <p><strong>Answer:</strong> {q.correctAnswer}</p>
+                                            )}
+                                            {q.type === 'Matching' && Array.isArray(q.correctAnswer) && (
+                                                <div className="space-y-2">
+                                                    <strong>Correct Pairs:</strong>
+                                                    <ul>
+                                                        {q.correctAnswer.map((pair: any, i: number) => (
+                                                            <li key={i}>{pair.a} = {pair.b}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {q.explanation && <p><strong>Explanation:</strong> {q.explanation}</p>}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                                </Accordion>
+                            </div>
+                        )}
+
+                        {activeChapter.practiceSets && activeChapter.practiceSets.length > 0 && (
+                            <div className="mt-8">
+                                <Separator />
+                                <h3 className="font-semibold text-2xl mt-6">Chapter Practice Sets</h3>
+                                <div className="space-y-2 mt-4">
+                                    {activeChapter.practiceSets.map((ps: any, index: number) => (
+                                        <PracticeSetItem
+                                            key={ps.id}
+                                            ps={ps}
+                                            textbookId={textbook.id}
+                                            chapterId={activeChapter.id}
+                                            isLocked={false} // Chapter-level sets are not locked by topic progression
+                                            passMark={settings?.practiceSetPassMark || 60}
+                                            highestScore={progress?.highestScores?.[ps.id]}
+                                            onDownload={() => handleDownloadPdf(ps)}
+                                            isDownloading={isDownloading === ps.id}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {!selectedTopicContent && !activeChapter.practiceSets?.length && !activeChapter.textbookQuestions?.length &&(
+                          <p className="mt-8 text-muted-foreground font-semibold">Please select a topic from the sidebar to view its content and practice sets.</p>
+                        )}
+                    </CardContent>
+                </Card>
+            ) : selectedTopicContent ? (
+             <Card>
+                <CardContent className="p-4">
+                     <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="text-xl font-headline">{selectedTopicContent.title}</AccordionTrigger>
+                            <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {selectedTopicContent.content || 'No content available for this topic yet.'}
+                                </ReactMarkdown>
+                                
+                                <Accordion type="single" collapsible className="w-full not-prose mt-8" onValueChange={(value) => {if(value) fetchResources()}}>
+                                    <AccordionItem value="resources">
+                                        <AccordionTrigger>
+                                            <h3 className="font-semibold text-lg">Additional Resources</h3>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                        {areResourcesLoading ? (
+                                            <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
+                                        ) : selectedTopicContent.resources && selectedTopicContent.resources.length > 0 ? (
+                                            <div className="space-y-4 mt-4">
+                                            {resourceOrder.map(type => (
+                                                groupedResources[type] && (
+                                                <div key={type}>
+                                                    <h4 className="font-semibold text-md mb-2 capitalize">{type}s</h4>
+                                                    <ul className="space-y-2">
+                                                    {groupedResources[type].map((res: Resource) => (
+                                                        <li key={res.id}>
+                                                            <button
+                                                                onClick={() => handleResourceClick(res)}
+                                                                className="w-full flex items-center p-3 border rounded-md hover:bg-secondary transition-colors text-left"
+                                                            >
+                                                                {getResourceIcon(res.type)}
+                                                                <span className="ml-3 font-medium">{res.title}</span>
+                                                                <ExternalLink className="w-4 h-4 ml-auto text-muted-foreground" />
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                    </ul>
+                                                </div>
+                                                )
+                                            ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-muted-foreground text-center py-4">No additional resources for this topic.</p>
+                                        )}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+
+                                {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
+                                    <div className="mt-8">
+                                        <Separator />
+                                        <div className="flex items-center justify-between mt-6">
+                                            <h3 className="font-semibold text-2xl">Practice Sets</h3>
+                                            {topicAggregateScore !== null && (
+                                                 <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-muted-foreground">Topic Average:</span>
+                                                    <ScoreCircle score={topicAggregateScore} size={40} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2 mt-4">
+                                            {selectedTopicContent.practiceSets.map((ps: any, index: number) => {
+                                                const passMark = settings?.practiceSetPassMark || 60;
+                                                const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
+                                                const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
+                                                
+                                                const isLocked = index > 0 && settings?.gateChaptersOnPass && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
+
+                                                return (
+                                                  <PracticeSetItem
+                                                    key={ps.id}
+                                                    ps={ps}
+                                                    textbookId={textbook.id}
+                                                    chapterId={activeChapter.id}
+                                                    topicId={activeTopic}
+                                                    isLocked={isLocked}
+                                                    passMark={passMark}
+                                                    highestScore={progress?.highestScores?.[ps.id]}
+                                                    onDownload={() => handleDownloadPdf(ps, activeTopic)}
+                                                    isDownloading={isDownloading === ps.id}
+                                                  />
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </CardContent>
+            </Card>
+           ) : (
+             <Card className="min-h-[60vh] flex items-center justify-center">
+                <CardContent className="text-center text-muted-foreground">
+                    <BookOpen className="mx-auto h-12 w-12 mb-4" />
+                    <p className="font-semibold">Select a chapter and topic to start learning.</p>
+                </CardContent>
+            </Card>
+           )}
+        </main>
+    )
+}
+
 export default function TextbookSolutionsPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -757,27 +971,6 @@ export default function TextbookSolutionsPage() {
         </div>
     );
   }
-  
-  const getResourceIcon = (type: string) => {
-    switch (type) {
-      case 'video': return <Video className="w-4 h-4 text-primary" />;
-      case 'audio': return <Mic className="w-4 h-4 text-primary" />;
-      case 'pdf': return <FileIcon className="w-4 h-4 text-primary" />;
-      case 'doc': return <FileText className="w-4 h-4 text-primary" />;
-      default: return <FileText className="w-4 h-4 text-primary" />;
-    }
-  };
-
-  const groupedResources = (selectedTopicContent?.resources || []).reduce((acc, resource) => {
-    const type = resource.type;
-    if (!acc[type]) {
-      acc[type] = [];
-    }
-    acc[type].push(resource);
-    return acc;
-  }, {} as { [key: string]: Resource[] });
-
-  const resourceOrder: ('video' | 'audio' | 'pdf' | 'doc')[] = ['video', 'audio', 'pdf', 'doc'];
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
@@ -852,193 +1045,23 @@ export default function TextbookSolutionsPage() {
           />
         </aside>
 
-        <main>
-           {activeChapter && !activeTopicId ? (
-                <Card className="min-h-[60vh]">
-                    <CardHeader>
-                        <CardTitle className="text-2xl">{activeChapter.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {activeChapter.content ? (
-                             <article className="prose dark:prose-invert max-w-none">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {activeChapter.content}
-                                </ReactMarkdown>
-                             </article>
-                        ) : (
-                            <p>No summary available for this chapter.</p>
-                        )}
-                        
-                        {activeChapter.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
-                            <div className="mt-8">
-                                <Separator />
-                                <h3 className="font-semibold text-2xl mt-6">Chapter Questions</h3>
-                                <Accordion type="single" collapsible className="w-full mt-4">
-                                {activeChapter.textbookQuestions.map((q, index) => (
-                                    <AccordionItem value={`item-${index}`} key={q.id}>
-                                        <AccordionTrigger>{index + 1}. {q.text}</AccordionTrigger>
-                                        <AccordionContent className="prose dark:prose-invert max-w-none">
-                                            {q.type === 'Multiple Choice' && q.options?.map((option, optIndex) => {
-                                                const isCorrectAnswer = q.correctAnswer === option.text;
-                                                return (
-                                                    <div key={optIndex} className={cn("p-3 rounded-lg border flex items-start gap-3", isCorrectAnswer ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" : "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800")}>
-                                                        {isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />}
-                                                        <div className="flex-1">
-                                                            <span className="font-medium">{option.text}</span>
-                                                            {option.explanation && <p className="text-xs text-muted-foreground mt-1">{option.explanation}</p>}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            {(q.type === 'Short Answer' || q.type === 'Fill in the Blank' || q.type === 'True/False') && (
-                                                <p><strong>Answer:</strong> {q.correctAnswer}</p>
-                                            )}
-                                            {q.type === 'Matching' && Array.isArray(q.correctAnswer) && (
-                                                <div className="space-y-2">
-                                                    <strong>Correct Pairs:</strong>
-                                                    <ul>
-                                                        {q.correctAnswer.map((pair: any, i: number) => (
-                                                            <li key={i}>{pair.a} = {pair.b}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
-                                            {q.explanation && <p><strong>Explanation:</strong> {q.explanation}</p>}
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                ))}
-                                </Accordion>
-                            </div>
-                        )}
-
-                        {activeChapter.practiceSets && activeChapter.practiceSets.length > 0 && (
-                            <div className="mt-8">
-                                <Separator />
-                                <h3 className="font-semibold text-2xl mt-6">Chapter Practice Sets</h3>
-                                <div className="space-y-2 mt-4">
-                                    {activeChapter.practiceSets.map((ps, index) => (
-                                        <PracticeSetItem
-                                            key={ps.id}
-                                            ps={ps}
-                                            textbookId={textbookId}
-                                            chapterId={activeChapter.id}
-                                            isLocked={false} // Chapter-level sets are not locked by topic progression
-                                            passMark={settings?.practiceSetPassMark || 60}
-                                            highestScore={progress?.highestScores?.[ps.id]}
-                                            onDownload={() => handleDownloadPdf(ps)}
-                                            isDownloading={isDownloading === ps.id}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                        {!selectedTopicContent && !activeChapter.practiceSets?.length && !activeChapter.textbookQuestions?.length &&(
-                          <p className="mt-8 text-muted-foreground font-semibold">Please select a topic from the sidebar to view its content and practice sets.</p>
-                        )}
-                    </CardContent>
-                </Card>
-            ) : selectedTopicContent ? (
-             <Card>
-                <CardContent className="p-4">
-                     <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
-                        <AccordionItem value="item-1">
-                            <AccordionTrigger className="text-xl font-headline">{selectedTopicContent.title}</AccordionTrigger>
-                            <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {selectedTopicContent.content || 'No content available for this topic yet.'}
-                                </ReactMarkdown>
-                                
-                                <Accordion type="single" collapsible className="w-full not-prose mt-8" onValueChange={(value) => {if(value) fetchResources()}}>
-                                    <AccordionItem value="resources">
-                                        <AccordionTrigger>
-                                            <h3 className="font-semibold text-lg">Additional Resources</h3>
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                        {areResourcesLoading ? (
-                                            <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
-                                        ) : selectedTopicContent.resources && selectedTopicContent.resources.length > 0 ? (
-                                            <div className="space-y-4 mt-4">
-                                            {resourceOrder.map(type => (
-                                                groupedResources[type] && (
-                                                <div key={type}>
-                                                    <h4 className="font-semibold text-md mb-2 capitalize">{type}s</h4>
-                                                    <ul className="space-y-2">
-                                                    {groupedResources[type].map(res => (
-                                                        <li key={res.id}>
-                                                            <button
-                                                                onClick={() => handleResourceClick(res)}
-                                                                className="w-full flex items-center p-3 border rounded-md hover:bg-secondary transition-colors text-left"
-                                                            >
-                                                                {getResourceIcon(res.type)}
-                                                                <span className="ml-3 font-medium">{res.title}</span>
-                                                                <ExternalLink className="w-4 h-4 ml-auto text-muted-foreground" />
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                    </ul>
-                                                </div>
-                                                )
-                                            ))}
-                                            </div>
-                                        ) : (
-                                            <p className="text-muted-foreground text-center py-4">No additional resources for this topic.</p>
-                                        )}
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-
-                                {selectedTopicContent.practiceSets && selectedTopicContent.practiceSets.length > 0 && (
-                                    <div className="mt-8">
-                                        <Separator />
-                                        <div className="flex items-center justify-between mt-6">
-                                            <h3 className="font-semibold text-2xl">Practice Sets</h3>
-                                            {topicAggregateScore !== null && (
-                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-muted-foreground">Topic Average:</span>
-                                                    <ScoreCircle score={topicAggregateScore} size={40} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="space-y-2 mt-4">
-                                            {selectedTopicContent.practiceSets.map((ps, index) => {
-                                                const passMark = settings?.practiceSetPassMark || 60;
-                                                const prevPsId = index > 0 ? selectedTopicContent.practiceSets[index - 1].id : null;
-                                                const prevSetHighestScore = prevPsId ? progress?.highestScores?.[prevPsId] : undefined;
-                                                
-                                                const isLocked = index > 0 && settings?.gateChaptersOnPass && (prevSetHighestScore === undefined || prevSetHighestScore < passMark);
-
-                                                return (
-                                                  <PracticeSetItem
-                                                    key={ps.id}
-                                                    ps={ps}
-                                                    textbookId={textbookId}
-                                                    chapterId={activeChapterId!}
-                                                    topicId={activeTopicId!}
-                                                    isLocked={isLocked}
-                                                    passMark={passMark}
-                                                    highestScore={progress?.highestScores?.[ps.id]}
-                                                    onDownload={() => handleDownloadPdf(ps, activeTopicId!)}
-                                                    isDownloading={isDownloading === ps.id}
-                                                  />
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                </CardContent>
-            </Card>
-           ) : (
-             <Card className="min-h-[60vh] flex items-center justify-center">
-                <CardContent className="text-center text-muted-foreground">
-                    <BookOpen className="mx-auto h-12 w-12 mb-4" />
-                    <p className="font-semibold">Select a chapter and topic to start learning.</p>
-                </CardContent>
-            </Card>
-           )}
-        </main>
+        <MainContent 
+            textbook={textbook}
+            chapters={chapters}
+            topics={topics}
+            activeChapter={activeChapter}
+            activeTopic={activeTopicId}
+            selectedTopicContent={selectedTopicContent}
+            topicAggregateScore={topicAggregateScore}
+            settings={settings}
+            progress={progress}
+            handleResourceClick={handleResourceClick}
+            fetchResources={fetchResources}
+            handleDownloadPdf={handleDownloadPdf}
+            isDownloading={isDownloading}
+            areResourcesLoading={areResourcesLoading}
+            areResourcesFetched={areResourcesFetched}
+        />
       </div>
 
        {viewerResource && (
