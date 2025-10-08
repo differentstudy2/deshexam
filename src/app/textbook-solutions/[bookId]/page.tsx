@@ -23,6 +23,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 function TextbookMainContent() {
     const params = useParams();
@@ -119,7 +121,7 @@ function TextbookMainContent() {
                                {chapter.topics.map(topic => (
                                    <li key={topic.id}>
                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
-                                            <FileIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                            <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                             <span className="flex-grow">{topic.title}</span>
                                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                        </Link>
