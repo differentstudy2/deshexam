@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,10 +8,10 @@ import { db } from '@/lib/firebase/client';
 import type { Textbook, Chapter, Topic } from '@/lib/types';
 import { getTopicsByChapterId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
+import { Loader2, ArrowLeft, BookOpen, FileText, CheckSquare, Edit } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 
 export default function ChapterPage() {
     const params = useParams();
@@ -63,71 +62,71 @@ export default function ChapterPage() {
     }, [textbookId, chapterId, toast]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin" /></div>;
+        return <div className="flex justify-center items-center h-full min-h-[50vh]"><Loader2 className="animate-spin" /></div>;
     }
     
     if (!chapter) {
-        return <div>Chapter not found.</div>;
+        return <div className="text-center p-8">Chapter not found.</div>;
     }
 
     return (
-        <div className="container py-8">
-            <div className="mb-6">
-                <Button variant="ghost" asChild>
-                    <Link href={`/textbook-solutions/${textbookId}`}>
-                        <ArrowLeft className="mr-2" /> Back to Chapters
-                    </Link>
-                </Button>
-            </div>
-            <header className="mb-8">
-                <h1 className="text-4xl font-bold font-headline">{chapter.title}</h1>
-                <p className="text-lg text-muted-foreground mt-2">{textbook?.title}</p>
-                {chapter.content && <p className="mt-4 max-w-3xl">{chapter.content}</p>}
-            </header>
+        <div className="bg-secondary/40">
+            <div className="container py-8 md:py-12">
+                <div className="mb-6">
+                    <Button variant="ghost" asChild>
+                        <Link href={`/textbook-solutions/${textbookId}`}>
+                            <ArrowLeft className="mr-2" /> Back to Chapters
+                        </Link>
+                    </Button>
+                </div>
+                <header className="mb-8 md:mb-12">
+                    <p className="text-primary font-semibold">{textbook?.title}</p>
+                    <h1 className="text-3xl md:text-4xl font-bold font-headline mt-1">{chapter.title}</h1>
+                    {chapter.content && <p className="mt-2 max-w-3xl text-muted-foreground">{chapter.content}</p>}
+                </header>
 
-            <div className="space-y-6">
-                {topics.map(topic => (
-                    <Card key={topic.id}>
-                        <CardHeader>
-                            <CardTitle>{topic.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="flex-1 space-y-4">
-                                    <h4 className="font-semibold">Practice Sets</h4>
-                                    {topic.practiceSets && topic.practiceSets.length > 0 ? (
-                                        <ul className="space-y-2">
-                                            {topic.practiceSets.map(ps => (
-                                                <li key={ps.id}>
-                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topic.id}`} className="flex items-center justify-between p-3 border rounded-md hover:bg-secondary">
-                                                        <div>
-                                                            <p>{ps.title}</p>
-                                                            <p className="text-sm text-muted-foreground">{(ps as any).questionCount || 0} questions</p>
-                                                        </div>
-                                                        <ChevronRight className="w-5 h-5"/>
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground">No practice sets for this topic.</p>
-                                    )}
-                                </div>
-                                <div className="flex-1">
-                                    <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
-                                        <Button className="w-full h-full text-lg">
-                                            <BookOpen className="mr-2" />
-                                            View Topic & Resources
+                <div className="space-y-6">
+                     <h2 className="text-2xl font-bold font-headline border-b pb-2">Topics</h2>
+                    {topics.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {topics.map(topic => (
+                                <Card key={topic.id} className="flex flex-col">
+                                    <CardHeader>
+                                        <CardTitle>{topic.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex-grow">
+                                        <div className="space-y-2 text-sm text-muted-foreground">
+                                            <div className="flex items-center gap-2">
+                                                <FileText className="w-4 h-4"/>
+                                                <span>{(topic.resources || []).length} Resources</span>
+                                            </div>
+                                             <div className="flex items-center gap-2">
+                                                <CheckSquare className="w-4 h-4"/>
+                                                <span>{(topic.practiceSets || []).length} Practice Sets</span>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="flex flex-col sm:flex-row gap-2">
+                                        <Button asChild className="w-full">
+                                            <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
+                                                <BookOpen className="mr-2"/> View Topic
+                                            </Link>
                                         </Button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-                {topics.length === 0 && (
-                    <p className="text-muted-foreground text-center py-8">No topics available for this chapter.</p>
-                )}
+                                        <Button asChild variant="secondary" className="w-full">
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
+                                                <Edit className="mr-2"/> Manage Topic
+                                            </Link>
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-muted-foreground py-16 bg-card rounded-lg">
+                            <p>No topics have been added to this chapter yet.</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
