@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -20,8 +20,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -47,6 +57,7 @@ export default function ManageTextbookExamsPage() {
 
     const [exams, setExams] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
+    const [examToDelete, setExamToDelete] = useState<Exam | null>(null);
 
     useEffect(() => {
         const fetchExams = async () => {
@@ -68,6 +79,27 @@ export default function ManageTextbookExamsPage() {
         };
         fetchExams();
     }, [textbookId, toast]);
+
+    const handleDelete = async () => {
+        if (!examToDelete) return;
+        try {
+            await deleteContent(examToDelete.id);
+            toast({
+                title: 'Exam Deleted',
+                description: `"${examToDelete.title}" has been successfully deleted.`,
+            });
+            setExams(exams.filter(exam => exam.id !== examToDelete.id));
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error Deleting Exam',
+                description: (error as Error).message,
+            });
+        } finally {
+            setExamToDelete(null);
+        }
+    };
+
 
     return (
         <div className="space-y-6">
@@ -123,9 +155,15 @@ export default function ManageTextbookExamsPage() {
                                     <TableCell className="font-medium">{exam.title}</TableCell>
                                     <TableCell>{exam.subject}</TableCell>
                                     <TableCell><ContentBadge type={exam.access} /></TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForExam(exam.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                        </Button>
+                                         <Button asChild variant="outline" size="sm">
+                                            <Link href={`/admin/edit-content/${exam.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
+                                        </Button>
+                                        <Button variant="destructive" size="sm" onClick={() => setExamToDelete(exam)}>
+                                            <Trash2 className="mr-2 h-4 w-4"/>Delete
                                         </Button>
                                     </TableCell>
                                 </TableRow>
@@ -140,6 +178,24 @@ export default function ManageTextbookExamsPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            <AlertDialog open={!!examToDelete} onOpenChange={() => setExamToDelete(null)}>
+                <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the exam
+                    "{examToDelete?.title}".
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                        Delete
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
