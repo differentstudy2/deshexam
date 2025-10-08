@@ -249,21 +249,19 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader className="p-4 border-b">
-                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
-                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-                            </Link>
-                        </SheetHeader>
-                        <aside className="h-full bg-card">
-                            {sidebarContent}
-                        </aside>
+                        <SheetHeader className="p-4 border-b">
+                           <SheetTitle className="sr-only">Main Navigation</SheetTitle>
+                           <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                               <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                           </Link>
+                       </SheetHeader>
+                       {sidebarContent}
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm overflow-hidden">
-                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
+                    <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         <li className="flex items-center gap-1.5">
-                            <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}`} className="text-muted-foreground hover:text-foreground">
+                             <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}`} className="text-muted-foreground hover:text-foreground">
                                 <ArrowLeft className="w-4 h-4 inline-block mr-1" />
                                 <span className="truncate max-w-[150px] sm:max-w-none">{activeChapter?.title || "Chapter"}</span>
                             </Link>
@@ -274,12 +272,11 @@ function TopicPageContent() {
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
                 <aside className="hidden md:block h-full bg-card border-r">
                     <div className="sticky top-0 h-screen overflow-y-auto">
-                         <SheetHeader className="p-4 border-b">
-                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
+                         <div className="p-4 border-b">
                             <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                 <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                             </Link>
-                        </SheetHeader>
+                        </div>
                         {sidebarContent}
                     </div>
                 </aside>
@@ -405,5 +402,3 @@ function TopicPageContent() {
 export default function TopicPage() {
     return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
-
-    

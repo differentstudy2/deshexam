@@ -214,15 +214,15 @@ function ChapterPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader className="p-4 border-b">
-                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                         <SheetHeader className="sr-only">
+                            <SheetTitle>Main Navigation</SheetTitle>
+                        </SheetHeader>
+                        <div className="p-4 border-b">
                             <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                 <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                             </Link>
-                        </SheetHeader>
-                        <aside className="h-full bg-card">
-                            {sidebarContent}
-                        </aside>
+                        </div>
+                        {sidebarContent}
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm overflow-hidden">
