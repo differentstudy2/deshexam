@@ -1,37 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1802,8 +1769,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersSnapshot),
-            getDocs(monthOrdersSnapshot),
+            getDocs(todayOrdersQuery),
+            getDocs(monthOrdersQuery),
             getCountFromServer(usersCollection),
         ]);
 
@@ -1843,9 +1810,14 @@ export const getAllTextbooks = async () => {
 
 export const getChaptersByTextbookId = async (textbookId: string) => {
     try {
-        const q = query(collection(db, "textbooks", textbookId, "chapters"), orderBy("title"));
+        const chaptersRef = collection(db, "textbooks", textbookId, "chapters");
+        const q = query(chaptersRef);
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const chaptersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { title: string } }));
+
+        chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+
+        return chaptersData;
     } catch (e) {
         console.error("Error getting chapters: ", e);
         throw new Error("Failed to fetch chapters.");
@@ -1930,6 +1902,9 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
                 questionCount: questionsSnapshot.size
             });
         }
+        
+        practiceSets.sort((a, b) => (a.title || "").localeCompare(b.title || "", undefined, { numeric: true }));
+        
         return practiceSets;
     } catch (e) {
         console.error("Error getting practice sets: ", e);
@@ -2118,15 +2093,3 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
