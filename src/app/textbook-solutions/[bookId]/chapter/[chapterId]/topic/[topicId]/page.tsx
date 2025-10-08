@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -153,7 +154,6 @@ function TopicPageContent() {
       }
     }, [activeTopic]);
 
-
     const fetchChapterTopics = useCallback(async (cId: string) => {
         if (!cId || topics[cId]) return; 
         setLoadingTopics(cId);
@@ -166,7 +166,7 @@ function TopicPageContent() {
             setLoadingTopics(null);
         }
     }, [textbookId, topics, toast]);
-
+    
     const fetchPageData = useCallback(async () => {
         setLoading(true);
         try {
@@ -308,12 +308,10 @@ function TopicPageContent() {
                      <SheetContent side="left" className="p-0 w-80">
                        <SheetHeader className="p-4 border-b">
                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
-                       </SheetHeader>
-                       <div className="p-4 border-b">
                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                            </Link>
-                       </div>
+                       </SheetHeader>
                        {sidebarContent}
                     </SheetContent>
                 </Sheet>
