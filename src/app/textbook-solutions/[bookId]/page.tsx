@@ -869,6 +869,24 @@ export default function TextbookSolutionsPage() {
                             <p>No summary available for this chapter.</p>
                         )}
                         
+                        {activeChapter.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
+                            <div className="mt-8">
+                                <Separator />
+                                <h3 className="font-semibold text-2xl mt-6">Chapter Questions</h3>
+                                <Accordion type="single" collapsible className="w-full mt-4">
+                                {activeChapter.textbookQuestions.map((q, index) => (
+                                    <AccordionItem value={`item-${index}`} key={q.id}>
+                                        <AccordionTrigger>{index + 1}. {q.text}</AccordionTrigger>
+                                        <AccordionContent className="prose dark:prose-invert max-w-none">
+                                            <p><strong>Answer:</strong> {q.correctAnswer}</p>
+                                            {q.explanation && <p><strong>Explanation:</strong> {q.explanation}</p>}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                                </Accordion>
+                            </div>
+                        )}
+
                         {activeChapter.practiceSets && activeChapter.practiceSets.length > 0 && (
                             <div className="mt-8">
                                 <Separator />
@@ -890,7 +908,9 @@ export default function TextbookSolutionsPage() {
                                 </div>
                             </div>
                         )}
-                        <p className="mt-8 text-muted-foreground font-semibold">Please select a topic from the sidebar to view its content and practice sets.</p>
+                        {!selectedTopicContent && !activeChapter.practiceSets?.length && !activeChapter.textbookQuestions?.length &&(
+                          <p className="mt-8 text-muted-foreground font-semibold">Please select a topic from the sidebar to view its content and practice sets.</p>
+                        )}
                     </CardContent>
                 </Card>
             ) : selectedTopicContent ? (
