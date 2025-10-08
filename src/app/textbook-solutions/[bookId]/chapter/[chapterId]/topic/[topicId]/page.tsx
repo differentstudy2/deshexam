@@ -44,7 +44,6 @@ const SidebarNav = ({
   topics,
   activeChapterId,
   activeTopicId,
-  onTopicSelect,
   loadingTopics,
   textbookId,
 }: {
@@ -52,7 +51,6 @@ const SidebarNav = ({
   topics: { [key: string]: Topic[] };
   activeChapterId: string | null;
   activeTopicId: string | null;
-  onTopicSelect: (chapterId: string, topicId: string) => void;
   loadingTopics: string | null;
   textbookId: string;
 }) => (
@@ -78,7 +76,7 @@ const SidebarNav = ({
                        variant="ghost"
                        asChild
                        className={cn(
-                         "w-full justify-start text-left h-auto py-1.5 px-2 text-sm",
+                         "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
                          activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
                        )}
                      >
@@ -208,7 +206,6 @@ function TopicPageContent() {
                     topics={topics}
                     activeChapterId={chapterId}
                     activeTopicId={topicId}
-                    onTopicSelect={() => {}}
                     loadingTopics={loadingTopics}
                     textbookId={textbookId}
                 />
@@ -227,15 +224,16 @@ function TopicPageContent() {
                         {sidebar}
                     </SheetContent>
                 </Sheet>
-                 <nav className="text-sm">
-                    <ol className="flex items-center gap-1 truncate">
-                        {breadcrumbs.slice(0, -1).map((crumb, index) => (
+                 <nav className="text-sm overflow-hidden">
+                    <ol className="flex items-center gap-1 whitespace-nowrap">
+                       {breadcrumbs.map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1">
-                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground">{crumb.name}</Link>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground"/>
+                               <Link href={crumb.href} className={cn("hover:text-foreground", index < breadcrumbs.length - 1 ? 'max-w-[100px] truncate text-muted-foreground' : 'font-semibold text-foreground')}>
+                                   {crumb.name}
+                                </Link>
+                               {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                            </li>
                         ))}
-                         <li className="font-semibold">{breadcrumbs.slice(-1)[0]?.name}</li>
                     </ol>
                 </nav>
             </div>
@@ -259,13 +257,9 @@ function TopicPageContent() {
                         <div>
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
                             {activeTopic.content && (
-                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6"
-                                    dangerouslySetInnerHTML={{ __html: activeTopic.content.replace(/^(#{1,6}\s+.*)$/gm, (match, p1) => {
-                                        const text = p1.replace(/#+\s+/, '');
-                                        const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-                                        return `<h${p1.match(/#/g)?.length} id="${id}">${text}</h${p1.match(/#/g)?.length}>`;
-                                    })}}
-                                />
+                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeTopic.content}</ReactMarkdown>
+                                </article>
                             )}
                             
                              {activeTopic.resources && activeTopic.resources.length > 0 && (
@@ -367,5 +361,5 @@ function TopicPageContent() {
 
 
 export default function TopicPage() {
-    return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent/></Suspense>
+    return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
