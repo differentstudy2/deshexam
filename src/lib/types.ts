@@ -1,5 +1,4 @@
 
-
 export type Resource = {
     id: string;
     type: 'video' | 'audio' | 'pdf' | 'doc';
@@ -35,7 +34,7 @@ export type Topic = {
     id: string;
     title: string;
     content?: string;
-    practiceSets: PracticeSet[];
+    practiceSets?: PracticeSet[];
     resources?: Resource[];
 };
 
@@ -65,3 +64,5 @@ export type Question = {
     correctAnswer: any;
     explanation?: string;
 };
+
+    

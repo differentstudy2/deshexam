@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -149,7 +149,7 @@ function TopicPageContent() {
 
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
-        if (!cId || topics[cId]) return; // Don't fetch if no ID or already fetched
+        if (!cId || topics[cId]) return; 
         setLoadingTopics(cId);
         try {
             const topicsData = await getTopicsByChapterId(textbookId, cId);
@@ -179,13 +179,22 @@ function TopicPageContent() {
 
             if (chapterId) {
                 const topicsData = await getTopicsByChapterId(textbookId, chapterId);
-                setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
+                const practiceSetsPromises = topicsData.map(t => getPracticeSetsByTopicId(textbookId, chapterId, t.id));
+                const practiceSetsArrays = await Promise.all(practiceSetsPromises);
                 
-                const currentTopic = topicsData.find(t => t.id === topicId);
+                const topicsWithPracticeSets = topicsData.map((t, index) => ({
+                    ...t,
+                    practiceSets: practiceSetsArrays[index]
+                }));
+                
+                setTopics(prev => ({ ...prev, [chapterId]: topicsWithPracticeSets }));
+                
+                const currentTopic = topicsWithPracticeSets.find(t => t.id === topicId);
+
                 if (currentTopic) {
                     setActiveTopic(currentTopic);
-                } else if(topicsData.length > 0 && !topicId) {
-                    // This case should be handled by the chapter page now
+                } else if(topicsWithPracticeSets.length > 0 && !topicId) {
+                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsWithPracticeSets[0].id}`);
                 }
             }
 
@@ -194,7 +203,7 @@ function TopicPageContent() {
         } finally {
             setLoading(false);
         }
-    }, [textbookId, chapterId, topicId, toast]);
+    }, [textbookId, chapterId, topicId, toast, router]);
 
     useEffect(() => {
         fetchPageData();
@@ -240,8 +249,8 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                        <SheetHeader className="p-4 border-b">
-                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                         <SheetHeader className="p-4 border-b">
+                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
                             <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                 <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                             </Link>
@@ -265,11 +274,12 @@ function TopicPageContent() {
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
                 <aside className="hidden md:block h-full bg-card border-r">
                     <div className="sticky top-0 h-screen overflow-y-auto">
-                        <div className="p-4 border-b">
+                         <SheetHeader className="p-4 border-b">
+                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
                             <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                 <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                             </Link>
-                        </div>
+                        </SheetHeader>
                         {sidebarContent}
                     </div>
                 </aside>
@@ -395,3 +405,5 @@ function TopicPageContent() {
 export default function TopicPage() {
     return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
+
+    
