@@ -212,6 +212,9 @@ export default function ManageTextbooksPage() {
                  <Button asChild className="w-full">
                     <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
                 </Button>
+                 <Button asChild className="w-full">
+                    <Link href={`/admin/textbooks/${book.id}/add-exam`}>Add Exam</Link>
+                </Button>
                 <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
                     <Trash2 className="mr-2 h-4 w-4" /> Delete
                 </Button>
