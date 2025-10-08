@@ -16,7 +16,7 @@ import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebas
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Download, CheckCircle, XCircle, GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { Badge } from '@/components/ui/badge';
@@ -150,7 +150,7 @@ function TextbookSolutionsLayout({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
 
-    const isPracticeSetPage = params.practiceSetId;
+    const isPracticeSetPage = !!params.practiceSetId;
 
     useEffect(() => {
         if (!textbookId) return;
@@ -318,4 +318,3 @@ function TextbookSolutionsLayout({ children }: { children: React.ReactNode }) {
 export default function TextbookSolutionsPage({ children }: { children: React.ReactNode }) {
     return <Suspense fallback={<div>Loading...</div>}><TextbookSolutionsLayout>{children}</TextbookSolutionsLayout></Suspense>
 }
-
