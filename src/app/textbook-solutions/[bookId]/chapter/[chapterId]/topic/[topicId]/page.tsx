@@ -367,5 +367,5 @@ function TopicPageContent() {
 
 
 export default function TopicPage() {
-    return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageLayout/></Suspense>
+    return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent/></Suspense>
 }
