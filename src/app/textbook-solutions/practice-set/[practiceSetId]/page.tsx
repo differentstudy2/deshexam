@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -22,6 +21,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescript
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { Separator } from '@/components/ui/separator';
 
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
 
@@ -301,55 +301,49 @@ export default function PracticeSetPage() {
     );
   }
   
-  const pageTitle = [
-    textbook?.board,
-    textbook?.class,
-    textbook?.subject,
-    chapter?.title,
-    topic?.title,
-    test.title
-  ].filter(Boolean).join(' - ');
-
-
   return (
-    <div className="container py-12">
-        <div className="md:col-span-1">
-            <header className="mb-8 p-4">
-                <p className="text-primary font-semibold">{textbook?.subject || 'Practice'}</p>
-                 <h1 className="font-headline text-4xl font-bold tracking-tighter">{pageTitle}</h1>
-                <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
-                 <div className="flex items-center text-muted-foreground space-x-4 mt-2">
-                    <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                        <HelpCircle className="w-4 h-4 text-muted-foreground" />
+    <div className="container py-8 max-w-4xl mx-auto">
+        <div className="bg-background border rounded-lg shadow-sm">
+            <header className="p-6 text-center border-b">
+                <p className="font-semibold text-primary">{textbook?.subject || 'Practice'}</p>
+                <h1 className="font-headline text-3xl font-bold tracking-tighter mt-1">{test.title}</h1>
+                <p className="text-muted-foreground mt-1 max-w-2xl mx-auto">{[textbook?.board, textbook?.class].filter(Boolean).join(' • ')}</p>
+                <div className="mt-4 flex items-center justify-center text-sm text-muted-foreground space-x-6">
+                    <div className="flex items-center gap-1.5">
+                        <HelpCircle className="w-4 h-4" />
                         <span>{test.questions.length} Questions</span>
                     </div>
+                     <div className="flex items-center gap-1.5">
+                        <HelpCircle className="w-4 h-4" />
+                        <span>{totalMarks} Marks</span>
+                    </div>
                     {timeLeft !== null && (
-                        <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                            <Clock className="w-4 h-4 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5 font-mono text-base font-semibold text-foreground">
+                            <Clock className="w-4 h-4" />
                             <span>{formatTime(timeLeft)}</span>
                         </div>
                     )}
                 </div>
             </header>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="p-6">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8">
                 {test.questions && test.questions.map((question, index) => {
                     const questionIndex = index;
                     return (
-                        <Card key={question.id}>
-                            <CardHeader>
-                                <CardTitle className="flex items-baseline gap-2 text-2xl font-bold">
-                                    {questionIndex + 1}. Q - {question.text}
+                        <Card key={question.id} className="p-6 shadow-none border">
+                            <CardHeader className="p-0 mb-4">
+                                <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
+                                    <span>{questionIndex + 1}.</span> <span>{question.text}</span>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-0">
                                 {question.type === 'Multiple Choice' && question.options && (
                                 <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {question.options.map((option, optIndex) => (
-                                    <div key={optIndex} className="flex items-center space-x-2">
+                                    <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
                                         <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-2xl">{option.text}</Label>
+                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">{option.text}</Label>
                                     </div>
                                     ))}
                                 </RadioGroup>
@@ -358,11 +352,11 @@ export default function PracticeSetPage() {
                                 <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
                                     <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                    <Label htmlFor={`q${question.id}-true`} className="text-2xl">True</Label>
+                                    <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                    <Label htmlFor={`q${question.id}-false`} className="text-2xl">False</Label>
+                                    <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
                                     </div>
                                 </RadioGroup>
                                 )}
@@ -439,3 +433,4 @@ export default function PracticeSetPage() {
     </div>
   );
 }
+
