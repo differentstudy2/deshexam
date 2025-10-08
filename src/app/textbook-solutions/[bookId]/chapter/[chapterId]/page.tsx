@@ -328,7 +328,7 @@ function ChapterPageContent() {
                                 </div>
                             )}
 
-                             {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
+                            {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
                                 <div className="mt-12">
                                     <h2 className="font-headline text-2xl font-bold mb-4">Practice Sets</h2>
                                     <div className="space-y-4">
@@ -344,7 +344,7 @@ function ChapterPageContent() {
                                 </div>
                             )}
 
-                            {(!activeChapter?.content && (!activeChapter?.textbookQuestions || activeChapter.textbookQuestions.length === 0)) && (
+                            {(!activeChapter?.content && (!activeChapter?.textbookQuestions || activeChapter.textbookQuestions.length === 0) && (!activeChapter?.practiceSets || activeChapter.practiceSets.length === 0)) && (
                                 <div className="text-center text-muted-foreground pt-16">
                                     <BookOpen className="w-16 h-16 mx-auto mb-4"/>
                                     <h2 className="text-xl font-semibold">Select a topic</h2>

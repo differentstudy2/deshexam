@@ -430,7 +430,7 @@ function TopicPageContent() {
                          <div className="text-center text-muted-foreground pt-16">
                             <BookOpen className="w-16 h-16 mx-auto mb-4"/>
                             <h2 className="text-xl font-semibold">Select a topic</h2>
-                            <p>Choose a chapter and topic from the sidebar to view the content.</p>
+                            <p>Choose a topic from the sidebar to view its specific content.</p>
                         </div>
                     )}
                 </main>
