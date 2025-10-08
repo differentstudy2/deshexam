@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -14,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -167,7 +166,7 @@ function TopicPageContent() {
         try {
             const [textbookSnap, chaptersQuerySnap] = await Promise.all([
                 getDoc(doc(db, 'textbooks', textbookId)),
-                getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title')))
+                getDocs(query(collection(db, `textbooks/${textbookId}/chapters`))),
             ]);
 
             if (textbookSnap.exists()) {
@@ -250,7 +249,7 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                        <SheetHeader className="p-4 border-b">
+                       <SheetHeader className="p-4 border-b">
                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
@@ -321,12 +320,18 @@ function TopicPageContent() {
                                  <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Practice Sets</h2>
                                  <div className="space-y-4">
                                       {activeTopic.practiceSets.map(ps => (
-                                          <Link key={ps.id} href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
-                                              <div className="p-4 border rounded-lg hover:bg-accent flex justify-between items-center">
-                                                  <span className="font-semibold">{ps.title}</span>
-                                                  <Button size="sm">Start Practice</Button>
+                                          <div key={ps.id} className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                              <span className="font-semibold flex-grow">{ps.title}</span>
+                                              <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+                                                <Button size="sm" asChild className="flex-1">
+                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>Start Practice</Link>
+                                                </Button>
+                                                <Button size="sm" variant="outline" className="flex-1">
+                                                    <FileDown className="mr-2 h-4 w-4"/>
+                                                    Download PDF
+                                                </Button>
                                               </div>
-                                          </Link>
+                                          </div>
                                       ))}
                                   </div>
                                  </>
