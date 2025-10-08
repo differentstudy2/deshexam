@@ -15,7 +15,7 @@ import { collection, doc, getDoc, getDocs, query } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useEffect, useState, useCallback, Suspense, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
@@ -26,6 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Separator } from '@/components/ui/separator';
 
 type UserProfile = {
   subscriptionPlan?: 'pass' | 'pro';
@@ -108,7 +109,7 @@ const SidebarNav = ({
 );
 
 
-function TextbookSolutionsLayout() {
+function TextbookSolutionsLayout({ children }: { children: React.ReactNode }) {
     const params = useParams();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -237,6 +238,11 @@ function TextbookSolutionsLayout() {
 
     if (loading) {
         return <div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>;
+    }
+
+     // If there are children (e.g., a specific practice set page), render them directly.
+    if (children) {
+        return <>{children}</>;
     }
     
     const breadcrumbs = [
@@ -370,6 +376,6 @@ function TextbookSolutionsLayout() {
     );
 }
 
-export default function TextbookSolutionsPage() {
-    return <Suspense fallback={<div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>}><TextbookSolutionsLayout /></Suspense>
+export default function TextbookSolutionsPage({ children }: { children: React.ReactNode }) {
+    return <Suspense fallback={<div>Loading...</div>}><TextbookSolutionsLayout>{children}</TextbookSolutionsLayout></Suspense>
 }
