@@ -125,31 +125,36 @@ function TextbookMainContent() {
                         </Link>
                         <CardContent className="p-0 flex-grow">
                            <ul className="divide-y">
-                               {chapter.topics.slice(0, 3).map(topic => (
-                                   <li key={topic.id}>
-                                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
-                                            <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                            <span className="flex-grow truncate">{topic.title}</span>
-                                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                       </Link>
-                                   </li>
-                               ))}
-                                {chapter.practiceSets.map(ps => (
-                                     <li key={ps.id}>
-                                         <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapter.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
-                                              <CheckSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                                              <span className="flex-grow truncate">{ps.title}</span>
-                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                         </Link>
-                                     </li>
-                                 ))}
-
-                               {chapter.topics.length > 3 && (
-                                    <li className="p-3 text-sm text-center text-muted-foreground">
-                                        ...and {chapter.topics.length - 3} more topics
-                                    </li>
+                               {chapter.topics && chapter.topics.length > 0 ? (
+                                   <>
+                                       {chapter.topics.slice(0, 3).map(topic => (
+                                           <li key={topic.id}>
+                                               <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
+                                                    <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                                    <span className="flex-grow truncate">{topic.title}</span>
+                                                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                               </Link>
+                                           </li>
+                                       ))}
+                                       {chapter.topics.length > 3 && (
+                                           <li className="p-3 text-sm text-center text-muted-foreground">
+                                               ...and {chapter.topics.length - 3} more topics
+                                           </li>
+                                       )}
+                                   </>
+                               ) : chapter.practiceSets && chapter.practiceSets.length > 0 ? (
+                                   chapter.practiceSets.map(ps => (
+                                       <li key={ps.id}>
+                                           <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapter.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
+                                                <CheckSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                                <span className="flex-grow truncate">{ps.title}</span>
+                                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                           </Link>
+                                       </li>
+                                   ))
+                               ) : (
+                                   <p className="p-4 text-sm text-center text-muted-foreground">No content in this chapter yet.</p>
                                )}
-                               {chapter.topics.length === 0 && chapter.practiceSets.length === 0 && <p className="p-4 text-sm text-center text-muted-foreground">No content in this chapter yet.</p>}
                            </ul>
                         </CardContent>
                     </Card>
