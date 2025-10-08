@@ -417,6 +417,8 @@ export const addContent = async (contentData: any) => {
             delete finalContentData.difficulty;
         } else if (cleanedContent.testType === 'Learn') {
              delete finalContentData.questions;
+        } else if (cleanedContent.testType === 'Exam') {
+            // Ensure exam-specific logic is correct, if any.
         }
 
 
@@ -545,9 +547,7 @@ export const addQuestionsToContent = async (contentId: string, questionsToAdd: a
 export const getAllContent = async (type?: string) => {
     try {
         let contentQuery;
-        if (type === 'Exam') {
-            contentQuery = query(collection(db, "content"), where("testType", "==", "Exam"));
-        } else if (type) {
+        if (type) {
             contentQuery = query(collection(db, "content"), where("testType", "==", type));
         } else {
             contentQuery = query(collection(db, "content"));
@@ -573,32 +573,6 @@ export const getAllContent = async (type?: string) => {
                 createdAt: formattedDate,
             };
         });
-
-        // if 'Exam' type is requested, also query textbooks collection for exams
-        if (type === 'Exam') {
-            const textbooksSnapshot = await getDocs(collection(db, "textbooks"));
-            for (const textbookDoc of textbooksSnapshot.docs) {
-                const examsRef = collection(textbookDoc.ref, 'exams');
-                const examsSnapshot = await getDocs(examsRef);
-                examsSnapshot.forEach(examDoc => {
-                    const data = examDoc.data();
-                     const createdAt = data.createdAt;
-                    let formattedDate = 'N/A';
-                     if (createdAt && typeof createdAt.toDate === 'function') {
-                        formattedDate = createdAt.toDate().toLocaleDateString();
-                    }
-                    contents.push({
-                        id: examDoc.id,
-                        textbookId: textbookDoc.id,
-                        ...data,
-                        questions: data.questions || [],
-                        createdAt: formattedDate,
-                        testType: 'Exam'
-                    });
-                });
-            }
-        }
-
 
         return contents;
     } catch (e) {
