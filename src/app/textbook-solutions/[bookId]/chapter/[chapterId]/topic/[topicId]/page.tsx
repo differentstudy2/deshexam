@@ -205,10 +205,7 @@ function TopicPageContent() {
     ];
 
     const sidebar = (
-        <aside className="h-full bg-card border-r">
-             <SheetHeader>
-                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            </SheetHeader>
+        <>
             <div className="p-4 border-b">
                 <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                     <ArrowLeft className="w-4 h-4" /> {textbook?.title}
@@ -224,7 +221,7 @@ function TopicPageContent() {
                     textbookId={textbookId}
                 />
             </div>
-        </aside>
+        </>
     );
 
     return (
@@ -235,14 +232,19 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                        {sidebar}
+                         <SheetHeader>
+                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                        </SheetHeader>
+                        <aside className="h-full bg-card">
+                            {sidebar}
+                        </aside>
                     </SheetContent>
                 </Sheet>
-                 <nav className="text-sm">
+                 <nav className="text-sm overflow-hidden">
                      <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         {breadcrumbs.map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1.5">
-                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate">{crumb.name}</Link>
+                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[100px] sm:max-w-none">{crumb.name}</Link>
                                {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                            </li>
                         ))}
@@ -250,9 +252,9 @@ function TopicPageContent() {
                 </nav>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
-                <div className="hidden md:block">
+                <aside className="hidden md:block h-full bg-card border-r">
                     {sidebar}
-                </div>
+                </aside>
                 <main className="p-6 md:p-8">
                     <nav className="text-sm mb-6 hidden md:block">
                          <ol className="flex items-center gap-1.5">
