@@ -73,9 +73,9 @@ export default function ManageTextbookExamsPage() {
         <div className="space-y-6">
             <div>
                 <Button asChild variant="ghost">
-                    <Link href={`/admin/textbooks/${textbookId}`}>
+                    <Link href={`/admin/textbooks`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Textbook
+                        Back to Textbooks
                     </Link>
                 </Button>
             </div>
@@ -87,7 +87,7 @@ export default function ManageTextbookExamsPage() {
                     </p>
                 </div>
                 <Button asChild>
-                    <Link href={`/admin/add-content?type=Exam&textbookId=${textbookId}`}>
+                    <Link href={`/admin/textbooks/${textbookId}/add-exam`}>
                         <PlusCircle className="mr-2" />
                         Add New Exam
                     </Link>
