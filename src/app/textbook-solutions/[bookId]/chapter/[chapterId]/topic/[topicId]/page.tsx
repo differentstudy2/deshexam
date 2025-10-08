@@ -13,16 +13,16 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
-import { getUserProfile, getTextbookProgress, getSettings, getTopicsByChapterId } from '@/lib/firebase/firestore';
-import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
+import { getTopicsByChapterId } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 const getResourceIcon = (type: string) => {
@@ -34,30 +34,36 @@ const getResourceIcon = (type: string) => {
     }
 };
 
+const getChapterIcon = (index: number) => {
+    const icons = [<BookOpen />, <FileText />, <CheckSquare />, <Award />, <Video/>, <Mic/>];
+    return icons[index % icons.length];
+};
+
 const SidebarNav = ({
   chapters,
   topics,
-  activeChapter,
-  activeTopic,
+  activeChapterId,
+  activeTopicId,
   onTopicSelect,
   loadingTopics,
   textbookId,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
-  activeChapter: string | null;
-  activeTopic: string | null;
+  activeChapterId: string | null;
+  activeTopicId: string | null;
   onTopicSelect: (chapterId: string, topicId: string) => void;
   loadingTopics: string | null;
   textbookId: string;
 }) => (
-    <Accordion type="single" collapsible defaultValue={activeChapter || undefined} className="w-full">
+    <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full">
       {chapters.map((chapter, index) => (
         <AccordionItem value={chapter.id} key={chapter.id}>
           <AccordionTrigger
-            className="hover:no-underline [&[data-state=open]]:bg-accent/50"
+            className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
           >
-             <div className="flex items-center gap-2">
+             <div className="flex items-center gap-3">
+                {getChapterIcon(index)}
                 <span>{chapter.title}</span>
             </div>
           </AccordionTrigger>
@@ -72,8 +78,8 @@ const SidebarNav = ({
                        variant="ghost"
                        asChild
                        className={cn(
-                         "w-full justify-start text-left h-auto py-1 px-2 text-base",
-                         activeTopic === topic.id ? "bg-accent text-accent-foreground" : ""
+                         "w-full justify-start text-left h-auto py-1.5 px-2 text-sm",
+                         activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
                        )}
                      >
                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`}>
@@ -94,7 +100,7 @@ const SidebarNav = ({
 );
 
 
-function TopicPageLayout() {
+function TopicPageContent() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
@@ -114,6 +120,23 @@ function TopicPageLayout() {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [viewerOpen, setViewerOpen] = useState(false);
     const [viewerResource, setViewerResource] = useState<Resource | null>(null);
+    const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
+
+    useEffect(() => {
+      if (activeTopic?.content) {
+        const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
+        const newHeadings = Array.from(matches).map((match, index) => {
+          const level = match[1].length;
+          const text = match[2];
+          const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+          return { id, text, level };
+        });
+        setHeadings(newHeadings);
+      } else {
+        setHeadings([]);
+      }
+    }, [activeTopic]);
+
 
     const fetchPageData = useCallback(async () => {
         setLoading(true);
@@ -179,15 +202,17 @@ function TopicPageLayout() {
                     <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                 </Link>
             </div>
-            <SidebarNav 
-                chapters={chapters} 
-                topics={topics}
-                activeChapter={chapterId}
-                activeTopic={topicId}
-                onTopicSelect={() => {}}
-                loadingTopics={loadingTopics}
-                textbookId={textbookId}
-            />
+             <div className="p-2">
+                <SidebarNav 
+                    chapters={chapters} 
+                    topics={topics}
+                    activeChapterId={chapterId}
+                    activeTopicId={topicId}
+                    onTopicSelect={() => {}}
+                    loadingTopics={loadingTopics}
+                    textbookId={textbookId}
+                />
+            </div>
         </aside>
     );
 
@@ -233,13 +258,16 @@ function TopicPageLayout() {
                     {activeTopic ? (
                         <div>
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
-                            <Separator className="my-6"/>
                             {activeTopic.content && (
-                                <article className="prose dark:prose-invert lg:prose-lg max-w-none">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeTopic.content}</ReactMarkdown>
-                                </article>
+                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6"
+                                    dangerouslySetInnerHTML={{ __html: activeTopic.content.replace(/^(#{1,6}\s+.*)$/gm, (match, p1) => {
+                                        const text = p1.replace(/#+\s+/, '');
+                                        const id = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+                                        return `<h${p1.match(/#/g)?.length} id="${id}">${text}</h${p1.match(/#/g)?.length}>`;
+                                    })}}
+                                />
                             )}
-
+                            
                              {activeTopic.resources && activeTopic.resources.length > 0 && (
                                 <>
                                  <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Resources</h2>
@@ -253,7 +281,7 @@ function TopicPageLayout() {
                                 </div>
                                 </>
                             )}
-
+                             
                              {activeTopic.practiceSets && activeTopic.practiceSets.length > 0 && (
                                 <>
                                  <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Practice Sets</h2>
@@ -269,6 +297,32 @@ function TopicPageLayout() {
                                  </div>
                                  </>
                              )}
+
+                            <Separator className="my-12" />
+
+                            <Card className="bg-secondary/50">
+                                <CardContent className="p-6">
+                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                        <p className="font-semibold">Is this article helpful? What are your Feelings</p>
+                                        <div className="flex gap-2">
+                                            <Button variant="ghost" size="icon"><Smile className="w-6 h-6 text-muted-foreground hover:text-green-500" /></Button>
+                                            <Button variant="ghost" size="icon"><Frown className="w-6 h-6 text-muted-foreground hover:text-yellow-500" /></Button>
+                                            <Button variant="ghost" size="icon"><Annoyed className="w-6 h-6 text-muted-foreground hover:text-red-500" /></Button>
+                                        </div>
+                                    </div>
+                                    <Separator className="my-4" />
+                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                        <p className="font-semibold">Share This Article :</p>
+                                        <div className="flex gap-2">
+                                            <Button variant="outline" size="icon"><Facebook className="w-5 h-5 text-[#1877F2]" /></Button>
+                                            <Button variant="outline" size="icon"><Twitter className="w-5 h-5 text-[#1DA1F2]" /></Button>
+                                            <Button variant="outline" size="icon"><Linkedin className="w-5 h-5 text-[#0A66C2]" /></Button>
+                                            <Button variant="outline" size="icon"><Link2 className="w-5 h-5" /></Button>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
                         </div>
                     ) : (
                          <div className="text-center text-muted-foreground pt-16">
@@ -279,9 +333,25 @@ function TopicPageLayout() {
                     )}
                 </main>
                 <aside className="hidden lg:block p-6 border-l">
-                    <div className="sticky top-20">
+                    <div className="sticky top-24">
                         <h3 className="font-semibold mb-4">On This Page</h3>
-                        <p className="text-sm text-muted-foreground">Table of contents will appear here.</p>
+                         {headings.length > 0 ? (
+                            <ul className="space-y-2">
+                            {headings.map((heading) => (
+                                <li key={heading.id}>
+                                <a
+                                    href={`#${heading.id}`}
+                                    className="text-sm text-muted-foreground hover:text-foreground"
+                                    style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
+                                >
+                                    {heading.text}
+                                </a>
+                                </li>
+                            ))}
+                            </ul>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No sections found.</p>
+                        )}
                     </div>
                 </aside>
             </div>
