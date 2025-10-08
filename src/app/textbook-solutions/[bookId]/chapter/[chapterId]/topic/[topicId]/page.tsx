@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2 } from 'lucide-react';
 import Link from 'next/link';
@@ -185,8 +185,7 @@ function TopicPageContent() {
                 if (currentTopic) {
                     setActiveTopic(currentTopic);
                 } else if(topicsData.length > 0 && !topicId) {
-                    // Redirect to the first topic if no topic ID is in the URL
-                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsData[0].id}`);
+                    // This case should be handled by the chapter page now
                 }
             }
 
@@ -195,7 +194,7 @@ function TopicPageContent() {
         } finally {
             setLoading(false);
         }
-    }, [textbookId, chapterId, topicId, toast, router]);
+    }, [textbookId, chapterId, topicId, toast]);
 
     useEffect(() => {
         fetchPageData();
@@ -220,24 +219,25 @@ function TopicPageContent() {
     ];
 
     const sidebar = (
-        <>
-            <div className="p-4 border-b">
-                <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-                    <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-                </Link>
-            </div>
-             <div className="p-2">
-                <SidebarNav 
-                    chapters={chapters}
-                    topics={topics}
-                    activeChapterId={chapterId}
-                    activeTopicId={topicId}
-                    onChapterToggle={fetchChapterTopics}
-                    loadingTopics={loadingTopics}
-                    textbookId={textbookId}
-                />
-            </div>
-        </>
+      <>
+        <SheetHeader className="p-4 border-b">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+          <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+              <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+          </Link>
+        </SheetHeader>
+        <div className="p-2">
+            <SidebarNav 
+                chapters={chapters}
+                topics={topics}
+                activeChapterId={chapterId}
+                activeTopicId={topicId}
+                onChapterToggle={fetchChapterTopics}
+                loadingTopics={loadingTopics}
+                textbookId={textbookId}
+            />
+        </div>
+      </>
     );
 
     return (
@@ -248,31 +248,27 @@ function TopicPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader>
-                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                        </SheetHeader>
                         <aside className="h-full bg-card">
                             {sidebar}
                         </aside>
                     </SheetContent>
                 </Sheet>
-                <nav className="text-sm overflow-hidden">
-                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
-                        {breadcrumbs.slice(0, -1).map((crumb, index) => (
-                           <li key={index} className="flex items-center gap-1.5">
+                 <nav className="text-sm overflow-hidden">
+                     <ol className="flex items-center gap-1 whitespace-nowrap">
+                        {breadcrumbs.map((crumb, index) => (
+                           <li key={index} className="flex items-center gap-1">
                                <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[80px] sm:max-w-none">{crumb.name}</Link>
-                               <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>
+                               {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                            </li>
                         ))}
-                        <li className="font-semibold text-foreground truncate max-w-[100px] sm:max-w-none">
-                            {breadcrumbs[breadcrumbs.length - 1]?.name}
-                        </li>
                     </ol>
                 </nav>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
                 <aside className="hidden md:block h-full bg-card border-r">
-                    {sidebar}
+                    <div className="sticky top-0 h-screen overflow-y-auto">
+                        {sidebar}
+                    </div>
                 </aside>
                 <main className="p-6 md:p-8">
                     <nav className="text-sm mb-6 hidden md:block">
