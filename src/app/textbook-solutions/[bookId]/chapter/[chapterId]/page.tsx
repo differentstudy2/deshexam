@@ -33,8 +33,7 @@ const getResourceIcon = (type: string) => {
 };
 
 const getChapterIcon = (index: number) => {
-    const icons = [<BookOpen />, <FileText />, <CheckSquare />, <Award />, <Video/>, <Mic/>];
-    return icons[index % icons.length];
+    return <BookOpen className="h-5 w-5" />;
 };
 
 const SidebarNav = ({
@@ -146,6 +145,15 @@ function ChapterPageContent() {
         }
     }, [textbookId, topics, toast]);
 
+    const fetchAllChapterTopics = useCallback(async (allChapters: Chapter[]) => {
+      for (const chapter of allChapters) {
+        if (!topics[chapter.id]) {
+          await fetchChapterTopics(chapter.id);
+        }
+      }
+    }, [topics, fetchChapterTopics]);
+
+
     useEffect(() => {
         const fetchPageData = async () => {
             setLoading(true);
@@ -214,14 +222,12 @@ function ChapterPageContent() {
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader className="sr-only">
-                            <SheetTitle>Main Navigation</SheetTitle>
-                        </SheetHeader>
-                        <div className="p-4 border-b">
+                         <SheetHeader className="p-4 border-b">
+                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
                             <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
                                 <ArrowLeft className="w-4 h-4" /> {textbook?.title}
                             </Link>
-                        </div>
+                        </SheetHeader>
                         {sidebarContent}
                     </SheetContent>
                 </Sheet>
@@ -229,7 +235,7 @@ function ChapterPageContent() {
                      <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         {breadcrumbs.map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1.5">
-                               <Link href={crumb.href} className="text-muted-foreground hover:text-foreground truncate max-w-[100px] sm:max-w-none">{crumb.name}</Link>
+                               <Link href={crumb.href} className="hover:text-foreground truncate max-w-[100px] sm:max-w-none">{crumb.name}</Link>
                                {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0"/>}
                            </li>
                         ))}

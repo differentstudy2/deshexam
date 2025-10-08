@@ -35,8 +35,7 @@ const getResourceIcon = (type: string) => {
 };
 
 const getChapterIcon = (index: number) => {
-    const icons = [<BookOpen />, <FileText />, <CheckSquare />, <Award />, <Video/>, <Mic/>];
-    return icons[index % icons.length];
+    return <BookOpen className="h-5 w-5" />;
 };
 
 const SidebarNav = ({
