@@ -401,7 +401,7 @@ export const addContent = async (contentData: any) => {
             createdAt: cleanedContent.publishedAt || new Date(),
         };
 
-        if (cleanedContent.testType !== 'Learn' && cleanedContent.testType !== 'Textbook' && cleanedContent.questions) {
+        if (['Mock Test', 'Quiz', 'Practice Questions', 'Exam'].includes(cleanedContent.testType) && cleanedContent.questions) {
             const questionsWithIds = await Promise.all(cleanedContent.questions.map(async (question: any) => {
                 const questionId = await addQuestion(question);
                 return { ...question, id: questionId };
@@ -411,12 +411,14 @@ export const addContent = async (contentData: any) => {
 
         delete finalContentData.publishedAt;
         
-        // For textbooks, remove questions array if it exists as it's not a direct property
         if (collectionName === 'textbooks') {
             delete finalContentData.questions;
             delete finalContentData.duration;
             delete finalContentData.difficulty;
+        } else if (cleanedContent.testType === 'Learn') {
+             delete finalContentData.questions;
         }
+
 
         const docRef = await addDoc(collection(db, collectionName), finalContentData);
         console.log("Document written with ID: ", docRef.id);
@@ -542,22 +544,23 @@ export const addQuestionsToContent = async (contentId: string, questionsToAdd: a
 
 export const getAllContent = async (type?: string) => {
     try {
-        let q;
-        if (type) {
-            q = query(collection(db, "content"), where("testType", "==", type));
+        let contentQuery;
+        if (type === 'Exam') {
+            contentQuery = query(collection(db, "content"), where("testType", "==", "Exam"));
+        } else if (type) {
+            contentQuery = query(collection(db, "content"), where("testType", "==", type));
         } else {
-            q = query(collection(db, "content"));
+            contentQuery = query(collection(db, "content"));
         }
         
-        const querySnapshot = await getDocs(q);
-        const contents = querySnapshot.docs.map(doc => {
+        const contentSnapshot = await getDocs(contentQuery);
+        const contents = contentSnapshot.docs.map(doc => {
             const data = doc.data();
             const createdAt = data.createdAt;
             let formattedDate = 'N/A';
             if (createdAt && typeof createdAt.toDate === 'function') {
                 formattedDate = createdAt.toDate().toLocaleDateString();
             } else if (createdAt) {
-                // Fallback for when it might be a string or number from previous incorrect saves
                 const d = new Date(createdAt);
                 if (!isNaN(d.getTime())) {
                     formattedDate = d.toLocaleDateString();
@@ -570,6 +573,33 @@ export const getAllContent = async (type?: string) => {
                 createdAt: formattedDate,
             };
         });
+
+        // if 'Exam' type is requested, also query textbooks collection for exams
+        if (type === 'Exam') {
+            const textbooksSnapshot = await getDocs(collection(db, "textbooks"));
+            for (const textbookDoc of textbooksSnapshot.docs) {
+                const examsRef = collection(textbookDoc.ref, 'exams');
+                const examsSnapshot = await getDocs(examsRef);
+                examsSnapshot.forEach(examDoc => {
+                    const data = examDoc.data();
+                     const createdAt = data.createdAt;
+                    let formattedDate = 'N/A';
+                     if (createdAt && typeof createdAt.toDate === 'function') {
+                        formattedDate = createdAt.toDate().toLocaleDateString();
+                    }
+                    contents.push({
+                        id: examDoc.id,
+                        textbookId: textbookDoc.id,
+                        ...data,
+                        questions: data.questions || [],
+                        createdAt: formattedDate,
+                        testType: 'Exam'
+                    });
+                });
+            }
+        }
+
+
         return contents;
     } catch (e) {
         console.error("Error getting documents: ", e);
