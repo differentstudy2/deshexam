@@ -57,7 +57,7 @@ export default function PracticeSetPage() {
   const practiceSetId = params.practiceSetId as string;
   const textbookId = searchParams.get('textbook')!;
   const chapterId = searchParams.get('chapter')!;
-  const topicId = searchParams.get('topic')!;
+  const topicId = searchParams.get('topic'); // Can be null
   
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timeUp, setTimeUp] = useState(false);
@@ -65,20 +65,23 @@ export default function PracticeSetPage() {
 
   useEffect(() => {
     const fetchTest = async () => {
-      if (!practiceSetId || !textbookId || !chapterId || !topicId) return;
+      if (!practiceSetId || !textbookId || !chapterId) return;
       try {
         setLoading(true);
 
-        const [practiceSetData, textbookData, chapterData, topicData] = await Promise.all([
+        const [practiceSetData, textbookData, chapterData] = await Promise.all([
             getPracticeSetById(textbookId, chapterId, topicId, practiceSetId),
             getDoc(doc(db, 'textbooks', textbookId)),
             getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId)),
-            getDoc(doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId)),
         ]);
         
+        if(topicId) {
+            const topicData = await getDoc(doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId));
+            if(topicData.exists()) setTopic(topicData.data() as Topic);
+        }
+
         if (textbookData.exists()) setTextbook(textbookData.data() as Textbook);
         if (chapterData.exists()) setChapter(chapterData.data() as Chapter);
-        if (topicData.exists()) setTopic(topicData.data() as Topic);
 
         if (practiceSetData) {
             let questionsData = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
@@ -135,10 +138,10 @@ export default function PracticeSetPage() {
   
     useEffect(() => {
         // Dynamically update metadata
-        if (test && textbook && chapter && topic) {
-            const title = `${test.title} | ${topic.title} | DeshExam`;
-            const description = `Practice set for ${topic.title}, part of the ${textbook.title} textbook. Test your knowledge on ${chapter.title}.`;
-            const keywords = `${test.title}, ${topic.title}, ${chapter.title}, ${textbook.subject}, practice questions, quiz`;
+        if (test && textbook && chapter) {
+            const title = `${test.title} | ${topic?.title || chapter.title} | DeshExam`;
+            const description = `Practice set for ${topic?.title || chapter.title}, part of the ${textbook.title} textbook. Test your knowledge on ${chapter.title}.`;
+            const keywords = `${test.title}, ${topic?.title || ''}, ${chapter.title}, ${textbook.subject}, practice questions, quiz`;
             
             document.title = title;
             document.querySelector('meta[name="description"]')?.setAttribute('content', description);
@@ -232,10 +235,9 @@ export default function PracticeSetPage() {
         const totalDurationInSeconds = (test?.duration || totalMarks) * 60;
         const timeTakenInSeconds = totalDurationInSeconds - (timeLeft || 0);
         
-        const submissionData = {
+        const submissionData: any = {
             practiceSetId: test?.id,
             practiceSetTitle: test?.title,
-            topicId: topicId,
             chapterId: chapterId,
             textbookId: textbookId,
             answers: answers,
@@ -244,6 +246,10 @@ export default function PracticeSetPage() {
             timeTaken: timeTakenInSeconds,
             duration: test?.duration || totalMarks,
         };
+
+        if (topicId) {
+            submissionData.topicId = topicId;
+        }
 
         const submissionId = await addPracticeSetSubmission(submissionData);
 
@@ -389,7 +395,7 @@ export default function PracticeSetPage() {
                                                         <SelectValue placeholder="Select a match" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB) => (
+                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
                                                             <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
                                                                 <div className="flex items-center gap-2">
                                                                     {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}

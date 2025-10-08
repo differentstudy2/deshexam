@@ -31,6 +31,7 @@
 
 
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1801,8 +1802,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersQuery),
-            getDocs(monthOrdersQuery),
+            getDocs(todayOrdersSnapshot),
+            getDocs(monthOrdersSnapshot),
             getCountFromServer(usersCollection),
         ]);
 
@@ -1936,10 +1937,13 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
     }
 };
 
-export const getPracticeSetById = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string) => {
-    if (!textbookId || !chapterId || !topicId || !practiceSetId) return null;
+export const getPracticeSetById = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string) => {
+    if (!textbookId || !chapterId || !practiceSetId) return null;
     try {
-        const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
+        const path = topicId 
+            ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}`
+            : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}`;
+        const practiceSetRef = doc(db, path);
         const docSnap = await getDoc(practiceSetRef);
         if (docSnap.exists()) {
             return { id: docSnap.id, ...docSnap.data() };
@@ -1964,7 +1968,10 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     });
 
     try {
-        const questionsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`);
+        const path = topicId
+            ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
+            : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+        const questionsRef = collection(db, path);
         const docRef = await addDoc(questionsRef, dataToSave);
         return docRef.id;
     } catch (e) {
@@ -1973,10 +1980,13 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     }
 };
 
-export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string) => {
-    if (!textbookId || !chapterId || !topicId || !practiceSetId) return [];
+export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string) => {
+    if (!textbookId || !chapterId || !practiceSetId) return [];
     try {
-        const questionsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`);
+        const path = topicId
+            ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
+            : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+        const questionsRef = collection(db, path);
         const q = query(questionsRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1987,7 +1997,10 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
 };
 
 export const updateQuestionInPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string, questionData: any) => {
-    const questionRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`, questionId);
+    const path = topicId
+        ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
+        : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+    const questionRef = doc(db, path, questionId);
     try {
         await updateDoc(questionRef, cleanDataForFirebase(questionData));
     } catch (e) {
@@ -1997,7 +2010,10 @@ export const updateQuestionInPracticeSet = async (textbookId: string, chapterId:
 };
 
 export const deleteQuestionFromPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string) => {
-    const questionRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`, questionId);
+    const path = topicId
+        ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
+        : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+    const questionRef = doc(db, path, questionId);
     try {
         await deleteDoc(questionRef);
     } catch (e) {
@@ -2102,6 +2118,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
+
 
 
 
