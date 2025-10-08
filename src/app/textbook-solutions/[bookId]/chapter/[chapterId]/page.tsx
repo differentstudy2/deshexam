@@ -122,9 +122,7 @@ function ChapterPageContent() {
     const activeTopicId = useMemo(() => {
         const topicId = searchParams.get('topic');
         if (topicId) return topicId;
-        // If no topic is in the URL, default to the first one of the current chapter
         if (topics[chapterId] && topics[chapterId].length > 0) {
-            // No default redirection, let the user choose
             return null;
         }
         return null;
@@ -136,7 +134,7 @@ function ChapterPageContent() {
     }, [topics, chapterId, activeTopicId]);
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
-        if (!cId || topics[cId]) return; // Already fetched
+        if (!cId || topics[cId]) return;
         setLoadingTopics(cId);
         try {
             const topicsData = await getTopicsByChapterId(textbookId, cId);
@@ -348,7 +346,7 @@ function ChapterPageContent() {
                                 <div className="text-center text-muted-foreground pt-16">
                                     <BookOpen className="w-16 h-16 mx-auto mb-4"/>
                                     <h2 className="text-xl font-semibold">Select a topic</h2>
-                                    <p>Choose a topic from the sidebar to view its specific content.</p>
+                                    <p>Choose a topic from the sidebar to view its content.</p>
                                 </div>
                             )}
                         </div>

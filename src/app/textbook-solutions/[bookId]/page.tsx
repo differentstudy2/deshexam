@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -11,13 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -34,7 +35,7 @@ function TextbookMainContent() {
     const textbookId = params.bookId as string;
 
     const [textbook, setTextbook] = useState<Textbook | null>(null);
-    const [chaptersWithTopics, setChaptersWithTopics] = useState<(Chapter & {topics: Topic[]})[]>([]);
+    const [chaptersWithTopics, setChaptersWithTopics] = useState<(Chapter & {topics: Topic[], practiceSets: PracticeSet[]})[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -56,12 +57,15 @@ function TextbookMainContent() {
                 const chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
                 chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
 
-                const chaptersWithTopicsData = await Promise.all(chaptersData.map(async (chapter) => {
+                const chaptersWithDetails = await Promise.all(chaptersData.map(async (chapter) => {
                     const topicsData = await getTopicsByChapterId(textbookId, chapter.id);
-                    return { ...chapter, topics: topicsData };
+                    const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/practiceSets`);
+                    const practiceSetsSnap = await getDocs(practiceSetsRef);
+                    const practiceSetsData = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
+                    return { ...chapter, topics: topicsData, practiceSets: practiceSetsData };
                 }));
 
-                setChaptersWithTopics(chaptersWithTopicsData);
+                setChaptersWithTopics(chaptersWithDetails);
 
             } catch (e) {
                 toast({ variant: "destructive", title: "Error loading textbook content", description: (e as Error).message });
@@ -121,7 +125,7 @@ function TextbookMainContent() {
                         </Link>
                         <CardContent className="p-0 flex-grow">
                            <ul className="divide-y">
-                               {chapter.topics.slice(0, 5).map(topic => ( // Limiting to 5 topics for preview
+                               {chapter.topics.slice(0, 3).map(topic => (
                                    <li key={topic.id}>
                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
                                             <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -130,12 +134,22 @@ function TextbookMainContent() {
                                        </Link>
                                    </li>
                                ))}
-                               {chapter.topics.length > 5 && (
+                                {chapter.practiceSets.map(ps => (
+                                     <li key={ps.id}>
+                                         <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapter.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
+                                              <CheckSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                                              <span className="flex-grow truncate">{ps.title}</span>
+                                              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                         </Link>
+                                     </li>
+                                 ))}
+
+                               {chapter.topics.length > 3 && (
                                     <li className="p-3 text-sm text-center text-muted-foreground">
-                                        ...and {chapter.topics.length - 5} more topics
+                                        ...and {chapter.topics.length - 3} more topics
                                     </li>
                                )}
-                               {chapter.topics.length === 0 && <p className="p-4 text-sm text-center text-muted-foreground">No topics in this chapter.</p>}
+                               {chapter.topics.length === 0 && chapter.practiceSets.length === 0 && <p className="p-4 text-sm text-center text-muted-foreground">No content in this chapter yet.</p>}
                            </ul>
                         </CardContent>
                     </Card>
