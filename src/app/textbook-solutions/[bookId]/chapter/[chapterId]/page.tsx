@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -159,15 +158,32 @@ function ChapterPageContent() {
         const fetchPageData = async () => {
             setLoading(true);
             try {
-                const [textbookSnap, chaptersQuerySnap] = await Promise.all([
+                const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+                const practiceSetsRef = collection(chapterRef, 'practiceSets');
+
+                const [textbookSnap, chaptersQuerySnap, chapterSnap, practiceSetsSnap] = await Promise.all([
                     getDoc(doc(db, 'textbooks', textbookId)),
                     getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
+                    getDoc(chapterRef),
+                    getDocs(practiceSetsRef)
                 ]);
 
                 if (textbookSnap.exists()) setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
                 
-                const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+                const chaptersData = chaptersQuerySnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as Chapter));
                 chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+
+                if (chapterSnap.exists()) {
+                    const chapterData = { id: chapterSnap.id, ...chapterSnap.data(), practiceSets: practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()})) } as Chapter;
+                    const chapterIndex = chaptersData.findIndex(c => c.id === chapterId);
+                    if(chapterIndex > -1) {
+                         chaptersData[chapterIndex] = chapterData;
+                    } else {
+                        chaptersData.push(chapterData);
+                        chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+                    }
+                }
+                
                 setChapters(chaptersData);
 
                 if (chapterId) {
@@ -326,7 +342,7 @@ function ChapterPageContent() {
                                 </div>
                             )}
 
-                            {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
+                             {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
                                 <div className="mt-12">
                                     <h2 className="font-headline text-2xl font-bold mb-4">Practice Sets</h2>
                                     <div className="space-y-4">
@@ -376,3 +392,5 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
+
+    
