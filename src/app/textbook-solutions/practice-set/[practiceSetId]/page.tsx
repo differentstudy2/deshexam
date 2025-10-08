@@ -345,7 +345,7 @@ export default function PracticeSetPage() {
                             </CardHeader>
                             <CardContent>
                                 {question.type === 'Multiple Choice' && question.options && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {question.options.map((option, optIndex) => (
                                     <div key={optIndex} className="flex items-center space-x-2">
                                         <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
