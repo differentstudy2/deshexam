@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Question, Resource } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
@@ -114,7 +114,11 @@ function TextbookMainContent() {
                     <Card key={chapter.id} className="flex flex-col">
                         <CardHeader className="bg-primary text-primary-foreground p-4 flex-row items-center gap-3">
                             <ChapterIcon index={index} />
-                            <CardTitle className="text-lg font-semibold">{chapter.title}</CardTitle>
+                            <CardTitle className="text-lg font-semibold hover:underline">
+                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
+                                    {chapter.title}
+                                </Link>
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="p-0 flex-grow">
                            <ul className="divide-y">
