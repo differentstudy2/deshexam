@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { db } from '@/lib/firebase/client';
 import { deleteTextbook } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc } from 'firebase/firestore';
 import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -247,5 +248,3 @@ export default function ManageTextbooksPage() {
     </div>
   );
 }
-
-    
