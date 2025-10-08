@@ -59,9 +59,14 @@ function TextbookMainContent() {
 
                 const chaptersWithDetails = await Promise.all(chaptersData.map(async (chapter) => {
                     const topicsData = await getTopicsByChapterId(textbookId, chapter.id);
-                    const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/practiceSets`);
-                    const practiceSetsSnap = await getDocs(practiceSetsRef);
-                    const practiceSetsData = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
+                    
+                    let practiceSetsData: PracticeSet[] = [];
+                    if (topicsData.length === 0) {
+                        const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/practiceSets`);
+                        const practiceSetsSnap = await getDocs(practiceSetsRef);
+                        practiceSetsData = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
+                    }
+
                     return { ...chapter, topics: topicsData, practiceSets: practiceSetsData };
                 }));
 
@@ -86,10 +91,9 @@ function TextbookMainContent() {
         );
     }
     
-    const ChapterIcon = ({index}: {index: number}) => {
-        const icons = [<BookOpen />, <FileText />, <CheckSquare />, <Award />, <Video/>, <Mic/>];
-        return icons[index % icons.length];
-    };
+    const ChapterIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+    );
 
     return (
       <div className="bg-secondary/30 min-h-screen">
@@ -118,7 +122,7 @@ function TextbookMainContent() {
                     <Card key={chapter.id} className="flex flex-col">
                         <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
                             <CardHeader className="bg-primary text-primary-foreground p-4 flex-row items-center gap-3 hover:bg-primary/90 transition-colors">
-                                <ChapterIcon index={index} />
+                                <ChapterIcon />
                                 <CardTitle className="text-lg font-semibold flex-grow">{chapter.title}</CardTitle>
                                 <ChevronRight className="w-5 h-5 flex-shrink-0" />
                             </CardHeader>
