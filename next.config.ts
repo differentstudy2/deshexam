@@ -54,6 +54,10 @@ const nextConfig: NextConfig = {
         destination: '/content/:id*',
       },
       {
+        source: '/exam/:id*',
+        destination: '/content/:id*',
+      },
+      {
         source: '/practice-questions/:id*',
         destination: '/content/:id*',
       },
@@ -66,3 +70,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
