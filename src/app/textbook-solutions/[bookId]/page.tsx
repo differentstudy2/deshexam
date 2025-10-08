@@ -220,7 +220,7 @@ const PracticeSetItem = ({
     ps: any; 
     textbookId: string; 
     chapterId: string; 
-    topicId: string; 
+    topicId?: string; 
     isLocked: boolean; 
     passMark: number;
     highestScore?: number; 
@@ -239,6 +239,12 @@ const PracticeSetItem = ({
                 </div>
             );
         }
+        
+        let href = `/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}`;
+        if (topicId) {
+            href += `&topic=${topicId}`;
+        }
+
         return (
              <div className="flex items-center gap-2">
                  <Button variant="outline" size="sm" onClick={onDownload} disabled={isDownloading}>
@@ -255,7 +261,7 @@ const PracticeSetItem = ({
                     )}
                 </Button>
                 <Button asChild>
-                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>
+                    <Link href={href}>
                         Start Practice
                     </Link>
                 </Button>
@@ -447,14 +453,22 @@ export default function TextbookSolutionsPage() {
       try {
           const topicsData = await getTopicsByChapterId(textbookId, chapterId);
           
-           for (let topic of topicsData) {
+          for (let topic of topicsData) {
               const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
               const practiceSetsSnap = await getDocs(practiceSetsQuery);
               (topic as any).practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
               (topic as any).practiceSets.sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-           }
+          }
 
+          // Fetch chapter-level practice sets
+          const chapterPracticeSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`), orderBy("createdAt", "desc"));
+          const chapterPracticeSetsSnap = await getDocs(chapterPracticeSetsQuery);
+          const chapterPracticeSets = chapterPracticeSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          
+          setChapters(prevChapters => prevChapters.map(ch => ch.id === chapterId ? {...ch, practiceSets: chapterPracticeSets} : ch));
+          
           setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
+          
           const params = new URLSearchParams(searchParams.toString());
           params.set('chapter', chapterId);
           params.delete('topic');
@@ -521,8 +535,8 @@ export default function TextbookSolutionsPage() {
     }
   }
 
- const handleDownloadPdf = async (practiceSet: any) => {
-    if (!activeChapterId || !activeTopicId) return;
+ const handleDownloadPdf = async (practiceSet: any, topicId?: string) => {
+    if (!activeChapterId) return;
     setIsDownloading(practiceSet.id);
     toast({
         title: "Generating PDF...",
@@ -530,7 +544,7 @@ export default function TextbookSolutionsPage() {
     });
 
     try {
-        const questions = await getQuestionsByPracticeSet(textbookId, activeChapterId, activeTopicId, practiceSet.id);
+        const questions = await getQuestionsByPracticeSet(textbookId, activeChapterId, topicId, practiceSet.id);
         const totalMarks = questions.reduce((total: number, q: any) => {
             if (q.type === 'Matching') return total + (q.correctAnswer?.length || 0);
             return total + (q.marks || 1);
@@ -854,6 +868,28 @@ export default function TextbookSolutionsPage() {
                         ) : (
                             <p>No summary available for this chapter.</p>
                         )}
+                        
+                        {activeChapter.practiceSets && activeChapter.practiceSets.length > 0 && (
+                            <div className="mt-8">
+                                <Separator />
+                                <h3 className="font-semibold text-2xl mt-6">Chapter Practice Sets</h3>
+                                <div className="space-y-2 mt-4">
+                                    {activeChapter.practiceSets.map((ps, index) => (
+                                        <PracticeSetItem
+                                            key={ps.id}
+                                            ps={ps}
+                                            textbookId={textbookId}
+                                            chapterId={activeChapter.id}
+                                            isLocked={false} // Chapter-level sets are not locked by topic progression
+                                            passMark={settings?.practiceSetPassMark || 60}
+                                            highestScore={progress?.highestScores?.[ps.id]}
+                                            onDownload={() => handleDownloadPdf(ps)}
+                                            isDownloading={isDownloading === ps.id}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                         <p className="mt-8 text-muted-foreground font-semibold">Please select a topic from the sidebar to view its content and practice sets.</p>
                     </CardContent>
                 </Card>
@@ -937,7 +973,7 @@ export default function TextbookSolutionsPage() {
                                                     isLocked={isLocked}
                                                     passMark={passMark}
                                                     highestScore={progress?.highestScores?.[ps.id]}
-                                                    onDownload={() => handleDownloadPdf(ps)}
+                                                    onDownload={() => handleDownloadPdf(ps, activeTopicId!)}
                                                     isDownloading={isDownloading === ps.id}
                                                   />
                                                 );
