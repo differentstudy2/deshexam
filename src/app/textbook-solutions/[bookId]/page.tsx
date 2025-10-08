@@ -341,14 +341,14 @@ const MainContent = ({ textbook, chapters, topics, activeChapter, activeTopic, s
                                 {activeChapter.textbookQuestions.map((q: Question, index: number) => (
                                     <AccordionItem value={`item-${index}`} key={q.id}>
                                         <AccordionTrigger>{index + 1}. {q.text}</AccordionTrigger>
-                                        <AccordionContent className="prose dark:prose-invert max-w-none">
+                                        <AccordionContent className="prose dark:prose-invert max-w-none pt-4">
                                             {q.type === 'Multiple Choice' && q.options?.map((option, optIndex) => {
                                                 const isCorrectAnswer = q.correctAnswer === option.text;
                                                 return (
-                                                    <div key={optIndex} className={cn("p-3 rounded-lg border flex items-start gap-3", isCorrectAnswer ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" : "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800")}>
-                                                        {isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />}
+                                                    <div key={optIndex} className={cn("p-3 rounded-lg border flex items-start gap-3", isCorrectAnswer ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" : "")}>
+                                                        {isCorrectAnswer && <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />}
                                                         <div className="flex-1">
-                                                            <span className="font-medium">{option.text}</span>
+                                                            <span className={cn(isCorrectAnswer && "font-bold")}>{option.text}</span>
                                                             {option.explanation && <p className="text-xs text-muted-foreground mt-1">{option.explanation}</p>}
                                                         </div>
                                                     </div>
@@ -506,273 +506,275 @@ const MainContent = ({ textbook, chapters, topics, activeChapter, activeTopic, s
     )
 }
 
-export default function TextbookSolutionsPage() {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const textbookId = params.bookId as string;
-  const router = useRouter();
-  const { user } = useAuth();
-  const { toast } = useToast();
-  
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [textbook, setTextbook] = useState<Textbook | null>(null);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
-  const [progress, setProgress] = useState<TextbookProgress | null>(null);
-  const [settings, setSettings] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  
-  const [viewerOpen, setViewerOpen] = useState(false);
-  const [viewerResource, setViewerResource] = useState<Resource | null>(null);
+function TextbookSolutionsLayout({ children }: { children: React.ReactNode }) {
+    const params = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { user } = useAuth();
+    const { toast } = useToast();
+    
+    const textbookId = params.bookId as string;
+    const activeChapterId = searchParams.get('chapter');
+    const activeTopicId = searchParams.get('topic');
 
-  const activeChapterId = searchParams.get('chapter');
-  const activeTopicId = searchParams.get('topic');
-  
-  const [areResourcesFetched, setAreResourcesFetched] = useState(false);
-  const [areResourcesLoading, setAreResourcesLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState<string | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [chapters, setChapters] = useState<Chapter[]>([]);
+    const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
+    const [progress, setProgress] = useState<TextbookProgress | null>(null);
+    const [settings, setSettings] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    
+    const [viewerOpen, setViewerOpen] = useState(false);
+    const [viewerResource, setViewerResource] = useState<Resource | null>(null);
 
+    const [areResourcesFetched, setAreResourcesFetched] = useState(false);
+    const [areResourcesLoading, setAreResourcesLoading] = useState(false);
+    const [isDownloading, setIsDownloading] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!textbookId) return;
+    useEffect(() => {
+        if (!textbookId) return;
 
-    const fetchTextbookAndChapters = async () => {
-      setLoading(true);
-      const textbookDocRef = doc(db, 'textbooks', textbookId);
-      
-      const [siteSettings, textbookDocSnap] = await Promise.all([getSettings(), getDoc(textbookDocRef)]);
-      setSettings(siteSettings);
-
-      if (user) {
-          const profile = await getUserProfile(user.uid);
-          setUserProfile(profile);
-          const progressData = await getTextbookProgress(user.uid, textbookId);
-          setProgress(progressData);
-      }
-
-      if (textbookDocSnap.exists()) {
-        setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
-        
-        const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`));
-        const chaptersSnap = await getDocs(chaptersQuery);
-        let chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
-        
-        chaptersData.sort((a, b) => {
-            return a.title.localeCompare(b.title, undefined, { numeric: true });
-        });
-        
-        setChapters(chaptersData);
-
-        const initialChapterId = searchParams.get('chapter');
-        if (initialChapterId) {
-            await handleChapterToggle(initialChapterId);
-        }
-
-      } else {
-        router.push('/');
-      }
-      setLoading(false);
-    };
-
-    fetchTextbookAndChapters();
-  }, [textbookId, router, user]);
-
-  const activeChapter = chapters.find(c => c.id === activeChapterId);
-  const selectedTopicContent = useMemo(() => {
-    if (!activeChapterId || !activeTopicId || !topics[activeChapterId]) return null;
-    return topics[activeChapterId]?.find(t => t.id === activeTopicId) || null;
-  }, [activeChapterId, activeTopicId, topics]);
-
-  useEffect(() => {
-    // Dynamically update metadata when textbook, chapter, or topic changes
-    const updateMetadata = () => {
-        let title = "Textbook Solutions";
-        let description = "Find detailed solutions for your textbook exercises.";
-        let keywords = "textbook solutions, exam preparation, practice sets";
-        const jsonLdScript = document.getElementById('structured-data');
-
-        if (textbook) {
-            title = `${textbook.title} Solutions | DeshExam`;
-            description = `Get complete solutions for ${textbook.title}. Covers all chapters and topics with practice sets.`;
-            keywords = `${textbook.title}, ${textbook.subject}, ${textbook.class}, textbook solutions, NCERT solutions`;
-        }
-        if (activeChapter) {
-            title = `${activeChapter.title} - ${textbook?.title} Solutions | DeshExam`;
-            description = `Solutions for ${activeChapter.title}, part of the ${textbook?.title} textbook. Includes detailed explanations and practice questions.`;
-            keywords += `, ${activeChapter.title}`;
-        }
-        if (selectedTopicContent) {
-            title = `${selectedTopicContent.title} - ${activeChapter?.title} | DeshExam`;
-            description = `Practice sets and resources for ${selectedTopicContent.title}, from chapter ${activeChapter?.title}.`;
-            keywords += `, ${selectedTopicContent.title}`;
-        }
-
-        document.title = title;
-        document.querySelector('meta[name="description"]')?.setAttribute('content', description);
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', keywords);
-
-        // Update or create JSON-LD script
-        const jsonLd = {
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": title,
-            "url": window.location.href,
-            "description": description,
-            "image": textbook?.featureImage || "https://picsum.photos/seed/bookcover/800/400",
-            "author": {
-              "@type": "Organization",
-              "name": "DeshExam",
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "DeshExam",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://deshexam.com/logo.png"
-              }
-            },
-            "datePublished": textbook ? new Date().toISOString() : '',
-            "dateModified": new Date().toISOString(),
-          };
-
-        if(jsonLdScript) {
-            jsonLdScript.innerHTML = JSON.stringify(jsonLd);
-        } else {
-            const script = document.createElement('script');
-            script.id = 'structured-data';
-            script.type = 'application/ld+json';
-            script.innerHTML = JSON.stringify(jsonLd);
-            document.head.appendChild(script);
-        }
-    };
-    updateMetadata();
-}, [textbook, activeChapter, selectedTopicContent]);
-  
-  useEffect(() => {
-    setAreResourcesFetched(false);
-  }, [activeTopicId]);
-
-
-  const handleChapterToggle = useCallback(async (chapterId: string) => {
-      if (!chapterId || topics[chapterId]) {
-          const params = new URLSearchParams(searchParams.toString());
-          params.set('chapter', chapterId);
-          params.delete('topic'); 
-          router.push(`?${params.toString()}`, { scroll: false });
-          return;
-      }
-      setLoadingTopics(chapterId);
-      try {
-          const topicsData = await getTopicsByChapterId(textbookId, chapterId);
+        const fetchTextbookAndChapters = async () => {
+          setLoading(true);
+          const textbookDocRef = doc(db, 'textbooks', textbookId);
           
-          for (let topic of topicsData) {
-              const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
-              const practiceSetsSnap = await getDocs(practiceSetsQuery);
-              (topic as any).practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-              (topic as any).practiceSets.sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+          const [siteSettings, textbookDocSnap] = await Promise.all([getSettings(), getDoc(textbookDocRef)]);
+          setSettings(siteSettings);
+
+          if (user) {
+              const profile = await getUserProfile(user.uid);
+              setUserProfile(profile);
+              const progressData = await getTextbookProgress(user.uid, textbookId);
+              setProgress(progressData);
           }
 
-          // Fetch chapter-level practice sets
-          const chapterPracticeSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`), orderBy("createdAt", "desc"));
-          const chapterPracticeSetsSnap = await getDocs(chapterPracticeSetsQuery);
-          const chapterPracticeSets = chapterPracticeSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          
-          setChapters(prevChapters => prevChapters.map(ch => ch.id === chapterId ? {...ch, practiceSets: chapterPracticeSets} : ch));
-          
-          setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
-          
+          if (textbookDocSnap.exists()) {
+            setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
+            
+            const chaptersQuery = query(collection(db, `textbooks/${textbookId}/chapters`));
+            const chaptersSnap = await getDocs(chaptersQuery);
+            let chaptersData = chaptersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+            
+            chaptersData.sort((a, b) => {
+                return a.title.localeCompare(b.title, undefined, { numeric: true });
+            });
+            
+            setChapters(chaptersData);
+
+            const initialChapterId = searchParams.get('chapter');
+            if (initialChapterId) {
+                await handleChapterToggle(initialChapterId);
+            }
+
+          } else {
+            router.push('/');
+          }
+          setLoading(false);
+        };
+
+        fetchTextbookAndChapters();
+    }, [textbookId, router, user]);
+
+    const activeChapter = chapters.find(c => c.id === activeChapterId);
+    const selectedTopicContent = useMemo(() => {
+        if (!activeChapterId || !activeTopicId || !topics[activeChapterId]) return null;
+        return topics[activeChapterId]?.find(t => t.id === activeTopicId) || null;
+    }, [activeChapterId, activeTopicId, topics]);
+
+    useEffect(() => {
+        // Dynamically update metadata when textbook, chapter, or topic changes
+        const updateMetadata = () => {
+            let title = "Textbook Solutions";
+            let description = "Find detailed solutions for your textbook exercises.";
+            let keywords = "textbook solutions, exam preparation, practice sets";
+            const jsonLdScript = document.getElementById('structured-data');
+
+            if (textbook) {
+                title = `${textbook.title} Solutions | DeshExam`;
+                description = `Get complete solutions for ${textbook.title}. Covers all chapters and topics with practice sets.`;
+                keywords = `${textbook.title}, ${textbook.subject}, ${textbook.class}, textbook solutions, NCERT solutions`;
+            }
+            if (activeChapter) {
+                title = `${activeChapter.title} - ${textbook?.title} Solutions | DeshExam`;
+                description = `Solutions for ${activeChapter.title}, part of the ${textbook?.title} textbook. Includes detailed explanations and practice questions.`;
+                keywords += `, ${activeChapter.title}`;
+            }
+            if (selectedTopicContent) {
+                title = `${selectedTopicContent.title} - ${activeChapter?.title} | DeshExam`;
+                description = `Practice sets and resources for ${selectedTopicContent.title}, from chapter ${activeChapter?.title}.`;
+                keywords += `, ${selectedTopicContent.title}`;
+            }
+
+            document.title = title;
+            document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+            document.querySelector('meta[name="keywords"]')?.setAttribute('content', keywords);
+
+            // Update or create JSON-LD script
+            const jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "Article",
+                "headline": title,
+                "url": window.location.href,
+                "description": description,
+                "image": textbook?.featureImage || "https://picsum.photos/seed/bookcover/800/400",
+                "author": { "@type": "Organization", "name": "DeshExam" },
+                "publisher": { "@type": "Organization", "name": "DeshExam", "logo": { "@type": "ImageObject", "url": "/logo.png" } },
+                "datePublished": textbook ? new Date().toISOString() : '',
+                "dateModified": new Date().toISOString(),
+              };
+
+            if(jsonLdScript) {
+                jsonLdScript.innerHTML = JSON.stringify(jsonLd);
+            } else {
+                const script = document.createElement('script');
+                script.id = 'structured-data';
+                script.type = 'application/ld+json';
+                script.innerHTML = JSON.stringify(jsonLd);
+                document.head.appendChild(script);
+            }
+        };
+        updateMetadata();
+    }, [textbook, activeChapter, selectedTopicContent]);
+      
+    useEffect(() => {
+        setAreResourcesFetched(false);
+    }, [activeTopicId]);
+
+
+    const handleChapterToggle = useCallback(async (chapterId: string) => {
+          if (!chapterId || topics[chapterId]) {
+              const params = new URLSearchParams(searchParams.toString());
+              params.set('chapter', chapterId);
+              params.delete('topic'); 
+              router.push(`?${params.toString()}`, { scroll: false });
+              return;
+          }
+          setLoadingTopics(chapterId);
+          try {
+              const topicsData = await getTopicsByChapterId(textbookId, chapterId);
+              
+              for (let topic of topicsData) {
+                  const practiceSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topic.id}/practiceSets`), orderBy("createdAt", "desc"));
+                  const practiceSetsSnap = await getDocs(practiceSetsQuery);
+                  (topic as any).practiceSets = practiceSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                  (topic as any).practiceSets.sort((a: any, b: any) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+              }
+
+              // Fetch chapter-level practice sets
+              const chapterPracticeSetsQuery = query(collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`), orderBy("createdAt", "desc"));
+              const chapterPracticeSetsSnap = await getDocs(chapterPracticeSetsQuery);
+              const chapterPracticeSets = chapterPracticeSetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              
+              setChapters(prevChapters => prevChapters.map(ch => ch.id === chapterId ? {...ch, practiceSets: chapterPracticeSets} : ch));
+              
+              setTopics(prev => ({ ...prev, [chapterId]: topicsData }));
+              
+              const params = new URLSearchParams(searchParams.toString());
+              params.set('chapter', chapterId);
+              params.delete('topic');
+              router.push(`?${params.toString()}`, { scroll: false });
+          } catch (e) {
+              console.error("Failed to fetch topics for chapter:", e);
+              toast({
+                  variant: "destructive",
+                  title: "Error",
+                  description: "Could not load topics for this chapter.",
+              });
+          } finally {
+              setLoadingTopics(null);
+          }
+    }, [textbookId, topics, toast, router, searchParams]);
+      
+    const handleTopicSelect = (chapterId: string, topicId: string) => {
           const params = new URLSearchParams(searchParams.toString());
           params.set('chapter', chapterId);
-          params.delete('topic');
+          params.set('topic', topicId);
           router.push(`?${params.toString()}`, { scroll: false });
-      } catch (e) {
-          console.error("Failed to fetch topics for chapter:", e);
-          toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Could not load topics for this chapter.",
-          });
-      } finally {
-          setLoadingTopics(null);
-      }
-  }, [textbookId, topics, toast, router, searchParams]);
-  
-  const handleTopicSelect = (chapterId: string, topicId: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('chapter', chapterId);
-      params.set('topic', topicId);
-      router.push(`?${params.toString()}`, { scroll: false });
-  };
-  
-  const topicAggregateScore = useMemo(() => {
-    if (!selectedTopicContent || !progress || !selectedTopicContent.practiceSets || selectedTopicContent.practiceSets.length === 0) {
-        return null;
-    }
-    const scores = selectedTopicContent.practiceSets
-        .map(ps => progress.highestScores[ps.id])
-        .filter(score => score !== undefined);
-        
-    if (scores.length === 0) return null;
-
-    const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-    return Math.round(average);
-  }, [selectedTopicContent, progress]);
-  
-  const handleResourceClick = (resource: any) => {
-    setViewerResource(resource);
-    setViewerOpen(true);
-  };
-  
-  const fetchResources = async () => {
-    if (!activeChapterId || !activeTopicId || areResourcesFetched) return;
-    
-    setAreResourcesLoading(true);
-    try {
-        const topicRef = doc(db, `textbooks/${textbookId}/chapters/${activeChapterId}/topics`, activeTopicId);
-        const topicSnap = await getDoc(topicRef);
-        if(topicSnap.exists()) {
-            const topicData = topicSnap.data();
-            setTopics(prevTopics => ({
-                ...prevTopics,
-                [activeChapterId]: prevTopics[activeChapterId].map(t => 
-                    t.id === activeTopicId ? { ...t, resources: topicData.resources || [] } : t
-                )
-            }));
-            setAreResourcesFetched(true);
+    };
+      
+    const topicAggregateScore = useMemo(() => {
+        if (!selectedTopicContent || !progress || !selectedTopicContent.practiceSets || selectedTopicContent.practiceSets.length === 0) {
+            return null;
         }
-    } catch(e) {
-        console.error("Failed to fetch resources", e);
-    } finally {
-        setAreResourcesLoading(false);
+        const scores = selectedTopicContent.practiceSets
+            .map(ps => progress.highestScores[ps.id])
+            .filter(score => score !== undefined);
+            
+        if (scores.length === 0) return null;
+
+        const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        return Math.round(average);
+    }, [selectedTopicContent, progress]);
+      
+    const handleResourceClick = (resource: any) => {
+        setViewerResource(resource);
+        setViewerOpen(true);
+    };
+      
+    const fetchResources = async () => {
+        if (!activeChapterId || !activeTopicId || areResourcesFetched) return;
+        
+        setAreResourcesLoading(true);
+        try {
+            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${activeChapterId}/topics`, activeTopicId);
+            const topicSnap = await getDoc(topicRef);
+            if(topicSnap.exists()) {
+                const topicData = topicSnap.data();
+                setTopics(prevTopics => ({
+                    ...prevTopics,
+                    [activeChapterId]: prevTopics[activeChapterId].map(t => 
+                        t.id === activeTopicId ? { ...t, resources: topicData.resources || [] } : t
+                    )
+                }));
+                setAreResourcesFetched(true);
+            }
+        } catch(e) {
+            console.error("Failed to fetch resources", e);
+        } finally {
+            setAreResourcesLoading(false);
+        }
     }
-  }
 
- const handleDownloadPdf = async (practiceSet: any, topicId?: string) => {
-    if (!activeChapterId) return;
-    setIsDownloading(practiceSet.id);
-    toast({
-        title: "Generating PDF...",
-        description: "Your download will begin shortly.",
-    });
+    const handleDownloadPdf = async (practiceSet: any, topicId?: string) => {
+        if (!activeChapterId) return;
+        setIsDownloading(practiceSet.id);
+        toast({
+            title: "Generating PDF...",
+            description: "Your download will begin shortly.",
+        });
 
-    try {
-        const questions = await getQuestionsByPracticeSet(textbookId, activeChapterId, topicId, practiceSet.id);
-        const totalMarks = questions.reduce((total: number, q: any) => {
-            if (q.type === 'Matching') return total + (q.correctAnswer?.length || 0);
-            return total + (q.marks || 1);
-        }, 0);
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pageHeight = 297;
-        const pageWidth = 210;
-        const margin = 10;
-        let y = margin;
-        
-        const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
-            if (yPos + contentHeight > pageHeight - margin) {
-                pdf.addPage();
+        try {
+            const questions = await getQuestionsByPracticeSet(textbookId, activeChapterId, topicId, practiceSet.id);
+            const totalMarks = questions.reduce((total: number, q: any) => {
+                if (q.type === 'Matching') return total + (q.correctAnswer?.length || 0);
+                return total + (q.marks || 1);
+            }, 0);
+            
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageHeight = 297;
+            const pageWidth = 210;
+            const margin = 10;
+            let y = margin;
+            
+            const addWatermarkAndNewPageIfNeeded = (yPos: number, contentHeight: number) => {
+                if (yPos + contentHeight > pageHeight - margin) {
+                    pdf.addPage();
+                    pdf.setFontSize(60);
+                    pdf.setTextColor(230, 230, 230);
+                    pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
+                        angle: -45,
+                        align: 'center',
+                    });
+                    pdf.setTextColor(0, 0, 0);
+                    return margin;
+                }
+                return yPos;
+            };
+            
+            const drawWatermark = () => {
                 pdf.setFontSize(60);
                 pdf.setTextColor(230, 230, 230);
                 pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
@@ -780,297 +782,294 @@ export default function TextbookSolutionsPage() {
                     align: 'center',
                 });
                 pdf.setTextColor(0, 0, 0);
-                return margin;
-            }
-            return yPos;
-        };
-        
-        const drawWatermark = () => {
-            pdf.setFontSize(60);
-            pdf.setTextColor(230, 230, 230);
-            pdf.text('DeshExam', pageWidth / 2, pageHeight / 2, {
-                angle: -45,
-                align: 'center',
-            });
-            pdf.setTextColor(0, 0, 0);
-        }
-
-        drawWatermark();
-        y = margin;
-
-        const headerContent = (
-            <div className="p-1 bg-transparent text-black font-sans w-[700px] text-sm">
-                <div className="text-center mb-2">
-                    <h1 className="text-xl font-bold">{practiceSet.title}</h1>
-                    <h2 className="text-lg">{textbook?.title}</h2>
-                </div>
-                 <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-2 my-2">
-                    <p><strong>Institute Name:</strong> Deshexam.com</p>
-                    {textbook?.board && <p><strong>Board:</strong> {textbook.board}</p>}
-                    {textbook?.class && <p><strong>Class:</strong> {textbook.class}</p>}
-                    {textbook?.subject && <p><strong>Subject:</strong> {textbook.subject}</p>}
-                    {chapters.find(c => c.id === activeChapterId)?.title && <p><strong>Chapter:</strong> {chapters.find(c => c.id === activeChapterId)?.title}</p>}
-                    {selectedTopicContent?.title && <p><strong>Topic:</strong> {selectedTopicContent.title}</p>}
-                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
-                    <p><strong>Full Marks:</strong> {totalMarks}</p>
-                    <p><strong>Duration:</strong> {totalMarks} min</p>
-                </div>
-            </div>
-        );
-        
-        const headerContainer = document.createElement('div');
-        headerContainer.style.position = 'absolute';
-        headerContainer.style.left = '-9999px';
-        document.body.appendChild(headerContainer);
-        const headerRoot = createRoot(headerContainer);
-        
-        flushSync(() => {
-          headerRoot.render(headerContent);
-        });
-
-        const headerElement = headerContainer.firstElementChild;
-        if (headerElement) {
-            const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
-            const imgData = canvas.toDataURL('image/png');
-            const imgWidth = pageWidth - 2 * margin;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
-            y = addWatermarkAndNewPageIfNeeded(y, imgHeight);
-            pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-            y += imgHeight + 2;
-        }
-        headerRoot.unmount();
-        document.body.removeChild(headerContainer);
-
-
-        for (let i = 0; i < questions.length; i++) {
-            let question = questions[i] as Question;
-
-             if (question.type === 'Matching' && question.correctAnswer && !question.matchingOptions) {
-                const pairs = question.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
-                const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
-                let columnB = [...pairs.map(p => ({ text: p.b, image: p.bImage }))];
-                
-                for (let j = columnB.length - 1; j > 0; j--) {
-                    const k = Math.floor(Math.random() * (j + 1));
-                    [columnB[j], columnB[k]] = [columnB[k], columnB[j]];
-                }
-                question.matchingOptions = { columnA, columnB };
             }
 
-            const content = (
-              <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-transparent text-black font-sans w-[700px]">
-                  <div className="flex justify-between items-start mb-1 text-base">
-                      <span className="flex-1"><strong>Q{i + 1}:</strong> {question.text}</span>
-                      <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
-                  </div>
-                   <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm">
-                        {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => (
-                            <div key={optIndex} className="flex items-start gap-1">
-                                <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
-                                <div>{option.text}</div>
-                            </div>
-                        ))}
+            drawWatermark();
+            y = margin;
+
+            const headerContent = (
+                <div className="p-1 bg-transparent text-black font-sans w-[700px] text-sm">
+                    <div className="text-center mb-2">
+                        <h1 className="text-xl font-bold">{practiceSet.title}</h1>
+                        <h2 className="text-lg">{textbook?.title}</h2>
                     </div>
-                  {question.type === 'True/False' && (
-                      <div className="flex space-x-4 text-sm"><span>A) True</span><span>B) False</span></div>
-                  )}
-                  {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                      <div className="mt-4 border-b-2 border-dotted border-black"></div>
-                  )}
-                  {question.type === 'Matching' && question.matchingOptions && (
-                        <div className="mt-2 text-sm">
-                            <div className="grid grid-cols-2 gap-8">
-                                <h4 className="font-semibold underline">Column A</h4>
-                                <h4 className="font-semibold underline">Column B</h4>
-                            </div>
-                            <div className="grid grid-cols-2 gap-8">
-                                <div>
-                                    {question.matchingOptions.columnA.map((itemA, index) => (
-                                        <div key={index} className="flex items-center gap-2">
-                                            <span>{index + 1}.</span>
-                                            <span>{itemA.text}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div>
-                                    {question.matchingOptions.columnB.map((itemB, index) => (
-                                        <div key={index} className="flex items-center gap-2">
-                                            <span>{String.fromCharCode(97 + index)}.</span>
-                                            <span>{itemB.text}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-              </div>
+                     <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm border-y-2 border-black py-2 my-2">
+                        <p><strong>Institute Name:</strong> Deshexam.com</p>
+                        {textbook?.board && <p><strong>Board:</strong> {textbook.board}</p>}
+                        {textbook?.class && <p><strong>Class:</strong> {textbook.class}</p>}
+                        {textbook?.subject && <p><strong>Subject:</strong> {textbook.subject}</p>}
+                        {chapters.find(c => c.id === activeChapterId)?.title && <p><strong>Chapter:</strong> {chapters.find(c => c.id === activeChapterId)?.title}</p>}
+                        {selectedTopicContent?.title && <p><strong>Topic:</strong> {selectedTopicContent.title}</p>}
+                        <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
+                        <p><strong>Full Marks:</strong> {totalMarks}</p>
+                        <p><strong>Duration:</strong> {totalMarks} min</p>
+                    </div>
+                </div>
             );
             
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.left = '-9999px';
-            document.body.appendChild(container);
-            
-            const root = createRoot(container);
+            const headerContainer = document.createElement('div');
+            headerContainer.style.position = 'absolute';
+            headerContainer.style.left = '-9999px';
+            document.body.appendChild(headerContainer);
+            const headerRoot = createRoot(headerContainer);
             
             flushSync(() => {
-              root.render(content);
+              headerRoot.render(headerContent);
             });
-            
-            const element = container.querySelector(`#pdf-question-${i}`);
-            if (element) {
-                const canvas = await html2canvas(element as HTMLElement, {
-                    scale: 2,
-                    backgroundColor: null,
-                });
+
+            const headerElement = headerContainer.firstElementChild;
+            if (headerElement) {
+                const canvas = await html2canvas(headerElement as HTMLElement, { scale: 2, backgroundColor: null });
                 const imgData = canvas.toDataURL('image/png');
                 const imgWidth = pageWidth - 2 * margin;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                y = addWatermarkAndNewPageIfNeeded(y, imgHeight);
+                pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+                y += imgHeight + 2;
+            }
+            headerRoot.unmount();
+            document.body.removeChild(headerContainer);
 
-                if (y + imgHeight > pageHeight - margin) {
-                    pdf.addPage();
-                    drawWatermark();
-                    y = margin;
+
+            for (let i = 0; i < questions.length; i++) {
+                let question = questions[i] as Question;
+
+                 if (question.type === 'Matching' && question.correctAnswer && !question.matchingOptions) {
+                    const pairs = question.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                    const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                    let columnB = [...pairs.map(p => ({ text: p.b, image: p.bImage }))];
+                    
+                    for (let j = columnB.length - 1; j > 0; j--) {
+                        const k = Math.floor(Math.random() * (j + 1));
+                        [columnB[j], columnB[k]] = [columnB[k], columnB[j]];
+                    }
+                    question.matchingOptions = { columnA, columnB };
                 }
 
-                pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
-                y += imgHeight + 0.5;
+                const content = (
+                  <div key={`pdf-q-${i}`} id={`pdf-question-${i}`} className="p-1 bg-transparent text-black font-sans w-[700px]">
+                      <div className="flex justify-between items-start mb-1 text-base">
+                          <span className="flex-1"><strong>Q{i + 1}:</strong> {question.text}</span>
+                          <span className="ml-4 font-normal text-xs">[Marks: {question.type === 'Matching' ? (question.correctAnswer?.length || 1) : question.marks || 1}]</span>
+                      </div>
+                       <div className="grid grid-cols-2 gap-x-4 gap-y-0 text-sm">
+                            {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => (
+                                <div key={optIndex} className="flex items-start gap-1">
+                                    <div className="font-bold">{String.fromCharCode(65 + optIndex)}.</div>
+                                    <div>{option.text}</div>
+                                </div>
+                            ))}
+                        </div>
+                      {question.type === 'True/False' && (
+                          <div className="flex space-x-4 text-sm"><span>A) True</span><span>B) False</span></div>
+                      )}
+                      {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
+                          <div className="mt-4 border-b-2 border-dotted border-black"></div>
+                      )}
+                      {question.type === 'Matching' && question.matchingOptions && (
+                            <div className="mt-2 text-sm">
+                                <div className="grid grid-cols-2 gap-8">
+                                    <h4 className="font-semibold underline">Column A</h4>
+                                    <h4 className="font-semibold underline">Column B</h4>
+                                </div>
+                                <div className="grid grid-cols-2 gap-8">
+                                    <div>
+                                        {question.matchingOptions.columnA.map((itemA, index) => (
+                                            <div key={index} className="flex items-center gap-2">
+                                                <span>{index + 1}.</span>
+                                                <span>{itemA.text}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div>
+                                        {question.matchingOptions.columnB.map((itemB, index) => (
+                                            <div key={index} className="flex items-center gap-2">
+                                                <span>{String.fromCharCode(97 + index)}.</span>
+                                                <span>{itemB.text}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                  </div>
+                );
+                
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                document.body.appendChild(container);
+                
+                const root = createRoot(container);
+                
+                flushSync(() => {
+                  root.render(content);
+                });
+                
+                const element = container.querySelector(`#pdf-question-${i}`);
+                if (element) {
+                    const canvas = await html2canvas(element as HTMLElement, {
+                        scale: 2,
+                        backgroundColor: null,
+                    });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = pageWidth - 2 * margin;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    if (y + imgHeight > pageHeight - margin) {
+                        pdf.addPage();
+                        drawWatermark();
+                        y = margin;
+                    }
+
+                    pdf.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
+                    y += imgHeight + 0.5;
+                }
+                root.unmount();
+                document.body.removeChild(container);
             }
-            root.unmount();
-            document.body.removeChild(container);
+            
+            pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
+
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Download Failed",
+                description: "An error occurred while generating the PDF.",
+            });
+        } finally {
+            setIsDownloading(null);
         }
-        
-        pdf.save(`${practiceSet.title.replace(/\s/g, '_')}.pdf`);
+    };
 
-    } catch (error) {
-        console.error(error);
-        toast({
-            variant: "destructive",
-            title: "Download Failed",
-            description: "An error occurred while generating the PDF.",
-        });
-    } finally {
-        setIsDownloading(null);
+    const hasPracticeSet = !!params.practiceSetId;
+
+    if (hasPracticeSet) {
+        return <>{children}</>;
     }
-  };
 
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+                <Loader2 className="w-8 h-8 animate-spin"/>
+            </div>
+        );
+    }
 
-  if (loading) {
+    if (!textbook) {
+        return (
+            <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+                <p>Textbook not found.</p>
+            </div>
+        );
+    }
+    
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <Loader2 className="w-8 h-8 animate-spin"/>
-        </div>
-    );
-  }
+        <div className="container mx-auto py-8 max-w-7xl">
+            <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="text-sm text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                    <Link href="/textbook-solutions" className="hover:text-primary">Textbook Solutions</Link>
+                    <ChevronRight className="w-4 h-4" />
+                    <span className="text-foreground">{textbook.title}</span>
+                </div>
 
-  if (!textbook) {
-    return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-            <p>Textbook not found.</p>
-        </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto py-8 max-w-7xl">
-       <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                <Link href="/textbook-solutions" className="hover:text-primary">Textbook Solutions</Link>
-                <ChevronRight className="w-4 h-4" />
-                <span className="text-foreground">{textbook.title}</span>
-            </div>
-
-            <div className="md:hidden self-end">
-                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-                    <SheetTrigger asChild>
-                        <Button variant="outline">
-                            <Menu className="mr-2 h-4 w-4" />
-                            Table of Contents
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
-                         <SheetHeader>
-                           <SheetTitle>Table of Contents</SheetTitle>
-                        </SheetHeader>
-                        <TextbookContentSidebar
-                            chapters={chapters}
-                            topics={topics}
-                            activeChapter={activeChapterId}
-                            activeTopic={activeTopicId}
-                            onTopicSelect={handleTopicSelect}
-                            onChapterToggle={handleChapterToggle}
-                            onSheetClose={() => setIsSheetOpen(false)}
-                            userProfile={userProfile}
-                            loadingTopics={loadingTopics}
-                            progress={progress}
-                            settings={settings}
-                        />
-                    </SheetContent>
-                </Sheet>
-            </div>
-       </div>
-      <header className="mb-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 rounded-lg bg-card p-6">
-        <Image 
-            src={textbook.featureImage || "https://picsum.photos/seed/bookcover/200/280"}
-            alt={textbook.title}
-            width={150}
-            height={210}
-            className="rounded-md shadow-lg object-cover w-36 md:w-40 flex-shrink-0"
-        />
-        <div className="text-center md:text-left">
-            <h1 className="font-headline text-3xl md:text-4xl font-bold">{textbook.title} Solutions</h1>
-            <p className="mt-2 text-lg text-muted-foreground">{textbook.description}</p>
-            <div className="mt-4 flex justify-center md:justify-start flex-wrap gap-2">
-                <Badge variant="secondary">{textbook.subject}</Badge>
-                <Badge variant="secondary">{textbook.class}</Badge>
-                {textbook.board && <Badge variant="outline">{textbook.board}</Badge>}
-            </div>
-        </div>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
-        <aside className="hidden md:block md:sticky md:top-24">
-          <TextbookContentSidebar
-            chapters={chapters}
-            topics={topics}
-            activeChapter={activeChapterId}
-            activeTopic={activeTopicId}
-            onTopicSelect={handleTopicSelect}
-            onChapterToggle={handleChapterToggle}
-            userProfile={userProfile}
-            loadingTopics={loadingTopics}
-            progress={progress}
-            settings={settings}
-          />
-        </aside>
-
-        <MainContent 
-            textbook={textbook}
-            chapters={chapters}
-            topics={topics}
-            activeChapter={activeChapter}
-            activeTopic={activeTopicId}
-            selectedTopicContent={selectedTopicContent}
-            topicAggregateScore={topicAggregateScore}
-            settings={settings}
-            progress={progress}
-            handleResourceClick={handleResourceClick}
-            fetchResources={fetchResources}
-            handleDownloadPdf={handleDownloadPdf}
-            isDownloading={isDownloading}
-            areResourcesLoading={areResourcesLoading}
-            areResourcesFetched={areResourcesFetched}
-        />
-      </div>
-
-       {viewerResource && (
-            <ResourceViewerDialog 
-                resource={viewerResource} 
-                open={viewerOpen} 
-                onOpenChange={setViewerOpen} 
+                <div className="md:hidden self-end">
+                    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                        <SheetTrigger asChild>
+                            <Button variant="outline">
+                                <Menu className="mr-2 h-4 w-4" />
+                                Table of Contents
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="left" className="p-2 w-[80%] sm:max-w-sm">
+                             <SheetHeader>
+                               <SheetTitle>Table of Contents</SheetTitle>
+                            </SheetHeader>
+                            <TextbookContentSidebar
+                                chapters={chapters}
+                                topics={topics}
+                                activeChapter={activeChapterId}
+                                activeTopic={activeTopicId}
+                                onTopicSelect={handleTopicSelect}
+                                onChapterToggle={handleChapterToggle}
+                                onSheetClose={() => setIsSheetOpen(false)}
+                                userProfile={userProfile}
+                                loadingTopics={loadingTopics}
+                                progress={progress}
+                                settings={settings}
+                            />
+                        </SheetContent>
+                    </Sheet>
+                </div>
+           </div>
+          <header className="mb-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 rounded-lg bg-card p-6">
+            <Image 
+                src={textbook.featureImage || "https://picsum.photos/seed/bookcover/200/280"}
+                alt={textbook.title}
+                width={150}
+                height={210}
+                className="rounded-md shadow-lg object-cover w-36 md:w-40 flex-shrink-0"
             />
-        )}
-    </div>
-  );
+            <div className="text-center md:text-left">
+                <h1 className="font-headline text-3xl md:text-4xl font-bold">{textbook.title} Solutions</h1>
+                <p className="mt-2 text-lg text-muted-foreground">{textbook.description}</p>
+                <div className="mt-4 flex justify-center md:justify-start flex-wrap gap-2">
+                    <Badge variant="secondary">{textbook.subject}</Badge>
+                    <Badge variant="secondary">{textbook.class}</Badge>
+                    {textbook.board && <Badge variant="outline">{textbook.board}</Badge>}
+                </div>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
+            <aside className="hidden md:block md:sticky md:top-24">
+              <TextbookContentSidebar
+                chapters={chapters}
+                topics={topics}
+                activeChapter={activeChapterId}
+                activeTopic={activeTopicId}
+                onTopicSelect={handleTopicSelect}
+                onChapterToggle={handleChapterToggle}
+                userProfile={userProfile}
+                loadingTopics={loadingTopics}
+                progress={progress}
+                settings={settings}
+              />
+            </aside>
+
+            <MainContent 
+                textbook={textbook}
+                chapters={chapters}
+                topics={topics}
+                activeChapter={activeChapter}
+                activeTopic={activeTopicId}
+                selectedTopicContent={selectedTopicContent}
+                topicAggregateScore={topicAggregateScore}
+                settings={settings}
+                progress={progress}
+                handleResourceClick={handleResourceClick}
+                fetchResources={fetchResources}
+                handleDownloadPdf={handleDownloadPdf}
+                isDownloading={isDownloading}
+                areResourcesLoading={areResourcesLoading}
+                areResourcesFetched={areResourcesFetched}
+            />
+          </div>
+
+           {viewerResource && (
+                <ResourceViewerDialog 
+                    resource={viewerResource} 
+                    open={viewerOpen} 
+                    onOpenChange={setViewerOpen} 
+                />
+            )}
+        </div>
+    );
+}
+
+export default function TextbookSolutionsPage() {
+    const params = useParams();
+    return params.practiceSetId ? null : <TextbookSolutionsLayout>{null}</TextbookSolutionsLayout>;
 }
