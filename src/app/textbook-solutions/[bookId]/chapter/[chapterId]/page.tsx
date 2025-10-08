@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
@@ -124,7 +124,8 @@ function ChapterPageContent() {
         if (topicId) return topicId;
         // If no topic is in the URL, default to the first one of the current chapter
         if (topics[chapterId] && topics[chapterId].length > 0) {
-            return topics[chapterId][0].id;
+            // No default redirection, let the user choose
+            return null;
         }
         return null;
     }, [searchParams, topics, chapterId]);
@@ -135,7 +136,7 @@ function ChapterPageContent() {
     }, [topics, chapterId, activeTopicId]);
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
-        if (topics[cId]) return; // Already fetched
+        if (!cId || topics[cId]) return; // Already fetched
         setLoadingTopics(cId);
         try {
             const topicsData = await getTopicsByChapterId(textbookId, cId);
@@ -310,11 +311,40 @@ function ChapterPageContent() {
                     ) : (
                          <div>
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeChapter?.title}</h1>
-                            {activeChapter?.content ? (
+                            {activeChapter?.content && (
                                 <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeChapter.content}</ReactMarkdown>
                                 </article>
-                            ) : (
+                            )}
+
+                            {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
+                                <div className="mt-12">
+                                    <h2 className="font-headline text-2xl font-bold mb-4">Textbook Questions</h2>
+                                    <div className="space-y-4">
+                                        {activeChapter.textbookQuestions.map((q, i) => (
+                                            <p key={q.id || i}>{i + 1}. {q.text}</p>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                             {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
+                                <div className="mt-12">
+                                    <h2 className="font-headline text-2xl font-bold mb-4">Practice Sets</h2>
+                                    <div className="space-y-4">
+                                        {activeChapter.practiceSets.map(ps => (
+                                             <Link key={ps.id} href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}`}>
+                                                <div className="p-4 border rounded-lg hover:bg-accent flex justify-between items-center">
+                                                    <span className="font-semibold">{ps.title}</span>
+                                                    <Button size="sm">Start Practice</Button>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {(!activeChapter?.content && (!activeChapter?.textbookQuestions || activeChapter.textbookQuestions.length === 0)) && (
                                 <div className="text-center text-muted-foreground pt-16">
                                     <BookOpen className="w-16 h-16 mx-auto mb-4"/>
                                     <h2 className="text-xl font-semibold">Select a topic</h2>
