@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Solution, Textbook, Topic, Resource, Question } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Download } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Download, CheckCircle, XCircle, GripVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -878,7 +878,31 @@ export default function TextbookSolutionsPage() {
                                     <AccordionItem value={`item-${index}`} key={q.id}>
                                         <AccordionTrigger>{index + 1}. {q.text}</AccordionTrigger>
                                         <AccordionContent className="prose dark:prose-invert max-w-none">
-                                            <p><strong>Answer:</strong> {q.correctAnswer}</p>
+                                            {q.type === 'Multiple Choice' && q.options?.map((option, optIndex) => {
+                                                const isCorrectAnswer = q.correctAnswer === option.text;
+                                                return (
+                                                    <div key={optIndex} className={cn("p-3 rounded-lg border flex items-start gap-3", isCorrectAnswer ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" : "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800")}>
+                                                        {isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />}
+                                                        <div className="flex-1">
+                                                            <span className="font-medium">{option.text}</span>
+                                                            {option.explanation && <p className="text-xs text-muted-foreground mt-1">{option.explanation}</p>}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {(q.type === 'Short Answer' || q.type === 'Fill in the Blank' || q.type === 'True/False') && (
+                                                <p><strong>Answer:</strong> {q.correctAnswer}</p>
+                                            )}
+                                            {q.type === 'Matching' && Array.isArray(q.correctAnswer) && (
+                                                <div className="space-y-2">
+                                                    <strong>Correct Pairs:</strong>
+                                                    <ul>
+                                                        {q.correctAnswer.map((pair: any, i: number) => (
+                                                            <li key={i}>{pair.a} = {pair.b}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                             {q.explanation && <p><strong>Explanation:</strong> {q.explanation}</p>}
                                         </AccordionContent>
                                     </AccordionItem>
