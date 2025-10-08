@@ -473,7 +473,7 @@ function AddContentForm() {
           getSettings()
       ]);
       
-      const allContentTypes = [...types, { id: 'textbook', name: 'Textbook' }];
+      const allContentTypes = [...types, { id: 'textbook', name: 'Textbook' }, { id: 'exam', name: 'Exam' }];
       setContentTypes(allContentTypes);
 
       setSubjects(subjectData);
@@ -953,7 +953,7 @@ function AddContentForm() {
 
     {contentTypes.length > 0 && (
       <Tabs defaultValue={initialContentType || form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           {contentTypes.map((type) => (
             <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
           ))}
@@ -1785,3 +1785,5 @@ export default function CreateTestPage() {
         </Suspense>
     )
 }
+
+    

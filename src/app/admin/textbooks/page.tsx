@@ -1,13 +1,13 @@
 
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
 import { deleteTextbook } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
-import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye } from 'lucide-react';
+import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 
 
 const TextbookStats = ({ textbookId }: { textbookId: string }) => {
-    const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0 });
+    const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0, examCount: 0 });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -34,10 +34,19 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             let chapterCount = 0;
             let topicCount = 0;
             let practiceSetCount = 0;
+            let examCount = 0;
             
-            const chaptersRef = collection(db, 'textbooks', textbookId, 'chapters');
-            const chaptersSnapshot = await getDocs(chaptersRef);
+            const textbookRef = doc(db, 'textbooks', textbookId);
+            const chaptersRef = collection(textbookRef, 'chapters');
+            const examsRef = collection(textbookRef, 'exams');
+            
+            const [chaptersSnapshot, examsSnapshot] = await Promise.all([
+                getDocs(chaptersRef),
+                getDocs(examsRef),
+            ]);
+
             chapterCount = chaptersSnapshot.size;
+            examCount = examsSnapshot.size;
 
             for (const chapterDoc of chaptersSnapshot.docs) {
                 const topicsRef = collection(chapterDoc.ref, "topics");
@@ -50,7 +59,7 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
                     practiceSetCount += practiceSetsSnapshot.size;
                 }
             }
-            setStats({ chapterCount, topicCount, practiceSetCount });
+            setStats({ chapterCount, topicCount, practiceSetCount, examCount });
             setLoading(false);
         };
         fetchStats();
@@ -58,14 +67,18 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
 
     if (loading) {
         return (
-            <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
+            <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-2 text-center text-xs text-muted-foreground">
                 <div className="flex flex-col items-center gap-1">
                     <Layers className="h-4 w-4" />
                     <span>... Chapters</span>
                 </div>
-                <div className="flex flex-col items-center gap-1">
+                 <div className="flex flex-col items-center gap-1">
                     <FileText className="h-4 w-4" />
                     <span>... Topics</span>
+                </div>
+                 <div className="flex flex-col items-center gap-1">
+                    <Award className="h-4 w-4" />
+                    <span>... Exams</span>
                 </div>
                 <div className="flex flex-col items-center gap-1">
                     <CheckSquare className="h-4 w-4" />
@@ -76,7 +89,7 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
     }
 
     return (
-        <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
+        <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-2 text-center text-xs text-muted-foreground">
             <div className="flex flex-col items-center gap-1">
                 <Layers className="h-4 w-4" />
                 <span>{stats.chapterCount} Chapters</span>
@@ -84,6 +97,10 @@ const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             <div className="flex flex-col items-center gap-1">
                 <FileText className="h-4 w-4" />
                 <span>{stats.topicCount} Topics</span>
+            </div>
+             <div className="flex flex-col items-center gap-1">
+                <Award className="h-4 w-4" />
+                <span>{stats.examCount} Exams</span>
             </div>
             <div className="flex flex-col items-center gap-1">
                 <CheckSquare className="h-4 w-4" />
@@ -230,3 +247,5 @@ export default function ManageTextbooksPage() {
     </div>
   );
 }
+
+    

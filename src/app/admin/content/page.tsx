@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -464,9 +465,11 @@ export default function ManageContentPage() {
 
   const allTabs = useMemo(() => {
     const baseTabs = [{ id: 'all', name: 'All' }, ...contentTypes];
-    const hasQuestionsTab = baseTabs.some(tab => tab.name.toLowerCase() === 'questions');
-    if (!hasQuestionsTab) {
+    if (!baseTabs.some(tab => tab.name.toLowerCase() === 'questions')) {
       baseTabs.push({ id: 'questions', name: 'Questions' });
+    }
+    if (!baseTabs.some(tab => tab.name.toLowerCase() === 'exam')) {
+      baseTabs.push({ id: 'exam', name: 'Exam' });
     }
     return baseTabs;
   }, [contentTypes]);
@@ -1276,3 +1279,5 @@ export default function ManageContentPage() {
     </div>
   );
 }
+
+    
