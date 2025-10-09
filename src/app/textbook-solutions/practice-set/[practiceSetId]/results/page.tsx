@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -28,8 +27,8 @@ type Submission = {
     id: string; 
     practiceSetId: string; 
     practiceSetTitle: string;
-    topicId: string;
-    topicTitle: string;
+    topicId?: string; // topicId is optional
+    topicTitle?: string;
     chapterId: string;
     textbookId: string;
     userId: string; 
@@ -75,16 +74,22 @@ function ResultsDisplay() {
           setSubmission(submissionData);
           
           const textbookDocRef = doc(db, 'textbooks', submissionData.textbookId);
-          const topicDocRef = doc(db, `textbooks/${submissionData.textbookId}/chapters/${submissionData.chapterId}/topics`, submissionData.topicId);
-           
-          const [textbookData, studentData, topicData] = await Promise.all([
+          
+          const promises = [
              getDoc(textbookDocRef),
-             getUserProfile(submissionData.userId) as Promise<UserProfile>,
-             getDoc(topicDocRef)
-           ]);
+             getUserProfile(submissionData.userId) as Promise<UserProfile>
+          ];
+
+          // Only fetch topic if topicId exists
+          if (submissionData.topicId) {
+              const topicDocRef = doc(db, `textbooks/${submissionData.textbookId}/chapters/${submissionData.chapterId}/topics`, submissionData.topicId);
+              promises.push(getDoc(topicDocRef));
+          }
+           
+          const [textbookData, studentData, topicData] = await Promise.all(promises);
            
            if(textbookData.exists()) setTextbook({id: textbookData.id, ...textbookData.data()} as Textbook);
-           if(topicData.exists()) setTopic({id: topicData.id, ...topicData.data()} as Topic);
+           if(topicData && topicData.exists()) setTopic({id: topicData.id, ...topicData.data()} as Topic);
 
            setStudent(studentData);
         } else {
@@ -130,8 +135,10 @@ function ResultsDisplay() {
   const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
   const reviewUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}/review?submissionId=${submissionId}`;
-  const tryAgainUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}?textbook=${submission.textbookId}&chapter=${submission.chapterId}&topic=${submission.topicId}`;
-  const backToTopicUrl = `/textbook-solutions/${submission.textbookId}?chapter=${submission.chapterId}&topic=${submission.topicId}`;
+  const tryAgainUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}?textbook=${submission.textbookId}&chapter=${submission.chapterId}${submission.topicId ? `&topic=${submission.topicId}` : ''}`;
+  const backToTopicUrl = submission.topicId
+    ? `/textbook-solutions/${submission.textbookId}/chapter/${submission.chapterId}/topic/${submission.topicId}`
+    : `/textbook-solutions/${submission.textbookId}/chapter/${submission.chapterId}`;
   
   const pageTitle = `${student?.displayName}'s Practice Set Results`;
   

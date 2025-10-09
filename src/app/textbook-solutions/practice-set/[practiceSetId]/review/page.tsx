@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -31,8 +30,8 @@ type Submission = {
     id: string; 
     practiceSetId: string; 
     practiceSetTitle: string;
-    topicId: string;
-    topicTitle: string;
+    topicId?: string;
+    topicTitle?: string;
     chapterId: string;
     textbookId: string;
     userId: string; 
@@ -79,17 +78,22 @@ function ReviewDisplay() {
           setSubmission(submissionData);
           
           const textbookDocRef = doc(db, 'textbooks', submissionData.textbookId);
-          const topicDocRef = doc(db, `textbooks/${submissionData.textbookId}/chapters/${submissionData.chapterId}/topics`, submissionData.topicId);
           
-          const [textbookSnap, studentData, topicSnap, questionsData] = await Promise.all([
+          const promises = [
              getDoc(textbookDocRef),
              getUserProfile(submissionData.userId) as Promise<UserProfile>,
-             getDoc(topicDocRef),
              getQuestionsByPracticeSet(submissionData.textbookId, submissionData.chapterId, submissionData.topicId, submissionData.practiceSetId)
-           ]);
+          ];
+          
+          if (submissionData.topicId) {
+              const topicDocRef = doc(db, `textbooks/${submissionData.textbookId}/chapters/${submissionData.chapterId}/topics`, submissionData.topicId);
+              promises.push(getDoc(topicDocRef));
+          }
+           
+          const [textbookSnap, studentData, questionsData, topicSnap] = await Promise.all(promises);
            
            if(textbookSnap.exists()) setTextbook({id: textbookSnap.id, ...textbookSnap.data()} as Textbook);
-           if(topicSnap.exists()) setTopic({id: topicSnap.id, ...topicSnap.data()} as Topic);
+           if(topicSnap && topicSnap.exists()) setTopic({id: topicSnap.id, ...topicSnap.data()} as Topic);
 
            setStudent(studentData);
            setQuestions(questionsData as Question[]);
