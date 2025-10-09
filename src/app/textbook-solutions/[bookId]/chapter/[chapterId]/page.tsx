@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -18,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -37,6 +36,10 @@ const ChapterIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
 );
 
+const ExamIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m14 2 4 4 4-4"></path><path d="M18 6V4"></path><path d="M6 10H4"></path><path d="M6 14H4"></path><path d="M6 18H4"></path><path d="M14 10h6"></path><path d="M14 14h6"></path><path d="M14 18h6"></path><path d="M4 20h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"></path></svg>
+);
+
 
 const SidebarNav = ({
   chapters,
@@ -46,6 +49,7 @@ const SidebarNav = ({
   onChapterToggle,
   loadingTopics,
   textbookId,
+  exams,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
@@ -54,49 +58,69 @@ const SidebarNav = ({
   onChapterToggle: (chapterId: string) => void;
   loadingTopics: string | null;
   textbookId: string;
+  exams: any[];
 }) => (
-    <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
-      {chapters.map((chapter, index) => (
-        <AccordionItem value={chapter.id} key={chapter.id}>
-          <AccordionTrigger
-            className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
-          >
-             <div className="flex items-center gap-3">
-                <ChapterIcon />
-                <span>{chapter.title}</span>
+    <div className="flex flex-col h-full">
+        <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
+          {chapters.map((chapter, index) => (
+            <AccordionItem value={chapter.id} key={chapter.id}>
+              <AccordionTrigger
+                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
+              >
+                 <div className="flex items-center gap-3">
+                    <ChapterIcon />
+                    <span>{chapter.title}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-2 pb-0">
+                {loadingTopics === chapter.id ? (
+                    <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
+                ) : (
+                    <ul className="space-y-1 pl-4 border-l">
+                     {(topics[chapter.id] || []).map(topic => (
+                       <li key={topic.id}>
+                         <Button
+                           variant="ghost"
+                           asChild
+                           className={cn(
+                             "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
+                             activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
+                           )}
+                         >
+                           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}?topic=${topic.id}`} className="flex items-center gap-2">
+                             <FileText className="w-4 h-4 text-muted-foreground" />
+                             <span>{topic.title}</span>
+                           </Link>
+                         </Button>
+                       </li>
+                     ))}
+                     {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
+                        <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
+                     )}
+                   </ul>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        {exams.length > 0 && (
+             <div className="mt-4 pt-4 border-t">
+                <h3 className="px-3 text-lg font-semibold flex items-center gap-3"><ExamIcon/> Exams</h3>
+                <ul className="mt-2 space-y-1">
+                    {exams.map(exam => (
+                        <li key={exam.id}>
+                            <Button variant="ghost" asChild className="w-full justify-start text-left h-auto py-1.5 px-3 text-base">
+                                <Link href={`/exam/${exam.id}`}>
+                                    {exam.title}
+                                </Link>
+                            </Button>
+                        </li>
+                    ))}
+                </ul>
             </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-0">
-            {loadingTopics === chapter.id ? (
-                <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
-            ) : (
-                <ul className="space-y-1 pl-4 border-l">
-                 {(topics[chapter.id] || []).map(topic => (
-                   <li key={topic.id}>
-                     <Button
-                       variant="ghost"
-                       asChild
-                       className={cn(
-                         "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
-                         activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
-                       )}
-                     >
-                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}?topic=${topic.id}`} className="flex items-center gap-2">
-                         <FileText className="w-4 h-4 text-muted-foreground" />
-                         <span>{topic.title}</span>
-                       </Link>
-                     </Button>
-                   </li>
-                 ))}
-                 {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
-                    <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
-                 )}
-               </ul>
-            )}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
+        )}
+    </div>
 );
 
 
@@ -112,6 +136,7 @@ function ChapterPageContent() {
     const [textbook, setTextbook] = useState<Textbook | null>(null);
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
+    const [exams, setExams] = useState<any[]>([]);
     
     const [loading, setLoading] = useState(true);
     const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
@@ -154,11 +179,12 @@ function ChapterPageContent() {
                 const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
                 const practiceSetsRef = collection(chapterRef, 'practiceSets');
 
-                const [textbookSnap, chaptersQuerySnap, chapterSnap, practiceSetsSnap] = await Promise.all([
+                const [textbookSnap, chaptersQuerySnap, chapterSnap, practiceSetsSnap, allExams] = await Promise.all([
                     getDoc(doc(db, 'textbooks', textbookId)),
                     getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
                     getDoc(chapterRef),
-                    getDocs(practiceSetsRef)
+                    getDocs(practiceSetsRef),
+                    getAllContent("Exam")
                 ]);
 
                 if (textbookSnap.exists()) setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
@@ -178,6 +204,8 @@ function ChapterPageContent() {
                 }
                 
                 setChapters(chaptersData);
+                setExams(allExams.filter((exam: any) => exam.textbookId === textbookId));
+
 
                 if (chapterId) {
                     await fetchChapterTopics(chapterId);
@@ -220,6 +248,7 @@ function ChapterPageContent() {
                 onChapterToggle={fetchChapterTopics}
                 loadingTopics={loadingTopics}
                 textbookId={textbookId}
+                exams={exams}
             />
         </div>
     );
