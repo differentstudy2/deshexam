@@ -105,20 +105,29 @@ const SidebarNav = ({
         </Accordion>
 
         {exams.length > 0 && (
-             <div className="mt-4 pt-4 border-t">
-                <h3 className="px-3 text-lg font-semibold flex items-center gap-3"><ExamIcon/> Exams</h3>
-                <ul className="mt-2 space-y-1">
-                    {exams.map(exam => (
-                        <li key={exam.id}>
-                            <Button variant="ghost" asChild className="w-full justify-start text-left h-auto py-1.5 px-3 text-base">
-                                <Link href={`/exam/${exam.id}`}>
-                                    {exam.title}
-                                </Link>
-                            </Button>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <Accordion type="single" collapsible className="w-full mt-4 pt-4 border-t">
+                 <AccordionItem value="exams">
+                    <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md">
+                        <div className="flex items-center gap-3">
+                            <ExamIcon/>
+                            <span>Exams</span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pb-0">
+                        <ul className="space-y-1 pl-4 border-l">
+                            {exams.map(exam => (
+                                <li key={exam.id}>
+                                    <Button variant="ghost" asChild className="w-full justify-start text-left h-auto py-1.5 px-2 text-base">
+                                        <Link href={`/exam/${exam.id}`}>
+                                            {exam.title}
+                                        </Link>
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
         )}
     </div>
 );
