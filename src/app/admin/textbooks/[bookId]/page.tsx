@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -219,7 +218,7 @@ export default function ManageChaptersPage() {
           </Link>
         </Button>
       </div>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="font-headline text-3xl font-bold">
             Manage Chapters for <span className="text-primary">{textbook.title}</span>
@@ -228,10 +227,10 @@ export default function ManageChaptersPage() {
             Add, edit, and manage chapters for this textbook.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Dialog open={isBulkAddOpen} onOpenChange={setIsBulkAddOpen}>
             <DialogTrigger asChild>
-              <Button variant="secondary"><Library className="mr-2 h-4 w-4" /> Bulk Add</Button>
+              <Button variant="secondary" className="w-full"><Library className="mr-2 h-4 w-4" /> Bulk Add</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -254,13 +253,13 @@ export default function ManageChaptersPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-           <Button variant="outline" asChild>
+           <Button variant="outline" asChild className="w-full">
             <Link href={`/admin/textbooks/${textbookId}/exams`}>
               <Award className="mr-2 h-4 w-4" />
               Manage Exams
             </Link>
           </Button>
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="w-full">
             <Link href={`/admin/textbooks/${textbookId}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               Edit Textbook Details
