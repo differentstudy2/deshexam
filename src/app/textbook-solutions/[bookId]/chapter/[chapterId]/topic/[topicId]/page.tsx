@@ -18,7 +18,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getPracticeSetsByTopicId, getAllContent } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -315,7 +315,7 @@ function TopicPageContent() {
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` }] : []),
+        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []),
         ...(activeTopic ? [{ name: activeTopic.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []),
     ];
 
@@ -471,7 +471,7 @@ function TopicPageContent() {
                     )}
                 </main>
                 <aside className="hidden lg:block p-6 border-l">
-                    <div className="sticky top-24">
+                    <div className="sticky top-20">
                         <h3 className="font-semibold mb-4">On This Page</h3>
                          {headings.length > 0 ? (
                             <ul className="space-y-2">
@@ -520,3 +520,4 @@ function TopicPageContent() {
 export default function TopicPage() {
     return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
+
