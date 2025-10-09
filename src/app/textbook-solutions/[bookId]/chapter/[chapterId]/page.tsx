@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -22,6 +23,8 @@ import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -365,11 +368,31 @@ function ChapterPageContent() {
                             {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
                                 <div className="mt-12">
                                     <h2 className="font-headline text-2xl font-bold mb-4">Textbook Questions</h2>
-                                    <div className="space-y-4">
+                                    <Accordion type="single" collapsible className="w-full space-y-4">
                                         {activeChapter.textbookQuestions.map((q, i) => (
-                                            <p key={q.id || i}>{i + 1}. {q.text}</p>
+                                            <AccordionItem key={q.id || i} value={`item-${i}`} className="bg-card border rounded-lg px-4">
+                                                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                                                    {i + 1}. {q.text}
+                                                </AccordionTrigger>
+                                                <AccordionContent className="pt-2">
+                                                    <div className="prose dark:prose-invert max-w-none">
+                                                        <h4 className="font-semibold">Answer / Explanation</h4>
+                                                        {q.type === 'Multiple Choice' && q.options && (
+                                                            <ul>
+                                                                {q.options.map((opt, optIndex) => (
+                                                                    <li key={optIndex} className={cn(q.correctAnswer === opt.text && "font-bold text-primary")}>
+                                                                        {opt.text} {q.correctAnswer === opt.text && "(Correct)"}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                        {q.explanation && <p>{q.explanation}</p>}
+                                                        {!q.explanation && (q.correctAnswer && typeof q.correctAnswer === 'string') && <p>{q.correctAnswer}</p>}
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
                                         ))}
-                                    </div>
+                                    </Accordion>
                                 </div>
                             )}
 
