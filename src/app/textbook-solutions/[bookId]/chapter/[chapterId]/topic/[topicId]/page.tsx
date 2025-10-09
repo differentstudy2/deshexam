@@ -22,6 +22,7 @@ import { getTopicsByChapterId, getPracticeSetsByTopicId, getQuestionsByPracticeS
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -51,6 +52,7 @@ const SidebarNav = ({
   onChapterToggle,
   loadingTopics,
   textbookId,
+  exams,
 }: {
   chapters: Chapter[];
   topics: { [key: string]: Topic[] };
@@ -59,49 +61,78 @@ const SidebarNav = ({
   onChapterToggle: (chapterId: string) => void;
   loadingTopics: string | null;
   textbookId: string;
+  exams: any[];
 }) => (
-    <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
-      {chapters.map((chapter, index) => (
-        <AccordionItem value={chapter.id} key={chapter.id}>
-          <AccordionTrigger
-            className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
-          >
-             <div className="flex items-center gap-3">
-                <ChapterIcon />
-                <span>{chapter.title}</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pt-2 pb-0">
-            {loadingTopics === chapter.id ? (
-                <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
-            ) : (
-                <ul className="space-y-1 pl-4 border-l">
-                 {(topics[chapter.id] || []).map(topic => (
-                   <li key={topic.id}>
-                     <Button
-                       variant="ghost"
-                       asChild
-                       className={cn(
-                         "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
-                         activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
-                       )}
-                     >
-                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-muted-foreground" />
-                        <span>{topic.title}</span>
-                       </Link>
-                     </Button>
-                   </li>
-                 ))}
-                 {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
-                    <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
-                 )}
-               </ul>
-            )}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
+    <div className="flex flex-col h-full">
+        <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
+          {chapters.map((chapter, index) => (
+            <AccordionItem value={chapter.id} key={chapter.id}>
+              <AccordionTrigger
+                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
+              >
+                 <div className="flex items-center gap-3">
+                    <ChapterIcon />
+                    <span>{chapter.title}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-2 pb-0">
+                {loadingTopics === chapter.id ? (
+                    <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
+                ) : (
+                    <ul className="space-y-1 pl-4 border-l">
+                     {(topics[chapter.id] || []).map(topic => (
+                       <li key={topic.id}>
+                         <Button
+                           variant="ghost"
+                           asChild
+                           className={cn(
+                             "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
+                             activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
+                           )}
+                         >
+                           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
+                             <FileText className="w-4 h-4 text-muted-foreground" />
+                             <span>{topic.title}</span>
+                           </Link>
+                         </Button>
+                       </li>
+                     ))}
+                     {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
+                        <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
+                     )}
+                   </ul>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        {exams.length > 0 && (
+            <Accordion type="single" collapsible className="w-full mt-4 pt-4 border-t">
+                 <AccordionItem value="exams">
+                    <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md">
+                        <div className="flex items-center gap-3">
+                            <Award/>
+                            <span>Exams</span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pb-0">
+                        <ul className="space-y-1 pl-4 border-l">
+                            {exams.map(exam => (
+                                <li key={exam.id}>
+                                    <Button variant="ghost" asChild className="w-full justify-start text-left h-auto py-1.5 px-2 text-base">
+                                        <Link href={`/exam/${exam.id}`}>
+                                            {exam.title}
+                                        </Link>
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        )}
+    </div>
 );
 
 
@@ -128,6 +159,7 @@ function TopicPageContent() {
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
     const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
+    const [exams, setExams] = useState<any[]>([]);
 
 
     useEffect(() => {
@@ -171,9 +203,10 @@ function TopicPageContent() {
     const fetchPageData = useCallback(async () => {
         setLoading(true);
         try {
-            const [textbookSnap, chaptersQuerySnap] = await Promise.all([
+            const [textbookSnap, chaptersQuerySnap, allExams] = await Promise.all([
                 getDoc(doc(db, 'textbooks', textbookId)),
                 getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
+                getAllContent("Exam"),
             ]);
 
             if (textbookSnap.exists()) {
@@ -183,6 +216,7 @@ function TopicPageContent() {
             const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
             chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
             setChapters(chaptersData);
+            setExams(allExams.filter((exam: any) => exam.textbookId === textbookId));
 
             if (chapterId) {
                 const topicsData = await getTopicsByChapterId(textbookId, chapterId);
@@ -286,17 +320,18 @@ function TopicPageContent() {
     ];
 
     const sidebarContent = (
-      <div className="p-2">
-          <SidebarNav 
-              chapters={chapters}
-              topics={topics}
-              activeChapterId={chapterId}
-              activeTopicId={topicId}
-              onChapterToggle={fetchChapterTopics}
-              loadingTopics={loadingTopics}
-              textbookId={textbookId}
-          />
-      </div>
+         <div className="p-2">
+            <SidebarNav 
+                chapters={chapters}
+                topics={topics}
+                activeChapterId={chapterId}
+                activeTopicId={topicId}
+                onChapterToggle={fetchChapterTopics}
+                loadingTopics={loadingTopics}
+                textbookId={textbookId}
+                exams={exams}
+            />
+        </div>
     );
 
     return (
@@ -355,7 +390,7 @@ function TopicPageContent() {
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
                             {activeTopic.content && (
                                 <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeTopic.content}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeTopic.content}</ReactMarkdown>
                                 </article>
                             )}
                             
