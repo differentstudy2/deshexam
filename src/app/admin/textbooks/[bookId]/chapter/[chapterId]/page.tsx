@@ -263,7 +263,7 @@ export default function ManageTopicsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 items-start">
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>{editingTopic ? 'Edit Topic' : 'Add New Topic'}</CardTitle>
