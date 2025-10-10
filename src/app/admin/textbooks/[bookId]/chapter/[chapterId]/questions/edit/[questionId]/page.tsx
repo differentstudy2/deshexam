@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, PlusCircle, Trash2, GripVertical, FileJson, Save, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,8 +37,10 @@ const matchingPairSchema = z.object({
 const subQuestionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Sub-question text cannot be empty.'),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
   marks: z.coerce.number().min(1).default(1),
-  correctAnswer: z.string().min(1, 'Sub-question answer cannot be empty.'),
+  options: z.array(optionSchema).optional(),
+  correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
 });
 
@@ -61,10 +63,7 @@ const questionSchema = z.object({
     if (data.type === 'True/False') {
         return data.correctAnswer === 'True' || data.correctAnswer === 'False';
     }
-    if (data.type === 'Grouped') {
-        return true; // Main validation is on sub-questions
-    }
-    return !!data.correctAnswer;
+    return !!data.correctAnswer || data.type === 'Grouped';
 }, {
     message: "A valid correct answer is required for this question type.",
     path: ["correctAnswer"],
@@ -74,10 +73,10 @@ const questionSchema = z.object({
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
 
-const MatchingPairsField = ({ control, setValue }: { control: any, setValue: any }) => {
+const MatchingPairsField = ({ control, fieldNamePrefix, setValue }: { control: any, fieldNamePrefix: string, setValue: any }) => {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "correctAnswer",
+        name: `${fieldNamePrefix}.correctAnswer` as any,
     });
 
     return (
@@ -96,16 +95,16 @@ const MatchingPairsField = ({ control, setValue }: { control: any, setValue: any
                     </div>
                     <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
                         <div className="space-y-2">
-                            <FormField control={control} name={`correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
-                            <Controller control={control} name={`correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
-                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`correctAnswer.${pairIndex}.aImage`, url, { shouldValidate: true })} />
+                            <FormField control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
+                            <Controller control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`, url, { shouldValidate: true })} />
                             )} />
                         </div>
                         <GripVertical className="h-5 w-5 text-muted-foreground pt-2" />
                         <div className="space-y-2">
-                             <FormField control={control} name={`correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
-                             <Controller control={control} name={`correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
-                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`correctAnswer.${pairIndex}.bImage`, url, { shouldValidate: true })} />
+                             <FormField control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
+                             <Controller control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`, url, { shouldValidate: true })} />
                             )} />
                         </div>
                     </div>
@@ -118,7 +117,7 @@ const MatchingPairsField = ({ control, setValue }: { control: any, setValue: any
     );
 };
 
-const GroupedQuestionsField = ({ control }: { control: any }) => {
+const GroupedQuestionsField = ({ control, setValue }: { control: any, setValue: any }) => {
     const { fields, append, remove } = useFieldArray({
         control,
         name: "subQuestions",
@@ -127,6 +126,7 @@ const GroupedQuestionsField = ({ control }: { control: any }) => {
     return (
         <div className="space-y-4">
             <FormLabel>Sub-Questions</FormLabel>
+            <FormDescription>Add the individual questions that fall under the main instruction.</FormDescription>
             {fields.map((field, index) => (
                 <Card key={field.id} className="p-4 bg-secondary/50">
                     <div className="flex justify-between items-center mb-2">
@@ -135,26 +135,91 @@ const GroupedQuestionsField = ({ control }: { control: any }) => {
                             <Trash2 className="h-4 w-4 text-destructive"/>
                         </Button>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         <FormField control={control} name={`subQuestions.${index}.text`} render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs">Question</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
+                            <FormItem><FormLabel className="text-xs">Question Text</FormLabel><FormControl><Input {...field} placeholder="e.g., Who is Bina?" /></FormControl><FormMessage/></FormItem>
                         )}/>
-                        <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs">Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
-                        )}/>
+                        <FormField
+                            control={control}
+                            name={`subQuestions.${index}.type`}
+                            render={({ field: typeField }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs">Question Type</FormLabel>
+                                    <Select onValueChange={typeField.onChange} defaultValue={typeField.value}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                            <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                            <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                            <SelectItem value="True/False">True/False</SelectItem>
+                                            <SelectItem value="Matching">Matching</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         {/* Dynamically render fields based on sub-question type */}
+                        <Controller
+                            control={control}
+                            name={`subQuestions.${index}`}
+                            render={({ field: subQuestionField }) => {
+                                const subQuestionType = subQuestionField.value.type;
+                                if (subQuestionType === 'Multiple Choice') {
+                                    return (
+                                        <div className="space-y-2">
+                                            <FormLabel className="text-xs">Options</FormLabel>
+                                            <RadioGroup onValueChange={(val) => setValue(`subQuestions.${index}.correctAnswer`, val)}>
+                                                {[0, 1, 2, 3].map(optIndex => (
+                                                    <div key={optIndex} className="flex items-center gap-2">
+                                                        <RadioGroupItem value={subQuestionField.value.options?.[optIndex]?.text || ''} />
+                                                        <FormField control={control} name={`subQuestions.${index}.options.${optIndex}.text`} render={({ field }) => (
+                                                            <Input {...field} placeholder={`Option ${optIndex + 1}`} />
+                                                        )}/>
+                                                    </div>
+                                                ))}
+                                            </RadioGroup>
+                                        </div>
+                                    )
+                                }
+                                if (subQuestionType === 'True/False') {
+                                    return (
+                                        <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs">Correct Answer</FormLabel>
+                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
+                                                    <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel className="font-normal">True</FormLabel></FormItem>
+                                                    <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel className="font-normal">False</FormLabel></FormItem>
+                                                </RadioGroup>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}/>
+                                    )
+                                }
+                                if (subQuestionType === 'Matching') {
+                                    return <MatchingPairsField control={control} fieldNamePrefix={`subQuestions.${index}`} setValue={setValue} />
+                                }
+                                // Default to Short Answer / Fill in the blank
+                                return (
+                                    <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
+                                        <FormItem><FormLabel className="text-xs">Correct Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
+                                    )}/>
+                                );
+                            }}
+                        />
+
                         <FormField control={control} name={`subQuestions.${index}.explanation`} render={({ field }) => (
-                             <FormItem><FormLabel className="text-xs">Explanation</FormLabel><FormControl><Textarea {...field} rows={2}/></FormControl><FormMessage/></FormItem>
+                             <FormItem><FormLabel className="text-xs">Explanation (Optional)</FormLabel><FormControl><Textarea {...field} placeholder="Optional explanation" rows={2}/></FormControl></FormItem>
                         )}/>
                     </div>
                 </Card>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => append({ text: '', correctAnswer: '', explanation: '', marks: 1 })}>
+            <Button type="button" variant="outline" size="sm" onClick={() => append({ text: '', correctAnswer: '', explanation: '', marks: 1, type: 'Short Answer' })}>
                 <PlusCircle className="mr-2 h-4 w-4"/> Add Sub-Question
             </Button>
         </div>
     );
 }
-
 
 export default function EditChapterQuestionPage() {
     const params = useParams();
@@ -312,7 +377,7 @@ export default function EditChapterQuestionPage() {
                             )}
 
                             {questionType === 'Matching' && (
-                                <MatchingPairsField control={form.control} setValue={form.setValue} />
+                                <MatchingPairsField control={form.control} fieldNamePrefix="" setValue={form.setValue} />
                             )}
                             
                             {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
@@ -321,8 +386,8 @@ export default function EditChapterQuestionPage() {
                                 )}/>
                             )}
 
-                             {questionType === 'Grouped' && (
-                                <GroupedQuestionsField control={form.control} />
+                            {questionType === 'Grouped' && (
+                                <GroupedQuestionsField control={form.control} setValue={form.setValue} />
                             )}
 
                             <FormField name="explanation" control={form.control} render={({ field }) => (

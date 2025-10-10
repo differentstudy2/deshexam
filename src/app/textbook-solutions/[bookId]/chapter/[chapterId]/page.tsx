@@ -379,7 +379,7 @@ function ChapterPageContent() {
                                             <CardContent className="p-4 space-y-4">
                                                 <div>
                                                     <h4 className="font-bold text-sm mb-2 text-primary">Answer / Solution</h4>
-                                                    {q.type === 'Multiple Choice' && q.options ? (
+                                                     {q.type === 'Multiple Choice' && q.options ? (
                                                         <ul className="space-y-1 text-sm">
                                                             {q.options.map((opt, optIndex) => (
                                                                 <li key={optIndex} className={cn(q.correctAnswer === opt.text && "font-bold text-green-600")}>
@@ -442,26 +442,7 @@ function ChapterPageContent() {
                     )}
                 </main>
                 <aside className="hidden lg:block p-6 border-l">
-                    <div className="sticky top-20">
-                        <h3 className="font-semibold mb-4">On This Page</h3>
-                         {headings.length > 0 ? (
-                            <ul className="space-y-2">
-                            {headings.map((heading) => (
-                                <li key={heading.id}>
-                                <a
-                                    href={`#${heading.id}`}
-                                    className="text-sm text-muted-foreground hover:text-foreground"
-                                    style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
-                                >
-                                    {heading.text}
-                                </a>
-                                </li>
-                            ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">No sections found.</p>
-                        )}
-                    </div>
+                   {/* This is a placeholder for a potential right sidebar, like "On This Page" */}
                 </aside>
             </div>
              <ResourceViewerDialog 
@@ -469,19 +450,7 @@ function ChapterPageContent() {
                 open={viewerOpen} 
                 onOpenChange={setViewerOpen} 
             />
-             {pdfContent && (
-                <div style={{ position: 'fixed', left: '-9999px', top: 0, zIndex: -10 }}>
-                    <div id="pdf-content">
-                        <PracticeSetPDF 
-                            practiceSet={pdfContent.practiceSet} 
-                            questions={pdfContent.questions} 
-                            textbookTitle={textbook?.title || ''} 
-                            chapterTitle={activeChapter?.title || ''}
-                            topicTitle={activeTopic?.title || ''}
-                        />
-                    </div>
-                </div>
-            )}
+            {/* Hidden div for PDF generation */}
         </div>
     );
 }

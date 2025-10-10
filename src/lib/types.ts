@@ -51,13 +51,22 @@ export type Solution = {
     content: string;
 };
 
+// Represents a question nested within a "Grouped" question.
+// It cannot have its own sub-questions.
 export type SubQuestion = {
   id: string;
   text: string;
+  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
   marks: number;
-  correctAnswer: string;
+  options?: { text: string; explanation?: string }[];
+  matchingOptions?: {
+    columnA: { text: string; image?: string }[];
+    columnB: { text: string; image?: string }[];
+  };
+  correctAnswer: any;
   explanation?: string;
-}
+};
+
 
 export type Question = {
     id: string;
