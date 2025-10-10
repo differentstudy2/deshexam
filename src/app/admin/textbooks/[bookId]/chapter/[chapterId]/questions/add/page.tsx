@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, PlusCircle, Trash2, GripVertical, FileJson, Save, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,38 +23,24 @@ import { ImageUploader } from '@/components/feature/image-uploader';
 
 
 const optionSchema = z.object({
-  text: z.string().min(1, 'Option text cannot be empty.'),
+  text: z.string().optional(),
   explanation: z.string().optional(),
 });
 
 const matchingPairSchema = z.object({
-    a: z.string().min(1, 'Column A item cannot be empty.'),
+    a: z.string().optional(),
     aImage: z.string().optional(),
-    b: z.string().min(1, 'Column B item cannot be empty.'),
+    b: z.string().optional(),
     bImage: z.string().optional(),
 });
 
 const questionSchema = z.object({
-  text: z.string().min(1, 'Question text cannot be empty.'),
+  text: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').default(1),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
-}).refine(data => {
-    if (data.type === 'Multiple Choice') {
-        return !!data.correctAnswer && data.options?.some(opt => opt.text === data.correctAnswer);
-    }
-    if (data.type === 'Matching') {
-        return Array.isArray(data.correctAnswer) && data.correctAnswer.length > 0;
-    }
-    if (data.type === 'True/False') {
-        return data.correctAnswer === 'True' || data.correctAnswer === 'False';
-    }
-    return !!data.correctAnswer;
-}, {
-    message: "A valid correct answer is required for this question type.",
-    path: ["correctAnswer"],
 });
 
 
@@ -70,6 +56,9 @@ const MatchingPairsField = ({ control, setValue }: { control: any, setValue: any
     return (
         <div className='space-y-4'>
             <FormLabel>Matching Pairs</FormLabel>
+             <FormDescription>
+                Add the correct pairs for the matching question. The options in Column B will be shuffled for the student.
+            </FormDescription>
             <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
                 <div>Column A</div>
                 <div></div>
@@ -133,6 +122,7 @@ export default function AddChapterQuestionPage() {
             form.setValue('correctAnswer', []);
         } else if (questionType === 'True/False') {
              form.setValue('options', [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}]);
+             form.setValue('correctAnswer', '');
         } else {
             form.setValue('correctAnswer', '');
         }
@@ -177,7 +167,12 @@ export default function AddChapterQuestionPage() {
                         <CardHeader><CardTitle>Question Details</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                            <FormField name="text" control={form.control} render={({ field }) => (
-                                <FormItem><FormLabel>Question Text</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem>
+                                    <FormLabel>Question Text</FormLabel>
+                                    <FormControl><Textarea {...field} /></FormControl>
+                                    {questionType === 'Fill in the Blank' && <FormDescription>Use four underscores `____` to indicate where the blank should be.</FormDescription>}
+                                    <FormMessage />
+                                </FormItem>
                             )}/>
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField name="type" control={form.control} render={({ field }) => (
@@ -202,6 +197,7 @@ export default function AddChapterQuestionPage() {
                             {questionType === 'Multiple Choice' && (
                                 <div className="space-y-4">
                                     <FormLabel>Options</FormLabel>
+                                    <FormDescription>Select the radio button next to the correct answer.</FormDescription>
                                     <Controller
                                         control={form.control}
                                         name="correctAnswer"
@@ -232,7 +228,9 @@ export default function AddChapterQuestionPage() {
                              {questionType === 'True/False' && (
                                 <div className="space-y-4">
                                     <FormField name="correctAnswer" control={form.control} render={({ field }) => (
-                                        <FormItem><FormLabel>Correct Answer</FormLabel>
+                                        <FormItem>
+                                            <FormLabel>Correct Answer</FormLabel>
+                                            <FormDescription>Select the correct option.</FormDescription>
                                             <FormControl>
                                                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
                                                     <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
@@ -252,12 +250,16 @@ export default function AddChapterQuestionPage() {
                             
                             {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                 <FormField name="correctAnswer" control={form.control} render={({ field }) => (
-                                    <FormItem><FormLabel>Correct Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem>
+                                        <FormLabel>Correct Answer</FormLabel>
+                                        <FormDescription>Provide the exact answer for this question.</FormDescription>
+                                        <FormControl><Input {...field} /></FormControl><FormMessage />
+                                    </FormItem>
                                 )}/>
                             )}
 
                             <FormField name="explanation" control={form.control} render={({ field }) => (
-                                <FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea {...field} placeholder="General explanation for the correct answer." /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea {...field} placeholder="A general explanation for the correct answer." /></FormControl><FormMessage /></FormItem>
                             )}/>
                         </CardContent>
                     </Card>
