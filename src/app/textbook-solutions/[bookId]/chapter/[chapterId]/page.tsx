@@ -387,6 +387,12 @@ function ChapterPageContent() {
                                                                 </li>
                                                             ))}
                                                         </ul>
+                                                    ) : q.type === 'Matching' && Array.isArray(q.correctAnswer) ? (
+                                                        <ul className="space-y-1 text-sm">
+                                                            {q.correctAnswer.map((pair: any, pairIndex: number) => (
+                                                                <li key={pairIndex}>{pair.a} → {pair.b}</li>
+                                                            ))}
+                                                        </ul>
                                                     ) : (
                                                         <p className="text-sm">{q.correctAnswer}</p>
                                                     )}
