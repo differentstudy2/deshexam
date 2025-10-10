@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -22,6 +21,7 @@ import { getTopicsByChapterId, getAllContent } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -324,7 +324,7 @@ function ChapterPageContent() {
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
                             {activeTopic.content && (
                                 <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeTopic.content}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeTopic.content}</ReactMarkdown>
                                 </article>
                             )}
 
@@ -393,6 +393,12 @@ function ChapterPageContent() {
                                                                 <li key={pairIndex}>{pair.a} → {pair.b}</li>
                                                             ))}
                                                         </ul>
+                                                     ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
+                                                        <ol className="list-decimal list-inside space-y-2 text-sm">
+                                                            {q.subQuestions.map((sub, subIndex) => (
+                                                                <li key={sub.id || subIndex}>{sub.text} <span className="font-semibold text-green-600">{sub.correctAnswer}</span></li>
+                                                            ))}
+                                                        </ol>
                                                     ) : (
                                                         <p className="text-sm">{q.correctAnswer}</p>
                                                     )}
@@ -438,7 +444,23 @@ function ChapterPageContent() {
                 <aside className="hidden lg:block p-6 border-l">
                     <div className="sticky top-20">
                         <h3 className="font-semibold mb-4">On This Page</h3>
-                        <p className="text-sm text-muted-foreground">Table of contents will appear here.</p>
+                         {headings.length > 0 ? (
+                            <ul className="space-y-2">
+                            {headings.map((heading) => (
+                                <li key={heading.id}>
+                                <a
+                                    href={`#${heading.id}`}
+                                    className="text-sm text-muted-foreground hover:text-foreground"
+                                    style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
+                                >
+                                    {heading.text}
+                                </a>
+                                </li>
+                            ))}
+                            </ul>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No sections found.</p>
+                        )}
                     </div>
                 </aside>
             </div>
@@ -447,6 +469,19 @@ function ChapterPageContent() {
                 open={viewerOpen} 
                 onOpenChange={setViewerOpen} 
             />
+             {pdfContent && (
+                <div style={{ position: 'fixed', left: '-9999px', top: 0, zIndex: -10 }}>
+                    <div id="pdf-content">
+                        <PracticeSetPDF 
+                            practiceSet={pdfContent.practiceSet} 
+                            questions={pdfContent.questions} 
+                            textbookTitle={textbook?.title || ''} 
+                            chapterTitle={activeChapter?.title || ''}
+                            topicTitle={activeTopic?.title || ''}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

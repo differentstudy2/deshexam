@@ -1,10 +1,11 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import type { Chapter, Question, SubQuestion } from '@/lib/types';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,42 +15,59 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, PlusCircle, Trash2, GripVertical, FileJson, Save, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploader } from '@/components/feature/image-uploader';
 
-
 const optionSchema = z.object({
-  text: z.string().optional(),
+  text: z.string().min(1, 'Option text cannot be empty.'),
   explanation: z.string().optional(),
 });
 
 const matchingPairSchema = z.object({
-    a: z.string().optional(),
+    a: z.string().min(1, 'Column A item cannot be empty.'),
     aImage: z.string().optional(),
-    b: z.string().optional(),
+    b: z.string().min(1, 'Column B item cannot be empty.'),
     bImage: z.string().optional(),
 });
 
 const subQuestionSchema = z.object({
   id: z.string().optional(),
-  text: z.string().optional(),
-  marks: z.coerce.number().optional(),
-  correctAnswer: z.string().optional(),
+  text: z.string().min(1, 'Sub-question text cannot be empty.'),
+  marks: z.coerce.number().min(1).default(1),
+  correctAnswer: z.string().min(1, 'Sub-question answer cannot be empty.'),
   explanation: z.string().optional(),
 });
 
 const questionSchema = z.object({
-  text: z.string().optional(),
+  id: z.string(),
+  text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Grouped']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').default(1),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
   subQuestions: z.array(subQuestionSchema).optional(),
+}).refine(data => {
+    if (data.type === 'Multiple Choice') {
+        return !!data.correctAnswer && data.options?.some(opt => opt.text === data.correctAnswer);
+    }
+    if (data.type === 'Matching') {
+        return Array.isArray(data.correctAnswer) && data.correctAnswer.length > 0;
+    }
+    if (data.type === 'True/False') {
+        return data.correctAnswer === 'True' || data.correctAnswer === 'False';
+    }
+    if (data.type === 'Grouped') {
+        return true; // Main validation is on sub-questions
+    }
+    return !!data.correctAnswer;
+}, {
+    message: "A valid correct answer is required for this question type.",
+    path: ["correctAnswer"],
 });
 
 
@@ -65,9 +83,6 @@ const MatchingPairsField = ({ control, setValue }: { control: any, setValue: any
     return (
         <div className='space-y-4'>
             <FormLabel>Matching Pairs</FormLabel>
-             <FormDescription>
-                Add the correct pairs for the matching question. The options in Column B will be shuffled for the student.
-            </FormDescription>
             <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
                 <div>Column A</div>
                 <div></div>
@@ -112,7 +127,6 @@ const GroupedQuestionsField = ({ control }: { control: any }) => {
     return (
         <div className="space-y-4">
             <FormLabel>Sub-Questions</FormLabel>
-            <FormDescription>Add the individual questions that fall under the main instruction.</FormDescription>
             {fields.map((field, index) => (
                 <Card key={field.id} className="p-4 bg-secondary/50">
                     <div className="flex justify-between items-center mb-2">
@@ -123,13 +137,13 @@ const GroupedQuestionsField = ({ control }: { control: any }) => {
                     </div>
                     <div className="space-y-2">
                         <FormField control={control} name={`subQuestions.${index}.text`} render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs">Question Text</FormLabel><FormControl><Input {...field} placeholder="e.g., Who is Bina?" /></FormControl></FormItem>
+                            <FormItem><FormLabel className="text-xs">Question</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
                         )}/>
                         <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs">Correct Answer</FormLabel><FormControl><Input {...field} placeholder="Answer text" /></FormControl></FormItem>
+                            <FormItem><FormLabel className="text-xs">Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
                         )}/>
                         <FormField control={control} name={`subQuestions.${index}.explanation`} render={({ field }) => (
-                             <FormItem><FormLabel className="text-xs">Explanation (Optional)</FormLabel><FormControl><Textarea {...field} placeholder="Optional explanation" rows={2}/></FormControl></FormItem>
+                             <FormItem><FormLabel className="text-xs">Explanation</FormLabel><FormControl><Textarea {...field} rows={2}/></FormControl><FormMessage/></FormItem>
                         )}/>
                     </div>
                 </Card>
@@ -142,64 +156,75 @@ const GroupedQuestionsField = ({ control }: { control: any }) => {
 }
 
 
-export default function AddChapterQuestionPage() {
+export default function EditChapterQuestionPage() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
 
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
+    const questionId = params.questionId as string;
+    
+    const [loading, setLoading] = useState(true);
 
     const form = useForm<QuestionFormValues>({
-        resolver: zodResolver(questionSchema),
-        defaultValues: {
-            text: '',
-            type: 'Multiple Choice',
-            marks: 1,
-            options: Array(4).fill({ text: '', explanation: '' }),
-            correctAnswer: '',
-            explanation: '',
-            subQuestions: [],
-        },
+        resolver: zodResolver(questionSchema)
     });
+    
+    useEffect(() => {
+        const fetchQuestion = async () => {
+            setLoading(true);
+            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterRef);
+
+            if (chapterSnap.exists()) {
+                const chapterData = chapterSnap.data() as Chapter;
+                const questionToEdit = chapterData.textbookQuestions?.find(q => q.id === questionId);
+
+                if (questionToEdit) {
+                    form.reset(questionToEdit);
+                } else {
+                    toast({ variant: 'destructive', title: 'Question not found' });
+                    router.back();
+                }
+            } else {
+                 toast({ variant: 'destructive', title: 'Chapter not found' });
+                 router.back();
+            }
+            setLoading(false);
+        };
+        fetchQuestion();
+    }, [textbookId, chapterId, questionId, form, toast, router]);
 
     const questionType = form.watch('type');
-
-    useEffect(() => {
-        if (questionType === 'Matching') {
-            form.setValue('correctAnswer', []);
-        } else if (questionType === 'True/False') {
-             form.setValue('options', [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}]);
-             form.setValue('correctAnswer', '');
-        } else if (questionType === 'Grouped') {
-             form.setValue('subQuestions', []);
-        } else {
-            form.setValue('correctAnswer', '');
-        }
-    }, [questionType, form]);
-
 
     const onSubmit = async (data: QuestionFormValues) => {
         try {
             const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const newQuestion = { ...data, id: new Date().getTime().toString() };
-            
-            await updateDoc(chapterRef, {
-                textbookQuestions: arrayUnion(newQuestion)
-            });
-            
-            toast({ title: "Question Added", description: "The new question has been added to the chapter." });
-            router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
-
+            const chapterSnap = await getDoc(chapterRef);
+            if (chapterSnap.exists()) {
+                const chapterData = chapterSnap.data() as Chapter;
+                const updatedQuestions = chapterData.textbookQuestions?.map(q => 
+                    q.id === questionId ? data : q
+                ) || [];
+                
+                await updateDoc(chapterRef, { textbookQuestions: updatedQuestions });
+                toast({ title: "Question Updated", description: "The question has been successfully updated." });
+                router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
+            }
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Error adding question', description: (error as Error).message });
+            toast({ variant: 'destructive', title: 'Error updating question', description: (error as Error).message });
         }
     };
+    
+    if (loading) {
+        return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
+    }
 
     return (
         <div className="space-y-6">
             <div>
-                <Button asChild variant="ghost">
+                <Button variant="ghost" asChild>
                     <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Questions
@@ -207,28 +232,21 @@ export default function AddChapterQuestionPage() {
                 </Button>
             </div>
             <header>
-                <h1 className="font-headline text-3xl font-bold">Add New Question</h1>
-                <p className="text-muted-foreground mt-1">Create a new textbook question and solution for this chapter.</p>
+                <h1 className="font-headline text-3xl font-bold">Edit Question</h1>
             </header>
             
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <Card>
+                     <Card>
                         <CardHeader><CardTitle>Question Details</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                            <FormField name="text" control={form.control} render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>{questionType === 'Grouped' ? 'Main Instruction / Question' : 'Question Text'}</FormLabel>
-                                    <FormControl><Textarea {...field} /></FormControl>
-                                    {questionType === 'Fill in the Blank' && <FormDescription>Use four underscores `____` to indicate where the blank should be.</FormDescription>}
-                                    {questionType === 'Grouped' && <FormDescription>Enter the main instruction that applies to all sub-questions below.</FormDescription>}
-                                    <FormMessage />
-                                </FormItem>
+                                <FormItem><FormLabel>{questionType === 'Grouped' ? 'Main Instruction' : 'Question Text'}</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
                             )}/>
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField name="type" control={form.control} render={({ field }) => (
                                     <FormItem><FormLabel>Type</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl>
                                             <SelectContent>
                                                 <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
@@ -249,7 +267,6 @@ export default function AddChapterQuestionPage() {
                             {questionType === 'Multiple Choice' && (
                                 <div className="space-y-4">
                                     <FormLabel>Options</FormLabel>
-                                    <FormDescription>Select the radio button next to the correct answer.</FormDescription>
                                     <Controller
                                         control={form.control}
                                         name="correctAnswer"
@@ -280,11 +297,9 @@ export default function AddChapterQuestionPage() {
                              {questionType === 'True/False' && (
                                 <div className="space-y-4">
                                     <FormField name="correctAnswer" control={form.control} render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Correct Answer</FormLabel>
-                                            <FormDescription>Select the correct option.</FormDescription>
+                                        <FormItem><FormLabel>Correct Answer</FormLabel>
                                             <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
+                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
                                                     <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
                                                     <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
                                                 </RadioGroup>
@@ -302,11 +317,7 @@ export default function AddChapterQuestionPage() {
                             
                             {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                 <FormField name="correctAnswer" control={form.control} render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Correct Answer</FormLabel>
-                                        <FormDescription>Provide the exact answer for this question.</FormDescription>
-                                        <FormControl><Input {...field} /></FormControl><FormMessage />
-                                    </FormItem>
+                                    <FormItem><FormLabel>Correct Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                                 )}/>
                             )}
 
@@ -315,14 +326,14 @@ export default function AddChapterQuestionPage() {
                             )}
 
                             <FormField name="explanation" control={form.control} render={({ field }) => (
-                                <FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea {...field} placeholder="A general explanation for the correct answer." /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea {...field} placeholder="General explanation for the correct answer." /></FormControl><FormMessage /></FormItem>
                             )}/>
                         </CardContent>
                     </Card>
                     <div className="flex justify-end">
                         <Button type="submit" disabled={form.formState.isSubmitting}>
                            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                           Add Question
+                           Save Changes
                         </Button>
                     </div>
                 </form>

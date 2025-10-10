@@ -51,10 +51,18 @@ export type Solution = {
     content: string;
 };
 
+export type SubQuestion = {
+  id: string;
+  text: string;
+  marks: number;
+  correctAnswer: string;
+  explanation?: string;
+}
+
 export type Question = {
     id: string;
     text: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Grouped';
     marks: number;
     options?: {text: string, explanation?: string}[];
     matchingOptions?: {
@@ -63,6 +71,5 @@ export type Question = {
     };
     correctAnswer: any;
     explanation?: string;
+    subQuestions?: SubQuestion[];
 };
-
-    
