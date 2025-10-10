@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -19,7 +19,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useFieldArray, Controller } from 'react-hook-form';
 import { ImageUploader } from '@/components/feature/image-uploader';
 
 
@@ -122,7 +121,7 @@ export default function AddChapterQuestionPage() {
             type: 'Multiple Choice',
             marks: 1,
             options: Array(4).fill({ text: '', explanation: '' }),
-            correctAnswer: undefined,
+            correctAnswer: '',
             explanation: '',
         },
     });
@@ -135,7 +134,7 @@ export default function AddChapterQuestionPage() {
         } else if (questionType === 'True/False') {
              form.setValue('options', [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}]);
         } else {
-            form.setValue('correctAnswer', undefined);
+            form.setValue('correctAnswer', '');
         }
     }, [questionType, form]);
 
