@@ -23,10 +23,11 @@ import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
-import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -452,4 +453,3 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
-
