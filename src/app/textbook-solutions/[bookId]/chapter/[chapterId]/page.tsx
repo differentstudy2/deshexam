@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +25,8 @@ import remarkGfm from 'remark-gfm';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -366,33 +368,37 @@ function ChapterPageContent() {
                             )}
 
                             {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
-                                <div className="mt-12">
-                                    <h2 className="font-headline text-2xl font-bold mb-4">Textbook Questions</h2>
-                                    <Accordion type="single" collapsible className="w-full space-y-4">
-                                        {activeChapter.textbookQuestions.map((q, i) => (
-                                            <AccordionItem key={q.id || i} value={`item-${i}`} className="bg-card border rounded-lg px-4">
-                                                <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                                                    {i + 1}. {q.text}
-                                                </AccordionTrigger>
-                                                <AccordionContent className="pt-2">
-                                                    <div className="prose dark:prose-invert max-w-none">
-                                                        <h4 className="font-semibold">Answer / Explanation</h4>
-                                                        {q.type === 'Multiple Choice' && q.options && (
-                                                            <ul>
-                                                                {q.options.map((opt, optIndex) => (
-                                                                    <li key={optIndex} className={cn(q.correctAnswer === opt.text && "font-bold text-primary")}>
-                                                                        {opt.text} {q.correctAnswer === opt.text && "(Correct)"}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        )}
-                                                        {q.explanation && <p>{q.explanation}</p>}
-                                                        {!q.explanation && (q.correctAnswer && typeof q.correctAnswer === 'string') && <p>{q.correctAnswer}</p>}
+                                <div className="mt-12 space-y-8">
+                                    <h2 className="font-headline text-2xl font-bold mb-4">Textbook Questions & Solutions</h2>
+                                    {activeChapter.textbookQuestions.map((q, i) => (
+                                        <Card key={q.id || i} className="overflow-hidden">
+                                            <CardHeader className="bg-muted/50 p-4">
+                                                <p className="font-semibold">{i + 1}. {q.text}</p>
+                                            </CardHeader>
+                                            <CardContent className="p-4 space-y-4">
+                                                <div>
+                                                    <h4 className="font-bold text-sm mb-2 text-primary">Answer / Solution</h4>
+                                                    {q.type === 'Multiple Choice' && q.options ? (
+                                                        <ul className="space-y-1 text-sm">
+                                                            {q.options.map((opt, optIndex) => (
+                                                                <li key={optIndex} className={cn(q.correctAnswer === opt.text && "font-bold text-green-600")}>
+                                                                    {opt.text} {q.correctAnswer === opt.text && " (Correct Answer)"}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <p className="text-sm">{q.correctAnswer}</p>
+                                                    )}
+                                                </div>
+                                                {q.explanation && (
+                                                    <div>
+                                                        <h4 className="font-bold text-sm mb-2 text-primary">General Explanation</h4>
+                                                        <p className="text-sm text-muted-foreground">{q.explanation}</p>
                                                     </div>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        ))}
-                                    </Accordion>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    ))}
                                 </div>
                             )}
 
@@ -446,3 +452,4 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
+
