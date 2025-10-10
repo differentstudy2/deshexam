@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -160,7 +160,7 @@ export default function AddChapterQuestionPage() {
     return (
         <div className="space-y-6">
             <div>
-                <Button variant="ghost" asChild>
+                <Button asChild variant="ghost">
                     <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Questions
@@ -273,6 +273,3 @@ export default function AddChapterQuestionPage() {
         </div>
     );
 }
-
-
-    
