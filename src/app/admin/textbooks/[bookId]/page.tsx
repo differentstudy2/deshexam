@@ -323,7 +323,9 @@ export default function ManageChaptersPage() {
                 </DialogDescription>
               </DialogHeader>
               <Textarea
-                placeholder="Chapter 1: Introduction&#10;Chapter 2: The Basics&#10;Chapter 3: Advanced Topics"
+                placeholder="Chapter 1: Introduction
+Chapter 2: The Basics
+Chapter 3: Advanced Topics"
                 className="min-h-[200px]"
                 value={bulkChaptersText}
                 onChange={(e) => setBulkChaptersText(e.target.value)}
@@ -557,3 +559,5 @@ export default function ManageChaptersPage() {
     </div>
   );
 }
+
+    
