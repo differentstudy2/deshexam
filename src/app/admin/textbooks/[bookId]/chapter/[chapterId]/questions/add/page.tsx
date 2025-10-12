@@ -286,12 +286,12 @@ export default function AddChapterQuestionPage() {
                         <CardContent className="space-y-4">
                            <FormField name="text" control={form.control} render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>{questionType === 'Grouped' ? 'Main Instruction / Question' : 'Question Text'}</FormLabel>
+                                    <FormLabel>{questionType === 'Grouped' ? 'Main Instruction / Passage' : 'Question Text'}</FormLabel>
                                     <FormControl><Textarea {...field} /></FormControl>
                                     <FormDescription>
                                         {questionType === 'Fill in the Blank' && 'Use four underscores `____` to indicate where the blank should be.'}
                                         {questionType === 'Matching' && 'Provide the instruction for matching, e.g., "Match the items from Column A to Column B."'}
-                                        {questionType === 'Grouped' && 'Enter the main instruction that applies to all sub-questions below.'}
+                                        {questionType === 'Grouped' && 'Enter the main instruction or passage that applies to all sub-questions below.'}
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
