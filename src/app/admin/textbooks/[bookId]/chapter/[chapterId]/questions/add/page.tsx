@@ -105,7 +105,7 @@ const MatchingPairsField = ({ control, fieldNamePrefix, setValue }: { control: a
     );
 };
 
-const GroupedQuestionsField = ({ control, setValue }: { control: any, setValue: any }) => {
+const GroupedQuestionsField = ({ control, setValue, getValues }: { control: any, setValue: any, getValues: any }) => {
     const { fields, append, remove } = useFieldArray({
         control,
         name: "subQuestions",
@@ -162,7 +162,7 @@ const GroupedQuestionsField = ({ control, setValue }: { control: any, setValue: 
                                         <RadioGroup onValueChange={(val) => setValue(`subQuestions.${index}.correctAnswer`, val)}>
                                             {[0, 1, 2, 3].map(optIndex => (
                                                 <div key={optIndex} className="flex items-center gap-2">
-                                                    <RadioGroupItem value={form.getValues(`subQuestions.${index}.options.${optIndex}.text`) || ''} />
+                                                    <RadioGroupItem value={getValues(`subQuestions.${index}.options.${optIndex}.text`) || ''} />
                                                     <FormField control={control} name={`subQuestions.${index}.options.${optIndex}.text`} render={({ field }) => (
                                                         <Input {...field} placeholder={`Option ${optIndex + 1}`} />
                                                     )}/>
@@ -326,7 +326,7 @@ export default function AddChapterQuestionPage() {
                                                 {[0, 1, 2, 3].map((optionIndex) => (
                                                     <div key={optionIndex} className="flex items-start gap-3">
                                                         <FormControl className="mt-2.5">
-                                                             <RadioGroupItem value={form.watch(`options.${optionIndex}.text`)} disabled={!form.watch(`options.${optionIndex}.text`)} />
+                                                             <RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} disabled={!form.getValues(`options.${optionIndex}.text`)} />
                                                         </FormControl>
                                                         <div className="flex-1 space-y-1">
                                                             <FormField control={form.control} name={`options.${optionIndex}.text`} render={({ field: optionField }) => (
@@ -379,7 +379,7 @@ export default function AddChapterQuestionPage() {
                             )}
 
                              {questionType === 'Grouped' && (
-                                <GroupedQuestionsField control={form.control} setValue={form.setValue}/>
+                                <GroupedQuestionsField control={form.control} setValue={form.setValue} getValues={form.getValues} />
                             )}
 
                             <FormField name="explanation" control={form.control} render={({ field }) => (
@@ -398,5 +398,3 @@ export default function AddChapterQuestionPage() {
         </div>
     );
 }
-
-    
