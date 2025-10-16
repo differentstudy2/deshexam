@@ -29,6 +29,7 @@ import { Separator } from '@/components/ui/separator';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
+import Image from 'next/image';
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -383,9 +384,19 @@ function ChapterPageContent() {
                                                      {q.type === 'Multiple Choice' ? (
                                                         <p className="text-sm">{q.correctAnswer}</p>
                                                     ) : q.type === 'Matching' && Array.isArray(q.correctAnswer) ? (
-                                                        <ul className="space-y-1 text-sm list-disc pl-5">
+                                                        <ul className="space-y-2 text-sm">
                                                             {q.correctAnswer.map((pair: any, pairIndex: number) => (
-                                                                <li key={pairIndex}><strong>{pair.a}</strong> → {pair.b}</li>
+                                                                <li key={pairIndex} className="flex items-center gap-2">
+                                                                    <div className="flex flex-col items-center text-center">
+                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                                        <strong>{pair.a}</strong>
+                                                                    </div>
+                                                                    <span>→</span>
+                                                                     <div className="flex flex-col items-center text-center">
+                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                                        <span>{pair.b}</span>
+                                                                    </div>
+                                                                </li>
                                                             ))}
                                                         </ul>
                                                     ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
@@ -465,4 +476,3 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
-
