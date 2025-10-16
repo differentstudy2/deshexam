@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
-import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -366,7 +366,7 @@ function ChapterPageContent() {
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeChapter?.title}</h1>
                             {activeChapter?.content && (
                                 <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{activeChapter.content}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
                                 </article>
                             )}
 
@@ -421,13 +421,13 @@ function ChapterPageContent() {
                                                                             ))}
                                                                         </ul>
                                                                     ) : (
-                                                                        <span className="font-semibold text-green-600">{sub.correctAnswer}</span>
+                                                                        <span className="font-semibold text-green-600">{String(sub.correctAnswer)}</span>
                                                                     )}
                                                                 </li>
                                                             ))}
                                                         </ol>
                                                     ) : (
-                                                        <p className="text-sm">{q.correctAnswer}</p>
+                                                        <p className="text-sm">{String(q.correctAnswer)}</p>
                                                     )}
                                                 </div>
                                                 {q.explanation && (
@@ -490,4 +490,3 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
-
