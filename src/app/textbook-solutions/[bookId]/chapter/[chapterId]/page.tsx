@@ -391,7 +391,14 @@ function ChapterPageContent() {
                                                     ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
                                                         <ol className="list-decimal list-inside space-y-2 text-sm">
                                                             {q.subQuestions.map((sub, subIndex) => (
-                                                                <li key={sub.id || subIndex}><span className="font-medium">{sub.text}</span> <br/> <span className="font-semibold text-green-600">{sub.correctAnswer}</span></li>
+                                                                <li key={sub.id || subIndex}>
+                                                                    <span className="font-medium">{sub.text}</span> <br/> 
+                                                                    <span className="font-semibold text-green-600">{
+                                                                        sub.type === 'Matching' && Array.isArray(sub.correctAnswer)
+                                                                        ? sub.correctAnswer.map(p => `${p.a} → ${p.b}`).join(', ')
+                                                                        : sub.correctAnswer
+                                                                    }</span>
+                                                                </li>
                                                             ))}
                                                         </ol>
                                                     ) : (
