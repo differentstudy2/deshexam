@@ -400,15 +400,29 @@ function ChapterPageContent() {
                                                             ))}
                                                         </ul>
                                                     ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
-                                                        <ol className="list-decimal list-inside space-y-2 text-sm">
+                                                        <ol className="list-decimal list-inside space-y-4 text-sm">
                                                             {q.subQuestions.map((sub, subIndex) => (
                                                                 <li key={sub.id || subIndex}>
-                                                                    <span className="font-medium">{sub.text}</span> <br/> 
-                                                                    <span className="font-semibold text-green-600">{
-                                                                        sub.type === 'Matching' && Array.isArray(sub.correctAnswer)
-                                                                        ? sub.correctAnswer.map(p => `${p.a} → ${p.b}`).join(', ')
-                                                                        : sub.correctAnswer
-                                                                    }</span>
+                                                                    <span className="font-medium">{sub.text}</span> <br/>
+                                                                    {sub.type === 'Matching' && Array.isArray(sub.correctAnswer) ? (
+                                                                        <ul className="space-y-1 text-sm list-none pl-4 mt-2">
+                                                                            {sub.correctAnswer.map((pair: any, pairIndex: number) => (
+                                                                                <li key={pairIndex} className="flex items-center gap-2">
+                                                                                    <div className="flex flex-col items-center text-center">
+                                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={30} height={30} className="rounded-md object-cover mb-1" />}
+                                                                                        <strong>{pair.a}</strong>
+                                                                                    </div>
+                                                                                    <span>→</span>
+                                                                                    <div className="flex flex-col items-center text-center">
+                                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={30} height={30} className="rounded-md object-cover mb-1" />}
+                                                                                        <span>{pair.b}</span>
+                                                                                    </div>
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    ) : (
+                                                                        <span className="font-semibold text-green-600">{sub.correctAnswer}</span>
+                                                                    )}
                                                                 </li>
                                                             ))}
                                                         </ol>
@@ -476,3 +490,4 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
+
