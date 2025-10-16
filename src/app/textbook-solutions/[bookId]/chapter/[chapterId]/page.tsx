@@ -402,12 +402,12 @@ function ChapterPageContent() {
                                                             {q.correctAnswer.map((pair: any, pairIndex: number) => (
                                                                 <li key={pairIndex} className="flex items-center gap-2">
                                                                     <div className="flex flex-col items-center text-center">
-                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={100} height={100} className="rounded-md object-cover mb-1" />}
                                                                         <strong>{pair.a}</strong>
                                                                     </div>
                                                                     <span>→</span>
                                                                      <div className="flex flex-col items-center text-center">
-                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={100} height={100} className="rounded-md object-cover mb-1" />}
                                                                         <span>{pair.b}</span>
                                                                     </div>
                                                                 </li>
@@ -423,12 +423,12 @@ function ChapterPageContent() {
                                                                             {sub.correctAnswer.map((pair: any, pairIndex: number) => (
                                                                                 <li key={pairIndex} className="flex items-center gap-2">
                                                                                     <div className="flex flex-col items-center text-center">
-                                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={30} height={30} className="rounded-md object-cover mb-1" />}
+                                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={100} height={100} className="rounded-md object-cover mb-1" />}
                                                                                         <strong>{pair.a}</strong>
                                                                                     </div>
                                                                                     <span>→</span>
                                                                                     <div className="flex flex-col items-center text-center">
-                                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={30} height={30} className="rounded-md object-cover mb-1" />}
+                                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={100} height={100} className="rounded-md object-cover mb-1" />}
                                                                                         <span>{pair.b}</span>
                                                                                     </div>
                                                                                 </li>
