@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -247,10 +247,18 @@ export default function AddChapterQuestionPage() {
     const onSubmit = async (data: QuestionFormValues) => {
         try {
             const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterRef);
+
+            if (!chapterSnap.exists()) {
+                throw new Error("Chapter not found.");
+            }
+
+            const existingQuestions = chapterSnap.data().textbookQuestions || [];
             const newQuestion = { ...data, id: new Date().getTime().toString() };
+            const updatedQuestions = [...existingQuestions, newQuestion];
             
             await updateDoc(chapterRef, {
-                textbookQuestions: arrayUnion(newQuestion)
+                textbookQuestions: updatedQuestions
             });
             
             toast({ title: "Question Added", description: "The new question has been added to the chapter." });
