@@ -41,6 +41,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   async rewrites() {
@@ -70,4 +76,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
