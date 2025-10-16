@@ -370,6 +370,20 @@ function ChapterPageContent() {
                                 </article>
                             )}
 
+                             {activeChapter?.resources && activeChapter.resources.length > 0 && (
+                                <div className="mt-12">
+                                    <h2 className="font-headline text-2xl font-bold mb-4">Additional Resources</h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {activeChapter.resources.map(res => (
+                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
+                                                {getResourceIcon(res.type)}
+                                                <span className="flex-grow text-left">{res.title}</span>
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
                                 <div className="mt-12 space-y-8">
                                     <h2 className="font-headline text-2xl font-bold mb-4">Textbook Questions & Solutions</h2>
