@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -379,24 +380,18 @@ function ChapterPageContent() {
                                             <CardContent className="p-4 space-y-4">
                                                 <div>
                                                     <h4 className="font-bold text-sm mb-2 text-primary">Answer / Solution</h4>
-                                                     {q.type === 'Multiple Choice' && q.options ? (
-                                                        <ul className="space-y-1 text-sm">
-                                                            {q.options.map((opt, optIndex) => (
-                                                                <li key={optIndex} className={cn(q.correctAnswer === opt.text && "font-bold text-green-600")}>
-                                                                    {opt.text} {q.correctAnswer === opt.text && " (Correct Answer)"}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
+                                                     {q.type === 'Multiple Choice' ? (
+                                                        <p className="text-sm">{q.correctAnswer}</p>
                                                     ) : q.type === 'Matching' && Array.isArray(q.correctAnswer) ? (
-                                                        <ul className="space-y-1 text-sm">
+                                                        <ul className="space-y-1 text-sm list-disc pl-5">
                                                             {q.correctAnswer.map((pair: any, pairIndex: number) => (
-                                                                <li key={pairIndex}>{pair.a} → {pair.b}</li>
+                                                                <li key={pairIndex}><strong>{pair.a}</strong> → {pair.b}</li>
                                                             ))}
                                                         </ul>
                                                     ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
                                                         <ol className="list-decimal list-inside space-y-2 text-sm">
                                                             {q.subQuestions.map((sub, subIndex) => (
-                                                                <li key={sub.id || subIndex}>{sub.text} <span className="font-semibold text-green-600">{sub.correctAnswer}</span></li>
+                                                                <li key={sub.id || subIndex}><span className="font-medium">{sub.text}</span> <br/> <span className="font-semibold text-green-600">{sub.correctAnswer}</span></li>
                                                             ))}
                                                         </ol>
                                                     ) : (
@@ -463,3 +458,4 @@ export default function TextbookChapterPage() {
         </Suspense>
     );
 }
+
