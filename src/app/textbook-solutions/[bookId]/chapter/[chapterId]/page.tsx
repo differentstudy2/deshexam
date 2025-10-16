@@ -393,7 +393,7 @@ function ChapterPageContent() {
                                                                 <li key={pairIndex}>{pair.a} → {pair.b}</li>
                                                             ))}
                                                         </ul>
-                                                     ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
+                                                    ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
                                                         <ol className="list-decimal list-inside space-y-2 text-sm">
                                                             {q.subQuestions.map((sub, subIndex) => (
                                                                 <li key={sub.id || subIndex}>{sub.text} <span className="font-semibold text-green-600">{sub.correctAnswer}</span></li>
