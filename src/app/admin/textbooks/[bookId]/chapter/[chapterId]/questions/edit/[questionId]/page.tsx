@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, PlusCircle, Trash2, GripVertical, FileJson, Save, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -73,10 +73,10 @@ const questionSchema = z.object({
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
 
-const MatchingPairsField = ({ control, fieldNamePrefix, setValue }: { control: any, fieldNamePrefix: string, setValue: any }) => {
+const MatchingPairsField = ({ control, setValue, fieldNamePrefix }: { control: any, setValue: any, fieldNamePrefix: string }) => {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: `${fieldNamePrefix}.correctAnswer` as any,
+        name: `${fieldNamePrefix}.correctAnswer`,
     });
 
     return (
@@ -97,14 +97,14 @@ const MatchingPairsField = ({ control, fieldNamePrefix, setValue }: { control: a
                         <div className="space-y-2">
                             <FormField control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
                             <Controller control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
-                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`, url, { shouldValidate: true })} />
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`, url, { shouldValidate: true })} value={field.value} />
                             )} />
                         </div>
                         <GripVertical className="h-5 w-5 text-muted-foreground pt-2" />
                         <div className="space-y-2">
                              <FormField control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
                              <Controller control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
-                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`, url, { shouldValidate: true })} />
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`, url, { shouldValidate: true })} value={field.value} />
                             )} />
                         </div>
                     </div>
@@ -116,6 +116,7 @@ const MatchingPairsField = ({ control, fieldNamePrefix, setValue }: { control: a
         </div>
     );
 };
+
 
 const GroupedQuestionsField = ({ control, setValue }: { control: any, setValue: any }) => {
     const { fields, append, remove } = useFieldArray({
@@ -386,7 +387,7 @@ export default function EditChapterQuestionPage() {
                                 )}/>
                             )}
 
-                            {questionType === 'Grouped' && (
+                             {questionType === 'Grouped' && (
                                 <GroupedQuestionsField control={form.control} setValue={form.setValue} />
                             )}
 
