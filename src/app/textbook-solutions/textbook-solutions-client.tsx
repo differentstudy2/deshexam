@@ -13,12 +13,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { Textbook } from '@/lib/types';
 import { TextbookStats } from '@/components/feature/textbook-stats';
+import { Loader2 } from 'lucide-react';
+
 
 type MetafieldItem = { id: string, name: string };
+const ITEMS_PER_PAGE = 8;
 
 export default function TextbookSolutionsListPage() {
   const [textbooks, setTextbooks] = useState<Textbook[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,6 +99,18 @@ export default function TextbookSolutionsListPage() {
       return matchesSearch && matchesSubject && matchesClass && matchesBoard && matchesSchool && matchesClassCategory;
     });
   }, [textbooks, searchQuery, selectedSubject, selectedGrade, selectedClassCategory, selectedBoard, selectedSchool]);
+  
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + ITEMS_PER_PAGE);
+  };
+  
+  const visibleTextbooks = useMemo(() => {
+    return filteredTextbooks.slice(0, visibleCount);
+  }, [filteredTextbooks, visibleCount]);
+
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [searchQuery, selectedSubject, selectedGrade, selectedClassCategory, selectedBoard, selectedSchool]);
 
   return (
     <div className="bg-secondary/30 min-h-screen">
@@ -147,39 +163,47 @@ export default function TextbookSolutionsListPage() {
                 ))}
             </div>
         ) : filteredTextbooks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredTextbooks.map((book) => (
-              <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                <Link href={`/textbook-solutions/${book.id}`} className="block">
-                    <CardHeader className="p-0 relative h-48">
-                        <Image
-                            src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
-                            alt={book.title}
-                            fill
-                            className="object-cover"
-                            data-ai-hint={`${book.subject || ''} textbook`}
-                        />
-                    </CardHeader>
-                </Link>
-                <CardContent className="flex-grow p-4">
-                    <p className="text-sm font-medium text-primary">{book.subject}</p>
-                    <Link href={`/textbook-solutions/${book.id}`}>
-                        <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug hover:text-primary transition-colors">
-                        {book.title.length > 50
-                            ? `${book.title.substring(0, 50)}...`
-                            : book.title}
-                        </CardTitle>
-                    </Link>
-                    <TextbookStats textbookId={book.id} />
-                </CardContent>
-                <CardFooter className="p-4 pt-0">
-                    <Button asChild className="w-full">
-                        <Link href={`/textbook-solutions/${book.id}`}><BookOpen className="mr-2"/> View Solutions</Link>
-                    </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {visibleTextbooks.map((book) => (
+                <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                  <Link href={`/textbook-solutions/${book.id}`} className="block">
+                      <CardHeader className="p-0 relative aspect-[2/3]">
+                          <Image
+                              src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
+                              alt={book.title}
+                              fill
+                              className="object-contain"
+                              data-ai-hint={`${book.subject || ''} textbook`}
+                          />
+                      </CardHeader>
+                  </Link>
+                  <CardContent className="flex-grow p-4">
+                      <p className="text-sm font-medium text-primary">{book.subject}</p>
+                      <Link href={`/textbook-solutions/${book.id}`}>
+                          <CardTitle className="font-headline text-base mt-1 mb-2 leading-snug hover:text-primary transition-colors">
+                              {book.title}
+                          </CardTitle>
+                      </Link>
+                      <p className="text-xs text-muted-foreground">by {book.authorName || 'DeshExam'}</p>
+                      <TextbookStats textbookId={book.id} />
+                  </CardContent>
+                  <CardFooter className="p-4 pt-0">
+                      <Button asChild className="w-full">
+                          <Link href={`/textbook-solutions/${book.id}`}><BookOpen className="mr-2"/> View Solutions</Link>
+                      </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+             {visibleCount < filteredTextbooks.length && (
+              <div className="mt-12 text-center">
+                <Button onClick={handleLoadMore} size="lg">
+                  Load More
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-16 text-muted-foreground">
             <p>No textbooks found matching your criteria.</p>
