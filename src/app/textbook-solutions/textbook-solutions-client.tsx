@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen } from "lucide-react";
+import { Layers, FileText, CheckSquare, BookOpen } from "lucide-react";
 import { getAllTextbooks, getSubjects, getClasses, getGradesByClass, getBoards, getSchools } from '@/lib/firebase/firestore';
 import { TextbookFilters } from "@/components/feature/textbook-filters";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import type { Textbook } from '@/lib/types';
 import { TextbookStats } from '@/components/feature/textbook-stats';
 import { Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ContentBadge } from '@/components/content-badge';
 
 
 type MetafieldItem = { id: string, name: string };
@@ -167,28 +169,36 @@ export default function TextbookSolutionsListPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleTextbooks.map((book) => (
                 <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                  <Link href={`/textbook-solutions/${book.id}`} className="block">
-                      <CardHeader className="p-0 relative aspect-[2/3]">
-                          <Image
-                              src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
-                              alt={book.title}
-                              fill
-                              className="object-contain"
-                              data-ai-hint={`${book.subject || ''} textbook`}
-                          />
-                      </CardHeader>
-                  </Link>
-                  <CardContent className="flex-grow p-4">
-                      <p className="text-sm font-medium text-primary">{book.subject}</p>
-                      <Link href={`/textbook-solutions/${book.id}`}>
-                          <CardTitle className="font-headline text-base mt-1 mb-2 leading-snug hover:text-primary transition-colors">
+                  <CardHeader className="p-0 relative bg-gray-100 flex items-center justify-center aspect-[4/5]">
+                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
+                        <Image
+                          src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
+                          alt={book.title}
+                          width={200}
+                          height={280}
+                          className="w-full h-full object-contain"
+                          data-ai-hint={`${book.subject || ''} textbook`}
+                        />
+                    </Link>
+                     <div className="absolute top-2 right-2">
+                        <ContentBadge type={book.access} />
+                      </div>
+                  </CardHeader>
+                  <CardContent className="flex-grow p-3 space-y-2">
+                      <div className="flex flex-wrap gap-1">
+                          {book.subject && <Badge variant="outline" className="text-xs">{book.subject}</Badge>}
+                          {book.class && <Badge variant="outline" className="text-xs">{book.class}</Badge>}
+                          {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
+                      </div>
+                      <Link href={`/textbook-solutions/${book.id}`} className="block">
+                          <CardTitle className="font-headline text-base mt-1 leading-snug hover:text-primary transition-colors">
                               {book.title}
                           </CardTitle>
                       </Link>
-                      <p className="text-xs text-muted-foreground">by {book.authorName || 'DeshExam'}</p>
+                       <p className="text-xs text-muted-foreground">by {(book as any).authorName || 'DeshExam'}</p>
                       <TextbookStats textbookId={book.id} />
                   </CardContent>
-                  <CardFooter className="p-4 pt-0">
+                  <CardFooter className="p-3 pt-0">
                       <Button asChild className="w-full">
                           <Link href={`/textbook-solutions/${book.id}`}><BookOpen className="mr-2"/> View Solutions</Link>
                       </Button>
