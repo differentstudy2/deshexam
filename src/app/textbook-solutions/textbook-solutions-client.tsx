@@ -150,22 +150,26 @@ export default function TextbookSolutionsListPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredTextbooks.map((book) => (
               <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                <CardHeader className="p-0 relative h-48">
-                    <Image
-                        src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
-                        alt={book.title}
-                        fill
-                        className="object-cover"
-                        data-ai-hint={`${book.subject || ''} textbook`}
-                    />
-                </CardHeader>
+                <Link href={`/textbook-solutions/${book.id}`} className="block">
+                    <CardHeader className="p-0 relative h-48">
+                        <Image
+                            src={book.featureImage || `https://picsum.photos/seed/${book.id}/400/225`}
+                            alt={book.title}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={`${book.subject || ''} textbook`}
+                        />
+                    </CardHeader>
+                </Link>
                 <CardContent className="flex-grow p-4">
                     <p className="text-sm font-medium text-primary">{book.subject}</p>
-                    <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">
-                      {book.title.length > 50
-                        ? `${book.title.substring(0, 50)}...`
-                        : book.title}
-                    </CardTitle>
+                    <Link href={`/textbook-solutions/${book.id}`}>
+                        <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug hover:text-primary transition-colors">
+                        {book.title.length > 50
+                            ? `${book.title.substring(0, 50)}...`
+                            : book.title}
+                        </CardTitle>
+                    </Link>
                     <TextbookStats textbookId={book.id} />
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
