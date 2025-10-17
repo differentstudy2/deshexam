@@ -129,8 +129,8 @@ export default function TextbookSolutionsListPage() {
         />
 
         {loading ? (
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
                     <Card key={i}>
                         <CardHeader className="p-0 relative h-48">
                             <Skeleton className="w-full h-full rounded-t-lg" />
@@ -138,6 +138,7 @@ export default function TextbookSolutionsListPage() {
                         <CardContent className="p-4 space-y-2">
                              <Skeleton className="h-4 w-1/3" />
                              <Skeleton className="h-6 w-full" />
+                             <Skeleton className="h-16 w-full" />
                         </CardContent>
                         <CardFooter className="p-4">
                              <Skeleton className="h-10 w-full" />
@@ -146,7 +147,7 @@ export default function TextbookSolutionsListPage() {
                 ))}
             </div>
         ) : filteredTextbooks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredTextbooks.map((book) => (
               <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                 <CardHeader className="p-0 relative h-48">
