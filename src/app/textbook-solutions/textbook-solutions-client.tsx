@@ -161,7 +161,11 @@ export default function TextbookSolutionsListPage() {
                 </CardHeader>
                 <CardContent className="flex-grow p-4">
                     <p className="text-sm font-medium text-primary">{book.subject}</p>
-                    <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{book.title}</CardTitle>
+                    <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">
+                      {book.title.length > 50
+                        ? `${book.title.substring(0, 50)}...`
+                        : book.title}
+                    </CardTitle>
                     <TextbookStats textbookId={book.id} />
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
