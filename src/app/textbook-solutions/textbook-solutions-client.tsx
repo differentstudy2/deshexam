@@ -169,7 +169,7 @@ export default function TextbookSolutionsListPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleTextbooks.map((book) => (
                 <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                  <CardHeader className="p-0 relative bg-gray-100 flex items-center justify-center aspect-[4/5]">
+                  <CardHeader className="p-0 relative bg-gray-100 flex items-center justify-center aspect-[2/3]">
                     <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
                         <Image
                           src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
@@ -192,7 +192,7 @@ export default function TextbookSolutionsListPage() {
                       </div>
                       <Link href={`/textbook-solutions/${book.id}`} className="block">
                           <CardTitle className="font-headline text-base mt-1 leading-snug hover:text-primary transition-colors">
-                              {book.title}
+                              {book.title.length > 52 ? book.title.substring(0, 52) + '...' : book.title}
                           </CardTitle>
                       </Link>
                        <p className="text-xs text-muted-foreground">by {(book as any).authorName || 'DeshExam'}</p>
