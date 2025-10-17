@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, getDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, PracticeSet } from '@/lib/types';
 
@@ -11,10 +11,20 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, Edit } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ManageChapterPracticeSetsPage() {
     const params = useParams();
@@ -31,6 +41,7 @@ export default function ManageChapterPracticeSetsPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
     const [practiceSetTitle, setPracticeSetTitle] = useState('');
+    const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
     useEffect(() => {
         if (!textbookId || !chapterId) return;
@@ -98,6 +109,23 @@ export default function ManageChapterPracticeSetsPage() {
             toast({ variant: 'destructive', title: 'Error saving practice set', description: (error as Error).message });
         }
     };
+    
+    const handleDeletePracticeSet = async () => {
+        if (!practiceSetToDelete) return;
+
+        try {
+            const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`, practiceSetToDelete.id);
+            // You might want to delete subcollections (like questions) here in a real app, possibly with a Cloud Function.
+            await deleteDoc(psRef);
+            toast({ title: 'Practice Set Deleted' });
+            
+            setPracticeSets(prev => prev.filter(ps => ps.id !== practiceSetToDelete.id));
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error deleting practice set', description: (error as Error).message });
+        } finally {
+            setPracticeSetToDelete(null);
+        }
+    };
 
     if (loading) {
         return <div>Loading...</div>;
@@ -141,6 +169,9 @@ export default function ManageChapterPracticeSetsPage() {
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(ps)}>
                                             <Edit className="mr-2 h-4 w-4" /> Edit
                                         </Button>
+                                        <Button variant="destructive" size="sm" onClick={() => setPracticeSetToDelete(ps)}>
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                        </Button>
                                     </div>
                                 </li>
                             ))}
@@ -166,6 +197,21 @@ export default function ManageChapterPracticeSetsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            
+            <AlertDialog open={!!practiceSetToDelete} onOpenChange={() => setPracticeSetToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete the practice set "{practiceSetToDelete?.title}" and all of its questions. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeletePracticeSet} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
