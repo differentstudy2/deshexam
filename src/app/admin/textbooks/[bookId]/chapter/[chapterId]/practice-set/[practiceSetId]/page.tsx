@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Question, Topic } from '@/lib/types';
+import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, Sparkles, Upload } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, Sparkles, Upload, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -206,8 +206,14 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             <FormItem><FormLabel>Correct Answer</FormLabel>
                                 <FormControl>
                                     <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
-                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
-                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
+                                       <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="True" id="r1" />
+                                            <Label htmlFor="r1">True</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="False" id="r2" />
+                                            <Label htmlFor="r2">False</Label>
+                                        </div>
                                     </RadioGroup>
                                 </FormControl>
                             <FormMessage /></FormItem>
@@ -268,7 +274,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
 
 
 const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['topic', 'text', 'file']),
+    sourceType: z.enum(['chapterContent', 'topic', 'text', 'file']),
     sourceTopic: z.string().optional(),
     sourceText: z.string().optional(),
     sourceFile: z.string().optional(),
@@ -277,7 +283,7 @@ const aiGeneratorFormSchema = z.object({
     questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
 }).refine(data => {
     if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
-    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
+    if (data.sourceType === 'text' || data.sourceType === 'chapterContent') return !!data.sourceText && data.sourceText.length >= 3;
     if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
     return false;
 }, {
@@ -298,6 +304,7 @@ export default function ManagePracticeSetQuestionsPage() {
     const practiceSetId = params.practiceSetId as string;
     
     const [topic, setTopic] = useState<Topic | null>(null);
+    const [chapter, setChapter] = useState<Chapter | null>(null);
     const [practiceSet, setPracticeSet] = useState<PracticeSet | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
@@ -330,7 +337,7 @@ export default function ManagePracticeSetQuestionsPage() {
     const aiForm = useForm<AIGeneratorFormValues>({
         resolver: zodResolver(aiGeneratorFormSchema),
         defaultValues: {
-          sourceType: 'topic',
+          sourceType: 'chapterContent',
           sourceTopic: '',
           sourceText: '',
           sourceFile: '',
@@ -340,21 +347,29 @@ export default function ManagePracticeSetQuestionsPage() {
         },
     });
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!textbookId || !chapterId || !practiceSetId) return;
         setLoading(true);
         try {
-            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-            const topicSnap = await getDoc(topicRef);
-            if(topicSnap.exists()) {
-                const topicData = { id: topicSnap.id, ...topicSnap.data() } as Topic;
-                setTopic(topicData);
-                aiForm.setValue('sourceTopic', topicData.title);
+            if (topicId) {
+                const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
+                const topicSnap = await getDoc(topicRef);
+                if(topicSnap.exists()) {
+                    setTopic({ id: topicSnap.id, ...topicSnap.data() } as Topic);
+                }
+            }
+            
+            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterRef);
+            if(chapterSnap.exists()) {
+                const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
+                setChapter(chapterData);
+                aiForm.setValue('sourceText', chapterData.content || '');
             }
 
-            const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
-            const practiceSetSnap = await getDoc(practiceSetRef);
-            if(practiceSetSnap.exists()) setPracticeSet({ id: practiceSetSnap.id, ...practiceSetSnap.data() } as PracticeSet);
+
+            const fetchedPracticeSet = await getPracticeSetById(textbookId, chapterId, topicId, practiceSetId);
+            setPracticeSet(fetchedPracticeSet as PracticeSet);
 
             const fetchedQuestions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
             setQuestions(fetchedQuestions as Question[]);
@@ -364,11 +379,11 @@ export default function ManagePracticeSetQuestionsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [textbookId, chapterId, topicId, practiceSetId, toast, aiForm]);
 
     useEffect(() => {
         fetchData();
-    }, [textbookId, chapterId, topicId, practiceSetId]);
+    }, [fetchData]);
 
     const openQuestionDialog = (question: Question | null) => {
         setEditingQuestion(question);
@@ -480,6 +495,7 @@ export default function ManagePracticeSetQuestionsPage() {
         setIsGenerating(true);
         try {
             const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
+                         : aiData.sourceType === 'chapterContent' ? chapter?.content
                          : aiData.sourceType === 'text' ? aiData.sourceText
                          : aiData.sourceFile || null;
     
@@ -497,7 +513,7 @@ export default function ManagePracticeSetQuestionsPage() {
                 numQuestions: aiData.numQuestions,
                 difficulty: aiData.difficulty,
                 questionType: aiData.questionType,
-                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                sourceType: (aiData.sourceType === 'file' || aiData.sourceType === 'chapterContent') ? 'text' : aiData.sourceType,
                 source: source,
             };
 
@@ -562,7 +578,7 @@ export default function ManagePracticeSetQuestionsPage() {
             </div>
             <header>
                 <h1 className="font-headline text-3xl font-bold">Practice Set: <span className="text-primary">{practiceSet?.title}</span></h1>
-                <p className="text-muted-foreground mt-1">Topic: {topic?.title}</p>
+                <p className="text-muted-foreground mt-1">Topic: {topic?.title || 'Chapter Level'}</p>
             </header>
 
             <Card>
@@ -587,20 +603,29 @@ export default function ManagePracticeSetQuestionsPage() {
                                 </DialogHeader>
                                 <Form {...aiForm}>
                                     <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
-                                        <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
-                                            <TabsList className="grid w-full grid-cols-3">
-                                                <TabsTrigger value="topic">From Topic</TabsTrigger>
-                                                <TabsTrigger value="text">From Text</TabsTrigger>
+                                        <Tabs defaultValue="chapterContent" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as any)}>
+                                            <TabsList className="grid w-full grid-cols-4">
+                                                <TabsTrigger value="chapterContent">Chapter's Content</TabsTrigger>
+                                                <TabsTrigger value="topic">Topic</TabsTrigger>
+                                                <TabsTrigger value="text">Paste Text</TabsTrigger>
                                                 <TabsTrigger value="file">From File</TabsTrigger>
                                             </TabsList>
+                                            <TabsContent value="chapterContent" className="pt-4">
+                                                <FormItem>
+                                                    <FormLabel>Chapter Content</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea readOnly value={chapter?.content || "No content available for this chapter."} className="min-h-[150px] bg-secondary"/>
+                                                    </FormControl>
+                                                </FormItem>
+                                            </TabsContent>
                                             <TabsContent value="topic" className="pt-4">
                                                 <FormField control={aiForm.control} name="sourceTopic" render={({ field }) => (
-                                                    <FormItem><FormLabel>Topic</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                                    <FormItem><FormLabel>Topic</FormLabel><FormControl><Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} /></FormControl><FormMessage /></FormItem>
                                                 )}/>
                                             </TabsContent>
                                             <TabsContent value="text" className="pt-4">
                                                 <FormField control={aiForm.control} name="sourceText" render={({ field }) => (
-                                                    <FormItem><FormLabel>Paste Text</FormLabel><FormControl><Textarea {...field} className="min-h-[150px]" /></FormControl><FormMessage /></FormItem>
+                                                    <FormItem><FormLabel>Paste Text</FormLabel><FormControl><Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /></FormControl><FormMessage /></FormItem>
                                                 )}/>
                                             </TabsContent>
                                             <TabsContent value="file" className="pt-4">
@@ -625,21 +650,35 @@ export default function ManagePracticeSetQuestionsPage() {
                                             <FormField control={aiForm.control} name="numQuestions" render={({ field }) => (<FormItem><FormLabel>Number of Questions</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
                                             <FormField control={aiForm.control} name="difficulty" render={({ field }) => (
                                                 <FormItem><FormLabel>Difficulty</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                                                        <SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent>
-                                                    </Select><FormMessage />
-                                                </FormItem>
+                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger><SelectValue /></SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectItem value="Easy">Easy</SelectItem>
+                                                            <SelectItem value="Medium">Medium</SelectItem>
+                                                            <SelectItem value="Hard">Hard</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                <FormMessage /></FormItem>
                                             )}/>
                                         </div>
                                         <FormField control={aiForm.control} name="questionType" render={({ field }) => (
                                             <FormItem><FormLabel>Question Type</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                                    </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="Any">Any</SelectItem><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem>
-                                                        <SelectItem value="Short Answer">Short Answer</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem>
+                                                        <SelectItem value="Any">Any</SelectItem>
+                                                        <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                                        <SelectItem value="True/False">True/False</SelectItem>
+                                                        <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                        <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                                        <SelectItem value="Matching">Matching</SelectItem>
                                                     </SelectContent>
-                                                </Select><FormMessage />
-                                            </FormItem>
+                                                </Select>
+                                            <FormMessage /></FormItem>
                                         )}/>
                                         <DialogFooter className="pt-4"><Button type="submit" disabled={isGenerating}>{isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}</Button></DialogFooter>
                                     </form>
