@@ -310,7 +310,7 @@ export default function ManageChaptersPage() {
                 const pageDataUri = reader.result as string;
                 const result = await solvedTextbookPageAssistant({ pageDataUri });
                 
-                const generatedContent = `## Summary\n${result.summary}\n\n## Explanations\n${result.explanations}\n\n## Solved Answers\n${result.solvedAnswers}`;
+                const generatedContent = result.content;
                 
                 setNewChapter(prev => ({ ...prev, content: generatedContent }));
                 toast({ title: "Content Generated!", description: "AI has populated the chapter content." });

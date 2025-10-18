@@ -21,9 +21,7 @@ const SolvedTextbookPageAssistantInputSchema = z.object({
 export type SolvedTextbookPageAssistantInput = z.infer<typeof SolvedTextbookPageAssistantInputSchema>;
 
 const SolvedTextbookPageAssistantOutputSchema = z.object({
-  summary: z.string().describe('A summary of the textbook page.'),
-  explanations: z.string().describe('Explanations of the concepts on the page.'),
-  solvedAnswers: z.string().describe('Solved answers to problems on the page.'),
+  content: z.string().describe('The transcribed content from the textbook page.'),
 });
 export type SolvedTextbookPageAssistantOutput = z.infer<typeof SolvedTextbookPageAssistantOutputSchema>;
 
@@ -35,15 +33,13 @@ const prompt = ai.definePrompt({
   name: 'solvedTextbookPageAssistantPrompt',
   input: {schema: SolvedTextbookPageAssistantInputSchema},
   output: {schema: SolvedTextbookPageAssistantOutputSchema},
-  prompt: `You are an expert tutor, skilled at explaining concepts and solving problems from textbook pages.
+  prompt: `You are an expert at extracting text content from images.
 
-You will generate a summary, explanations, and solved answers for the given textbook page.
+You will transcribe the text from the given textbook page exactly as it appears, preserving the original language and formatting as much as possible.
 
 Textbook Page: {{media url=pageDataUri}}
 
-Summary:
-Explanations:
-Solved Answers:`,
+`,
 });
 
 const solvedTextbookPageAssistantFlow = ai.defineFlow(
