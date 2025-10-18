@@ -29,7 +29,7 @@ import {
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -45,7 +45,7 @@ const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
-  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
+  marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
     columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
@@ -203,21 +203,23 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                  {questionType === 'True/False' && (
                     <div className="space-y-4">
                         <FormField name="correctAnswer" control={form.control} render={({ field }) => (
-                            <FormItem><FormLabel>Correct Answer</FormLabel>
+                            <FormItem>
+                                <FormLabel>Correct Answer</FormLabel>
                                 <FormControl>
-                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
-                                       <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="True" id="r1" />
+                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl><RadioGroupItem value="True" /></FormControl>
                                             <Label htmlFor="r1">True</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="False" id="r2" />
+                                        </FormItem>
+                                        <FormItem className="flex items-center space-x-2">
+                                            <FormControl><RadioGroupItem value="False" /></FormControl>
                                             <Label htmlFor="r2">False</Label>
-                                        </div>
+                                        </FormItem>
                                     </RadioGroup>
                                 </FormControl>
-                            <FormMessage /></FormItem>
-                        )}/>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
                         <FormField control={form.control} name="options.0.explanation" render={({ field }) => (<FormItem><FormLabel>Explanation for "True"</FormLabel><FormControl><Textarea {...field}/></FormControl></FormItem>)} />
                         <FormField control={form.control} name="options.1.explanation" render={({ field }) => (<FormItem><FormLabel>Explanation for "False"</FormLabel><FormControl><Textarea {...field}/></FormControl></FormItem>)} />
                     </div>
@@ -388,7 +390,10 @@ export default function ManagePracticeSetQuestionsPage() {
     const openQuestionDialog = (question: Question | null) => {
         setEditingQuestion(question);
         if (question) {
-            form.reset(question);
+            form.reset({
+                ...question,
+                 options: question.options || (question.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
+            });
         } else {
             form.reset({
                 text: '', type: 'Multiple Choice', marks: 1,
