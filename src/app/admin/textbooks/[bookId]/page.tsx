@@ -58,8 +58,8 @@ import { TextbookStats } from '@/components/feature/textbook-stats';
 import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
-import { generateSummary, type AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
-import { generateQuestions, type AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
+import { generateSummary } from '@/ai/flows/ai-summary-generator';
+import { generateQuestions } from '@/ai/flows/ai-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -114,9 +114,9 @@ export default function ManageChaptersPage() {
   const aiFileInputRef = useRef<HTMLInputElement>(null);
   
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
-  const [generatedSummary, setGeneratedSummary] = useState<AISummaryGeneratorOutput | null>(null);
+  const [generatedSummary, setGeneratedSummary] = useState<any | null>(null);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<AIQuestionGeneratorOutput['questions'] | null>(null);
+  const [generatedQuestions, setGeneratedQuestions] = useState<any[] | null>(null);
   const [numQuestions, setNumQuestions] = useState(5);
   const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
@@ -378,7 +378,7 @@ export default function ManageChaptersPage() {
 
     const handleUseSummary = () => {
         if (!generatedSummary) return;
-        const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map(p => `- ${p}`).join('\n')}`;
+        const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map((p: string) => `- ${p}`).join('\n')}`;
         setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + summaryText }));
         toast({ title: "Summary added to content!" });
         setGeneratedSummary(null);
@@ -390,14 +390,14 @@ export default function ManageChaptersPage() {
         generatedQuestions.forEach((q, index) => {
             questionsText += `**${index + 1}. ${q.text}**\n\n`;
             if (q.type === 'Multiple Choice' && q.options) {
-                q.options.forEach(opt => {
+                q.options.forEach((opt: { text: string; }) => {
                     questionsText += `- ${opt.text}\n`;
                 });
             }
             if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
                 const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
                 questionsText += `\n> **Answer:**\n${pairs}\n`;
-            } else {
+            } else if (q.correctAnswer) {
                  questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
             }
 
@@ -605,7 +605,7 @@ Chapter 3: Advanced Topics"
                                          <div>
                                             <h4 className="font-semibold">Key Points:</h4>
                                             <ul className="list-disc list-inside text-sm text-muted-foreground">
-                                                {generatedSummary.keyPoints.map((pt, i) => <li key={i}>{pt}</li>)}
+                                                {generatedSummary.keyPoints.map((pt: string, i: number) => <li key={i}>{pt}</li>)}
                                             </ul>
                                         </div>
                                         <Button variant="secondary" size="sm" onClick={handleUseSummary} className="w-full">Append to Chapter Content</Button>
@@ -652,9 +652,9 @@ Chapter 3: Advanced Topics"
                                     <div className="space-y-4 border-t pt-4">
                                         <h4 className="font-semibold">Generated Questions:</h4>
                                         <div className="text-sm text-muted-foreground space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md">
-                                            {generatedQuestions.map((q, i) => <p key={i}><strong>{i+1}.</strong> {q.text}</p>)}
+                                            {generatedQuestions.map((q: any, i: number) => <p key={i}><strong>{i+1}.</strong> {q.text}</p>)}
                                         </div>
-                                        <Button variant="secondary" size="sm" onClick={handleUseQuestions} className="w-full">Append to Chapter Content</Button>
+                                        <Button variant="secondary" size="sm" onClick={handleUseQuestions} className="w-full">Append Questions to Content</Button>
                                     </div>
                                 )}
                             </AccordionContent>
@@ -803,4 +803,3 @@ Chapter 3: Advanced Topics"
     </div>
   );
 }
-
