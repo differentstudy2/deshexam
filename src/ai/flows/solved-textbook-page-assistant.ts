@@ -21,7 +21,7 @@ const SolvedTextbookPageAssistantInputSchema = z.object({
 export type SolvedTextbookPageAssistantInput = z.infer<typeof SolvedTextbookPageAssistantInputSchema>;
 
 const SolvedTextbookPageAssistantOutputSchema = z.object({
-  content: z.string().describe('The transcribed content from the textbook page.'),
+  content: z.string().describe('The transcribed and styled content from the textbook page in Markdown format.'),
 });
 export type SolvedTextbookPageAssistantOutput = z.infer<typeof SolvedTextbookPageAssistantOutputSchema>;
 
@@ -33,12 +33,23 @@ const prompt = ai.definePrompt({
   name: 'solvedTextbookPageAssistantPrompt',
   input: {schema: SolvedTextbookPageAssistantInputSchema},
   output: {schema: SolvedTextbookPageAssistantOutputSchema},
-  prompt: `You are an expert at extracting text content from images.
+  prompt: `You are an expert at extracting and styling text content from images of textbook pages. Your task is to transcribe the text and then format it into clear, stylish, and engaging Markdown.
 
-You will transcribe the text from the given textbook page exactly as it appears, preserving the original language and formatting as much as possible.
+**Instructions:**
+1.  **Transcribe:** First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists, paragraphs, and any special text.
+2.  **Format:** Convert the transcribed text into well-structured GitHub-flavored Markdown.
+3.  **Stylize:** Enhance the Markdown with the following elements to make it visually appealing:
+    *   **Headings:** Use \`#\`, \`##\`, \`###\` for titles and sections.
+    *   **Emphasis:** Use **bold** and *italics* to highlight key terms and concepts.
+    *   **Lists:** Use bulleted (\`*\`) or numbered (\`1.\`) lists for items or steps.
+    *   **Emojis:** Sparingly use relevant emojis to add visual cues and make the content more engaging (e.g., 💡 for a key idea, 🧪 for a science concept, 📌 for a definition).
+    *   **Blockquotes:** Use \`>\` for important definitions or quotes.
 
+**Input:**
 Textbook Page: {{media url=pageDataUri}}
 
+**Output Requirement:**
+Return a single Markdown string containing the styled content. Ensure the output preserves the original language and meaning of the source text.
 `,
 });
 
