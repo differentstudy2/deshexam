@@ -312,8 +312,8 @@ export default function ManageChaptersPage() {
                 
                 const generatedContent = result.content;
                 
-                setNewChapter(prev => ({ ...prev, content: generatedContent }));
-                toast({ title: "Content Generated!", description: "AI has populated the chapter content." });
+                setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + generatedContent }));
+                toast({ title: "Content Generated!", description: "AI content has been appended." });
                 setIsAiDialogOpen(false);
                 setAiFile(null);
             };
