@@ -64,6 +64,7 @@ import type { AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
 import type { AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -407,7 +408,7 @@ export default function ManageChaptersPage() {
                 const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
                 questionsText += `\n> **Answer:**\n${pairs}\n`;
             } else if (q.correctAnswer) {
-                 questionsText += `> **Answer:** ${q.correctAnswer}\n`;
+                 questionsText += `> **Answer:** ${String(q.correctAnswer)}\n`;
             }
 
             if (q.explanation) {
@@ -516,21 +517,28 @@ Chapter 3: Advanced Topics"
                                     <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>Generate Content from Page(s)</DialogTitle>
                                     <DialogDescription>Upload one or more images of textbook pages to automatically generate content.</DialogDescription>
                                 </DialogHeader>
                                 <div 
-                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                                    className="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
                                     onClick={() => aiFileInputRef.current?.click()}
                                 >
-                                    <div className="space-y-1 text-center">
-                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                        <p>Click to upload image(s)</p>
-                                        {aiFiles.length > 0 && <p className="text-sm text-green-600">{aiFiles.length} file(s) selected</p>}
-                                    </div>
+                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                    <p>Click to upload image(s)</p>
+                                    {aiFiles.length > 0 && <p className="text-sm font-semibold text-green-600 mt-2">{aiFiles.length} file(s) selected</p>}
                                 </div>
+                                {aiFiles.length > 0 && (
+                                    <ScrollArea className="h-24 w-full rounded-md border p-2">
+                                        <ul className="text-sm text-muted-foreground">
+                                            {aiFiles.map((file, index) => (
+                                                <li key={index}>{file.name}</li>
+                                            ))}
+                                        </ul>
+                                    </ScrollArea>
+                                )}
                                 <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf" multiple />
                                 <DialogFooter>
                                     <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || aiFiles.length === 0}>
