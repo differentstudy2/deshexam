@@ -29,7 +29,7 @@ import {
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -180,23 +180,32 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             render={({ field }) => (
                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {[0, 1, 2, 3].map((optionIndex) => (
-                                        <div key={optionIndex} className="flex items-start gap-3">
-                                            <FormControl className="mt-2.5">
-                                                <RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}-${form.getValues('id')}`} />
+                                         <div key={optionIndex} className="flex items-start gap-4">
+                                            <FormControl>
+                                                <RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}-${form.getValues('id')}`} className="mt-2.5" />
                                             </FormControl>
-                                            <div className="flex-1 space-y-1">
-                                                <FormField control={form.control} name={`options.${optionIndex}.text`} render={({ field: optionField }) => (
-                                                    <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                )}/>
-                                                 <FormField control={form.control} name={`options.${optionIndex}.explanation`} render={({ field: expField }) => (
-                                                    <Textarea {...expField} placeholder={`Explanation for Option ${optionIndex + 1}`} className="text-xs" />
-                                                )}/>
+                                            <div className="space-y-2 flex-1">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`options.${optionIndex}.text`}
+                                                    render={({ field: optionField }) => (
+                                                        <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`options.${optionIndex}.explanation`}
+                                                    render={({ field: explanationField }) => (
+                                                        <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
+                                                    )}
+                                                />
                                             </div>
                                         </div>
                                     ))}
                                 </RadioGroup>
                             )}
                         />
+                        <FormMessage>{form.formState.errors.correctAnswer?.message}</FormMessage>
                     </div>
                 )}
 
@@ -214,8 +223,10 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <FormField control={form.control} name="options.0.explanation" render={({ field }) => (<FormItem><FormLabel>Explanation for "True"</FormLabel><FormControl><Textarea {...field}/></FormControl></FormItem>)} />
-                        <FormField control={form.control} name="options.1.explanation" render={({ field }) => (<FormItem><FormLabel>Explanation for "False"</FormLabel><FormControl><Textarea {...field}/></FormControl></FormItem>)} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField control={form.control} name="options.0.explanation" render={({ field }) => (<FormItem><FormLabel>Explanation for "True"</FormLabel><FormControl><Textarea {...field}/></FormControl></FormItem>)} />
+                            <FormField control={form.control} name="options.1.explanation" render={({ field }) => (<FormItem><FormLabel>Explanation for "False"</FormLabel><FormControl><Textarea {...field}/></FormControl></FormItem>)} />
+                        </div>
                     </div>
                 )}
                 
@@ -787,3 +798,5 @@ export default function ManagePracticeSetQuestionsPage() {
         </div>
     );
 }
+
+    
