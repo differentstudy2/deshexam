@@ -24,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -56,6 +56,7 @@ import { useToast } from '@/hooks/use-toast';
 import { TextbookStats } from '@/components/feature/textbook-stats';
 import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
+import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -101,6 +102,12 @@ export default function ManageChaptersPage() {
   const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+  const [aiFile, setAiFile] = useState<File | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const aiFileInputRef = useRef<HTMLInputElement>(null);
+
 
   const fetchTextbookAndChapters = async () => {
     if (!textbookId) return;
@@ -281,6 +288,41 @@ export default function ManageChaptersPage() {
         }
     }
   };
+  
+    const handleAiFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAiFile(file);
+        }
+    }
+
+    const handleAIGenerateContent = async () => {
+        if (!aiFile) {
+            toast({ variant: "destructive", title: "No file selected" });
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const reader = new FileReader();
+            reader.readAsDataURL(aiFile);
+            reader.onload = async () => {
+                const pageDataUri = reader.result as string;
+                const result = await solvedTextbookPageAssistant({ pageDataUri });
+                
+                const generatedContent = `## Summary\n${result.summary}\n\n## Explanations\n${result.explanations}\n\n## Solved Answers\n${result.solvedAnswers}`;
+                
+                setNewChapter(prev => ({ ...prev, content: generatedContent }));
+                toast({ title: "Content Generated!", description: "AI has populated the chapter content." });
+                setIsAiDialogOpen(false);
+                setAiFile(null);
+            };
+        } catch (error) {
+            toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
 
   if (loading) {
@@ -369,7 +411,38 @@ Chapter 3: Advanced Topics"
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="chapter-content">Chapter Content</Label>
+                 <div className="flex justify-between items-center">
+                    <Label htmlFor="chapter-content">Chapter Content</Label>
+                    <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button type="button" variant="outline" size="sm">
+                                <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Generate Content from Page</DialogTitle>
+                                <DialogDescription>Upload an image or PDF of a textbook page to automatically generate content.</DialogDescription>
+                            </DialogHeader>
+                            <div 
+                                className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                                onClick={() => aiFileInputRef.current?.click()}
+                            >
+                                <div className="space-y-1 text-center">
+                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                    <p>Click to upload an image or PDF</p>
+                                    {aiFile && <p className="text-sm text-green-600">{aiFile.name}</p>}
+                                </div>
+                            </div>
+                            <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf"/>
+                            <DialogFooter>
+                                <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || !aiFile}>
+                                    {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
                 <Textarea
                 id="chapter-content"
                 placeholder="Add a summary or introduction for the chapter."
@@ -559,5 +632,3 @@ Chapter 3: Advanced Topics"
     </div>
   );
 }
-
-    
