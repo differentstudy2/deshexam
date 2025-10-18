@@ -111,7 +111,7 @@ export default function ManageChaptersPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
-  const [aiFile, setAiFile] = useState<File | null>(null);
+  const [aiFiles, setAiFiles] = useState<File[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const aiFileInputRef = useRef<HTMLInputElement>(null);
   
@@ -304,33 +304,40 @@ export default function ManageChaptersPage() {
   };
   
     const handleAiFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setAiFile(file);
+        if (e.target.files) {
+            setAiFiles(Array.from(e.target.files));
         }
     }
 
     const handleAIGenerateContent = async () => {
-        if (!aiFile) {
-            toast({ variant: "destructive", title: "No file selected" });
+        if (aiFiles.length === 0) {
+            toast({ variant: "destructive", title: "No files selected" });
             return;
         }
 
         setIsGenerating(true);
+        let combinedContent = newChapter.content || '';
+
         try {
-            const reader = new FileReader();
-            reader.readAsDataURL(aiFile);
-            reader.onload = async () => {
-                const pageDataUri = reader.result as string;
+            for (const file of aiFiles) {
+                const pageDataUri = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = error => reject(error);
+                });
+                
                 const result = await solvedTextbookPageAssistant({ pageDataUri });
+                combinedContent += (combinedContent ? '\n\n---\n\n' : '') + result.content;
                 
-                const generatedContent = result.content;
-                
-                setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n---\n\n' : '') + generatedContent }));
-                toast({ title: "Content Generated!", description: "AI content has been appended to the chapter content." });
-                setIsAiDialogOpen(false);
-                setAiFile(null);
-            };
+                // Update content in real-time after each page
+                setNewChapter(prev => ({...prev, content: combinedContent}));
+            }
+            
+            toast({ title: `Content Generated!`, description: `AI content from ${aiFiles.length} page(s) has been appended.` });
+            setIsAiDialogOpen(false);
+            setAiFiles([]);
+
         } catch (error) {
             toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
         } finally {
@@ -511,8 +518,8 @@ Chapter 3: Advanced Topics"
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Generate Content from Page</DialogTitle>
-                                    <DialogDescription>Upload an image or PDF of a textbook page to automatically generate content.</DialogDescription>
+                                    <DialogTitle>Generate Content from Page(s)</DialogTitle>
+                                    <DialogDescription>Upload one or more images of textbook pages to automatically generate content.</DialogDescription>
                                 </DialogHeader>
                                 <div 
                                     className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
@@ -520,13 +527,13 @@ Chapter 3: Advanced Topics"
                                 >
                                     <div className="space-y-1 text-center">
                                         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                        <p>Click to upload an image or PDF</p>
-                                        {aiFile && <p className="text-sm text-green-600">{aiFile.name}</p>}
+                                        <p>Click to upload image(s)</p>
+                                        {aiFiles.length > 0 && <p className="text-sm text-green-600">{aiFiles.length} file(s) selected</p>}
                                     </div>
                                 </div>
-                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf"/>
+                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf" multiple />
                                 <DialogFooter>
-                                    <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || !aiFile}>
+                                    <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || aiFiles.length === 0}>
                                         {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
                                     </Button>
                                 </DialogFooter>
