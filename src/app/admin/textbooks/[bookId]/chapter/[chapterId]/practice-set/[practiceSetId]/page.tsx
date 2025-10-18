@@ -3,9 +3,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { doc, getDoc, collection, getDocs, addDoc, deleteDoc, orderBy, query, updateDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Question, Chapter, Topic } from '@/lib/types';
+import type { PracticeSet, Question, Topic } from '@/lib/types';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, Sparkles, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -34,6 +34,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/use-auth';
+import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -266,16 +267,37 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
 };
 
 
-export default function ManageChapterPracticeSetQuestionsPage() {
+const aiGeneratorFormSchema = z.object({
+    sourceType: z.enum(['topic', 'text', 'file']),
+    sourceTopic: z.string().optional(),
+    sourceText: z.string().optional(),
+    sourceFile: z.string().optional(),
+    numQuestions: z.coerce.number().int().min(1).max(20),
+    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
+}).refine(data => {
+    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
+    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
+    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
+    return false;
+}, {
+    message: 'Source content must be at least 3 characters.',
+    path: ['sourceTopic'], 
+});
+type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
+
+
+export default function ManagePracticeSetQuestionsPage() {
     const params = useParams();
     const { toast } = useToast();
     const { user } = useAuth();
 
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
+    const topicId = params.topicId as string;
     const practiceSetId = params.practiceSetId as string;
     
-    const [chapter, setChapter] = useState<Chapter | null>(null);
+    const [topic, setTopic] = useState<Topic | null>(null);
     const [practiceSet, setPracticeSet] = useState<PracticeSet | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
@@ -284,6 +306,9 @@ export default function ManageChapterPracticeSetQuestionsPage() {
     const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+    const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const aiFormFileInputRef = useRef<HTMLInputElement>(null);
 
     const importFileRef = useRef<HTMLInputElement>(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -301,24 +326,38 @@ export default function ManageChapterPracticeSetQuestionsPage() {
             explanation: '',
         },
     });
-
-    const getQuestionsRef = () => collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`);
+    
+    const aiForm = useForm<AIGeneratorFormValues>({
+        resolver: zodResolver(aiGeneratorFormSchema),
+        defaultValues: {
+          sourceType: 'topic',
+          sourceTopic: '',
+          sourceText: '',
+          sourceFile: '',
+          numQuestions: 5,
+          difficulty: 'Medium',
+          questionType: 'Any',
+        },
+    });
 
     const fetchData = async () => {
         if (!textbookId || !chapterId || !practiceSetId) return;
         setLoading(true);
         try {
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const chapterSnap = await getDoc(chapterRef);
-            if(chapterSnap.exists()) setChapter({ id: chapterSnap.id, ...chapterSnap.data() } as Chapter);
+            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
+            const topicSnap = await getDoc(topicRef);
+            if(topicSnap.exists()) {
+                const topicData = { id: topicSnap.id, ...topicSnap.data() } as Topic;
+                setTopic(topicData);
+                aiForm.setValue('sourceTopic', topicData.title);
+            }
 
-            const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`, practiceSetId);
+            const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
             const practiceSetSnap = await getDoc(practiceSetRef);
             if(practiceSetSnap.exists()) setPracticeSet({ id: practiceSetSnap.id, ...practiceSetSnap.data() } as PracticeSet);
 
-            const q = query(getQuestionsRef(), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            setQuestions(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Question)));
+            const fetchedQuestions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
+            setQuestions(fetchedQuestions as Question[]);
 
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error fetching data', description: (error as Error).message });
@@ -329,7 +368,7 @@ export default function ManageChapterPracticeSetQuestionsPage() {
 
     useEffect(() => {
         fetchData();
-    }, [textbookId, chapterId, practiceSetId]);
+    }, [textbookId, chapterId, topicId, practiceSetId]);
 
     const openQuestionDialog = (question: Question | null) => {
         setEditingQuestion(question);
@@ -348,19 +387,11 @@ export default function ManageChapterPracticeSetQuestionsPage() {
     const handleQuestionSubmit = async (data: QuestionFormValues) => {
         setIsSubmitting(true);
         try {
-            const questionsRef = getQuestionsRef();
-            const dataToSave = {
-                ...data,
-                authorId: user?.uid,
-                authorName: user?.displayName,
-                updatedAt: new Date()
-            };
             if (editingQuestion) {
-                const questionRef = doc(questionsRef, editingQuestion.id);
-                await updateDoc(questionRef, dataToSave);
+                await updateQuestionInPracticeSet(textbookId, chapterId, topicId, practiceSetId, editingQuestion.id, data);
                 toast({ title: 'Question Updated' });
             } else {
-                await addDoc(questionsRef, { ...dataToSave, createdAt: new Date() });
+                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, data);
                 toast({ title: 'Question Added' });
             }
             fetchData();
@@ -374,8 +405,7 @@ export default function ManageChapterPracticeSetQuestionsPage() {
 
     const handleDeleteQuestion = async (questionId: string) => {
         try {
-            const questionRef = doc(getQuestionsRef(), questionId);
-            await deleteDoc(questionRef);
+            await deleteQuestionFromPracticeSet(textbookId, chapterId, topicId, practiceSetId, questionId);
             toast({ title: 'Question Deleted' });
             fetchData();
         } catch (error) {
@@ -397,7 +427,7 @@ export default function ManageChapterPracticeSetQuestionsPage() {
     
     const handleDeleteSelected = async () => {
         try {
-            const deletePromises = selectedQuestions.map(id => deleteDoc(doc(getQuestionsRef(), id)));
+            const deletePromises = selectedQuestions.map(id => deleteQuestionFromPracticeSet(textbookId, chapterId, topicId, practiceSetId, id));
             await Promise.all(deletePromises);
             toast({ title: `${selectedQuestions.length} question(s) deleted.` });
             setSelectedQuestions([]);
@@ -412,8 +442,9 @@ export default function ManageChapterPracticeSetQuestionsPage() {
             const parsedJson = JSON.parse(jsonText);
             const questionsToImport = parsedJson.questions.map((q: any) => ({...q, authorId: user?.uid, authorName: user?.displayName, createdAt: new Date()}));
             
-            const addPromises = questionsToImport.map((q: any) => addDoc(getQuestionsRef(), q));
-            await Promise.all(addPromises);
+            for(const q of questionsToImport) {
+                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, q);
+            }
             
             toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions have been added.`});
             fetchData();
@@ -445,6 +476,76 @@ export default function ManageChapterPracticeSetQuestionsPage() {
         processJsonImport(jsonText);
     }
     
+    const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
+        setIsGenerating(true);
+        try {
+            const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
+                         : aiData.sourceType === 'text' ? aiData.sourceText
+                         : aiData.sourceFile || null;
+    
+            if (!source || source.length < 3) {
+                toast({
+                    variant: "destructive",
+                    title: 'AI Generation Failed',
+                    description: 'Source content must be at least 3 characters.',
+                });
+                setIsGenerating(false);
+                return;
+            }
+    
+            const input: AIQuestionGeneratorInput = {
+                numQuestions: aiData.numQuestions,
+                difficulty: aiData.difficulty,
+                questionType: aiData.questionType,
+                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                source: source,
+            };
+
+            const result: AIQuestionGeneratorOutput = await generateQuestions(input);
+            
+            for(const q of result.questions) {
+                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, q);
+            }
+            
+            toast({
+                title: 'Questions Generated!',
+                description: `${result.questions.length} new questions have been added.`,
+            });
+            fetchData();
+            setIsAIGeneratorOpen(false);
+    
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+          });
+        } finally {
+          setIsGenerating(false);
+        }
+    };
+    
+      const handleAiFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            if (file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const text = e.target?.result as string;
+                    aiForm.setValue('sourceFile', text, { shouldValidate: true });
+                    aiForm.setValue('sourceType', 'file');
+                };
+                reader.readAsText(file);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Invalid File Type',
+                    description: 'Please upload a .txt file.',
+                });
+            }
+        }
+    };
+    
     if (loading) {
         return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
     }
@@ -453,15 +554,15 @@ export default function ManageChapterPracticeSetQuestionsPage() {
         <div className="space-y-6">
             <div>
                 <Button variant="ghost" asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-sets`}>
+                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Chapter Practice Sets
+                        Back to Topic
                     </Link>
                 </Button>
             </div>
             <header>
                 <h1 className="font-headline text-3xl font-bold">Practice Set: <span className="text-primary">{practiceSet?.title}</span></h1>
-                <p className="text-muted-foreground mt-1">Chapter: {chapter?.title}</p>
+                <p className="text-muted-foreground mt-1">Topic: {topic?.title}</p>
             </header>
 
             <Card>
@@ -473,6 +574,78 @@ export default function ManageChapterPracticeSetQuestionsPage() {
                         <Button size="sm" onClick={() => openQuestionDialog(null)} className="w-full">
                             <PlusCircle className="mr-2"/> Add Question
                         </Button>
+                         <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="sm" variant="outline" className="w-full"><Sparkles className="mr-2"/> Generate with AI</Button>
+                            </DialogTrigger>
+                             <DialogContent className="sm:max-w-2xl">
+                                <DialogHeader>
+                                    <DialogTitle>Generate Questions with AI</DialogTitle>
+                                    <DialogDescription>
+                                        Describe the questions you want to create, and Gemini will generate them for this practice set.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <Form {...aiForm}>
+                                    <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
+                                        <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
+                                            <TabsList className="grid w-full grid-cols-3">
+                                                <TabsTrigger value="topic">From Topic</TabsTrigger>
+                                                <TabsTrigger value="text">From Text</TabsTrigger>
+                                                <TabsTrigger value="file">From File</TabsTrigger>
+                                            </TabsList>
+                                            <TabsContent value="topic" className="pt-4">
+                                                <FormField control={aiForm.control} name="sourceTopic" render={({ field }) => (
+                                                    <FormItem><FormLabel>Topic</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                                )}/>
+                                            </TabsContent>
+                                            <TabsContent value="text" className="pt-4">
+                                                <FormField control={aiForm.control} name="sourceText" render={({ field }) => (
+                                                    <FormItem><FormLabel>Paste Text</FormLabel><FormControl><Textarea {...field} className="min-h-[150px]" /></FormControl><FormMessage /></FormItem>
+                                                )}/>
+                                            </TabsContent>
+                                            <TabsContent value="file" className="pt-4">
+                                                <FormItem>
+                                                    <FormLabel>Upload File</FormLabel>
+                                                    <FormControl>
+                                                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => aiFormFileInputRef.current?.click()}>
+                                                            <div className="space-y-1 text-center">
+                                                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                                <p className="pl-1">{aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}</p>
+                                                                <p className="text-xs text-muted-foreground">{aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}</p>
+                                                            </div>
+                                                        </div>
+                                                    </FormControl>
+                                                    <Input type="file" ref={aiFormFileInputRef} onChange={handleAiFileChange} className="hidden" accept=".txt"/>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            </TabsContent>
+                                        </Tabs>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField control={aiForm.control} name="numQuestions" render={({ field }) => (<FormItem><FormLabel>Number of Questions</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                                            <FormField control={aiForm.control} name="difficulty" render={({ field }) => (
+                                                <FormItem><FormLabel>Difficulty</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                        <SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent>
+                                                    </Select><FormMessage />
+                                                </FormItem>
+                                            )}/>
+                                        </div>
+                                        <FormField control={aiForm.control} name="questionType" render={({ field }) => (
+                                            <FormItem><FormLabel>Question Type</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="Any">Any</SelectItem><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem>
+                                                        <SelectItem value="Short Answer">Short Answer</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem>
+                                                    </SelectContent>
+                                                </Select><FormMessage />
+                                            </FormItem>
+                                        )}/>
+                                        <DialogFooter className="pt-4"><Button type="submit" disabled={isGenerating}>{isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}</Button></DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
                         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button size="sm" variant="outline" className="w-full"><FileJson className="mr-2"/> Bulk Import</Button>
@@ -575,5 +748,3 @@ export default function ManageChapterPracticeSetQuestionsPage() {
         </div>
     );
 }
-
-    
