@@ -170,3 +170,9 @@
     height: 100%;
     
 }
+.aspect-\[2\/3\] {
+  aspect-ratio: 0 / 0;
+}
+.th-full {
+  height: 250px;
+}

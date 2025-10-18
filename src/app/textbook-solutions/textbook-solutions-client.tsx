@@ -170,7 +170,7 @@ export default function TextbookSolutionsListPage() {
               {visibleTextbooks.map((book) => (
                 <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                   <CardHeader className="p-0 relative bg-gray-100 flex items-center justify-center aspect-[2/3]">
-                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
+                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full th-full">
                         <Image
                           src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
                           alt={book.title}

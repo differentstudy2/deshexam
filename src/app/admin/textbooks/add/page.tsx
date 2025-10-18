@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { generateImage } from '@/ai/flows/ai-image-generator';
+import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 
@@ -169,6 +170,7 @@ export default function AddTextbookPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
@@ -272,6 +274,37 @@ export default function AddTextbookPage() {
       });
     }
   };
+
+  const handleAIDescriptionGenerate = async () => {
+    const { title, subject, board, class: grade } = form.getValues();
+    if (!title) {
+        toast({
+            variant: "destructive",
+            title: 'Title is required',
+            description: 'Please enter a title before generating a description.',
+        });
+        return;
+    }
+
+    setIsGeneratingDesc(true);
+    try {
+        const sourceText = `Textbook Title: ${title}, Subject: ${subject}, Board: ${board}, Class: ${grade}`;
+        const result = await generateDescription({ source: sourceText });
+        form.setValue('description', result.description);
+        toast({
+            title: 'Description Generated!',
+            description: 'AI has created a description for you.',
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+        });
+    } finally {
+      setIsGeneratingDesc(false);
+    }
+  };
   
   if (loading) {
     return (
@@ -323,7 +356,19 @@ export default function AddTextbookPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <div className="flex justify-between items-center">
+                        <FormLabel>Description</FormLabel>
+                         <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={handleAIDescriptionGenerate}
+                            disabled={isGeneratingDesc || !form.getValues('title')}
+                        >
+                            {isGeneratingDesc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            Generate with AI
+                        </Button>
+                    </div>
                     <FormControl>
                       <Textarea placeholder="A brief description of the textbook." {...field} />
                     </FormControl>
