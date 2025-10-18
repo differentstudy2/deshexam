@@ -4,8 +4,6 @@
  * @fileOverview Generates educational questions using an AI model.
  *
  * - generateQuestions - A function that generates questions based on user prompts.
- * - AIQuestionGeneratorInput - The input type for the generateQuestions function.
- * - AIQuestionGeneratorOutput - The return type for the generateQuestions function.
  */
 
 import { ai } from '@/ai/genkit';

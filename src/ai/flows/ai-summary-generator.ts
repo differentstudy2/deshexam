@@ -4,19 +4,17 @@
  * @fileOverview Generates a summary for a given text content.
  *
  * - generateSummary - A function that generates a summary.
- * - AISummaryGeneratorInput - The input type for the function.
- * - AISummaryGeneratorOutput - The return type for the function.
  */
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-export const AISummaryGeneratorInputSchema = z.object({
+const AISummaryGeneratorInputSchema = z.object({
   content: z.string().describe('The text content to be summarized.'),
 });
 export type AISummaryGeneratorInput = z.infer<typeof AISummaryGeneratorInputSchema>;
 
-export const AISummaryGeneratorOutputSchema = z.object({
+const AISummaryGeneratorOutputSchema = z.object({
   summary: z.string().describe('The generated summary in Markdown format.'),
   keyPoints: z.array(z.string()).describe('A list of key points from the content.'),
 });
