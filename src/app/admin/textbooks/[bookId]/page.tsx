@@ -24,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -57,6 +57,10 @@ import { TextbookStats } from '@/components/feature/textbook-stats';
 import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
+import { generateSummary, AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
+import { generateQuestions, AIQuestionGeneratorOutput as AIQuestionsOutput } from '@/ai/flows/ai-question-generator';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -107,6 +111,13 @@ export default function ManageChaptersPage() {
   const [aiFile, setAiFile] = useState<File | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const aiFileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [generatedSummary, setGeneratedSummary] = useState<AISummaryGeneratorOutput | null>(null);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [generatedQuestions, setGeneratedQuestions] = useState<AIQuestionsOutput['questions'] | null>(null);
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
 
   const fetchTextbookAndChapters = async () => {
@@ -312,8 +323,8 @@ export default function ManageChaptersPage() {
                 
                 const generatedContent = result.content;
                 
-                setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + generatedContent }));
-                toast({ title: "Content Generated!", description: "AI content has been appended." });
+                setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n---\n\n' : '') + generatedContent }));
+                toast({ title: "Content Generated!", description: "AI content has been appended to the chapter content." });
                 setIsAiDialogOpen(false);
                 setAiFile(null);
             };
@@ -321,6 +332,46 @@ export default function ManageChaptersPage() {
             toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
         } finally {
             setIsGenerating(false);
+        }
+    };
+    
+    const handleGenerateSummary = async () => {
+        if (!newChapter.content) {
+            toast({ variant: "destructive", title: "Chapter content is empty." });
+            return;
+        }
+        setIsGeneratingSummary(true);
+        setGeneratedSummary(null);
+        try {
+            const result = await generateSummary({ content: newChapter.content });
+            setGeneratedSummary(result);
+        } catch(error) {
+             toast({ variant: "destructive", title: "Summary Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGeneratingSummary(false);
+        }
+    }
+    
+    const handleGenerateQuestions = async () => {
+        if (!newChapter.content) {
+            toast({ variant: "destructive", title: "Chapter content is empty." });
+            return;
+        }
+        setIsGeneratingQuestions(true);
+        setGeneratedQuestions(null);
+        try {
+            const result = await generateQuestions({ 
+                numQuestions: numQuestions,
+                difficulty: 'Medium',
+                sourceType: 'text',
+                source: newChapter.content,
+                questionType: questionTypes.length === 1 ? questionTypes[0] as any : 'Any'
+            });
+            setGeneratedQuestions(result.questions);
+        } catch(error) {
+             toast({ variant: "destructive", title: "Question Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGeneratingQuestions(false);
         }
     };
 
@@ -396,103 +447,188 @@ Chapter 3: Advanced Topics"
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="chapter-title">Chapter Title</Label>
-                <Input
-                id="chapter-title"
-                placeholder="e.g., Chapter 1: Electric Charges"
-                value={newChapter.title}
-                onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
-                />
-            </div>
-            <div className="space-y-2">
-                 <div className="flex justify-between items-center">
-                    <Label htmlFor="chapter-content">Chapter Content</Label>
-                    <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button type="button" variant="outline" size="sm">
-                                <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Generate Content from Page</DialogTitle>
-                                <DialogDescription>Upload an image or PDF of a textbook page to automatically generate content.</DialogDescription>
-                            </DialogHeader>
-                            <div 
-                                className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
-                                onClick={() => aiFileInputRef.current?.click()}
-                            >
-                                <div className="space-y-1 text-center">
-                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                    <p>Click to upload an image or PDF</p>
-                                    {aiFile && <p className="text-sm text-green-600">{aiFile.name}</p>}
-                                </div>
-                            </div>
-                            <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf"/>
-                            <DialogFooter>
-                                <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || !aiFile}>
-                                    {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
-                <Textarea
-                id="chapter-content"
-                placeholder="Add a summary or introduction for the chapter."
-                value={newChapter.content || ''}
-                onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
-                />
-            </div>
-             <div className="space-y-2">
-                <Label htmlFor="chapter-access">Access Level</Label>
-                 <Select value={newChapter.access} onValueChange={(value) => setNewChapter({...newChapter, access: value as 'free' | 'pass' | 'pro' })}>
-                    <SelectTrigger id="chapter-access">
-                        <SelectValue placeholder="Select access level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="free">Free</SelectItem>
-                        <SelectItem value="pass">Pass</SelectItem>
-                        <SelectItem value="pro">Pass Pro</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <Separator />
-            <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                     <Label>Additional Resources</Label>
-                     <Button type="button" variant="outline" size="sm" onClick={() => openResourceDialog(null)}>
-                         <PlusCircle className="mr-2 h-4 w-4" /> Add
-                    </Button>
+        <div className="lg:col-span-1 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="chapter-title">Chapter Title</Label>
+                    <Input
+                    id="chapter-title"
+                    placeholder="e.g., Chapter 1: Electric Charges"
+                    value={newChapter.title}
+                    onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
+                    />
                 </div>
                 <div className="space-y-2">
-                    {newChapter.resources.map(res => (
-                        <ResourceItem 
-                            key={res.id} 
-                            resource={res} 
-                            onEdit={() => openResourceDialog(res)}
-                            onDelete={() => setResourceToDelete(res)}
-                        />
-                    ))}
-                    {newChapter.resources.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">No resources added.</p>}
+                     <div className="flex justify-between items-center">
+                        <Label htmlFor="chapter-content">Chapter Content</Label>
+                        <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button type="button" variant="outline" size="sm">
+                                    <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Generate Content from Page</DialogTitle>
+                                    <DialogDescription>Upload an image or PDF of a textbook page to automatically generate content.</DialogDescription>
+                                </DialogHeader>
+                                <div 
+                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                                    onClick={() => aiFileInputRef.current?.click()}
+                                >
+                                    <div className="space-y-1 text-center">
+                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                        <p>Click to upload an image or PDF</p>
+                                        {aiFile && <p className="text-sm text-green-600">{aiFile.name}</p>}
+                                    </div>
+                                </div>
+                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf"/>
+                                <DialogFooter>
+                                    <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || !aiFile}>
+                                        {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                    <Textarea
+                    id="chapter-content"
+                    placeholder="Add a summary or introduction for the chapter. You can use AI to generate this from an image."
+                    value={newChapter.content || ''}
+                    onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
+                    className="min-h-[200px]"
+                    />
                 </div>
-            </div>
-             <div className="flex gap-2">
-              <Button onClick={handleAddOrUpdateChapter}>
-                {editingChapter ? 'Update Chapter' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Chapter</>}
-              </Button>
-              {editingChapter && (
-                <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                 <div className="space-y-2">
+                    <Label htmlFor="chapter-access">Access Level</Label>
+                     <Select value={newChapter.access} onValueChange={(value) => setNewChapter({...newChapter, access: value as 'free' | 'pass' | 'pro' })}>
+                        <SelectTrigger id="chapter-access">
+                            <SelectValue placeholder="Select access level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="free">Free</SelectItem>
+                            <SelectItem value="pass">Pass</SelectItem>
+                            <SelectItem value="pro">Pass Pro</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                         <Label>Additional Resources</Label>
+                         <Button type="button" variant="outline" size="sm" onClick={() => openResourceDialog(null)}>
+                             <PlusCircle className="mr-2 h-4 w-4" /> Add
+                        </Button>
+                    </div>
+                    <div className="space-y-2">
+                        {newChapter.resources.map(res => (
+                            <ResourceItem 
+                                key={res.id} 
+                                resource={res} 
+                                onEdit={() => openResourceDialog(res)}
+                                onDelete={() => setResourceToDelete(res)}
+                            />
+                        ))}
+                        {newChapter.resources.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">No resources added.</p>}
+                    </div>
+                </div>
+                 <div className="flex gap-2">
+                  <Button onClick={handleAddOrUpdateChapter}>
+                    {editingChapter ? 'Update Chapter' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Chapter</>}
+                  </Button>
+                  {editingChapter && (
+                    <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><BrainCircuit className="text-primary"/> AI Content Tools</CardTitle>
+                    <CardDescription>Generate summaries and questions based on the chapter content above.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="summary">
+                            <AccordionTrigger>Generate Summary</AccordionTrigger>
+                            <AccordionContent className="pt-4 space-y-4">
+                               <Button onClick={handleGenerateSummary} disabled={isGeneratingSummary || !newChapter.content} className="w-full">
+                                    {isGeneratingSummary ? <Loader2 className="animate-spin"/> : "Generate Summary & Key Points"}
+                                </Button>
+                                {generatedSummary && (
+                                    <div className="space-y-4 border-t pt-4">
+                                        <div>
+                                            <h4 className="font-semibold">Generated Summary:</h4>
+                                            <p className="text-sm text-muted-foreground">{generatedSummary.summary}</p>
+                                        </div>
+                                         <div>
+                                            <h4 className="font-semibold">Key Points:</h4>
+                                            <ul className="list-disc list-inside text-sm text-muted-foreground">
+                                                {generatedSummary.keyPoints.map((pt, i) => <li key={i}>{pt}</li>)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="questions">
+                            <AccordionTrigger>Generate Questions</AccordionTrigger>
+                            <AccordionContent className="pt-4 space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <Label htmlFor="num-questions" className="flex-shrink-0">Number of Questions:</Label>
+                                    <Input 
+                                        id="num-questions" 
+                                        type="number"
+                                        value={numQuestions}
+                                        onChange={(e) => setNumQuestions(Number(e.target.value))}
+                                        min="1"
+                                        max="10"
+                                        className="w-20"
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Question Types:</Label>
+                                     <div className="grid grid-cols-2 gap-2 mt-2">
+                                        {['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank'].map(type => (
+                                             <div key={type} className="flex items-center space-x-2">
+                                                <Checkbox 
+                                                    id={`type-${type}`}
+                                                    checked={questionTypes.includes(type)}
+                                                    onCheckedChange={(checked) => {
+                                                        checked ? setQuestionTypes(prev => [...prev, type]) : setQuestionTypes(prev => prev.filter(t => t !== type))
+                                                    }}
+                                                />
+                                                <label htmlFor={`type-${type}`} className="text-sm font-medium leading-none">{type}</label>
+                                             </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <Button onClick={handleGenerateQuestions} disabled={isGeneratingQuestions || !newChapter.content} className="w-full">
+                                    {isGeneratingQuestions ? <Loader2 className="animate-spin"/> : "Generate Questions"}
+                                </Button>
+                                {generatedQuestions && (
+                                    <div className="border-t pt-4">
+                                        <h4 className="font-semibold mb-2">Generated Questions:</h4>
+                                        <Textarea
+                                            readOnly
+                                            value={JSON.stringify(generatedQuestions, null, 2)}
+                                            className="min-h-[200px] bg-secondary font-mono text-xs"
+                                        />
+                                        <Button variant="outline" size="sm" className="mt-2" onClick={() => { navigator.clipboard.writeText(JSON.stringify(generatedQuestions, null, 2)); toast({ title: "Copied to clipboard!"})}}>Copy JSON</Button>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                     </Accordion>
+                </CardContent>
+            </Card>
+        </div>
+
 
         <div className="lg:col-span-2">
             <Card>
