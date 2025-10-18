@@ -29,7 +29,7 @@ import {
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -206,15 +206,9 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             <FormItem>
                                 <FormLabel>Correct Answer</FormLabel>
                                 <FormControl>
-                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl><RadioGroupItem value="True" /></FormControl>
-                                            <Label htmlFor="r1">True</Label>
-                                        </FormItem>
-                                        <FormItem className="flex items-center space-x-2">
-                                            <FormControl><RadioGroupItem value="False" /></FormControl>
-                                            <Label htmlFor="r2">False</Label>
-                                        </FormItem>
+                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
+                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><Label htmlFor="r1">True</Label></FormItem>
+                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><Label htmlFor="r2">False</Label></FormItem>
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
@@ -434,7 +428,7 @@ export default function ManagePracticeSetQuestionsPage() {
     }
     
     const handleSelectQuestion = (questionId: string) => {
-        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, id]);
+        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, questionId]);
     };
     
     const handleSelectAllQuestions = (checked: boolean) => {
@@ -502,7 +496,8 @@ export default function ManagePracticeSetQuestionsPage() {
             const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
                          : aiData.sourceType === 'chapterContent' ? chapter?.content
                          : aiData.sourceType === 'text' ? aiData.sourceText
-                         : aiData.sourceFile || null;
+                         : aiData.sourceType === 'file' ? aiData.sourceFile
+                         : null;
     
             if (!source || source.length < 3) {
                 toast({
@@ -792,3 +787,4 @@ export default function ManagePracticeSetQuestionsPage() {
         </div>
     );
 }
+
