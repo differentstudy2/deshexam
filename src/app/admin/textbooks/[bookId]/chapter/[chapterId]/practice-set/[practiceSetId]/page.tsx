@@ -29,7 +29,7 @@ import {
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -178,18 +178,18 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             control={form.control}
                             name="correctAnswer"
                             render={({ field }) => (
-                                <RadioGroup onValueChange={field.onChange} value={field.value} className="space-y-2">
+                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {[0, 1, 2, 3].map((optionIndex) => (
                                         <div key={optionIndex} className="flex items-start gap-3">
                                             <FormControl className="mt-2.5">
-                                                <RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} />
+                                                <RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}-${form.getValues('id')}`} />
                                             </FormControl>
                                             <div className="flex-1 space-y-1">
                                                 <FormField control={form.control} name={`options.${optionIndex}.text`} render={({ field: optionField }) => (
                                                     <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
                                                 )}/>
                                                  <FormField control={form.control} name={`options.${optionIndex}.explanation`} render={({ field: expField }) => (
-                                                    <Textarea {...expField} placeholder={`Explanation (optional)`} className="text-xs" />
+                                                    <Textarea {...expField} placeholder={`Explanation for Option ${optionIndex + 1}`} className="text-xs" />
                                                 )}/>
                                             </div>
                                         </div>
@@ -206,9 +206,9 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             <FormItem>
                                 <FormLabel>Correct Answer</FormLabel>
                                 <FormControl>
-                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
-                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><Label htmlFor="r1">True</Label></FormItem>
-                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><Label htmlFor="r2">False</Label></FormItem>
+                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex gap-4">
+                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><Label>True</Label></FormItem>
+                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><Label>False</Label></FormItem>
                                     </RadioGroup>
                                 </FormControl>
                                 <FormMessage />
@@ -324,7 +324,7 @@ export default function ManagePracticeSetQuestionsPage() {
             text: '',
             type: 'Multiple Choice',
             marks: 1,
-            options: [{ text: '', explanation: '' }, { text: '', explanation: '' }, { text: '', explanation: '' }, { text: '', explanation: '' }],
+            options: Array(4).fill({ text: '', explanation: '' }),
             correctAnswer: '',
             explanation: '',
         },
@@ -787,4 +787,3 @@ export default function ManagePracticeSetQuestionsPage() {
         </div>
     );
 }
-
