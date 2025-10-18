@@ -25,7 +25,7 @@ const QuestionSchema = z.object({
 });
 
 const AIQuestionGeneratorInputSchema = z.object({
-  numQuestions: z.number().int().min(1).describe('The number of questions to generate.'),
+  numQuestions: z.coerce.number().int().min(1).describe('The number of questions to generate.'),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe('The difficulty level of the questions.'),
   sourceType: z.enum(['topic', 'text']).describe('The source of the content to be generated.'),
   source: z.string().describe('The source topic or text content.'),
