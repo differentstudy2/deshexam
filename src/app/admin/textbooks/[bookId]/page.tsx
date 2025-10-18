@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Resource, PracticeSet, Question } from '@/lib/types';
+import type { Textbook, Chapter, Topic, Resource, PracticeSet, Question } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -25,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -58,8 +58,10 @@ import { TextbookStats } from '@/components/feature/textbook-stats';
 import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
-import { generateSummary, AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
-import { generateQuestions, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
+import { generateSummary } from '@/ai/flows/ai-summary-generator';
+import type { AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
+import { generateQuestions } from '@/ai/flows/ai-question-generator';
+import type { AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -68,8 +70,8 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
         switch(resource.type) {
             case 'video': return <Video className="w-4 h-4 text-muted-foreground" />;
             case 'audio': return <Mic className="w-4 h-4 text-muted-foreground" />;
-            case 'pdf': return <File className="w-4 h-4 text-muted-foreground" />;
-            case 'doc': return <File className="w-4 h-4 text-muted-foreground" />;
+            case 'pdf': return <FileIcon className="w-4 h-4 text-muted-foreground" />;
+            case 'doc': return <FileIcon className="w-4 h-4 text-muted-foreground" />;
             default: return <LinkIcon className="w-4 h-4 text-muted-foreground" />;
         }
     }
@@ -384,6 +386,27 @@ export default function ManageChaptersPage() {
         setGeneratedSummary(null);
     }
 
+    const handleUseQuestions = () => {
+        if (!generatedQuestions) return;
+        let questionsText = "## Practice Questions\n\n";
+        generatedQuestions.forEach((q, index) => {
+            questionsText += `**${index + 1}. ${q.text}**\n\n`;
+            if (q.type === 'Multiple Choice' && q.options) {
+                q.options.forEach(opt => {
+                    questionsText += `- ${opt.text}\n`;
+                });
+            }
+            questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+            if (q.explanation) {
+                questionsText += `> **Explanation:** ${q.explanation}\n`;
+            }
+            questionsText += "\n---\n\n";
+        });
+        setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + questionsText }));
+        toast({ title: "Questions added to content!" });
+        setGeneratedQuestions(null);
+    }
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -622,14 +645,14 @@ Chapter 3: Advanced Topics"
                                     {isGeneratingQuestions ? <Loader2 className="animate-spin"/> : "Generate Questions"}
                                 </Button>
                                 {generatedQuestions && (
-                                    <div className="border-t pt-4">
+                                    <div className="border-t pt-4 space-y-2">
                                         <h4 className="font-semibold mb-2">Generated Questions:</h4>
                                         <Textarea
                                             readOnly
                                             value={JSON.stringify({ questions: generatedQuestions }, null, 2)}
                                             className="min-h-[200px] bg-secondary font-mono text-xs"
                                         />
-                                        <Button variant="outline" size="sm" className="mt-2" onClick={() => { navigator.clipboard.writeText(JSON.stringify({ questions: generatedQuestions }, null, 2)); toast({ title: "Copied to clipboard!"})}}>Copy JSON</Button>
+                                        <Button variant="secondary" size="sm" onClick={handleUseQuestions} className="w-full">Append to Chapter Content</Button>
                                     </div>
                                 )}
                             </AccordionContent>
