@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Resource } from '@/lib/types';
+import type { Textbook, Chapter, Resource, PracticeSet, Question } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -58,7 +59,7 @@ import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
 import { generateSummary, AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
-import { generateQuestions, AIQuestionGeneratorOutput as AIQuestionsOutput } from '@/ai/flows/ai-question-generator';
+import { generateQuestions, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -115,7 +116,7 @@ export default function ManageChaptersPage() {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [generatedSummary, setGeneratedSummary] = useState<AISummaryGeneratorOutput | null>(null);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<AIQuestionsOutput['questions'] | null>(null);
+  const [generatedQuestions, setGeneratedQuestions] = useState<AIQuestionGeneratorOutput['questions'] | null>(null);
   const [numQuestions, setNumQuestions] = useState(5);
   const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
@@ -375,6 +376,14 @@ export default function ManageChaptersPage() {
         }
     };
 
+    const handleUseSummary = () => {
+        if (!generatedSummary) return;
+        const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map(p => `- ${p}`).join('\n')}`;
+        setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + summaryText }));
+        toast({ title: "Summary added to content!" });
+        setGeneratedSummary(null);
+    }
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -572,6 +581,7 @@ Chapter 3: Advanced Topics"
                                                 {generatedSummary.keyPoints.map((pt, i) => <li key={i}>{pt}</li>)}
                                             </ul>
                                         </div>
+                                        <Button variant="secondary" size="sm" onClick={handleUseSummary} className="w-full">Append to Chapter Content</Button>
                                     </div>
                                 )}
                             </AccordionContent>
@@ -616,10 +626,10 @@ Chapter 3: Advanced Topics"
                                         <h4 className="font-semibold mb-2">Generated Questions:</h4>
                                         <Textarea
                                             readOnly
-                                            value={JSON.stringify(generatedQuestions, null, 2)}
+                                            value={JSON.stringify({ questions: generatedQuestions }, null, 2)}
                                             className="min-h-[200px] bg-secondary font-mono text-xs"
                                         />
-                                        <Button variant="outline" size="sm" className="mt-2" onClick={() => { navigator.clipboard.writeText(JSON.stringify(generatedQuestions, null, 2)); toast({ title: "Copied to clipboard!"})}}>Copy JSON</Button>
+                                        <Button variant="outline" size="sm" className="mt-2" onClick={() => { navigator.clipboard.writeText(JSON.stringify({ questions: generatedQuestions }, null, 2)); toast({ title: "Copied to clipboard!"})}}>Copy JSON</Button>
                                     </div>
                                 )}
                             </AccordionContent>
@@ -643,7 +653,7 @@ Chapter 3: Advanced Topics"
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <CardHeader className="flex-row items-start justify-between pb-2">
+                                <CardHeader className="pb-4">
                                     <CardTitle className="text-base font-medium leading-tight">{chapter.title}</CardTitle>
                                     <ContentBadge type={chapter.access || 'pass'} />
                                 </CardHeader>
@@ -768,3 +778,4 @@ Chapter 3: Advanced Topics"
     </div>
   );
 }
+
