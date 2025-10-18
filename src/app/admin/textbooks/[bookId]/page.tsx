@@ -60,6 +60,8 @@ import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
 import { generateSummary } from '@/ai/flows/ai-summary-generator';
 import { generateQuestions } from '@/ai/flows/ai-question-generator';
+import type { AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
+import type { AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -114,9 +116,9 @@ export default function ManageChaptersPage() {
   const aiFileInputRef = useRef<HTMLInputElement>(null);
   
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
-  const [generatedSummary, setGeneratedSummary] = useState<any | null>(null);
+  const [generatedSummary, setGeneratedSummary] = useState<AISummaryGeneratorOutput | null>(null);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<any[] | null>(null);
+  const [generatedQuestions, setGeneratedQuestions] = useState<AIQuestionGeneratorOutput['questions'] | null>(null);
   const [numQuestions, setNumQuestions] = useState(5);
   const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
@@ -361,7 +363,7 @@ export default function ManageChaptersPage() {
         setIsGeneratingQuestions(true);
         setGeneratedQuestions(null);
         try {
-            const result = await generateQuestions({ 
+            const result: AIQuestionGeneratorOutput = await generateQuestions({ 
                 numQuestions: numQuestions,
                 difficulty: 'Medium',
                 sourceType: 'text',
@@ -393,16 +395,16 @@ export default function ManageChaptersPage() {
                 q.options.forEach((opt: { text: string; }) => {
                     questionsText += `- ${opt.text}\n`;
                 });
-            }
-            if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+                questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+            } else if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
                 const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
                 questionsText += `\n> **Answer:**\n${pairs}\n`;
             } else if (q.correctAnswer) {
-                 questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+                 questionsText += `> **Answer:** ${q.correctAnswer}\n`;
             }
 
             if (q.explanation) {
-                questionsText += `> **Explanation:** ${q.explanation}\n`;
+                questionsText += `\n> **Explanation:** ${q.explanation}\n`;
             }
             questionsText += "\n---\n\n";
         });
@@ -413,7 +415,7 @@ export default function ManageChaptersPage() {
 
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading textbooks...</div>;
   }
 
   if (!textbook) {
