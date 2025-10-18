@@ -30,6 +30,8 @@ const prompt = ai.definePrompt({
   output: { schema: AISummaryGeneratorOutputSchema },
   prompt: `You are an expert at simplifying complex educational content. Your task is to analyze the following text and generate a clear, easy-to-understand summary and a list of key takeaways.
 
+IMPORTANT: You MUST generate all content (summary, key points) in the same language as the provided source material.
+
 Source Content:
 ---
 {{content}}

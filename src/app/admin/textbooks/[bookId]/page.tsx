@@ -58,10 +58,8 @@ import { TextbookStats } from '@/components/feature/textbook-stats';
 import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
-import { generateSummary } from '@/ai/flows/ai-summary-generator';
-import type { AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
-import { generateQuestions } from '@/ai/flows/ai-question-generator';
-import type { AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
+import { generateSummary, type AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
+import { generateQuestions, type AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -388,7 +386,7 @@ export default function ManageChaptersPage() {
 
     const handleUseQuestions = () => {
         if (!generatedQuestions) return;
-        let questionsText = "## Practice Questions\n\n";
+        let questionsText = "\n\n## Practice Questions\n\n";
         generatedQuestions.forEach((q, index) => {
             questionsText += `**${index + 1}. ${q.text}**\n\n`;
             if (q.type === 'Multiple Choice' && q.options) {
@@ -396,7 +394,13 @@ export default function ManageChaptersPage() {
                     questionsText += `- ${opt.text}\n`;
                 });
             }
-            questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+            if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+                const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
+                questionsText += `\n> **Answer:**\n${pairs}\n`;
+            } else {
+                 questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+            }
+
             if (q.explanation) {
                 questionsText += `> **Explanation:** ${q.explanation}\n`;
             }
@@ -645,13 +649,11 @@ Chapter 3: Advanced Topics"
                                     {isGeneratingQuestions ? <Loader2 className="animate-spin"/> : "Generate Questions"}
                                 </Button>
                                 {generatedQuestions && (
-                                    <div className="border-t pt-4 space-y-2">
-                                        <h4 className="font-semibold mb-2">Generated Questions:</h4>
-                                        <Textarea
-                                            readOnly
-                                            value={JSON.stringify({ questions: generatedQuestions }, null, 2)}
-                                            className="min-h-[200px] bg-secondary font-mono text-xs"
-                                        />
+                                    <div className="space-y-4 border-t pt-4">
+                                        <h4 className="font-semibold">Generated Questions:</h4>
+                                        <div className="text-sm text-muted-foreground space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md">
+                                            {generatedQuestions.map((q, i) => <p key={i}><strong>{i+1}.</strong> {q.text}</p>)}
+                                        </div>
                                         <Button variant="secondary" size="sm" onClick={handleUseQuestions} className="w-full">Append to Chapter Content</Button>
                                     </div>
                                 )}
@@ -686,7 +688,7 @@ Chapter 3: Advanced Topics"
                                             switch(res.type) {
                                                 case 'video': return <Button key={res.id} variant="outline" size="sm" className="h-7"><Video className="w-3 h-3 mr-1"/> Video</Button>;
                                                 case 'audio': return <Button key={res.id} variant="outline" size="sm" className="h-7"><Mic className="w-3 h-3 mr-1"/> Audio</Button>;
-                                                case 'pdf': return <Button key={res.id} variant="outline" size="sm" className="h-7"><File className="w-3 h-3 mr-1"/> PDF</Button>;
+                                                case 'pdf': return <Button key={res.id} variant="outline" size="sm" className="h-7"><FileIcon className="w-3 h-3 mr-1"/> PDF</Button>;
                                                 default: return null;
                                             }
                                         })}
