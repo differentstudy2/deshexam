@@ -306,9 +306,14 @@ export default function ManageChaptersPage() {
   
     const handleAiFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setAiFiles(Array.from(e.target.files));
+            setAiFiles(prevFiles => [...prevFiles, ...Array.from(e.target.files!)]);
         }
     }
+
+    const removeAiFile = (fileToRemove: File) => {
+        setAiFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
+    };
+
 
     const handleAIGenerateContent = async () => {
         if (aiFiles.length === 0) {
@@ -527,19 +532,21 @@ Chapter 3: Advanced Topics"
                                     onClick={() => aiFileInputRef.current?.click()}
                                 >
                                     <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                    <p>Click to upload image(s)</p>
-                                    {aiFiles.length > 0 && <p className="text-sm font-semibold text-green-600 mt-2">{aiFiles.length} file(s) selected</p>}
+                                    <p>Click to upload or add files</p>
                                 </div>
+                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf" multiple />
                                 {aiFiles.length > 0 && (
-                                    <ScrollArea className="h-24 w-full rounded-md border p-2">
-                                        <ul className="text-sm text-muted-foreground">
+                                    <ScrollArea className="h-32 w-full rounded-md border p-2">
+                                        <ul className="text-sm text-muted-foreground space-y-2">
                                             {aiFiles.map((file, index) => (
-                                                <li key={index}>{file.name}</li>
+                                                <li key={index} className="flex items-center justify-between">
+                                                    <span className="truncate pr-2">{file.name}</span>
+                                                    <Button variant="ghost" size="sm" onClick={() => removeAiFile(file)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                </li>
                                             ))}
                                         </ul>
                                     </ScrollArea>
                                 )}
-                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf" multiple />
                                 <DialogFooter>
                                     <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || aiFiles.length === 0}>
                                         {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
