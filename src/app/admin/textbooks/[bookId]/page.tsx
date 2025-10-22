@@ -59,9 +59,9 @@ import { uploadFile } from "@/lib/firebase/firestore";
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
 import { generateSummary } from '@/ai/flows/ai-summary-generator';
-import { generateQuestions } from '@/ai/flows/ai-question-generator';
+import { generateTextbookQuestions } from '@/ai/flows/ai-textbook-question-generator';
 import type { AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
-import type { AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
+import type { AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-question-generator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -119,7 +119,7 @@ export default function ManageChaptersPage() {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [generatedSummary, setGeneratedSummary] = useState<AISummaryGeneratorOutput | null>(null);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<AIQuestionGeneratorOutput['questions'] | null>(null);
+  const [generatedQuestions, setGeneratedQuestions] = useState<AITextbookQuestionGeneratorOutput['questions'] | null>(null);
   const [numQuestions, setNumQuestions] = useState(5);
   const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
@@ -376,12 +376,10 @@ export default function ManageChaptersPage() {
         setIsGeneratingQuestions(true);
         setGeneratedQuestions(null);
         try {
-            const result: AIQuestionGeneratorOutput = await generateQuestions({ 
+            const result: AITextbookQuestionGeneratorOutput = await generateTextbookQuestions({ 
                 numQuestions: numQuestions,
-                difficulty: 'Medium',
-                sourceType: 'text',
-                source: newChapter.content,
-                questionType: questionTypes.length === 1 ? questionTypes[0] as any : 'Any'
+                sourceText: newChapter.content,
+                questionTypes: questionTypes as any,
             });
             setGeneratedQuestions(result.questions);
         } catch(error) {
