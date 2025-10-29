@@ -136,7 +136,7 @@ const SidebarNav = ({
 );
 
 
-function TopicPageContent() {
+export default function TopicClientPage() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
@@ -544,3 +544,4 @@ function TopicPageContent() {
         </div>
     );
 }
+
