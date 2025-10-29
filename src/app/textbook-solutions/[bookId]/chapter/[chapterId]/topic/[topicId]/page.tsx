@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -18,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getPracticeSetsByTopicId, getAllContent } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getPracticeSetsByTopicId, getAllContent, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -223,19 +222,25 @@ function TopicPageContent() {
                 const practiceSetsPromises = topicsData.map(t => getPracticeSetsByTopicId(textbookId, chapterId, t.id));
                 const practiceSetsArrays = await Promise.all(practiceSetsPromises);
                 
-                const topicsWithPracticeSets = topicsData.map((t, index) => ({
-                    ...t,
-                    practiceSets: practiceSetsArrays[index]
+                const topicsWithDetails = await Promise.all(topicsData.map(async (t, index) => {
+                    const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, t.id);
+                    const topicSnap = await getDoc(topicRef);
+                    const fullTopicData = topicSnap.exists() ? topicSnap.data() as Topic : {};
+                    return {
+                        ...t,
+                        ...fullTopicData, // This will include content and resources
+                        practiceSets: practiceSetsArrays[index]
+                    };
                 }));
+
+                setTopics(prev => ({ ...prev, [chapterId]: topicsWithDetails }));
                 
-                setTopics(prev => ({ ...prev, [chapterId]: topicsWithPracticeSets }));
-                
-                const currentTopic = topicsWithPracticeSets.find(t => t.id === topicId);
+                const currentTopic = topicsWithDetails.find(t => t.id === topicId);
 
                 if (currentTopic) {
                     setActiveTopic(currentTopic);
-                } else if(topicsWithPracticeSets.length > 0 && !topicId) {
-                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsWithPracticeSets[0].id}`);
+                } else if(topicsWithDetails.length > 0 && !topicId) {
+                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsWithDetails[0].id}`);
                 }
             }
 
@@ -521,3 +526,4 @@ export default function TopicPage() {
     return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
 
+    
