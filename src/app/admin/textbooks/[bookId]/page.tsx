@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -65,6 +64,8 @@ import type { AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-q
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ImageUploader } from '@/components/feature/image-uploader';
+
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -94,7 +95,7 @@ export default function ManageChaptersPage() {
 
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [newChapter, setNewChapter] = useState<{ title: string; content: string; access: 'free' | 'pass' | 'pro', resources: Resource[] }>({ title: '', content: '', access: 'pass', resources: [] });
+  const [newChapter, setNewChapter] = useState<{ title: string; content: string; access: 'free' | 'pass' | 'pro', resources: Resource[], featureImage?: string, chapterPdfUrl?: string }>({ title: '', content: '', access: 'pass', resources: [], featureImage: '', chapterPdfUrl: '' });
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [chapterToDelete, setChapterToDelete] = useState<Chapter | null>(null);
@@ -110,6 +111,7 @@ export default function ManageChaptersPage() {
   const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chapterPdfFileRef = useRef<HTMLInputElement>(null);
   
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
   const [aiFiles, setAiFiles] = useState<File[]>([]);
@@ -174,7 +176,7 @@ export default function ManageChaptersPage() {
             // Add logic
             await addDoc(chaptersCollectionRef, newChapter);
         }
-        setNewChapter({ title: '', content: '', access: 'pass', resources: [] });
+        setNewChapter({ title: '', content: '', access: 'pass', resources: [], featureImage: '', chapterPdfUrl: '' });
         fetchTextbookAndChapters(); // Refetch to get the updated/new chapter
 
     } catch (error) {
@@ -218,12 +220,12 @@ export default function ManageChaptersPage() {
 
   const handleEditClick = (chapter: Chapter) => {
     setEditingChapter(chapter);
-    setNewChapter({ title: chapter.title, content: chapter.content || '', access: chapter.access || 'pass', resources: chapter.resources || [] });
+    setNewChapter({ title: chapter.title, content: chapter.content || '', access: chapter.access || 'pass', resources: chapter.resources || [], featureImage: chapter.featureImage || '', chapterPdfUrl: chapter.chapterPdfUrl || '' });
   };
   
   const handleCancelEdit = () => {
     setEditingChapter(null);
-    setNewChapter({ title: '', content: '', access: 'pass', resources: [] });
+    setNewChapter({ title: '', content: '', access: 'pass', resources: [], featureImage: '', chapterPdfUrl: '' });
   }
   
   const handleDeleteClick = (chapter: Chapter) => {
@@ -288,14 +290,14 @@ export default function ManageChaptersPage() {
     setResourceToDelete(null);
   }
   
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'featureImage' | 'chapterPdfUrl') => {
     const file = e.target.files?.[0];
     if (file) {
         setIsUploading(true);
         try {
             const downloadURL = await uploadFile(file);
-            setNewResource(prev => ({...prev, url: downloadURL}));
-            toast({ title: 'File uploaded!', description: 'URL has been set. Click Save.' });
+            setNewChapter(prev => ({ ...prev, [fieldToUpdate]: downloadURL }));
+            toast({ title: 'File uploaded!' });
         } catch (error) {
             toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
         } finally {
@@ -510,6 +512,24 @@ Chapter 3: Advanced Topics"
                     value={newChapter.title}
                     onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
                     />
+                </div>
+                 <div className="space-y-2">
+                    <Label>Feature Image</Label>
+                    <ImageUploader fieldName="featureImage" onUrlChange={(url) => setNewChapter(prev => ({ ...prev, featureImage: url }))} value={newChapter.featureImage} />
+                 </div>
+                 <div className="space-y-2">
+                    <Label>Chapter PDF</Label>
+                     <div className="flex items-center gap-2">
+                         <Input 
+                            placeholder="PDF URL or upload a file" 
+                            value={newChapter.chapterPdfUrl} 
+                            onChange={(e) => setNewChapter(prev => ({...prev, chapterPdfUrl: e.target.value}))}
+                        />
+                         <Button type="button" variant="outline" size="icon" onClick={() => chapterPdfFileRef.current?.click()}>
+                            <Upload className="w-4 h-4"/>
+                         </Button>
+                         <Input type="file" className="hidden" ref={chapterPdfFileRef} onChange={(e) => handleFileUpload(e, 'chapterPdfUrl')} accept=".pdf"/>
+                     </div>
                 </div>
                 <div className="space-y-2">
                      <div className="flex justify-between items-center">
@@ -803,7 +823,7 @@ Chapter 3: Advanced Topics"
                                 {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
                              </Button>
                         </div>
-                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                        <Input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'resources')} className="hidden" />
                     </div>
                 </div>
                 <DialogFooter>

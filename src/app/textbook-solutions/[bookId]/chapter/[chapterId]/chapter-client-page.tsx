@@ -455,6 +455,24 @@ export default function ChapterClientPage() {
                     ) : (
                          <div>
                             <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeChapter?.title}</h1>
+                            {activeChapter?.featureImage && (
+                                <Image
+                                    src={activeChapter.featureImage}
+                                    alt={activeChapter.title}
+                                    width={800}
+                                    height={400}
+                                    className="w-full h-auto object-cover rounded-lg my-6 shadow-lg"
+                                />
+                            )}
+                            {activeChapter?.chapterPdfUrl && (
+                                <div className="my-6">
+                                    <Button asChild>
+                                        <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
+                                            <FileIcon className="mr-2" /> View Chapter PDF
+                                        </a>
+                                    </Button>
+                                </div>
+                            )}
                             {activeChapter?.content && (
                                 <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
@@ -616,4 +634,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-

@@ -23,6 +23,8 @@ export type Chapter = {
     id: string;
     title: string;
     content?: string;
+    featureImage?: string;
+    chapterPdfUrl?: string;
     topics: Topic[];
     resources?: Resource[];
     textbookQuestions?: Question[];
