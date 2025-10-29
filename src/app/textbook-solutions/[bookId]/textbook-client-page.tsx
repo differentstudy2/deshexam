@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getPracticeSetsByTopicId, getAllContent, getContentById } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -144,8 +144,21 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chaptersWithTopics.map((chapter, index) => (
                             <Card key={chapter.id} className="flex flex-col">
+                                {chapter.featureImage && (
+                                    <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative aspect-video">
+                                        <Image
+                                            src={chapter.featureImage}
+                                            alt={chapter.title}
+                                            fill
+                                            className="object-cover rounded-t-lg"
+                                        />
+                                    </Link>
+                                )}
                                 <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
-                                    <CardHeader className="bg-primary text-primary-foreground p-4 flex-row items-center gap-3 hover:bg-primary/90 transition-colors">
+                                    <CardHeader className={cn(
+                                        "p-4 flex-row items-center gap-3 hover:bg-primary/90 transition-colors",
+                                        chapter.featureImage ? 'bg-secondary' : 'bg-primary text-primary-foreground rounded-t-lg'
+                                    )}>
                                         <ChapterIcon />
                                         <CardTitle className="text-lg font-semibold flex-grow">{chapter.title}</CardTitle>
                                         <ChevronRight className="w-5 h-5 flex-shrink-0" />
@@ -243,4 +256,3 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
       </div>
     );
 }
-
