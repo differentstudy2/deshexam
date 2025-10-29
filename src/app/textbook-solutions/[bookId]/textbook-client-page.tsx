@@ -176,9 +176,9 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                                    <ul className="divide-y">
                                        {chapter.topics && chapter.topics.length > 0 ? (
                                            <>
-                                               {chapter.topics.slice(0, 3).map(topic => (
+                                               {chapter.topics.slice(0, 3).map((topic, topicIndex) => (
                                                    <li key={topic.id}>
-                                                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
+                                                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className={cn("flex items-center gap-3 p-3 text-sm hover:bg-opacity-80 transition-colors", bgColors[(index + topicIndex + 1) % bgColors.length])}>
                                                             <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                                             <span className="flex-grow truncate">{topic.title}</span>
                                                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
