@@ -48,11 +48,19 @@ export async function generateMetadata(
 
 
 export default async function TextbookSolutionsPage({ params }: PageProps) {
-    const textbook = await getContentById(params.bookId);
+    const textbookData = await getContentById(params.bookId);
 
-    if (!textbook) {
+    if (!textbookData) {
         notFound();
     }
+
+    // Serialize the textbook object to make it a "plain object"
+    const textbook = {
+      ...textbookData,
+      // Convert Firestore Timestamps to simple strings.
+      createdAt: textbookData.createdAt?.toDate ? textbookData.createdAt.toDate().toLocaleDateString() : null,
+      updatedAt: textbookData.updatedAt?.toDate ? textbookData.updatedAt.toDate().toLocaleDateString() : null,
+    };
 
     return <TextbookClientPage textbook={textbook as any} />;
 }
