@@ -350,13 +350,13 @@ export default function ChapterClientPage() {
     );
 
     const bgColors = [
-        'bg-blue-900/80',
-        'bg-green-900/80',
-        'bg-yellow-900/80',
-        'bg-pink-900/80',
-        'bg-purple-900/80',
-        'bg-orange-900/80',
-        'bg-teal-900/80',
+        'bg-blue-100 dark:bg-blue-900/20',
+        'bg-green-100 dark:bg-green-900/20',
+        'bg-yellow-100 dark:bg-yellow-900/20',
+        'bg-pink-100 dark:bg-pink-900/20',
+        'bg-purple-100 dark:bg-purple-900/20',
+        'bg-orange-100 dark:bg-orange-900/20',
+        'bg-teal-100 dark:bg-teal-900/20',
     ];
 
 
@@ -399,17 +399,19 @@ export default function ChapterClientPage() {
                         {sidebarContent}
                     </div>
                 </aside>
-                <main className="bg-slate-900 text-white">
+                <main>
                     <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start">
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-0"></div>
-                        <Image 
-                            src={activeChapter?.featureImage || '/image/logo.png'}
-                            alt={activeChapter?.title || 'Chapter background'}
-                            fill
-                            className="object-cover opacity-20"
-                        />
-                        <div className="relative z-10">
-                            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-white">{activeChapter?.title}</h1>
+                        <div className="absolute inset-0 z-0">
+                             <Image 
+                                src={activeChapter?.featureImage || '/image/logo.png'}
+                                alt={activeChapter?.title || 'Chapter background'}
+                                fill
+                                className="object-cover opacity-20"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+                        </div>
+                        <div className="relative z-20">
+                            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-foreground">{activeChapter?.title}</h1>
                             {activeChapter?.chapterPdfUrl && (
                                 <div className="mt-4">
                                     <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
@@ -423,8 +425,12 @@ export default function ChapterClientPage() {
                     </header>
 
                     <div className="p-6 md:p-8">
+                         {activeChapter?.description && (
+                            <p className="prose dark:prose-invert lg:prose-lg max-w-none mb-12 text-muted-foreground">{activeChapter.description}</p>
+                        )}
+                        
                         {activeChapter?.content && (
-                            <article className="prose prose-invert lg:prose-lg max-w-none mb-12">
+                            <article className="prose dark:prose-invert lg:prose-lg max-w-none mb-12">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
                             </article>
                         )}
@@ -436,11 +442,11 @@ export default function ChapterClientPage() {
                                 {topics[chapterId].map((topic, index) => (
                                     <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
                                         <div className={cn(
-                                            "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg",
+                                            "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg border",
                                             bgColors[index % bgColors.length]
                                         )}>
-                                            <FileText className="w-5 h-5 flex-shrink-0" />
-                                            <span className="font-semibold flex-grow">{topic.title}</span>
+                                            <FileText className="w-5 h-5 flex-shrink-0 text-foreground/70" />
+                                            <span className="font-semibold flex-grow text-foreground">{topic.title}</span>
                                             <ChevronRight className="w-5 h-5 flex-shrink-0 opacity-70" />
                                         </div>
                                     </Link>
@@ -454,7 +460,7 @@ export default function ChapterClientPage() {
                                 <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
                                  <div className="space-y-4">
                                      {activeChapter.practiceSets.map(ps => (
-                                         <div key={ps.id} className="p-4 border border-slate-700 bg-slate-800 rounded-lg hover:bg-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                         <div key={ps.id} className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                              <span className="font-semibold flex-grow">{ps.title}</span>
                                              <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                                                <Button size="sm" asChild className="flex-1">
@@ -482,20 +488,20 @@ export default function ChapterClientPage() {
                                 <h2 className="font-headline text-3xl font-bold mb-6">Additional Resources</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {activeChapter.resources.map(res => (
-                                        <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3 bg-slate-800 border-slate-700 hover:bg-slate-700" onClick={() => handleResourceClick(res)}>
+                                        <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
                                             {getResourceIcon(res.type)}
-                                            <span className="flex-grow text-left text-white">{res.title}</span>
+                                            <span className="flex-grow text-left">{res.title}</span>
                                         </Button>
                                     ))}
                                 </div>
                             </section>
                         )}
 
-                        {(!activeTopic && topics[chapterId]?.length > 0) && (
-                            <div className="text-center text-slate-400 pt-16">
+                        {(!activeTopic && (!topics[chapterId] || topics[chapterId].length === 0) && !activeChapter?.content && !activeChapter?.practiceSets?.length && !activeChapter?.resources?.length) && (
+                            <div className="text-center text-muted-foreground py-16">
                                 <BookOpen className="w-16 h-16 mx-auto mb-4"/>
-                                <h2 className="text-xl font-semibold">Select a topic</h2>
-                                <p>Choose a topic from the sidebar to view its specific content.</p>
+                                <h2 className="text-xl font-semibold">No Content Yet</h2>
+                                <p>There is no content available for this chapter yet. Check back later!</p>
                             </div>
                         )}
                     </div>
