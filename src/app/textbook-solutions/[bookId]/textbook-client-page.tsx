@@ -113,6 +113,16 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
       return `/${typeSlug}/${testId}`;
     }
 
+    const bgColors = [
+        'bg-blue-100 dark:bg-blue-900/20',
+        'bg-green-100 dark:bg-green-900/20',
+        'bg-yellow-100 dark:bg-yellow-900/20',
+        'bg-pink-100 dark:bg-pink-900/20',
+        'bg-purple-100 dark:bg-purple-900/20',
+        'bg-orange-100 dark:bg-orange-900/20',
+        'bg-teal-100 dark:bg-teal-900/20',
+    ];
+
     return (
       <div className="bg-secondary/30 min-h-screen">
         <div className="container mx-auto px-4 py-12">
@@ -144,7 +154,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chaptersWithTopics.map((chapter, index) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg h-48">
+                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg h-48 max-h-48">
                                     <Image
                                         src={chapter.featureImage || '/image/logo.png'}
                                         alt={chapter.title}
@@ -154,11 +164,11 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                                 </Link>
                                 <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
                                     <CardHeader className={cn(
-                                        "p-4 flex-row items-center gap-3 hover:bg-primary/90 transition-colors",
-                                        'bg-secondary'
+                                        "p-4 flex-row items-center gap-3 hover:bg-opacity-80 transition-colors",
+                                        bgColors[index % bgColors.length]
                                     )}>
                                         <ChapterIcon />
-                                        <CardTitle className="text-lg font-semibold flex-grow">{chapter.title}</CardTitle>
+                                        <CardTitle className="text-base font-semibold flex-grow">{chapter.title}</CardTitle>
                                         <ChevronRight className="w-5 h-5 flex-shrink-0" />
                                     </CardHeader>
                                 </Link>
