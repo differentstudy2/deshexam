@@ -95,7 +95,7 @@ const SidebarNav = ({
                              activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
                            )}
                          >
-                           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}?topic=${topic.id}`} className="flex items-center gap-2">
+                           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
                              <FileText className="w-4 h-4 text-muted-foreground" />
                              <span>{topic.title}</span>
                            </Link>
@@ -451,7 +451,7 @@ export default function ChapterClientPage() {
                                 <h2 className="font-headline text-3xl font-bold mb-6">Topics in this Chapter</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {topics[chapterId].map((topic, index) => (
-                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topic.id}`}>
+                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
                                         <div className={cn(
                                             "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg border",
                                             bgColors[index % bgColors.length]
