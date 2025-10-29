@@ -176,18 +176,20 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                                    <ul className="divide-y">
                                        {chapter.topics && chapter.topics.length > 0 ? (
                                            <>
-                                               {chapter.topics.slice(0, 3).map((topic, topicIndex) => (
+                                               {chapter.topics.slice(0, 10).map((topic, topicIndex) => (
                                                    <li key={topic.id}>
-                                                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className={cn("flex items-center gap-3 p-3 text-sm hover:bg-opacity-80 transition-colors", bgColors[(index + topicIndex + 1) % bgColors.length])}>
+                                                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}?topic=${topic.id}`} className={cn("flex items-center gap-3 p-3 text-sm hover:bg-opacity-80 transition-colors", bgColors[(index + topicIndex + 1) % bgColors.length])}>
                                                             <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                                             <span className="flex-grow truncate">{topic.title}</span>
                                                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                                        </Link>
                                                    </li>
                                                ))}
-                                               {chapter.topics.length > 3 && (
-                                                   <li className="p-3 text-sm text-center text-muted-foreground">
-                                                       ...and {chapter.topics.length - 3} more topics
+                                               {chapter.topics.length > 10 && (
+                                                   <li className="p-3 text-sm text-center">
+                                                       <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="font-semibold text-primary hover:underline">
+                                                           See {chapter.topics.length - 10} More Topics...
+                                                       </Link>
                                                    </li>
                                                )}
                                            </>
