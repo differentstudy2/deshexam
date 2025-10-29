@@ -400,32 +400,8 @@ export default function ChapterClientPage() {
                     </div>
                 </aside>
                 <main>
-                    <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white">
-                        <div className="absolute inset-0 z-0">
-                             <Image 
-                                src={activeChapter?.featureImage || '/image/logo.png'}
-                                alt={activeChapter?.title || 'Chapter background'}
-                                fill
-                                className="object-cover opacity-20"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
-                        </div>
-                        <div className="relative z-20">
-                            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">{activeChapter?.title}</h1>
-                            {activeChapter?.chapterPdfUrl && (
-                                <div className="mt-4">
-                                    <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-                                        <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
-                                            <FileText className="mr-2" /> View Chapter PDF
-                                        </a>
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
-                    </header>
-
                     <div className="p-6 md:p-8">
-                         <nav className="text-sm mb-6 hidden md:block">
+                        <nav className="text-sm mb-6 hidden md:block">
                              <ol className="flex items-center gap-1.5">
                                 {breadcrumbs.map((crumb, index) => (
                                    <li key={index} className="flex items-center gap-1.5">
@@ -436,22 +412,46 @@ export default function ChapterClientPage() {
                             </ol>
                         </nav>
                         
+                        <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
+                            <div className="absolute inset-0 z-0">
+                                <Image 
+                                    src={activeChapter?.featureImage || '/image/logo.png'}
+                                    alt={activeChapter?.title || 'Chapter background'}
+                                    fill
+                                    className="object-cover opacity-20"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
+                            </div>
+                            <div className="relative z-20">
+                                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">{activeChapter?.title}</h1>
+                                {activeChapter?.chapterPdfUrl && (
+                                    <div className="mt-4">
+                                        <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
+                                            <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
+                                                <FileText className="mr-2" /> View Chapter PDF
+                                            </a>
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </header>
+                        
                         {activeChapter?.description && (
-                            <p className="prose dark:prose-invert lg:prose-lg max-w-none mb-12 text-muted-foreground">{activeChapter.description}</p>
+                            <p className="prose dark:prose-invert lg:prose-lg max-w-none my-8 text-muted-foreground">{activeChapter.description}</p>
                         )}
                         
                         {activeChapter?.content && (
-                            <article className="prose dark:prose-invert lg:prose-lg max-w-none mb-12">
+                            <article className="prose dark:prose-invert lg:prose-lg max-w-none my-8">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
                             </article>
                         )}
 
                         {topics[chapterId] && topics[chapterId].length > 0 && (
-                            <section id="topics" className="mb-12">
+                            <section id="topics" className="my-8">
                                 <h2 className="font-headline text-3xl font-bold mb-6">Topics in this Chapter</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {topics[chapterId].map((topic, index) => (
-                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topic.id}`}>
+                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
                                         <div className={cn(
                                             "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg border",
                                             bgColors[index % bgColors.length]
@@ -467,7 +467,7 @@ export default function ChapterClientPage() {
                         )}
                         
                         {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
-                            <section id="practice-sets" className="mb-12">
+                            <section id="practice-sets" className="my-8">
                                 <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
                                  <div className="space-y-4">
                                      {activeChapter.practiceSets.map(ps => (
@@ -495,7 +495,7 @@ export default function ChapterClientPage() {
                         )}
                         
                         {activeChapter?.resources && activeChapter.resources.length > 0 && (
-                            <section id="resources">
+                            <section id="resources" className="my-8">
                                 <h2 className="font-headline text-3xl font-bold mb-6">Additional Resources</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {activeChapter.resources.map(res => (
