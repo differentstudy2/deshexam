@@ -144,20 +144,18 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chaptersWithTopics.map((chapter, index) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                {chapter.featureImage && (
-                                    <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative aspect-video">
-                                        <Image
-                                            src={chapter.featureImage}
-                                            alt={chapter.title}
-                                            fill
-                                            className="object-cover rounded-t-lg"
-                                        />
-                                    </Link>
-                                )}
+                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative aspect-video">
+                                    <Image
+                                        src={chapter.featureImage || '/image/logo.png'}
+                                        alt={chapter.title}
+                                        fill
+                                        className="object-cover rounded-t-lg"
+                                    />
+                                </Link>
                                 <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
                                     <CardHeader className={cn(
                                         "p-4 flex-row items-center gap-3 hover:bg-primary/90 transition-colors",
-                                        chapter.featureImage ? 'bg-secondary' : 'bg-primary text-primary-foreground rounded-t-lg'
+                                        'bg-secondary'
                                     )}>
                                         <ChapterIcon />
                                         <CardTitle className="text-lg font-semibold flex-grow">{chapter.title}</CardTitle>
