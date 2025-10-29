@@ -461,7 +461,7 @@ export default function ChapterClientPage() {
                                     alt={activeChapter.title}
                                     width={800}
                                     height={400}
-                                    className="w-full h-auto object-cover rounded-lg my-6 shadow-lg"
+                                    className="w-full max-h-96 h-auto object-cover rounded-lg my-6 shadow-lg"
                                 />
                             )}
                             {activeChapter?.chapterPdfUrl && (
