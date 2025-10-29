@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -406,7 +406,7 @@ export default function ChapterClientPage() {
                             src={activeChapter?.featureImage || '/image/logo.png'}
                             alt={activeChapter?.title || 'Chapter background'}
                             fill
-                            className="object-contain object-right-bottom opacity-10"
+                            className="object-cover opacity-20"
                         />
                         <div className="relative z-10">
                             <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-white">{activeChapter?.title}</h1>
@@ -434,7 +434,7 @@ export default function ChapterClientPage() {
                                 <h2 className="font-headline text-3xl font-bold mb-6">Topics in this Chapter</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {topics[chapterId].map((topic, index) => (
-                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topic.id}`}>
+                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
                                         <div className={cn(
                                             "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg",
                                             bgColors[index % bgColors.length]
@@ -523,4 +523,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
