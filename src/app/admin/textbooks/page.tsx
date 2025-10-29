@@ -1,16 +1,15 @@
 
-
 'use client';
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
-import { deleteTextbook } from '@/lib/firebase/firestore';
+import { deleteTextbook, getAllTextbooks, getSubjects, getClasses, getGradesByClass, getBoards, getSchools } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import { collection, getDocs, doc } from 'firebase/firestore';
 import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye, Award } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,115 +23,94 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { TextbookStats } from '@/components/feature/textbook-stats';
+import { TextbookFilters } from '@/components/feature/textbook-filters';
+import { Loader2 } from 'lucide-react';
 
-
-const TextbookStats = ({ textbookId }: { textbookId: string }) => {
-    const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0, examCount: 0 });
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            let chapterCount = 0;
-            let topicCount = 0;
-            let practiceSetCount = 0;
-            let examCount = 0;
-            
-            const textbookRef = doc(db, 'textbooks', textbookId);
-            const chaptersRef = collection(textbookRef, 'chapters');
-            const examsRef = collection(textbookRef, 'exams');
-            
-            const [chaptersSnapshot, examsSnapshot] = await Promise.all([
-                getDocs(chaptersRef),
-                getDocs(examsRef),
-            ]);
-
-            chapterCount = chaptersSnapshot.size;
-            examCount = examsSnapshot.size;
-
-            for (const chapterDoc of chaptersSnapshot.docs) {
-                const topicsRef = collection(chapterDoc.ref, "topics");
-                const topicsSnapshot = await getDocs(topicsRef);
-                topicCount += topicsSnapshot.size;
-
-                 for (const topicDoc of topicsSnapshot.docs) {
-                    const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
-                    const practiceSetsSnapshot = await getDocs(practiceSetsRef);
-                    practiceSetCount += practiceSetsSnapshot.size;
-                }
-            }
-            setStats({ chapterCount, topicCount, practiceSetCount, examCount });
-            setLoading(false);
-        };
-        fetchStats();
-    }, [textbookId]);
-
-    if (loading) {
-        return (
-            <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-2 text-center text-xs text-muted-foreground">
-                <div className="flex flex-col items-center gap-1">
-                    <Layers className="h-4 w-4" />
-                    <span>... Chapters</span>
-                </div>
-                 <div className="flex flex-col items-center gap-1">
-                    <FileText className="h-4 w-4" />
-                    <span>... Topics</span>
-                </div>
-                 <div className="flex flex-col items-center gap-1">
-                    <Award className="h-4 w-4" />
-                    <span>... Exams</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                    <CheckSquare className="h-4 w-4" />
-                    <span>... Sets</span>
-                </div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-2 text-center text-xs text-muted-foreground">
-            <div className="flex flex-col items-center gap-1">
-                <Layers className="h-4 w-4" />
-                <span>{stats.chapterCount} Chapters</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-                <FileText className="h-4 w-4" />
-                <span>{stats.topicCount} Topics</span>
-            </div>
-             <div className="flex flex-col items-center gap-1">
-                <Award className="h-4 w-4" />
-                <span>{stats.examCount} Exams</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-                <CheckSquare className="h-4 w-4" />
-                <span>{stats.practiceSetCount} Sets</span>
-            </div>
-        </div>
-    );
-};
-
+type MetafieldItem = { id: string, name: string };
 
 export default function ManageTextbooksPage() {
-  const [textbooks, setTextbooks] = useState<Textbook[]>([]);
+  const [allTextbooks, setAllTextbooks] = useState<Textbook[]>([]);
   const [loading, setLoading] = useState(true);
   const [textbookToDelete, setTextbookToDelete] = useState<Textbook | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [classCategories, setClassCategories] = useState<MetafieldItem[]>([]);
+  const [selectedClassCategory, setSelectedClassCategory] = useState('all');
+  const [grades, setGrades] = useState<MetafieldItem[]>([]);
+  const [selectedGrade, setSelectedGrade] = useState('all');
+  const [boards, setBoards] = useState<MetafieldItem[]>([]);
+  const [selectedBoard, setSelectedBoard] = useState('all');
+  const [schools, setSchools] = useState<string[]>([]);
+  const [selectedSchool, setSelectedSchool] = useState('all');
 
-  const fetchTextbooks = async () => {
+  const fetchInitialData = async () => {
       setLoading(true);
-      const textbooksCollectionRef = collection(db, 'textbooks');
-      const querySnapshot = await getDocs(textbooksCollectionRef);
-      const textbooksData = querySnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as Textbook)
-      );
-      setTextbooks(textbooksData);
-      setLoading(false);
+      try {
+        const [
+          textbookData,
+          subjectsData,
+          classesData,
+          boardsData,
+          schoolsData
+        ] = await Promise.all([
+          getAllTextbooks(),
+          getSubjects(),
+          getClasses(),
+          getBoards(),
+          getSchools(),
+        ]);
+        
+        setAllTextbooks(textbookData as Textbook[]);
+        setSubjects(subjectsData);
+        setClassCategories(classesData);
+        setBoards(boardsData);
+        setSchools(schoolsData.map(s => s.name || '').filter(Boolean));
+
+      } catch (error) {
+         toast({
+          variant: "destructive",
+          title: "Error fetching data",
+          description: (error as Error).message,
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
   useEffect(() => {
-    fetchTextbooks();
-  }, []);
+    fetchInitialData();
+  }, [toast]);
+  
+  useEffect(() => {
+    const fetchGrades = async () => {
+        if(selectedClassCategory !== 'all') {
+            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            setGrades(fetchedGrades);
+        } else {
+            setGrades([]);
+        }
+        setSelectedGrade('all');
+    };
+    fetchGrades();
+  }, [selectedClassCategory]);
+
+  const filteredTextbooks = useMemo(() => {
+    return allTextbooks.filter(book => {
+      const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject;
+      const matchesClass = selectedGrade === 'all' || book.class === selectedGrade;
+      const matchesBoard = selectedBoard === 'all' || book.board === selectedBoard;
+      const matchesSchool = selectedSchool === 'all' || (book as any).school === selectedSchool;
+      const matchesClassCategory = selectedClassCategory === 'all' || book.classCategory === selectedClassCategory;
+      return matchesSearch && matchesSubject && matchesClass && matchesBoard && matchesSchool && matchesClassCategory;
+    });
+  }, [allTextbooks, searchQuery, selectedSubject, selectedGrade, selectedClassCategory, selectedBoard, selectedSchool]);
+
 
   const handleDeleteClick = (book: Textbook) => {
     setTextbookToDelete(book);
@@ -147,7 +125,7 @@ export default function ManageTextbooksPage() {
         title: "Textbook Deleted",
         description: `"${textbookToDelete.title}" and all its content have been removed.`,
       });
-      fetchTextbooks(); // Refetch the list
+      fetchInitialData(); // Refetch the list
     } catch (error) {
        toast({
         variant: "destructive",
@@ -162,7 +140,12 @@ export default function ManageTextbooksPage() {
 
 
   if (loading) {
-    return <div>Loading textbooks...</div>;
+    return (
+        <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <p className="ml-4 text-lg">Loading Textbooks...</p>
+        </div>
+    );
   }
 
   return (
@@ -180,8 +163,29 @@ export default function ManageTextbooksPage() {
             </Link>
         </Button>
       </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {textbooks.map((book) => (
+
+       <TextbookFilters
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+            subjects={subjects}
+            selectedSubject={selectedSubject}
+            onSubjectChange={setSelectedSubject}
+            classCategories={classCategories}
+            selectedClassCategory={selectedClassCategory}
+            onClassCategoryChange={setSelectedClassCategory}
+            grades={grades}
+            selectedGrade={selectedGrade}
+            onGradeChange={setSelectedGrade}
+            boards={boards}
+            selectedBoard={selectedBoard}
+            onBoardChange={setSelectedBoard}
+            schools={schools}
+            selectedSchool={selectedSchool}
+            onSchoolChange={setSelectedSchool}
+        />
+        
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {filteredTextbooks.map((book) => (
           <Card key={book.id} className="flex flex-col max-h-[550px]">
             <CardHeader className="p-0 relative h-48 flex-shrink-0">
                <Image 
@@ -221,9 +225,9 @@ export default function ManageTextbooksPage() {
             </CardFooter>
           </Card>
         ))}
-         {textbooks.length === 0 && (
+         {filteredTextbooks.length === 0 && (
             <div className="col-span-full text-center text-muted-foreground py-10">
-                <p>No textbooks found. Add one to get started.</p>
+                <p>No textbooks found matching your criteria.</p>
             </div>
         )}
       </div>
