@@ -5,8 +5,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import { getAllContent } from '@/lib/firebase/firestore';
-import type { Textbook, Chapter, Topic, Exam } from '@/lib/types';
+import { getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import type { Textbook, Chapter, Topic, Exam, PracticeSet } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 export function usePageData() {
@@ -70,7 +70,10 @@ export function usePageData() {
                     setActiveTopic(null);
                  }
             } else {
-                 setActiveTopic({ id: topicSnap.id, ...topicSnap.data() } as Topic);
+                 const topicData = { id: topicSnap.id, ...topicSnap.data() } as Topic;
+                 const practiceSetsData = await getPracticeSetsByTopicId(textbookId, chapterId, topicId);
+                 topicData.practiceSets = practiceSetsData;
+                 setActiveTopic(topicData);
             }
 
         } catch (e: any) {
