@@ -144,12 +144,12 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chaptersWithTopics.map((chapter, index) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative aspect-video">
+                                <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg h-48">
                                     <Image
                                         src={chapter.featureImage || '/image/logo.png'}
                                         alt={chapter.title}
                                         fill
-                                        className="object-cover rounded-t-lg"
+                                        className="object-contain p-2"
                                     />
                                 </Link>
                                 <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`}>
