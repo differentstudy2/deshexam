@@ -349,6 +349,17 @@ export default function ChapterClientPage() {
         </div>
     );
 
+    const bgColors = [
+        'bg-blue-900/80',
+        'bg-green-900/80',
+        'bg-yellow-900/80',
+        'bg-pink-900/80',
+        'bg-purple-900/80',
+        'bg-orange-900/80',
+        'bg-teal-900/80',
+    ];
+
+
     return (
         <div className="min-h-screen bg-background">
             <div className="md:hidden p-4 border-b flex items-center gap-4">
@@ -377,7 +388,7 @@ export default function ChapterClientPage() {
                     </ol>
                 </nav>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
+            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr]">
                 <aside className="hidden md:block h-full bg-card border-r">
                     <div className="sticky top-0 h-screen overflow-y-auto">
                          <div className="p-4 border-b">
@@ -388,51 +399,66 @@ export default function ChapterClientPage() {
                         {sidebarContent}
                     </div>
                 </aside>
-                <main className="p-6 md:p-8">
-                    <nav className="text-sm mb-6 hidden md:block">
-                         <ol className="flex items-center gap-1.5">
-                            {breadcrumbs.map((crumb, index) => (
-                               <li key={index} className="flex items-center gap-1.5">
-                                   <Link href={crumb.href} className={cn("hover:text-foreground", index === breadcrumbs.length - 1 ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{crumb.name}</Link>
-                                   {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
-                               </li>
-                            ))}
-                        </ol>
-                    </nav>
-
-                    {activeTopic ? (
-                        <div>
-                            <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
-                            {activeTopic.content && (
-                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeTopic.content}</ReactMarkdown>
-                                </article>
-                            )}
-
-                             {activeTopic.resources && activeTopic.resources.length > 0 && (
-                                <>
-                                 <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Resources</h2>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {activeTopic.resources.map(res => (
-                                        <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                            {getResourceIcon(res.type)}
-                                            <span className="flex-grow text-left">{res.title}</span>
-                                        </Button>
-                                    ))}
+                <main className="bg-slate-900 text-white">
+                    <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start">
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-0"></div>
+                        <Image 
+                            src={activeChapter?.featureImage || '/image/logo.png'}
+                            alt={activeChapter?.title || 'Chapter background'}
+                            fill
+                            className="object-contain object-right-bottom opacity-10"
+                        />
+                        <div className="relative z-10">
+                            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-white">{activeChapter?.title}</h1>
+                            {activeChapter?.chapterPdfUrl && (
+                                <div className="mt-4">
+                                    <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
+                                        <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
+                                            <FileText className="mr-2" /> View Chapter PDF
+                                        </a>
+                                    </Button>
                                 </div>
-                                </>
                             )}
-                             
-                             {activeTopic.practiceSets && activeTopic.practiceSets.length > 0 && (
-                                <>
-                                 <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Practice Sets</h2>
+                        </div>
+                    </header>
+
+                    <div className="p-6 md:p-8">
+                        {activeChapter?.content && (
+                            <article className="prose prose-invert lg:prose-lg max-w-none mb-12">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
+                            </article>
+                        )}
+
+                        {topics[chapterId] && topics[chapterId].length > 0 && (
+                            <section id="topics" className="mb-12">
+                                <h2 className="font-headline text-3xl font-bold mb-6">Topics in this Chapter</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {topics[chapterId].map((topic, index) => (
+                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}?topic=${topic.id}`}>
+                                        <div className={cn(
+                                            "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg",
+                                            bgColors[index % bgColors.length]
+                                        )}>
+                                            <FileText className="w-5 h-5 flex-shrink-0" />
+                                            <span className="font-semibold flex-grow">{topic.title}</span>
+                                            <ChevronRight className="w-5 h-5 flex-shrink-0 opacity-70" />
+                                        </div>
+                                    </Link>
+                                ))}
+                                </div>
+                            </section>
+                        )}
+                        
+                        {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
+                            <section id="practice-sets" className="mb-12">
+                                <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
                                  <div className="space-y-4">
-                                     {activeTopic.practiceSets.map(ps => (
-                                         <div key={ps.id} className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                     {activeChapter.practiceSets.map(ps => (
+                                         <div key={ps.id} className="p-4 border border-slate-700 bg-slate-800 rounded-lg hover:bg-slate-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                              <span className="font-semibold flex-grow">{ps.title}</span>
                                              <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                                                <Button size="sm" asChild className="flex-1">
-                                                   <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>Start Practice</Link>
+                                                   <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}`}>Start Practice</Link>
                                                </Button>
                                                <Button 
                                                    size="sm" 
@@ -448,169 +474,32 @@ export default function ChapterClientPage() {
                                          </div>
                                      ))}
                                  </div>
-                                 </>
-                             )}
-
-                        </div>
-                    ) : (
-                         <div>
-                            <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeChapter?.title}</h1>
-                            {activeChapter?.featureImage && (
-                                <Image
-                                    src={activeChapter.featureImage}
-                                    alt={activeChapter.title}
-                                    width={800}
-                                    height={400}
-                                    className="w-full max-h-96 h-auto object-cover rounded-lg my-6 shadow-lg"
-                                />
-                            )}
-                            {activeChapter?.chapterPdfUrl && (
-                                <div className="my-6">
-                                    <Button asChild>
-                                        <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
-                                            <FileIcon className="mr-2" /> View Chapter PDF
-                                        </a>
-                                    </Button>
-                                </div>
-                            )}
-                            {activeChapter?.content && (
-                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
-                                </article>
-                            )}
-                             {activeChapter?.resources && activeChapter.resources.length > 0 && (
-                                <div className="mt-12">
-                                    <h2 className="font-headline text-2xl font-bold mb-4">Additional Resources</h2>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {activeChapter.resources.map(res => (
-                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                                {getResourceIcon(res.type)}
-                                                <span className="flex-grow text-left">{res.title}</span>
-                                            </Button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && (
-                                <div className="mt-12 space-y-8">
-                                    <h2 className="font-headline text-2xl font-bold mb-4">Textbook Questions & Solutions</h2>
-                                    {activeChapter.textbookQuestions.map((q, i) => (
-                                        <Card key={q.id || i} className="overflow-hidden">
-                                            <CardHeader className="bg-muted/50 p-4">
-                                                <p className="font-semibold">{i + 1}. {q.text}</p>
-                                            </CardHeader>
-                                            <CardContent className="p-4 space-y-4">
-                                                <div>
-                                                    <h4 className="font-bold text-sm mb-2 text-primary">Answer / Solution</h4>
-                                                     {q.type === 'Multiple Choice' ? (
-                                                        <p className="text-sm">{q.correctAnswer}</p>
-                                                    ) : q.type === 'Matching' && Array.isArray(q.correctAnswer) ? (
-                                                        <ul className="space-y-2 text-sm">
-                                                            {q.correctAnswer.map((pair: any, pairIndex: number) => (
-                                                                <li key={pairIndex} className="flex items-center gap-2">
-                                                                    <div className="flex flex-col items-center text-center">
-                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={100} height={100} className="rounded-md object-cover mb-1" />}
-                                                                        <strong>{pair.a}</strong>
-                                                                    </div>
-                                                                    <span>→</span>
-                                                                     <div className="flex flex-col items-center text-center">
-                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={100} height={100} className="rounded-md object-cover mb-1" />}
-                                                                        <span>{pair.b}</span>
-                                                                    </div>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    ) : q.type === 'Grouped' && Array.isArray(q.subQuestions) ? (
-                                                        <ol className="list-decimal list-inside space-y-4 text-sm">
-                                                            {q.subQuestions.map((sub, subIndex) => (
-                                                                <li key={sub.id || subIndex}>
-                                                                    <span className="font-medium">{sub.text}</span> <br/>
-                                                                    {sub.type === 'Matching' && Array.isArray(sub.correctAnswer) ? (
-                                                                        <ul className="space-y-1 text-sm list-none pl-4 mt-2">
-                                                                            {sub.correctAnswer.map((pair: any, pairIndex: number) => (
-                                                                                <li key={pairIndex} className="flex items-center gap-2">
-                                                                                    <div className="flex flex-col items-center text-center">
-                                                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={100} height={100} className="rounded-md object-cover mb-1" />}
-                                                                                        <strong>{pair.a}</strong>
-                                                                                    </div>
-                                                                                    <span>→</span>
-                                                                                    <div className="flex flex-col items-center text-center">
-                                                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={100} height={100} className="rounded-md object-cover mb-1" />}
-                                                                                        <span>{pair.b}</span>
-                                                                                    </div>
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                    ) : (
-                                                                        <span className="font-semibold text-green-600">{String(sub.correctAnswer)}</span>
-                                                                    )}
-                                                                </li>
-                                                            ))}
-                                                        </ol>
-                                                    ) : (
-                                                        <p className="text-sm">{String(q.correctAnswer)}</p>
-                                                    )}
-                                                </div>
-                                                {q.explanation && (
-                                                    <div>
-                                                        <h4 className="font-bold text-sm mb-2 text-primary">General Explanation</h4>
-                                                        <p className="text-sm text-muted-foreground">{q.explanation}</p>
-                                                    </div>
-                                                )}
-                                            </CardContent>
-                                        </Card>
+                            </section>
+                        )}
+                        
+                        {activeChapter?.resources && activeChapter.resources.length > 0 && (
+                            <section id="resources">
+                                <h2 className="font-headline text-3xl font-bold mb-6">Additional Resources</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {activeChapter.resources.map(res => (
+                                        <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3 bg-slate-800 border-slate-700 hover:bg-slate-700" onClick={() => handleResourceClick(res)}>
+                                            {getResourceIcon(res.type)}
+                                            <span className="flex-grow text-left text-white">{res.title}</span>
+                                        </Button>
                                     ))}
                                 </div>
-                            )}
+                            </section>
+                        )}
 
-                             {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
-                                <div className="mt-12">
-                                    <h2 className="font-headline text-2xl font-bold mb-4">Practice Sets</h2>
-                                    <div className="space-y-4">
-                                        {activeChapter.practiceSets.map(ps => (
-                                             <Link key={ps.id} href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}`}>
-                                                <div className="p-4 border rounded-lg hover:bg-accent flex justify-between items-center">
-                                                    <span className="font-semibold">{ps.title}</span>
-                                                    <Button size="sm">Start Practice</Button>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {(!activeChapter?.content && (!activeChapter?.textbookQuestions || activeChapter.textbookQuestions.length === 0) && (!activeChapter?.practiceSets || activeChapter.practiceSets.length === 0)) && (
-                                <div className="text-center text-muted-foreground pt-16">
-                                    <BookOpen className="w-16 h-16 mx-auto mb-4"/>
-                                    <h2 className="text-xl font-semibold">Select a topic</h2>
-                                    <p>Choose a topic from the sidebar to view its specific content.</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </main>
-                <aside className="hidden lg:block p-6 border-l">
-                   <div className="sticky top-20">
-                        <h3 className="font-semibold mb-4">On This Page</h3>
-                         {headings.length > 0 ? (
-                            <ul className="space-y-2">
-                            {headings.map((heading) => (
-                                <li key={heading.id}>
-                                <a
-                                    href={`#${heading.id}`}
-                                    className="text-sm text-muted-foreground hover:text-foreground"
-                                    style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
-                                >
-                                    {heading.text}
-                                </a>
-                                </li>
-                            ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">No sections found.</p>
+                        {(!activeTopic && topics[chapterId]?.length > 0) && (
+                            <div className="text-center text-slate-400 pt-16">
+                                <BookOpen className="w-16 h-16 mx-auto mb-4"/>
+                                <h2 className="text-xl font-semibold">Select a topic</h2>
+                                <p>Choose a topic from the sidebar to view its specific content.</p>
+                            </div>
                         )}
                     </div>
-                </aside>
+                </main>
             </div>
             
             <ResourceViewerDialog 
@@ -634,3 +523,4 @@ export default function ChapterClientPage() {
         </div>
     );
 }
+
