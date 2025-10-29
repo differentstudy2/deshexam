@@ -11,9 +11,42 @@ interface PracticeSetPDFProps {
     topicTitle: string;
 }
 
+const Watermark = () => (
+    <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: -1,
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+    }}>
+        {Array.from({ length: 50 }).map((_, i) => (
+            <div key={i} style={{
+                color: 'rgba(0, 0, 0, 0.05)',
+                fontSize: '48px',
+                fontWeight: 'bold',
+                transform: 'rotate(-30deg)',
+                whiteSpace: 'nowrap',
+                padding: '50px',
+                userSelect: 'none',
+            }}>
+                DeshExam
+            </div>
+        ))}
+    </div>
+);
+
+
 export const PracticeSetPDF = ({ practiceSet, questions, textbookTitle, chapterTitle, topicTitle }: PracticeSetPDFProps) => {
     return (
-        <div style={{ fontFamily: 'sans-serif', padding: '20px', color: '#333' }}>
+        <div style={{ fontFamily: 'sans-serif', padding: '20px', color: '#333', position: 'relative' }}>
+            <Watermark />
             <h1 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '10px' }}>{textbookTitle}</h1>
             <h2 style={{ fontSize: '20px', textAlign: 'center', marginBottom: '10px' }}>{chapterTitle}</h2>
             <h3 style={{ fontSize: '18px', textAlign: 'center', marginBottom: '10px' }}>{topicTitle}</h3>
@@ -65,22 +98,13 @@ export const PracticeSetPDF = ({ practiceSet, questions, textbookTitle, chapterT
 
             <div style={{ pageBreakBefore: 'always', paddingTop: '20px' }}>
                 <h2 style={{ fontSize: '20px', textAlign: 'center', marginBottom: '20px' }}>Answer Key</h2>
-                <ol style={{ paddingLeft: '20px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 20px', justifyContent: 'center' }}>
                     {questions.map((q, index) => (
-                        <li key={`ans-${q.id}`} style={{ marginBottom: '15px' }}>
-                            <p><strong>Answer {index + 1}:</strong></p>
-                            {q.type === 'Matching' ? (
-                                <ul style={{ listStyleType: 'none', paddingLeft: '10px' }}>
-                                    {Array.isArray(q.correctAnswer) && q.correctAnswer.map((pair: any, pairIndex: number) => (
-                                        <li key={pairIndex}>{pair.a} → {pair.b}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>{q.correctAnswer}</p>
-                            )}
-                        </li>
+                        <div key={`ans-${q.id}`} style={{ marginBottom: '5px' }}>
+                           <span style={{ fontWeight: 'bold' }}>{index + 1}.</span> {q.correctAnswer}
+                        </div>
                     ))}
-                </ol>
+                </div>
             </div>
         </div>
     );
