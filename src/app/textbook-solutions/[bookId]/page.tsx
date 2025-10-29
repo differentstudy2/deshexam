@@ -33,12 +33,14 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
   const featureImage = textbook.featureImage || `https://picsum.photos/seed/${bookId}/1200/630`;
 
+  const newTitle = `${textbook.title} | Solution, Mock Test, Practice Set, Exam Free`;
+
   return {
-    title: textbook.title,
+    title: newTitle,
     description: textbook.description || `Solutions and practice sets for the ${textbook.title} textbook.`,
     keywords,
     openGraph: {
-      title: textbook.title,
+      title: newTitle,
       description: textbook.description,
       images: [featureImage, ...previousImages],
       type: 'article',
