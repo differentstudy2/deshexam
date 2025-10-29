@@ -73,7 +73,7 @@ const SidebarNav = ({
           {chapters.map((chapter, index) => (
             <AccordionItem value={chapter.id} key={chapter.id}>
               <AccordionTrigger
-                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
+                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md justify-start"
               >
                  <div className="flex items-center gap-3">
                     <ChapterIcon />
