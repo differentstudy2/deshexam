@@ -11,11 +11,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { getTopicsByChapterId, getPracticeSetsByTopicId, getAllContent, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
@@ -29,6 +29,8 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 import Image from 'next/image';
+import { usePageData } from './use-page-data';
+
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -46,7 +48,7 @@ const ChapterIcon = () => (
 
 const SidebarNav = ({
   chapters,
-  topics,
+  topicsByChapter,
   activeChapterId,
   activeTopicId,
   onChapterToggle,
@@ -55,7 +57,7 @@ const SidebarNav = ({
   exams,
 }: {
   chapters: Chapter[];
-  topics: { [key: string]: Topic[] };
+  topicsByChapter: { [key: string]: Topic[] };
   activeChapterId: string | null;
   activeTopicId: string | null;
   onChapterToggle: (chapterId: string) => void;
@@ -80,7 +82,7 @@ const SidebarNav = ({
                     <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
                 ) : (
                     <ul className="space-y-1 pl-4 border-l">
-                     {(topics[chapter.id] || []).map(topic => (
+                     {(topicsByChapter[chapter.id] || []).map(topic => (
                        <li key={topic.id}>
                          <Button
                            variant="ghost"
@@ -97,7 +99,7 @@ const SidebarNav = ({
                          </Button>
                        </li>
                      ))}
-                     {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
+                     {(!topicsByChapter[chapter.id] || topicsByChapter[chapter.id].length === 0) && (
                         <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
                      )}
                    </ul>
@@ -138,19 +140,23 @@ const SidebarNav = ({
 
 export default function TopicClientPage() {
     const params = useParams();
-    const router = useRouter();
     const { toast } = useToast();
+
+    const { 
+        loading, 
+        textbook, 
+        chapters, 
+        activeChapter, 
+        activeTopic, 
+        exams, 
+        error 
+    } = usePageData();
     
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
     const topicId = params.topicId as string;
-
-    const [textbook, setTextbook] = useState<Textbook | null>(null);
-    const [chapters, setChapters] = useState<Chapter[]>([]);
-    const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
-    const [activeTopic, setActiveTopic] = useState<Topic | null>(null);
     
-    const [loading, setLoading] = useState(true);
+    const [topicsByChapter, setTopicsByChapter] = useState<{ [chapterId: string]: Topic[] }>({});
     const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
     
     const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -159,14 +165,12 @@ export default function TopicClientPage() {
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
     const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
-    const [exams, setExams] = useState<any[]>([]);
-
 
     useEffect(() => {
       if (activeTopic?.content) {
         const idMap = new Map();
         const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
-        const newHeadings = Array.from(matches).map((match, index) => {
+        const newHeadings = Array.from(matches).map((match) => {
           const level = match[1].length;
           const text = match[2];
           const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
@@ -188,73 +192,23 @@ export default function TopicClientPage() {
     }, [activeTopic]);
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
-        if (!cId || topics[cId]) return; 
+        if (!cId || topicsByChapter[cId]) return; 
         setLoadingTopics(cId);
         try {
             const topicsData = await getTopicsByChapterId(textbookId, cId);
-            setTopics(prev => ({ ...prev, [cId]: topicsData }));
+            setTopicsByChapter(prev => ({ ...prev, [cId]: topicsData }));
         } catch (e) {
             toast({ variant: "destructive", title: "Error loading topics", description: (e as Error).message });
         } finally {
             setLoadingTopics(null);
         }
-    }, [textbookId, topics, toast]);
-    
-    const fetchPageData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const [textbookSnap, chaptersQuerySnap, allExams] = await Promise.all([
-                getDoc(doc(db, 'textbooks', textbookId)),
-                getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
-                getAllContent("Exam"),
-            ]);
-
-            if (textbookSnap.exists()) {
-                setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
-            }
-
-            const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
-            chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-            setChapters(chaptersData);
-            setExams(allExams.filter((exam: any) => exam.textbookId === textbookId));
-
-            if (chapterId) {
-                const topicsData = await getTopicsByChapterId(textbookId, chapterId);
-                const practiceSetsPromises = topicsData.map(t => getPracticeSetsByTopicId(textbookId, chapterId, t.id));
-                const practiceSetsArrays = await Promise.all(practiceSetsPromises);
-                
-                const topicsWithDetails = await Promise.all(topicsData.map(async (t, index) => {
-                    const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, t.id);
-                    const topicSnap = await getDoc(topicRef);
-                    const fullTopicData = topicSnap.exists() ? topicSnap.data() as Topic : {};
-                    return {
-                        ...t,
-                        ...fullTopicData, // This will include content and resources
-                        practiceSets: practiceSetsArrays[index]
-                    };
-                }));
-
-                setTopics(prev => ({ ...prev, [chapterId]: topicsWithDetails }));
-                
-                const currentTopic = topicsWithDetails.find(t => t.id === topicId);
-
-                if (currentTopic) {
-                    setActiveTopic(currentTopic);
-                } else if(topicsWithDetails.length > 0 && !topicId) {
-                    router.replace(`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicsWithDetails[0].id}`);
-                }
-            }
-
-        } catch (e) {
-            toast({ variant: "destructive", title: "Error loading data", description: (e as Error).message });
-        } finally {
-            setLoading(false);
-        }
-    }, [textbookId, chapterId, topicId, toast, router]);
+    }, [textbookId, topicsByChapter, toast]);
 
     useEffect(() => {
-        fetchPageData();
-    }, [fetchPageData]);
+        if (chapterId && !topicsByChapter[chapterId]) {
+            fetchChapterTopics(chapterId);
+        }
+    }, [chapterId, topicsByChapter, fetchChapterTopics]);
     
     const handleResourceClick = (resource: Resource) => {
         setViewerResource(resource);
@@ -268,7 +222,6 @@ export default function TopicClientPage() {
             const questions = await getQuestionsByPracticeSet(textbookId, chapterId, activeTopic.id, practiceSet.id);
             setPdfContent({ practiceSet, questions });
 
-            // Allow time for the PDF content to render in the hidden div
             setTimeout(async () => {
                 const pdfElement = document.getElementById('pdf-content');
                 if (pdfElement) {
@@ -315,9 +268,11 @@ export default function TopicClientPage() {
     if (loading) {
         return <div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>;
     }
-    
-    const activeChapter = chapters.find(c => c.id === chapterId);
 
+    if (error) {
+        return <div className="text-center py-10 text-destructive">{error}</div>;
+    }
+    
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
@@ -329,7 +284,7 @@ export default function TopicClientPage() {
          <div className="p-2">
             <SidebarNav 
                 chapters={chapters}
-                topics={topics}
+                topicsByChapter={topicsByChapter}
                 activeChapterId={chapterId}
                 activeTopicId={topicId}
                 onChapterToggle={fetchChapterTopics}
@@ -544,4 +499,3 @@ export default function TopicClientPage() {
         </div>
     );
 }
-
