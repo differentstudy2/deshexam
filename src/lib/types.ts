@@ -38,6 +38,8 @@ export type Topic = {
     content?: string;
     practiceSets?: PracticeSet[];
     resources?: Resource[];
+    featureImage?: string;
+    pdfUrl?: string;
 };
 
 export type PracticeSet = {

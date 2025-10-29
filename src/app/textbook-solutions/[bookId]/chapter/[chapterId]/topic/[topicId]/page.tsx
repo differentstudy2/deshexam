@@ -28,6 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
+import Image from 'next/image';
 
 const getResourceIcon = (type: string) => {
     switch(type) {
@@ -320,7 +321,7 @@ function TopicPageContent() {
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []),
+        ...(activeChapter ? [{ name: activeChapter.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` }] : []),
         ...(activeTopic ? [{ name: activeTopic.title, href: `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}` }] : []),
     ];
 
@@ -392,9 +393,32 @@ function TopicPageContent() {
 
                     {activeTopic ? (
                         <div>
-                            <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
+                             <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
+                                <div className="absolute inset-0 z-0">
+                                    <Image 
+                                        src={activeTopic?.featureImage || activeChapter?.featureImage || '/image/logo.png'}
+                                        alt={activeTopic?.title || 'Topic background'}
+                                        fill
+                                        className="object-cover opacity-20"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
+                                </div>
+                                <div className="relative z-20">
+                                    <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
+                                    {activeTopic?.pdfUrl && (
+                                        <div className="mt-4">
+                                            <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
+                                                <a href={activeTopic.pdfUrl} target="_blank" rel="noopener noreferrer">
+                                                    <FileText className="mr-2" /> View Topic PDF
+                                                </a>
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            </header>
+                            
                             {activeTopic.content && (
-                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-6">
+                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-8">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeTopic.content}</ReactMarkdown>
                                 </article>
                             )}
@@ -525,5 +549,3 @@ function TopicPageContent() {
 export default function TopicPage() {
     return <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin"/></div>}><TopicPageContent /></Suspense>
 }
-
-    

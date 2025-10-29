@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -54,6 +53,7 @@ import type { AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-q
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ImageUploader } from '@/components/feature/image-uploader';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -85,7 +85,7 @@ export default function ManageTopicsPage() {
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [newTopic, setNewTopic] = useState<{ title: string, content: string, resources: Resource[] }>({ title: '', content: '', resources: [] });
+  const [newTopic, setNewTopic] = useState<{ title: string, content: string, resources: Resource[], featureImage?: string, pdfUrl?: string }>({ title: '', content: '', resources: [], featureImage: '', pdfUrl: '' });
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
   const [topicToDelete, setTopicToDelete] = useState<Topic | null>(null);
@@ -98,6 +98,7 @@ export default function ManageTopicsPage() {
   const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const topicPdfFileRef = useRef<HTMLInputElement>(null);
 
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
   const [aiFiles, setAiFiles] = useState<File[]>([]);
@@ -154,7 +155,7 @@ export default function ManageTopicsPage() {
             await addTopicToChapter(textbookId, chapterId, newTopic);
             toast({ title: "Topic added successfully." });
         }
-        setNewTopic({ title: '', content: '', resources: [] });
+        setNewTopic({ title: '', content: '', resources: [], featureImage: '', pdfUrl: '' });
         fetchChapterAndTopics(); 
 
     } catch (error) {
@@ -168,12 +169,12 @@ export default function ManageTopicsPage() {
 
   const handleEditClick = (topic: Topic) => {
     setEditingTopic(topic);
-    setNewTopic({ title: topic.title, content: topic.content || '', resources: topic.resources || [] });
+    setNewTopic({ title: topic.title, content: topic.content || '', resources: topic.resources || [], featureImage: topic.featureImage || '', pdfUrl: topic.pdfUrl || '' });
   };
   
   const handleCancelEdit = () => {
     setEditingTopic(null);
-    setNewTopic({ title: '', content: '', resources: [] });
+    setNewTopic({ title: '', content: '', resources: [], featureImage: '', pdfUrl: '' });
   }
   
   const handleDeleteClick = (topic: Topic) => {
@@ -238,14 +239,18 @@ export default function ManageTopicsPage() {
     setResourceToDelete(null);
   }
   
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'pdfUrl') => {
     const file = e.target.files?.[0];
     if (file) {
         setIsUploading(true);
         try {
             const downloadURL = await uploadFile(file);
-            setNewResource(prev => ({...prev, url: downloadURL}));
-            toast({ title: 'File uploaded!', description: 'URL has been set. Click Save.' });
+            if(fieldToUpdate === 'pdfUrl') {
+                setNewTopic(prev => ({ ...prev, pdfUrl: downloadURL }));
+            } else {
+                 setNewResource(prev => ({...prev, url: downloadURL}));
+            }
+            toast({ title: 'File uploaded!', description: 'URL has been set.' });
         } catch (error) {
             toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
         } finally {
@@ -419,8 +424,26 @@ export default function ManageTopicsPage() {
                     />
                 </div>
                 <div className="space-y-2">
+                    <Label>Feature Image</Label>
+                    <ImageUploader fieldName="featureImage" onUrlChange={(url) => setNewTopic(prev => ({ ...prev, featureImage: url }))} value={newTopic.featureImage} />
+                </div>
+                <div className="space-y-2">
+                    <Label>Topic PDF</Label>
+                     <div className="flex items-center gap-2">
+                         <Input 
+                            placeholder="PDF URL or upload a file" 
+                            value={newTopic.pdfUrl} 
+                            onChange={(e) => setNewTopic(prev => ({...prev, pdfUrl: e.target.value}))}
+                        />
+                         <Button type="button" variant="outline" size="icon" onClick={() => topicPdfFileRef.current?.click()}>
+                            <Upload className="w-4 h-4"/>
+                         </Button>
+                         <Input type="file" className="hidden" ref={topicPdfFileRef} onChange={(e) => handleFileUpload(e, 'pdfUrl')} accept=".pdf"/>
+                     </div>
+                </div>
+                <div className="space-y-2">
                      <div className="flex justify-between items-center">
-                        <Label htmlFor="topic-content">Topic Content (Markdown)</Label>
+                        <Label htmlFor="topic-content">Topic Content</Label>
                         <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button type="button" variant="outline" size="sm">
@@ -439,7 +462,7 @@ export default function ManageTopicsPage() {
                                     <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                     <p>Click to upload or add files</p>
                                 </div>
-                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*" multiple />
+                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf" multiple />
                                 {aiFiles.length > 0 && (
                                     <ScrollArea className="h-32 w-full rounded-md border p-2">
                                         <ul className="text-sm text-muted-foreground space-y-2">
@@ -678,7 +701,7 @@ export default function ManageTopicsPage() {
                                 {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
                              </Button>
                         </div>
-                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                        <Input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'resources')} className="hidden" />
                     </div>
                 </div>
                 <DialogFooter>
