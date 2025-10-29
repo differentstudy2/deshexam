@@ -25,7 +25,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -46,6 +46,15 @@ import { getTopicsByChapterId, addTopicToChapter, updateTopic, uploadFile } from
 import { Dialog, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Separator } from "@/components/ui/separator";
+import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
+import { generateSummary } from '@/ai/flows/ai-summary-generator';
+import { generateTextbookQuestions } from '@/ai/flows/ai-textbook-question-generator';
+import type { AISummaryGeneratorOutput } from '@/ai/flows/ai-summary-generator';
+import type { AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-question-generator';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -89,6 +98,18 @@ export default function ManageTopicsPage() {
   const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+  const [aiFiles, setAiFiles] = useState<File[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const aiFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [generatedSummary, setGeneratedSummary] = useState<AISummaryGeneratorOutput | null>(null);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [generatedQuestions, setGeneratedQuestions] = useState<AITextbookQuestionGeneratorOutput['questions'] | null>(null);
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
 
   const fetchChapterAndTopics = useCallback(async () => {
@@ -233,6 +254,124 @@ export default function ManageTopicsPage() {
     }
   };
 
+  const handleAiFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setAiFiles(prevFiles => [...prevFiles, ...Array.from(e.target.files!)]);
+    }
+  };
+
+  const removeAiFile = (fileToRemove: File) => {
+    setAiFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
+  };
+
+  const handleAIGenerateContent = async () => {
+    if (aiFiles.length === 0) {
+        toast({ variant: "destructive", title: "No files selected" });
+        return;
+    }
+
+    setIsGenerating(true);
+    let combinedContent = newTopic.content || '';
+
+    try {
+        for (const file of aiFiles) {
+            const pageDataUri = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = error => reject(error);
+            });
+            
+            const result = await solvedTextbookPageAssistant({ pageDataUri });
+            combinedContent += (combinedContent ? '\n\n---\n\n' : '') + result.content;
+            
+            setNewTopic(prev => ({...prev, content: combinedContent}));
+        }
+        
+        toast({ title: `Content Generated!`, description: `AI content from ${aiFiles.length} page(s) has been appended.` });
+        setIsAiDialogOpen(false);
+        setAiFiles([]);
+
+    } catch (error) {
+        toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    if (!newTopic.content) {
+        toast({ variant: "destructive", title: "Topic content is empty." });
+        return;
+    }
+    setIsGeneratingSummary(true);
+    setGeneratedSummary(null);
+    try {
+        const result = await generateSummary({ content: newTopic.content });
+        setGeneratedSummary(result);
+    } catch(error) {
+         toast({ variant: "destructive", title: "Summary Generation Failed", description: (error as Error).message });
+    } finally {
+        setIsGeneratingSummary(false);
+    }
+  }
+
+  const handleGenerateQuestions = async () => {
+    if (!newTopic.content) {
+        toast({ variant: "destructive", title: "Topic content is empty." });
+        return;
+    }
+    setIsGeneratingQuestions(true);
+    setGeneratedQuestions(null);
+    try {
+        const result: AITextbookQuestionGeneratorOutput = await generateTextbookQuestions({ 
+            numQuestions: numQuestions,
+            sourceText: newTopic.content,
+            questionTypes: questionTypes as any,
+        });
+        setGeneratedQuestions(result.questions);
+    } catch(error) {
+         toast({ variant: "destructive", title: "Question Generation Failed", description: (error as Error).message });
+    } finally {
+        setIsGeneratingQuestions(false);
+    }
+  };
+
+  const handleUseSummary = () => {
+    if (!generatedSummary) return;
+    const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map((p: string) => `- ${p}`).join('\n')}`;
+    setNewTopic(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + summaryText }));
+    toast({ title: "Summary added to content!" });
+    setGeneratedSummary(null);
+  }
+
+  const handleUseQuestions = () => {
+    if (!generatedQuestions) return;
+    let questionsText = "\n\n## Practice Questions\n\n";
+    generatedQuestions.forEach((q, index) => {
+        questionsText += `**${index + 1}. ${q.text}**\n\n`;
+        if (q.type === 'Multiple Choice' && q.options) {
+            q.options.forEach((opt: { text: string; }) => {
+                questionsText += `- ${opt.text}\n`;
+            });
+            questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+        } else if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+            const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
+            questionsText += `\n> **Answer:**\n${pairs}\n`;
+        } else if (q.correctAnswer) {
+             questionsText += `> **Answer:** ${String(q.correctAnswer)}\n`;
+        }
+
+        if (q.explanation) {
+            questionsText += `\n> **Explanation:** ${q.explanation}\n`;
+        }
+        questionsText += "\n---\n\n";
+    });
+    setNewTopic(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + questionsText }));
+    toast({ title: "Questions added to content!" });
+    setGeneratedQuestions(null);
+  }
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -264,60 +403,183 @@ export default function ManageTopicsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>{editingTopic ? 'Edit Topic' : 'Add New Topic'}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="topic-title">Topic Title</Label>
-                <Input
-                id="topic-title"
-                placeholder="e.g., 1.1 Electric Charge"
-                value={newTopic.title}
-                onChange={(e) => setNewTopic({...newTopic, title: e.target.value})}
-                />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="topic-content">Topic Content (Markdown)</Label>
-                <Textarea
-                id="topic-content"
-                placeholder="Add the main educational content. You can use Markdown."
-                value={newTopic.content || ''}
-                onChange={(e) => setNewTopic({...newTopic, content: e.target.value})}
-                className="min-h-[200px]"
-                />
-            </div>
-            <Separator />
-            <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                     <Label>Additional Resources</Label>
-                     <Button type="button" variant="outline" size="sm" onClick={() => openResourceDialog(null)}>
-                         <PlusCircle className="mr-2 h-4 w-4" /> Add
-                    </Button>
+        <div className="lg:col-span-1 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingTopic ? 'Edit Topic' : 'Add New Topic'}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="topic-title">Topic Title</Label>
+                    <Input
+                    id="topic-title"
+                    placeholder="e.g., 1.1 Electric Charge"
+                    value={newTopic.title}
+                    onChange={(e) => setNewTopic({...newTopic, title: e.target.value})}
+                    />
                 </div>
                 <div className="space-y-2">
-                    {newTopic.resources.map(res => (
-                        <ResourceItem 
-                            key={res.id} 
-                            resource={res} 
-                            onEdit={() => openResourceDialog(res)}
-                            onDelete={() => setResourceToDelete(res)}
-                        />
-                    ))}
-                    {newTopic.resources.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">No resources added.</p>}
+                     <div className="flex justify-between items-center">
+                        <Label htmlFor="topic-content">Topic Content (Markdown)</Label>
+                        <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button type="button" variant="outline" size="sm">
+                                    <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
+                                </Button>
+                            </DialogTrigger>
+                             <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Generate Content from Page(s)</DialogTitle>
+                                    <DialogDescription>Upload one or more images of textbook pages to automatically generate content.</DialogDescription>
+                                </DialogHeader>
+                                <div 
+                                    className="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                                    onClick={() => aiFileInputRef.current?.click()}
+                                >
+                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                    <p>Click to upload or add files</p>
+                                </div>
+                                <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*" multiple />
+                                {aiFiles.length > 0 && (
+                                    <ScrollArea className="h-32 w-full rounded-md border p-2">
+                                        <ul className="text-sm text-muted-foreground space-y-2">
+                                            {aiFiles.map((file, index) => (
+                                                <li key={index} className="flex items-center justify-between">
+                                                    <span className="truncate pr-2">{file.name}</span>
+                                                    <Button variant="ghost" size="sm" onClick={() => removeAiFile(file)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </ScrollArea>
+                                )}
+                                <DialogFooter>
+                                    <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || aiFiles.length === 0}>
+                                        {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                    <Textarea
+                    id="topic-content"
+                    placeholder="Add the main educational content. You can use Markdown."
+                    value={newTopic.content || ''}
+                    onChange={(e) => setNewTopic({...newTopic, content: e.target.value})}
+                    className="min-h-[200px]"
+                    />
                 </div>
-            </div>
-             <div className="flex gap-2">
-              <Button onClick={handleAddOrUpdateTopic}>
-                {editingTopic ? 'Update Topic' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Topic</>}
-              </Button>
-              {editingTopic && (
-                <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                <Separator />
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                         <Label>Additional Resources</Label>
+                         <Button type="button" variant="outline" size="sm" onClick={() => openResourceDialog(null)}>
+                             <PlusCircle className="mr-2 h-4 w-4" /> Add
+                        </Button>
+                    </div>
+                    <div className="space-y-2">
+                        {newTopic.resources.map(res => (
+                            <ResourceItem 
+                                key={res.id} 
+                                resource={res} 
+                                onEdit={() => openResourceDialog(res)}
+                                onDelete={() => setResourceToDelete(res)}
+                            />
+                        ))}
+                        {newTopic.resources.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">No resources added.</p>}
+                    </div>
+                </div>
+                 <div className="flex gap-2">
+                  <Button onClick={handleAddOrUpdateTopic}>
+                    {editingTopic ? 'Update Topic' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Topic</>}
+                  </Button>
+                  {editingTopic && (
+                    <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><BrainCircuit className="text-primary"/> AI Content Tools</CardTitle>
+                    <CardDescription>Generate summaries and questions based on the topic content above.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="summary">
+                            <AccordionTrigger>Generate Summary</AccordionTrigger>
+                            <AccordionContent className="pt-4 space-y-4">
+                               <Button onClick={handleGenerateSummary} disabled={isGeneratingSummary || !newTopic.content} className="w-full">
+                                    {isGeneratingSummary ? <Loader2 className="animate-spin"/> : "Generate Summary & Key Points"}
+                                </Button>
+                                {generatedSummary && (
+                                    <div className="space-y-4 border-t pt-4">
+                                        <div>
+                                            <h4 className="font-semibold">Generated Summary:</h4>
+                                            <p className="text-sm text-muted-foreground">{generatedSummary.summary}</p>
+                                        </div>
+                                         <div>
+                                            <h4 className="font-semibold">Key Points:</h4>
+                                            <ul className="list-disc list-inside text-sm text-muted-foreground">
+                                                {generatedSummary.keyPoints.map((pt: string, i: number) => <li key={i}>{pt}</li>)}
+                                            </ul>
+                                        </div>
+                                        <Button variant="secondary" size="sm" onClick={handleUseSummary} className="w-full">Append to Topic Content</Button>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="questions">
+                            <AccordionTrigger>Generate Questions</AccordionTrigger>
+                            <AccordionContent className="pt-4 space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <Label htmlFor="num-questions" className="flex-shrink-0">Number of Questions:</Label>
+                                    <Input 
+                                        id="num-questions" 
+                                        type="number"
+                                        value={numQuestions}
+                                        onChange={(e) => setNumQuestions(Number(e.target.value))}
+                                        min="1"
+                                        max="10"
+                                        className="w-20"
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Question Types:</Label>
+                                     <div className="grid grid-cols-2 gap-2 mt-2">
+                                        {['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank'].map(type => (
+                                             <div key={type} className="flex items-center space-x-2">
+                                                <Checkbox 
+                                                    id={`type-${type}`}
+                                                    checked={questionTypes.includes(type)}
+                                                    onCheckedChange={(checked) => {
+                                                        checked ? setQuestionTypes(prev => [...prev, type]) : setQuestionTypes(prev => prev.filter(t => t !== type))
+                                                    }}
+                                                />
+                                                <label htmlFor={`type-${type}`} className="text-sm font-medium leading-none">{type}</label>
+                                             </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <Button onClick={handleGenerateQuestions} disabled={isGeneratingQuestions || !newTopic.content} className="w-full">
+                                    {isGeneratingQuestions ? <Loader2 className="animate-spin"/> : "Generate Questions"}
+                                </Button>
+                                {generatedQuestions && (
+                                    <div className="space-y-4 border-t pt-4">
+                                        <h4 className="font-semibold">Generated Questions:</h4>
+                                        <div className="text-sm text-muted-foreground space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md">
+                                            {generatedQuestions.map((q: any, i: number) => <p key={i}><strong>{i+1}.</strong> {q.text}</p>)}
+                                        </div>
+                                        <Button variant="secondary" size="sm" onClick={handleUseQuestions} className="w-full">Append Questions to Content</Button>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                     </Accordion>
+                </CardContent>
+            </Card>
+        </div>
+
 
         <div className="lg:col-span-2">
             <Card>
