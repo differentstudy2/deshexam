@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -87,7 +86,11 @@ export default function ManageChapterPracticeSetsPage() {
 
     const handleOpenDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
-        setPracticeSetData(ps ? { title: ps.title, difficulty: ps.difficulty || ['Medium'], questionSource: ps.questionSource || 'random-chapter' } : { title: '', difficulty: ['Medium'], questionSource: 'random-chapter'});
+        let difficultyArray = ps?.difficulty || ['Medium'];
+        if (typeof difficultyArray === 'string') {
+            difficultyArray = [difficultyArray as any];
+        }
+        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: ps.questionSource || 'random-chapter' } : { title: '', difficulty: ['Medium'], questionSource: 'random-chapter'});
         setIsDialogOpen(true);
     };
 
@@ -168,11 +171,13 @@ export default function ManageChapterPracticeSetsPage() {
                 <CardContent>
                     {practiceSets.length > 0 ? (
                         <ul className="space-y-2">
-                            {practiceSets.map(ps => (
+                            {practiceSets.map(ps => {
+                                const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty].filter(Boolean);
+                                return (
                                 <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
                                     <div className="flex-grow flex items-center gap-2 flex-wrap">
                                         <span className="font-medium">{ps.title}</span>
-                                        {ps.difficulty?.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
+                                        {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
                                         {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0">
@@ -189,7 +194,7 @@ export default function ManageChapterPracticeSetsPage() {
                                         </Button>
                                     </div>
                                 </li>
-                            ))}
+                            )})}
                         </ul>
                     ) : (
                         <p className="text-muted-foreground text-center py-8">No practice sets created for this chapter yet.</p>

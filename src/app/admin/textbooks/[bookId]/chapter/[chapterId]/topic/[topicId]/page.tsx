@@ -1,9 +1,8 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Topic, PracticeSet, Resource } from '@/lib/types';
@@ -51,6 +50,7 @@ export default function ManageTopicPage() {
         difficulty: ['Medium'],
         questionSource: 'random-topic'
     });
+    const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
     const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
@@ -114,7 +114,12 @@ export default function ManageTopicPage() {
 
     const handleOpenPracticeSetDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
-        setPracticeSetData(ps ? { title: ps.title, difficulty: ps.difficulty || ['Medium'], questionSource: ps.questionSource || 'random-topic' } : { title: '', difficulty: ['Medium'], questionSource: 'random-topic'});
+        let difficultyArray = ps?.difficulty || ['Medium'];
+        if (typeof difficultyArray === 'string') {
+            difficultyArray = [difficultyArray as any];
+        }
+
+        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: ps.questionSource || 'random-topic' } : { title: '', difficulty: ['Medium'], questionSource: 'random-topic'});
         setIsPracticeSetDialogOpen(true);
     }
 
@@ -141,6 +146,19 @@ export default function ManageTopicPage() {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
         }
     }
+    
+    const handleDeletePracticeSet = async (ps: PracticeSet) => {
+        try {
+            const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, ps.id);
+            await deleteDoc(psRef);
+            toast({ title: 'Practice Set Deleted' });
+            setPracticeSets(prev => prev.filter(p => p.id !== ps.id));
+        } catch (error) {
+             toast({ variant: 'destructive', title: 'Error deleting practice set', description: (error as Error).message });
+        } finally {
+            setPracticeSetToDelete(null);
+        }
+    };
 
     const handleOpenResourceDialog = (resource: Resource | null) => {
         setEditingResource(resource);
@@ -231,25 +249,13 @@ export default function ManageTopicPage() {
         }
     };
 
-    const groupedResources = (topic?.resources || []).reduce((acc, resource) => {
-        const type = resource.type;
-        if (!acc[type]) {
-            acc[type] = [];
-        }
-        acc[type].push(resource);
-        return acc;
-    }, {} as { [key: string]: Resource[] });
-
-    const resourceOrder: ('video' | 'audio' | 'pdf' | 'doc')[] = ['video', 'audio', 'pdf', 'doc'];
-
-
     if (loading) return <div className="flex items-center justify-center h-full">Loading...</div>
 
     return (
         <div className="space-y-6">
             <div>
                 <Button variant="ghost" asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}`}>
+                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topics`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Topics
                     </Link>
@@ -278,26 +284,16 @@ export default function ManageTopicPage() {
                                     ) : (
                                         <>
                                             {(topic?.resources && topic.resources.length > 0) ? (
-                                                <div className="space-y-4">
-                                                    <h3 className="font-semibold text-lg">Additional Resources</h3>
-                                                    {resourceOrder.map(type => (
-                                                        groupedResources[type] && (
-                                                            <div key={type}>
-                                                                <h4 className="font-semibold text-md mb-2 capitalize">{type}s</h4>
-                                                                <ul className="space-y-2">
-                                                                    {groupedResources[type].map(res => (
-                                                                        <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
-                                                                            {getResourceIcon(res.type)}
-                                                                            <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
-                                                                            <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
-                                                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )
+                                                 <ul className="space-y-2">
+                                                    {topic.resources.map(res => (
+                                                        <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
+                                                            {getResourceIcon(res.type)}
+                                                            <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
+                                                            <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
+                                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
+                                                        </li>
                                                     ))}
-                                                </div>
+                                                </ul>
                                             ) : (
                                                 <p className="text-muted-foreground text-center py-8">No resources added yet.</p>
                                             )}
@@ -320,30 +316,33 @@ export default function ManageTopicPage() {
                     <CardContent>
                         {practiceSets.length > 0 ? (
                             <ul className="space-y-2">
-                                {practiceSets.map(ps => (
-                                    <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                        <div className="flex-grow flex items-center gap-2 flex-wrap">
-                                            <span className="font-medium">{ps.title}</span>
-                                            {ps.difficulty?.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                            {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
-                                        </div>
-                                        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-                                            <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
-                                                    Manage Questions
-                                                </Link>
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
-                                                <Edit className="mr-2 h-4 w-4" /> Edit
-                                            </Button>
-                                            <Button variant="ghost" size="sm" asChild>
-                                                <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`} target="_blank">
-                                                    <BookOpen className="mr-2 h-4 w-4"/> Preview
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    </li>
-                                ))}
+                                {practiceSets.map(ps => {
+                                    const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty].filter(Boolean);
+                                    return (
+                                        <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
+                                            <div className="flex-grow flex items-center gap-2 flex-wrap">
+                                                <span className="font-medium">{ps.title}</span>
+                                                {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
+                                                {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
+                                            </div>
+                                            <div className="flex gap-2 flex-shrink-0">
+                                                <Button variant="outline" size="sm" asChild>
+                                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
+                                                        Manage Questions
+                                                    </Link>
+                                                </Button>
+                                                 <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
+                                                    <Edit className="mr-2 h-4 w-4" /> Edit
+                                                </Button>
+                                                <Button variant="ghost" size="sm" asChild>
+                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`} target="_blank">
+                                                        <BookOpen className="mr-2 h-4 w-4"/> Preview
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </li>
+                                    )
+                                })}
                             </ul>
                         ) : (
                             <p className="text-muted-foreground text-center py-8">No practice sets created for this topic yet.</p>
@@ -402,6 +401,21 @@ export default function ManageTopicPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            
+            <AlertDialog open={!!practiceSetToDelete} onOpenChange={() => setPracticeSetToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete the practice set "{practiceSetToDelete?.title}" and all of its questions. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeletePracticeSet(practiceSetToDelete!)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
              <Dialog open={isResourceDialogOpen} onOpenChange={setIsResourceDialogOpen}>
                 <DialogContent>
