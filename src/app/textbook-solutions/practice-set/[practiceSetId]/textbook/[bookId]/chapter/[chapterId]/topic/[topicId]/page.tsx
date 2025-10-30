@@ -43,8 +43,9 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { practiceSet, textbook, chapter, topic } = await getPageData(params);
+export async function generateMetadata({ params, searchParams }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+  const awaitedParams = await params;
+  const { textbook, chapter, topic, practiceSet } = await getPageData(awaitedParams);
 
   if (!practiceSet || !textbook || !chapter) {
     return {
@@ -73,13 +74,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 
 export default async function PracticeSetPage({ params }: PageProps) {
-    const { practiceSet, textbook, chapter, topic } = await getPageData(params);
+    const awaitedParams = await params;
+    const { practiceSet, textbook, chapter, topic } = await getPageData(awaitedParams);
     
     if (!practiceSet || !textbook || !chapter) {
         notFound();
     }
     
-    const questions = await getQuestionsByPracticeSet(params.bookId, params.chapterId, params.topicId === 'null' ? null : params.topicId, params.practiceSetId);
+    const questions = await getQuestionsByPracticeSet(awaitedParams.bookId, awaitedParams.chapterId, awaitedParams.topicId === 'null' ? null : awaitedParams.topicId, awaitedParams.practiceSetId);
 
     // Helper function to serialize Firestore Timestamps
     const serializeFirestoreTimestamps = (data: any) => {
@@ -130,4 +132,3 @@ export default async function PracticeSetPage({ params }: PageProps) {
 
 // Define the type for the initialTest prop
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
-
