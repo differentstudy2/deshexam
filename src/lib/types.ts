@@ -1,4 +1,5 @@
 
+
 export type Resource = {
     id: string;
     type: 'video' | 'audio' | 'pdf' | 'doc';
@@ -46,6 +47,8 @@ export type PracticeSet = {
     id: string;
     title: string;
     duration?: number;
+    difficulty?: 'Easy' | 'Medium' | 'Hard';
+    questionSource?: 'random-chapter' | 'random-topic' | 'exercise';
 };
 
 export type Solution = {

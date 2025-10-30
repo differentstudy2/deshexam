@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -25,6 +26,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 export default function ManageChapterPracticeSetsPage() {
     const params = useParams();
@@ -40,7 +43,11 @@ export default function ManageChapterPracticeSetsPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
-    const [practiceSetTitle, setPracticeSetTitle] = useState('');
+    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: 'Easy' | 'Medium' | 'Hard', questionSource: 'random-chapter' | 'random-topic' | 'exercise'}>({
+        title: '',
+        difficulty: 'Medium',
+        questionSource: 'random-chapter'
+    });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
     useEffect(() => {
@@ -77,30 +84,29 @@ export default function ManageChapterPracticeSetsPage() {
 
     const handleOpenDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
-        setPracticeSetTitle(ps ? ps.title : '');
+        setPracticeSetData(ps ? { title: ps.title, difficulty: ps.difficulty || 'Medium', questionSource: ps.questionSource || 'random-chapter' } : { title: '', difficulty: 'Medium', questionSource: 'random-chapter'});
         setIsDialogOpen(true);
     };
 
     const handleAddOrUpdate = async () => {
-        if (!practiceSetTitle.trim()) return;
+        if (!practiceSetData.title.trim()) return;
         
         const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`);
         
         try {
             if (editingPracticeSet) {
                 const psRef = doc(practiceSetsRef, editingPracticeSet.id);
-                await updateDoc(psRef, { title: practiceSetTitle });
+                await updateDoc(psRef, practiceSetData);
                 toast({ title: 'Practice Set Updated' });
             } else {
-                await addDoc(practiceSetsRef, { title: practiceSetTitle, createdAt: new Date() });
+                await addDoc(practiceSetsRef, { ...practiceSetData, createdAt: new Date() });
                 toast({ title: 'Practice Set Added' });
             }
 
-            setPracticeSetTitle('');
+            setPracticeSetData({ title: '', difficulty: 'Medium', questionSource: 'random-chapter' });
             setIsDialogOpen(false);
             setEditingPracticeSet(null);
             
-            // Refetch
             const practiceSetsSnap = await getDocs(practiceSetsRef);
             const sets = practiceSetsSnap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeSet));
             setPracticeSets(sets);
@@ -115,7 +121,6 @@ export default function ManageChapterPracticeSetsPage() {
 
         try {
             const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`, practiceSetToDelete.id);
-            // You might want to delete subcollections (like questions) here in a real app, possibly with a Cloud Function.
             await deleteDoc(psRef);
             toast({ title: 'Practice Set Deleted' });
             
@@ -159,7 +164,11 @@ export default function ManageChapterPracticeSetsPage() {
                         <ul className="space-y-2">
                             {practiceSets.map(ps => (
                                 <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                    <span className="font-medium flex-grow">{ps.title}</span>
+                                    <div className="flex-grow flex items-center gap-2">
+                                        <span className="font-medium">{ps.title}</span>
+                                        {ps.difficulty && <Badge variant="secondary">{ps.difficulty}</Badge>}
+                                        {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
+                                    </div>
                                     <div className="flex gap-2 flex-shrink-0">
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-set/${ps.id}`}>
@@ -187,9 +196,32 @@ export default function ManageChapterPracticeSetsPage() {
                     <DialogHeader>
                         <DialogTitle>{editingPracticeSet ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-2 py-4">
-                        <Label htmlFor="practice-set-title">Title</Label>
-                        <Input id="practice-set-title" value={practiceSetTitle} onChange={(e) => setPracticeSetTitle(e.target.value)} />
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="practice-set-title">Title</Label>
+                            <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({...prev, title: e.target.value}))} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Difficulty</Label>
+                             <Select value={practiceSetData.difficulty} onValueChange={(value) => setPracticeSetData(prev => ({...prev, difficulty: value as any}))}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Easy">Easy</SelectItem>
+                                    <SelectItem value="Medium">Medium</SelectItem>
+                                    <SelectItem value="Hard">Hard</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Question Source</Label>
+                            <Select value={practiceSetData.questionSource} onValueChange={(value) => setPracticeSetData(prev => ({...prev, questionSource: value as any}))}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="random-chapter">Random from Chapter</SelectItem>
+                                    <SelectItem value="exercise">Textbook Exercise Questions</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                     <DialogFooter>
                          <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>

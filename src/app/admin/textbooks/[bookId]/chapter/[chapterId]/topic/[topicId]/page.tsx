@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -43,7 +42,11 @@ export default function ManageTopicPage() {
 
     const [isPracticeSetDialogOpen, setIsPracticeSetDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
-    const [practiceSetTitle, setPracticeSetTitle] = useState('');
+    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: 'Easy' | 'Medium' | 'Hard', questionSource: 'random-chapter' | 'random-topic' | 'exercise'}>({
+        title: '',
+        difficulty: 'Medium',
+        questionSource: 'random-topic'
+    });
 
     const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
@@ -107,23 +110,23 @@ export default function ManageTopicPage() {
 
     const handleOpenPracticeSetDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
-        setPracticeSetTitle(ps ? ps.title : '');
+        setPracticeSetData(ps ? { title: ps.title, difficulty: ps.difficulty || 'Medium', questionSource: ps.questionSource || 'random-topic' } : { title: '', difficulty: 'Medium', questionSource: 'random-topic'});
         setIsPracticeSetDialogOpen(true);
     }
 
     const handleAddOrUpdatePracticeSet = async () => {
-        if (!practiceSetTitle.trim()) return;
+        if (!practiceSetData.title.trim()) return;
         try {
             if (editingPracticeSet) {
                 const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, editingPracticeSet.id);
-                await updateDoc(psRef, { title: practiceSetTitle });
+                await updateDoc(psRef, practiceSetData);
                 toast({ title: 'Practice Set Updated' });
             } else {
-                await addPracticeSetToTopic(textbookId, chapterId, topicId, { title: practiceSetTitle });
+                await addPracticeSetToTopic(textbookId, chapterId, topicId, practiceSetData);
                 toast({ title: 'Practice Set Added' });
             }
 
-            setPracticeSetTitle('');
+            setPracticeSetData({ title: '', difficulty: 'Medium', questionSource: 'random-topic'});
             setIsPracticeSetDialogOpen(false);
             setEditingPracticeSet(null);
             fetchData();
@@ -314,7 +317,8 @@ export default function ManageTopicPage() {
                                     <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
                                         <div className="flex-grow flex items-center gap-2">
                                             <span className="font-medium">{ps.title}</span>
-                                            {(ps as any).questionCount > 0 && <Badge variant="secondary">{(ps as any).questionCount} questions</Badge>}
+                                            {ps.difficulty && <Badge variant="secondary">{ps.difficulty}</Badge>}
+                                            {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                                             <Button variant="outline" size="sm" asChild>
@@ -347,9 +351,33 @@ export default function ManageTopicPage() {
                     <DialogHeader>
                         <DialogTitle>{editingPracticeSet ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-2 py-4">
-                        <Label htmlFor="practice-set-title">Title</Label>
-                        <Input id="practice-set-title" value={practiceSetTitle} onChange={(e) => setPracticeSetTitle(e.target.value)} />
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="practice-set-title">Title</Label>
+                            <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({ ...prev, title: e.target.value }))} />
+                        </div>
+                        <div className="space-y-2">
+                             <Label>Difficulty</Label>
+                            <Select value={practiceSetData.difficulty} onValueChange={(value) => setPracticeSetData(prev => ({...prev, difficulty: value as any}))}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Easy">Easy</SelectItem>
+                                    <SelectItem value="Medium">Medium</SelectItem>
+                                    <SelectItem value="Hard">Hard</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                             <Label>Question Source</Label>
+                            <Select value={practiceSetData.questionSource} onValueChange={(value) => setPracticeSetData(prev => ({...prev, questionSource: value as any}))}>
+                                <SelectTrigger><SelectValue/></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="random-topic">Random from Topic</SelectItem>
+                                    <SelectItem value="random-chapter">Random from Chapter</SelectItem>
+                                    <SelectItem value="exercise">Textbook Exercise Questions</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                     <DialogFooter>
                          <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
@@ -438,5 +466,3 @@ export default function ManageTopicPage() {
         </div>
     )
 }
-
-    
