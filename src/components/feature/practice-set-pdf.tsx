@@ -62,19 +62,6 @@ export const PracticeSetPDF = ({ practiceSet, questions, textbookTitle, chapterT
                     </div>
                 ))}
             </div>
-            
-            <hr style={{ margin: '30px 0' }} />
-
-            <div>
-                <h2 style={{ fontSize: '20px', textAlign: 'center', marginBottom: '20px' }}>Answer Key</h2>
-                <ol>
-                    {questions.map((q, index) => (
-                        <li key={`ans-${q.id}`} style={{ marginBottom: '5px' }}>
-                           <span style={{ fontWeight: 'bold' }}>{index + 1}.</span> {q.correctAnswer}
-                        </li>
-                    ))}
-                </ol>
-            </div>
         </div>
     );
 };
