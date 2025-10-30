@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -80,6 +80,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [timeUp, setTimeUp] = useState(false);
   const [totalMarks, setTotalMarks] = useState(0);
 
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
+
   const difficulties = useMemo(() => {
     if (!test?.difficulty) return [];
     if (Array.isArray(test.difficulty)) return test.difficulty;
@@ -135,6 +138,19 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     processInitialData();
 
   }, [initialTest, user]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = ''; // Required for legacy browsers
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
   
 
   const handleSubmit = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -240,6 +256,30 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
     };
 
+    const handleConfirmAction = () => {
+        setIsConfirming(false);
+        if (confirmAction === 'submit') {
+            handleSubmit();
+        } else if (confirmAction === 'back') {
+            router.back();
+        }
+        setConfirmAction(null);
+    };
+
+    const getConfirmDialogContent = () => {
+        switch (confirmAction) {
+            case 'submit':
+                return { title: 'Submit Your Answers?', description: 'Are you sure you want to submit? You cannot change your answers after this.' };
+            case 'back':
+                return { title: 'Go Back?', description: 'Are you sure you want to go back? Your current progress will be lost.' };
+            case 'new':
+                 return { title: 'Start a New Problem?', description: 'Are you sure? Your current progress will be lost.' };
+            default:
+                return { title: '', description: '' };
+        }
+    };
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -329,7 +369,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 </Card>
             )}
 
-            <form onSubmit={handleSubmit} className="p-6 pt-0">
+            <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
                 {test.questions && test.questions.map((question, index) => {
                     const questionIndex = index;
@@ -413,7 +453,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 </fieldset>
 
                 <div className="mt-8 flex justify-center">
-                    <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
+                     <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
                         {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Practice Set"}
                     </Button>
                 </div>
@@ -431,6 +471,24 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 <AlertDialogAction onClick={() => handleSubmit()}>
                     View Results
                 </AlertDialogAction>
+            </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="text-yellow-500" />
+                        {getConfirmDialogContent().title}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {getConfirmDialogContent().description}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setConfirmAction(null)}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmAction}>Continue</AlertDialogAction>
+                </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
     </div>
