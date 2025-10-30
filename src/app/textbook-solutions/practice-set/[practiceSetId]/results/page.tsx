@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -135,7 +134,7 @@ function ResultsDisplay() {
   const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
   const reviewUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}/review?submissionId=${submissionId}`;
-  const tryAgainUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}?textbook=${submission.textbookId}&chapter=${submission.chapterId}${submission.topicId ? `&topic=${submission.topicId}` : ''}`;
+  const tryAgainUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}/textbook/${submission.textbookId}/chapter/${submission.chapterId}/topic/${submission.topicId || ''}`;
   const backToTopicUrl = submission.topicId
     ? `/textbook-solutions/${submission.textbookId}/chapter/${submission.chapterId}/topic/${submission.topicId}`
     : `/textbook-solutions/${submission.textbookId}/chapter/${submission.chapterId}`;

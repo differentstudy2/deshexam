@@ -295,6 +295,17 @@ export default function TopicClientPage() {
         </div>
     );
 
+    const bgColors = [
+        'bg-blue-100 dark:bg-blue-900/20',
+        'bg-green-100 dark:bg-green-900/20',
+        'bg-yellow-100 dark:bg-yellow-900/20',
+        'bg-pink-100 dark:bg-pink-900/20',
+        'bg-purple-100 dark:bg-purple-900/20',
+        'bg-orange-100 dark:bg-orange-900/20',
+        'bg-teal-100 dark:bg-teal-900/20',
+    ];
+
+
     return (
         <div className="min-h-screen bg-background">
             <div className="md:hidden p-4 border-b flex items-center gap-4">
@@ -401,7 +412,7 @@ export default function TopicClientPage() {
                                               <span className="font-semibold flex-grow">{ps.title}</span>
                                               <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                                                 <Button size="sm" asChild className="flex-1">
-                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`}>Start Practice</Link>
+                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`}>Start Practice</Link>
                                                 </Button>
                                                 <Button 
                                                     size="sm" 

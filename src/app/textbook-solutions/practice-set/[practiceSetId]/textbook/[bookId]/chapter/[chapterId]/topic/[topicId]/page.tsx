@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -10,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter, usePathname, useParams, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -48,16 +47,14 @@ export default function PracticeSetPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
-  const pathname = usePathname();
   const params = useParams();
-  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { openAuthDialog } = useAuthDialog();
-
+  
   const practiceSetId = params.practiceSetId as string;
-  const textbookId = searchParams.get('textbook')!;
-  const chapterId = searchParams.get('chapter')!;
-  const topicId = searchParams.get('topic'); // Can be null
+  const textbookId = params.bookId as string;
+  const chapterId = params.chapterId as string;
+  const topicId = params.topicId as string; // Can be null if practice set is at chapter level
   
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timeUp, setTimeUp] = useState(false);
@@ -86,7 +83,6 @@ export default function PracticeSetPage() {
         if (practiceSetData) {
             let questionsData = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
             
-            // Group questions by type
             const groupedQuestions = questionsData.reduce((acc, q) => {
                 const type = q.type || 'unknown';
                 if (!acc[type]) {
@@ -96,7 +92,6 @@ export default function PracticeSetPage() {
                 return acc;
             }, {} as Record<string, typeof questionsData>);
 
-            // Shuffle within each group and then combine
             const shuffledQuestions = Object.values(groupedQuestions).flatMap(group => shuffleArray(group));
 
             const questionsWithMatchingOptions = shuffledQuestions.map((q: any) => {
@@ -149,7 +144,6 @@ export default function PracticeSetPage() {
   }, [practiceSetId, textbookId, chapterId, topicId, toast, router]);
   
     useEffect(() => {
-        // Dynamically update metadata
         if (test && textbook && chapter) {
             const title = `${test.title} | ${topic?.title || chapter.title} | DeshExam`;
             const description = `Practice set for ${topic?.title || chapter.title}, part of the ${textbook.title} textbook. Test your knowledge on ${chapter.title}.`;
@@ -159,7 +153,6 @@ export default function PracticeSetPage() {
             document.querySelector('meta[name="description"]')?.setAttribute('content', description);
             document.querySelector('meta[name="keywords"]')?.setAttribute('content', keywords);
 
-            // Update or create JSON-LD script
             const jsonLdScriptId = 'structured-data-practice-set';
             let jsonLdScript = document.getElementById(jsonLdScriptId);
             if (!jsonLdScript) {
@@ -445,4 +438,3 @@ export default function PracticeSetPage() {
     </div>
   );
 }
-

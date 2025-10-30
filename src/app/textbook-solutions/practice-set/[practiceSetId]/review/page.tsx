@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -170,11 +169,7 @@ function ReviewDisplay() {
         setQuestions(updatedQuestions);
 
         try {
-            // Note: handleQuestionVote expects a content ID, but here we don't have one for practice set questions.
-            // This part of the logic might need a new firestore function if question voting is a feature.
-            // For now, it will fail silently or throw error if not adapted.
-            // await handleQuestionVote(questionId, voteType);
-             console.warn("Voting on practice set questions is not fully implemented on the backend yet.");
+            console.warn("Voting on practice set questions is not fully implemented on the backend yet.");
         } catch (error) {
             setQuestions(originalQuestions);
             toast({
@@ -291,7 +286,7 @@ function ReviewDisplay() {
         <Card className="max-w-4xl mx-auto">
             <CardHeader>
             <CardTitle>Detailed Answer Review</CardTitle>
-            <CardDescription>Check your answers for "{submission.practiceSetTitle}" below.</CardDescription>
+            <CardDescription>Check your answers for "{submission.practiceSetTitle}" below to see where you can improve.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
             {questions.map((question, index) => {
@@ -491,8 +486,9 @@ function ReviewDisplay() {
 export default function PracticeSetReviewPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const practiceSetId = params.practiceSetId as string;
   const submissionId = searchParams.get('submissionId');
+
+  const backUrl = `/textbook-solutions/practice-set/${params.practiceSetId}/results?submissionId=${submissionId}`;
 
   return (
     <div className="container py-8 sm:py-12 md:max-w-4xl">
@@ -502,7 +498,7 @@ export default function PracticeSetReviewPage() {
             <p className="text-muted-foreground">Let's see how you did.</p>
         </div>
         <Button asChild variant="outline">
-            <Link href={`/textbook-solutions/practice-set/${practiceSetId}/results?submissionId=${submissionId}`}>
+            <Link href={backUrl}>
                 <ArrowLeft className="mr-2 h-4 w-4"/>
                 Back to Results
             </Link>
