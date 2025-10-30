@@ -28,6 +28,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+
+const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 
 export default function ManageChapterPracticeSetsPage() {
     const params = useParams();
@@ -43,9 +46,9 @@ export default function ManageChapterPracticeSetsPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
-    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: 'Easy' | 'Medium' | 'Hard', questionSource: 'random-chapter' | 'random-topic' | 'exercise'}>({
+    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: 'random-chapter' | 'random-topic' | 'exercise'}>({
         title: '',
-        difficulty: 'Medium',
+        difficulty: ['Medium'],
         questionSource: 'random-chapter'
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
@@ -84,12 +87,15 @@ export default function ManageChapterPracticeSetsPage() {
 
     const handleOpenDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
-        setPracticeSetData(ps ? { title: ps.title, difficulty: ps.difficulty || 'Medium', questionSource: ps.questionSource || 'random-chapter' } : { title: '', difficulty: 'Medium', questionSource: 'random-chapter'});
+        setPracticeSetData(ps ? { title: ps.title, difficulty: ps.difficulty || ['Medium'], questionSource: ps.questionSource || 'random-chapter' } : { title: '', difficulty: ['Medium'], questionSource: 'random-chapter'});
         setIsDialogOpen(true);
     };
 
     const handleAddOrUpdate = async () => {
-        if (!practiceSetData.title.trim()) return;
+        if (!practiceSetData.title.trim() || practiceSetData.difficulty.length === 0) {
+            toast({ variant: 'destructive', title: 'Please fill all required fields.' });
+            return;
+        }
         
         const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`);
         
@@ -103,7 +109,7 @@ export default function ManageChapterPracticeSetsPage() {
                 toast({ title: 'Practice Set Added' });
             }
 
-            setPracticeSetData({ title: '', difficulty: 'Medium', questionSource: 'random-chapter' });
+            setPracticeSetData({ title: '', difficulty: ['Medium'], questionSource: 'random-chapter' });
             setIsDialogOpen(false);
             setEditingPracticeSet(null);
             
@@ -164,9 +170,9 @@ export default function ManageChapterPracticeSetsPage() {
                         <ul className="space-y-2">
                             {practiceSets.map(ps => (
                                 <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                    <div className="flex-grow flex items-center gap-2">
+                                    <div className="flex-grow flex items-center gap-2 flex-wrap">
                                         <span className="font-medium">{ps.title}</span>
-                                        {ps.difficulty && <Badge variant="secondary">{ps.difficulty}</Badge>}
+                                        {ps.difficulty?.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
                                         {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0">
@@ -203,14 +209,24 @@ export default function ManageChapterPracticeSetsPage() {
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
-                             <Select value={practiceSetData.difficulty} onValueChange={(value) => setPracticeSetData(prev => ({...prev, difficulty: value as any}))}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Easy">Easy</SelectItem>
-                                    <SelectItem value="Medium">Medium</SelectItem>
-                                    <SelectItem value="Hard">Hard</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="grid grid-cols-3 gap-2">
+                                {difficultyOptions.map(option => (
+                                    <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`diff-${option}`}
+                                            checked={practiceSetData.difficulty.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentDifficulties = practiceSetData.difficulty;
+                                                const newDifficulties = checked
+                                                    ? [...currentDifficulties, option as any]
+                                                    : currentDifficulties.filter(d => d !== option);
+                                                setPracticeSetData(prev => ({...prev, difficulty: newDifficulties }));
+                                            }}
+                                        />
+                                        <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                          <div className="space-y-2">
                             <Label>Question Source</Label>

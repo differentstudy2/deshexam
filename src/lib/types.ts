@@ -47,7 +47,7 @@ export type PracticeSet = {
     id: string;
     title: string;
     duration?: number;
-    difficulty?: 'Easy' | 'Medium' | 'Hard';
+    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: 'random-chapter' | 'random-topic' | 'exercise';
 };
 
