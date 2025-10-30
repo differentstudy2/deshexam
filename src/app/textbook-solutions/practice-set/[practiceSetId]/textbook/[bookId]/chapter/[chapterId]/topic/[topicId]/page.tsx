@@ -310,31 +310,24 @@ export default function PracticeSetPage() {
   return (
     <div className="container py-8 max-w-4xl mx-auto">
         <div className="bg-background border rounded-lg shadow-sm">
-            <header className="p-6 text-center border-b">
-                <p className="font-semibold text-primary">{textbook?.subject || 'Practice'}</p>
-                <h1 className="font-headline text-3xl font-bold tracking-tighter mt-1">{test.title}</h1>
-                <p className="text-muted-foreground mt-1 max-w-2xl mx-auto">
-                    {[textbook?.board, textbook?.class].filter(Boolean).join(' • ')}
-                </p>
-                <div className="mt-4 flex items-center justify-center text-sm text-muted-foreground space-x-6">
-                    <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-4 h-4" />
-                        <span>{test.questions.length} Questions</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <BarChart className="w-4 h-4" />
-                        <span>{totalMarks} Marks</span>
-                    </div>
-                    {timeLeft !== null && (
-                        <div className="flex items-center gap-1.5 font-mono text-base font-semibold text-foreground">
-                            <Clock className="w-4 h-4" />
-                            <span>{formatTime(timeLeft)}</span>
-                        </div>
-                    )}
+             <header className="p-6 border-b">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <div><strong>Institute Name:</strong> DeshExam.com</div>
+                    <div><strong>Board:</strong> {textbook?.board}</div>
+                    <div><strong>Class:</strong> {textbook?.class}</div>
+                    <div><strong>Subject:</strong> {textbook?.subject}</div>
+                    <div><strong>Chapter:</strong> {chapter?.title}</div>
+                    <div><strong>Topic:</strong> {topic?.title}</div>
+                    <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
+                    <div><strong>Full Marks:</strong> {totalMarks}</div>
+                    <div><strong>Duration:</strong> {test.duration || totalMarks} min</div>
                 </div>
             </header>
+            <div className="p-6 text-center">
+                 <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
+            </div>
 
-            <form onSubmit={handleSubmit} className="p-6">
+            <form onSubmit={handleSubmit} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8">
                 {test.questions && test.questions.map((question, index) => {
                     const questionIndex = index;
@@ -441,3 +434,5 @@ export default function PracticeSetPage() {
     </div>
   );
 }
+
+    
