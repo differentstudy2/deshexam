@@ -70,6 +70,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                     const topicsData = await getTopicsByChapterId(textbookId, chapter.id);
                     
                     let practiceSetsData: PracticeSet[] = [];
+                    // Only fetch chapter-level practice sets if there are NO topics
                     if (topicsData.length === 0) {
                         const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/practiceSets`);
                         const practiceSetsSnap = await getDocs(practiceSetsRef);
@@ -196,7 +197,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                                        ) : chapter.practiceSets && chapter.practiceSets.length > 0 ? (
                                            chapter.practiceSets.map(ps => (
                                                <li key={ps.id}>
-                                                   <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapter.id}`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
+                                                   <Link href={`/textbook-solutions/practice-set/${ps.id}/textbook/${textbookId}/chapter/${chapter.id}/topic/null`} className="flex items-center gap-3 p-3 text-sm hover:bg-accent/50 transition-colors">
                                                         <CheckSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                                         <span className="flex-grow truncate">{ps.title}</span>
                                                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
