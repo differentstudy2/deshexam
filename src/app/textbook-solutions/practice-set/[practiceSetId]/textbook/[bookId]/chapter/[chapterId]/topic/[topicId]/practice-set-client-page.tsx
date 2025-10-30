@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, Suspense, useMemo } from 'react';
+import { useEffect, useState, Suspense, useMemo, useCallback } from 'react';
 import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet, getUserProfile } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,17 +80,17 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [timeUp, setTimeUp] = useState(false);
   const [totalMarks, setTotalMarks] = useState(0);
 
-    const difficulties = useMemo(() => {
-        if (!test?.difficulty) return [];
-        if (Array.isArray(test.difficulty)) return test.difficulty;
-        return [String(test.difficulty)];
-    }, [test]);
+  const difficulties = useMemo(() => {
+    if (!test?.difficulty) return [];
+    if (Array.isArray(test.difficulty)) return test.difficulty;
+    return [String(test.difficulty)];
+  }, [test]);
 
-    const sources = useMemo(() => {
-        if (!test?.questionSource) return [];
-        if (Array.isArray(test.questionSource)) return test.questionSource;
-        return [String(test.questionSource)];
-    }, [test]);
+  const sources = useMemo(() => {
+      if (!test?.questionSource) return [];
+      if (Array.isArray(test.questionSource)) return test.questionSource;
+      return [String(test.questionSource)];
+  }, [test]);
 
 
   useEffect(() => {
@@ -137,34 +137,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }, [initialTest, user]);
   
 
-  useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) {
-      if (timeLeft === 0) {
-        setTimeUp(true);
-        if(!isSubmitting) handleSubmit();
-      }
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft, isSubmitting]);
-
-
-  const handleAnswerChange = (questionId: string, answer: any) => {
-    setAnswers(prev => ({ ...prev, [questionId]: answer }));
-  };
-
-  const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
-    const currentAnswer = answers[questionId] || {};
-    const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
-    handleAnswerChange(questionId, newAnswer);
-  }
-
-  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     if (isSubmitting) return;
 
@@ -231,8 +204,35 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         });
         setIsSubmitting(false);
     }
-  };
+  }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, timeLeft, chapterId, textbookId, topicId, toast, router]);
   
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0) {
+      if (timeLeft === 0) {
+        setTimeUp(true);
+        if(!isSubmitting) handleSubmit();
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, isSubmitting, handleSubmit]);
+
+
+  const handleAnswerChange = (questionId: string, answer: any) => {
+    setAnswers(prev => ({ ...prev, [questionId]: answer }));
+  };
+
+  const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
+    const currentAnswer = answers[questionId] || {};
+    const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
+    handleAnswerChange(questionId, newAnswer);
+  }
+    
     const formatTime = (seconds: number) => {
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
@@ -315,15 +315,15 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             </header>
             <div className="p-6 text-center">
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
-                 <p className="text-sm text-muted-foreground mt-1">{test.subtitle}</p>
+                 
                  <div className="flex flex-wrap justify-center gap-2 mt-2">
-                    {difficulties.map(d => <Badge key={d} variant="secondary">{String(d)}</Badge>)}
-                    {sources.map(s => <Badge key={s} variant="outline">{String(s)}</Badge>)}
+                    {difficulties.map(d => <Badge key={String(d)} variant="secondary">{String(d)}</Badge>)}
+                    {sources.map(s => <Badge key={String(s)} variant="outline">{String(s)}</Badge>)}
                  </div>
             </div>
 
              {timeLeft !== null && totalDuration > 0 && (
-                <Card className="sticky top-16 z-40 rounded-none border-x-0 border-b">
+                <Card className={cn("sticky rounded-none border-x-0 border-b", "top-16")}>
                     <CardContent className="p-3 flex items-center justify-center gap-4">
                          <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
                             <Clock className="w-5 h-5" />
