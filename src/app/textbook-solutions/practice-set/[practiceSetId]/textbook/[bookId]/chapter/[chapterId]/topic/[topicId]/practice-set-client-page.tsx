@@ -315,11 +315,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             </header>
             <div className="p-6 text-center">
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
-                 
-                 <div className="flex flex-wrap justify-center gap-2 mt-2">
-                    {difficulties.map(d => <Badge key={String(d)} variant="secondary">{String(d)}</Badge>)}
-                    {sources.map(s => <Badge key={String(s)} variant="outline">{String(s)}</Badge>)}
-                 </div>
             </div>
 
              {timeLeft !== null && totalDuration > 0 && (
@@ -441,5 +436,3 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
-
-    
