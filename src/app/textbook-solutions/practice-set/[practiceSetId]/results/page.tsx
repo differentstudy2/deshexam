@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck, Crown, Gem } from 'lucide-react';
+import { Award, CheckCircle, XCircle, Loader2, FileQuestion, GraduationCap, Target, School, Book, Layers, BarChart, Clock, Star, Calendar, BadgeCheck, Crown, Gem, User } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getUserProfile } from '@/lib/firebase/firestore';
@@ -139,7 +140,7 @@ function ResultsDisplay() {
     ? `/textbook-solutions/${submission.textbookId}/chapter/${submission.chapterId}/topic/${submission.topicId}`
     : `/textbook-solutions/${submission.textbookId}/chapter/${submission.chapterId}`;
   
-  const pageTitle = `${student?.displayName}'s Practice Set Results`;
+  const pageTitle = `Practice Set Results`;
   
   const formatTimeTaken = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -166,16 +167,6 @@ function ResultsDisplay() {
                         <div className="flex items-center justify-center md:justify-start gap-2">
                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
-                         {student.subscriptionPlan === 'pro' && (
-                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
-                                <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
-                            </Badge>
-                        )}
-                        {student.subscriptionPlan === 'pass' && (
-                            <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
-                                <Gem className="w-3.5 h-3.5 mr-1" /> Pass
-                            </Badge>
-                        )}
                         </div>
                         <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
                             {student.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
@@ -198,8 +189,15 @@ function ResultsDisplay() {
         <CardContent className="space-y-4 pt-0">
             <Separator />
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground col-span-full"><User className="w-4 h-4"/> <strong>Student's Name:</strong> <span className="text-foreground">{student?.displayName}</span></div>
+                <div className="flex items-center gap-2 text-muted-foreground col-span-full">
+                    <Star className="w-4 h-4"/> <strong>Subscription:</strong> 
+                    <span className="text-foreground">
+                        {student?.subscriptionPlan === 'pro' ? 'Pass Pro' : student?.subscriptionPlan === 'pass' ? 'Pass' : 'Free User'}
+                    </span>
+                </div>
                 <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Practice Set:</strong> <span className="text-foreground">{submission.practiceSetTitle}</span></div>
-                {topic?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic.title}</span></div>}
+                {topic?.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-3"><Layers className="w-4 h-4" /> <strong>Topic:</strong> <span className="text-foreground">{topic.title}</span></div>}
                 
                 {textbook?.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{textbook.subject}</span></div>}
                 {textbook?.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{textbook.board}</span></div>}
@@ -213,7 +211,7 @@ function ResultsDisplay() {
 
                 {submittedAtDate && submittedAtDate.toString() !== 'Invalid Date' && (
                     <>
-                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Submitted At:</strong> <span className="text-foreground">{submittedAtDate.toLocaleString()}</span></div>
+                        <div className="flex items-center gap-2 text-muted-foreground"><Calendar className="w-4 h-4"/> <strong>Date:</strong> <span className="text-foreground">{submittedAtDate.toLocaleDateString()}</span></div>
                     </>
                 )}
             </div>
