@@ -2,13 +2,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
+import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet, getUserProfile } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -23,8 +23,11 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
+type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; subscriptionPlan?: 'pro' | 'pass'; };
 
 const shuffleArray = (array: any[]) => {
   if (!array) return [];
@@ -44,6 +47,7 @@ export default function PracticeSetPage() {
   const [textbook, setTextbook] = useState<Textbook | null>(null);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [student, setStudent] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,6 +85,11 @@ export default function PracticeSetPage() {
 
         if (textbookData.exists()) setTextbook(textbookData.data() as Textbook);
         if (chapterData.exists()) setChapter(chapterData.data() as Chapter);
+        
+        if (user) {
+            const profile = await getUserProfile(user.uid);
+            setStudent(profile);
+        }
 
         if (practiceSetData) {
             let questionsData = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSetId);
@@ -143,7 +152,7 @@ export default function PracticeSetPage() {
     };
 
     fetchTest();
-  }, [practiceSetId, textbookId, chapterId, topicId, toast, router]);
+  }, [practiceSetId, textbookId, chapterId, topicId, toast, router, user]);
   
     useEffect(() => {
         if (test && textbook && chapter) {
@@ -313,11 +322,41 @@ export default function PracticeSetPage() {
   return (
     <div className="container py-8 max-w-4xl mx-auto">
         <div className="bg-background border rounded-lg shadow-sm">
-             <header className="p-6 border-b">
+            <header className="p-6 border-b space-y-6">
+                {student && (
+                     <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                         <Avatar className="h-16 w-16">
+                            <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
+                            <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <div className="flex items-center justify-center sm:justify-start gap-2">
+                            <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                            <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                            {student?.subscriptionPlan === 'pro' && (
+                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
+                                    <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
+                                </Badge>
+                            )}
+                            {student?.subscriptionPlan === 'pass' && (
+                                <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
+                                    <Gem className="w-3.5 h-3.5 mr-1" /> Pass
+                                </Badge>
+                            )}
+                            </div>
+                            <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 pt-1">
+                                {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                                {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                                {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <Separator />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
                     <div><strong>Institute Name:</strong> DeshExam.com</div>
-                    <div><strong>Board:</strong> {textbook?.board}</div>
                     <div><strong>Book Name:</strong> {textbook?.title}</div>
+                    <div><strong>Board:</strong> {textbook?.board}</div>
                     <div><strong>Subject:</strong> {textbook?.subject}</div>
                     <div><strong>Class:</strong> {textbook?.class}</div>
                     <div><strong>Topic:</strong> {topic?.title}</div>
@@ -332,7 +371,7 @@ export default function PracticeSetPage() {
             </div>
 
              {timeLeft !== null && totalDuration > 0 && (
-                <Card className="sticky top-16 z-40 rounded-t-none border-x-0 border-b">
+                <Card className="sticky top-0 z-40 rounded-t-none border-x-0 border-b">
                     <CardContent className="p-3 flex items-center justify-center gap-4">
                          <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
                             <Clock className="w-5 h-5" />
