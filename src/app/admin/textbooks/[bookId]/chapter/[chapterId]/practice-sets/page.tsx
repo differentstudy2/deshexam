@@ -53,8 +53,9 @@ export default function ManageChapterPracticeSetsPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
-    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
+    const [practiceSetData, setPracticeSetData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
+        subtitle: '',
         difficulty: ['Medium'],
         questionSource: ['Random from Chapter']
     });
@@ -107,8 +108,10 @@ export default function ManageChapterPracticeSetsPage() {
         if (ps?.questionSource) {
             sourceArray = Array.isArray(ps.questionSource) ? ps.questionSource : [ps.questionSource] as any;
         }
+        
+        const subtitle = ps ? ps.subtitle || `Practice Set ${practiceSets.findIndex(p => p.id === ps.id) + 1}` : `Practice Set ${practiceSets.length + 1}`;
 
-        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', difficulty: ['Medium'], questionSource: ['Random from Chapter']});
+        setPracticeSetData(ps ? { title: ps.title, subtitle: subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle: subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter']});
         setIsDialogOpen(true);
     };
 
@@ -130,7 +133,7 @@ export default function ManageChapterPracticeSetsPage() {
                 toast({ title: 'Practice Set Added' });
             }
 
-            setPracticeSetData({ title: '', difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+            setPracticeSetData({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
             setIsDialogOpen(false);
             setEditingPracticeSet(null);
             
@@ -203,6 +206,7 @@ export default function ManageChapterPracticeSetsPage() {
                                 return (
                                 <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
                                     <div className="flex-grow flex items-center gap-2 flex-wrap">
+                                        <span className="font-semibold">{ps.subtitle || 'Practice Set'}:</span>
                                         <span className="font-medium">{ps.title}</span>
                                         {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
                                         {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
@@ -235,6 +239,10 @@ export default function ManageChapterPracticeSetsPage() {
                         <DialogTitle>{editingPracticeSet ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label htmlFor="practice-set-subtitle">Subtitle</Label>
+                            <Input id="practice-set-subtitle" value={practiceSetData.subtitle} onChange={(e) => setPracticeSetData(prev => ({...prev, subtitle: e.target.value}))} />
+                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="practice-set-title">Title</Label>
                             <div className="flex gap-2">

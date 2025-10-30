@@ -46,6 +46,7 @@ export type Topic = {
 export type PracticeSet = {
     id: string;
     title: string;
+    subtitle?: string;
     duration?: number;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
@@ -89,3 +90,4 @@ export type Question = {
     explanation?: string;
     subQuestions?: SubQuestion[];
 };
+
