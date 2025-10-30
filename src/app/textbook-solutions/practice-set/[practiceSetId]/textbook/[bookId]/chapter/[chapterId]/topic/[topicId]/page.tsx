@@ -22,6 +22,7 @@ import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/type
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
 
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
 
@@ -307,6 +308,8 @@ export default function PracticeSetPage() {
     );
   }
   
+  const totalDuration = (test.duration || totalMarks) * 60;
+
   return (
     <div className="container py-8 max-w-4xl mx-auto">
         <div className="bg-background border rounded-lg shadow-sm">
@@ -320,17 +323,26 @@ export default function PracticeSetPage() {
                     <div><strong>Topic:</strong> {topic?.title}</div>
                     <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
                     <div><strong>Full Marks:</strong> {totalMarks}</div>
-                    <div>
-                        <strong>Duration:</strong> {timeLeft !== null ? formatTime(timeLeft) : `${test.duration || totalMarks} min`}
-                    </div>
                 </div>
             </header>
             <div className="p-6 text-center">
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
             </div>
 
+             {timeLeft !== null && totalDuration > 0 && (
+                <Card className="sticky top-16 z-40 rounded-t-none border-x-0 border-b">
+                    <CardContent className="p-3 flex items-center justify-center gap-4">
+                         <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
+                            <Clock className="w-5 h-5" />
+                            <span>{formatTime(timeLeft)}</span>
+                        </div>
+                        <Progress value={(timeLeft / totalDuration) * 100} className="w-1/2 h-2" />
+                    </CardContent>
+                </Card>
+            )}
+
             <form onSubmit={handleSubmit} className="p-6 pt-0">
-                <fieldset disabled={timeUp || isSubmitting} className="space-y-8">
+                <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
                 {test.questions && test.questions.map((question, index) => {
                     const questionIndex = index;
                     return (
@@ -436,5 +448,3 @@ export default function PracticeSetPage() {
     </div>
   );
 }
-
-    
