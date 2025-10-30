@@ -314,15 +314,17 @@ export default function PracticeSetPage() {
     <div className="container py-8 max-w-4xl mx-auto">
         <div className="bg-background border rounded-lg shadow-sm">
              <header className="p-6 border-b">
-                <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
                     <div><strong>Institute Name:</strong> DeshExam.com</div>
                     <div><strong>Board:</strong> {textbook?.board}</div>
-                    <div><strong>Class:</strong> {textbook?.class}</div>
+                    <div><strong>Book Name:</strong> {textbook?.title}</div>
                     <div><strong>Subject:</strong> {textbook?.subject}</div>
-                    <div><strong>Chapter:</strong> {chapter?.title}</div>
+                    <div><strong>Class:</strong> {textbook?.class}</div>
                     <div><strong>Topic:</strong> {topic?.title}</div>
-                    <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
+                    <div><strong>Chapter:</strong> {chapter?.title}</div>
                     <div><strong>Full Marks:</strong> {totalMarks}</div>
+                    <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
+                    <div><strong>Duration:</strong> {test.duration || totalMarks} minutes</div>
                 </div>
             </header>
             <div className="p-6 text-center">
