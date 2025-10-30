@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -26,10 +27,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 export default function ManageChapterPracticeSetsPage() {
     const params = useParams();
@@ -45,10 +46,10 @@ export default function ManageChapterPracticeSetsPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
-    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: 'random-chapter' | 'random-topic' | 'exercise'}>({
+    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
         difficulty: ['Medium'],
-        questionSource: 'random-chapter'
+        questionSource: ['random-chapter']
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
@@ -90,7 +91,13 @@ export default function ManageChapterPracticeSetsPage() {
         if (typeof difficultyArray === 'string') {
             difficultyArray = [difficultyArray as any];
         }
-        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: ps.questionSource || 'random-chapter' } : { title: '', difficulty: ['Medium'], questionSource: 'random-chapter'});
+
+        let sourceArray = ps?.questionSource || ['Random from Chapter'];
+        if (typeof sourceArray === 'string') {
+            sourceArray = [sourceArray as any];
+        }
+
+        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', difficulty: ['Medium'], questionSource: ['Random from Chapter']});
         setIsDialogOpen(true);
     };
 
@@ -112,7 +119,7 @@ export default function ManageChapterPracticeSetsPage() {
                 toast({ title: 'Practice Set Added' });
             }
 
-            setPracticeSetData({ title: '', difficulty: ['Medium'], questionSource: 'random-chapter' });
+            setPracticeSetData({ title: '', difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
             setIsDialogOpen(false);
             setEditingPracticeSet(null);
             
@@ -172,13 +179,14 @@ export default function ManageChapterPracticeSetsPage() {
                     {practiceSets.length > 0 ? (
                         <ul className="space-y-2">
                             {practiceSets.map(ps => {
-                                const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty].filter(Boolean);
+                                const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
+                                const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
                                 return (
                                 <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
                                     <div className="flex-grow flex items-center gap-2 flex-wrap">
                                         <span className="font-medium">{ps.title}</span>
                                         {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                        {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
+                                        {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0">
                                         <Button variant="outline" size="sm" asChild>
@@ -235,13 +243,24 @@ export default function ManageChapterPracticeSetsPage() {
                         </div>
                          <div className="space-y-2">
                             <Label>Question Source</Label>
-                            <Select value={practiceSetData.questionSource} onValueChange={(value) => setPracticeSetData(prev => ({...prev, questionSource: value as any}))}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="random-chapter">Random from Chapter</SelectItem>
-                                    <SelectItem value="exercise">Textbook Exercise Questions</SelectItem>
-                                </SelectContent>
-                            </Select>
+                             <div className="grid grid-cols-2 gap-2">
+                                {questionSourceOptions.map(option => (
+                                     <div key={option} className="flex items-center space-x-2">
+                                         <Checkbox
+                                            id={`source-${option}`}
+                                            checked={practiceSetData.questionSource.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentSources = practiceSetData.questionSource;
+                                                const newSources = checked
+                                                    ? [...currentSources, option as any]
+                                                    : currentSources.filter(s => s !== option);
+                                                setPracticeSetData(prev => ({...prev, questionSource: newSources }));
+                                            }}
+                                        />
+                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                     </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

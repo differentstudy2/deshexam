@@ -48,7 +48,7 @@ export type PracticeSet = {
     title: string;
     duration?: number;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
-    questionSource?: 'random-chapter' | 'random-topic' | 'exercise';
+    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
 };
 
 export type Solution = {

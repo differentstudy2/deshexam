@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -30,6 +31,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 export default function ManageTopicPage() {
     const params = useParams();
@@ -45,10 +47,10 @@ export default function ManageTopicPage() {
 
     const [isPracticeSetDialogOpen, setIsPracticeSetDialogOpen] = useState(false);
     const [editingPracticeSet, setEditingPracticeSet] = useState<PracticeSet | null>(null);
-    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: 'random-chapter' | 'random-topic' | 'exercise'}>({
+    const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
         difficulty: ['Medium'],
-        questionSource: 'random-topic'
+        questionSource: ['Random from Topic']
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
@@ -114,12 +116,18 @@ export default function ManageTopicPage() {
 
     const handleOpenPracticeSetDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
+        
         let difficultyArray = ps?.difficulty || ['Medium'];
         if (typeof difficultyArray === 'string') {
             difficultyArray = [difficultyArray as any];
         }
 
-        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: ps.questionSource || 'random-topic' } : { title: '', difficulty: ['Medium'], questionSource: 'random-topic'});
+        let sourceArray = ps?.questionSource || ['Random from Topic'];
+        if (typeof sourceArray === 'string') {
+            sourceArray = [sourceArray as any];
+        }
+
+        setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', difficulty: ['Medium'], questionSource: ['Random from Topic']});
         setIsPracticeSetDialogOpen(true);
     }
 
@@ -138,7 +146,7 @@ export default function ManageTopicPage() {
                 toast({ title: 'Practice Set Added' });
             }
 
-            setPracticeSetData({ title: '', difficulty: ['Medium'], questionSource: 'random-topic'});
+            setPracticeSetData({ title: '', difficulty: ['Medium'], questionSource: ['Random from Topic']});
             setIsPracticeSetDialogOpen(false);
             setEditingPracticeSet(null);
             fetchData();
@@ -317,13 +325,14 @@ export default function ManageTopicPage() {
                         {practiceSets.length > 0 ? (
                             <ul className="space-y-2">
                                 {practiceSets.map(ps => {
-                                    const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty].filter(Boolean);
+                                    const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
+                                    const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
                                     return (
                                         <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
                                             <div className="flex-grow flex items-center gap-2 flex-wrap">
                                                 <span className="font-medium">{ps.title}</span>
                                                 {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                                {ps.questionSource && <Badge variant="outline">{ps.questionSource.replace('-', ' ')}</Badge>}
+                                                {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
                                             </div>
                                             <div className="flex gap-2 flex-shrink-0">
                                                 <Button variant="outline" size="sm" asChild>
@@ -385,14 +394,24 @@ export default function ManageTopicPage() {
                         </div>
                          <div className="space-y-2">
                              <Label>Question Source</Label>
-                            <Select value={practiceSetData.questionSource} onValueChange={(value) => setPracticeSetData(prev => ({...prev, questionSource: value as any}))}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="random-topic">Random from Topic</SelectItem>
-                                    <SelectItem value="random-chapter">Random from Chapter</SelectItem>
-                                    <SelectItem value="exercise">Textbook Exercise Questions</SelectItem>
-                                </SelectContent>
-                            </Select>
+                             <div className="grid grid-cols-2 gap-2">
+                                {questionSourceOptions.map(option => (
+                                     <div key={option} className="flex items-center space-x-2">
+                                         <Checkbox
+                                            id={`source-${option}`}
+                                            checked={practiceSetData.questionSource.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentSources = practiceSetData.questionSource;
+                                                const newSources = checked
+                                                    ? [...currentSources, option as any]
+                                                    : currentSources.filter(s => s !== option);
+                                                setPracticeSetData(prev => ({...prev, questionSource: newSources }));
+                                            }}
+                                        />
+                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                     </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
