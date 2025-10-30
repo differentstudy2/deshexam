@@ -29,6 +29,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 
 const getResourceIcon = (type: string) => {
@@ -470,9 +471,18 @@ export default function ChapterClientPage() {
                             <section id="practice-sets" className="my-8">
                                 <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
                                  <div className="space-y-4">
-                                     {activeChapter.practiceSets.map(ps => (
+                                     {activeChapter.practiceSets.map(ps => {
+                                        const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
+                                        const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
+                                        return (
                                          <div key={ps.id} className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                             <span className="font-semibold flex-grow">{ps.title}</span>
+                                             <div className="flex-grow">
+                                                <p className="font-semibold flex-grow">{ps.subtitle}: {ps.title}</p>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
+                                                    {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
+                                                </div>
+                                             </div>
                                              <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                                                <Button size="sm" asChild className="flex-1">
                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}`}>Start Practice</Link>
@@ -489,7 +499,7 @@ export default function ChapterClientPage() {
                                                </Button>
                                              </div>
                                          </div>
-                                     ))}
+                                     )})}
                                  </div>
                             </section>
                         )}
@@ -540,4 +550,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
