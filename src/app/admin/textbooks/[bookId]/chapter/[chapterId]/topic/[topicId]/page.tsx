@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -12,14 +11,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { 
     addPracticeSetToTopic, 
     getPracticeSetsByTopicId, 
-    uploadFile
+    uploadFile,
+    getTextbookById,
+    getChapterById
 } from '@/lib/firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -28,6 +29,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
@@ -42,6 +49,8 @@ export default function ManageTopicPage() {
     const topicId = params.topicId as string;
     
     const [topic, setTopic] = useState<Topic | null>(null);
+    const [textbook, setTextbook] = useState<any | null>(null);
+    const [chapter, setChapter] = useState<any | null>(null);
     const [practiceSets, setPracticeSets] = useState<PracticeSet[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -53,55 +62,32 @@ export default function ManageTopicPage() {
         questionSource: ['Random from Topic']
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
-
-    const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
-    const [editingResource, setEditingResource] = useState<Resource | null>(null);
-    const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
-    const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
-    const [isUploading, setIsUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     
-    const [viewerOpen, setViewerOpen] = useState(false);
-    const [viewerResource, setViewerResource] = useState<Resource | null>(null);
-
-
-    const [areResourcesFetched, setAreResourcesFetched] = useState(false);
-    const [areResourcesLoading, setAreResourcesLoading] = useState(false);
 
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
         setLoading(true);
 
-        const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-        const topicSnap = await getDoc(topicRef);
-        if (topicSnap.exists()) {
-             const topicData = { id: topicSnap.id, ...topicSnap.data() } as Topic;
-            // Initially, don't load resources
-            delete (topicData as any).resources;
-            setTopic(topicData);
-        }
-
-        const fetchedPracticeSets = await getPracticeSetsByTopicId(textbookId, chapterId, topicId);
-        setPracticeSets(fetchedPracticeSets as PracticeSet[]);
-
-        setLoading(false);
-    };
-
-    const fetchResources = async () => {
-        if (!topicId || areResourcesFetched) return;
-        setAreResourcesLoading(true);
         try {
             const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
             const topicSnap = await getDoc(topicRef);
             if (topicSnap.exists()) {
-                const topicData = topicSnap.data() as Topic;
-                setTopic(prev => prev ? { ...prev, resources: topicData.resources || [] } : null);
-                setAreResourcesFetched(true);
+                setTopic({ id: topicSnap.id, ...topicSnap.data() } as Topic);
             }
+
+            const [textbookData, chapterData] = await Promise.all([
+                getTextbookById(textbookId),
+                getChapterById(textbookId, chapterId),
+            ]);
+            setTextbook(textbookData);
+            setChapter(chapterData);
+
+            const fetchedPracticeSets = await getPracticeSetsByTopicId(textbookId, chapterId, topicId);
+            setPracticeSets(fetchedPracticeSets as PracticeSet[]);
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Failed to load resources', description: (error as Error).message });
+             toast({ variant: 'destructive', title: 'Error fetching topic data', description: (error as Error).message });
         } finally {
-            setAreResourcesLoading(false);
+            setLoading(false);
         }
     };
 
@@ -109,22 +95,17 @@ export default function ManageTopicPage() {
         fetchData();
     }, [textbookId, chapterId, topicId]);
     
-     useEffect(() => {
-        // Reset resource fetching state when topic changes
-        setAreResourcesFetched(false);
-    }, [topicId]);
-
     const handleOpenPracticeSetDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
         
-        let difficultyArray = ps?.difficulty || ['Medium'];
-        if (typeof difficultyArray === 'string') {
-            difficultyArray = [difficultyArray as any];
+        let difficultyArray: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[] = ['Medium'];
+        if (ps?.difficulty) {
+            difficultyArray = Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty] as any;
         }
-
-        let sourceArray = ps?.questionSource || ['Random from Topic'];
-        if (typeof sourceArray === 'string') {
-            sourceArray = [sourceArray as any];
+        
+        let sourceArray: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[] = ['Random from Topic'];
+        if (ps?.questionSource) {
+            sourceArray = Array.isArray(ps.questionSource) ? ps.questionSource : [ps.questionSource] as any;
         }
 
         setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', difficulty: ['Medium'], questionSource: ['Random from Topic']});
@@ -156,6 +137,7 @@ export default function ManageTopicPage() {
     }
     
     const handleDeletePracticeSet = async (ps: PracticeSet) => {
+        if (!ps) return;
         try {
             const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, ps.id);
             await deleteDoc(psRef);
@@ -167,94 +149,14 @@ export default function ManageTopicPage() {
             setPracticeSetToDelete(null);
         }
     };
-
-    const handleOpenResourceDialog = (resource: Resource | null) => {
-        setEditingResource(resource);
-        if (resource) {
-            setNewResource({ type: resource.type, title: resource.title, url: resource.url });
-        } else {
-            setNewResource({ type: 'video', title: '', url: '' });
-        }
-        setIsResourceDialogOpen(true);
-    };
     
-    const handleSaveResource = async () => {
-        if (!newResource.title || !newResource.url || !topic) {
-            toast({ variant: 'destructive', title: 'Please fill all fields.' });
-            return;
-        }
-    
-        try {
-            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-            
-            const currentResources = topic.resources || [];
-            let updatedResources;
-            
-            if (editingResource) {
-                updatedResources = currentResources.map((r) => r.id === editingResource.id ? { ...newResource, id: editingResource.id } : r);
-            } else {
-                updatedResources = [...currentResources, { ...newResource, id: new Date().getTime().toString() }];
-            }
-            
-            await updateDoc(topicRef, { resources: updatedResources });
-    
-            toast({ title: `Resource ${editingResource ? 'updated' : 'added'}` });
-            setIsResourceDialogOpen(false);
-            setEditingResource(null);
-            
-            setTopic(prev => prev ? { ...prev, resources: updatedResources } : null);
-            setAreResourcesFetched(true);
-    
-        } catch (error) {
-            toast({ variant: 'destructive', title: 'Failed to save resource', description: (error as Error).message });
-        }
-    };
-    
-    const handleDeleteResource = async () => {
-        if (!resourceToDelete || !topic) return;
-        try {
-            const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
-            const updatedResources = (topic.resources || []).filter(r => r.id !== resourceToDelete.id);
-            await updateDoc(topicRef, { resources: updatedResources });
-            toast({ title: 'Resource Deleted' });
-            setResourceToDelete(null);
-            
-            setTopic(prev => prev ? { ...prev, resources: updatedResources } : null);
-
-        } catch (error) {
-            toast({ variant: 'destructive', title: 'Failed to delete resource', description: (error as Error).message });
-        }
-    };
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setIsUploading(true);
-            try {
-                const downloadURL = await uploadFile(file);
-                setNewResource(prev => ({...prev, url: downloadURL}));
-                toast({ title: 'File uploaded!', description: 'URL has been set. Click Save.' });
-            } catch (error) {
-                toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
-            } finally {
-                setIsUploading(false);
-            }
-        }
-    };
-
-    const handleResourceClick = (resource: Resource) => {
-        setViewerResource(resource);
-        setViewerOpen(true);
-    };
-
-     const getResourceIcon = (type: string) => {
-        switch (type) {
-        case 'video': return <Video className="w-4 h-4 text-muted-foreground" />;
-        case 'audio': return <Mic className="w-4 h-4 text-muted-foreground" />;
-        case 'pdf': return <FileText className="w-4 h-4 text-muted-foreground" />;
-        case 'doc': return <FileText className="w-4 h-4 text-muted-foreground" />;
-        default: return <FileText className="w-4 h-4 text-muted-foreground" />;
-        }
+    const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Chapter Title]', chapter?.title || '')
+            .replace('[Topic Title]', topic?.title || '')
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setPracticeSetData(prev => ({ ...prev, title }));
     };
 
     if (loading) return <div className="flex items-center justify-center h-full">Loading...</div>
@@ -271,95 +173,51 @@ export default function ManageTopicPage() {
             </div>
             <header>
                 <h1 className="font-headline text-3xl font-bold">Manage Topic: <span className="text-primary">{topic?.title}</span></h1>
-                 <p className="text-muted-foreground mt-1">Here you can add and manage practice sets and resources for this topic.</p>
+                 <p className="text-muted-foreground mt-1">Here you can add and manage practice sets for this topic.</p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                 <Accordion type="single" collapsible className="w-full" onValueChange={(value) => { if(value) fetchResources() }}>
-                    <AccordionItem value="resources">
-                        <Card>
-                             <CardHeader>
-                                <AccordionTrigger className="w-full justify-between">
-                                    <CardTitle>Additional Resources</CardTitle>
-                                </AccordionTrigger>
-                            </CardHeader>
-                            <AccordionContent>
-                                <CardContent>
-                                    {areResourcesLoading ? (
-                                        <div className="flex justify-center p-4">
-                                            <Loader2 className="w-6 h-6 animate-spin" />
-                                        </div>
-                                    ) : (
-                                        <>
-                                            {(topic?.resources && topic.resources.length > 0) ? (
-                                                 <ul className="space-y-2">
-                                                    {topic.resources.map(res => (
-                                                        <li key={res.id} className="flex items-center p-2 border rounded-md gap-2">
-                                                            {getResourceIcon(res.type)}
-                                                            <span className="flex-grow font-medium text-sm truncate">{res.title}</span>
-                                                            <Button variant="ghost" size="sm" onClick={() => handleOpenResourceDialog(res)}><Edit className="w-4 h-4"/></Button>
-                                                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setResourceToDelete(res)}><Trash2 className="w-4 h-4"/></Button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-muted-foreground text-center py-8">No resources added yet.</p>
-                                            )}
-                                            <Button size="sm" className="mt-4" onClick={() => handleOpenResourceDialog(null)}><PlusCircle className="mr-2"/> Add Resource</Button>
-                                        </>
-                                    )}
-                                </CardContent>
-                            </AccordionContent>
-                        </Card>
-                    </AccordionItem>
-                </Accordion>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Practice Sets</CardTitle>
-                            <CardDescription>Manage the practice sets associated with this topic.</CardDescription>
-                        </div>
-                        <Button size="sm" onClick={() => handleOpenPracticeSetDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
-                    </CardHeader>
-                    <CardContent>
-                        {practiceSets.length > 0 ? (
-                            <ul className="space-y-2">
-                                {practiceSets.map(ps => {
-                                    const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
-                                    const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
-                                    return (
-                                        <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                            <div className="flex-grow flex items-center gap-2 flex-wrap">
-                                                <span className="font-medium">{ps.title}</span>
-                                                {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                                {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
-                                            </div>
-                                            <div className="flex gap-2 flex-shrink-0">
-                                                <Button variant="outline" size="sm" asChild>
-                                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
-                                                        Manage Questions
-                                                    </Link>
-                                                </Button>
-                                                 <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
-                                                    <Edit className="mr-2 h-4 w-4" /> Edit
-                                                </Button>
-                                                <Button variant="ghost" size="sm" asChild>
-                                                    <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}&topic=${topicId}`} target="_blank">
-                                                        <BookOpen className="mr-2 h-4 w-4"/> Preview
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        </li>
-                                    )
-                                })}
-                            </ul>
-                        ) : (
-                            <p className="text-muted-foreground text-center py-8">No practice sets created for this topic yet.</p>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-           
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Practice Sets</CardTitle>
+                        <CardDescription>Manage practice tests associated with this topic.</CardDescription>
+                    </div>
+                    <Button size="sm" onClick={() => handleOpenPracticeSetDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
+                </CardHeader>
+                <CardContent>
+                    {practiceSets.length > 0 ? (
+                        <ul className="space-y-2">
+                            {practiceSets.map(ps => {
+                                const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
+                                const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
+                                return (
+                                <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
+                                    <div className="flex-grow flex items-center gap-2 flex-wrap">
+                                        <span className="font-medium">{ps.title}</span>
+                                        {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
+                                        {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
+                                    </div>
+                                    <div className="flex gap-2 flex-shrink-0">
+                                        <Button variant="outline" size="sm" asChild>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
+                                                Manage Questions
+                                            </Link>
+                                        </Button>
+                                         <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
+                                            <Edit className="mr-2 h-4 w-4" /> Edit
+                                        </Button>
+                                        <Button variant="destructive" size="sm" onClick={() => setPracticeSetToDelete(ps)}>
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                        </Button>
+                                    </div>
+                                </li>
+                            )})}
+                        </ul>
+                    ) : (
+                        <p className="text-muted-foreground text-center py-8">No practice sets created for this topic yet.</p>
+                    )}
+                </CardContent>
+            </Card>
 
             <Dialog open={isPracticeSetDialogOpen} onOpenChange={setIsPracticeSetDialogOpen}>
                 <DialogContent>
@@ -369,7 +227,20 @@ export default function ManageTopicPage() {
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="practice-set-title">Title</Label>
-                            <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({ ...prev, title: e.target.value }))} />
+                            <div className="flex gap-2">
+                                <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({ ...prev, title: e.target.value }))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Practice Set')}>[Topic Title] - Practice Set</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - MCQ Questions')}>[Topic Title] - MCQ Questions</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Practice: [Topic Title]')}>[Subject] Practice: [Topic Title]</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title]: [Topic Title] Practice')}>[Textbook Title]: [Topic Title] Practice</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
@@ -435,84 +306,6 @@ export default function ManageTopicPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-
-             <Dialog open={isResourceDialogOpen} onOpenChange={setIsResourceDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{editingResource ? 'Edit' : 'Add'} Resource</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                             <Label>Resource Type</Label>
-                            <Select value={newResource.type} onValueChange={(v) => setNewResource({...newResource, type: v as any})}>
-                                <SelectTrigger><SelectValue/></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="video">Video</SelectItem>
-                                    <SelectItem value="audio">Audio</SelectItem>
-                                    <SelectItem value="pdf">PDF</SelectItem>
-                                    <SelectItem value="doc">Document</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                         <div className="space-y-2">
-                             <Label>Title</Label>
-                            <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
-                         </div>
-                         <Tabs defaultValue="url">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="url">From URL</TabsTrigger>
-                                <TabsTrigger value="upload">Upload File</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="url" className="pt-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="resource-url">URL</Label>
-                                    <Input id="resource-url" placeholder="https://example.com/resource" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
-                                </div>
-                            </TabsContent>
-                            <TabsContent value="upload" className="pt-4">
-                                 <div 
-                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
-                                    onClick={() => fileInputRef.current?.click()}
-                                >
-                                    <div className="space-y-1 text-center">
-                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                        <p className="text-sm text-muted-foreground">Click to upload a file</p>
-                                        <p className="text-xs text-muted-foreground">Video, Audio, PDF, DOC up to 50MB</p>
-                                    </div>
-                                </div>
-                                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-                                {isUploading && <div className="mt-2 flex items-center justify-center text-sm"><Loader2 className="animate-spin mr-2" /> Uploading...</div>}
-                            </TabsContent>
-                         </Tabs>
-                    </div>
-                    <DialogFooter>
-                        <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                        <Button onClick={handleSaveResource}>Save Resource</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            <AlertDialog open={!!resourceToDelete} onOpenChange={() => setResourceToDelete(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Resource?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to delete the resource "{resourceToDelete?.title}"? This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteResource}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            {viewerResource && (
-                <ResourceViewerDialog 
-                    resource={viewerResource} 
-                    open={viewerOpen} 
-                    onOpenChange={setViewerOpen} 
-                />
-            )}
         </div>
     )
 }

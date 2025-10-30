@@ -1,4 +1,5 @@
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -1214,6 +1215,24 @@ export const getChaptersBySubjectId = async (subjectId: string) => {
     }
 };
 
+export const getChapterById = async (textbookId: string, chapterId: string) => {
+    if (!textbookId || !chapterId) {
+        throw new Error("Textbook ID and Chapter ID are required.");
+    }
+    try {
+        const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+        const chapterSnap = await getDoc(chapterRef);
+        if (chapterSnap.exists()) {
+            return { id: chapterSnap.id, ...chapterSnap.data() };
+        }
+        return null;
+    } catch (e) {
+        console.error("Error getting chapter by ID: ", e);
+        throw new Error("Failed to fetch chapter.");
+    }
+};
+
+
 export const addChapter = async (subjectId: string, chapterData: { chapterNo: string, chapterName: string }) => {
     if (!subjectId || !chapterData.chapterNo || !chapterData.chapterName) {
         throw new Error("Subject ID, Chapter No, and Chapter Name are required.");
@@ -1812,6 +1831,23 @@ export const getAllTextbooks = async () => {
     }
 };
 
+export const getTextbookById = async (textbookId: string) => {
+    if (!textbookId) {
+        throw new Error("Textbook ID is required.");
+    }
+    try {
+        const textbookRef = doc(db, 'textbooks', textbookId);
+        const textbookSnap = await getDoc(textbookRef);
+        if (textbookSnap.exists()) {
+            return { id: textbookSnap.id, ...textbookSnap.data() };
+        }
+        return null;
+    } catch(e) {
+        console.error("Error getting textbook by ID: ", e);
+        throw new Error("Failed to fetch textbook.");
+    }
+};
+
 export const getChaptersByTextbookId = async (textbookId: string) => {
     try {
         const chaptersRef = collection(db, "textbooks", textbookId, "chapters");
@@ -1879,7 +1915,7 @@ export const addPracticeSetToTopic = async (textbookId: string, chapterId: strin
     try {
         const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`);
         const docRef = await addDoc(practiceSetsRef, {
-            title: practiceSetData.title,
+            ...practiceSetData,
             createdAt: serverTimestamp(),
         });
         return docRef.id;

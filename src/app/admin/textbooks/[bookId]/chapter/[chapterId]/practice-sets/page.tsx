@@ -1,18 +1,17 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, PracticeSet } from '@/lib/types';
+import type { Chapter, PracticeSet, Textbook } from '@/lib/types';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -28,6 +27,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getTextbookById } from '@/lib/firebase/firestore';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
@@ -41,6 +47,7 @@ export default function ManageChapterPracticeSetsPage() {
     const chapterId = params.chapterId as string;
 
     const [chapter, setChapter] = useState<Chapter | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
     const [practiceSets, setPracticeSets] = useState<PracticeSet[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -49,7 +56,7 @@ export default function ManageChapterPracticeSetsPage() {
     const [practiceSetData, setPracticeSetData] = useState<{title: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
         difficulty: ['Medium'],
-        questionSource: ['random-chapter']
+        questionSource: ['Random from Chapter']
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
@@ -59,6 +66,9 @@ export default function ManageChapterPracticeSetsPage() {
         const fetchData = async () => {
             setLoading(true);
             try {
+                const textbookData = await getTextbookById(textbookId);
+                setTextbook(textbookData as Textbook);
+
                 const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
                 const chapterSnap = await getDoc(chapterRef);
 
@@ -87,14 +97,15 @@ export default function ManageChapterPracticeSetsPage() {
 
     const handleOpenDialog = (ps: PracticeSet | null) => {
         setEditingPracticeSet(ps);
-        let difficultyArray = ps?.difficulty || ['Medium'];
-        if (typeof difficultyArray === 'string') {
-            difficultyArray = [difficultyArray as any];
+        
+        let difficultyArray: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[] = ['Medium'];
+        if (ps?.difficulty) {
+            difficultyArray = Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty] as any;
         }
-
-        let sourceArray = ps?.questionSource || ['Random from Chapter'];
-        if (typeof sourceArray === 'string') {
-            sourceArray = [sourceArray as any];
+        
+        let sourceArray: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[] = ['Random from Chapter'];
+        if (ps?.questionSource) {
+            sourceArray = Array.isArray(ps.questionSource) ? ps.questionSource : [ps.questionSource] as any;
         }
 
         setPracticeSetData(ps ? { title: ps.title, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', difficulty: ['Medium'], questionSource: ['Random from Chapter']});
@@ -147,6 +158,14 @@ export default function ManageChapterPracticeSetsPage() {
             setPracticeSetToDelete(null);
         }
     };
+    
+    const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Chapter Title]', chapter?.title || '')
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setPracticeSetData(prev => ({ ...prev, title }));
+    };
 
     if (loading) {
         return <div>Loading...</div>;
@@ -190,7 +209,7 @@ export default function ManageChapterPracticeSetsPage() {
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0">
                                         <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-set/${ps.id}`}>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/null/practice-set/${ps.id}`}>
                                                 Manage Questions
                                             </Link>
                                         </Button>
@@ -218,7 +237,20 @@ export default function ManageChapterPracticeSetsPage() {
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
                             <Label htmlFor="practice-set-title">Title</Label>
-                            <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({...prev, title: e.target.value}))} />
+                            <div className="flex gap-2">
+                                <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({...prev, title: e.target.value}))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Practice Set')}>[Chapter Title] - Practice Set</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - MCQ Practice')}>[Chapter Title] - MCQ Questions</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Practice: [Chapter Title]')}>[Subject] Practice: [Chapter Title]</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title]: [Chapter Title] Practice')}>[Textbook Title]: [Chapter Title] Practice</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
