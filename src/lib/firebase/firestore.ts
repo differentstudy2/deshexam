@@ -1215,24 +1215,6 @@ export const getChaptersBySubjectId = async (subjectId: string) => {
     }
 };
 
-export const getChapterById = async (textbookId: string, chapterId: string) => {
-    if (!textbookId || !chapterId) {
-        throw new Error("Textbook ID and Chapter ID are required.");
-    }
-    try {
-        const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-        const chapterSnap = await getDoc(chapterRef);
-        if (chapterSnap.exists()) {
-            return { id: chapterSnap.id, ...chapterSnap.data() };
-        }
-        return null;
-    } catch (e) {
-        console.error("Error getting chapter by ID: ", e);
-        throw new Error("Failed to fetch chapter.");
-    }
-};
-
-
 export const addChapter = async (subjectId: string, chapterData: { chapterNo: string, chapterName: string }) => {
     if (!subjectId || !chapterData.chapterNo || !chapterData.chapterName) {
         throw new Error("Subject ID, Chapter No, and Chapter Name are required.");
@@ -1864,6 +1846,23 @@ export const getChaptersByTextbookId = async (textbookId: string) => {
     }
 };
 
+export const getChapterById = async (textbookId: string, chapterId: string) => {
+    if (!textbookId || !chapterId) {
+        throw new Error("Textbook ID and Chapter ID are required.");
+    }
+    try {
+        const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+        const chapterSnap = await getDoc(chapterRef);
+        if (chapterSnap.exists()) {
+            return { id: chapterSnap.id, ...chapterSnap.data() };
+        }
+        return null;
+    } catch (e) {
+        console.error("Error getting chapter by ID: ", e);
+        throw new Error("Failed to fetch chapter.");
+    }
+};
+
 export const getTopicsByChapterId = async (textbookId: string, chapterId: string) => {
     if (!textbookId || !chapterId) return [];
     try {
@@ -1955,7 +1954,7 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
 export const getPracticeSetById = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string) => {
     if (!textbookId || !chapterId || !practiceSetId) return null;
     try {
-        const path = topicId 
+        const path = (topicId && topicId !== 'null')
             ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}`
             : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}`;
         const practiceSetRef = doc(db, path);
@@ -1969,6 +1968,7 @@ export const getPracticeSetById = async (textbookId: string, chapterId: string, 
         throw new Error("Failed to fetch practice set.");
     }
 };
+
 
 export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionData: any) => {
     const auth = getAuth();
@@ -1998,7 +1998,7 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
 export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string) => {
     if (!textbookId || !chapterId || !practiceSetId) return [];
     try {
-        const path = topicId
+        const path = (topicId && topicId !== 'null')
             ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
             : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
         const questionsRef = collection(db, path);
@@ -2010,6 +2010,7 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
         throw new Error("Failed to fetch questions.");
     }
 };
+
 
 export const updateQuestionInPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string, questionData: any) => {
     const path = topicId
