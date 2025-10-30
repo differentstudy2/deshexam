@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useMemo } from 'react';
 import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet, getUserProfile } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -79,6 +79,19 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timeUp, setTimeUp] = useState(false);
   const [totalMarks, setTotalMarks] = useState(0);
+
+    const difficulties = useMemo(() => {
+        if (!test?.difficulty) return [];
+        if (Array.isArray(test.difficulty)) return test.difficulty;
+        return [String(test.difficulty)];
+    }, [test]);
+
+    const sources = useMemo(() => {
+        if (!test?.questionSource) return [];
+        if (Array.isArray(test.questionSource)) return test.questionSource;
+        return [String(test.questionSource)];
+    }, [test]);
+
 
   useEffect(() => {
     const processInitialData = () => {
@@ -302,10 +315,15 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             </header>
             <div className="p-6 text-center">
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
+                 <p className="text-sm text-muted-foreground mt-1">{test.subtitle}</p>
+                 <div className="flex flex-wrap justify-center gap-2 mt-2">
+                    {difficulties.map(d => <Badge key={d} variant="secondary">{String(d)}</Badge>)}
+                    {sources.map(s => <Badge key={s} variant="outline">{String(s)}</Badge>)}
+                 </div>
             </div>
 
              {timeLeft !== null && totalDuration > 0 && (
-                <Card className="sticky top-0 z-40 rounded-none border-x-0 border-b">
+                <Card className="sticky top-16 z-40 rounded-none border-x-0 border-b">
                     <CardContent className="p-3 flex items-center justify-center gap-4">
                          <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
                             <Clock className="w-5 h-5" />
@@ -423,3 +441,5 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
+
+    
