@@ -355,7 +355,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                               <Clock className="w-5 h-5" />
                               <span>{formatTime(timeLeft)}</span>
                           </div>
-                          <Progress value={(timeLeft / totalDuration) * 100} className="w-40 h-2" />
+                          <Progress value={(timeLeft / totalDuration) * 100} className="w-24 h-2" />
                       </div>
                   )}
                    <Separator orientation="vertical" className="h-6 hidden sm:block" />
