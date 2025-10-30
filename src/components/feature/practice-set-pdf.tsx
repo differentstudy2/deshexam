@@ -13,7 +13,7 @@ interface PracticeSetPDFProps {
 
 export const PracticeSetPDF = ({ practiceSet, questions, textbookTitle, chapterTitle, topicTitle }: PracticeSetPDFProps) => {
     return (
-        <div style={{ fontFamily: 'sans-serif', padding: '20px', color: '#333' }}>
+        <div style={{ fontFamily: 'sans-serif', padding: '40px', color: '#333' }}>
             <h1 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '10px' }}>{textbookTitle}</h1>
             <h2 style={{ fontSize: '20px', textAlign: 'center', marginBottom: '10px' }}>{chapterTitle}</h2>
             <h3 style={{ fontSize: '18px', textAlign: 'center', marginBottom: '10px' }}>{topicTitle}</h3>
