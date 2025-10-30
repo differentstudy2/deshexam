@@ -1,7 +1,7 @@
 
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { PracticeSet, Textbook, Chapter, Topic, Question } from '@/lib/types';
@@ -83,10 +83,18 @@ export default async function PracticeSetPage({ params }: PageProps) {
 
     const initialTest: Test = {
         ...practiceSet,
-        questions: questions.map(q => ({...q})),
+        questions: questions.map(q => {
+            const { createdAt, ...rest } = q;
+            return {
+                ...rest,
+                // Serialize Firestore Timestamp
+                createdAt: createdAt?.toDate ? createdAt.toDate().toISOString() : new Date().toISOString(),
+            };
+        }),
         testType: 'Practice Set'
     };
 
+    // Serialize any potential Timestamps in the main objects
     const initialTextbook = { ...textbook };
     const initialChapter = { ...chapter };
     const initialTopic = topic ? { ...topic } : null;
