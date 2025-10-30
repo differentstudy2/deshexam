@@ -320,7 +320,9 @@ export default function PracticeSetPage() {
                     <div><strong>Topic:</strong> {topic?.title}</div>
                     <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
                     <div><strong>Full Marks:</strong> {totalMarks}</div>
-                    <div><strong>Duration:</strong> {test.duration || totalMarks} min</div>
+                    <div>
+                        <strong>Duration:</strong> {timeLeft !== null ? formatTime(timeLeft) : `${test.duration || totalMarks} min`}
+                    </div>
                 </div>
             </header>
             <div className="p-6 text-center">
