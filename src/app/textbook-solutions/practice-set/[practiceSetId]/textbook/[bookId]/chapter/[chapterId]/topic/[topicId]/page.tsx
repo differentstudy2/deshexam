@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -312,14 +313,16 @@ export default function PracticeSetPage() {
             <header className="p-6 text-center border-b">
                 <p className="font-semibold text-primary">{textbook?.subject || 'Practice'}</p>
                 <h1 className="font-headline text-3xl font-bold tracking-tighter mt-1">{test.title}</h1>
-                <p className="text-muted-foreground mt-1 max-w-2xl mx-auto">{[textbook?.board, textbook?.class].filter(Boolean).join(' • ')}</p>
+                <p className="text-muted-foreground mt-1 max-w-2xl mx-auto">
+                    {[textbook?.board, textbook?.class].filter(Boolean).join(' • ')}
+                </p>
                 <div className="mt-4 flex items-center justify-center text-sm text-muted-foreground space-x-6">
                     <div className="flex items-center gap-1.5">
                         <HelpCircle className="w-4 h-4" />
                         <span>{test.questions.length} Questions</span>
                     </div>
-                     <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-4 h-4" />
+                    <div className="flex items-center gap-1.5">
+                        <BarChart className="w-4 h-4" />
                         <span>{totalMarks} Marks</span>
                     </div>
                     {timeLeft !== null && (
