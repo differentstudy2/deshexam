@@ -293,6 +293,8 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }
   
   const totalDuration = (test.duration || totalMarks) * 60;
+  const answeredCount = Object.keys(answers).length;
+  const skippedCount = test.questions.length - answeredCount;
 
   return (
     <div className="container py-8 max-w-4xl mx-auto">
@@ -345,17 +347,24 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
             </div>
 
-             {timeLeft !== null && totalDuration > 0 && (
-                <Card className={cn("sticky rounded-none border-x-0 border-b", "top-16")}>
-                    <CardContent className="p-3 flex items-center justify-center gap-4">
-                         <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
-                            <Clock className="w-5 h-5" />
-                            <span>{formatTime(timeLeft)}</span>
-                        </div>
-                        <Progress value={(timeLeft / totalDuration) * 100} className="w-1/2 h-2" />
-                    </CardContent>
-                </Card>
-            )}
+            <Card className={cn("sticky top-16 z-40 rounded-none border-x-0 border-b")}>
+              <CardContent className="p-3 flex items-center justify-center gap-4 flex-wrap">
+                  {timeLeft !== null && totalDuration > 0 && (
+                      <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
+                              <Clock className="w-5 h-5" />
+                              <span>{formatTime(timeLeft)}</span>
+                          </div>
+                          <Progress value={(timeLeft / totalDuration) * 100} className="w-40 h-2" />
+                      </div>
+                  )}
+                   <Separator orientation="vertical" className="h-6 hidden sm:block" />
+                   <div className="flex items-center gap-4 text-sm font-medium">
+                      <div className="text-green-600">Answered: {answeredCount}</div>
+                      <div className="text-destructive">Skipped: {skippedCount}</div>
+                   </div>
+              </CardContent>
+            </Card>
 
             <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
