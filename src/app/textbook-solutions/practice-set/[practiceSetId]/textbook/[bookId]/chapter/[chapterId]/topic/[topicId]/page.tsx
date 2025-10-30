@@ -81,23 +81,36 @@ export default async function PracticeSetPage({ params }: PageProps) {
     
     const questions = await getQuestionsByPracticeSet(params.bookId, params.chapterId, params.topicId === 'null' ? null : params.topicId, params.practiceSetId);
 
-    const initialTest: Test = {
+    // Helper function to serialize Firestore Timestamps
+    const serializeFirestoreTimestamps = (data: any) => {
+        if (!data) return data;
+        const newObj: { [key: string]: any } = {};
+        for (const key in data) {
+            const value = data[key];
+            if (value && typeof value === 'object' && value.hasOwnProperty('seconds') && value.hasOwnProperty('nanoseconds')) {
+                // It's a Firestore Timestamp
+                newObj[key] = new Date(value.seconds * 1000).toISOString();
+            } else if (Array.isArray(value)) {
+                newObj[key] = value.map(item => serializeFirestoreTimestamps(item));
+            } else if (typeof value === 'object') {
+                newObj[key] = serializeFirestoreTimestamps(value);
+            } else {
+                newObj[key] = value;
+            }
+        }
+        return newObj;
+    };
+
+    const initialTest = {
         ...practiceSet,
-        questions: questions.map(q => {
-            const { createdAt, ...rest } = q;
-            return {
-                ...rest,
-                // Serialize Firestore Timestamp
-                createdAt: createdAt?.toDate ? createdAt.toDate().toISOString() : new Date().toISOString(),
-            };
-        }),
+        questions: questions.map(q => serializeFirestoreTimestamps(q)),
         testType: 'Practice Set'
     };
 
-    // Serialize any potential Timestamps in the main objects
-    const initialTextbook = { ...textbook };
-    const initialChapter = { ...chapter };
-    const initialTopic = topic ? { ...topic } : null;
+    const serializedTest = serializeFirestoreTimestamps(initialTest);
+    const serializedTextbook = serializeFirestoreTimestamps(textbook);
+    const serializedChapter = serializeFirestoreTimestamps(chapter);
+    const serializedTopic = topic ? serializeFirestoreTimestamps(topic) : null;
 
     return (
         <Suspense fallback={
@@ -106,10 +119,10 @@ export default async function PracticeSetPage({ params }: PageProps) {
             </div>
         }>
             <PracticeSetClientPage 
-                initialTest={initialTest as any} 
-                initialTextbook={initialTextbook as any} 
-                initialChapter={initialChapter as any}
-                initialTopic={initialTopic as any}
+                initialTest={serializedTest as any} 
+                initialTextbook={serializedTextbook as any} 
+                initialChapter={serializedChapter as any}
+                initialTopic={serializedTopic as any}
             />
         </Suspense>
     )
@@ -117,3 +130,4 @@ export default async function PracticeSetPage({ params }: PageProps) {
 
 // Define the type for the initialTest prop
 type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };
+
