@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -82,18 +82,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
-
-  const difficulties = useMemo(() => {
-    if (!test?.difficulty) return [];
-    if (Array.isArray(test.difficulty)) return test.difficulty;
-    return [String(test.difficulty)];
-  }, [test]);
-
-  const sources = useMemo(() => {
-      if (!test?.questionSource) return [];
-      if (Array.isArray(test.questionSource)) return test.questionSource;
-      return [String(test.questionSource)];
-  }, [test]);
 
 
   useEffect(() => {
