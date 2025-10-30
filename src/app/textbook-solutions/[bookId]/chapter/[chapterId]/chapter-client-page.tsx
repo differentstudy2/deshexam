@@ -182,9 +182,10 @@ export default function ChapterClientPage() {
     }, [topics, chapterId, activeTopicId]);
     
     useEffect(() => {
-      if (activeTopic?.content) {
+      const activeContentSource = activeTopic || chapters.find(c => c.id === chapterId);
+      if (activeContentSource?.content) {
         const idMap = new Map();
-        const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
+        const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
         const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
@@ -204,7 +205,7 @@ export default function ChapterClientPage() {
       } else {
         setHeadings([]);
       }
-    }, [activeTopic]);
+    }, [activeTopic, chapters, chapterId]);
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
         if (!cId || topics[cId]) return;
@@ -224,13 +225,11 @@ export default function ChapterClientPage() {
             setLoading(true);
             try {
                 const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-                const practiceSetsRef = collection(chapterRef, 'practiceSets');
-
-                const [textbookSnap, chaptersQuerySnap, chapterSnap, practiceSetsSnap, allExams] = await Promise.all([
+                
+                const [textbookSnap, chaptersQuerySnap, chapterSnap, allExams] = await Promise.all([
                     getDoc(doc(db, 'textbooks', textbookId)),
                     getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
                     getDoc(chapterRef),
-                    getDocs(practiceSetsRef),
                     getAllContent("Exam")
                 ]);
 
@@ -240,7 +239,11 @@ export default function ChapterClientPage() {
                 chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
 
                 if (chapterSnap.exists()) {
-                    const chapterData = { id: chapterSnap.id, ...chapterSnap.data(), practiceSets: practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()})) } as Chapter;
+                    const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
+                    const chapterPracticeSetsRef = collection(chapterRef, 'practiceSets');
+                    const practiceSetsSnap = await getDocs(chapterPracticeSetsRef);
+                    chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
+                    
                     const chapterIndex = chaptersData.findIndex(c => c.id === chapterId);
                     if(chapterIndex > -1) {
                          chaptersData[chapterIndex] = chapterData;
@@ -273,14 +276,13 @@ export default function ChapterClientPage() {
         setViewerOpen(true);
     };
     
-    const handleDownloadPdf = async (practiceSet: PracticeSet) => {
-        if (!activeTopic) return;
+    const handleDownloadPdf = async (practiceSet: PracticeSet, topicContext?: Topic) => {
         setIsGeneratingPdf(practiceSet.id);
         try {
-            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, activeTopic.id, practiceSet.id);
+            const topicId = topicContext ? topicContext.id : 'null';
+            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSet.id);
             setPdfContent({ practiceSet, questions });
 
-            // Allow time for the PDF content to render in the hidden div
             setTimeout(async () => {
                 const pdfElement = document.getElementById('pdf-content');
                 if (pdfElement) {
@@ -360,6 +362,37 @@ export default function ChapterClientPage() {
         'bg-teal-100 dark:bg-teal-900/20',
     ];
 
+    const PracticeSetItem = ({ practiceSet, topicContext, isChapterLevel }: { practiceSet: PracticeSet, topicContext?: Topic, isChapterLevel?: boolean }) => {
+        const difficulties = Array.isArray(practiceSet.difficulty) ? practiceSet.difficulty : practiceSet.difficulty ? [practiceSet.difficulty] : [];
+        const sources = Array.isArray(practiceSet.questionSource) ? practiceSet.questionSource : practiceSet.questionSource ? [practiceSet.questionSource] : [];
+        
+        return (
+            <div className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div className="flex-grow">
+                   <p className="font-semibold">{practiceSet.subtitle}: {practiceSet.title}</p>
+                   <div className="flex flex-wrap gap-2 mt-2">
+                       {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
+                       {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
+                   </div>
+                </div>
+                <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
+                  <Button size="sm" asChild className="flex-1">
+                      <Link href={`/textbook-solutions/practice-set/${practiceSet.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicContext?.id || 'null'}`}>Start Practice</Link>
+                  </Button>
+                  <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handleDownloadPdf(practiceSet, topicContext)}
+                      disabled={isGeneratingPdf === practiceSet.id}
+                  >
+                      {isGeneratingPdf === practiceSet.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
+                      Download PDF
+                  </Button>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen bg-background">
@@ -447,62 +480,34 @@ export default function ChapterClientPage() {
                             </article>
                         )}
 
-                        {topics[chapterId] && topics[chapterId].length > 0 && (
-                            <section id="topics" className="my-8">
-                                <h2 className="font-headline text-3xl font-bold mb-6">Topics in this Chapter</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {topics[chapterId].map((topic, index) => (
-                                    <Link key={topic.id} href={`/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
-                                        <div className={cn(
-                                            "p-4 rounded-lg flex items-center gap-4 transition-transform transform hover:scale-[1.02] hover:shadow-lg border",
-                                            bgColors[index % bgColors.length]
-                                        )}>
-                                            <FileText className="w-5 h-5 flex-shrink-0 text-foreground/70" />
-                                            <span className="font-semibold flex-grow text-foreground">{topic.title}</span>
-                                            <ChevronRight className="w-5 h-5 flex-shrink-0 opacity-70" />
-                                        </div>
-                                    </Link>
-                                ))}
+                        <section id="practice-sets" className="my-8">
+                            <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
+                            {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
+                                <div className="space-y-4 mb-6">
+                                    <h3 className="font-semibold">Chapter Level Practice</h3>
+                                    {activeChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
                                 </div>
-                            </section>
-                        )}
-                        
-                        {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
-                            <section id="practice-sets" className="my-8">
-                                <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
-                                 <div className="space-y-4">
-                                     {activeChapter.practiceSets.map(ps => {
-                                        const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
-                                        const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
-                                        return (
-                                         <div key={ps.id} className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                             <div className="flex-grow">
-                                                <p className="font-semibold flex-grow">{ps.subtitle}: {ps.title}</p>
-                                                <div className="flex flex-wrap gap-2 mt-2">
-                                                    {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                                    {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
-                                                </div>
-                                             </div>
-                                             <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-                                               <Button size="sm" asChild className="flex-1">
-                                                   <Link href={`/textbook-solutions/practice-set/${ps.id}?textbook=${textbookId}&chapter=${chapterId}`}>Start Practice</Link>
-                                               </Button>
-                                               <Button 
-                                                   size="sm" 
-                                                   variant="outline" 
-                                                   className="flex-1"
-                                                   onClick={() => handleDownloadPdf(ps)}
-                                                   disabled={isGeneratingPdf === ps.id}
-                                               >
-                                                   {isGeneratingPdf === ps.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
-                                                   Download PDF
-                                               </Button>
-                                             </div>
-                                         </div>
-                                     )})}
-                                 </div>
-                            </section>
-                        )}
+                            )}
+
+                             {topics[chapterId] && topics[chapterId].length > 0 && (
+                                <Accordion type="multiple" className="w-full space-y-4">
+                                    {topics[chapterId].map((topic, index) => (
+                                        (topic.practiceSets && topic.practiceSets.length > 0) && (
+                                            <AccordionItem value={topic.id} key={topic.id} className="border rounded-lg bg-card/50">
+                                                <AccordionTrigger className="p-4 hover:no-underline font-semibold">
+                                                    Topic: {topic.title}
+                                                </AccordionTrigger>
+                                                <AccordionContent className="p-4 border-t">
+                                                     <div className="space-y-4">
+                                                        {topic.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} topicContext={topic} />)}
+                                                    </div>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        )
+                                    ))}
+                                </Accordion>
+                            )}
+                        </section>
                         
                         {activeChapter?.resources && activeChapter.resources.length > 0 && (
                             <section id="resources" className="my-8">
@@ -550,3 +555,4 @@ export default function ChapterClientPage() {
         </div>
     );
 }
+
