@@ -305,7 +305,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             </div>
 
              {timeLeft !== null && totalDuration > 0 && (
-                <Card className="sticky top-0 z-40 rounded-t-none border-x-0 border-b">
+                <Card className="sticky top-0 z-40 rounded-none border-x-0 border-b">
                     <CardContent className="p-3 flex items-center justify-center gap-4">
                          <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
                             <Clock className="w-5 h-5" />
