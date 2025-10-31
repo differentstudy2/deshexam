@@ -1970,7 +1970,7 @@ export const getPracticeSetById = async (textbookId: string, chapterId: string, 
 };
 
 
-export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionData: any) => {
+export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string, questionData: any) => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) throw new Error("Authentication required.");
@@ -1983,7 +1983,7 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     });
 
     try {
-        const path = topicId
+        const path = (topicId && topicId !== 'null')
             ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
             : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
         const questionsRef = collection(db, path);
