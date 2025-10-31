@@ -68,7 +68,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [chapter, setChapter] = useState<Chapter | null>(initialChapter);
   const [topic, setTopic] = useState<Topic | null>(initialTopic);
   const [student, setStudent] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -431,7 +431,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         <div className="bg-background border rounded-lg shadow-sm">
             <header className="p-6 border-b space-y-6">
                 {student && (
-                     <Card className="shadow-none border-0 p-0">
+                    <Card className="shadow-none border-0 p-0">
                         <CardHeader className="p-0">
                             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                                 <div className="flex items-center gap-4">
@@ -440,8 +440,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                                            <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                                             {student?.subscriptionPlan === 'pro' && (
                                                 <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
                                                     <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
@@ -460,11 +461,11 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" asChild>
+                                <div className="flex gap-2 w-full sm:w-auto">
+                                    <Button variant="outline" size="sm" asChild className="flex-1">
                                         <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Read Topic / Chapter</Link>
                                     </Button>
-                                    <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf !== null}>
+                                    <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf !== null} className="flex-1">
                                         {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
                                         Download as PDF
                                     </Button>
@@ -715,3 +716,5 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
+
+    
