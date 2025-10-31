@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -382,36 +382,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                             <div className="text-destructive">Skipped: {Math.max(0, highestAttemptedIndex + 1 - answeredCount)}</div>
                         </div>
                     </div>
-                    <div className="flex flex-wrap gap-1.5 justify-center">
-                        {test.questions.map((q, qIndex) => {
-                            const isCurrent = qIndex >= startIndex && qIndex < endIndex;
-                            const isAnswered = answers[q.id] !== undefined;
-                            const isSkipped = !isAnswered && qIndex <= highestAttemptedIndex;
-
-                             let variant: "default" | "outline" | "destructive" = "outline";
-                            if (isAnswered) {
-                                variant = "default";
-                            } else if (isSkipped) {
-                                variant = "destructive";
-                            }
-
-                            return (
-                                <Button
-                                    key={q.id || qIndex}
-                                    variant={variant}
-                                    size="sm"
-                                    className={cn(
-                                        "h-8 w-8 rounded-full",
-                                        isCurrent && "ring-2 ring-ring ring-offset-2",
-                                        isAnswered && "bg-green-500 hover:bg-green-600",
-                                    )}
-                                    onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
-                                >
-                                    {qIndex + 1}
-                                </Button>
-                            )
-                        })}
-                    </div>
                 </CardContent>
             </Card>
 
@@ -567,3 +537,5 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
+
+    
