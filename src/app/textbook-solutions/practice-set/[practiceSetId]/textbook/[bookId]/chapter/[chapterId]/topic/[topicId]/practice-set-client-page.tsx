@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -287,10 +286,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     };
     
   if (loading) {
-    return (
+      return (
         <div className="container py-8 max-w-4xl mx-auto">
             <div className="bg-background border rounded-lg shadow-sm">
-                <header className="p-6 border-b space-y-4">
+                <header className="p-6 border-b space-y-6">
                     <div className="flex items-center gap-4">
                         <Skeleton className="h-16 w-16 rounded-full" />
                         <div className="space-y-2">
@@ -306,7 +305,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 <div className="p-6 text-center">
                     <Skeleton className="h-8 w-3/4 mx-auto" />
                 </div>
-                <Card className="sticky top-[64px] z-40 border-x-0 border-b">
+                 <Card className="sticky top-[64px] z-40 border-x-0 border-b">
                     <CardContent className="p-3">
                          <div className="flex items-center justify-center gap-4 sm:gap-6">
                             <Skeleton className="h-6 w-24" />
@@ -331,21 +330,14 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 </div>
             </div>
         </div>
-    );
+      );
   }
-
-  if (!test) {
+  
+  if (!test || !textbook || !chapter || !student) {
     return (
-      <div className="text-center min-h-[calc(100vh-200px)] flex flex-col justify-center">
-        <h2 className="text-2xl font-bold">Practice Set not found</h2>
-        <p className="text-muted-foreground">The practice set you are looking for does not exist.</p>
-        <Button asChild className="mt-4 mx-auto" variant="outline">
-          <Link href="/textbook-solutions">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Textbooks
-          </Link>
-        </Button>
-      </div>
+        <div className="flex items-center justify-center h-full">
+            <p className="text-destructive">Could not load test data. Please try again later.</p>
+        </div>
     );
   }
   
@@ -468,6 +460,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
             <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
+                
                 {test.questions.map((question, index) => (
                     <Card key={question.id || index} ref={el => questionRefs.current[index] = el} className="p-6 shadow-none border scroll-m-24">
                         <CardHeader className="p-0 mb-4">
