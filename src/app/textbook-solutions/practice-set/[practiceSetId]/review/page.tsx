@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -24,6 +25,11 @@ import { ScoreCircle } from '@/components/feature/score-circle';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 type Submission = { 
     id: string; 
@@ -242,6 +248,7 @@ function ReviewDisplay() {
                             <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-1 pt-1">
                                 {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
                                 {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                                {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
                             </div>
                         </div>
                     </div>
@@ -326,7 +333,9 @@ function ReviewDisplay() {
                         )}
                     </div>
                     <div className="flex-1">
-                        <p className="font-semibold">{index + 1}. {question.text}</p>
+                        <div className="prose dark:prose-invert max-w-none">
+                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{`${index + 1}. ${question.text}`}</ReactMarkdown>
+                        </div>
                         <div className="mt-4 space-y-2">
                             {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => {
                                 const isUserAnswer = userAnswer === option.text;
@@ -348,14 +357,14 @@ function ReviewDisplay() {
                                                 : <div className="w-5 h-5 mt-0.5 shrink-0" /> 
                                         }
                                         <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium">{option.text}</span>
+                                            <div className="flex items-center justify-between prose dark:prose-invert max-w-none">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
                                                 {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
                                             </div>
                                             {option.explanation && (
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {option.explanation}
-                                                </p>
+                                                <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -381,9 +390,9 @@ function ReviewDisplay() {
                                                     {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-auto">Correct</Badge>}
                                                 </div>
                                                 {option.explanation && (
-                                                    <p className="text-sm text-muted-foreground mt-2 pl-7">
-                                                        {option.explanation}
-                                                    </p>
+                                                    <div className="text-sm text-muted-foreground mt-2 pl-7 prose dark:prose-invert max-w-none">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
+                                                    </div>
                                                 )}
                                             </div>
                                         )
@@ -447,9 +456,9 @@ function ReviewDisplay() {
                             )}
                         </div>
                         {question.explanation && (
-                            <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800">
-                            <h4 className="font-semibold text-sm mb-1">General Explanation</h4>
-                            <p className="text-sm">{question.explanation}</p>
+                            <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800 prose dark:prose-invert max-w-none text-sm">
+                                <h4 className="font-semibold text-sm mb-1">General Explanation</h4>
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.explanation}</ReactMarkdown>
                             </div>
                         )}
                          <div className="mt-4 flex items-center gap-2">
