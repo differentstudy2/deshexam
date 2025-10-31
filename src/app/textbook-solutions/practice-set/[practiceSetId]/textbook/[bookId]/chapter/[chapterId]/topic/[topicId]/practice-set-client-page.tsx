@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, Suspense, useMemo, useCallback } from 'react';
+import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
 import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet, getUserProfile } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,14 +85,17 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [currentPage, setCurrentPage] = useState(0);
   const QUESTIONS_PER_PAGE = 5;
 
-  const answeredCount = Object.keys(answers).length;
-  
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const highestAttemptedIndex = useMemo(() => {
     if (!test) return -1;
     return test.questions.reduce((maxIndex, q, index) => {
         return answers[q.id] !== undefined ? Math.max(maxIndex, index) : maxIndex;
     }, -1);
   }, [answers, test]);
+  
+  const answeredCount = Object.keys(answers).length;
+  const skippedCount = highestAttemptedIndex > -1 ? highestAttemptedIndex + 1 - answeredCount : 0;
   
   const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
   const startIndex = currentPage * QUESTIONS_PER_PAGE;
@@ -106,6 +109,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         }
         
         if (initialTest) {
+            questionRefs.current = Array(initialTest.questions.length).fill(null);
             const questionsWithMatchingOptions = initialTest.questions.map((q: any) => {
                 if (q.type === 'Matching' && q.correctAnswer) {
                     const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
@@ -281,6 +285,13 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 return { title: '', description: '' };
         }
     };
+    
+    const handleNavigateToQuestion = (qIndex: number) => {
+        setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE));
+        setTimeout(() => {
+            questionRefs.current[qIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    };
 
 
   if (loading) {
@@ -365,7 +376,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 "sticky rounded-none top-[64px] z-40 border-x-0 border-b",
                 timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
             )}>
-                <CardContent className="p-3 flex flex-col gap-4">
+                <CardContent className="p-3 flex flex-col gap-3">
                     <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                         {timeLeft !== null && totalDuration > 0 && (
                             <div className="flex items-center gap-3">
@@ -377,10 +388,34 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                             </div>
                         )}
                         <Separator orientation="vertical" className="h-6 hidden sm:block" />
-                        <div className="flex items-center gap-4 text-sm font-medium">
+                         <div className="flex items-center gap-4 text-sm font-medium">
                             <div className="text-green-600">Answered: {answeredCount}</div>
-                            <div className="text-destructive">Skipped: {Math.max(0, highestAttemptedIndex + 1 - answeredCount)}</div>
+                            <div className="text-destructive">Skipped: {skippedCount}</div>
                         </div>
+                    </div>
+                     <div className="flex flex-wrap items-center justify-center gap-1.5 border-t pt-3">
+                        {test.questions.map((q, qIndex) => {
+                            const isCurrent = Math.floor(qIndex / QUESTIONS_PER_PAGE) === currentPage;
+                            const isAnswered = answers[q.id] !== undefined;
+                            const isSkipped = qIndex < highestAttemptedIndex && !isAnswered;
+
+                            let variant: 'default' | 'destructive' | 'outline' | 'secondary' = 'outline';
+                            if(isCurrent) variant = 'secondary';
+                            if(isAnswered) variant = 'default';
+                            if(isSkipped) variant = 'destructive';
+
+                            return (
+                               <Button
+                                    key={q.id}
+                                    variant={variant}
+                                    size="sm"
+                                    className="h-7 w-7 rounded-full p-0 text-xs"
+                                    onClick={() => handleNavigateToQuestion(qIndex)}
+                                >
+                                    {qIndex + 1}
+                                </Button>
+                            )
+                        })}
                     </div>
                 </CardContent>
             </Card>
@@ -390,7 +425,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 {currentQuestions && currentQuestions.map((question, index) => {
                     const questionIndex = startIndex + index;
                     return (
-                        <Card key={question.id || questionIndex} className="p-6 shadow-none border">
+                        <Card key={question.id || questionIndex} ref={el => questionRefs.current[questionIndex] = el} className="p-6 shadow-none border scroll-m-24">
                             <CardHeader className="p-0 mb-4">
                                 <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
                                     <span>{questionIndex + 1}.</span> <span>{question.text}</span>
@@ -537,5 +572,3 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
-
-    
