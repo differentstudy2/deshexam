@@ -176,3 +176,14 @@
 .th-full {
   height: 250px;
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+    }
+    
+    .tracking-tight {
+      font-size: 16px;
+    }
+}
