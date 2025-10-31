@@ -268,6 +268,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     };
 
     const getConfirmDialogContent = () => {
+        const baseDescription = `Are you sure you want to ${confirmAction}?`;
         switch (confirmAction) {
             case 'submit':
                 return { 
@@ -568,28 +569,30 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <AlertTriangle className="text-yellow-500" />
                         {getConfirmDialogContent().title}
                     </AlertDialogTitle>
+                    <AlertDialogDescription>
+                        <>
+                            {getConfirmDialogContent().description}
+                            {confirmAction === 'submit' && skippedQuestions.length > 0 && (
+                                <div className="mt-4">
+                                    <div className="font-semibold">You have skipped the following questions:</div>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {skippedQuestions.map(qIndex => (
+                                            <Button
+                                                key={`confirm-skip-${qIndex}`}
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-7 w-7 p-0"
+                                                onClick={() => handleNavigateToQuestion(qIndex)}
+                                            >
+                                                {qIndex + 1}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogDescription>
-                    {getConfirmDialogContent().description}
-                    {confirmAction === 'submit' && skippedQuestions.length > 0 && (
-                        <div className="mt-4">
-                            <div className="font-semibold">You have skipped the following questions:</div>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {skippedQuestions.map(qIndex => (
-                                    <Button
-                                        key={`confirm-skip-${qIndex}`}
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-7 w-7 p-0"
-                                        onClick={() => handleNavigateToQuestion(qIndex)}
-                                    >
-                                        {qIndex + 1}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </AlertDialogDescription>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setConfirmAction(null)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmAction}>Continue</AlertDialogAction>
@@ -599,3 +602,5 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
+
+    
