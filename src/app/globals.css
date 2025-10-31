@@ -217,5 +217,32 @@
   .text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
+  }
 }
+
+
+@page {
+  size: A4;
+  margin: 15mm 12mm 20mm 12mm; /* top, right, bottom, left */
+}
+
+@media print {
+  body {
+    margin: 0;
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pdf-page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: auto;
+    background: white;
+    box-sizing: border-box;
+  }
+
+  .pdf-inner {
+    padding: 15mm 12mm 20mm 12mm;
+  }
 }

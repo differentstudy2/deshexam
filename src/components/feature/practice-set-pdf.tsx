@@ -48,8 +48,8 @@ export const PracticeSetPDF = ({
     }
     
     return (
-        <div style={{ fontFamily: 'sans-serif', padding: '0', color: '#333', width: '210mm', minHeight: '297mm', background: 'white' }}>
-            <div style={{ padding: '12.7mm' }}>
+        <div className="pdf-page" style={{ fontFamily: 'sans-serif', color: '#333', background: 'white' }}>
+            <div className="pdf-inner">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', borderBottom: '1px solid #ccc', paddingBottom: '15px', marginBottom: '20px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
                         <div><strong>{renderBengaliLabel('Institute Name')}:</strong> DeshExam.com</div>

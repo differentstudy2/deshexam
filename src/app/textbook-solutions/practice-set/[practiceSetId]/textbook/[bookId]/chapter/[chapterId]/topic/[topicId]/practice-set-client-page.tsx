@@ -300,7 +300,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     };
 
     const getConfirmDialogContent = () => {
-        const baseDescription = `Are you sure you want to ${confirmAction}?`;
         switch (confirmAction) {
             case 'submit':
                 return { 
@@ -325,33 +324,24 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             setTimeout(async () => {
                 const pdfElement = document.getElementById('pdf-content');
                 if (pdfElement) {
-                    const margin = 12.7; // 0.5 inches in mm
+                    const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
-                    const pdfHeight = pdf.internal.pageSize.getHeight() - margin * 2;
-
-                    const canvas = await html2canvas(pdfElement, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: true,
-                        width: pdfElement.scrollWidth,
-                        height: pdfElement.scrollHeight,
-                        windowWidth: pdfElement.scrollWidth,
-                        windowHeight: pdfElement.scrollHeight
-                    });
-                    
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+                    const ratio = canvasWidth / canvasHeight;
                     const imgWidth = pdfWidth;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    let heightLeft = imgHeight;
+                    const imgHeight = imgWidth / ratio;
                     let position = 0;
-                    
-                    pdf.addImage(canvas, 'PNG', margin, margin, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
+
+                    pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
+                    let heightLeft = imgHeight - pdfHeight;
 
                     while (heightLeft > 0) {
-                        position -= pdfHeight;
+                        position = position - pdfHeight;
                         pdf.addPage();
-                        pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
+                        pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
                         heightLeft -= pdfHeight;
                     }
                     pdf.save(`${test.title}.pdf`);
@@ -445,7 +435,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div className="flex flex-wrap items-center gap-2">
+                                    <div className="flex items-center flex-wrap gap-2">
                                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                                         {student?.subscriptionPlan === 'pro' && (
@@ -461,10 +451,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                     </div>
                                 </div>
                                 <div className="flex gap-2 w-full sm:w-auto">
-                                    <Button variant="outline" size="sm" asChild className="flex-1">
+                                    <Button variant="outline" size="sm" asChild>
                                         <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Read Topic / Chapter</Link>
                                     </Button>
-                                    <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf !== null} className="flex-1">
+                                    <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf !== null}>
                                         {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
                                         Download as PDF
                                     </Button>
