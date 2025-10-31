@@ -22,6 +22,9 @@ import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -476,7 +479,7 @@ export default function ChapterClientPage() {
                         
                         {activeChapter?.content && (
                             <article className="prose dark:prose-invert lg:prose-lg max-w-none my-8">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{activeChapter.content}</ReactMarkdown>
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeChapter.content}</ReactMarkdown>
                             </article>
                         )}
 

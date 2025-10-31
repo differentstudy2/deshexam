@@ -389,7 +389,7 @@ export default function TopicClientPage() {
                             
                             {activeTopic.content && (
                                 <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-8">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{activeTopic.content}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeTopic.content}</ReactMarkdown>
                                 </article>
                             )}
                             
