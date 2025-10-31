@@ -82,7 +82,13 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const QUESTIONS_PER_PAGE = 5;
 
+  const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
+  const startIndex = currentPage * QUESTIONS_PER_PAGE;
+  const endIndex = startIndex + QUESTIONS_PER_PAGE;
+  const currentQuestions = test?.questions.slice(startIndex, endIndex);
 
   useEffect(() => {
     const processInitialData = () => {
@@ -347,31 +353,55 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
             </div>
 
-            <Card className={cn("sticky top-16 z-40 rounded-none border-x-0 border-b")}>
-              <CardContent className="p-3 flex items-center justify-center gap-4 flex-wrap">
-                  {timeLeft !== null && totalDuration > 0 && (
-                      <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
-                              <Clock className="w-5 h-5" />
-                              <span>{formatTime(timeLeft)}</span>
-                          </div>
-                          <Progress value={(timeLeft / totalDuration) * 100} className="w-24 h-2" />
-                      </div>
-                  )}
-                   <Separator orientation="vertical" className="h-6 hidden sm:block" />
-                   <div className="flex items-center gap-4 text-sm font-medium">
-                      <div className="text-green-600">Answered: {answeredCount}</div>
-                      <div className="text-destructive">Skipped: {skippedCount}</div>
-                   </div>
-              </CardContent>
+            <Card className={cn("sticky rounded-none border-x-0 border-b", timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200")}>
+                <CardContent className="p-3 flex flex-col gap-4">
+                    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+                        {timeLeft !== null && totalDuration > 0 && (
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
+                                    <Clock className="w-5 h-5" />
+                                    <span>{formatTime(timeLeft)}</span>
+                                </div>
+                                <Progress value={(timeLeft / totalDuration) * 100} className="w-24 h-2" />
+                            </div>
+                        )}
+                        <Separator orientation="vertical" className="h-6 hidden sm:block" />
+                        <div className="flex items-center gap-4 text-sm font-medium">
+                            <div className="text-green-600">Answered: {answeredCount}</div>
+                            <div className="text-destructive">Skipped: {skippedCount}</div>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 justify-center">
+                        {test.questions.map((q, qIndex) => {
+                            const isCurrent = qIndex >= startIndex && qIndex < endIndex;
+                            const isAnswered = answers[q.id] !== undefined;
+                            return (
+                                <Button
+                                    key={q.id || qIndex}
+                                    variant={isAnswered ? 'default' : 'outline'}
+                                    size="sm"
+                                    className={cn(
+                                        "h-8 w-8 rounded-full",
+                                        isCurrent && "ring-2 ring-ring ring-offset-2",
+                                        isAnswered && "bg-green-500 hover:bg-green-600",
+                                        !isAnswered && "bg-background"
+                                    )}
+                                    onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
+                                >
+                                    {qIndex + 1}
+                                </Button>
+                            )
+                        })}
+                    </div>
+                </CardContent>
             </Card>
 
             <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
-                {test.questions && test.questions.map((question, index) => {
-                    const questionIndex = index;
+                {currentQuestions && currentQuestions.map((question, index) => {
+                    const questionIndex = startIndex + index;
                     return (
-                        <Card key={question.id || (question as any).originalIndex} className="p-6 shadow-none border">
+                        <Card key={question.id || questionIndex} className="p-6 shadow-none border">
                             <CardHeader className="p-0 mb-4">
                                 <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
                                     <span>{questionIndex + 1}.</span> <span>{question.text}</span>
@@ -448,6 +478,33 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     )
                 })}
                 </fieldset>
+
+                 <div className="mt-8 flex justify-between items-center">
+                        <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => setCurrentPage(p => p - 1)} 
+                            disabled={currentPage === 0 || isSubmitting}
+                        >
+                        <ChevronLeft className="mr-2"/>
+                        Previous
+                        </Button>
+                        
+                        <span className="text-sm text-muted-foreground">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+
+                        <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => setCurrentPage(p => p + 1)} 
+                            disabled={currentPage === totalPages - 1 || isSubmitting}
+                        >
+                        Next
+                        <ChevronRight className="ml-2"/>
+                        </Button>
+                    </div>
+
 
                 <div className="mt-8 flex justify-center">
                      <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
