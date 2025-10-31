@@ -85,6 +85,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
+  
+  const [visibleQuestions, setVisibleQuestions] = useState(5);
+  const lastQuestionRef = useRef<HTMLDivElement>(null);
+
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -233,6 +237,28 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
     return () => clearInterval(timer);
   }, [timeLeft, isSubmitting, handleSubmit]);
+  
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && test && visibleQuestions < test.questions.length) {
+                    setVisibleQuestions(prev => prev + 5);
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        const currentRef = lastQuestionRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
+
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
+    }, [lastQuestionRef, test, visibleQuestions]);
 
 
   const handleAnswerChange = (questionId: string, answer: any) => {
@@ -273,9 +299,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             case 'submit':
                 return { 
                     title: 'Submit Your Answers?', 
-                    description: skippedQuestions.length > 0
-                        ? `You have skipped ${skippedQuestions.length} question(s). Are you sure you want to submit?`
-                        : 'Are you sure you want to submit? You cannot change your answers after this.'
+                    description: 'Are you sure you want to submit? You cannot change your answers after this.'
                 };
             case 'back':
                 return { title: 'Go Back?', description: 'Are you sure you want to go back? Your current progress will be lost.' };
@@ -334,7 +358,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
       );
   }
   
-  if (!test || !textbook || !chapter || !student) {
+  if (!test || !textbook || !chapter) {
     return (
         <div className="flex items-center justify-center h-full">
             <p className="text-destructive">Could not load test data. Please try again later.</p>
@@ -462,8 +486,15 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
                 
-                {test.questions.map((question, index) => (
-                        <Card key={question.id || index} ref={el => questionRefs.current[index] = el} className="p-6 shadow-none border scroll-m-24">
+                {test.questions.slice(0, visibleQuestions).map((question, index) => {
+                        const isLastQuestion = index === visibleQuestions - 1;
+                        return (
+                            <Card key={question.id || index} ref={el => {
+                                questionRefs.current[index] = el;
+                                if (isLastQuestion) {
+                                    (lastQuestionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+                                }
+                            }} className="p-6 shadow-none border scroll-m-24">
                             <CardHeader className="p-0 mb-4">
                                 <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
                                     <span>{index + 1}.</span> <span>{question.text}</span>
@@ -537,7 +568,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 )}
                             </CardContent>
                         </Card>
-                    ))}
+                    )})}
                 </fieldset>
 
                 <div className="mt-8 flex justify-center">
@@ -569,11 +600,11 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <AlertTriangle className="text-yellow-500" />
                         {getConfirmDialogContent().title}
                     </AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {getConfirmDialogContent().description}
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogDescription>
-                   {getConfirmDialogContent().description}
-                </AlertDialogDescription>
-                {confirmAction === 'submit' && skippedQuestions.length > 0 && (
+                 {confirmAction === 'submit' && skippedQuestions.length > 0 && (
                     <div className="mt-4 rounded-md border bg-secondary p-4">
                         <div className="font-semibold">You have skipped the following questions:</div>
                         <div className="flex flex-wrap gap-2 mt-2">
