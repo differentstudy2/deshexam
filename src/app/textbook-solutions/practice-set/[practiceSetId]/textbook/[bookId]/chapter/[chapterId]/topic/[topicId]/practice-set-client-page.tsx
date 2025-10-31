@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
@@ -142,7 +142,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
+        window.removeEventListener('beforeUnload', handleBeforeUnload);
     };
   }, []);
   
@@ -300,7 +300,12 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   
   const totalDuration = (test.duration || totalMarks) * 60;
   const answeredCount = Object.keys(answers).length;
-  const skippedCount = test.questions.length - answeredCount;
+  
+  const highestAttemptedIndex = useMemo(() => {
+    return test.questions.reduce((maxIndex, q, index) => {
+        return answers[q.id] !== undefined ? Math.max(maxIndex, index) : maxIndex;
+    }, -1);
+  }, [answers, test.questions]);
 
   return (
     <div className="container py-8 max-w-4xl mx-auto">
@@ -342,7 +347,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     <div><strong>Board:</strong> {textbook?.board}</div>
                     <div><strong>Subject:</strong> {textbook?.subject}</div>
                     <div><strong>Class:</strong> {textbook?.class}</div>
-                    <div><strong>Topic:</strong> {topic?.title}</div>
+                    {topic?.title && <div><strong>Topic:</strong> {topic?.title}</div>}
                     <div><strong>Chapter:</strong> {chapter?.title}</div>
                     <div><strong>Full Marks:</strong> {totalMarks}</div>
                     <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
@@ -353,7 +358,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
             </div>
 
-            <Card className={cn("sticky rounded-none border-x-0 border-b", timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200")}>
+            <Card className={cn(
+                "sticky rounded-none top-[64px] z-40 border-x-0 border-b",
+                timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
+            )}>
                 <CardContent className="p-3 flex flex-col gap-4">
                     <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                         {timeLeft !== null && totalDuration > 0 && (
@@ -368,23 +376,31 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <Separator orientation="vertical" className="h-6 hidden sm:block" />
                         <div className="flex items-center gap-4 text-sm font-medium">
                             <div className="text-green-600">Answered: {answeredCount}</div>
-                            <div className="text-destructive">Skipped: {skippedCount}</div>
+                            <div className="text-destructive">Skipped: {Math.max(0, highestAttemptedIndex + 1 - answeredCount)}</div>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5 justify-center">
                         {test.questions.map((q, qIndex) => {
                             const isCurrent = qIndex >= startIndex && qIndex < endIndex;
                             const isAnswered = answers[q.id] !== undefined;
+                            const isSkipped = !isAnswered && qIndex <= highestAttemptedIndex;
+
+                             let variant: "default" | "outline" | "destructive" = "outline";
+                            if (isAnswered) {
+                                variant = "default";
+                            } else if (isSkipped) {
+                                variant = "destructive";
+                            }
+
                             return (
                                 <Button
                                     key={q.id || qIndex}
-                                    variant={isAnswered ? 'default' : 'outline'}
+                                    variant={variant}
                                     size="sm"
                                     className={cn(
                                         "h-8 w-8 rounded-full",
                                         isCurrent && "ring-2 ring-ring ring-offset-2",
                                         isAnswered && "bg-green-500 hover:bg-green-600",
-                                        !isAnswered && "bg-background"
                                     )}
                                     onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
                                 >
@@ -548,3 +564,4 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
+
