@@ -232,3 +232,10 @@
 h3.name.text-lg.font-semibold {
   margin-bottom: 0.5rem;
 }
+.prose p {
+  margin-bottom: 0.2rem;
+}
+.text-xs {
+  font-size: .75rem !important;
+  line-height: 1rem !important;
+}
