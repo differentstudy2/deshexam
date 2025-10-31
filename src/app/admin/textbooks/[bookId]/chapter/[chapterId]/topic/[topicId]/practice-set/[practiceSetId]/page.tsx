@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { PracticeSet, Question, Topic, Textbook, Chapter } from '@/lib/types';
@@ -160,7 +160,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
                             <Textarea {...field} />
                         </FormControl>
                          <FormDescription>
-                           You can use Markdown and LaTeX for formatting (e.g., `$\text{N}_2$`).
+                           You can use Markdown and LaTeX for formatting (e.g., `$\text{'{N}'}_2$`).
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
