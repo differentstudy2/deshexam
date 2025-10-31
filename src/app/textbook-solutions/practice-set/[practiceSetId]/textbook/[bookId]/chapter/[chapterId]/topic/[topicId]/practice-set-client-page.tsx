@@ -31,6 +31,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 
 type Option = {
@@ -426,7 +431,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }
   
   const totalDuration = (test.duration || totalMarks) * 60;
-  const backToTopicUrl = topicId !== 'null'
+  const backToTopicUrl = topicId !== 'null' 
     ? `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}`
     : `/textbook-solutions/${textbookId}/chapter/${chapterId}`;
 
@@ -574,8 +579,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 }
                             }} className="p-6 shadow-none border scroll-m-24">
                             <CardHeader className="p-0 mb-4">
-                                <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
-                                    <span>{index + 1}.</span> <span>{question.text}</span>
+                                <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
+                                     <span className="self-start">{index + 1}.</span>
+                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.text}</ReactMarkdown>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
