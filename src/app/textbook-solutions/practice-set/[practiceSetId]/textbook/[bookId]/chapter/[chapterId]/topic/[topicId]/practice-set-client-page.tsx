@@ -346,19 +346,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     const ratio = imgHeight / imgWidth;
                     const finalImgHeight = contentWidth * ratio;
 
-                    const addWatermark = (pdfDoc: jsPDF) => {
-                        const totalPages = pdfDoc.getNumberOfPages();
-                        for (let i = 1; i <= totalPages; i++) {
-                            pdfDoc.setPage(i);
-                            pdfDoc.setFontSize(120);
-                            pdfDoc.setTextColor(0, 0, 0, 0.05);
-                            pdfDoc.text('DeshExam', pdfWidth / 2, pdfHeight / 2, {
-                                angle: -45,
-                                align: 'center'
-                            });
-                        }
-                    };
-
                     let position = 0;
                     pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
                     let heightLeft = finalImgHeight - (pdfHeight - margin * 2);
@@ -369,8 +356,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, contentWidth, finalImgHeight);
                         heightLeft -= (pdfHeight - margin * 2);
                     }
-                    
-                    addWatermark(pdf);
                     
                     pdf.save(`${pdfContent.practiceSet.title}.pdf`);
                 }

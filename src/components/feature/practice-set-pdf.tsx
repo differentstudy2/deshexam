@@ -49,7 +49,21 @@ export const PracticeSetPDF = ({
     
     return (
         <div style={{ fontFamily: 'sans-serif', padding: '0', color: '#333', width: '210mm', minHeight: '297mm', background: 'white', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ padding: '0' }}>
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                fontSize: '120px',
+                color: 'rgba(0, 0, 0, 0.05)',
+                fontWeight: 'bold',
+                pointerEvents: 'none',
+                zIndex: 1,
+                whiteSpace: 'nowrap'
+            }}>
+                DeshExam
+            </div>
+            <div style={{ padding: '0', position: 'relative', zIndex: 2 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', borderBottom: '1px solid #ccc', paddingBottom: '15px', marginBottom: '20px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
                         <div><strong>{renderBengaliLabel('Institute Name')}:</strong> DeshExam.com</div>
