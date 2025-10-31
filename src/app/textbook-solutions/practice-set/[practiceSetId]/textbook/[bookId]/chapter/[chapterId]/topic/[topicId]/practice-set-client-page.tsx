@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -89,7 +90,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
   
-  const [visibleQuestions, setVisibleQuestions] = useState(5);
   const lastQuestionRef = useRef<HTMLDivElement>(null);
 
   const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
@@ -97,6 +97,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [visibleQuestions, setVisibleQuestions] = useState(5);
 
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
   
@@ -228,22 +229,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     }
   }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, timeLeft, chapterId, textbookId, topicId, toast, router]);
   
-  useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) {
-      if (timeLeft === 0) {
-        setTimeUp(true);
-        if(!isSubmitting) handleSubmit();
-      }
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft, isSubmitting, handleSubmit]);
-  
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -265,6 +250,22 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             }
         };
     }, [lastQuestionRef, test, visibleQuestions]);
+
+  useEffect(() => {
+    if (timeLeft === null || timeLeft <= 0) {
+      if (timeLeft === 0) {
+        setTimeUp(true);
+        if(!isSubmitting) handleSubmit();
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, isSubmitting, handleSubmit]);
 
 
   const handleAnswerChange = (questionId: string, answer: any) => {
@@ -317,51 +318,53 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     };
     
     const handleDownloadPdf = async () => {
-      if (!test) return;
-      setIsGeneratingPdf(test.id);
-      try {
-          setPdfContent({ practiceSet: test, questions: test.questions });
+        if (!test) return;
+        setIsGeneratingPdf(test.id);
+        try {
+            setPdfContent({ practiceSet: test, questions: test.questions });
 
-          setTimeout(async () => {
-              const pdfElement = document.getElementById('pdf-content');
-              if (pdfElement) {
-                  const canvas = await html2canvas(pdfElement, { scale: 2 });
-                  const imgData = canvas.toDataURL('image/png');
-                  const pdf = new jsPDF('p', 'mm', 'a4');
-                  const pdfWidth = pdf.internal.pageSize.getWidth();
-                  const pdfHeight = pdf.internal.pageSize.getHeight();
-                  const imgWidth = canvas.width;
-                  const imgHeight = canvas.height;
-                  const ratio = imgWidth / imgHeight;
-                  const width = pdfWidth;
-                  const height = width / ratio;
-                  let position = 0;
-                  let heightLeft = height;
+            setTimeout(async () => {
+                const pdfElement = document.getElementById('pdf-content');
+                if (pdfElement) {
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const margin = 12.7; // 0.5 inches
+                    const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
+                    const pdfHeight = pdf.internal.pageSize.getHeight() - margin * 2;
+                   
+                    const canvas = await html2canvas(pdfElement, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: true,
+                    });
+                    
+                    const imgWidth = pdfWidth;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(canvas, 'PNG', margin, margin, imgWidth, imgHeight);
+                    heightLeft -= pdfHeight;
 
-                  pdf.addImage(imgData, 'PNG', 0, position, width, height);
-                  heightLeft -= pdfHeight;
+                    while (heightLeft > 0) {
+                        position = position - pdfHeight;
+                        pdf.addPage();
+                        pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
+                        heightLeft -= pdfHeight;
+                    }
+                    pdf.save(`${test.title}.pdf`);
+                }
+                setPdfContent(null);
+                setIsGeneratingPdf(null);
+            }, 500);
 
-                  while (heightLeft > 0) {
-                      position = heightLeft - height;
-                      pdf.addPage();
-                      pdf.addImage(imgData, 'PNG', 0, position, width, height);
-                      heightLeft -= pdfHeight;
-                  }
-
-                  pdf.save(`${test.title}.pdf`);
-              }
-              setPdfContent(null);
-              setIsGeneratingPdf(null);
-          }, 500);
-
-      } catch (error) {
-          toast({
-              variant: 'destructive',
-              title: 'Error generating PDF',
-              description: (error as Error).message,
-          });
-          setIsGeneratingPdf(null);
-      }
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error generating PDF',
+                description: (error as Error).message,
+            });
+            setIsGeneratingPdf(null);
+        }
     };
 
   if (loading) {
@@ -439,26 +442,19 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <h3 className="text-lg font-semibold">{student?.displayName}</h3>
-                                            <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
-                                            {student?.subscriptionPlan === 'pro' && (
-                                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
-                                                    <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
-                                                </Badge>
-                                            )}
-                                            {student?.subscriptionPlan === 'pass' && (
-                                                <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
-                                                    <Gem className="w-3.5 h-3.5 mr-1" /> Pass
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
-                                            {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
-                                            {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
-                                            {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
-                                        </div>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                                        <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
+                                        {student?.subscriptionPlan === 'pro' && (
+                                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
+                                                <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
+                                            </Badge>
+                                        )}
+                                        {student?.subscriptionPlan === 'pass' && (
+                                            <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
+                                                <Gem className="w-3.5 h-3.5 mr-1" /> Pass
+                                            </Badge>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex gap-2 w-full sm:w-auto">
@@ -470,6 +466,11 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         Download as PDF
                                     </Button>
                                 </div>
+                            </div>
+                             <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-2">
+                                {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                                {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                                {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
                             </div>
                         </CardHeader>
                     </Card>
@@ -674,7 +675,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     </AlertDialogTitle>
                 </AlertDialogHeader>
                 <AlertDialogDescription>
-                    {getConfirmDialogContent().description}
+                   {getConfirmDialogContent().description}
                 </AlertDialogDescription>
                  {confirmAction === 'submit' && skippedQuestions.length > 0 && (
                     <div className="mt-4 rounded-md border bg-secondary p-4">
@@ -709,6 +710,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         textbookTitle={textbook?.title || ''} 
                         chapterTitle={chapter?.title || ''}
                         topicTitle={topic?.title || ''}
+                        board={textbook?.board || ''}
+                        className={textbook?.class || ''}
+                        subject={textbook?.subject || ''}
+                        totalMarks={totalMarks}
                     />
                 </div>
             </div>
@@ -716,5 +721,3 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
-
-    
