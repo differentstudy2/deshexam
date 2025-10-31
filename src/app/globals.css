@@ -160,16 +160,14 @@
   .prose pre code {
     @apply bg-transparent p-0 rounded-none;
   }
-  .custom-prose-style {
-    font-size: 0.8rem;
-  }
   .custom-prose-style p {
+    font-size: 0.8rem;
     margin-bottom: 0.3rem;
   }
-  .custom-prose-style li {
+  .prose.dark\:prose-invert.max-w-none li {
     font-size: 1.5rem;
   }
-  .custom-p-3 {
+  .p-3 {
     padding: 0.25rem;
   }
 }
