@@ -87,6 +87,8 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const answeredCount = Object.keys(answers).length;
+  
   const highestAttemptedIndex = useMemo(() => {
     if (!test) return -1;
     return test.questions.reduce((maxIndex, q, index) => {
@@ -94,9 +96,14 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     }, -1);
   }, [answers, test]);
   
-  const answeredCount = Object.keys(answers).length;
-  const skippedCount = highestAttemptedIndex > -1 ? highestAttemptedIndex + 1 - answeredCount : 0;
-  
+  const skippedQuestions = useMemo(() => {
+    if (!test || highestAttemptedIndex < 0) return [];
+    return test.questions
+      .map((q, index) => ({ q, index }))
+      .filter(({ q, index }) => index < highestAttemptedIndex && answers[q.id] === undefined)
+      .map(({ index }) => index);
+  }, [answers, test, highestAttemptedIndex]);
+
   const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
   const startIndex = currentPage * QUESTIONS_PER_PAGE;
   const endIndex = startIndex + QUESTIONS_PER_PAGE;
@@ -390,32 +397,21 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <Separator orientation="vertical" className="h-6 hidden sm:block" />
                          <div className="flex items-center gap-4 text-sm font-medium">
                             <div className="text-green-600">Answered: {answeredCount}</div>
-                            <div className="text-destructive">Skipped: {skippedCount}</div>
                         </div>
                     </div>
                      <div className="flex flex-wrap items-center justify-center gap-1.5 border-t pt-3">
-                        {test.questions.map((q, qIndex) => {
-                            const isCurrent = Math.floor(qIndex / QUESTIONS_PER_PAGE) === currentPage;
-                            const isAnswered = answers[q.id] !== undefined;
-                            const isSkipped = qIndex < highestAttemptedIndex && !isAnswered;
-
-                            let variant: 'default' | 'destructive' | 'outline' | 'secondary' = 'outline';
-                            if(isCurrent) variant = 'secondary';
-                            if(isAnswered) variant = 'default';
-                            if(isSkipped) variant = 'destructive';
-
-                            return (
-                               <Button
-                                    key={q.id}
-                                    variant={variant}
-                                    size="sm"
-                                    className="h-7 w-7 rounded-full p-0 text-xs"
-                                    onClick={() => handleNavigateToQuestion(qIndex)}
-                                >
-                                    {qIndex + 1}
-                                </Button>
-                            )
-                        })}
+                        <span className="text-xs font-semibold mr-2">Skipped:</span>
+                        {skippedQuestions.length > 0 ? skippedQuestions.map((qIndex) => (
+                            <Button
+                                key={`skipped-${qIndex}`}
+                                variant="destructive"
+                                size="sm"
+                                className="h-7 w-7 rounded-full p-0 text-xs"
+                                onClick={() => handleNavigateToQuestion(qIndex)}
+                            >
+                                {qIndex + 1}
+                            </Button>
+                        )) : <span className="text-xs text-muted-foreground">None</span>}
                     </div>
                 </CardContent>
             </Card>
@@ -572,3 +568,4 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
+
