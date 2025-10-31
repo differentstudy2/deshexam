@@ -21,7 +21,7 @@ import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, S
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { 
     getPracticeSetById,
     addQuestionToPracticeSet,
@@ -455,7 +455,7 @@ export default function ManagePracticeSetQuestionsPage() {
     }
     
     const handleSelectQuestion = (questionId: string) => {
-        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, questionId]);
+        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, id]);
     };
     
     const handleSelectAllQuestions = (checked: boolean) => {
@@ -591,14 +591,14 @@ export default function ManagePracticeSetQuestionsPage() {
             }
         }
     };
+    
+    if (loading) {
+        return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
+    }
 
     const backUrl = topicId === 'null' 
         ? `/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-sets`
         : `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`;
-
-    if (loading) {
-        return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
-    }
 
     return (
         <div className="space-y-6">
@@ -790,7 +790,7 @@ export default function ManagePracticeSetQuestionsPage() {
                                 <li key={q.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-4">
                                     <div className="flex items-start flex-1 min-w-0">
                                         <Checkbox id={`select-${q.id}`} checked={selectedQuestions.includes(q.id)} onCheckedChange={() => handleSelectQuestion(q.id)} className="mr-4 mt-1" />
-                                        <div className="flex-1 prose prose-sm max-w-full">
+                                        <div className="prose prose-sm max-w-full">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                                                 {q.text}
                                             </ReactMarkdown>
