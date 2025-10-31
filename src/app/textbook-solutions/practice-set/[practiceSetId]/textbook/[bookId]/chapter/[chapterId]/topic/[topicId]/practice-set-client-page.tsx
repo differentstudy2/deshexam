@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -326,15 +325,19 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             setTimeout(async () => {
                 const pdfElement = document.getElementById('pdf-content');
                 if (pdfElement) {
+                    const margin = 12.7; // 0.5 inches in mm
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const margin = 12.7; // 0.5 inches
                     const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
                     const pdfHeight = pdf.internal.pageSize.getHeight() - margin * 2;
-                   
+
                     const canvas = await html2canvas(pdfElement, {
                         scale: 2,
                         useCORS: true,
                         logging: true,
+                        width: pdfElement.scrollWidth,
+                        height: pdfElement.scrollHeight,
+                        windowWidth: pdfElement.scrollWidth,
+                        windowHeight: pdfElement.scrollHeight
                     });
                     
                     const imgWidth = pdfWidth;
@@ -346,7 +349,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     heightLeft -= pdfHeight;
 
                     while (heightLeft > 0) {
-                        position = position - pdfHeight;
+                        position -= pdfHeight;
                         pdf.addPage();
                         pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
                         heightLeft -= pdfHeight;
@@ -442,7 +445,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div className="flex items-center gap-2 flex-wrap">
+                                    <div className="flex flex-wrap items-center gap-2">
                                         <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                                         <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                                         {student?.subscriptionPlan === 'pro' && (
