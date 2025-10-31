@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -27,6 +28,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 type Option = {
   text: string;
@@ -285,10 +288,49 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="ml-4 text-lg">Loading Practice Set...</p>
-      </div>
+        <div className="container py-8 max-w-4xl mx-auto">
+            <div className="bg-background border rounded-lg shadow-sm">
+                <header className="p-6 border-b space-y-4">
+                    <div className="flex items-center gap-4">
+                        <Skeleton className="h-16 w-16 rounded-full" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-48" />
+                            <Skeleton className="h-4 w-64" />
+                        </div>
+                    </div>
+                    <Separator />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-5 w-full" />)}
+                    </div>
+                </header>
+                <div className="p-6 text-center">
+                    <Skeleton className="h-8 w-3/4 mx-auto" />
+                </div>
+                <Card className="sticky top-[64px] z-40 border-x-0 border-b">
+                    <CardContent className="p-3">
+                         <div className="flex items-center justify-center gap-4 sm:gap-6">
+                            <Skeleton className="h-6 w-24" />
+                            <Skeleton className="h-2 w-24" />
+                            <Separator orientation="vertical" className="h-6" />
+                            <Skeleton className="h-6 w-20" />
+                            <Separator orientation="vertical" className="h-6" />
+                             <Skeleton className="h-6 w-32" />
+                        </div>
+                    </CardContent>
+                </Card>
+                <div className="p-6 space-y-8 mt-6">
+                    {[...Array(3)].map((_, i) => (
+                        <Card key={i} className="p-6">
+                            <Skeleton className="h-6 w-1/2 mb-4" />
+                            <div className="space-y-3">
+                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </div>
     );
   }
 
