@@ -316,10 +316,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     };
     
     const handleDownloadPdf = async (practiceSet: PracticeSet) => {
-        if (!topic) return;
         setIsGeneratingPdf(practiceSet.id);
         try {
-            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topic.id, practiceSet.id);
+            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId === 'null' ? null : topicId, practiceSet.id);
             setPdfContent({ practiceSet, questions });
         } catch (error) {
             toast({
@@ -330,45 +329,42 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             setIsGeneratingPdf(null);
         }
     };
-
+    
     useEffect(() => {
-        if (pdfContent) {
-          const generate = async () => {
-            const pdfElement = document.getElementById('pdf-content');
-            if (pdfElement) {
-              const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
-              const pdf = new jsPDF('p', 'mm', 'a4');
-              const margin = 12.7; // 0.5 inch
-              const pdfWidth = pdf.internal.pageSize.getWidth();
-              const pdfHeight = pdf.internal.pageSize.getHeight();
-              const contentWidth = pdfWidth - margin * 2;
-              const contentHeight = pdfHeight - margin * 2;
-              const imgWidth = canvas.width;
-              const imgHeight = canvas.height;
-              const ratio = imgHeight / imgWidth;
-              const finalImgHeight = contentWidth * ratio;
-              let position = 0;
-  
-              pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
-              let heightLeft = finalImgHeight;
-  
-              heightLeft -= contentHeight;
-              while (heightLeft > 0) {
-                position -= contentHeight;
-                pdf.addPage();
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position + margin, contentWidth, finalImgHeight);
-                heightLeft -= contentHeight;
-              }
-              pdf.save(`${pdfContent.practiceSet.title}.pdf`);
+      if (pdfContent) {
+        const generate = async () => {
+          const pdfElement = document.getElementById('pdf-content');
+          if (pdfElement) {
+            const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const margin = 12.7; // 0.5 inch
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const contentWidth = pdfWidth - margin * 2;
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = imgHeight / imgWidth;
+            const finalImgHeight = contentWidth * ratio;
+
+            let position = 0;
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
+            let heightLeft = finalImgHeight - (pdfHeight - margin * 2);
+
+            while (heightLeft > 0) {
+              position -= (pdfHeight - margin);
+              pdf.addPage();
+              pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position + margin, contentWidth, finalImgHeight);
+              heightLeft -= (pdfHeight - margin * 2);
             }
-            setPdfContent(null);
-            setIsGeneratingPdf(null);
-          };
-          // Timeout to ensure content is rendered
-          setTimeout(generate, 500);
-        }
-      }, [pdfContent]);
-      
+            pdf.save(`${pdfContent.practiceSet.title}.pdf`);
+          }
+          setPdfContent(null);
+          setIsGeneratingPdf(null);
+        };
+        setTimeout(generate, 500);
+      }
+    }, [pdfContent]);
+
 
   if (loading) {
       return (
@@ -445,10 +441,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div className='user-details'>
-                                    <h3 className="name text-lg font-semibold">{student?.displayName}</h3>
-                                        <div className="flex items-center flex-wrap gap-2">
-                                            
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="name text-lg font-semibold">{student?.displayName}</h3>
                                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                                             {student?.subscriptionPlan === 'pro' && (
                                                 <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
@@ -470,7 +465,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 </div>
                                  <div className="flex gap-2 w-full sm:w-auto self-start">
                                     <Button variant="outline" size="sm" asChild>
-                                        <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Learn</Link>
+                                        <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Read Topic / Chapter</Link>
                                     </Button>
                                     <Button variant="outline" size="sm" onClick={() => handleDownloadPdf(test)} disabled={isGeneratingPdf !== null}>
                                         {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
