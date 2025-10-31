@@ -446,8 +446,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
                                     <div className='user-details'>
+                                    <h3 className="name text-lg font-semibold">{student?.displayName}</h3>
                                         <div className="flex items-center flex-wrap gap-2">
-                                            <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                                            
                                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                                             {student?.subscriptionPlan === 'pro' && (
                                                 <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
@@ -469,7 +470,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 </div>
                                  <div className="flex gap-2 w-full sm:w-auto self-start">
                                     <Button variant="outline" size="sm" asChild>
-                                        <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Read Topic / Chapter</Link>
+                                        <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Learn</Link>
                                     </Button>
                                     <Button variant="outline" size="sm" onClick={() => handleDownloadPdf(test)} disabled={isGeneratingPdf !== null}>
                                         {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}

@@ -219,3 +219,6 @@
     line-height: 2rem;
   }
 }
+h3.name.text-lg.font-semibold {
+  margin-bottom: 0.5rem;
+}
