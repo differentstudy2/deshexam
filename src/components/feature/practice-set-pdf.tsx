@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { PracticeSet, Question } from '@/lib/types';
@@ -47,8 +48,22 @@ export const PracticeSetPDF = ({
     }
     
     return (
-        <div style={{ fontFamily: 'sans-serif', padding: '0', color: '#333', width: '210mm', minHeight: '297mm', background: 'white' }}>
-            <div style={{ padding: '12.7mm' }}>
+        <div style={{ fontFamily: 'sans-serif', padding: '0', color: '#333', width: '210mm', minHeight: '297mm', background: 'white', position: 'relative', overflow: 'hidden' }}>
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                fontSize: '120px',
+                fontWeight: 'bold',
+                color: 'rgba(0, 0, 0, 0.05)',
+                whiteSpace: 'nowrap',
+                zIndex: 0,
+                userSelect: 'none',
+            }}>
+                DeshExam
+            </div>
+            <div style={{ padding: '12.7mm', position: 'relative', zIndex: 1 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', borderBottom: '1px solid #ccc', paddingBottom: '15px', marginBottom: '20px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
                         <div><strong>{renderBengaliLabel('Institute Name')}:</strong> DeshExam.com</div>
