@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem, AlertTriangle } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem, AlertTriangle, BookOpen, FileDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -28,6 +28,9 @@ import { Badge } from '@/components/ui/badge';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Skeleton } from '@/components/ui/skeleton';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 
 
 type Option = {
@@ -88,6 +91,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   
   const [visibleQuestions, setVisibleQuestions] = useState(5);
   const lastQuestionRef = useRef<HTMLDivElement>(null);
+
+  const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
 
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -299,17 +305,65 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             case 'submit':
                 return { 
                     title: 'Submit Your Answers?', 
-                    description: 'Are you sure you want to submit? You cannot change your answers after this.'
+                    description: 'You cannot change your answers after this.'
                 };
             case 'back':
-                return { title: 'Go Back?', description: 'Are you sure you want to go back? Your current progress will be lost.' };
+                return { title: 'Go Back?', description: 'Your current progress will be lost.' };
             case 'new':
-                 return { title: 'Start a New Problem?', description: 'Are you sure? Your current progress will be lost.' };
+                 return { title: 'Start a New Problem?', description: 'Your current progress will be lost.' };
             default:
                 return { title: '', description: '' };
         }
     };
     
+    const handleDownloadPdf = async () => {
+      if (!test) return;
+      setIsGeneratingPdf(test.id);
+      try {
+          setPdfContent({ practiceSet: test, questions: test.questions });
+
+          setTimeout(async () => {
+              const pdfElement = document.getElementById('pdf-content');
+              if (pdfElement) {
+                  const canvas = await html2canvas(pdfElement, { scale: 2 });
+                  const imgData = canvas.toDataURL('image/png');
+                  const pdf = new jsPDF('p', 'mm', 'a4');
+                  const pdfWidth = pdf.internal.pageSize.getWidth();
+                  const pdfHeight = pdf.internal.pageSize.getHeight();
+                  const imgWidth = canvas.width;
+                  const imgHeight = canvas.height;
+                  const ratio = imgWidth / imgHeight;
+                  const width = pdfWidth;
+                  const height = width / ratio;
+                  let position = 0;
+                  let heightLeft = height;
+
+                  pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                  heightLeft -= pdfHeight;
+
+                  while (heightLeft > 0) {
+                      position = heightLeft - height;
+                      pdf.addPage();
+                      pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                      heightLeft -= pdfHeight;
+                  }
+
+                  pdf.save(`${test.title}.pdf`);
+              }
+              setPdfContent(null);
+              setIsGeneratingPdf(null);
+          }, 500);
+
+      } catch (error) {
+          toast({
+              variant: 'destructive',
+              title: 'Error generating PDF',
+              description: (error as Error).message,
+          });
+          setIsGeneratingPdf(null);
+      }
+    };
+
   if (loading) {
       return (
         <div className="container py-8 max-w-4xl mx-auto">
@@ -367,6 +421,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }
   
   const totalDuration = (test.duration || totalMarks) * 60;
+  const backToTopicUrl = topicId !== 'null'
+    ? `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}`
+    : `/textbook-solutions/${textbookId}/chapter/${chapterId}`;
 
 
   return (
@@ -374,33 +431,47 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         <div className="bg-background border rounded-lg shadow-sm">
             <header className="p-6 border-b space-y-6">
                 {student && (
-                     <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                         <Avatar className="h-16 w-16">
-                            <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
-                            <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <div className="flex items-center justify-center sm:justify-start gap-2">
-                            <h3 className="text-lg font-semibold">{student?.displayName}</h3>
-                            <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
-                            {student?.subscriptionPlan === 'pro' && (
-                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
-                                    <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
-                                </Badge>
-                            )}
-                            {student?.subscriptionPlan === 'pass' && (
-                                <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
-                                    <Gem className="w-3.5 h-3.5 mr-1" /> Pass
-                                </Badge>
-                            )}
+                     <Card className="shadow-none border-0 p-0">
+                        <CardHeader className="p-0">
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                                <div className="flex items-center gap-4">
+                                    <Avatar className="h-16 w-16">
+                                        <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
+                                        <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-lg font-semibold">{student?.displayName}</h3>
+                                            {student?.subscriptionPlan === 'pro' && (
+                                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
+                                                    <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
+                                                </Badge>
+                                            )}
+                                            {student?.subscriptionPlan === 'pass' && (
+                                                <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
+                                                    <Gem className="w-3.5 h-3.5 mr-1" /> Pass
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                                            {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
+                                            {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
+                                            {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" size="sm" asChild>
+                                        <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Read Topic / Chapter</Link>
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf !== null}>
+                                        {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
+                                        Download as PDF
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="text-sm text-muted-foreground flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 pt-1">
-                                {student?.school && <div className="flex items-center gap-1.5"><School className="w-4 h-4" />{student.school}</div>}
-                                {student?.classGrade && <div className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{student.classGrade}</div>}
-                                {student?.targetExam && <div className="flex items-center gap-1.5"><Target className="w-4 h-4" />{student.targetExam}</div>}
-                            </div>
-                        </div>
-                    </div>
+                        </CardHeader>
+                    </Card>
                 )}
                 <Separator />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
@@ -600,10 +671,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <AlertTriangle className="text-yellow-500" />
                         {getConfirmDialogContent().title}
                     </AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {getConfirmDialogContent().description}
-                    </AlertDialogDescription>
                 </AlertDialogHeader>
+                <AlertDialogDescription>
+                    {getConfirmDialogContent().description}
+                </AlertDialogDescription>
                  {confirmAction === 'submit' && skippedQuestions.length > 0 && (
                     <div className="mt-4 rounded-md border bg-secondary p-4">
                         <div className="font-semibold">You have skipped the following questions:</div>
@@ -628,6 +699,19 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+        {pdfContent && (
+            <div style={{ position: 'fixed', left: '-9999px', top: 0, zIndex: -10 }}>
+                <div id="pdf-content">
+                    <PracticeSetPDF 
+                        practiceSet={pdfContent.practiceSet} 
+                        questions={pdfContent.questions} 
+                        textbookTitle={textbook?.title || ''} 
+                        chapterTitle={chapter?.title || ''}
+                        topicTitle={topic?.title || ''}
+                    />
+                </div>
+            </div>
+        )}
     </div>
   );
 }
