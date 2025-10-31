@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -26,6 +27,7 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import type { Metadata, ResolvingMetadata } from 'next';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 type Option = {
   text: string;
@@ -380,38 +382,64 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             </div>
 
             <Card className={cn(
-                "sticky rounded-none top-[64px] z-40 border-x-0 border-b",
+                "sticky top-[64px] z-40 border-x-0 border-b",
                 timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
             )}>
-                <CardContent className="p-3 flex flex-col gap-3">
-                    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+                <CardContent className="p-3">
+                     <div className="flex items-center justify-center gap-4 sm:gap-6">
                         {timeLeft !== null && totalDuration > 0 && (
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
-                                    <Clock className="w-5 h-5" />
-                                    <span>{formatTime(timeLeft)}</span>
-                                </div>
-                                <Progress value={(timeLeft / totalDuration) * 100} className="w-24 h-2" />
+                            <div className="flex items-center gap-2 font-mono text-xl font-semibold text-foreground">
+                                <Clock className="w-5 h-5" />
+                                <span>{formatTime(timeLeft)}</span>
                             </div>
                         )}
-                        <Separator orientation="vertical" className="h-6 hidden sm:block" />
-                         <div className="flex items-center gap-4 text-sm font-medium">
-                            <div className="text-green-600">Answered: {answeredCount}</div>
+                        <Progress value={(timeLeft || 0) / totalDuration * 100} className="w-24 h-2" />
+
+                        <Separator orientation="vertical" className="h-6" />
+
+                        <div className="flex items-center gap-4 text-sm font-medium">
+                            <div className="text-green-600">Ans: {answeredCount}</div>
                         </div>
-                    </div>
-                     <div className="flex flex-wrap items-center justify-center gap-1.5 border-t pt-3">
-                        <span className="text-xs font-semibold mr-2">Skipped:</span>
-                        {skippedQuestions.length > 0 ? skippedQuestions.map((qIndex) => (
-                            <Button
-                                key={`skipped-${qIndex}`}
-                                variant="destructive"
-                                size="sm"
-                                className="h-7 w-7 rounded-full p-0 text-xs"
-                                onClick={() => handleNavigateToQuestion(qIndex)}
-                            >
-                                {qIndex + 1}
-                            </Button>
-                        )) : <span className="text-xs text-muted-foreground">None</span>}
+                        
+                        <Separator orientation="vertical" className="h-6" />
+
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                            <span>Skipped:</span>
+                             {skippedQuestions.length <= 5 ? (
+                                <div className="flex items-center gap-1.5">
+                                    {skippedQuestions.map((qIndex) => (
+                                        <Button
+                                            key={`skipped-${qIndex}`}
+                                            variant="destructive"
+                                            size="sm"
+                                            className="h-7 w-7 rounded-full p-0 text-xs"
+                                            onClick={() => handleNavigateToQuestion(qIndex)}
+                                        >
+                                            {qIndex + 1}
+                                        </Button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="w-48">
+                                    <Carousel opts={{ align: "start", loop: false }}>
+                                        <CarouselContent className="-ml-2">
+                                            {skippedQuestions.map((qIndex) => (
+                                                <CarouselItem key={`skipped-carousel-${qIndex}`} className="pl-2 basis-auto">
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="h-7 w-7 rounded-full p-0 text-xs"
+                                                        onClick={() => handleNavigateToQuestion(qIndex)}
+                                                    >
+                                                        {qIndex + 1}
+                                                    </Button>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                    </Carousel>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </CardContent>
             </Card>
