@@ -590,7 +590,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                     {question.options.map((option, optIndex) => (
                                     <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
                                         <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">{option.text}</Label>
+                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                        </Label>
                                     </div>
                                     ))}
                                 </RadioGroup>
