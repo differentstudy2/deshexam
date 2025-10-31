@@ -316,53 +316,71 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     };
     
     const handleDownloadPdf = async (practiceSet: PracticeSet) => {
-        setIsGeneratingPdf(practiceSet.id);
-        try {
-            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId === 'null' ? null : topicId, practiceSet.id);
-            setPdfContent({ practiceSet, questions });
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Error preparing PDF',
-                description: (error as Error).message,
-            });
-            setIsGeneratingPdf(null);
-        }
-    };
-    
-    useEffect(() => {
-      if (pdfContent) {
-        const generate = async () => {
-          const pdfElement = document.getElementById('pdf-content');
-          if (pdfElement) {
-            const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const margin = 12.7; // 0.5 inch
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const contentWidth = pdfWidth - margin * 2;
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
-            const ratio = imgHeight / imgWidth;
-            const finalImgHeight = contentWidth * ratio;
-
-            let position = 0;
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
-            let heightLeft = finalImgHeight - (pdfHeight - margin * 2);
-
-            while (heightLeft > 0) {
-              position -= (pdfHeight - margin);
-              pdf.addPage();
-              pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position + margin, contentWidth, finalImgHeight);
-              heightLeft -= (pdfHeight - margin * 2);
-            }
-            pdf.save(`${pdfContent.practiceSet.title}.pdf`);
-          }
-          setPdfContent(null);
+      setIsGeneratingPdf(practiceSet.id);
+      try {
+          const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId === 'null' ? null : topicId, practiceSet.id);
+          setPdfContent({ practiceSet, questions });
+      } catch (error) {
+          toast({
+              variant: 'destructive',
+              title: 'Error preparing PDF',
+              description: (error as Error).message,
+          });
           setIsGeneratingPdf(null);
-        };
-        setTimeout(generate, 500);
       }
+    };
+
+    useEffect(() => {
+        if (pdfContent) {
+            const generate = async () => {
+                const pdfElement = document.getElementById('pdf-content');
+                if (pdfElement) {
+                    const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const margin = 12.7; // 0.5 inch
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const contentWidth = pdfWidth - margin * 2;
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = imgHeight / imgWidth;
+                    const finalImgHeight = contentWidth * ratio;
+
+                    const addWatermark = (pdfDoc: jsPDF) => {
+                        const totalPages = pdfDoc.getNumberOfPages();
+                        for (let i = 1; i <= totalPages; i++) {
+                            pdfDoc.setPage(i);
+                            pdfDoc.setFontSize(120);
+                            pdfDoc.setTextColor(0, 0, 0, 0.05);
+                            pdfDoc.text('DeshExam', pdfWidth / 2, pdfHeight / 2, {
+                                angle: -45,
+                                align: 'center'
+                            });
+                        }
+                    };
+
+                    let position = 0;
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
+                    let heightLeft = finalImgHeight - (pdfHeight - margin * 2);
+
+                    while (heightLeft > 0) {
+                        position -= (pdfHeight - margin * 2);
+                        pdf.addPage();
+                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, contentWidth, finalImgHeight);
+                        heightLeft -= (pdfHeight - margin * 2);
+                    }
+                    
+                    addWatermark(pdf);
+                    
+                    pdf.save(`${pdfContent.practiceSet.title}.pdf`);
+                }
+                setPdfContent(null);
+                setIsGeneratingPdf(null);
+            };
+            // setTimeout is a workaround to ensure the component has rendered before capture
+            const timer = setTimeout(generate, 500); 
+            return () => clearTimeout(timer);
+        }
     }, [pdfContent]);
 
 
