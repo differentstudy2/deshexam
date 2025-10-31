@@ -160,6 +160,18 @@
   .prose pre code {
     @apply bg-transparent p-0 rounded-none;
   }
+  .custom-prose-style {
+    font-size: 0.8rem;
+  }
+  .custom-prose-style p {
+    margin-bottom: 0.3rem;
+  }
+  .custom-prose-style li {
+    font-size: 1.5rem;
+  }
+  .custom-p-3 {
+    padding: 0.25rem;
+  }
 }
 
 .ql-editor {

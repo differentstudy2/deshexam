@@ -457,7 +457,7 @@ function ReviewDisplay() {
                             )}
                         </div>
                         {question.explanation && (
-                            <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800 prose dark:prose-invert max-w-none text-sm">
+                            <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800 prose dark:prose-invert max-w-none text-sm custom-prose-style">
                                 <h4 className="font-semibold text-sm mb-1">General Explanation</h4>
                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.explanation}</ReactMarkdown>
                             </div>
