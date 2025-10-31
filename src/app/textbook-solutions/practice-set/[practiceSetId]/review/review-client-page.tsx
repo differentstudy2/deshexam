@@ -51,9 +51,7 @@ type Submission = {
 
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; subscriptionPlan?: 'pro' | 'pass'; };
 
-function ReviewDisplay() {
-  const searchParams = useSearchParams();
-  const submissionId = searchParams.get('submissionId');
+export default function ReviewClientPage({ submissionId }: { submissionId: string }) {
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -70,7 +68,7 @@ function ReviewDisplay() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No submission ID found in the URL.",
+        description: "No submission ID found.",
       });
       setLoading(false);
       return;
@@ -221,7 +219,22 @@ function ReviewDisplay() {
     return `${mins}m ${secs}s`;
   };
 
+  const backUrl = `/textbook-solutions/practice-set/${submission.practiceSetId}/results?submissionId=${submissionId}`;
+
   return (
+    <div className="container py-8 sm:py-12 md:max-w-4xl">
+       <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8 px-4 sm:px-0">
+        <div>
+            <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
+            <p className="text-muted-foreground">Let's see how you did.</p>
+        </div>
+        <Button asChild variant="outline">
+            <Link href={backUrl}>
+                <ArrowLeft className="mr-2 h-4 w-4"/>
+                Back to Results
+            </Link>
+        </Button>
+      </div>
       <>
         <Card className="max-w-4xl mx-auto mb-8 relative">
              <CardHeader>
@@ -363,7 +376,7 @@ function ReviewDisplay() {
                                                 {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
                                             </div>
                                             {option.explanation && (
-                                                <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none">
+                                                <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
                                                 </div>
                                             )}
@@ -490,33 +503,6 @@ function ReviewDisplay() {
             </CardContent>
         </Card>
       </>
-  );
-}
-
-export default function PracticeSetReviewPage() {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const submissionId = searchParams.get('submissionId');
-
-  const backUrl = `/textbook-solutions/practice-set/${params.practiceSetId}/results?submissionId=${submissionId}`;
-
-  return (
-    <div className="container py-8 sm:py-12 md:max-w-4xl">
-       <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center text-center md:text-left mb-8 px-4 sm:px-0">
-        <div>
-            <h1 className="font-headline text-4xl font-bold">Answer Review</h1>
-            <p className="text-muted-foreground">Let's see how you did.</p>
-        </div>
-        <Button asChild variant="outline">
-            <Link href={backUrl}>
-                <ArrowLeft className="mr-2 h-4 w-4"/>
-                Back to Results
-            </Link>
-        </Button>
-      </div>
-      <Suspense fallback={<div className="text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto"/></div>}>
-        <ReviewDisplay />
-      </Suspense>
     </div>
   );
 }
