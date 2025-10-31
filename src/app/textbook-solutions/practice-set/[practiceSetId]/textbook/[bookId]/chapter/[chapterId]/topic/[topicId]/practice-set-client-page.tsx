@@ -325,7 +325,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 const pdfElement = document.getElementById('pdf-content');
                 if (pdfElement) {
                     const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
-                    const pdf = new jsPDF('p', 'a4');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
                     const margin = 12.7; // 0.5 inch
                     const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
                     const pdfHeight = pdf.internal.pageSize.getHeight() - margin * 2;
@@ -334,15 +334,16 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     const ratio = canvasWidth / canvasHeight;
                     const imgWidth = pdfWidth;
                     const imgHeight = imgWidth / ratio;
-                    let position = 0;
+                    let position = margin;
+                    let heightLeft = imgHeight;
 
-                    pdf.addImage(canvas, 'PNG', margin, margin, imgWidth, imgHeight);
-                    let heightLeft = imgHeight - pdfHeight;
+                    pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
+                    heightLeft -= pdfHeight;
 
                     while (heightLeft > 0) {
                         position -= pdfHeight;
                         pdf.addPage();
-                        pdf.addImage(canvas, 'PNG', margin, position + margin, imgWidth, imgHeight);
+                        pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
                         heightLeft -= pdfHeight;
                     }
                     pdf.save(`${test.title}.pdf`);
@@ -669,10 +670,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <AlertTriangle className="text-yellow-500" />
                         {getConfirmDialogContent().title}
                     </AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {getConfirmDialogContent().description}
-                    </AlertDialogDescription>
                 </AlertDialogHeader>
+                <div className="py-4">
+                  <p>{getConfirmDialogContent().description}</p>
                  {confirmAction === 'submit' && skippedQuestions.length > 0 && (
                     <div className="mt-4 rounded-md border bg-secondary p-4">
                         <div className="font-semibold">You have skipped the following questions:</div>
@@ -690,7 +690,8 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                             ))}
                         </div>
                     </div>
-                )}
+                  )}
+                </div>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setConfirmAction(null)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmAction}>Continue</AlertDialogAction>
