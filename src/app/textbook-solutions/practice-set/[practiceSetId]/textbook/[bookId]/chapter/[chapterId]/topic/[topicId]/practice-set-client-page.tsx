@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -89,7 +88,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const answeredCount = Object.keys(answers).length;
+  const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
   
   const highestAttemptedIndex = useMemo(() => {
     if (!test) return -1;
@@ -99,7 +98,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }, [answers, test]);
   
   const skippedQuestions = useMemo(() => {
-    if (!test || highestAttemptedIndex < 0) return [];
+    if (!test) return [];
     return test.questions
       .map((q, index) => ({ q, index }))
       .filter(({ q, index }) => index < highestAttemptedIndex && answers[q.id] === undefined)
@@ -154,20 +153,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     processInitialData();
 
   }, [initialTest, user]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-        e.preventDefault();
-        e.returnValue = ''; // Required for legacy browsers
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
-  
 
   const handleSubmit = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
@@ -282,10 +267,23 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         setConfirmAction(null);
     };
 
+    const handleNavigateToQuestion = (qIndex: number) => {
+        setIsConfirming(false);
+        setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE));
+        setTimeout(() => {
+            questionRefs.current[qIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    };
+
     const getConfirmDialogContent = () => {
         switch (confirmAction) {
             case 'submit':
-                return { title: 'Submit Your Answers?', description: 'Are you sure you want to submit? You cannot change your answers after this.' };
+                return { 
+                    title: 'Submit Your Answers?', 
+                    description: skippedQuestions.length > 0
+                        ? `You have skipped ${skippedQuestions.length} question(s). Are you sure you want to submit?`
+                        : 'Are you sure you want to submit? You cannot change your answers after this.'
+                };
             case 'back':
                 return { title: 'Go Back?', description: 'Are you sure you want to go back? Your current progress will be lost.' };
             case 'new':
@@ -295,14 +293,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         }
     };
     
-    const handleNavigateToQuestion = (qIndex: number) => {
-        setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE));
-        setTimeout(() => {
-            questionRefs.current[qIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-    };
-
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -381,7 +371,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
             </div>
 
-            <Card className={cn(
+             <Card className={cn(
                 "sticky top-[64px] z-40 border-x-0 border-b",
                 timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
             )}>
@@ -576,17 +566,35 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             </AlertDialogContent>
         </AlertDialog>
 
-        <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
+         <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                         <AlertTriangle className="text-yellow-500" />
                         {getConfirmDialogContent().title}
                     </AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {getConfirmDialogContent().description}
-                    </AlertDialogDescription>
                 </AlertDialogHeader>
+                <AlertDialogDescription>
+                    {getConfirmDialogContent().description}
+                    {confirmAction === 'submit' && skippedQuestions.length > 0 && (
+                        <div className="mt-4">
+                            <p className="font-semibold">You have skipped the following questions:</p>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {skippedQuestions.map(qIndex => (
+                                    <Button
+                                        key={`confirm-skip-${qIndex}`}
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 w-7 p-0"
+                                        onClick={() => handleNavigateToQuestion(qIndex)}
+                                    >
+                                        {qIndex + 1}
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </AlertDialogDescription>
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setConfirmAction(null)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmAction}>Continue</AlertDialogAction>
