@@ -315,52 +315,60 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         }
     };
     
-    const handleDownloadPdf = async () => {
-        if (!test) return;
-        setIsGeneratingPdf(test.id);
+    const handleDownloadPdf = async (practiceSet: PracticeSet) => {
+        if (!topic) return;
+        setIsGeneratingPdf(practiceSet.id);
         try {
-            setPdfContent({ practiceSet: test, questions: test.questions });
-
-            setTimeout(async () => {
-                const pdfElement = document.getElementById('pdf-content');
-                if (pdfElement) {
-                    const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const margin = 12.7; // 0.5 inch
-                    const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
-                    const pdfHeight = pdf.internal.pageSize.getHeight() - margin * 2;
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
-                    const ratio = canvasWidth / canvasHeight;
-                    const imgWidth = pdfWidth;
-                    const imgHeight = imgWidth / ratio;
-                    let position = margin;
-                    let heightLeft = imgHeight;
-
-                    pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
-                    heightLeft -= pdfHeight;
-
-                    while (heightLeft > 0) {
-                        position -= pdfHeight;
-                        pdf.addPage();
-                        pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
-                        heightLeft -= pdfHeight;
-                    }
-                    pdf.save(`${test.title}.pdf`);
-                }
-                setPdfContent(null);
-                setIsGeneratingPdf(null);
-            }, 500);
-
+            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topic.id, practiceSet.id);
+            setPdfContent({ practiceSet, questions });
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Error generating PDF',
+                title: 'Error preparing PDF',
                 description: (error as Error).message,
             });
             setIsGeneratingPdf(null);
         }
     };
+
+    useEffect(() => {
+        if (pdfContent) {
+          const generate = async () => {
+            const pdfElement = document.getElementById('pdf-content');
+            if (pdfElement) {
+              const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
+              const pdf = new jsPDF('p', 'mm', 'a4');
+              const margin = 12.7; // 0.5 inch
+              const pdfWidth = pdf.internal.pageSize.getWidth();
+              const pdfHeight = pdf.internal.pageSize.getHeight();
+              const contentWidth = pdfWidth - margin * 2;
+              const contentHeight = pdfHeight - margin * 2;
+              const imgWidth = canvas.width;
+              const imgHeight = canvas.height;
+              const ratio = imgHeight / imgWidth;
+              const finalImgHeight = contentWidth * ratio;
+              let position = 0;
+  
+              pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
+              let heightLeft = finalImgHeight;
+  
+              heightLeft -= contentHeight;
+              while (heightLeft > 0) {
+                position -= contentHeight;
+                pdf.addPage();
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position + margin, contentWidth, finalImgHeight);
+                heightLeft -= contentHeight;
+              }
+              pdf.save(`${pdfContent.practiceSet.title}.pdf`);
+            }
+            setPdfContent(null);
+            setIsGeneratingPdf(null);
+          };
+          // Timeout to ensure content is rendered
+          setTimeout(generate, 500);
+        }
+      }, [pdfContent]);
+      
 
   if (loading) {
       return (
@@ -437,7 +445,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
                                         <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
                                     </Avatar>
-                                    <div>
+                                    <div className='user-details'>
                                         <div className="flex items-center flex-wrap gap-2">
                                             <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
@@ -463,7 +471,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                     <Button variant="outline" size="sm" asChild>
                                         <Link href={backToTopicUrl}><BookOpen className="mr-2"/>Read Topic / Chapter</Link>
                                     </Button>
-                                    <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={isGeneratingPdf !== null}>
+                                    <Button variant="outline" size="sm" onClick={() => handleDownloadPdf(test)} disabled={isGeneratingPdf !== null}>
                                         {isGeneratingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
                                         Download as PDF
                                     </Button>
@@ -671,27 +679,27 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         {getConfirmDialogContent().title}
                     </AlertDialogTitle>
                 </AlertDialogHeader>
-                <div className="py-4">
-                  <p>{getConfirmDialogContent().description}</p>
-                 {confirmAction === 'submit' && skippedQuestions.length > 0 && (
-                    <div className="mt-4 rounded-md border bg-secondary p-4">
-                        <div className="font-semibold">You have skipped the following questions:</div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {skippedQuestions.map(qIndex => (
-                                <Button
-                                    key={`confirm-skip-${qIndex}`}
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-7 w-7 p-0"
-                                    onClick={() => handleNavigateToQuestion(qIndex)}
-                                >
-                                    {qIndex + 1}
-                                </Button>
-                            ))}
+                    <AlertDialogDescription>
+                        {getConfirmDialogContent().description}
+                    </AlertDialogDescription>
+                    {confirmAction === 'submit' && skippedQuestions.length > 0 && (
+                        <div className="mt-4 rounded-md border bg-secondary p-4">
+                            <div className="font-semibold">You have skipped the following questions:</div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {skippedQuestions.map(qIndex => (
+                                    <Button
+                                        key={`confirm-skip-${qIndex}`}
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 w-7 p-0"
+                                        onClick={() => handleNavigateToQuestion(qIndex)}
+                                    >
+                                        {qIndex + 1}
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                  )}
-                </div>
+                    )}
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setConfirmAction(null)}>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={handleConfirmAction}>Continue</AlertDialogAction>
