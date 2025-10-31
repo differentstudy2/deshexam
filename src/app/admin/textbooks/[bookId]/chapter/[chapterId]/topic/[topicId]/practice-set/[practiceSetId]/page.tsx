@@ -35,6 +35,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/use-auth';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -149,7 +154,16 @@ const QuestionForm = ({ form, onSubmit, isSubmitting }: { form: any, onSubmit: (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
                 <FormField name="text" control={form.control} render={({ field }) => (
-                    <FormItem><FormLabel>Question Text</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem>
+                        <FormLabel>Question Text</FormLabel>
+                        <FormControl>
+                            <Textarea {...field} />
+                        </FormControl>
+                         <FormDescription>
+                           You can use Markdown and LaTeX for formatting (e.g., `$\text{N}_2$`).
+                        </FormDescription>
+                        <FormMessage />
+                    </FormItem>
                 )}/>
                 <div className="grid grid-cols-2 gap-4">
                     <FormField name="type" control={form.control} render={({ field }) => (
@@ -412,11 +426,12 @@ export default function ManagePracticeSetQuestionsPage() {
     const handleQuestionSubmit = async (data: QuestionFormValues) => {
         setIsSubmitting(true);
         try {
+            const pathTopicId = topicId === 'null' ? null : topicId;
             if (editingQuestion) {
-                await updateQuestionInPracticeSet(textbookId, chapterId, topicId, practiceSetId, editingQuestion.id, data);
+                await updateQuestionInPracticeSet(textbookId, chapterId, pathTopicId, practiceSetId, editingQuestion.id, data);
                 toast({ title: 'Question Updated' });
             } else {
-                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, data);
+                await addQuestionToPracticeSet(textbookId, chapterId, pathTopicId, practiceSetId, data);
                 toast({ title: 'Question Added' });
             }
             fetchData();
@@ -430,7 +445,8 @@ export default function ManagePracticeSetQuestionsPage() {
 
     const handleDeleteQuestion = async (questionId: string) => {
         try {
-            await deleteQuestionFromPracticeSet(textbookId, chapterId, topicId, practiceSetId, questionId);
+            const pathTopicId = topicId === 'null' ? null : topicId;
+            await deleteQuestionFromPracticeSet(textbookId, chapterId, pathTopicId, practiceSetId, questionId);
             toast({ title: 'Question Deleted' });
             fetchData();
         } catch (error) {
@@ -439,7 +455,7 @@ export default function ManagePracticeSetQuestionsPage() {
     }
     
     const handleSelectQuestion = (questionId: string) => {
-        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, id]);
+        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, questionId]);
     };
     
     const handleSelectAllQuestions = (checked: boolean) => {
@@ -452,7 +468,8 @@ export default function ManagePracticeSetQuestionsPage() {
     
     const handleDeleteSelected = async () => {
         try {
-            const deletePromises = selectedQuestions.map(id => deleteQuestionFromPracticeSet(textbookId, chapterId, topicId, practiceSetId, id));
+            const pathTopicId = topicId === 'null' ? null : topicId;
+            const deletePromises = selectedQuestions.map(id => deleteQuestionFromPracticeSet(textbookId, chapterId, pathTopicId, practiceSetId, id));
             await Promise.all(deletePromises);
             toast({ title: `${selectedQuestions.length} question(s) deleted.` });
             setSelectedQuestions([]);
@@ -467,8 +484,9 @@ export default function ManagePracticeSetQuestionsPage() {
             const parsedJson = JSON.parse(jsonText);
             const questionsToImport = parsedJson.questions.map((q: any) => ({...q, authorId: user?.uid, authorName: user?.displayName, createdAt: new Date()}));
             
+            const pathTopicId = topicId === 'null' ? null : topicId;
             for(const q of questionsToImport) {
-                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, q);
+                await addQuestionToPracticeSet(textbookId, chapterId, pathTopicId, practiceSetId, q);
             }
             
             toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions have been added.`});
@@ -530,8 +548,9 @@ export default function ManagePracticeSetQuestionsPage() {
 
             const result: AIQuestionGeneratorOutput = await generateQuestions(input);
             
+            const pathTopicId = topicId === 'null' ? null : topicId;
             for(const q of result.questions) {
-                await addQuestionToPracticeSet(textbookId, chapterId, topicId, practiceSetId, q);
+                await addQuestionToPracticeSet(textbookId, chapterId, pathTopicId, practiceSetId, q);
             }
             
             toast({
@@ -572,14 +591,14 @@ export default function ManagePracticeSetQuestionsPage() {
             }
         }
     };
-    
+
+    const backUrl = topicId === 'null' 
+        ? `/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-sets`
+        : `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`;
+
     if (loading) {
         return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
     }
-
-    const backUrl = topicId !== 'null' 
-        ? `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`
-        : `/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-sets`;
 
     return (
         <div className="space-y-6">
@@ -771,7 +790,11 @@ export default function ManagePracticeSetQuestionsPage() {
                                 <li key={q.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-4">
                                     <div className="flex items-start flex-1 min-w-0">
                                         <Checkbox id={`select-${q.id}`} checked={selectedQuestions.includes(q.id)} onCheckedChange={() => handleSelectQuestion(q.id)} className="mr-4 mt-1" />
-                                        <label htmlFor={`select-${q.id}`} className="flex-1">{q.text}</label>
+                                        <div className="flex-1 prose prose-sm max-w-full">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                                {q.text}
+                                            </ReactMarkdown>
+                                        </div>
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
                                         <Button variant="ghost" size="icon" onClick={() => openQuestionDialog(q)}><Edit className="h-4 w-4"/></Button>
