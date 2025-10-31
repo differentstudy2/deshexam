@@ -85,6 +85,15 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [currentPage, setCurrentPage] = useState(0);
   const QUESTIONS_PER_PAGE = 5;
 
+  const answeredCount = Object.keys(answers).length;
+  
+  const highestAttemptedIndex = useMemo(() => {
+    if (!test) return -1;
+    return test.questions.reduce((maxIndex, q, index) => {
+        return answers[q.id] !== undefined ? Math.max(maxIndex, index) : maxIndex;
+    }, -1);
+  }, [answers, test]);
+  
   const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
   const startIndex = currentPage * QUESTIONS_PER_PAGE;
   const endIndex = startIndex + QUESTIONS_PER_PAGE;
@@ -142,7 +151,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-        window.removeEventListener('beforeUnload', handleBeforeUnload);
+        window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
   
@@ -299,13 +308,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }
   
   const totalDuration = (test.duration || totalMarks) * 60;
-  const answeredCount = Object.keys(answers).length;
-  
-  const highestAttemptedIndex = useMemo(() => {
-    return test.questions.reduce((maxIndex, q, index) => {
-        return answers[q.id] !== undefined ? Math.max(maxIndex, index) : maxIndex;
-    }, -1);
-  }, [answers, test.questions]);
+
 
   return (
     <div className="container py-8 max-w-4xl mx-auto">
@@ -564,4 +567,3 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     </div>
   );
 }
-
