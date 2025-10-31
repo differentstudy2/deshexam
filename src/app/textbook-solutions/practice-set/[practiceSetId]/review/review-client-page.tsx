@@ -316,7 +316,11 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                     </div>
                     <div className="flex items-center gap-6 mt-4 md:mt-0">
                         <div className="text-center md:text-right">
-                            <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
+                            <div className="text-3xl font-bold">
+                                <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                    {`$\\frac{${score}}{${totalQuestions}}$`}
+                                </ReactMarkdown>
+                            </div>
                             <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
                         </div>
                         <div className="flex flex-col items-center">
@@ -385,7 +389,7 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                 return (
                 <div key={index}>
                     <div className="flex items-start gap-4">
-                    <div>
+                    <div className="mt-1">
                         {question.type === 'Matching' ? (
                         <ScoreCircle score={matchingPercentage} size={36} strokeWidth={3} />
                         ) : isCorrect ? (
@@ -419,7 +423,7 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                                                 : <div className="w-5 h-5 mt-0.5 shrink-0" /> 
                                         }
                                         <div className="flex-1">
-                                            <div className="flex items-center justify-between prose dark:prose-invert max-w-none">
+                                            <div className="flex items-center justify-between prose dark:prose-invert max-w-none custom-prose-style">
                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
                                                 {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
                                             </div>
