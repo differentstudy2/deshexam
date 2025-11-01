@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -173,7 +172,7 @@ export default function TextbookSolutionsListPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleTextbooks.map((book) => (
                 <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                  <CardHeader className="p-0 relative bg-gray-100 flex items-center justify-center aspect-[2/3]">
+                  <CardHeader className="p-0 relative bg-gray-100 dark:bg-gray-800 flex items-center justify-center aspect-[2/3]">
                     <Link href={`/textbook-solutions/${book.id}`} className="block w-full th-full">
                         <Image
                           src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
