@@ -314,7 +314,7 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center gap-6 mt-4 md:mt-0">
+                    <div className="flex items-end gap-6 mt-4 md:mt-0">
                         <div className="p-4 rounded-xl bg-gradient-to-br from-secondary via-background to-secondary shadow-lg border">
                             <div className="text-center">
                                 <div className="text-3xl font-bold">
