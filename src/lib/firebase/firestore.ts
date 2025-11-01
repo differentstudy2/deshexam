@@ -942,8 +942,7 @@ export const getSchools = async () => {
     try {
         const q = query(collection(db, "schools"), orderBy("name"));
         const querySnapshot = await getDocs(q);
-        const schools = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
-        return schools;
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
     } catch (e) {
         console.error("Error getting schools: ", e);
         throw new Error("Failed to fetch schools.");

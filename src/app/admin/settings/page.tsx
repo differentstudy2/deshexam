@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book, School as SchoolIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -54,7 +54,11 @@ import {
     getGradesByClass,
     addGradeToClass,
     updateGradeInClass,
-    deleteGradeFromClass
+    deleteGradeFromClass,
+    getSchools,
+    addSchool,
+    updateSchool,
+    deleteSchool
 } from '@/lib/firebase/firestore';
 import {
   AlertDialog,
@@ -101,6 +105,7 @@ const settingsSchema = z.object({
     enableStateMetafield: z.boolean(),
     enableExamMetafield: z.boolean(),
     enableChapterMetafield: z.boolean(),
+    enableSchoolMetafield: z.boolean().default(true),
     defaultBoard: z.string().optional(),
     defaultClass: z.string().optional(),
     defaultSubject: z.string().optional(),
@@ -131,7 +136,7 @@ type ContentSummary = { [key: string]: number; };
 type MetafieldItem = { id: string; name?: string; chapterNo?: string, chapterName?: string };
 
 const aiGeneratorSchema = z.object({
-  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State', 'Chapter', 'Exam']),
+  metafieldType: z.enum(['Subject', 'Board', 'Exam Category', 'Class', 'State', 'Chapter', 'Exam', 'School']),
   topic: z.string().min(3, "Topic must be at least 3 characters."),
   count: z.coerce.number().int().min(1).max(20),
   parentId: z.string().optional(),
@@ -387,6 +392,7 @@ export default function AdminSettingsPage() {
   const [classes, setClasses] = useState<MetafieldItem[]>([]);
   const [states, setStates] = useState<MetafieldItem[]>([]);
   const [examTypes, setExamTypes] = useState<MetafieldItem[]>([]);
+  const [schools, setSchools] = useState<MetafieldItem[]>([]);
   
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -408,6 +414,7 @@ export default function AdminSettingsPage() {
         enableSubjectMetafield: true,
         enableBoardMetafield: true,
         enableClassMetafield: true,
+        enableSchoolMetafield: true,
         enableExamCategoryMetafield: true,
         enableStateMetafield: true,
         enableExamMetafield: true,
@@ -443,7 +450,7 @@ export default function AdminSettingsPage() {
   const fetchInitialData = useCallback(async () => {
     try {
         setLoading(true);
-        const [settings, allContent, subjectData, boardData, classData, stateData, examTypeData] = await Promise.all([
+        const [settings, allContent, subjectData, boardData, classData, stateData, examTypeData, schoolData] = await Promise.all([
             getSettings(),
             getAllContent(),
             getSubjects(),
@@ -451,6 +458,7 @@ export default function AdminSettingsPage() {
             getClasses(),
             getStates(),
             getExamTypes(),
+            getSchools(),
         ]);
 
         if (settings) {
@@ -472,6 +480,7 @@ export default function AdminSettingsPage() {
         setClasses(classData);
         setStates(stateData);
         setExamTypes(examTypeData);
+        setSchools(schoolData);
 
     } catch (error) {
         toast({
@@ -515,7 +524,7 @@ export default function AdminSettingsPage() {
               topic: data.topic,
           };
            if (data.parentId) {
-               const parentCollection = data.metafieldType === 'Chapter' ? subjects : examTypes;
+               const parentCollection = data.metafieldType === 'Chapter' ? subjects : data.metafieldType === 'Exam' ? examTypes : schools;
                const parent = parentCollection.find(p => p.id === data.parentId);
                if (parent) {
                    input.topic = parent.name!;
@@ -548,6 +557,7 @@ export default function AdminSettingsPage() {
           'Exam Category': addExamType,
           'Class': addClass,
           'State': addState,
+          'School': addSchool,
           'Chapter': (item: string) => addChapter(parentId!, { chapterNo: '1', chapterName: item }), // Dummy chapter no
           'Exam': (item: string) => addExam(parentId!, { name: item }),
       };
@@ -584,24 +594,25 @@ export default function AdminSettingsPage() {
       }
   }
 
-  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class' | 'state') => {
-      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses, state: setStates } as const;
-      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass, state: addState };
-      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass, state: updateState };
-      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass, state: deleteState };
+  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class' | 'state' | 'school') => {
+      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses, state: setStates, school: setSchools } as const;
+      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass, state: addState, school: addSchool };
+      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass, state: updateState, school: updateSchool };
+      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass, state: deleteState, school: deleteSchool };
       
       const getFunc = type === 'subject' ? getSubjects 
           : type === 'board' ? getBoards 
           : type === 'class' ? getClasses 
           : type === 'state' ? getStates
+          : type === 'school' ? getSchools
           : getExamTypes;
       
       const setState = stateSetterMap[type];
 
       return {
-          onAdd: async (name: string) => { await addFuncMap[type](name); setState(await getFunc()); },
-          onUpdate: async (id: string, name: string) => { await updateFuncMap[type](id, name); setState(await getFunc()); },
-          onDelete: async (id: string) => { await deleteFuncMap[type](id); setState(await getFunc()); }
+          onAdd: async (name: string) => { await addFuncMap[type](name); setState(await getFunc() as any); },
+          onUpdate: async (id: string, name: string) => { await updateFuncMap[type](id, name); setState(await getFunc() as any); },
+          onDelete: async (id: string) => { await deleteFuncMap[type](id); setState(await getFunc() as any); }
       };
   };
 
@@ -610,6 +621,7 @@ export default function AdminSettingsPage() {
   const classHandlers = createMetafieldHandlers('class');
   const stateHandlers = createMetafieldHandlers('state');
   const examTypeHandlers = createMetafieldHandlers('examType');
+  const schoolHandlers = createMetafieldHandlers('school');
 
     const chapterHandlers = {
         onAdd: addChapter, onUpdate: updateChapter, onDelete: deleteChapter,
@@ -1009,6 +1021,7 @@ export default function AdminSettingsPage() {
                                                                 <SelectItem value="Class">Class</SelectItem>
                                                                 <SelectItem value="State">State</SelectItem>
                                                                 <SelectItem value="Exam Category">Exam Category</SelectItem>
+                                                                <SelectItem value="School">School</SelectItem>
                                                                 <SelectItem value="Chapter">Chapter</SelectItem>
                                                                 <SelectItem value="Exam">Exam</SelectItem>
                                                             </SelectContent>
@@ -1182,6 +1195,36 @@ export default function AdminSettingsPage() {
                                         onDelete={stateHandlers.onDelete}
                                         defaultValue={form.watch('defaultState')}
                                         onSetDefault={(value) => form.setValue('defaultState', value)}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <FormField
+                                        control={form.control}
+                                        name="enableSchoolMetafield"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between">
+                                                <div className="space-y-0.5">
+                                                    <FormLabel className="text-base">Schools/Colleges</FormLabel>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                     <MetafieldManager 
+                                        title="Schools"
+                                        items={schools}
+                                        onAdd={schoolHandlers.onAdd}
+                                        onUpdate={schoolHandlers.onUpdate}
+                                        onDelete={schoolHandlers.onDelete}
+                                        defaultValue={undefined} // No default school
+                                        onSetDefault={() => {}} // No default school
                                     />
                                 </CardContent>
                             </Card>
