@@ -175,6 +175,13 @@ export default function ProfilePage() {
         title: "Profile Updated",
         description: "Your information has been successfully saved.",
       });
+      // Optionally refetch schools if a new one was added
+      if (data.school === 'add_new_school' && data.newSchool) {
+          const schoolsData = await getSchools();
+          setSchools(schoolsData);
+          form.setValue('school', data.newSchool);
+          setIsAddingNewSchool(false);
+      }
     } catch (error) {
       toast({
         variant: "destructive",
