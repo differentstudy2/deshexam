@@ -30,6 +30,8 @@ export type Chapter = {
     resources?: Resource[];
     textbookQuestions?: Question[];
     practiceSets?: PracticeSet[];
+    mockTests?: Test[];
+    quizzes?: Test[];
     access: 'free' | 'pass' | 'pro';
 };
 
@@ -38,6 +40,8 @@ export type Topic = {
     title: string;
     content?: string;
     practiceSets?: PracticeSet[];
+    mockTests?: Test[];
+    quizzes?: Test[];
     resources?: Resource[];
     featureImage?: string;
     pdfUrl?: string;
@@ -107,3 +111,13 @@ export type Exam = {
 };
 
 
+export type Test = {
+  id: string;
+  title: string;
+  subject: string;
+  questions: any[];
+  duration: number;
+  difficulty: string;
+  access: "free" | "premium" | "pro";
+  testType: string;
+};

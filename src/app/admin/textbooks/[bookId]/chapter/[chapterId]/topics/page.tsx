@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Topic, Resource } from '@/lib/types';
+import type { Textbook, Chapter, Topic, Resource, PracticeSet, Question, Test } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -627,6 +628,12 @@ export default function ManageTopicsPage() {
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
                                     <Button variant="secondary" size="sm" asChild>
                                         <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>Manage Practice Sets</Link>
+                                    </Button>
+                                    <Button variant="secondary" size="sm" asChild>
+                                        <Link href={`/admin/add-content?type=Mock+Test&textbookId=${textbookId}&chapterId=${chapterId}&topicId=${topic.id}`}>Add Mock Test</Link>
+                                    </Button>
+                                     <Button variant="secondary" size="sm" asChild>
+                                        <Link href={`/admin/add-content?type=Quiz&textbookId=${textbookId}&chapterId=${chapterId}&topicId=${topic.id}`}>Add Quiz</Link>
                                     </Button>
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
