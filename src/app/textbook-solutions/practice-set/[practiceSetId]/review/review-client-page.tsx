@@ -315,13 +315,15 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                         </div>
                     </div>
                     <div className="flex items-center gap-6 mt-4 md:mt-0">
-                        <div className="text-center">
-                            <div className="text-3xl font-bold">
-                                <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                    {`$\\frac{${score}}{${totalQuestions}}$`}
-                                </ReactMarkdown>
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-secondary via-background to-secondary shadow-lg border">
+                            <div className="text-center">
+                                <div className="text-3xl font-bold">
+                                    <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                        {`$\\frac{${score}}{${totalQuestions}}$`}
+                                    </ReactMarkdown>
+                                </div>
+                                <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
                             </div>
-                            <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
                         </div>
                         <div className="flex flex-col items-center">
                             <ScoreCircle score={percentage} size={60} strokeWidth={5}/>
@@ -558,5 +560,3 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
     </div>
   );
 }
-
-    
