@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -33,6 +34,7 @@ const profileSchema = z.object({
   grade: z.string().optional(),
   targetExam: z.string().optional(),
   board: z.string().optional(),
+  semester: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -60,6 +62,7 @@ export default function ProfilePage() {
       grade: '',
       targetExam: '',
       board: '',
+      semester: '',
     },
   });
   
@@ -119,6 +122,7 @@ export default function ProfilePage() {
             grade: userProfile.grade || '',
             targetExam: userProfile.targetExam || '',
             board: userProfile.board || '',
+            semester: userProfile.semester || '',
           });
         }
       };
@@ -168,6 +172,7 @@ export default function ProfilePage() {
         grade: data.grade,
         targetExam: data.targetExam,
         board: data.board,
+        semester: data.semester,
         email: user.email, // Keep email consistent
       });
 
@@ -400,6 +405,19 @@ export default function ProfilePage() {
                           <FormLabel>Target Exam</FormLabel>
                           <FormControl>
                             <Input placeholder="e.g., NEET, JEE, UPSC" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="semester"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Semester (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., 3rd Semester" {...field} value={field.value ?? ''} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
