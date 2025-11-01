@@ -938,30 +938,26 @@ export const deleteBoard = async (id: string) => {
     }
 };
 
-export const getSchools = async () => {
+export const getSchoolsByClass = async (classId: string) => {
+    if (!classId) return [];
     try {
-        const q = query(collection(db, "schools"), orderBy("name"));
+        const schoolsRef = collection(db, `classes/${classId}/schools`);
+        const q = query(schoolsRef, orderBy("name"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { name: string } }));
     } catch (e) {
-        console.error("Error getting schools: ", e);
+        console.error("Error getting schools by class: ", e);
         throw new Error("Failed to fetch schools.");
     }
 };
 
-export const addSchool = async (schoolName: string) => {
-    if (!schoolName?.trim()) {
-        throw new Error("School name cannot be empty.");
+export const addSchoolToClass = async (classId: string, schoolData: { name: string }) => {
+    if (!classId || !schoolData.name) {
+        throw new Error("Class ID and School Name are required.");
     }
-    const trimmedName = schoolName.trim();
     try {
-        const q = query(collection(db, "schools"), where("name", "==", trimmedName));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-            console.log("School already exists.");
-            return querySnapshot.docs[0].id;
-        }
-        const docRef = await addDoc(collection(db, "schools"), { name: trimmedName });
+        const schoolsRef = collection(db, `classes/${classId}/schools`);
+        const docRef = await addDoc(schoolsRef, schoolData);
         return docRef.id;
     } catch (e) {
         console.error("Error adding school: ", e);
@@ -969,20 +965,20 @@ export const addSchool = async (schoolName: string) => {
     }
 };
 
-export const updateSchool = async (id: string, name: string) => {
-    if (!id || !name) throw new Error("ID and name are required.");
+export const updateSchoolInClass = async (classId: string, schoolId: string, data: { name: string }) => {
+    if (!classId || !schoolId || !data) throw new Error("IDs and data are required.");
     try {
-        await updateDoc(doc(db, "schools", id), { name });
+        await updateDoc(doc(db, `classes/${classId}/schools`, schoolId), data);
     } catch (e) {
         console.error("Error updating school: ", e);
         throw new Error("Failed to update school.");
     }
 };
 
-export const deleteSchool = async (id: string) => {
-    if (!id) throw new Error("ID is required.");
+export const deleteSchoolFromClass = async (classId: string, schoolId: string) => {
+    if (!classId || !schoolId) throw new Error("IDs are required.");
     try {
-        await deleteDoc(doc(db, "schools", id));
+        await deleteDoc(doc(db, `classes/${classId}/schools`, schoolId));
     } catch (e) {
         console.error("Error deleting school: ", e);
         throw new Error("Failed to delete school.");
@@ -1362,7 +1358,7 @@ export const updateUserProfile = async (userId: string, data: any) => {
             }
 
             if (data.school === 'add_new_school' && data.newSchool) {
-                const newSchoolId = await addSchool(data.newSchool);
+                const newSchoolId = await addDoc(collection(db, 'schools'), { name: data.newSchool });
                 newData.school = data.newSchool;
             }
             delete newData.newSchool;

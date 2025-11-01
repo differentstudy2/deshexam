@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -7,7 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Layers, FileText, CheckSquare, BookOpen } from "lucide-react";
-import { getAllTextbooks, getSubjects, getClasses, getGradesByClass, getBoards, getSchools } from '@/lib/firebase/firestore';
+import { getAllTextbooks, getSubjects, getClasses, getGradesByClass, getBoards, getSchoolsByClass } from '@/lib/firebase/firestore';
 import { TextbookFilters } from "@/components/feature/textbook-filters";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -36,7 +37,7 @@ export default function TextbookSolutionsListPage() {
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [boards, setBoards] = useState<MetafieldItem[]>([]);
   const [selectedBoard, setSelectedBoard] = useState('all');
-  const [schools, setSchools] = useState<string[]>([]);
+  const [schools, setSchools] = useState<MetafieldItem[]>([]);
   const [selectedSchool, setSelectedSchool] = useState('all');
 
   useEffect(() => {
@@ -48,20 +49,17 @@ export default function TextbookSolutionsListPage() {
           subjectsData,
           classesData,
           boardsData,
-          schoolsData
         ] = await Promise.all([
           getAllTextbooks(),
           getSubjects(),
           getClasses(),
           getBoards(),
-          getSchools(),
         ]);
         
         setTextbooks(textbookData as Textbook[]);
         setSubjects(subjectsData);
         setClassCategories(classesData);
         setBoards(boardsData);
-        setSchools(schoolsData.map(s => s.name || '').filter(Boolean));
 
       } catch (error) {
          toast({
@@ -78,16 +76,22 @@ export default function TextbookSolutionsListPage() {
   }, [toast]);
   
   useEffect(() => {
-    const fetchGrades = async () => {
+    const fetchDependentData = async () => {
         if(selectedClassCategory !== 'all') {
-            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            const [fetchedGrades, fetchedSchools] = await Promise.all([
+                getGradesByClass(selectedClassCategory),
+                getSchoolsByClass(selectedClassCategory),
+            ]);
             setGrades(fetchedGrades);
+            setSchools(fetchedSchools);
         } else {
             setGrades([]);
+            setSchools([]);
         }
         setSelectedGrade('all');
+        setSelectedSchool('all');
     };
-    fetchGrades();
+    fetchDependentData();
   }, [selectedClassCategory]);
 
   const filteredTextbooks = useMemo(() => {

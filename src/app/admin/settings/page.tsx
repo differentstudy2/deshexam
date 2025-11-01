@@ -55,10 +55,10 @@ import {
     addGradeToClass,
     updateGradeInClass,
     deleteGradeFromClass,
-    getSchools,
-    addSchool,
-    updateSchool,
-    deleteSchool
+    getSchoolsByClass,
+    addSchoolToClass,
+    updateSchoolInClass,
+    deleteSchoolFromClass
 } from '@/lib/firebase/firestore';
 import {
   AlertDialog,
@@ -313,6 +313,7 @@ const DependentMetafieldManager = ({
     
     const isChapter = childTitle === 'Chapters';
     const isGrade = childTitle === 'Grades';
+    const isSchool = childTitle === 'Schools';
 
     const getFullItemName = (item: MetafieldItem) => {
         return isChapter ? `${item.chapterNo}. ${item.chapterName}` : item.name!;
@@ -392,7 +393,6 @@ export default function AdminSettingsPage() {
   const [classes, setClasses] = useState<MetafieldItem[]>([]);
   const [states, setStates] = useState<MetafieldItem[]>([]);
   const [examTypes, setExamTypes] = useState<MetafieldItem[]>([]);
-  const [schools, setSchools] = useState<MetafieldItem[]>([]);
   
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -450,7 +450,7 @@ export default function AdminSettingsPage() {
   const fetchInitialData = useCallback(async () => {
     try {
         setLoading(true);
-        const [settings, allContent, subjectData, boardData, classData, stateData, examTypeData, schoolData] = await Promise.all([
+        const [settings, allContent, subjectData, boardData, classData, stateData, examTypeData] = await Promise.all([
             getSettings(),
             getAllContent(),
             getSubjects(),
@@ -458,7 +458,6 @@ export default function AdminSettingsPage() {
             getClasses(),
             getStates(),
             getExamTypes(),
-            getSchools(),
         ]);
 
         if (settings) {
@@ -480,7 +479,6 @@ export default function AdminSettingsPage() {
         setClasses(classData);
         setStates(stateData);
         setExamTypes(examTypeData);
-        setSchools(schoolData);
 
     } catch (error) {
         toast({
@@ -524,8 +522,13 @@ export default function AdminSettingsPage() {
               topic: data.topic,
           };
            if (data.parentId) {
-               const parentCollection = data.metafieldType === 'Chapter' ? subjects : data.metafieldType === 'Exam' ? examTypes : schools;
-               const parent = parentCollection.find(p => p.id === data.parentId);
+               const parentCollectionMap: {[key: string]: MetafieldItem[]} = {
+                 'Chapter': subjects,
+                 'Exam': examTypes,
+                 'School': classes,
+               };
+               const parentCollection = parentCollectionMap[data.metafieldType];
+               const parent = parentCollection?.find(p => p.id === data.parentId);
                if (parent) {
                    input.topic = parent.name!;
                }
@@ -551,15 +554,15 @@ export default function AdminSettingsPage() {
       const { metafieldType, parentId } = aiForm.getValues();
       if (generatedItems.length === 0) return;
       
-      const addFunctionMap = {
+      const addFunctionMap: {[key:string]: Function} = {
           'Subject': addSubject,
           'Board': addBoard,
           'Exam Category': addExamType,
           'Class': addClass,
           'State': addState,
-          'School': addSchool,
           'Chapter': (item: string) => addChapter(parentId!, { chapterNo: '1', chapterName: item }), // Dummy chapter no
           'Exam': (item: string) => addExam(parentId!, { name: item }),
+          'School': (item: string) => addSchoolToClass(parentId!, { name: item }),
       };
 
       const addFunc = addFunctionMap[metafieldType];
@@ -594,17 +597,16 @@ export default function AdminSettingsPage() {
       }
   }
 
-  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class' | 'state' | 'school') => {
-      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses, state: setStates, school: setSchools } as const;
-      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass, state: addState, school: addSchool };
-      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass, state: updateState, school: updateSchool };
-      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass, state: deleteState, school: deleteSchool };
+  const createMetafieldHandlers = (type: 'subject' | 'board' | 'examType' | 'class' | 'state') => {
+      const stateSetterMap = { subject: setSubjects, board: setBoards, examType: setExamTypes, class: setClasses, state: setStates } as const;
+      const addFuncMap = { subject: addSubject, board: addBoard, examType: addExamType, class: addClass, state: addState };
+      const updateFuncMap = { subject: updateSubject, board: updateBoard, examType: updateExamType, class: updateClass, state: updateState };
+      const deleteFuncMap = { subject: deleteSubject, board: deleteBoard, examType: deleteExamType, class: deleteClass, state: deleteState };
       
       const getFunc = type === 'subject' ? getSubjects 
           : type === 'board' ? getBoards 
           : type === 'class' ? getClasses 
           : type === 'state' ? getStates
-          : type === 'school' ? getSchools
           : getExamTypes;
       
       const setState = stateSetterMap[type];
@@ -621,7 +623,6 @@ export default function AdminSettingsPage() {
   const classHandlers = createMetafieldHandlers('class');
   const stateHandlers = createMetafieldHandlers('state');
   const examTypeHandlers = createMetafieldHandlers('examType');
-  const schoolHandlers = createMetafieldHandlers('school');
 
     const chapterHandlers = {
         onAdd: addChapter, onUpdate: updateChapter, onDelete: deleteChapter,
@@ -636,6 +637,14 @@ export default function AdminSettingsPage() {
         onUpdate: updateGradeInClass,
         onDelete: deleteGradeFromClass,
     }
+    
+    const schoolHandlers = {
+        fetchChildren: getSchoolsByClass,
+        onAdd: addSchoolToClass,
+        onUpdate: updateSchoolInClass,
+        onDelete: deleteSchoolFromClass,
+    };
+
 
     const settingTabs = [
         { id: 'general', label: 'General', icon: Settings },
@@ -1030,14 +1039,14 @@ export default function AdminSettingsPage() {
                                                     </FormItem>
                                                 )} />
 
-                                                { (aiMetafieldType === 'Chapter' || aiMetafieldType === 'Exam') && (
+                                                { (aiMetafieldType === 'Chapter' || aiMetafieldType === 'Exam' || aiMetafieldType === 'School') && (
                                                     <FormField control={aiForm.control} name="parentId" render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>{aiMetafieldType === 'Chapter' ? 'Parent Subject' : 'Parent Exam Category'}</FormLabel>
+                                                            <FormLabel>{aiMetafieldType === 'Chapter' ? 'Parent Subject' : aiMetafieldType === 'Exam' ? 'Parent Exam Category' : 'Parent Class Category'}</FormLabel>
                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                <FormControl><SelectTrigger><SelectValue placeholder={`Select a ${aiMetafieldType === 'Chapter' ? 'Subject' : 'Category'}`} /></SelectTrigger></FormControl>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder={`Select a ${aiMetafieldType === 'Chapter' ? 'Subject' : aiMetafieldType === 'Exam' ? 'Category' : 'Class Category'}`} /></SelectTrigger></FormControl>
                                                                 <SelectContent>
-                                                                    {(aiMetafieldType === 'Chapter' ? subjects : examTypes).map(item => (
+                                                                    {(aiMetafieldType === 'Chapter' ? subjects : aiMetafieldType === 'Exam' ? examTypes : classes).map(item => (
                                                                         <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
                                                                     ))}
                                                                 </SelectContent>
@@ -1217,9 +1226,11 @@ export default function AdminSettingsPage() {
                                     />
                                 </CardHeader>
                                 <CardContent>
-                                     <MetafieldManager 
-                                        title="Schools"
-                                        items={schools}
+                                     <DependentMetafieldManager
+                                        parentTitle="Class Categories"
+                                        childTitle="Schools"
+                                        parentItems={classes}
+                                        fetchChildren={schoolHandlers.fetchChildren}
                                         onAdd={schoolHandlers.onAdd}
                                         onUpdate={schoolHandlers.onUpdate}
                                         onDelete={schoolHandlers.onDelete}
@@ -1511,3 +1522,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+

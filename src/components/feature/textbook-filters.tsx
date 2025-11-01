@@ -22,7 +22,7 @@ type TextbookFiltersProps = {
     boards: MetafieldItem[];
     selectedBoard: string;
     onBoardChange: (board: string) => void;
-    schools: string[];
+    schools: MetafieldItem[];
     selectedSchool: string;
     onSchoolChange: (school: string) => void;
 }
@@ -71,18 +71,6 @@ export function TextbookFilters({
               </SelectContent>
             </Select>
 
-            <Select value={selectedSchool} onValueChange={onSchoolChange}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Filter by school" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Schools</SelectItem>
-                {schools.map((school) => (
-                  <SelectItem key={school} value={school}>{school}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <Select value={selectedClassCategory} onValueChange={onClassCategoryChange}>
               <SelectTrigger className="h-10">
                 <SelectValue placeholder="Filter by Class Category" />
@@ -105,6 +93,18 @@ export function TextbookFilters({
                     <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
                     ))}
                 </SelectContent>
+            </Select>
+            
+            <Select value={selectedSchool} onValueChange={onSchoolChange} disabled={selectedClassCategory === 'all' || schools.length === 0}>
+              <SelectTrigger className="h-10">
+                <SelectValue placeholder="Filter by school" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Schools</SelectItem>
+                {schools.map((school) => (
+                  <SelectItem key={school.id} value={school.name}>{school.name}</SelectItem>
+                ))}
+              </SelectContent>
             </Select>
 
             <Select value={selectedSubject} onValueChange={onSubjectChange}>

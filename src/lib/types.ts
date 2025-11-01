@@ -89,5 +89,21 @@ export type Question = {
     correctAnswer: any;
     explanation?: string;
     subQuestions?: SubQuestion[];
+    likes: number;
+    dislikes: number;
+    likedBy: string[];
+    dislikedBy: string[];
 };
+
+export type Exam = {
+  id: string;
+  title: string;
+  subject: string;
+  questions: any[];
+  duration: number;
+  difficulty: string;
+  access: "free" | "premium" | "pro";
+  testType: string;
+};
+
 
