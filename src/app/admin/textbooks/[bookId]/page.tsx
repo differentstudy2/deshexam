@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Topic, Resource, PracticeSet, Question, Test } from '@/lib/types';
+import type { Textbook, Chapter, Topic, Resource } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -740,29 +740,9 @@ Chapter 3: Advanced Topics"
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
                                      <div className="space-y-2">
                                         <Button variant="secondary" size="sm" className="w-full" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/questions`}>
-                                                <FileQuestion className="h-3 w-3 mr-1"/> Manage Questions
-                                            </Link>
-                                        </Button>
-                                        <Button variant="secondary" size="sm" className="w-full" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/practice-sets`}>
-                                                Manage Practice Sets
-                                            </Link>
-                                        </Button>
-                                         <Button variant="secondary" size="sm" className="w-full" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`}>Manage Topics</Link>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Chapter</Link>
                                         </Button>
                                     </div>
-                                    <Separator />
-                                     <div className="space-y-2">
-                                        <Button variant="outline" size="sm" className="w-full" asChild>
-                                            <Link href={`/admin/add-content?type=Mock+Test&textbookId=${textbookId}&chapterId=${chapter.id}`}>Add Mock Test</Link>
-                                        </Button>
-                                         <Button variant="outline" size="sm" className="w-full" asChild>
-                                            <Link href={`/admin/add-content?type=Quiz&textbookId=${textbookId}&chapterId=${chapter.id}`}>Add Quiz</Link>
-                                        </Button>
-                                    </div>
-                                    <Separator />
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
                                             <Edit className="h-3 w-3 mr-1"/> Edit
