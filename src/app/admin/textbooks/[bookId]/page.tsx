@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -202,7 +201,7 @@ export default function ManageChaptersPage() {
         
         toast({
             title: 'Chapters Added',
-            description: `${chapterTitles.length} chapters have been added successfully.`,
+            description: `${'chapterTitles.length'} chapters have been added successfully.`,
         });
         
         setBulkChaptersText('');
@@ -739,25 +738,31 @@ Chapter 3: Advanced Topics"
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
-                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/questions`}>
-                                            <FileQuestion className="h-3 w-3 mr-1"/> Manage Questions
-                                        </Link>
-                                    </Button>
-                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/practice-sets`}>
-                                            Manage Practice Sets
-                                        </Link>
-                                    </Button>
-                                    <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`}>Manage Topics</Link>
-                                    </Button>
-                                    <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/add-content?type=Mock+Test&textbookId=${textbookId}&chapterId=${chapter.id}`}>Add Mock Test</Link>
-                                    </Button>
-                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/add-content?type=Quiz&textbookId=${textbookId}&chapterId=${chapter.id}`}>Add Quiz</Link>
-                                    </Button>
+                                     <div className="space-y-2">
+                                        <Button variant="secondary" size="sm" className="w-full" asChild>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/questions`}>
+                                                <FileQuestion className="h-3 w-3 mr-1"/> Manage Questions
+                                            </Link>
+                                        </Button>
+                                        <Button variant="secondary" size="sm" className="w-full" asChild>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/practice-sets`}>
+                                                Manage Practice Sets
+                                            </Link>
+                                        </Button>
+                                         <Button variant="secondary" size="sm" className="w-full" asChild>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`}>Manage Topics</Link>
+                                        </Button>
+                                    </div>
+                                    <Separator />
+                                     <div className="space-y-2">
+                                        <Button variant="outline" size="sm" className="w-full" asChild>
+                                            <Link href={`/admin/add-content?type=Mock+Test&textbookId=${textbookId}&chapterId=${chapter.id}`}>Add Mock Test</Link>
+                                        </Button>
+                                         <Button variant="outline" size="sm" className="w-full" asChild>
+                                            <Link href={`/admin/add-content?type=Quiz&textbookId=${textbookId}&chapterId=${chapter.id}`}>Add Quiz</Link>
+                                        </Button>
+                                    </div>
+                                    <Separator />
                                     <div className="flex gap-2">
                                          <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
                                             <Edit className="h-3 w-3 mr-1"/> Edit
