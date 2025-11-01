@@ -232,7 +232,7 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                 {[...Array(3)].map((_, i) => (
                     <div key={i} className="space-y-4">
                         <Skeleton className="h-6 w-full" />
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <Skeleton className="h-12 w-full" />
                             <Skeleton className="h-12 w-full" />
                         </div>
@@ -315,7 +315,7 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
                         </div>
                     </div>
                     <div className="flex items-center gap-6 mt-4 md:mt-0">
-                        <div className="text-center md:text-right">
+                        <div className="text-center">
                             <div className="text-3xl font-bold">
                                 <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                                     {`$\\frac{${score}}{${totalQuestions}}$`}
@@ -558,3 +558,5 @@ export default function ReviewClientPage({ submissionId }: { submissionId: strin
     </div>
   );
 }
+
+    
