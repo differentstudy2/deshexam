@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, CheckSquare, FileText, Library, FileQuestion, PlusCircle, Award } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckSquare, FileText, Library, FileQuestion, PlusCircle, Award, Book } from "lucide-react";
 import Link from "next/link";
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from "react";
@@ -55,6 +55,12 @@ export default function ManageChapterPage() {
             link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/practice-sets`,
             icon: <CheckSquare />,
         },
+        {
+            title: "Manage Additional Resources",
+            description: "Add videos, PDFs, and other supplementary materials.",
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/resources`,
+            icon: <Book />,
+        }
     ];
 
     const addContentActions = [
