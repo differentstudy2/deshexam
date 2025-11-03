@@ -33,12 +33,24 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Save } from 'lucide-react';
-import { useEffect } from 'react';
+import { addContent, getContentById } from '@/lib/firebase/firestore';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileJson } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
-
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import type { Textbook, Chapter, Topic } from '@/lib/types';
+import { generateDescription } from '@/ai/flows/ai-description-generator';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -72,13 +84,47 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "Multiple Choice",
+      "marks": 1,
+      "options": [
+        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
+        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
+        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
+        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
+      ],
+      "correctAnswer": "Paris",
+      "explanation": "Paris is the capital and most populous city of France."
+    }
+  ]
+}
+`;
+
 
 export default function AddTextbookMockTestPage() {
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  
   const textbookId = params.bookId as string;
   const chapterId = params.chapterId as string;
+  const topicId = searchParams.get('topicId');
+  
+  const [textbook, setTextbook] = useState<Textbook | null>(null);
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
+  
+  const importFileRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [jsonText, setJsonText] = useState('');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -91,7 +137,30 @@ export default function AddTextbookMockTestPage() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  useEffect(() => {
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const bookData = await getContentById(textbookId) as Textbook;
+            setTextbook(bookData);
+
+            const chapData = await getContentById(chapterId) as Chapter;
+            setChapter(chapData);
+            
+            if (topicId) {
+                const topicData = await getContentById(topicId) as Topic;
+                setTopic(topicData);
+            }
+        } catch (error) {
+             toast({ variant: "destructive", title: "Failed to load context", description: (error as Error).message });
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchData();
+  }, [textbookId, chapterId, topicId, toast]);
+
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'questions',
   });
@@ -107,6 +176,28 @@ export default function AddTextbookMockTestPage() {
     form.setValue('duration', totalMarks, { shouldValidate: true });
   }, [questions, form]);
   
+    useEffect(() => {
+    const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
+    if (aiQuestionsRaw) {
+      try {
+        const newQuestions = JSON.parse(aiQuestionsRaw);
+        replace(newQuestions);
+        toast({
+            title: 'Questions Added!',
+            description: 'AI-generated questions have been loaded into the form.',
+        });
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Failed to load AI questions',
+        });
+      } finally {
+          sessionStorage.removeItem('aiGeneratedQuestions');
+      }
+    }
+  }, [replace, toast]);
+
+
   const handleFormSubmit = async (data: FormValues) => {
     try {
       const contentToSave: any = { 
@@ -114,7 +205,8 @@ export default function AddTextbookMockTestPage() {
         testType: 'Mock Test',
         textbookId: textbookId,
         chapterId: chapterId,
-        access: 'free', // Default access for textbook content
+        topicId: topicId,
+        access: 'free', 
       };
       
       await addContent(contentToSave);
@@ -134,18 +226,84 @@ export default function AddTextbookMockTestPage() {
     }
   }
 
+  const handleAIDescriptionGenerate = async () => {
+    const title = form.getValues('title');
+    if (!title) {
+        toast({
+            variant: "destructive",
+            title: 'Title is required',
+            description: 'Please enter a title before generating a description.',
+        });
+        return;
+    }
+
+    setIsGeneratingDesc(true);
+    try {
+        const source = `${title} - for chapter ${chapter?.title} in textbook ${textbook?.title}`;
+        const result = await generateDescription({ source });
+        form.setValue('description', result.description);
+        toast({
+            title: 'Description Generated!',
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+        });
+    } finally {
+      setIsGeneratingDesc(false);
+    }
+  };
+
+    const processJsonImport = (jsonString: string) => {
+        try {
+            const parsed = JSON.parse(jsonString);
+            const questionsToImport = parsed.questions || [];
+            if(!Array.isArray(questionsToImport) || questionsToImport.length === 0){
+                throw new Error("No 'questions' array found in JSON.");
+            }
+            append(questionsToImport);
+            toast({ title: 'Import Successful', description: `${questionsToImport.length} questions added.` });
+            setIsImportDialogOpen(false);
+            setJsonText('');
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Import Failed', description: (error as Error).message });
+        } finally {
+            setIsImporting(false);
+        }
+    };
+    
+    const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        setIsImporting(true);
+        const reader = new FileReader();
+        reader.onload = (e) => processJsonImport(e.target?.result as string);
+        reader.readAsText(file);
+    };
+
+    const handleBulkImportFromText = () => {
+        setIsImporting(true);
+        processJsonImport(jsonText);
+    };
+
+    const backUrl = topicId 
+        ? `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`
+        : `/admin/textbooks/${textbookId}/chapter/${chapterId}`;
+
   return (
     <div>
         <div className="flex justify-between items-center mb-6">
             <div>
                 <h1 className="font-headline text-3xl font-bold">Add New Mock Test</h1>
                 <p className="text-muted-foreground">
-                    Create a new mock test for this chapter.
+                    For: {textbook?.title} - {chapter?.title} {topic ? `- ${topic.title}` : ''}
                 </p>
             </div>
              <Button asChild variant="outline">
-                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}`}>
-                    Back to Chapter
+                <Link href={backUrl}>
+                    Back to {topicId ? 'Topic' : 'Chapter'}
                 </Link>
             </Button>
         </div>
@@ -170,6 +328,7 @@ export default function AddTextbookMockTestPage() {
                     <FormControl>
                       <Input placeholder="e.g., Chapter 1 Test - Physics" {...field} />
                     </FormControl>
+                    <FormDescription>SEO Suggestion: {chapter?.title} Mock Test for {textbook?.title}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -180,7 +339,12 @@ export default function AddTextbookMockTestPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description / Summary</FormLabel>
+                    <div className="flex justify-between items-center">
+                        <FormLabel>Description / Summary</FormLabel>
+                        <Button type="button" variant="outline" size="sm" onClick={handleAIDescriptionGenerate} disabled={!form.getValues('title') || isGeneratingDesc}>
+                            <Sparkles className="mr-2 h-4 w-4"/> Generate with AI
+                        </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         placeholder="Provide a brief description of the mock test."
@@ -355,24 +519,49 @@ export default function AddTextbookMockTestPage() {
                     );
                 })}
             </CardContent>
-            <CardFooter>
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      append({ 
-                          text: '', 
-                          type: 'Multiple Choice', 
-                          marks: 1, 
-                          options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
-                          correctAnswer: '', 
-                          explanation: '' 
-                      });
-                  }}
-                >
-                    <PlusCircle className="mr-2" />
-                    Add Question
+            <CardFooter className="flex flex-wrap gap-4">
+                <Button type="button" variant="outline" onClick={() => { append({ text: '', type: 'Multiple Choice', marks: 1, options: [ { text: '' }, { text: '' }, { text: '' }, { text: '' } ], correctAnswer: '' }); }}>
+                    <PlusCircle className="mr-2" /> Add Question
                 </Button>
+                <Button asChild variant="outline">
+                    <Link href={`/admin/add-content/add-ai-question?redirect=${encodeURIComponent(router.asPath)}`}>
+                        <Sparkles className="mr-2 h-4 w-4" /> Add with AI
+                    </Link>
+                </Button>
+                <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                    <DialogTrigger asChild>
+                         <Button type="button" variant="outline">
+                            <FileJson className="mr-2" />
+                            Bulk Import
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Bulk Import Questions from JSON</DialogTitle>
+                        </DialogHeader>
+                        <Tabs defaultValue="paste">
+                             <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="paste">Paste JSON</TabsTrigger>
+                                <TabsTrigger value="upload">Upload File</TabsTrigger>
+                            </TabsList>
+                             <TabsContent value="paste" className="pt-4 space-y-2">
+                                <Textarea value={jsonText} onChange={(e) => setJsonText(e.target.value)} className="min-h-[200px]" placeholder='Paste your JSON content here...' />
+                                <Button onClick={handleBulkImportFromText} disabled={isImporting}>Import from Text</Button>
+                             </TabsContent>
+                              <TabsContent value="upload" className="pt-4 space-y-2">
+                                <Input id="json-file" type="file" accept=".json" onChange={handleBulkImportFromFile} ref={importFileRef} />
+                             </TabsContent>
+                        </Tabs>
+                        <Accordion type="single" collapsible>
+                            <AccordionItem value="item-1">
+                                <AccordionTrigger>View Example JSON</AccordionTrigger>
+                                <AccordionContent>
+                                    <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap text-sm">{jsonExample}</pre>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </DialogContent>
+                </Dialog>
             </CardFooter>
           </Card>
           

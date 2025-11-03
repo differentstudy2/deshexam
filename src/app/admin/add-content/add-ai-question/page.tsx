@@ -33,10 +33,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, ArrowLeft, Upload } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 const aiGeneratorFormSchema = z.object({
@@ -59,9 +59,12 @@ const aiGeneratorFormSchema = z.object({
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
 
-export default function AIQuestionGeneratorPage() {
+function AIQuestionGeneratorPageComponent() {
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect') || '/admin/add-content';
+
     const [isGenerating, setIsGenerating] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -112,7 +115,7 @@ export default function AIQuestionGeneratorPage() {
                 description: `Redirecting you back to the form...`,
             });
 
-            router.push('/admin/add-content');
+            router.push(redirectUrl);
     
         } catch (error) {
           toast({
@@ -150,7 +153,7 @@ export default function AIQuestionGeneratorPage() {
         <div>
             <div className="mb-6">
                 <Button asChild variant="outline">
-                    <Link href="/admin/add-content">
+                    <Link href={redirectUrl}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Content Editor
                     </Link>
@@ -300,4 +303,12 @@ export default function AIQuestionGeneratorPage() {
             </Card>
         </div>
     );
+}
+
+export default function AIQuestionGeneratorPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AIQuestionGeneratorPageComponent />
+        </Suspense>
+    )
 }
