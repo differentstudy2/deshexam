@@ -64,18 +64,6 @@ export default function ManageChapterPage() {
     ];
 
     const addContentActions = [
-        {
-            title: "Add Mock Test",
-            description: "Create a new mock test based on this chapter.",
-            link: `/admin/add-content?type=Mock+Test&textbookId=${textbookId}&chapterId=${chapterId}`,
-            icon: <PlusCircle />,
-        },
-        {
-            title: "Add Quiz",
-            description: "Create a new quiz based on this chapter.",
-            link: `/admin/add-content?type=Quiz&textbookId=${textbookId}&chapterId=${chapterId}`,
-            icon: <PlusCircle />,
-        },
          {
             title: "Add Exam",
             description: "Create a new exam based on this chapter.",
