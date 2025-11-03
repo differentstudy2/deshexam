@@ -56,6 +56,18 @@ export default function ManageChapterPage() {
             icon: <CheckSquare />,
         },
         {
+            title: "Manage Mock Tests",
+            description: "Create and manage mock tests for this chapter.",
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/mock-tests`,
+            icon: <Award />,
+        },
+        {
+            title: "Manage Quizzes",
+            description: "Create and manage quizzes for this chapter.",
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/quizzes`,
+            icon: <Award />,
+        },
+        {
             title: "Manage Additional Resources",
             description: "Add videos, PDFs, and other supplementary materials.",
             link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/resources`,
@@ -64,18 +76,6 @@ export default function ManageChapterPage() {
     ];
 
     const addContentActions = [
-         {
-            title: "Add Mock Test",
-            description: "Create a new mock test for this chapter.",
-            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/add-mock-test`,
-            icon: <Award />,
-        },
-        {
-            title: "Add Quiz",
-            description: "Create a new quiz for this chapter.",
-            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/add-quiz`,
-            icon: <Award />,
-        },
         {
             title: "Add Exam",
             description: "Create a new exam based on this chapter.",

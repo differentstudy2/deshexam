@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -8,11 +7,11 @@ import { doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, 
 import { db } from '@/lib/firebase/client';
 import type { Topic, PracticeSet, Resource, Textbook, Chapter } from '@/lib/types';
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink, Sparkles, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -43,6 +42,7 @@ const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Text
 
 export default function ManageTopicPage() {
     const params = useParams();
+    const router = useRouter();
     const { toast } = useToast();
 
     const textbookId = params.bookId as string;
@@ -177,52 +177,53 @@ export default function ManageTopicPage() {
             </div>
             <header>
                 <h1 className="font-headline text-3xl font-bold">Manage Topic: <span className="text-primary">{topic?.title}</span></h1>
-                 <p className="text-muted-foreground mt-1">Here you can add and manage practice sets for this topic.</p>
+                 <p className="text-muted-foreground mt-1">Here you can add and manage practice sets, tests, and quizzes for this topic.</p>
             </header>
 
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Practice Sets</CardTitle>
-                        <CardDescription>Manage practice tests associated with this topic.</CardDescription>
-                    </div>
-                    <Button size="sm" onClick={() => handleOpenPracticeSetDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
-                </CardHeader>
-                <CardContent>
-                    {practiceSets.length > 0 ? (
-                        <ul className="space-y-2">
-                            {practiceSets.map(ps => {
-                                const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
-                                const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
-                                return (
-                                <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                    <div className="flex-grow flex items-center gap-2 flex-wrap">
-                                        <span className="font-semibold">{ps.subtitle || 'Practice Set'}:</span>
-                                        <span className="font-medium">{ps.title}</span>
-                                        {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                        {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
-                                    </div>
-                                    <div className="flex gap-2 flex-shrink-0">
-                                        <Button variant="outline" size="sm" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
-                                                Manage Questions
-                                            </Link>
-                                        </Button>
-                                         <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
-                                            <Edit className="mr-2 h-4 w-4" /> Edit
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => setPracticeSetToDelete(ps)}>
-                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                        </Button>
-                                    </div>
-                                </li>
-                            )})}
-                        </ul>
-                    ) : (
-                        <p className="text-muted-foreground text-center py-8">No practice sets created for this topic yet.</p>
-                    )}
-                </CardContent>
-            </Card>
+                        <Button size="sm" onClick={() => handleOpenPracticeSetDialog(null)}><PlusCircle className="mr-2"/> Add</Button>
+                    </CardHeader>
+                    <CardContent>
+                        {practiceSets.length > 0 ? (
+                            <ul className="space-y-2">
+                                {practiceSets.map(ps => (
+                                    <li key={ps.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`} className="flex-grow font-medium hover:underline">{ps.title}</Link>
+                                        <div className="flex gap-1">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenPracticeSetDialog(ps)}><Edit className="h-4 w-4"/></Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setPracticeSetToDelete(ps)}><Trash2 className="h-4 w-4"/></Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                             <p className="text-muted-foreground text-center py-4 text-sm">No practice sets yet.</p>
+                        )}
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Mock Tests</CardTitle>
+                        <Button size="sm" asChild><Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-mock-test`}><PlusCircle className="mr-2"/> Add</Link></Button>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground text-center py-4 text-sm">Manage mock tests here.</p>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Quizzes</CardTitle>
+                        <Button size="sm" asChild><Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-quiz`}><PlusCircle className="mr-2"/> Add</Link></Button>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground text-center py-4 text-sm">Manage quizzes here.</p>
+                    </CardContent>
+                </Card>
+            </div>
+
 
             <Dialog open={isPracticeSetDialogOpen} onOpenChange={setIsPracticeSetDialogOpen}>
                 <DialogContent>
