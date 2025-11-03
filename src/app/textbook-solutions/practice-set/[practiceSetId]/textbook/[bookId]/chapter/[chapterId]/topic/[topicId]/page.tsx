@@ -18,6 +18,25 @@ type PageProps = {
   };
 };
 
+// Helper function to serialize Firestore Timestamps
+const serializeFirestoreTimestamps = (data: any): any => {
+    if (!data) return data;
+    if (Array.isArray(data)) {
+        return data.map(item => serializeFirestoreTimestamps(item));
+    }
+    if (typeof data === 'object' && data !== null) {
+        if (data.hasOwnProperty('seconds') && data.hasOwnProperty('nanoseconds') && typeof (data as any).toDate === 'function') {
+            return (data as any).toDate().toISOString();
+        }
+        const newObj: { [key: string]: any } = {};
+        for (const key in data) {
+            newObj[key] = serializeFirestoreTimestamps(data[key]);
+        }
+        return newObj;
+    }
+    return data;
+};
+
 async function getPageData(params: PageProps['params']) {
     const { practiceSetId, bookId, chapterId, topicId } = params;
     try {
@@ -36,7 +55,12 @@ async function getPageData(params: PageProps['params']) {
             }
         }
         
-        return { practiceSet, textbook, chapter, topic };
+        return { 
+            practiceSet: serializeFirestoreTimestamps(practiceSet), 
+            textbook: serializeFirestoreTimestamps(textbook), 
+            chapter: serializeFirestoreTimestamps(chapter), 
+            topic: serializeFirestoreTimestamps(topic) 
+        };
     } catch (error) {
         console.error("Error fetching data for metadata:", error);
         return { practiceSet: null, textbook: null, chapter: null, topic: null };
@@ -81,38 +105,15 @@ export default async function PracticeSetPage({ params }: PageProps) {
         notFound();
     }
     
-    const questions = await getQuestionsByPracticeSet(awaitedParams.bookId, awaitedParams.chapterId, awaitedParams.topicId === 'null' ? null : awaitedParams.topicId, awaitedParams.practiceSetId);
+    const questionsData = await getQuestionsByPracticeSet(awaitedParams.bookId, awaitedParams.chapterId, awaitedParams.topicId === 'null' ? null : awaitedParams.topicId, awaitedParams.practiceSetId);
+    const questions = serializeFirestoreTimestamps(questionsData);
 
-    // Helper function to serialize Firestore Timestamps
-    const serializeFirestoreTimestamps = (data: any) => {
-        if (!data) return data;
-        const newObj: { [key: string]: any } = {};
-        for (const key in data) {
-            const value = data[key];
-            if (value && typeof value === 'object' && value.hasOwnProperty('seconds') && value.hasOwnProperty('nanoseconds')) {
-                // It's a Firestore Timestamp
-                newObj[key] = new Date(value.seconds * 1000).toISOString();
-            } else if (Array.isArray(value)) {
-                newObj[key] = value.map(item => serializeFirestoreTimestamps(item));
-            } else if (typeof value === 'object') {
-                newObj[key] = serializeFirestoreTimestamps(value);
-            } else {
-                newObj[key] = value;
-            }
-        }
-        return newObj;
-    };
 
     const initialTest = {
         ...practiceSet,
-        questions: questions.map(q => serializeFirestoreTimestamps(q)),
+        questions: questions.map((q: any) => serializeFirestoreTimestamps(q)),
         testType: 'Practice Set'
     };
-
-    const serializedTest = serializeFirestoreTimestamps(initialTest);
-    const serializedTextbook = serializeFirestoreTimestamps(textbook);
-    const serializedChapter = serializeFirestoreTimestamps(chapter);
-    const serializedTopic = topic ? serializeFirestoreTimestamps(topic) : null;
 
     return (
         <Suspense fallback={
@@ -121,14 +122,11 @@ export default async function PracticeSetPage({ params }: PageProps) {
             </div>
         }>
             <PracticeSetClientPage 
-                initialTest={serializedTest as any} 
-                initialTextbook={serializedTextbook as any} 
-                initialChapter={serializedChapter as any}
-                initialTopic={serializedTopic as any}
+                initialTest={initialTest as any} 
+                initialTextbook={textbook as any} 
+                initialChapter={chapter as any}
+                initialTopic={topic as any}
             />
         </Suspense>
     )
 }
-
-// Define the type for the initialTest prop
-type Test = PracticeSet & { questions: Question[], testType: 'Practice Set' };

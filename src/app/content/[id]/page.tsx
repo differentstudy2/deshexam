@@ -37,12 +37,19 @@ export async function generateMetadata(
 }
 
 export default async function TestPage({ params }: Props) {
-  const test = await getContentById(params.id);
+  const testData = await getContentById(params.id);
 
-  if (!test) {
+  if (!testData) {
     notFound();
   }
   
+  // Serialize Firestore Timestamps
+  const test = {
+      ...testData,
+      createdAt: testData.createdAt?.toDate ? testData.createdAt.toDate().toISOString() : new Date().toISOString(),
+      updatedAt: testData.updatedAt?.toDate ? testData.updatedAt.toDate().toISOString() : null,
+  };
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -74,8 +81,7 @@ export default async function TestPage({ params }: Props) {
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <TestClientPage test={test} />
+        <TestClientPage test={test as any} />
     </>
   );
 }
-
