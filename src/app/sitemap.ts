@@ -22,7 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/kids-zone/learning-games',
     '/kids-zone/learning-games/math-puzzles',
     '/kids-zone/learning-games/math-puzzles/addition-adventure',
-    '/kids-zone/learning-games/math-puzzles/subtraction-submarine',
     '/kids-zone/learning-games/number-recognition',
     '/kids-zone/learning-games/number-recognition/learn-numbers',
     '/kids-zone/learning-games/number-recognition/learn-numbers/0-10',
@@ -48,6 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/kids-zone/learning-bengali/reading/lion-and-mouse',
     '/kids-zone/learning-bengali/reading/two-friends-and-bear',
     '/kids-zone/learning-english',
+    '/textbook-solutions',
   ].map(route => ({
       url: `${baseUrl}${route}`,
       lastModified: new Date(),
@@ -139,10 +139,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const book of allTextbooks) {
       const chapters = await getChaptersByTextbookId((book as any).id);
       for (const chapter of chapters) {
+          textbookChapterTopicRoutes.push({
+            url: `${baseUrl}/textbook-solutions/${(book as any).id}/chapter/${(chapter as any).id}`,
+            lastModified: new Date(),
+            priority: 0.7
+          });
           const topics = await getTopicsByChapterId((book as any).id, (chapter as any).id);
           for (const topic of topics) {
               textbookChapterTopicRoutes.push({
-                  url: `${baseUrl}/textbook-solutions/${(book as any).id}?chapter=${(chapter as any).id}&amp;topic=${(topic as any).id}`,
+                  url: `${baseUrl}/textbook-solutions/${(book as any).id}/chapter/${(chapter as any).id}/topic/${(topic as any).id}`,
                   lastModified: new Date(),
                   priority: 0.6
               });
@@ -150,7 +155,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               const practiceSets = await getPracticeSetsByTopicId((book as any).id, (chapter as any).id, (topic as any).id);
               for (const practiceSet of practiceSets) {
                   practiceSetRoutes.push({
-                      url: `${baseUrl}/textbook-solutions/practice-set/${(practiceSet as any).id}?textbook=${(book as any).id}&amp;chapter=${(chapter as any).id}&amp;topic=${(topic as any).id}`,
+                      url: `${baseUrl}/textbook-solutions/practice-set/${(practiceSet as any).id}/textbook/${(book as any).id}/chapter/${(chapter as any).id}/topic/${(topic as any).id}`,
                       lastModified: new Date(),
                       priority: 0.5,
                   });
