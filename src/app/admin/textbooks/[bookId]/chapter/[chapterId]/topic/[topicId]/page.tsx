@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { Topic, PracticeSet, Resource, Textbook, Chapter } from '@/lib/types';
+import type { Topic, PracticeSet, Resource, Textbook, Chapter, Exam } from '@/lib/types';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,8 @@ import {
     getPracticeSetsByTopicId, 
     uploadFile,
     getTextbookById,
-    getChapterById
+    getChapterById,
+    addContent
 } from '@/lib/firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -53,6 +54,8 @@ export default function ManageTopicPage() {
     const [textbook, setTextbook] = useState<any | null>(null);
     const [chapter, setChapter] = useState<any | null>(null);
     const [practiceSets, setPracticeSets] = useState<PracticeSet[]>([]);
+    const [mockTests, setMockTests] = useState<Exam[]>([]);
+    const [quizzes, setQuizzes] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
 
     const [isPracticeSetDialogOpen, setIsPracticeSetDialogOpen] = useState(false);
@@ -64,6 +67,12 @@ export default function ManageTopicPage() {
         questionSource: ['Random from Topic']
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
+    
+    const [isMockTestDialogOpen, setIsMockTestDialogOpen] = useState(false);
+    const [mockTestData, setMockTestData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Topic'] });
+
+    const [isQuizDialogOpen, setIsQuizDialogOpen] = useState(false);
+    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Topic'] });
     
 
     const fetchData = async () => {
@@ -86,6 +95,12 @@ export default function ManageTopicPage() {
 
             const fetchedPracticeSets = await getPracticeSetsByTopicId(textbookId, chapterId, topicId);
             setPracticeSets(fetchedPracticeSets as PracticeSet[]);
+            
+            const allContent = await getAllContent();
+            setMockTests((allContent as Exam[]).filter(item => item.testType === 'Mock Test' && item.topicId === topicId));
+            setQuizzes((allContent as Exam[]).filter(item => item.testType === 'Quiz' && item.topicId === topicId));
+
+
         } catch (error) {
              toast({ variant: 'destructive', title: 'Error fetching topic data', description: (error as Error).message });
         } finally {
@@ -154,13 +169,44 @@ export default function ManageTopicPage() {
         }
     };
     
-    const generateTitle = (template: string) => {
+    const handleAddTestOrQuiz = async (type: 'Mock Test' | 'Quiz') => {
+        const data = type === 'Mock Test' ? mockTestData : quizData;
+        if (!data.title.trim()) {
+            toast({ variant: 'destructive', title: 'Title is required.' });
+            return;
+        }
+
+        const contentData = {
+            title: data.title,
+            subtitle: data.subtitle,
+            difficulty: data.difficulty,
+            questionSource: data.questionSource,
+            textbookId,
+            chapterId,
+            topicId,
+            testType: type,
+            access: 'free',
+            questions: [],
+        };
+        
+        try {
+            await addContent(contentData);
+            toast({ title: `${type} Added Successfully` });
+            fetchData(); // Refresh data
+            if(type === 'Mock Test') setIsMockTestDialogOpen(false);
+            else setIsQuizDialogOpen(false);
+        } catch (error) {
+            toast({ variant: 'destructive', title: `Error adding ${type}`, description: (error as Error).message });
+        }
+    };
+    
+    const generateTitle = (template: string, setData: Function) => {
         const title = template
             .replace('[Chapter Title]', chapter?.title || '')
             .replace('[Topic Title]', topic?.title || '')
             .replace('[Subject]', textbook?.subject || '')
             .replace('[Textbook Title]', textbook?.title || '');
-        setPracticeSetData(prev => ({ ...prev, title }));
+        setData((prev: any) => ({ ...prev, title }));
     };
 
     if (loading) return <div className="flex items-center justify-center h-full">Loading...</div>
@@ -207,19 +253,27 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Mock Tests</CardTitle>
-                        <Button size="sm" asChild><Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-mock-test`}><PlusCircle className="mr-2"/> Add</Link></Button>
+                        <Button size="sm" onClick={() => setIsMockTestDialogOpen(true)}><PlusCircle className="mr-2"/> Add</Button>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground text-center py-4 text-sm">Manage mock tests here.</p>
+                     <CardContent>
+                         {mockTests.length > 0 ? (
+                             mockTests.map(test => <p key={test.id}>{test.title}</p>)
+                         ) : (
+                            <p className="text-muted-foreground text-center py-4 text-sm">No mock tests yet.</p>
+                         )}
                     </CardContent>
                 </Card>
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Quizzes</CardTitle>
-                        <Button size="sm" asChild><Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-quiz`}><PlusCircle className="mr-2"/> Add</Link></Button>
+                        <Button size="sm" onClick={() => setIsQuizDialogOpen(true)}><PlusCircle className="mr-2"/> Add</Button>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground text-center py-4 text-sm">Manage quizzes here.</p>
+                        {quizzes.length > 0 ? (
+                             quizzes.map(quiz => <p key={quiz.id}>{quiz.title}</p>)
+                         ) : (
+                            <p className="text-muted-foreground text-center py-4 text-sm">No quizzes yet.</p>
+                         )}
                     </CardContent>
                 </Card>
             </div>
@@ -231,7 +285,7 @@ export default function ManageTopicPage() {
                         <DialogTitle>{editingPracticeSet ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
-                        <div className="space-y-2">
+                         <div className="space-y-2">
                             <Label htmlFor="practice-set-subtitle">Subtitle</Label>
                             <Input id="practice-set-subtitle" value={practiceSetData.subtitle} onChange={(e) => setPracticeSetData(prev => ({...prev, subtitle: e.target.value}))} />
                         </div>
@@ -244,10 +298,10 @@ export default function ManageTopicPage() {
                                         <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Practice Set')}>[Topic Title] - Practice Set</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - MCQ Questions')}>[Topic Title] - MCQ Questions</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Practice: [Topic Title]')}>[Subject] Practice: [Topic Title]</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title]: [Topic Title] Practice')}>[Textbook Title]: [Topic Title] Practice</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Practice Set', setPracticeSetData)}>[Topic Title] - Practice Set</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - MCQ Practice', setPracticeSetData)}>[Topic Title] - MCQ Questions</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Practice: [Topic Title]', setPracticeSetData)}>[Subject] Practice: [Topic Title]</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title]: [Topic Title] Practice', setPracticeSetData)}>[Textbook Title]: [Topic Title] Practice</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
@@ -258,7 +312,7 @@ export default function ManageTopicPage() {
                                 {difficultyOptions.map(option => (
                                     <div key={option} className="flex items-center space-x-2">
                                         <Checkbox
-                                            id={`diff-${option}`}
+                                            id={`diff-ps-${option}`}
                                             checked={practiceSetData.difficulty.includes(option as any)}
                                             onCheckedChange={(checked) => {
                                                 const currentDifficulties = practiceSetData.difficulty;
@@ -268,7 +322,7 @@ export default function ManageTopicPage() {
                                                 setPracticeSetData(prev => ({...prev, difficulty: newDifficulties }));
                                             }}
                                         />
-                                        <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        <label htmlFor={`diff-ps-${option}`} className="text-sm font-medium leading-none">{option}</label>
                                     </div>
                                 ))}
                             </div>
@@ -279,7 +333,7 @@ export default function ManageTopicPage() {
                                 {questionSourceOptions.map(option => (
                                      <div key={option} className="flex items-center space-x-2">
                                          <Checkbox
-                                            id={`source-${option}`}
+                                            id={`source-ps-${option}`}
                                             checked={practiceSetData.questionSource.includes(option as any)}
                                             onCheckedChange={(checked) => {
                                                 const currentSources = practiceSetData.questionSource;
@@ -289,7 +343,7 @@ export default function ManageTopicPage() {
                                                 setPracticeSetData(prev => ({...prev, questionSource: newSources }));
                                             }}
                                         />
-                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        <label htmlFor={`source-ps-${option}`} className="text-sm font-medium leading-none">{option}</label>
                                      </div>
                                 ))}
                             </div>
@@ -300,6 +354,32 @@ export default function ManageTopicPage() {
                         <Button onClick={handleAddOrUpdatePracticeSet}>Save</Button>
                     </DialogFooter>
                 </DialogContent>
+            </Dialog>
+            
+            <Dialog open={isMockTestDialogOpen} onOpenChange={setIsMockTestDialogOpen}>
+                 <DialogContent>
+                    <DialogHeader><DialogTitle>Add New Mock Test</DialogTitle></DialogHeader>
+                     <div className="space-y-4 py-4">
+                        <div className="space-y-2"><Label>Subtitle</Label><Input value={mockTestData.subtitle} onChange={(e) => setMockTestData(prev => ({...prev, subtitle: e.target.value}))} /></div>
+                        <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={mockTestData.title} onChange={(e) => setMockTestData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
+                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-mt-${o}`} checked={mockTestData.difficulty.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-mt-${o}`}>{o}</label></div>)}</div></div>
+                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-mt-${o}`} checked={mockTestData.questionSource.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-mt-${o}`}>{o}</label></div>)}</div></div>
+                    </div>
+                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Mock Test')}>Save</Button></DialogFooter>
+                 </DialogContent>
+            </Dialog>
+
+            <Dialog open={isQuizDialogOpen} onOpenChange={setIsQuizDialogOpen}>
+                 <DialogContent>
+                    <DialogHeader><DialogTitle>Add New Quiz</DialogTitle></DialogHeader>
+                     <div className="space-y-4 py-4">
+                        <div className="space-y-2"><Label>Subtitle</Label><Input value={quizData.subtitle} onChange={(e) => setQuizData(prev => ({...prev, subtitle: e.target.value}))} /></div>
+                        <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={quizData.title} onChange={(e) => setQuizData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
+                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-q-${o}`} checked={quizData.difficulty.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-q-${o}`}>{o}</label></div>)}</div></div>
+                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-q-${o}`} checked={quizData.questionSource.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-q-${o}`}>{o}</label></div>)}</div></div>
+                    </div>
+                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Quiz')}>Save</Button></DialogFooter>
+                 </DialogContent>
             </Dialog>
             
             <AlertDialog open={!!practiceSetToDelete} onOpenChange={() => setPracticeSetToDelete(null)}>
