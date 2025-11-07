@@ -27,7 +27,7 @@ import {
 import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -126,41 +126,46 @@ export default function ManageChaptersPage() {
   const [questionTypes, setQuestionTypes] = useState<string[]>(['Multiple Choice']);
 
 
-  const fetchTextbookAndChapters = async () => {
+  const fetchTextbookAndChapters = useCallback(async () => {
     if (!textbookId) return;
     setLoading(true);
-    // Fetch textbook details
-    const textbookDocRef = doc(db, 'textbooks', textbookId);
-    const textbookDocSnap = await getDoc(textbookDocRef);
-    if (textbookDocSnap.exists()) {
-      setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
-    } else {
-      console.error('No such textbook!');
-    }
-
-    // Fetch chapters
-    const chaptersQuery = query(collection(db, 'textbooks', textbookId, 'chapters'));
-    const querySnapshot = await getDocs(chaptersQuery);
-    const chaptersData = querySnapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() } as Chapter)
-    );
     
-    chaptersData.sort((a, b) => {
-      const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
-      const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
-      if (numA !== numB) {
-        return numA - numB;
-      }
-      return a.title.localeCompare(b.title, undefined, { numeric: true });
-    });
+    try {
+        const textbookDocRef = doc(db, 'textbooks', textbookId);
+        const textbookDocSnap = await getDoc(textbookDocRef);
+        if(textbookDocSnap.exists()) setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
+        
+        const chaptersQuery = query(collection(db, 'textbooks', textbookId, 'chapters'));
+        const querySnapshot = await getDocs(chaptersQuery);
+        const chaptersData = querySnapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Chapter)
+        );
+        
+        chaptersData.sort((a, b) => {
+          const numA = parseInt(a.title.match(/^\d+/)?.[0] || '0', 10);
+          const numB = parseInt(b.title.match(/^\d+/)?.[0] || '0', 10);
+          if (numA !== numB) {
+            return numA - numB;
+          }
+          return a.title.localeCompare(b.title, undefined, { numeric: true });
+        });
 
-    setChapters(chaptersData);
-    setLoading(false);
-  };
+        setChapters(chaptersData);
+
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error fetching data",
+            description: (error as Error).message,
+        })
+    } finally {
+        setLoading(false);
+    }
+  }, [textbookId, toast]);
   
   useEffect(() => {
     fetchTextbookAndChapters();
-  }, [textbookId]);
+  }, [fetchTextbookAndChapters]);
 
   const handleAddOrUpdateChapter = async () => {
     if (!newChapter.title.trim()) return;
@@ -482,10 +487,14 @@ Chapter 3: Advanced Topics"
               </DialogFooter>
             </DialogContent>
           </Dialog>
-           <Button variant="outline" asChild className="w-full">
-            <Link href={`/admin/textbooks/${textbookId}/exams`}>
-              <Award className="mr-2 h-4 w-4" />
-              Manage Exams
+          <Button variant="outline" asChild className="w-full">
+            <Link href={`/admin/textbooks/${textbookId}/mock-tests`}>
+                <Award className="mr-2 h-4 w-4" /> Manage Mock Tests
+            </Link>
+          </Button>
+          <Button variant="outline" asChild className="w-full">
+            <Link href={`/admin/textbooks/${textbookId}/quizzes`}>
+                <Award className="mr-2 h-4 w-4" /> Manage Quizzes
             </Link>
           </Button>
           <Button variant="outline" asChild className="w-full">

@@ -70,11 +70,13 @@ const nextConfig: NextConfig = {
       {
         source: '/practice-set/:id*',
         destination: '/textbook-solutions/practice-set/:id*',
-      }
+      },
+      {
+        source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
+        destination: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
+      },
     ];
   }
 };
 
 export default nextConfig;
-
-
