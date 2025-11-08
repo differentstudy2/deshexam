@@ -1,6 +1,4 @@
 
-'use client';
-
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
@@ -8,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { PracticeSet, Textbook, Chapter, Topic, Question } from '@/lib/types';
 import { getPracticeSetById, getQuestionsByPracticeSet, getContentById } from '@/lib/firebase/firestore';
-import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
+import MockTestClientPage from './mock-test-client-page';
 import { notFound } from 'next/navigation';
 
 type PageProps = {
@@ -77,22 +75,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${(mockTest as any).title} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Take the interactive mock test "${(mockTest as any).title}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
-  const keywords = [
-    (mockTest as any).title,
-    topic?.title || '',
-    chapter.title,
-    textbook.title,
-    (textbook as any).subject,
-    'mock test',
-    'online quiz',
-  ].filter(Boolean);
+  const title = `Manage: ${(mockTest as any).title} | ${topic?.title || chapter.title} | DeshExam`;
+  const description = `Manage questions for the mock test "${(mockTest as any).title}".`;
 
   return {
     title,
     description,
-    keywords,
+    robots: {
+        index: false,
+        follow: false,
+    },
   };
 }
 
@@ -103,21 +95,15 @@ export default async function MockTestPage({ params }: PageProps) {
     if (!mockTest || !textbook || !chapter) {
         notFound();
     }
-
-    // Since questions are part of the mockTest object, we can just use it.
-    const initialTest = {
-        ...(mockTest as any),
-        testType: 'Mock Test'
-    };
-
+    
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
                 <Loader2 className="w-8 h-8 animate-spin" />
             </div>
         }>
-            <PracticeSetClientPage 
-                initialTest={initialTest as any} 
+            <MockTestClientPage 
+                initialTest={mockTest as any}
                 initialTextbook={textbook as any} 
                 initialChapter={chapter as any}
                 initialTopic={topic as any}
