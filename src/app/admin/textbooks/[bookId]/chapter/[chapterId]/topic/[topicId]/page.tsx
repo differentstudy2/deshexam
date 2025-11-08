@@ -22,7 +22,8 @@ import {
     getTextbookById,
     getChapterById,
     addContent,
-    getAllContent
+    getAllContent,
+    deleteContent
 } from '@/lib/firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -254,11 +255,27 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Mock Tests</CardTitle>
-                        <Button size="sm" onClick={() => setIsMockTestDialogOpen(true)}><PlusCircle className="mr-2"/> Add</Button>
+                        <Button asChild size="sm">
+                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-mock-test`}>
+                                <PlusCircle className="mr-2"/> Add
+                            </Link>
+                        </Button>
                     </CardHeader>
                      <CardContent>
                          {mockTests.length > 0 ? (
-                             mockTests.map(test => <p key={test.id}>{test.title}</p>)
+                             <ul className="space-y-2">
+                                {mockTests.map(test => (
+                                    <li key={test.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
+                                        <Link href={`/admin/edit-content/${test.id}`} className="flex-grow font-medium hover:underline">{test.title}</Link>
+                                        <div className="flex gap-1">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test/${test.id}`}><Edit className="h-4 w-4"/></Link>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => {/* Delete logic */}}><Trash2 className="h-4 w-4"/></Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                          ) : (
                             <p className="text-muted-foreground text-center py-4 text-sm">No mock tests yet.</p>
                          )}
@@ -267,11 +284,27 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Quizzes</CardTitle>
-                        <Button size="sm" onClick={() => setIsQuizDialogOpen(true)}><PlusCircle className="mr-2"/> Add</Button>
+                        <Button asChild size="sm">
+                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-quiz`}>
+                                <PlusCircle className="mr-2"/> Add
+                            </Link>
+                        </Button>
                     </CardHeader>
                     <CardContent>
                         {quizzes.length > 0 ? (
-                             quizzes.map(quiz => <p key={quiz.id}>{quiz.title}</p>)
+                             <ul className="space-y-2">
+                                {quizzes.map(quiz => (
+                                    <li key={quiz.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
+                                        <Link href={`/admin/edit-content/${quiz.id}`} className="flex-grow font-medium hover:underline">{quiz.title}</Link>
+                                        <div className="flex gap-1">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test/${quiz.id}`}><Edit className="h-4 w-4"/></Link>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => {/* Delete logic */}}><Trash2 className="h-4 w-4"/></Button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                          ) : (
                             <p className="text-muted-foreground text-center py-4 text-sm">No quizzes yet.</p>
                          )}
@@ -400,3 +433,5 @@ export default function ManageTopicPage() {
         </div>
     )
 }
+
+    
