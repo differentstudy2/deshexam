@@ -545,6 +545,32 @@ export const addQuestionsToContent = async (contentId: string, questionsToAdd: a
     }
 };
 
+export const deleteQuestionFromContent = async (contentId: string, questionId: string) => {
+    if (!contentId || !questionId) {
+        throw new Error("Content ID and Question ID are required.");
+    }
+    const contentRef = doc(db, "content", contentId);
+    try {
+        const contentDoc = await getDoc(contentRef);
+        if (!contentDoc.exists()) {
+            throw new Error("Content not found.");
+        }
+        const contentData = contentDoc.data();
+        const questionToDelete = contentData.questions?.find((q: any) => q.id === questionId);
+
+        if (questionToDelete) {
+            await updateDoc(contentRef, {
+                questions: arrayRemove(questionToDelete)
+            });
+        } else {
+            console.warn("Question not found in content, nothing to delete.");
+        }
+    } catch (e) {
+        console.error("Error deleting question from content:", e);
+        throw new Error("Failed to delete question from content.");
+    }
+};
+
 export const getAllContent = async (type?: string) => {
     try {
         let contentQuery;
@@ -1769,8 +1795,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersQuery),
-            getDocs(monthOrdersQuery),
+            getDocs(todayOrdersSnapshot),
+            getDocs(monthOrdersSnapshot),
             getCountFromServer(usersCollection),
         ]);
 
