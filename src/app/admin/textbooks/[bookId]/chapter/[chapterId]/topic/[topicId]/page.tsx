@@ -324,7 +324,7 @@ export default function ManageTopicPage() {
                                     <li key={quiz.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
                                         <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`} className="flex-grow font-medium hover:underline">{quiz.title}</Link>
                                         <div className="flex gap-1">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                                                 <Link href={`/quiz/${quiz.id}`} target="_blank"><Eye/></Link>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
@@ -437,3 +437,5 @@ export default function ManageTopicPage() {
         </div>
     )
 }
+
+    
