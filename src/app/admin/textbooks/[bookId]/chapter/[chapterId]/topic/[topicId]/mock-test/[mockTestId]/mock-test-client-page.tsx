@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { 
-    addQuestionToPracticeSet,
+    addQuestionToContent,
     updateContent,
     deleteQuestionFromContent,
     getContentById
@@ -313,9 +313,9 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
                 setTest({ ...test, questions: updatedQuestions });
                 toast({ title: 'Question Updated' });
             } else {
-                await addQuestionToPracticeSet(initialTextbook.id, initialChapter.id, initialTopic?.id || null, mockTestId, data);
-                const updatedTest = await getContentById(mockTestId);
-                setTest(updatedTest);
+                const newQuestionId = await addQuestionToContent(mockTestId, data);
+                const newQuestion = { ...data, id: newQuestionId };
+                setTest((prevTest: any) => ({ ...prevTest, questions: [...prevTest.questions, newQuestion] }));
                 toast({ title: 'Question Added' });
             }
             setIsQuestionDialogOpen(false);
@@ -368,7 +368,7 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
             const questionsToImport = parsedJson.questions.map((q: any) => ({...q, authorId: user?.uid, authorName: user?.displayName, createdAt: new Date()}));
             
             for(const q of questionsToImport) {
-                await addQuestionToPracticeSet(initialTextbook.id, initialChapter.id, initialTopic?.id || null, mockTestId, q);
+                await addQuestionToContent(mockTestId, q);
             }
             
             const updatedTest = await getContentById(mockTestId);
@@ -432,7 +432,7 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
             const result: AIQuestionGeneratorOutput = await generateQuestions(input);
             
             for(const q of result.questions) {
-                await addQuestionToPracticeSet(initialTextbook.id, initialChapter.id, initialTopic?.id || null, mockTestId, q);
+                await addQuestionToContent(mockTestId, q);
             }
             
             const updatedTest = await getContentById(mockTestId);
@@ -626,6 +626,7 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
                                 <Accordion type="single" collapsible className="w-full"><AccordionItem value="item-1">
                                     <AccordionTrigger>View JSON Format Example</AccordionTrigger>
                                     <AccordionContent>
+                                        <p className="text-sm text-muted-foreground mb-4">Your JSON file must contain a single key "questions" which is an array of question objects.</p>
                                         <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre>
                                     </AccordionContent>
                                 </AccordionItem></Accordion>

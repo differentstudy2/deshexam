@@ -530,18 +530,32 @@ export const updateContent = async (contentId: string, contentData: any) => {
     }
 };
 
-export const addQuestionsToContent = async (contentId: string, questionsToAdd: any[]) => {
-    if (!contentId || !questionsToAdd || questionsToAdd.length === 0) {
-        throw new Error("Content ID and questions are required.");
+export const addQuestionToContent = async (contentId: string, questionData: any) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+        throw new Error("Authentication required.");
     }
-    const contentRef = doc(db, "content", contentId);
+
+    const questionId = doc(collection(db, 'idGenerator')).id;
+    
+    const newQuestion = cleanDataForFirebase({
+        ...questionData,
+        id: questionId,
+        authorId: user.uid,
+        authorName: user.displayName || user.email,
+        createdAt: new Date(),
+    });
+
     try {
+        const contentRef = doc(db, "content", contentId);
         await updateDoc(contentRef, {
-            questions: arrayUnion(...questionsToAdd)
+            questions: arrayUnion(newQuestion)
         });
+        return questionId; // Return the generated ID
     } catch (e) {
-        console.error("Error adding questions to content: ", e);
-        throw new Error("Failed to add questions to content.");
+        console.error("Error adding question to content: ", e);
+        throw new Error("Failed to add question.");
     }
 };
 
