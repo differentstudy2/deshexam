@@ -4,7 +4,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent, getDoc, doc } from '@/lib/firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
   Card,
   CardContent,
@@ -31,7 +32,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -47,18 +48,27 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Textbook, Chapter } from '@/lib/types';
+
 
 type Quiz = {
     id: string;
     title: string;
+    subtitle?: string;
     subject: string;
     testType: string;
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     chapterId?: string;
+    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
 }
+
+const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
+
 
 function getUrlForTest(testId: string) {
     return `/quiz/${testId}`;
@@ -73,14 +83,29 @@ export default function ManageChapterQuizzesPage() {
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [loading, setLoading] = useState(true);
     const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [chapter, setChapter] = useState<Chapter | null>(null);
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [newQuizData, setNewQuizData] = useState({ title: '', description: '', difficulty: 'Medium' });
-    
+    const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions')[]}>({
+        title: '',
+        subtitle: '',
+        difficulty: ['Medium'],
+        questionSource: ['Random from Chapter']
+    });
+
     const fetchQuizzes = async () => {
         if (!chapterId) return;
         setLoading(true);
         try {
+            const [textbookSnap, chapterSnap] = await Promise.all([
+                getDoc(doc(db, 'textbooks', textbookId)),
+                getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId))
+            ]);
+            if (textbookSnap.exists()) setTextbook({id: textbookSnap.id, ...textbookSnap.data()} as Textbook);
+            if (chapterSnap.exists()) setChapter({id: chapterSnap.id, ...chapterSnap.data()} as Chapter);
+
             const allQuizzes = (await getAllContent("Quiz")) as Quiz[];
             const chapterQuizzes = allQuizzes.filter(quiz => quiz.chapterId === chapterId);
             setQuizzes(chapterQuizzes);
@@ -119,28 +144,53 @@ export default function ManageChapterQuizzesPage() {
         }
     };
     
-     const handleAddQuiz = async () => {
-        if (!newQuizData.title) {
+    const handleOpenDialog = (quiz: Quiz | null) => {
+        setEditingQuiz(quiz);
+        const difficultyArray = (quiz?.difficulty && Array.isArray(quiz.difficulty) ? quiz.difficulty : ['Medium']) as ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+        const sourceArray = (quiz?.questionSource && Array.isArray(quiz.questionSource) ? quiz.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions')[];
+        
+        const subtitle = quiz ? quiz.subtitle || `Quiz ${quizzes.findIndex(q => q.id === quiz.id) + 1}` : `Quiz ${quizzes.length + 1}`;
+        setQuizData(quiz ? { title: quiz.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+        setIsDialogOpen(true);
+    };
+
+    const handleAddOrUpdate = async () => {
+        if (!quizData.title.trim()) {
             toast({ variant: 'destructive', title: 'Title is required.' });
             return;
         }
+        
+        const contentToSave: any = { 
+            ...quizData, 
+            testType: 'Quiz',
+            textbookId: textbookId,
+            chapterId: chapterId,
+            access: 'free',
+            questions: editingQuiz?.questions || [],
+        };
+        
         try {
-             const contentToSave: any = { 
-                ...newQuizData, 
-                testType: 'Quiz',
-                textbookId: textbookId,
-                chapterId: chapterId,
-                access: 'free',
-                questions: [],
-             };
-            await addContent(contentToSave);
-            toast({ title: 'Quiz Added' });
+            if (editingQuiz) {
+                await updateContent(editingQuiz.id, contentToSave);
+                toast({ title: 'Quiz Updated' });
+            } else {
+                await addContent(contentToSave);
+                toast({ title: 'Quiz Added' });
+            }
             setIsDialogOpen(false);
-            setNewQuizData({ title: '', description: '', difficulty: 'Medium' });
+            setEditingQuiz(null);
             fetchQuizzes();
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Error adding quiz', description: (error as Error).message });
+            toast({ variant: 'destructive', title: 'Error saving quiz', description: (error as Error).message });
         }
+    };
+
+     const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Chapter Title]', chapter?.title || '')
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setQuizData(prev => ({ ...prev, title }));
     };
 
 
@@ -161,42 +211,7 @@ export default function ManageChapterQuizzesPage() {
                         Quizzes associated with this chapter.
                     </p>
                 </div>
-                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button><PlusCircle className="mr-2" /> Add New Quiz</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Add New Quiz</DialogTitle>
-                            <DialogDescription>Fill in the details for the new quiz.</DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="quiz-title">Title</Label>
-                                <Input id="quiz-title" value={newQuizData.title} onChange={e => setNewQuizData(p => ({...p, title: e.target.value}))} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="quiz-desc">Description</Label>
-                                <Textarea id="quiz-desc" value={newQuizData.description} onChange={e => setNewQuizData(p => ({...p, description: e.target.value}))} />
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="quiz-difficulty">Difficulty</Label>
-                                <Select value={newQuizData.difficulty} onValueChange={(v) => setNewQuizData(p => ({...p, difficulty: v}))}>
-                                    <SelectTrigger id="quiz-difficulty"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Easy">Easy</SelectItem>
-                                        <SelectItem value="Medium">Medium</SelectItem>
-                                        <SelectItem value="Hard">Hard</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                            <Button onClick={handleAddQuiz}>Save</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                 <Button onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2" /> Add New Quiz</Button>
             </div>
              <Card>
                 <CardHeader>
@@ -207,7 +222,6 @@ export default function ManageChapterQuizzesPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Title</TableHead>
-                                <TableHead>Subject</TableHead>
                                 <TableHead>Access</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -217,7 +231,6 @@ export default function ManageChapterQuizzesPage() {
                                 Array.from({ length: 3 }).map((_, i) => (
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                     <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                                 </TableRow>
@@ -225,15 +238,14 @@ export default function ManageChapterQuizzesPage() {
                             ) : quizzes.length > 0 ? (
                                 quizzes.map((quiz) => (
                                 <TableRow key={quiz.id}>
-                                    <TableCell className="font-medium">{quiz.title}</TableCell>
-                                    <TableCell>{quiz.subject}</TableCell>
+                                    <TableCell className="font-medium">{quiz.subtitle}: {quiz.title}</TableCell>
                                     <TableCell><ContentBadge type={quiz.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForTest(quiz.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
-                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/edit-content/${quiz.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
+                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(quiz)}>
+                                            <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setQuizToDelete(quiz)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
@@ -251,6 +263,81 @@ export default function ManageChapterQuizzesPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingQuiz ? 'Edit Quiz' : 'Add New Quiz'}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label htmlFor="quiz-subtitle">Subtitle</Label>
+                            <Input id="quiz-subtitle" value={quizData.subtitle} onChange={e => setQuizData(p => ({...p, subtitle: e.target.value}))} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="quiz-title">Title</Label>
+                            <div className="flex gap-2">
+                                <Input id="quiz-title" value={quizData.title} onChange={e => setQuizData(p => ({...p, title: e.target.value}))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Quiz')}>[Chapter Title] - Quiz</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Knowledge Check')}>[Chapter Title] - Knowledge Check</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Difficulty</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {difficultyOptions.map(option => (
+                                    <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`diff-quiz-${option}`}
+                                            checked={quizData.difficulty.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentDifficulties = quizData.difficulty;
+                                                const newDifficulties = checked
+                                                    ? [...currentDifficulties, option as any]
+                                                    : currentDifficulties.filter(d => d !== option);
+                                                setQuizData(prev => ({...prev, difficulty: newDifficulties }));
+                                            }}
+                                        />
+                                        <label htmlFor={`diff-quiz-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Question Source</Label>
+                             <div className="grid grid-cols-2 gap-2">
+                                {questionSourceOptions.map(option => (
+                                     <div key={option} className="flex items-center space-x-2">
+                                         <Checkbox
+                                            id={`source-quiz-${option}`}
+                                            checked={quizData.questionSource.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentSources = quizData.questionSource;
+                                                const newSources = checked
+                                                    ? [...currentSources, option as any]
+                                                    : currentSources.filter(s => s !== option);
+                                                setQuizData(prev => ({...prev, questionSource: newSources }));
+                                            }}
+                                        />
+                                        <label htmlFor={`source-quiz-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                     </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                        <Button onClick={handleAddOrUpdate}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <AlertDialog open={!!quizToDelete} onOpenChange={() => setQuizToDelete(null)}>
                 <AlertDialogContent>
@@ -272,3 +359,5 @@ export default function ManageChapterQuizzesPage() {
         </div>
     );
 }
+
+    

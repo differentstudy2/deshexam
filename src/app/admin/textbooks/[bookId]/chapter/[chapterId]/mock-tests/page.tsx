@@ -4,7 +4,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent, getDoc, doc } from '@/lib/firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
   Card,
   CardContent,
@@ -12,14 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,7 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -47,19 +40,27 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Textbook, Chapter } from '@/lib/types';
 
 
 type MockTest = {
     id: string;
     title: string;
+    subtitle?: string;
     subject: string;
     testType: string;
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     chapterId?: string;
+    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
 }
+
+const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
+
 
 function getUrlForTest(testId: string) {
     return `/mock-test/${testId}`;
@@ -74,14 +75,29 @@ export default function ManageChapterMockTestsPage() {
     const [tests, setTests] = useState<MockTest[]>([]);
     const [loading, setLoading] = useState(true);
     const [testToDelete, setTestToDelete] = useState<MockTest | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [chapter, setChapter] = useState<Chapter | null>(null);
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [newTestData, setNewTestData] = useState({ title: '', description: '', difficulty: 'Medium' });
+    const [editingTest, setEditingTest] = useState<MockTest | null>(null);
+    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions')[]}>({
+        title: '',
+        subtitle: '',
+        difficulty: ['Medium'],
+        questionSource: ['Random from Chapter']
+    });
 
     const fetchTests = async () => {
         if (!chapterId) return;
         setLoading(true);
         try {
+            const [textbookSnap, chapterSnap] = await Promise.all([
+                getDoc(doc(db, 'textbooks', textbookId)),
+                getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId))
+            ]);
+            if (textbookSnap.exists()) setTextbook({id: textbookSnap.id, ...textbookSnap.data()} as Textbook);
+            if (chapterSnap.exists()) setChapter({id: chapterSnap.id, ...chapterSnap.data()} as Chapter);
+
             const allTests = (await getAllContent("Mock Test")) as MockTest[];
             const chapterTests = allTests.filter(test => test.chapterId === chapterId);
             setTests(chapterTests);
@@ -120,30 +136,54 @@ export default function ManageChapterMockTestsPage() {
         }
     };
 
-    const handleAddTest = async () => {
-        if (!newTestData.title) {
+    const handleOpenDialog = (test: MockTest | null) => {
+        setEditingTest(test);
+        const difficultyArray = (test?.difficulty && Array.isArray(test.difficulty) ? test.difficulty : ['Medium']) as ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+        const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions')[];
+        
+        const subtitle = test ? test.subtitle || `Mock Test ${tests.findIndex(t => t.id === test.id) + 1}` : `Mock Test ${tests.length + 1}`;
+        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+        setIsDialogOpen(true);
+    };
+
+    const handleAddOrUpdate = async () => {
+        if (!testData.title.trim()) {
             toast({ variant: 'destructive', title: 'Title is required.' });
             return;
         }
+
+        const contentToSave: any = { 
+            ...testData, 
+            testType: 'Mock Test',
+            textbookId: textbookId,
+            chapterId: chapterId,
+            access: 'free',
+            questions: editingTest?.questions || [],
+        };
+        
         try {
-             const contentToSave: any = { 
-                ...newTestData, 
-                testType: 'Mock Test',
-                textbookId: textbookId,
-                chapterId: chapterId,
-                access: 'free',
-                questions: [],
-             };
-            await addContent(contentToSave);
-            toast({ title: 'Mock Test Added' });
+            if (editingTest) {
+                await updateContent(editingTest.id, contentToSave);
+                toast({ title: 'Mock Test Updated' });
+            } else {
+                await addContent(contentToSave);
+                toast({ title: 'Mock Test Added' });
+            }
             setIsDialogOpen(false);
-            setNewTestData({ title: '', description: '', difficulty: 'Medium' });
+            setEditingTest(null);
             fetchTests();
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Error adding mock test', description: (error as Error).message });
+            toast({ variant: 'destructive', title: 'Error saving mock test', description: (error as Error).message });
         }
     };
-
+    
+    const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Chapter Title]', chapter?.title || '')
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setTestData(prev => ({ ...prev, title }));
+    };
 
     return (
         <div className="space-y-6">
@@ -162,42 +202,7 @@ export default function ManageChapterMockTestsPage() {
                         Mock tests associated with this chapter.
                     </p>
                 </div>
-                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button><PlusCircle className="mr-2" /> Add New Mock Test</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Add New Mock Test</DialogTitle>
-                            <DialogDescription>Fill in the details for the new mock test.</DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="test-title">Title</Label>
-                                <Input id="test-title" value={newTestData.title} onChange={e => setNewTestData(p => ({...p, title: e.target.value}))} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="test-desc">Description</Label>
-                                <Textarea id="test-desc" value={newTestData.description} onChange={e => setNewTestData(p => ({...p, description: e.target.value}))} />
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="test-difficulty">Difficulty</Label>
-                                <Select value={newTestData.difficulty} onValueChange={(v) => setNewTestData(p => ({...p, difficulty: v}))}>
-                                    <SelectTrigger id="test-difficulty"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Easy">Easy</SelectItem>
-                                        <SelectItem value="Medium">Medium</SelectItem>
-                                        <SelectItem value="Hard">Hard</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                            <Button onClick={handleAddTest}>Save</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <Button onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2" /> Add New Mock Test</Button>
             </div>
              <Card>
                 <CardHeader>
@@ -208,7 +213,6 @@ export default function ManageChapterMockTestsPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Title</TableHead>
-                                <TableHead>Subject</TableHead>
                                 <TableHead>Access</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -218,7 +222,6 @@ export default function ManageChapterMockTestsPage() {
                                 Array.from({ length: 3 }).map((_, i) => (
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                     <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                                 </TableRow>
@@ -226,15 +229,14 @@ export default function ManageChapterMockTestsPage() {
                             ) : tests.length > 0 ? (
                                 tests.map((test) => (
                                 <TableRow key={test.id}>
-                                    <TableCell className="font-medium">{test.title}</TableCell>
-                                    <TableCell>{test.subject}</TableCell>
+                                    <TableCell className="font-medium">{test.subtitle}: {test.title}</TableCell>
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForTest(test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
-                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/edit-content/${test.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
+                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
+                                            <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
@@ -252,6 +254,81 @@ export default function ManageChapterMockTestsPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingTest ? 'Edit Mock Test' : 'Add New Mock Test'}</DialogTitle>
+                    </DialogHeader>
+                     <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label htmlFor="test-subtitle">Subtitle</Label>
+                            <Input id="test-subtitle" value={testData.subtitle} onChange={e => setTestData(p => ({...p, subtitle: e.target.value}))} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="test-title">Title</Label>
+                            <div className="flex gap-2">
+                                <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Mock Test')}>[Chapter Title] - Mock Test</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Mock Test')}>[Subject] Full Mock Test</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Difficulty</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {difficultyOptions.map(option => (
+                                    <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`diff-${option}`}
+                                            checked={testData.difficulty.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentDifficulties = testData.difficulty;
+                                                const newDifficulties = checked
+                                                    ? [...currentDifficulties, option as any]
+                                                    : currentDifficulties.filter(d => d !== option);
+                                                setTestData(prev => ({...prev, difficulty: newDifficulties }));
+                                            }}
+                                        />
+                                        <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Question Source</Label>
+                             <div className="grid grid-cols-2 gap-2">
+                                {questionSourceOptions.map(option => (
+                                     <div key={option} className="flex items-center space-x-2">
+                                         <Checkbox
+                                            id={`source-${option}`}
+                                            checked={testData.questionSource.includes(option as any)}
+                                            onCheckedChange={(checked) => {
+                                                const currentSources = testData.questionSource;
+                                                const newSources = checked
+                                                    ? [...currentSources, option as any]
+                                                    : currentSources.filter(s => s !== option);
+                                                setTestData(prev => ({...prev, questionSource: newSources }));
+                                            }}
+                                        />
+                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                     </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                        <Button onClick={handleAddOrUpdate}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <AlertDialog open={!!testToDelete} onOpenChange={() => setTestToDelete(null)}>
                 <AlertDialogContent>
@@ -273,3 +350,5 @@ export default function ManageChapterMockTestsPage() {
         </div>
     );
 }
+
+    
