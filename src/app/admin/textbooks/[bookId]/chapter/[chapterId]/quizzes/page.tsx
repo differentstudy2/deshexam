@@ -4,8 +4,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent, updateContent, getDoc, doc } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { getDoc, doc } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -50,7 +51,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import type { Textbook, Chapter } from '@/lib/types';
+import type { Textbook, Chapter, Question } from '@/lib/types';
 
 
 type Quiz = {
@@ -64,6 +65,7 @@ type Quiz = {
     chapterId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
+    questions?: Question[];
 }
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
@@ -88,7 +90,7 @@ export default function ManageChapterQuizzesPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
-    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions')[]}>({
+    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
         subtitle: '',
         difficulty: ['Medium'],
@@ -147,7 +149,7 @@ export default function ManageChapterQuizzesPage() {
     const handleOpenDialog = (quiz: Quiz | null) => {
         setEditingQuiz(quiz);
         const difficultyArray = (quiz?.difficulty && Array.isArray(quiz.difficulty) ? quiz.difficulty : ['Medium']) as ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
-        const sourceArray = (quiz?.questionSource && Array.isArray(quiz.questionSource) ? quiz.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions')[];
+        const sourceArray = (quiz?.questionSource && Array.isArray(quiz.questionSource) ? quiz.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
         
         const subtitle = quiz ? quiz.subtitle || `Quiz ${quizzes.findIndex(q => q.id === quiz.id) + 1}` : `Quiz ${quizzes.length + 1}`;
         setQuizData(quiz ? { title: quiz.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
@@ -359,5 +361,3 @@ export default function ManageChapterQuizzesPage() {
         </div>
     );
 }
-
-    
