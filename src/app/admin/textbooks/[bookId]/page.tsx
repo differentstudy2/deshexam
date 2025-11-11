@@ -56,6 +56,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { ContentBadge } from '@/components/content-badge';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
