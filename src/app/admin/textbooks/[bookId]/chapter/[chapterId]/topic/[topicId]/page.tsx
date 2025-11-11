@@ -259,9 +259,21 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Mock Tests</CardTitle>
-                        <Button size="sm" asChild>
-                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-mock-test`}><PlusCircle className="mr-2"/> Add</Link>
-                        </Button>
+                         <Dialog open={isMockTestDialogOpen} onOpenChange={setIsMockTestDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="sm"><PlusCircle className="mr-2"/> Add</Button>
+                            </DialogTrigger>
+                             <DialogContent>
+                                <DialogHeader><DialogTitle>Add New Mock Test</DialogTitle></DialogHeader>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2"><Label>Subtitle</Label><Input value={mockTestData.subtitle} onChange={(e) => setMockTestData(prev => ({...prev, subtitle: e.target.value}))} /></div>
+                                    <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={mockTestData.title} onChange={(e) => setMockTestData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
+                                    <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-mt-${o}`} checked={mockTestData.difficulty.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-mt-${o}`}>{o}</label></div>)}</div></div>
+                                    <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-mt-${o}`} checked={mockTestData.questionSource.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-mt-${o}`}>{o}</label></div>)}</div></div>
+                                </div>
+                                <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Mock Test')}>Save</Button></DialogFooter>
+                             </DialogContent>
+                        </Dialog>
                     </CardHeader>
                      <CardContent>
                          {mockTests.length > 0 ? (
@@ -289,9 +301,21 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Quizzes</CardTitle>
-                        <Button size="sm" asChild>
-                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-quiz`}><PlusCircle className="mr-2"/> Add</Link>
-                        </Button>
+                         <Dialog open={isQuizDialogOpen} onOpenChange={setIsQuizDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button size="sm"><PlusCircle className="mr-2"/> Add</Button>
+                            </DialogTrigger>
+                             <DialogContent>
+                                <DialogHeader><DialogTitle>Add New Quiz</DialogTitle></DialogHeader>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2"><Label>Subtitle</Label><Input value={quizData.subtitle} onChange={(e) => setQuizData(prev => ({...prev, subtitle: e.target.value}))} /></div>
+                                    <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={quizData.title} onChange={(e) => setQuizData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
+                                    <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-q-${o}`} checked={quizData.difficulty.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-q-${o}`}>{o}</label></div>)}</div></div>
+                                    <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-q-${o}`} checked={quizData.questionSource.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-q-${o}`}>{o}</label></div>)}</div></div>
+                                </div>
+                                <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Quiz')}>Save</Button></DialogFooter>
+                             </DialogContent>
+                        </Dialog>
                     </CardHeader>
                     <CardContent>
                         {quizzes.length > 0 ? (
@@ -394,32 +418,6 @@ export default function ManageTopicPage() {
                         <Button onClick={handleAddOrUpdatePracticeSet}>Save</Button>
                     </DialogFooter>
                 </DialogContent>
-            </Dialog>
-            
-            <Dialog open={isMockTestDialogOpen} onOpenChange={setIsMockTestDialogOpen}>
-                 <DialogContent>
-                    <DialogHeader><DialogTitle>Add New Mock Test</DialogTitle></DialogHeader>
-                     <div className="space-y-4 py-4">
-                        <div className="space-y-2"><Label>Subtitle</Label><Input value={mockTestData.subtitle} onChange={(e) => setMockTestData(prev => ({...prev, subtitle: e.target.value}))} /></div>
-                        <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={mockTestData.title} onChange={(e) => setMockTestData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
-                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-mt-${o}`} checked={mockTestData.difficulty.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-mt-${o}`}>{o}</label></div>)}</div></div>
-                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-mt-${o}`} checked={mockTestData.questionSource.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-mt-${o}`}>{o}</label></div>)}</div></div>
-                    </div>
-                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Mock Test')}>Save</Button></DialogFooter>
-                 </DialogContent>
-            </Dialog>
-
-            <Dialog open={isQuizDialogOpen} onOpenChange={setIsQuizDialogOpen}>
-                 <DialogContent>
-                    <DialogHeader><DialogTitle>Add New Quiz</DialogTitle></DialogHeader>
-                     <div className="space-y-4 py-4">
-                        <div className="space-y-2"><Label>Subtitle</Label><Input value={quizData.subtitle} onChange={(e) => setQuizData(prev => ({...prev, subtitle: e.target.value}))} /></div>
-                        <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={quizData.title} onChange={(e) => setQuizData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
-                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-q-${o}`} checked={quizData.difficulty.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-q-${o}`}>{o}</label></div>)}</div></div>
-                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-q-${o}`} checked={quizData.questionSource.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-q-${o}`}>{o}</label></div>)}</div></div>
-                    </div>
-                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Quiz')}>Save</Button></DialogFooter>
-                 </DialogContent>
             </Dialog>
             
             <AlertDialog open={!!practiceSetToDelete} onOpenChange={() => setPracticeSetToDelete(null)}>
