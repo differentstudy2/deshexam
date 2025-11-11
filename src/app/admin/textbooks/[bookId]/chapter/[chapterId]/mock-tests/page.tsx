@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
-import { db } from '@/lib/firebase/client';
 import { getDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
   Card,
   CardContent,
@@ -33,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles, FileQuestion } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -233,7 +233,7 @@ export default function ManageChapterMockTestsPage() {
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto" /></TableCell>
                                 </TableRow>
                             ))
                             ) : tests.length > 0 ? (
@@ -243,7 +243,7 @@ export default function ManageChapterMockTestsPage() {
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={getUrlForTest(test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/null/mock-test/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
                                             <Edit className="mr-2 h-4 w-4"/>Edit
