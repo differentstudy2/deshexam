@@ -729,37 +729,31 @@ Chapter 3: Advanced Topics"
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <CardHeader className="pb-4">
-                                    <CardTitle className="text-base font-medium leading-tight">{chapter.title}</CardTitle>
-                                    <ContentBadge type={chapter.access || 'pass'} />
-                                </CardHeader>
-                                <CardContent className="flex-grow text-sm text-muted-foreground">
-                                    <div className="flex gap-2 flex-wrap">
-                                        {(chapter.resources || []).slice(0, 3).map(res => {
-                                            switch(res.type) {
-                                                case 'video': return <Button key={res.id} variant="outline" size="sm" className="h-7"><Video className="w-3 h-3 mr-1"/> Video</Button>;
-                                                case 'audio': return <Button key={res.id} variant="outline" size="sm" className="h-7"><Mic className="w-3 h-3 mr-1"/> Audio</Button>;
-                                                case 'pdf': return <Button key={res.id} variant="outline" size="sm" className="h-7"><FileIcon className="w-3 h-3 mr-1"/> PDF</Button>;
-                                                default: return null;
-                                            }
-                                        })}
-                                        {(chapter.resources || []).length > 3 && <Badge>+ {(chapter.resources || []).length - 3} more</Badge>}
-                                    </div>
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg max-h-48 h-48">
+                                    <Image
+                                        src={chapter.featureImage || '/image/logo.png'}
+                                        alt={chapter.title}
+                                        fill
+                                        className="object-contain p-2"
+                                    />
+                                </Link>
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>
+                                    <CardHeader className="p-4 flex-row items-center gap-3 hover:bg-accent/50 transition-colors">
+                                        <ChapterIcon />
+                                        <CardTitle className="text-base font-semibold flex-grow">{chapter.title}</CardTitle>
+                                        <ChevronRight className="w-5 h-5 flex-shrink-0" />
+                                    </CardHeader>
+                                </Link>
+                                <CardContent className="p-4 pt-0">
+                                   <ContentBadge type={chapter.access || 'pass'} />
                                 </CardContent>
-                                <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
-                                     <div className="space-y-2">
-                                        <Button variant="secondary" size="sm" className="w-full" asChild>
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>Manage Chapter</Link>
-                                        </Button>
-                                    </div>
-                                    <div className="flex gap-2">
-                                         <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
-                                            <Edit className="h-3 w-3 mr-1"/> Edit
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(chapter)} className="w-full">
-                                            <Trash2 className="h-3 w-3 mr-1"/> Delete
-                                        </Button>
-                                    </div>
+                                <CardFooter className="p-4 pt-0 flex gap-2">
+                                     <Button variant="outline" size="sm" onClick={() => handleEditClick(chapter)} className="w-full">
+                                        <Edit className="h-3 w-3 mr-1"/> Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(chapter)} className="w-full">
+                                        <Trash2 className="h-3 w-3 mr-1"/> Delete
+                                    </Button>
                                 </CardFooter>
                             </Card>
                         ))}
@@ -824,7 +818,7 @@ Chapter 3: Advanced Topics"
                                 {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
                              </Button>
                         </div>
-                        <Input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'resources')} className="hidden" />
+                        <Input type="file" ref={fileInputRef} className="hidden" />
                     </div>
                 </div>
                 <DialogFooter>
