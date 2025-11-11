@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -24,14 +25,13 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, FileQuestion, BookOpen, Award, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ContentBadge } from '@/components/content-badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,19 +42,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { TextbookStats } from '@/components/feature/textbook-stats';
-import { uploadFile } from "@/lib/firebase/firestore";
+import { getTopicsByChapterId, addTopicToChapter, updateTopic, uploadFile } from '@/lib/firebase/firestore';
+import { Dialog, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
 import { generateSummary } from '@/ai/flows/ai-summary-generator';
@@ -65,6 +55,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageUploader } from '@/components/feature/image-uploader';
+import { cn } from '@/lib/utils';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -88,6 +79,10 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
     )
 }
 
+const ChapterIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+);
+
 
 export default function ManageChaptersPage() {
   const params = useParams();
@@ -104,7 +99,7 @@ export default function ManageChaptersPage() {
   const [bulkChaptersText, setBulkChaptersText] = useState('');
   const [isBulkAdding, setIsBulkAdding] = useState(false);
   const { toast } = useToast();
-
+  
   const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
@@ -177,12 +172,14 @@ export default function ManageChaptersPage() {
             const chapterDocRef = doc(chaptersCollectionRef, editingChapter.id);
             await updateDoc(chapterDocRef, newChapter);
             setEditingChapter(null);
+            toast({ title: "Topic updated successfully." });
         } else {
             // Add logic
             await addDoc(chaptersCollectionRef, newChapter);
+            toast({ title: "Topic added successfully." });
         }
         setNewChapter({ title: '', content: '', access: 'pass', resources: [], featureImage: '', chapterPdfUrl: '' });
-        fetchTextbookAndChapters(); // Refetch to get the updated/new chapter
+        fetchTextbookAndChapters(); 
 
     } catch (error) {
       console.error('Error saving chapter: ', error);
@@ -247,7 +244,7 @@ export default function ManageChaptersPage() {
         title: "Chapter Deleted",
         description: `"${chapterToDelete.title}" has been removed.`,
       });
-      fetchTextbookAndChapters(); // Refresh the list
+      fetchTextbookAndChapters();
     } catch (error) {
        toast({
         variant: "destructive",
@@ -487,16 +484,6 @@ Chapter 3: Advanced Topics"
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <Button variant="outline" asChild className="w-full">
-            <Link href={`/admin/textbooks/${textbookId}/mock-tests`}>
-                <Award className="mr-2 h-4 w-4" /> Manage Mock Tests
-            </Link>
-          </Button>
-          <Button variant="outline" asChild className="w-full">
-            <Link href={`/admin/textbooks/${textbookId}/quizzes`}>
-                <Award className="mr-2 h-4 w-4" /> Manage Quizzes
-            </Link>
-          </Button>
           <Button variant="outline" asChild className="w-full">
             <Link href={`/admin/textbooks/${textbookId}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
