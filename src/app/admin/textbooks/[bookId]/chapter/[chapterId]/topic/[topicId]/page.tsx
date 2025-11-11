@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, BookOpen, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink, Sparkles, Award } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink, Sparkles, Award, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -27,7 +27,7 @@ import {
 } from '@/lib/firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
@@ -38,7 +38,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
@@ -211,15 +210,17 @@ export default function ManageTopicPage() {
         setData((prev: any) => ({ ...prev, title }));
     };
 
-    if (loading) return <div className="flex items-center justify-center h-full">Loading...</div>
-
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+    
     return (
         <div className="space-y-6">
             <div>
                 <Button variant="ghost" asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topics`}>
+                    <Link href={`/admin/textbooks/${textbookId}`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Topics
+                        Back to Chapters
                     </Link>
                 </Button>
             </div>
@@ -241,6 +242,9 @@ export default function ManageTopicPage() {
                                     <li key={ps.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
                                         <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`} className="flex-grow font-medium hover:underline">{ps.title}</Link>
                                         <div className="flex gap-1">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                <Link href={`/textbook-solutions/practice-set/${ps.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`} target="_blank"><Eye/></Link>
+                                            </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenPracticeSetDialog(ps)}><Edit className="h-4 w-4"/></Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setPracticeSetToDelete(ps)}><Trash2 className="h-4 w-4"/></Button>
                                         </div>
@@ -255,19 +259,24 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Mock Tests</CardTitle>
-                        <Button size="sm" onClick={() => setIsMockTestDialogOpen(true)}><PlusCircle className="mr-2"/> Add</Button>
+                        <Button size="sm" asChild>
+                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-mock-test`}><PlusCircle className="mr-2"/> Add</Link>
+                        </Button>
                     </CardHeader>
                      <CardContent>
                          {mockTests.length > 0 ? (
                              <ul className="space-y-2">
                                 {mockTests.map(test => (
                                     <li key={test.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
-                                        <span className="flex-grow font-medium">{test.title}</span>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test/${test.id}`} className="flex-grow font-medium hover:underline">{test.title}</Link>
                                         <div className="flex gap-1">
-                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`} target="_blank"><Eye/></Link>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                                                 <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test/${test.id}`}><Edit className="h-4 w-4"/></Link>
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => {/* Delete logic */}}><Trash2 className="h-4 w-4"/></Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={async () => { await deleteContent(test.id); await fetchData(); }}><Trash2 className="h-4 w-4"/></Button>
                                         </div>
                                     </li>
                                 ))}
@@ -280,19 +289,24 @@ export default function ManageTopicPage() {
                  <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle>Quizzes</CardTitle>
-                        <Button size="sm" onClick={() => setIsQuizDialogOpen(true)}><PlusCircle className="mr-2"/> Add</Button>
+                        <Button size="sm" asChild>
+                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/add-quiz`}><PlusCircle className="mr-2"/> Add</Link>
+                        </Button>
                     </CardHeader>
                     <CardContent>
                         {quizzes.length > 0 ? (
                              <ul className="space-y-2">
                                 {quizzes.map(quiz => (
                                     <li key={quiz.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
-                                        <Link href={`/admin/edit-content/${quiz.id}`} className="flex-grow font-medium hover:underline">{quiz.title}</Link>
+                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`} className="flex-grow font-medium hover:underline">{quiz.title}</Link>
                                         <div className="flex gap-1">
                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`}><Edit className="h-4 w-4"/></Link>
+                                                <Link href={`/quiz/${quiz.id}`} target="_blank"><Eye/></Link>
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => {/* Delete logic */}}><Trash2 className="h-4 w-4"/></Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                 <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`}><Edit className="h-4 w-4"/></Link>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={async () => { await deleteContent(quiz.id); await fetchData(); }}><Trash2 className="h-4 w-4"/></Button>
                                         </div>
                                     </li>
                                 ))}
@@ -425,5 +439,3 @@ export default function ManageTopicPage() {
         </div>
     )
 }
-
-    
