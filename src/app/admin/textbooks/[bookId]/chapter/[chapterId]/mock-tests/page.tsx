@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -35,6 +35,21 @@ import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 type MockTest = {
     id: string;
@@ -59,25 +74,29 @@ export default function ManageChapterMockTestsPage() {
     const [tests, setTests] = useState<MockTest[]>([]);
     const [loading, setLoading] = useState(true);
     const [testToDelete, setTestToDelete] = useState<MockTest | null>(null);
+    
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newTestData, setNewTestData] = useState({ title: '', description: '', difficulty: 'Medium' });
 
+    const fetchTests = async () => {
+        if (!chapterId) return;
+        setLoading(true);
+        try {
+            const allTests = (await getAllContent("Mock Test")) as MockTest[];
+            const chapterTests = allTests.filter(test => test.chapterId === chapterId);
+            setTests(chapterTests);
+        } catch (error) {
+             toast({
+                variant: "destructive",
+                title: 'Error fetching mock tests',
+                description: (error as Error).message,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    
     useEffect(() => {
-        const fetchTests = async () => {
-            if (!chapterId) return;
-            setLoading(true);
-            try {
-                const allTests = (await getAllContent("Mock Test")) as MockTest[];
-                const chapterTests = allTests.filter(test => test.chapterId === chapterId);
-                setTests(chapterTests);
-            } catch (error) {
-                 toast({
-                    variant: "destructive",
-                    title: 'Error fetching mock tests',
-                    description: (error as Error).message,
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchTests();
     }, [chapterId, toast]);
 
@@ -101,6 +120,30 @@ export default function ManageChapterMockTestsPage() {
         }
     };
 
+    const handleAddTest = async () => {
+        if (!newTestData.title) {
+            toast({ variant: 'destructive', title: 'Title is required.' });
+            return;
+        }
+        try {
+             const contentToSave: any = { 
+                ...newTestData, 
+                testType: 'Mock Test',
+                textbookId: textbookId,
+                chapterId: chapterId,
+                access: 'free',
+                questions: [],
+             };
+            await addContent(contentToSave);
+            toast({ title: 'Mock Test Added' });
+            setIsDialogOpen(false);
+            setNewTestData({ title: '', description: '', difficulty: 'Medium' });
+            fetchTests();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error adding mock test', description: (error as Error).message });
+        }
+    };
+
 
     return (
         <div className="space-y-6">
@@ -119,12 +162,42 @@ export default function ManageChapterMockTestsPage() {
                         Mock tests associated with this chapter.
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/add-mock-test`}>
-                        <PlusCircle className="mr-2" />
-                        Add New Mock Test
-                    </Link>
-                </Button>
+                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button><PlusCircle className="mr-2" /> Add New Mock Test</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Add New Mock Test</DialogTitle>
+                            <DialogDescription>Fill in the details for the new mock test.</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="test-title">Title</Label>
+                                <Input id="test-title" value={newTestData.title} onChange={e => setNewTestData(p => ({...p, title: e.target.value}))} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="test-desc">Description</Label>
+                                <Textarea id="test-desc" value={newTestData.description} onChange={e => setNewTestData(p => ({...p, description: e.target.value}))} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="test-difficulty">Difficulty</Label>
+                                <Select value={newTestData.difficulty} onValueChange={(v) => setNewTestData(p => ({...p, difficulty: v}))}>
+                                    <SelectTrigger id="test-difficulty"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Easy">Easy</SelectItem>
+                                        <SelectItem value="Medium">Medium</SelectItem>
+                                        <SelectItem value="Hard">Hard</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                            <Button onClick={handleAddTest}>Save</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
              <Card>
                 <CardHeader>

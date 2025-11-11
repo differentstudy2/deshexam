@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -35,6 +35,20 @@ import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Quiz = {
     id: string;
@@ -60,24 +74,28 @@ export default function ManageChapterQuizzesPage() {
     const [loading, setLoading] = useState(true);
     const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null);
 
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newQuizData, setNewQuizData] = useState({ title: '', description: '', difficulty: 'Medium' });
+    
+    const fetchQuizzes = async () => {
+        if (!chapterId) return;
+        setLoading(true);
+        try {
+            const allQuizzes = (await getAllContent("Quiz")) as Quiz[];
+            const chapterQuizzes = allQuizzes.filter(quiz => quiz.chapterId === chapterId);
+            setQuizzes(chapterQuizzes);
+        } catch (error) {
+             toast({
+                variant: "destructive",
+                title: 'Error fetching quizzes',
+                description: (error as Error).message,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchQuizzes = async () => {
-            if (!chapterId) return;
-            setLoading(true);
-            try {
-                const allQuizzes = (await getAllContent("Quiz")) as Quiz[];
-                const chapterQuizzes = allQuizzes.filter(quiz => quiz.chapterId === chapterId);
-                setQuizzes(chapterQuizzes);
-            } catch (error) {
-                 toast({
-                    variant: "destructive",
-                    title: 'Error fetching quizzes',
-                    description: (error as Error).message,
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchQuizzes();
     }, [chapterId, toast]);
 
@@ -100,6 +118,30 @@ export default function ManageChapterQuizzesPage() {
             setQuizToDelete(null);
         }
     };
+    
+     const handleAddQuiz = async () => {
+        if (!newQuizData.title) {
+            toast({ variant: 'destructive', title: 'Title is required.' });
+            return;
+        }
+        try {
+             const contentToSave: any = { 
+                ...newQuizData, 
+                testType: 'Quiz',
+                textbookId: textbookId,
+                chapterId: chapterId,
+                access: 'free',
+                questions: [],
+             };
+            await addContent(contentToSave);
+            toast({ title: 'Quiz Added' });
+            setIsDialogOpen(false);
+            setNewQuizData({ title: '', description: '', difficulty: 'Medium' });
+            fetchQuizzes();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error adding quiz', description: (error as Error).message });
+        }
+    };
 
 
     return (
@@ -119,12 +161,42 @@ export default function ManageChapterQuizzesPage() {
                         Quizzes associated with this chapter.
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/add-quiz`}>
-                        <PlusCircle className="mr-2" />
-                        Add New Quiz
-                    </Link>
-                </Button>
+                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button><PlusCircle className="mr-2" /> Add New Quiz</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Add New Quiz</DialogTitle>
+                            <DialogDescription>Fill in the details for the new quiz.</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="quiz-title">Title</Label>
+                                <Input id="quiz-title" value={newQuizData.title} onChange={e => setNewQuizData(p => ({...p, title: e.target.value}))} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="quiz-desc">Description</Label>
+                                <Textarea id="quiz-desc" value={newQuizData.description} onChange={e => setNewQuizData(p => ({...p, description: e.target.value}))} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="quiz-difficulty">Difficulty</Label>
+                                <Select value={newQuizData.difficulty} onValueChange={(v) => setNewQuizData(p => ({...p, difficulty: v}))}>
+                                    <SelectTrigger id="quiz-difficulty"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Easy">Easy</SelectItem>
+                                        <SelectItem value="Medium">Medium</SelectItem>
+                                        <SelectItem value="Hard">Hard</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                            <Button onClick={handleAddQuiz}>Save</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
              <Card>
                 <CardHeader>
