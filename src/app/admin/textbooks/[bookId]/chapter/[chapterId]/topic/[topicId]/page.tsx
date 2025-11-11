@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, FileText, Mic, Upload, Loader2, ExternalLink, Sparkles, Award, Eye } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, ExternalLink, Sparkles, Award, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -325,7 +325,7 @@ export default function ManageTopicPage() {
                                         <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`} className="flex-grow font-medium hover:underline">{quiz.title}</Link>
                                         <div className="flex gap-1">
                                              <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                                <Link href={`/quiz/${quiz.id}`} target="_blank"><Eye/></Link>
+                                                <Link href={`/textbook-solutions/quiz/${quiz.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`} target="_blank"><Eye/></Link>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                                                  <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`}><Edit className="h-4 w-4"/></Link>
@@ -437,5 +437,3 @@ export default function ManageTopicPage() {
         </div>
     )
 }
-
-    
