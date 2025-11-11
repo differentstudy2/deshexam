@@ -7,7 +7,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion, addQuestionsToContent, updateQuestion, addQuestion } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, getContentTypes, getSubjects, updateContent, getBoards, getChaptersBySubjectId, getExamsByCategory, getExamTypes, getAllQuestions, deleteQuestion, addQuestionToContent, updateQuestion, addQuestion } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -720,7 +720,7 @@ export default function ManageContentPage() {
   const handleAddQuestionsToContent = async (contentIds: string[], questionIds: string[]) => {
     try {
         const questionsToAdd = allQuestions.filter(q => questionIds.includes(q.id));
-        await Promise.all(contentIds.map(id => addQuestionsToContent(id, questionsToAdd)));
+        await Promise.all(contentIds.map(id => addQuestionToContent(id, questionsToAdd)));
       
         toast({
             title: "Questions Added",
