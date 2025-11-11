@@ -72,10 +72,6 @@ const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 
-function getUrlForTest(testId: string) {
-    return `/mock-test/${testId}`;
-}
-
 export default function ManageChapterMockTestsPage() {
     const params = useParams();
     const textbookId = params.bookId as string;
@@ -242,6 +238,9 @@ export default function ManageChapterMockTestsPage() {
                                     <TableCell className="font-medium">{test.subtitle}: {test.title}</TableCell>
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}/chapter/${chapterId}/topic/null`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                        </Button>
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/null/mock-test/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>

@@ -71,11 +71,6 @@ type Quiz = {
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
-
-function getUrlForTest(testId: string) {
-    return `/quiz/${testId}`;
-}
-
 export default function ManageChapterQuizzesPage() {
     const params = useParams();
     const textbookId = params.bookId as string;
@@ -243,6 +238,9 @@ export default function ManageChapterQuizzesPage() {
                                     <TableCell className="font-medium">{quiz.subtitle}: {quiz.title}</TableCell>
                                     <TableCell><ContentBadge type={quiz.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={`/textbook-solutions/quiz/${quiz.id}/textbook/${textbookId}/chapter/${chapterId}/topic/null`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                        </Button>
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/null/quiz/${quiz.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
