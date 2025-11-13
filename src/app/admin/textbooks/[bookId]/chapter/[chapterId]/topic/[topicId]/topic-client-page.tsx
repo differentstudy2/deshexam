@@ -303,7 +303,7 @@ export default function TopicClientPage() {
          <div className="p-2">
             <SidebarNav 
                 chapters={chapters}
-                topicsByChapter={topicsByChapter}
+                topics={topicsByChapter}
                 activeChapterId={chapterId}
                 activeTopicId={topicId}
                 onChapterToggle={fetchChapterTopics}
@@ -334,7 +334,7 @@ export default function TopicClientPage() {
         {
             title: "Manage Mock Tests",
             description: "Create and manage mock tests for this topic.",
-            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-tests`,
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test`,
             icon: <Award />,
         },
         {
@@ -501,8 +501,8 @@ export default function TopicClientPage() {
                     ) : (
                          <div className="text-center text-muted-foreground pt-16">
                             <BookOpen className="w-16 h-16 mx-auto mb-4"/>
-                            <h2 className="text-xl font-semibold">No Content Yet</h2>
-                            <p>There is no content available for this topic yet. Check back later!</p>
+                            <h2 className="text-xl font-semibold">Select a topic</h2>
+                            <p>Choose a topic from the sidebar to view its specific content.</p>
                         </div>
                     )}
                 </main>
@@ -544,10 +544,6 @@ export default function TopicClientPage() {
                             textbookTitle={textbook?.title || ''} 
                             chapterTitle={activeChapter?.title || ''}
                             topicTitle={activeTopic?.title || ''}
-                            board={textbook?.board || ''}
-                            className={textbook?.class || ''}
-                            subject={textbook?.subject || ''}
-                            totalMarks={0} // This might need adjustment if practice sets have marks
                         />
                     </div>
                 </div>
