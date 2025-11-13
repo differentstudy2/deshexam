@@ -15,7 +15,7 @@ import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } 
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
@@ -56,7 +56,7 @@ const ExamIcon = () => (
 
 const SidebarNav = ({
   chapters,
-  topics,
+  topicsByChapter,
   activeChapterId,
   activeTopicId,
   onChapterToggle,
@@ -65,7 +65,7 @@ const SidebarNav = ({
   exams,
 }: {
   chapters: Chapter[];
-  topics: { [key: string]: Topic[] };
+  topicsByChapter: { [key: string]: Topic[] };
   activeChapterId: string | null;
   activeTopicId: string | null;
   onChapterToggle: (chapterId: string) => void;
@@ -78,7 +78,7 @@ const SidebarNav = ({
           {chapters.map((chapter, index) => (
             <AccordionItem value={chapter.id} key={chapter.id}>
               <AccordionTrigger
-                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md justify-start"
+                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
               >
                  <div className="flex items-center gap-3">
                     <ChapterIcon />
@@ -90,7 +90,7 @@ const SidebarNav = ({
                     <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
                 ) : (
                     <ul className="space-y-1 pl-4 border-l">
-                     {(topics[chapter.id] || []).map(topic => (
+                     {(topicsByChapter[chapter.id] || []).map(topic => (
                        <li key={topic.id}>
                          <Button
                            variant="ghost"
@@ -107,7 +107,7 @@ const SidebarNav = ({
                          </Button>
                        </li>
                      ))}
-                     {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
+                     {(!topicsByChapter[chapter.id] || topicsByChapter[chapter.id].length === 0) && (
                         <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
                      )}
                    </ul>
@@ -122,7 +122,7 @@ const SidebarNav = ({
                  <AccordionItem value="exams">
                     <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md">
                         <div className="flex items-center gap-3">
-                            <ExamIcon/>
+                            <Award/>
                             <span>Exams</span>
                         </div>
                     </AccordionTrigger>
@@ -158,7 +158,8 @@ export default function TopicClientPage() {
         activeChapter, 
         activeTopic, 
         exams, 
-        error 
+        error,
+        fetchPageData,
     } = usePageData();
     
     const textbookId = params.bookId as string;
@@ -175,21 +176,11 @@ export default function TopicClientPage() {
     const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
 
-    const activeTopicId = useMemo(() => {
-        const topicIdParam = params.topicId as string;
-        if (topicIdParam) return topicIdParam;
-        if (topicsByChapter[chapterId] && topicsByChapter[chapterId].length > 0) {
-            return null;
-        }
-        return null;
-    }, [params, topicsByChapter, chapterId]);
-
     useEffect(() => {
-      const activeContentSource = activeTopic;
-      if (activeContentSource?.content) {
+      if (activeTopic?.content) {
         const idMap = new Map();
-        const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
-        const newHeadings = Array.from(matches).map((match, index) => {
+        const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
+        const newHeadings = Array.from(matches).map((match) => {
           const level = match[1].length;
           const text = match[2];
           const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
@@ -233,7 +224,7 @@ export default function TopicClientPage() {
         setViewerResource(resource);
         setViewerOpen(true);
     };
-    
+
     const handleDownloadPdf = async (practiceSet: PracticeSet) => {
         if (!activeTopic) return;
         setIsGeneratingPdf(practiceSet.id);
@@ -251,7 +242,7 @@ export default function TopicClientPage() {
                     const pdfHeight = pdf.internal.pageSize.getHeight();
                     const imgWidth = canvas.width;
                     const imgHeight = canvas.height;
-                    const ratio = imgWidth / imgHeight;
+                    const ratio = imgHeight / imgWidth;
                     const width = pdfWidth;
                     const height = width / ratio;
                     let position = 0;
@@ -303,7 +294,7 @@ export default function TopicClientPage() {
          <div className="p-2">
             <SidebarNav 
                 chapters={chapters}
-                topics={topicsByChapter}
+                topicsByChapter={topicsByChapter}
                 activeChapterId={chapterId}
                 activeTopicId={topicId}
                 onChapterToggle={fetchChapterTopics}
