@@ -41,10 +41,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { uploadFile } from '@/lib/firebase/firestore';
 import { ImageUploader } from "@/components/feature/image-uploader";
 import { DeshExamLogo } from "@/components/icons";
+import { cn } from "@/lib/utils";
 
 
 export default function ManageChaptersPage() {
