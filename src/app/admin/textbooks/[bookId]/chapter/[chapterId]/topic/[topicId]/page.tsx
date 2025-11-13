@@ -37,7 +37,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
@@ -79,7 +79,6 @@ export default function ManageTopicPage() {
     const fetchData = async () => {
         if (!textbookId || !chapterId || !topicId) return;
         setLoading(true);
-
         try {
             const topicRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId);
             const topicSnap = await getDoc(topicRef);
@@ -239,14 +238,23 @@ export default function ManageTopicPage() {
                         {practiceSets.length > 0 ? (
                             <ul className="space-y-2">
                                 {practiceSets.map(ps => (
-                                    <li key={ps.id} className="flex justify-between items-center p-2 border rounded-md gap-2">
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`} className="flex-grow font-medium hover:underline">{ps.title}</Link>
-                                        <div className="flex gap-1">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                                <Link href={`/textbook-solutions/practice-set/${ps.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`} target="_blank"><Eye/></Link>
+                                    <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
+                                        <div className="flex-grow flex items-center gap-2 flex-wrap">
+                                            <span className="font-semibold">{ps.subtitle || 'Practice Set'}:</span>
+                                            <span className="font-medium">{ps.title}</span>
+                                        </div>
+                                        <div className="flex gap-2 flex-shrink-0">
+                                            <Button variant="outline" size="sm" asChild>
+                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/practice-set/${ps.id}`}>
+                                                    Manage Questions
+                                                </Link>
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenPracticeSetDialog(ps)}><Edit className="h-4 w-4"/></Button>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setPracticeSetToDelete(ps)}><Trash2 className="h-4 w-4"/></Button>
+                                            <Button variant="outline" size="sm" onClick={() => handleOpenPracticeSetDialog(ps)}>
+                                                <Edit className="mr-2 h-4 w-4" /> Edit
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => setPracticeSetToDelete(ps)}>
+                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                            </Button>
                                         </div>
                                     </li>
                                 ))}
@@ -266,8 +274,22 @@ export default function ManageTopicPage() {
                              <DialogContent>
                                 <DialogHeader><DialogTitle>Add New Mock Test</DialogTitle></DialogHeader>
                                 <div className="space-y-4 py-4">
-                                    <div className="space-y-2"><Label>Subtitle</Label><Input value={mockTestData.subtitle} onChange={(e) => setMockTestData(prev => ({...prev, subtitle: e.target.value}))} /></div>
-                                    <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={mockTestData.title} onChange={(e) => setMockTestData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
+                                    <div className="space-y-2"><Label htmlFor="mt-subtitle">Subtitle</Label><Input id="mt-subtitle" value={mockTestData.subtitle} onChange={e => setMockTestData(p => ({...p, subtitle: e.target.value}))} /></div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="mt-title">Title</Label>
+                                        <div className="flex gap-2">
+                                            <Input id="mt-title" value={mockTestData.title} onChange={e => setMockTestData(p => ({...p, title: e.target.value}))} />
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Mock Test', setMockTestData)}>[Topic Title] - Mock Test</DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] Mock: [Topic Title]', setMockTestData)}>[Chapter Title] Mock: [Topic Title]</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </div>
                                     <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-mt-${o}`} checked={mockTestData.difficulty.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-mt-${o}`}>{o}</label></div>)}</div></div>
                                     <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-mt-${o}`} checked={mockTestData.questionSource.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-mt-${o}`}>{o}</label></div>)}</div></div>
                                 </div>
@@ -309,7 +331,21 @@ export default function ManageTopicPage() {
                                 <DialogHeader><DialogTitle>Add New Quiz</DialogTitle></DialogHeader>
                                 <div className="space-y-4 py-4">
                                     <div className="space-y-2"><Label>Subtitle</Label><Input value={quizData.subtitle} onChange={(e) => setQuizData(prev => ({...prev, subtitle: e.target.value}))} /></div>
-                                    <div className="space-y-2"><Label>Title</Label><div className="flex gap-2"><Input value={quizData.title} onChange={(e) => setQuizData(prev => ({...prev, title: e.target.value}))} /><Button variant="outline" size="icon"><Sparkles /></Button></div></div>
+                                    <div className="space-y-2">
+                                        <Label>Title</Label>
+                                        <div className="flex gap-2">
+                                            <Input value={quizData.title} onChange={(e) => setQuizData(prev => ({...prev, title: e.target.value}))} />
+                                             <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Quiz', setQuizData)}>[Topic Title] - Quiz</DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Knowledge Check', setQuizData)}>[Topic Title] - Knowledge Check</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </div>
                                     <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-q-${o}`} checked={quizData.difficulty.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-q-${o}`}>{o}</label></div>)}</div></div>
                                     <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-q-${o}`} checked={quizData.questionSource.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-q-${o}`}>{o}</label></div>)}</div></div>
                                 </div>
@@ -355,7 +391,7 @@ export default function ManageTopicPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="practice-set-title">Title</Label>
-                            <div className="flex gap-2">
+                             <div className="flex gap-2">
                                 <Input id="practice-set-title" value={practiceSetData.title} onChange={(e) => setPracticeSetData(prev => ({...prev, title: e.target.value}))} />
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
