@@ -1959,6 +1959,41 @@ export const addPracticeSetToTopic = async (textbookId: string, chapterId: strin
     }
 };
 
+export const updatePracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, practiceSetData: any) => {
+    if (!textbookId || !chapterId || !topicId || !practiceSetId) {
+        throw new Error("Missing required IDs to update a practice set.");
+    }
+    try {
+        const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
+        await updateDoc(practiceSetRef, {
+            ...practiceSetData,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (e) {
+        console.error("Error updating practice set: ", e);
+        throw new Error("Failed to update practice set.");
+    }
+};
+
+export const deletePracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string) => {
+    if (!textbookId || !chapterId || !topicId || !practiceSetId) {
+        throw new Error("Missing required IDs to delete a practice set.");
+    }
+    try {
+        const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
+        // Also need to delete subcollection of questions, ideally with a cloud function for robustness
+        const questionsRef = collection(practiceSetRef, 'questions');
+        const questionsSnap = await getDocs(questionsRef);
+        for (const qDoc of questionsSnap.docs) {
+            await deleteDoc(qDoc.ref);
+        }
+        await deleteDoc(practiceSetRef);
+    } catch (e) {
+        console.error("Error deleting practice set: ", e);
+        throw new Error("Failed to delete practice set.");
+    }
+};
+
 export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: string, topicId: string) => {
     if (!textbookId || !chapterId || !topicId) return [];
     try {
