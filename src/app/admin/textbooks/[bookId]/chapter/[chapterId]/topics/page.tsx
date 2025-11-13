@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Topic, Resource, PracticeSet, Question, Test } from '@/lib/types';
+import type { Textbook, Chapter, Topic, Resource } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -25,12 +24,13 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +44,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { getTopicsByChapterId, addTopicToChapter, updateTopic, uploadFile } from '@/lib/firebase/firestore';
 import { Dialog, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Separator } from "@/components/ui/separator";
 import { solvedTextbookPageAssistant } from '@/ai/flows/solved-textbook-page-assistant';
 import { generateSummary } from '@/ai/flows/ai-summary-generator';
@@ -55,6 +54,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageUploader } from '@/components/feature/image-uploader';
+import Image from 'next/image';
+import { DeshExamLogo } from '@/components/icons';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -270,113 +271,115 @@ export default function ManageTopicsPage() {
     setAiFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
   };
 
-  const handleAIGenerateContent = async () => {
-    if (aiFiles.length === 0) {
-        toast({ variant: "destructive", title: "No files selected" });
-        return;
-    }
 
-    setIsGenerating(true);
-    let combinedContent = newTopic.content || '';
-
-    try {
-        for (const file of aiFiles) {
-            const pageDataUri = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result as string);
-                reader.onerror = error => reject(error);
-            });
-            
-            const result = await solvedTextbookPageAssistant({ pageDataUri });
-            combinedContent += (combinedContent ? '\n\n---\n\n' : '') + result.content;
-            
-            setNewTopic(prev => ({...prev, content: combinedContent}));
+    const handleAIGenerateContent = async () => {
+        if (aiFiles.length === 0) {
+            toast({ variant: "destructive", title: "No files selected" });
+            return;
         }
-        
-        toast({ title: `Content Generated!`, description: `AI content from ${aiFiles.length} page(s) has been appended.` });
-        setIsAiDialogOpen(false);
-        setAiFiles([]);
 
-    } catch (error) {
-        toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
-    } finally {
-        setIsGenerating(false);
-    }
-  };
+        setIsGenerating(true);
+        let combinedContent = newTopic.content || '';
 
-  const handleGenerateSummary = async () => {
-    if (!newTopic.content) {
-        toast({ variant: "destructive", title: "Topic content is empty." });
-        return;
-    }
-    setIsGeneratingSummary(true);
-    setGeneratedSummary(null);
-    try {
-        const result = await generateSummary({ content: newTopic.content });
-        setGeneratedSummary(result);
-    } catch(error) {
-         toast({ variant: "destructive", title: "Summary Generation Failed", description: (error as Error).message });
-    } finally {
-        setIsGeneratingSummary(false);
-    }
-  }
+        try {
+            for (const file of aiFiles) {
+                const pageDataUri = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = error => reject(error);
+                });
+                
+                const result = await solvedTextbookPageAssistant({ pageDataUri });
+                combinedContent += (combinedContent ? '\n\n---\n\n' : '') + result.content;
+                
+                // Update content in real-time after each page
+                setNewTopic(prev => ({...prev, content: combinedContent}));
+            }
+            
+            toast({ title: `Content Generated!`, description: `AI content from ${aiFiles.length} page(s) has been appended.` });
+            setIsAiDialogOpen(false);
+            setAiFiles([]);
 
-  const handleGenerateQuestions = async () => {
-    if (!newTopic.content) {
-        toast({ variant: "destructive", title: "Topic content is empty." });
-        return;
+        } catch (error) {
+            toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+    
+    const handleGenerateSummary = async () => {
+        if (!newTopic.content) {
+            toast({ variant: "destructive", title: "Topic content is empty." });
+            return;
+        }
+        setIsGeneratingSummary(true);
+        setGeneratedSummary(null);
+        try {
+            const result = await generateSummary({ content: newTopic.content });
+            setGeneratedSummary(result);
+        } catch(error) {
+             toast({ variant: "destructive", title: "Summary Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGeneratingSummary(false);
+        }
     }
-    setIsGeneratingQuestions(true);
-    setGeneratedQuestions(null);
-    try {
-        const result: AITextbookQuestionGeneratorOutput = await generateTextbookQuestions({ 
-            numQuestions: numQuestions,
-            sourceText: newTopic.content,
-            questionTypes: questionTypes as any,
+    
+    const handleGenerateQuestions = async () => {
+        if (!newTopic.content) {
+            toast({ variant: "destructive", title: "Chapter content is empty." });
+            return;
+        }
+        setIsGeneratingQuestions(true);
+        setGeneratedQuestions(null);
+        try {
+            const result: AITextbookQuestionGeneratorOutput = await generateTextbookQuestions({ 
+                numQuestions: numQuestions,
+                sourceText: newTopic.content,
+                questionTypes: questionTypes as any,
+            });
+            setGeneratedQuestions(result.questions);
+        } catch(error) {
+             toast({ variant: "destructive", title: "Question Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGeneratingQuestions(false);
+        }
+    };
+
+    const handleUseSummary = () => {
+        if (!generatedSummary) return;
+        const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map((p: string) => `- ${p}`).join('\n')}`;
+        setNewTopic(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + summaryText }));
+        toast({ title: "Summary added to content!" });
+        setGeneratedSummary(null);
+    }
+
+    const handleUseQuestions = () => {
+        if (!generatedQuestions) return;
+        let questionsText = "\n\n## Practice Questions\n\n";
+        generatedQuestions.forEach((q, index) => {
+            questionsText += `**${index + 1}. ${q.text}**\n\n`;
+            if (q.type === 'Multiple Choice' && q.options) {
+                q.options.forEach((opt: { text: string; }) => {
+                    questionsText += `- ${opt.text}\n`;
+                });
+                questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
+            } else if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+                const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
+                questionsText += `\n> **Answer:**\n${pairs}\n`;
+            } else if (q.correctAnswer) {
+                 questionsText += `> **Answer:** ${String(q.correctAnswer)}\n`;
+            }
+
+            if (q.explanation) {
+                questionsText += `\n> **Explanation:** ${q.explanation}\n`;
+            }
+            questionsText += "\n---\n\n";
         });
-        setGeneratedQuestions(result.questions);
-    } catch(error) {
-         toast({ variant: "destructive", title: "Question Generation Failed", description: (error as Error).message });
-    } finally {
-        setIsGeneratingQuestions(false);
+        setNewTopic(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + questionsText }));
+        toast({ title: "Questions added to content!" });
+        setGeneratedQuestions(null);
     }
-  };
-
-  const handleUseSummary = () => {
-    if (!generatedSummary) return;
-    const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map((p: string) => `- ${p}`).join('\n')}`;
-    setNewTopic(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + summaryText }));
-    toast({ title: "Summary added to content!" });
-    setGeneratedSummary(null);
-  }
-
-  const handleUseQuestions = () => {
-    if (!generatedQuestions) return;
-    let questionsText = "\n\n## Practice Questions\n\n";
-    generatedQuestions.forEach((q, index) => {
-        questionsText += `**${index + 1}. ${q.text}**\n\n`;
-        if (q.type === 'Multiple Choice' && q.options) {
-            q.options.forEach((opt: { text: string; }) => {
-                questionsText += `- ${opt.text}\n`;
-            });
-            questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
-        } else if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
-            const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
-            questionsText += `\n> **Answer:**\n${pairs}\n`;
-        } else if (q.correctAnswer) {
-             questionsText += `> **Answer:** ${String(q.correctAnswer)}\n`;
-        }
-
-        if (q.explanation) {
-            questionsText += `\n> **Explanation:** ${q.explanation}\n`;
-        }
-        questionsText += "\n---\n\n";
-    });
-    setNewTopic(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + questionsText }));
-    toast({ title: "Questions added to content!" });
-    setGeneratedQuestions(null);
-  }
 
 
   if (loading) {
@@ -436,10 +439,10 @@ export default function ManageTopicsPage() {
                             value={newTopic.pdfUrl} 
                             onChange={(e) => setNewTopic(prev => ({...prev, pdfUrl: e.target.value}))}
                         />
-                         <Button type="button" variant="outline" size="icon" onClick={() => topicPdfFileRef.current?.click()}>
+                         <Button type="button" variant="outline" size="icon" onClick={() => chapterPdfFileRef.current?.click()}>
                             <Upload className="w-4 h-4"/>
                          </Button>
-                         <Input type="file" className="hidden" ref={topicPdfFileRef} onChange={(e) => handleFileUpload(e, 'pdfUrl')} accept=".pdf"/>
+                         <Input type="file" className="hidden" ref={chapterPdfFileRef} onChange={(e) => handleFileUpload(e, 'pdfUrl')} accept=".pdf"/>
                      </div>
                 </div>
                 <div className="space-y-2">
@@ -618,31 +621,37 @@ export default function ManageTopicsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {topics.map((topic) => (
                             <Card key={topic.id} className="flex flex-col">
-                                <CardHeader className="pb-4">
-                                    <CardTitle className="text-base font-medium leading-tight">{topic.title}</CardTitle>
+                                <CardHeader className="relative p-0 h-40 bg-slate-800 flex items-center justify-center rounded-t-lg">
+                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`} className="w-full h-full">
+                                        {topic.featureImage ? (
+                                             <Image 
+                                                src={topic.featureImage} 
+                                                alt={topic.title} 
+                                                fill 
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full text-white/80 p-4">
+                                                <DeshExamLogo />
+                                            </div>
+                                        )}
+                                    </Link>
                                 </CardHeader>
-                                 <CardContent className="flex-grow text-sm text-muted-foreground">
-                                    <p className="text-xs">{(topic.resources || []).length} resources</p>
-                                    <p className="text-xs">{(topic.practiceSets || []).length} practice sets</p>
+                                <CardContent className="p-4 flex-grow">
+                                     <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`} className="block">
+                                        <CardTitle className="text-base font-semibold flex items-center gap-2 hover:text-primary transition-colors">
+                                            <span className="flex-grow">{topic.title}</span>
+                                            <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
+                                        </CardTitle>
+                                    </Link>
                                 </CardContent>
-                                <CardFooter className="flex-col items-stretch gap-2 pt-4 border-t">
-                                    <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>Manage Practice Sets</Link>
+                                <CardFooter className="p-4 pt-0 flex gap-2">
+                                     <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
+                                        <Edit className="h-3 w-3 mr-1"/> Edit
                                     </Button>
-                                    <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/add-content?type=Mock+Test&textbookId=${textbookId}&chapterId=${chapterId}&topicId=${topic.id}`}>Add Mock Test</Link>
+                                    <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(topic)} className="w-full">
+                                        <Trash2 className="h-3 w-3 mr-1"/> Delete
                                     </Button>
-                                     <Button variant="secondary" size="sm" asChild>
-                                        <Link href={`/admin/add-content?type=Quiz&textbookId=${textbookId}&chapterId=${chapterId}&topicId=${topic.id}`}>Add Quiz</Link>
-                                    </Button>
-                                    <div className="flex gap-2">
-                                         <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
-                                            <Edit className="h-3 w-3 mr-1"/> Edit Topic
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(topic)} className="w-full">
-                                            <Trash2 className="h-3 w-3 mr-1"/> Delete Topic
-                                        </Button>
-                                    </div>
                                 </CardFooter>
                             </Card>
                         ))}
