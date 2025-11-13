@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Topic, Resource } from '@/lib/types';
+import type { Textbook, Chapter } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -33,6 +33,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import { uploadFile } from '@/lib/firebase/firestore';
 import { ImageUploader } from "@/components/feature/image-uploader";
@@ -54,6 +64,7 @@ export default function ManageChaptersPage() {
   const [bulkChaptersText, setBulkChaptersText] = useState('');
   const [isBulkAdding, setIsBulkAdding] = useState(false);
   const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const fetchChapters = useCallback(async () => {
     if (!textbookId) return;
@@ -69,7 +80,6 @@ export default function ManageChaptersPage() {
         const querySnapshot = await getDocs(q);
         const chaptersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { title: string } } as Chapter));
         
-        // Sort chapters numerically if they start with numbers
         chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
 
         setChapters(chaptersData);
@@ -102,6 +112,7 @@ export default function ManageChaptersPage() {
             toast({ title: "Chapter added successfully." });
         }
         setNewChapter({ title: '', content: '', featureImage: '', chapterPdfUrl: '', access: 'free' });
+        setIsDialogOpen(false);
         fetchChapters(); 
 
     } catch (error) {
@@ -135,7 +146,7 @@ export default function ManageChaptersPage() {
         
         setBulkChaptersText('');
         setIsBulkAddOpen(false);
-        fetchChapters();
+        fetchChapters(); // Refresh the list
     } catch (error) {
          toast({
             variant: "destructive",
@@ -150,11 +161,13 @@ export default function ManageChaptersPage() {
   const handleEditClick = (chapter: Chapter) => {
     setEditingChapter(chapter);
     setNewChapter({ title: chapter.title, content: chapter.content || '', featureImage: chapter.featureImage || '', chapterPdfUrl: chapter.chapterPdfUrl || '', access: chapter.access || 'free' });
+    setIsDialogOpen(true);
   };
   
-  const handleCancelEdit = () => {
+  const handleAddNewClick = () => {
     setEditingChapter(null);
     setNewChapter({ title: '', content: '', featureImage: '', chapterPdfUrl: '', access: 'free' });
+    setIsDialogOpen(true);
   }
   
   const handleDeleteClick = (chapter: Chapter) => {
@@ -212,107 +225,45 @@ export default function ManageChaptersPage() {
             For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
           </p>
         </div>
-        <div>
-            <Button onClick={() => setIsBulkAddOpen(true)}>
-                 <PlusCircle className="mr-2" /> Bulk Add Chapters
+        <div className="flex gap-2">
+            <Button onClick={handleAddNewClick}>
+                 <PlusCircle className="mr-2" /> Add New Chapter
+            </Button>
+            <Button variant="outline" onClick={() => setIsBulkAddOpen(true)}>
+                 Bulk Add Chapters
             </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="chapter-title">Chapter Title</Label>
-                    <Input
-                    id="chapter-title"
-                    placeholder="e.g., Chapter 1: Electric Charges"
-                    value={newChapter.title}
-                    onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
-                    />
+       <Card>
+        <CardHeader>
+            <CardTitle>Existing Chapters</CardTitle>
+            <CardDescription>
+                A list of all chapters in this textbook. Click a chapter to manage its topics.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+        {chapters.length > 0 ? (
+            <div className="space-y-2">
+            {chapters.map((chapter) => (
+                <div key={chapter.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50">
+                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-medium flex-grow">
+                    {chapter.title}
+                </Link>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditClick(chapter)}><Edit className="h-4 w-4"/></Button>
+                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(chapter)}><Trash2 className="h-4 w-4"/></Button>
                 </div>
-                 <div className="space-y-2">
-                    <Label>Feature Image</Label>
-                    <ImageUploader fieldName="featureImage" onUrlChange={(url) => setNewChapter(prev => ({ ...prev, featureImage: url }))} value={newChapter.featureImage} />
                 </div>
-                 <div className="space-y-2">
-                    <Label>Chapter PDF</Label>
-                    <div className="flex items-center gap-2">
-                         <Input 
-                            placeholder="PDF URL or upload a file" 
-                            value={newChapter.chapterPdfUrl} 
-                            onChange={(e) => setNewChapter(prev => ({...prev, chapterPdfUrl: e.target.value}))}
-                        />
-                    </div>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="chapter-content">Chapter Content</Label>
-                    <Textarea
-                    id="chapter-content"
-                    placeholder="Add the main educational content for the chapter itself. You can use Markdown."
-                    value={newChapter.content}
-                    onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
-                    className="min-h-[150px]"
-                    />
-                </div>
-                 <div className="space-y-2">
-                    <Label>Access</Label>
-                    <Select value={newChapter.access} onValueChange={(value) => setNewChapter(prev => ({...prev, access: value as 'free'|'pass'|'pro'}))}>
-                        <SelectTrigger><SelectValue/></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="free">Free</SelectItem>
-                            <SelectItem value="pass">Pass Required</SelectItem>
-                            <SelectItem value="pro">Pro Required</SelectItem>
-                        </SelectContent>
-                    </Select>
-                 </div>
-                 <div className="flex gap-2">
-                  <Button onClick={handleAddOrUpdateChapter}>
-                    {editingChapter ? 'Update Chapter' : <><PlusCircle className="mr-2 h-4 w-4" /> Add Chapter</>}
-                  </Button>
-                  {editingChapter && (
-                    <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-        </div>
-        <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Existing Chapters</CardTitle>
-                <CardDescription>
-                  A list of all chapters in this textbook. Click a chapter to manage its topics.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {chapters.length > 0 ? (
-                  <div className="space-y-2">
-                    {chapters.map((chapter) => (
-                      <div key={chapter.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50">
-                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-medium flex-grow">
-                            {chapter.title}
-                        </Link>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => handleEditClick(chapter)}><Edit className="h-4 w-4"/></Button>
-                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(chapter)}><Trash2 className="h-4 w-4"/></Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-muted-foreground py-4">
-                    No chapters added yet.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-        </div>
-      </div>
+            ))}
+            </div>
+        ) : (
+            <div className="text-center text-muted-foreground py-4">
+            No chapters added yet.
+            </div>
+        )}
+        </CardContent>
+        </Card>
       
        <AlertDialog open={!!chapterToDelete} onOpenChange={(open) => !open && setChapterToDelete(null)}>
         <AlertDialogContent>
@@ -355,6 +306,66 @@ export default function ManageChaptersPage() {
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                    <DialogTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</DialogTitle>
+                </DialogHeader>
+                <div className="py-4 space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="chapter-title">Chapter Title</Label>
+                        <Input
+                            id="chapter-title"
+                            placeholder="e.g., Chapter 1: Electric Charges"
+                            value={newChapter.title}
+                            onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Feature Image</Label>
+                        <ImageUploader fieldName="featureImage" onUrlChange={(url) => setNewChapter(prev => ({ ...prev, featureImage: url }))} value={newChapter.featureImage} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Chapter PDF</Label>
+                        <Input 
+                            placeholder="PDF URL" 
+                            value={newChapter.chapterPdfUrl} 
+                            onChange={(e) => setNewChapter(prev => ({...prev, chapterPdfUrl: e.target.value}))}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="chapter-content">Chapter Content</Label>
+                        <Textarea
+                            id="chapter-content"
+                            placeholder="Add the main educational content for the chapter itself. You can use Markdown."
+                            value={newChapter.content}
+                            onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
+                            className="min-h-[150px]"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Access</Label>
+                        <Select value={newChapter.access} onValueChange={(value) => setNewChapter(prev => ({...prev, access: value as 'free'|'pass'|'pro'}))}>
+                            <SelectTrigger><SelectValue/></SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="free">Free</SelectItem>
+                                <SelectItem value="pass">Pass Required</SelectItem>
+                                <SelectItem value="pro">Pro Required</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                 <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button onClick={handleAddOrUpdateChapter}>
+                        {editingChapter ? 'Update Chapter' : 'Add Chapter'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
 
     </div>
   );
