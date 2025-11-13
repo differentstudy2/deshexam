@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Topic } from '@/lib/types';
+import type { Textbook, Chapter, Topic, Resource } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -16,10 +16,10 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, BookOpen } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, BookOpen, Upload, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -36,6 +36,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { uploadFile } from '@/lib/firebase/firestore';
 import { ImageUploader } from "@/components/feature/image-uploader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 export default function ManageChaptersPage() {
   const params = useParams();
@@ -185,6 +187,10 @@ export default function ManageChaptersPage() {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!textbook) {
+    return <div>Textbook not found.</div>;
   }
 
   return (
