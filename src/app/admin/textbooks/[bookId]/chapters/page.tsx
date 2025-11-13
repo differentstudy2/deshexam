@@ -141,9 +141,9 @@ export default function ManageChaptersPage() {
         const textbookDocRef = doc(db, 'textbooks', textbookId);
         const textbookDocSnap = await getDoc(textbookDocRef);
         if(textbookDocSnap.exists()) setTextbook({ id: textbookDocSnap.id, ...textbookDocSnap.data() } as Textbook);
-
+        
         const chaptersRef = collection(db, "textbooks", textbookId, "chapters");
-        const q = query(chaptersRef);
+        const q = query(chaptersRef, orderBy("title"));
         const querySnapshot = await getDocs(q);
         const chaptersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { title: string } } as Chapter));
         
@@ -208,7 +208,7 @@ export default function ManageChaptersPage() {
         
         toast({
             title: 'Chapters Added',
-            description: `${'chapterTitles.length'} chapters have been added successfully.`,
+            description: `${chapterTitles.length} chapters have been added successfully.`,
         });
         
         setBulkChaptersText('');
@@ -235,6 +235,12 @@ export default function ManageChaptersPage() {
     setEditingChapter(null);
     setNewChapter({ title: '', content: '', resources: [], featureImage: '', chapterPdfUrl: '', access: 'free' });
     setIsDialogOpen(true);
+  }
+  
+  const handleCancelEdit = () => {
+    setEditingChapter(null);
+    setNewChapter({ title: '', content: '', resources: [], featureImage: '', chapterPdfUrl: '', access: 'free' });
+    setIsDialogOpen(false);
   }
   
   const handleDeleteClick = (chapter: Chapter) => {
@@ -305,9 +311,7 @@ export default function ManageChaptersPage() {
         setIsUploading(true);
         try {
             const downloadURL = await uploadFile(file);
-            if(fieldToUpdate === 'pdfUrl') {
-                setNewTopic(prev => ({ ...prev, pdfUrl: downloadURL }));
-            } else if (fieldToUpdate === 'featureImage') {
+            if(fieldToUpdate === 'featureImage') {
                 setNewChapter(prev => ({...prev, featureImage: downloadURL}));
             } else if (fieldToUpdate === 'chapterPdfUrl') {
                 setNewChapter(prev => ({...prev, chapterPdfUrl: downloadURL}));
@@ -757,9 +761,9 @@ export default function ManageChaptersPage() {
                                                 </div>
                                                 <div>
                                                     <Label>Question Types:</Label>
-                                                    <div className="grid grid-cols-2 gap-2 mt-2">
+                                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                                         {['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank'].map(type => (
-                                                            <div key={type} className="flex items-center space-x-2">
+                                                             <div key={type} className="flex items-center space-x-2">
                                                                 <Checkbox 
                                                                     id={`type-${type}`}
                                                                     checked={questionTypes.includes(type)}
@@ -768,7 +772,7 @@ export default function ManageChaptersPage() {
                                                                     }}
                                                                 />
                                                                 <label htmlFor={`type-${type}`} className="text-sm font-medium leading-none">{type}</label>
-                                                            </div>
+                                                             </div>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -786,7 +790,7 @@ export default function ManageChaptersPage() {
                                                 )}
                                             </AccordionContent>
                                         </AccordionItem>
-                                    </Accordion>
+                                     </Accordion>
                                 </CardContent>
                             </Card>
                         </ScrollArea>
@@ -850,7 +854,6 @@ export default function ManageChaptersPage() {
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-
     </div>
   );
 }
