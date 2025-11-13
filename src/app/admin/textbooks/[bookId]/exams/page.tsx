@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -105,9 +105,9 @@ export default function ManageTextbookExamsPage() {
         <div className="space-y-6">
             <div>
                 <Button asChild variant="ghost">
-                    <Link href={`/admin/textbooks`}>
+                    <Link href={`/admin/textbooks/${textbookId}`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Textbooks
+                        Back to Textbook
                     </Link>
                 </Button>
             </div>
@@ -159,8 +159,11 @@ export default function ManageTextbookExamsPage() {
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForExam(exam.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={`/admin/textbooks/${textbookId}/exams/${exam.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
+                                        </Button>
                                          <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/edit-content/${exam.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
+                                            <Link href={`/admin/edit-content/${exam.id}`}><Edit className="mr-2 h-4 w-4"/>Edit Details</Link>
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setExamToDelete(exam)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
