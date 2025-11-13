@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, ExternalLink, Sparkles, Award, Eye } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, ExternalLink, Sparkles, Award, Eye, FileQuestion } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -218,9 +218,9 @@ export default function ManageTopicPage() {
         <div className="space-y-6">
             <div>
                 <Button variant="ghost" asChild>
-                    <Link href={`/admin/textbooks/${textbookId}`}>
+                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topics`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Chapters
+                        Back to Topics
                     </Link>
                 </Button>
             </div>
@@ -286,7 +286,7 @@ export default function ManageTopicPage() {
                                                 <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`} target="_blank"><Eye/></Link>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test/${test.id}`}><Edit className="h-4 w-4"/></Link>
+                                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/mock-test/${test.id}`}><FileQuestion className="h-4 w-4"/></Link>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={async () => { await deleteContent(test.id); await fetchData(); }}><Trash2 className="h-4 w-4"/></Button>
                                         </div>
@@ -328,7 +328,7 @@ export default function ManageTopicPage() {
                                                 <Link href={`/textbook-solutions/quiz/${quiz.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`} target="_blank"><Eye/></Link>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                                 <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`}><Edit className="h-4 w-4"/></Link>
+                                                 <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`}><FileQuestion className="h-4 w-4"/></Link>
                                             </Button>
                                             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={async () => { await deleteContent(quiz.id); await fetchData(); }}><Trash2 className="h-4 w-4"/></Button>
                                         </div>

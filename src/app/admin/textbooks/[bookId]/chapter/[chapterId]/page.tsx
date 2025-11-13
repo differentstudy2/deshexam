@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -65,6 +64,12 @@ export default function ManageChapterPage() {
             title: "Manage Quizzes",
             description: "Create and manage quizzes for this chapter.",
             link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/quizzes`,
+            icon: <Award />,
+        },
+        {
+            title: "Manage Exams",
+            description: "Create and manage exams for this chapter.",
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/exams`,
             icon: <Award />,
         },
         {

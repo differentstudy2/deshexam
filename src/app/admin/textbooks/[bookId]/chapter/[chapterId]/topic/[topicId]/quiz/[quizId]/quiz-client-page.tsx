@@ -1,24 +1,30 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, Sparkles, FileJson, Upload } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, Sparkles, Upload, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { addQuestionToContent, updateContent, deleteQuestionFromContent, getContentById } from '@/lib/firebase/firestore';
+import { 
+    addQuestionToContent,
+    updateContent,
+    deleteQuestionFromContent,
+    getContentById
+} from '@/lib/firebase/firestore';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -43,6 +49,27 @@ const questionSchema = z.object({
 });
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
+const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "Multiple Choice",
+      "marks": 1,
+      "options": [
+        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
+        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
+        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
+        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
+      ],
+      "correctAnswer": "Paris",
+      "explanation": "Paris is the capital and most populous city of France."
+    }
+  ]
+}
+`;
+
+
 const aiGeneratorFormSchema = z.object({
     sourceType: z.enum(['chapterContent', 'topic', 'text', 'file']),
     sourceTopic: z.string().optional(),
@@ -62,6 +89,7 @@ const aiGeneratorFormSchema = z.object({
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
+
 export default function QuizClientPage({ initialTest, initialTextbook, initialChapter, initialTopic }: { initialTest: Quiz, initialTextbook: Textbook, initialChapter: Chapter, initialTopic: Topic | null }) {
     const params = useParams();
     const { toast } = useToast();
@@ -77,6 +105,11 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
     const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const aiFormFileInputRef = useRef<HTMLInputElement>(null);
+
+    const importFileRef = useRef<HTMLInputElement>(null);
+    const [isImporting, setIsImporting] = useState(false);
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [jsonText, setJsonText] = useState('');
 
     const form = useForm<QuestionFormValues>({
         resolver: zodResolver(questionSchema),
@@ -154,6 +187,46 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error deleting questions', description: (error as Error).message });
         }
+    }
+    
+    const processJsonImport = async (jsonText: string) => {
+        try {
+            const parsedJson = JSON.parse(jsonText);
+            const questionsToImport = parsedJson.questions.map((q: any) => ({...q, authorId: user?.uid, authorName: user?.displayName, createdAt: new Date()}));
+            
+            for(const q of questionsToImport) {
+                await addQuestionToContent(quizId, q);
+            }
+            
+            const updatedTest = await getContentById(quizId);
+            setTest(updatedTest as Quiz);
+            toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions have been added.`});
+            setIsImportDialogOpen(false);
+            setJsonText('');
+          } catch (error) {
+            toast({ variant: 'destructive', title: 'Import Failed', description: (error as Error).message });
+          } finally {
+            setIsImporting(false);
+          }
+    }
+
+    const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        setIsImporting(true);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result as string;
+          processJsonImport(text);
+           if(importFileRef.current) importFileRef.current.value = '';
+        };
+        reader.readAsText(file);
+    };
+      
+    const handleBulkImportFromText = () => {
+        if (!jsonText.trim()) { toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."}); return; }
+        setIsImporting(true);
+        processJsonImport(jsonText);
     }
     
     const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
@@ -251,6 +324,17 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
                                         <DialogFooter className="pt-4"><Button type="submit" disabled={isGenerating}>{isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}</Button></DialogFooter>
                                     </form>
                                 </Form>
+                            </DialogContent>
+                        </Dialog>
+                        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                            <DialogTrigger asChild><Button size="sm" variant="outline" className="w-full"><FileJson className="mr-2"/> Bulk Import</Button></DialogTrigger>
+                            <DialogContent className="sm:max-w-2xl"><DialogHeader><DialogTitle>Bulk Import Questions</DialogTitle><DialogDescription>Upload a JSON file or paste JSON text containing an array of questions.</DialogDescription></DialogHeader>
+                                <Tabs defaultValue="upload" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="upload">Upload File</TabsTrigger><TabsTrigger value="paste">Paste JSON</TabsTrigger></TabsList>
+                                    <TabsContent value="upload"><div className="py-4"><div className="grid w-full max-w-sm items-center gap-1.5"><Label htmlFor="json-import">JSON/TXT File</Label><Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />{isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}</div></div></TabsContent>
+                                    <TabsContent value="paste"><div className="py-4 space-y-4"><Textarea placeholder='Paste your JSON content here...' value={jsonText} onChange={(e) => setJsonText(e.target.value)} className="min-h-[200px] font-mono text-xs" disabled={isImporting}/><Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>{isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}</Button></div></TabsContent>
+                                </Tabs>
+                                <Accordion type="single" collapsible className="w-full"><AccordionItem value="item-1"><AccordionTrigger>View JSON Format Example</AccordionTrigger><AccordionContent><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre></AccordionContent></AccordionItem></Accordion>
                             </DialogContent>
                         </Dialog>
                     </div>

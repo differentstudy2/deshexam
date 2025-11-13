@@ -25,15 +25,14 @@ import {
     deleteQuestionFromContent,
     getContentById
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/use-auth';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
-import type { Question, Topic, Textbook, Chapter } from '@/lib/types';
+import type { Question, Chapter, Textbook, Exam } from '@/lib/types';
 import QuestionForm from './question-form';
-
 
 const questionSchema = z.object({
   id: z.string().optional(),
@@ -90,12 +89,12 @@ const aiGeneratorFormSchema = z.object({
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
 
-export default function MockTestClientPage({ initialTest, initialTextbook, initialChapter, initialTopic }: { initialTest: any, initialTextbook: Textbook, initialChapter: Chapter, initialTopic: Topic | null }) {
+export default function ExamClientPage({ initialTest, initialTextbook, initialChapter }: { initialTest: Exam, initialTextbook: Textbook, initialChapter: Chapter | null }) {
     const params = useParams();
     const { toast } = useToast();
     const { user } = useAuth();
     
-    const mockTestId = params.mockTestId as string;
+    const examId = params.examId as string;
     const [test, setTest] = useState(initialTest);
 
     const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
@@ -158,11 +157,11 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
         try {
             if (editingQuestion) {
                 const updatedQuestions = test.questions.map((q: any) => q.id === editingQuestion.id ? {...q, ...data} : q);
-                await updateContent(mockTestId, { questions: updatedQuestions });
+                await updateContent(examId, { questions: updatedQuestions });
                 setTest({ ...test, questions: updatedQuestions });
                 toast({ title: 'Question Updated' });
             } else {
-                const newQuestionId = await addQuestionToContent(mockTestId, data);
+                const newQuestionId = await addQuestionToContent(examId, data);
                 const newQuestion = { ...data, id: newQuestionId };
                 setTest((prevTest: any) => ({ ...prevTest, questions: [...prevTest.questions, newQuestion] }));
                 toast({ title: 'Question Added' });
@@ -177,9 +176,9 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
 
     const handleDeleteQuestion = async (questionId: string) => {
         try {
-            await deleteQuestionFromContent(mockTestId, questionId);
-            const updatedTest = await getContentById(mockTestId);
-            setTest(updatedTest);
+            await deleteQuestionFromContent(examId, questionId);
+            const updatedTest = await getContentById(examId);
+            setTest(updatedTest as Exam);
             toast({ title: 'Question Deleted' });
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
@@ -200,10 +199,10 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
     
     const handleDeleteSelected = async () => {
         try {
-            const deletePromises = selectedQuestions.map(id => deleteQuestionFromContent(mockTestId, id));
+            const deletePromises = selectedQuestions.map(id => deleteQuestionFromContent(examId, id));
             await Promise.all(deletePromises);
-            const updatedTest = await getContentById(mockTestId);
-            setTest(updatedTest);
+            const updatedTest = await getContentById(examId);
+            setTest(updatedTest as Exam);
             toast({ title: `${selectedQuestions.length} question(s) deleted.` });
             setSelectedQuestions([]);
         } catch (error) {
@@ -217,11 +216,11 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
             const questionsToImport = parsedJson.questions.map((q: any) => ({...q, authorId: user?.uid, authorName: user?.displayName, createdAt: new Date()}));
             
             for(const q of questionsToImport) {
-                await addQuestionToContent(mockTestId, q);
+                await addQuestionToContent(examId, q);
             }
             
-            const updatedTest = await getContentById(mockTestId);
-            setTest(updatedTest);
+            const updatedTest = await getContentById(examId);
+            setTest(updatedTest as Exam);
             toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions have been added.`});
             setIsImportDialogOpen(false);
             setJsonText('');
@@ -281,11 +280,11 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
             const result: AIQuestionGeneratorOutput = await generateQuestions(input);
             
             for(const q of result.questions) {
-                await addQuestionToContent(mockTestId, q);
+                await addQuestionToContent(examId, q);
             }
             
-            const updatedTest = await getContentById(mockTestId);
-            setTest(updatedTest);
+            const updatedTest = await getContentById(examId);
+            setTest(updatedTest as Exam);
             toast({
                 title: 'Questions Generated!',
                 description: `${result.questions.length} new questions have been added.`,
@@ -324,9 +323,7 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
         }
     };
     
-    const backUrl = initialTopic 
-        ? `/admin/textbooks/${initialTextbook.id}/chapter/${initialChapter.id}/topic/${initialTopic.id}`
-        : `/admin/textbooks/${initialTextbook.id}/chapter/${initialChapter.id}`;
+    const backUrl = `/admin/textbooks/${initialTextbook.id}/chapter/${initialChapter?.id}/exams`;
 
     return (
         <div className="space-y-6">
@@ -334,13 +331,13 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
                 <Button variant="ghost" asChild>
                     <Link href={backUrl}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to {initialTopic ? 'Topic' : 'Chapter'}
+                        Back to Exams
                     </Link>
                 </Button>
             </div>
             <header>
-                <h1 className="font-headline text-3xl font-bold">Mock Test: <span className="text-primary">{test?.title}</span></h1>
-                <p className="text-muted-foreground mt-1">Topic: {initialTopic?.title || 'Chapter Level'}</p>
+                <h1 className="font-headline text-3xl font-bold">Exam: <span className="text-primary">{test?.title}</span></h1>
+                 <p className="text-muted-foreground mt-1">Textbook: {initialTextbook?.title || 'N/A'}</p>
             </header>
 
             <Card>
@@ -360,7 +357,7 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
                                 <DialogHeader>
                                     <DialogTitle>Generate Questions with AI</DialogTitle>
                                     <DialogDescription>
-                                        Describe the questions you want to create, and Gemini will generate them for this mock test.
+                                        Describe the questions you want to create, and Gemini will generate them for this exam.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <Form {...aiForm}>
@@ -520,7 +517,7 @@ export default function MockTestClientPage({ initialTest, initialTextbook, initi
                                 </li>
                             ))}
                         </ul>
-                    ) : ( <p className="text-muted-foreground text-center py-8">No questions added to this mock test yet.</p>)}
+                    ) : ( <p className="text-muted-foreground text-center py-8">No questions added to this exam yet.</p>)}
                 </CardContent>
             </Card>
             
