@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -30,11 +30,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 type Exam = {
     id: string;
@@ -58,25 +71,28 @@ export default function ManageTextbookExamsPage() {
     const [exams, setExams] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
     const [examToDelete, setExamToDelete] = useState<Exam | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newExamData, setNewExamData] = useState({ title: '', description: '' });
+
+    const fetchExams = async () => {
+        if (!textbookId) return;
+        setLoading(true);
+        try {
+            const allExams = await getAllContent('Exam') as Exam[];
+            const textbookExams = allExams.filter(exam => exam.textbookId === textbookId);
+            setExams(textbookExams);
+        } catch (error) {
+             toast({
+                variant: "destructive",
+                title: 'Error fetching exams',
+                description: (error as Error).message,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchExams = async () => {
-            if (!textbookId) return;
-            setLoading(true);
-            try {
-                const allExams = await getAllContent('Exam') as Exam[];
-                const textbookExams = allExams.filter(exam => exam.textbookId === textbookId);
-                setExams(textbookExams);
-            } catch (error) {
-                 toast({
-                    variant: "destructive",
-                    title: 'Error fetching exams',
-                    description: (error as Error).message,
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchExams();
     }, [textbookId, toast]);
 
@@ -99,6 +115,31 @@ export default function ManageTextbookExamsPage() {
             setExamToDelete(null);
         }
     };
+    
+    const handleAddExam = async () => {
+        if (!newExamData.title) {
+            toast({ variant: 'destructive', title: 'Title is required' });
+            return;
+        }
+        
+        const contentToSave = {
+            ...newExamData,
+            testType: 'Exam',
+            textbookId: textbookId,
+            access: 'free',
+            questions: [],
+        };
+        
+        try {
+            await addContent(contentToSave);
+            toast({ title: 'Exam Created!', description: 'You can now add questions to it.' });
+            setIsDialogOpen(false);
+            setNewExamData({ title: '', description: '' });
+            fetchExams();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error Creating Exam', description: (error as Error).message });
+        }
+    };
 
 
     return (
@@ -118,12 +159,46 @@ export default function ManageTextbookExamsPage() {
                         Exams associated with this textbook.
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/add-exam`}>
-                        <PlusCircle className="mr-2" />
-                        Add New Exam
-                    </Link>
-                </Button>
+                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <PlusCircle className="mr-2" />
+                            Add New Exam
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Add New Exam</DialogTitle>
+                            <DialogDescription>
+                                Create a new exam shell. You can add questions after creating it.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="exam-title">Title</Label>
+                                <Input 
+                                    id="exam-title" 
+                                    value={newExamData.title} 
+                                    onChange={(e) => setNewExamData(prev => ({...prev, title: e.target.value}))} 
+                                    placeholder="e.g., Mid-Term Exam"
+                                />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="exam-description">Description</Label>
+                                <Textarea 
+                                    id="exam-description" 
+                                    value={newExamData.description} 
+                                    onChange={(e) => setNewExamData(prev => ({...prev, description: e.target.value}))} 
+                                    placeholder="A brief description of the exam."
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                            <Button onClick={handleAddExam}>Create Exam</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
              <Card>
                 <CardHeader>
