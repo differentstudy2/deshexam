@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet, addContent, deleteContent, updateContent } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet, addContent, deleteContent } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -26,7 +26,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -52,7 +52,11 @@ const getResourceIcon = (type: string) => {
 };
 
 const ChapterIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+);
+
+const ExamIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m14 2 4 4 4-4"></path><path d="M18 6V4"></path><path d="M6 10H4"></path><path d="M6 14H4"></path><path d="M6 18H4"></path><path d="M14 10h6"></path><path d="M14 14h6"></path><path d="M14 18h6"></path><path d="M4 20h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"></path></svg>
 );
 
 
@@ -80,7 +84,7 @@ const SidebarNav = ({
           {chapters.map((chapter, index) => (
             <AccordionItem value={chapter.id} key={chapter.id}>
               <AccordionTrigger
-                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md"
+                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md justify-start"
               >
                  <div className="flex items-center gap-3">
                     <ChapterIcon />
@@ -124,7 +128,7 @@ const SidebarNav = ({
                  <AccordionItem value="exams">
                     <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md">
                         <div className="flex items-center gap-3">
-                            <Award/>
+                            <ExamIcon/>
                             <span>Exams</span>
                         </div>
                     </AccordionTrigger>
@@ -188,7 +192,7 @@ export default function TopicClientPage() {
       if (activeTopic?.content) {
         const idMap = new Map();
         const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
-        const newHeadings = Array.from(matches).map((match) => {
+        const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
           const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
@@ -232,7 +236,7 @@ export default function TopicClientPage() {
         setViewerResource(resource);
         setViewerOpen(true);
     };
-
+    
     const handleDownloadPdf = async (practiceSet: PracticeSet) => {
         if (!activeTopic) return;
         setIsGeneratingPdf(practiceSet.id);
@@ -243,28 +247,29 @@ export default function TopicClientPage() {
             setTimeout(async () => {
                 const pdfElement = document.getElementById('pdf-content');
                 if (pdfElement) {
-                    const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
+                    const canvas = await html2canvas(pdfElement, { scale: 2 });
+                    const imgData = canvas.toDataURL('image/png');
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const margin = 12.7; // 0.5 inch
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = pdf.internal.pageSize.getHeight();
-                    const contentWidth = pdfWidth - margin * 2;
                     const imgWidth = canvas.width;
                     const imgHeight = canvas.height;
-                    const ratio = imgHeight / imgWidth;
-                    const finalImgHeight = contentWidth * ratio;
-
+                    const ratio = imgWidth / imgHeight;
+                    const width = pdfWidth;
+                    const height = width / ratio;
                     let position = 0;
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
-                    let heightLeft = finalImgHeight - (pdfHeight - margin * 2);
+                    let heightLeft = height;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                    heightLeft -= pdfHeight;
 
                     while (heightLeft > 0) {
-                        position -= (pdfHeight - margin * 2);
+                        position = heightLeft - height;
                         pdf.addPage();
-                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, contentWidth, finalImgHeight);
-                        heightLeft -= (pdfHeight - margin * 2);
+                        pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                        heightLeft -= pdfHeight;
                     }
-                    
+
                     pdf.save(`${practiceSet.title}.pdf`);
                 }
                 setPdfContent(null);
@@ -303,7 +308,7 @@ export default function TopicClientPage() {
         try {
             await addContent(contentData);
             toast({ title: `Exam Added Successfully` });
-            fetchPageData(); // Refresh data to show new exam
+            fetchPageData(); // Refresh data
             setIsExamDialogOpen(false);
         } catch (error) {
             toast({ variant: 'destructive', title: `Error adding Exam`, description: (error as Error).message });
@@ -389,7 +394,7 @@ export default function TopicClientPage() {
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm overflow-hidden">
-                    <ol className="flex items-center gap-1.5 whitespace-nowrap">
+                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         <li className="flex items-center gap-1.5">
                              <Link href={`/textbook-solutions/${textbookId}/chapter/${chapterId}`} className="text-muted-foreground hover:text-foreground">
                                 <ArrowLeft className="w-4 h-4 inline-block mr-1" />
@@ -585,3 +590,4 @@ export default function TopicClientPage() {
         </div>
     );
 }
+
