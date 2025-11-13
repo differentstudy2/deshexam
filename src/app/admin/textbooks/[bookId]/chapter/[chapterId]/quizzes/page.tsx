@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -31,6 +32,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles, FileQuestion } from 'lucide-react';
@@ -283,8 +285,8 @@ export default function ManageChapterQuizzesPage() {
                                         <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Quiz')}>[Chapter Title] - Quiz</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Knowledge Check')}>[Chapter Title] - Knowledge Check</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Quiz', setQuizData)}>[Chapter Title] - Quiz</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Knowledge Check', setQuizData)}>[Chapter Title] - Knowledge Check</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>

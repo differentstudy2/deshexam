@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -14,13 +15,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, Sparkles, FileJson, Upload, FileText } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, Sparkles, Upload, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { addQuestionToContent, updateContent, deleteQuestionFromContent, getContentById } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { 
+    addQuestionToContent,
+    updateContent,
+    deleteQuestionFromContent,
+    getContentById
+} from '@/lib/firebase/firestore';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -43,6 +49,26 @@ const questionSchema = z.object({
   explanation: z.string().optional(),
 });
 type QuestionFormValues = z.infer<typeof questionSchema>;
+
+const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "Multiple Choice",
+      "marks": 1,
+      "options": [
+        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
+        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
+        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
+        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
+      ],
+      "correctAnswer": "Paris",
+      "explanation": "Paris is the capital and most populous city of France."
+    }
+  ]
+}
+`;
 
 const aiGeneratorFormSchema = z.object({
     sourceType: z.enum(['chapterContent', 'topic', 'text', 'file']),
@@ -443,6 +469,10 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
                                         </div>
                                     </TabsContent>
                                 </Tabs>
+                                <Accordion type="single" collapsible className="w-full"><AccordionItem value="item-1">
+                                    <AccordionTrigger>View JSON Format Example</AccordionTrigger>
+                                    <AccordionContent><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre></AccordionContent>
+                                </AccordionItem></Accordion>
                             </DialogContent>
                         </Dialog>
                     </div>

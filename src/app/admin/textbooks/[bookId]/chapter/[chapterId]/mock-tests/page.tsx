@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -31,6 +32,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles, FileQuestion } from 'lucide-react';
@@ -283,8 +285,8 @@ export default function ManageChapterMockTestsPage() {
                                         <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Mock Test')}>[Chapter Title] - Mock Test</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Mock Test')}>[Subject] Full Mock Test</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Mock Test', setTestData)}>[Chapter Title] - Mock Test</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Mock Test', setTestData)}>[Subject] Full Mock Test</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>

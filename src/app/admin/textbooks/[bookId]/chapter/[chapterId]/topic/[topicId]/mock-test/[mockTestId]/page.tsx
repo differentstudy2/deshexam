@@ -1,4 +1,5 @@
 
+
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
@@ -96,6 +97,12 @@ export default async function MockTestPage({ params }: PageProps) {
         notFound();
     }
     
+    // Since questions are part of the mockTest object, we can just use it.
+    const initialTest = {
+        ...(mockTest as any),
+        testType: 'Mock Test'
+    };
+
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center min-h-screen">
@@ -103,7 +110,7 @@ export default async function MockTestPage({ params }: PageProps) {
             </div>
         }>
             <MockTestClientPage 
-                initialTest={mockTest as any}
+                initialTest={initialTest as any}
                 initialTextbook={textbook as any} 
                 initialChapter={chapter as any}
                 initialTopic={topic as any}
