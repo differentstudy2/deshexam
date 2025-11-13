@@ -30,7 +30,6 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,17 +41,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogTrigger,
+    DialogClose
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { uploadFile } from '@/lib/firebase/firestore';
 import { ImageUploader } from "@/components/feature/image-uploader";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import Image from 'next/image';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 export default function ManageChaptersPage() {
@@ -274,11 +277,16 @@ export default function ManageChaptersPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col bg-slate-800 text-white">
-                                <div className="h-48 flex items-center justify-center p-4">
-                                    <DeshExamLogo />
+                                <div className="relative h-48 flex items-center justify-center p-4 bg-slate-700 rounded-t-lg">
+                                    <Image
+                                        src={chapter.featureImage || '/image/logo.png'}
+                                        alt={chapter.title}
+                                        fill
+                                        className="object-contain p-2"
+                                    />
                                 </div>
                                 <div className="p-4 border-t border-slate-700">
-                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-semibold hover:text-primary transition-colors flex justify-between items-center">
+                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`} className="font-semibold hover:text-primary transition-colors flex justify-between items-center">
                                        <span className="flex items-center gap-2">
                                             <BookOpen className="w-4 h-4"/>
                                             {chapter.title}
@@ -363,7 +371,7 @@ export default function ManageChaptersPage() {
                             onChange={(e) => setNewChapter({...newChapter, title: e.target.value})}
                         />
                     </div>
-                    <div className="space-y-2">
+                     <div className="space-y-2">
                         <Label>Feature Image</Label>
                         <ImageUploader fieldName="featureImage" onUrlChange={(url) => setNewChapter(prev => ({ ...prev, featureImage: url }))} value={newChapter.featureImage} />
                     </div>
