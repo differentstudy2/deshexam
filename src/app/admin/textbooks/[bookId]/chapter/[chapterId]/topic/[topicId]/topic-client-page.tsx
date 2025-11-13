@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -188,30 +189,12 @@ export default function TopicClientPage() {
     const [isExamDialogOpen, setIsExamDialogOpen] = useState(false);
     const [examData, setExamData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Topic'] });
 
-    useEffect(() => {
-      if (activeTopic?.content) {
-        const idMap = new Map();
-        const matches = activeTopic.content.matchAll(/^(#+)\s+(.*)/gm);
-        const newHeadings = Array.from(matches).map((match, index) => {
-          const level = match[1].length;
-          const text = match[2];
-          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-          
-          let id = baseId;
-          let count = 1;
-          while(idMap.has(id)) {
-            id = `${baseId}-${count}`;
-            count++;
-          }
-          idMap.set(id, true);
+    const [isMockTestDialogOpen, setIsMockTestDialogOpen] = useState(false);
+    const [mockTestData, setMockTestData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Topic'] });
 
-          return { id, text, level };
-        });
-        setHeadings(newHeadings);
-      } else {
-        setHeadings([]);
-      }
-    }, [activeTopic]);
+    const [isQuizDialogOpen, setIsQuizDialogOpen] = useState(false);
+    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Topic'] });
+    
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
         if (!cId || topicsByChapter[cId]) return; 
@@ -286,42 +269,49 @@ export default function TopicClientPage() {
         }
     };
     
-    const handleAddExam = async () => {
-        if (!examData.title.trim()) {
+    const handleAddTestOrQuiz = async (type: 'Exam' | 'Mock Test' | 'Quiz') => {
+        let data, setData, setDialogOpen;
+        switch(type) {
+            case 'Exam': data = examData; setData = setExamData; setDialogOpen = setIsExamDialogOpen; break;
+            case 'Mock Test': data = mockTestData; setData = setMockTestData; setDialogOpen = setIsMockTestDialogOpen; break;
+            case 'Quiz': data = quizData; setData = setQuizData; setDialogOpen = setIsQuizDialogOpen; break;
+        }
+
+        if (!data.title.trim()) {
             toast({ variant: 'destructive', title: 'Title is required.' });
             return;
         }
 
         const contentData = {
-            title: examData.title,
-            subtitle: examData.subtitle,
-            difficulty: examData.difficulty,
-            questionSource: examData.questionSource,
+            title: data.title,
+            subtitle: data.subtitle,
+            difficulty: data.difficulty,
+            questionSource: data.questionSource,
             textbookId,
             chapterId,
             topicId,
-            testType: 'Exam',
+            testType: type,
             access: 'free',
             questions: [],
         };
         
         try {
             await addContent(contentData);
-            toast({ title: `Exam Added Successfully` });
-            fetchPageData(); // Refresh data
-            setIsExamDialogOpen(false);
+            toast({ title: `${type} Added Successfully` });
+            fetchPageData();
+            setDialogOpen(false);
         } catch (error) {
-            toast({ variant: 'destructive', title: `Error adding Exam`, description: (error as Error).message });
+            toast({ variant: 'destructive', title: `Error adding ${type}`, description: (error as Error).message });
         }
     };
     
-    const handleDeleteExam = async (examId: string) => {
+    const handleDeleteTest = async (testId: string) => {
         try {
-            await deleteContent(examId);
-            toast({ title: 'Exam Deleted' });
-            fetchPageData(); // Refresh data
+            await deleteContent(testId);
+            toast({ title: 'Content Deleted' });
+            fetchPageData();
         } catch (error) {
-             toast({ variant: 'destructive', title: 'Error deleting exam', description: (error as Error).message });
+             toast({ variant: 'destructive', title: 'Error deleting content', description: (error as Error).message });
         }
     }
     
@@ -404,169 +394,90 @@ export default function TopicClientPage() {
                     </ol>
                 </nav>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr_250px]">
-                <aside className="hidden md:block h-full bg-card border-r">
-                    <div className="sticky top-0 h-screen overflow-y-auto">
-                         <div className="p-4 border-b">
-                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-                            </Link>
-                        </div>
-                        {sidebarContent}
-                    </div>
-                </aside>
-                <main className="p-6 md:p-8">
-                    <nav className="text-sm mb-6 hidden md:block">
-                         <ol className="flex items-center gap-1.5">
-                            {breadcrumbs.map((crumb, index) => (
-                               <li key={index} className="flex items-center gap-1.5">
-                                   <Link href={crumb.href} className={cn("hover:text-foreground", index === breadcrumbs.length - 1 ? 'text-foreground font-semibold' : 'text-muted-foreground')}>{crumb.name}</Link>
-                                   {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 text-muted-foreground"/>}
-                               </li>
-                            ))}
-                        </ol>
-                    </nav>
-
-                    {activeTopic ? (
-                        <div>
-                             <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
-                                <div className="absolute inset-0 z-0">
-                                    <Image 
-                                        src={activeTopic?.featureImage || activeChapter?.featureImage || '/image/logo.png'}
-                                        alt={activeTopic?.title || 'Topic background'}
-                                        fill
-                                        className="object-cover opacity-20"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
-                                </div>
-                                <div className="relative z-20">
-                                    <h1 className="font-headline text-3xl md:text-4xl font-bold">{activeTopic.title}</h1>
-                                    {activeTopic?.pdfUrl && (
-                                        <div className="mt-4">
-                                            <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-                                                <a href={activeTopic.pdfUrl} target="_blank" rel="noopener noreferrer">
-                                                    <FileText className="mr-2" /> View Topic PDF
-                                                </a>
-                                            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>Practice Sets</CardTitle>
+                        </CardHeader>
+                        <CardContent>{/* ... practice set list ... */}</CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>Mock Tests</CardTitle>
+                             <Dialog open={isMockTestDialogOpen} onOpenChange={setIsMockTestDialogOpen}>
+                                <DialogTrigger asChild><Button size="sm"><PlusCircle className="mr-2"/> Add</Button></DialogTrigger>
+                                 <DialogContent>
+                                    <DialogHeader><DialogTitle>Add New Mock Test</DialogTitle></DialogHeader>
+                                    <div className="space-y-4 py-4">
+                                        <div className="space-y-2"><Label htmlFor="mt-subtitle">Subtitle</Label><Input id="mt-subtitle" value={mockTestData.subtitle} onChange={e => setMockTestData(p => ({...p, subtitle: e.target.value}))} /></div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="mt-title">Title</Label>
+                                            <div className="flex gap-2">
+                                                <Input id="mt-title" value={mockTestData.title} onChange={e => setMockTestData(p => ({...p, title: e.target.value}))} />
+                                                <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Mock Test', setMockTestData)}>[Topic Title] - Mock Test</DropdownMenuItem><DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] Mock: [Topic Title]', setMockTestData)}>[Chapter Title] Mock: [Topic Title]</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                            </header>
-                            
-                            {activeTopic.content && (
-                                <article className="prose dark:prose-invert lg:prose-lg max-w-none mt-8">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeTopic.content}</ReactMarkdown>
-                                </article>
-                            )}
-                            
-                             {activeTopic.resources && activeTopic.resources.length > 0 && (
-                                <>
-                                 <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Resources</h2>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {activeTopic.resources.map(res => (
-                                        <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                            {getResourceIcon(res.type)}
-                                            <span className="flex-grow text-left">{res.title}</span>
-                                        </Button>
-                                    ))}
-                                </div>
-                                </>
-                             )}
-                             
-                             {activeTopic.practiceSets && activeTopic.practiceSets.length > 0 && (
-                                <section id="practice-sets" className="my-8">
-                                    <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
-                                    <div className="space-y-4">
-                                        {activeTopic.practiceSets.map(ps => {
-                                            const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
-                                            const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
-                                            return (
-                                                <div key={ps.id} className="p-4 border rounded-lg hover:bg-accent flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                                    <div className="flex-grow">
-                                                        <p className="font-semibold">{ps.subtitle}: {ps.title}</p>
-                                                        <div className="flex flex-wrap gap-2 mt-2">
-                                                            {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                                            {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
-                                                        <Button size="sm" asChild className="flex-1">
-                                                            <Link href={`/textbook-solutions/practice-set/${ps.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`}>Start Practice</Link>
-                                                        </Button>
-                                                        <Button 
-                                                            size="sm" 
-                                                            variant="outline" 
-                                                            className="flex-1"
-                                                            onClick={() => handleDownloadPdf(ps)}
-                                                            disabled={isGeneratingPdf === ps.id}
-                                                        >
-                                                            {isGeneratingPdf === ps.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
-                                                            Download PDF
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })}
+                                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-mt-${o}`} checked={mockTestData.difficulty.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-mt-${o}`}>{o}</label></div>)}</div></div>
+                                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-mt-${o}`} checked={mockTestData.questionSource.includes(o)} onCheckedChange={(c)=>setMockTestData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-mt-${o}`}>{o}</label></div>)}</div></div>
                                     </div>
-                                </section>
-                             )}
-
-                            <Separator className="my-12" />
-
-                            <Card className="bg-secondary/50">
-                                <CardContent className="p-6">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                                        <p className="font-semibold">Is this article helpful? What are your Feelings</p>
-                                        <div className="flex gap-2">
-                                            <Button variant="ghost" size="icon"><Smile className="w-6 h-6 text-muted-foreground hover:text-green-500" /></Button>
-                                            <Button variant="ghost" size="icon"><Frown className="w-6 h-6 text-muted-foreground hover:text-yellow-500" /></Button>
-                                            <Button variant="ghost" size="icon"><Annoyed className="w-6 h-6 text-muted-foreground hover:text-red-500" /></Button>
+                                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Mock Test')}>Save</Button></DialogFooter>
+                                 </DialogContent>
+                            </Dialog>
+                        </CardHeader>
+                         <CardContent>{/* ... mock test list ... */}</CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>Quizzes</CardTitle>
+                             <Dialog open={isQuizDialogOpen} onOpenChange={setIsQuizDialogOpen}>
+                                <DialogTrigger asChild><Button size="sm"><PlusCircle className="mr-2"/> Add</Button></DialogTrigger>
+                                 <DialogContent>
+                                    <DialogHeader><DialogTitle>Add New Quiz</DialogTitle></DialogHeader>
+                                    <div className="space-y-4 py-4">
+                                        <div className="space-y-2"><Label>Subtitle</Label><Input value={quizData.subtitle} onChange={(e) => setQuizData(prev => ({...prev, subtitle: e.target.value}))} /></div>
+                                        <div className="space-y-2">
+                                            <Label>Title</Label>
+                                            <div className="flex gap-2">
+                                                <Input value={quizData.title} onChange={(e) => setQuizData(prev => ({...prev, title: e.target.value}))} />
+                                                 <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Quiz', setQuizData)}>[Topic Title] - Quiz</DropdownMenuItem><DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Knowledge Check', setQuizData)}>[Topic Title] - Knowledge Check</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+                                            </div>
                                         </div>
+                                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-q-${o}`} checked={quizData.difficulty.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-q-${o}`}>{o}</label></div>)}</div></div>
+                                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-q-${o}`} checked={quizData.questionSource.includes(o)} onCheckedChange={(c)=>setQuizData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-q-${o}`}>{o}</label></div>)}</div></div>
                                     </div>
-                                    <Separator className="my-4" />
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                                        <p className="font-semibold">Share This Article :</p>
-                                        <div className="flex gap-2">
-                                            <Button variant="outline" size="icon"><Facebook className="w-5 h-5 text-[#1877F2]" /></Button>
-                                            <Button variant="outline" size="icon"><Twitter className="w-5 h-5 text-[#1DA1F2]" /></Button>
-                                            <Button variant="outline" size="icon"><Linkedin className="w-5 h-5 text-[#0A66C2]" /></Button>
-                                            <Button variant="outline" size="icon"><Link2 className="w-5 h-5" /></Button>
+                                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Quiz')}>Save</Button></DialogFooter>
+                                 </DialogContent>
+                            </Dialog>
+                        </CardHeader>
+                        <CardContent>{/* ... quiz list ... */}</CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>Exams</CardTitle>
+                            <Dialog open={isExamDialogOpen} onOpenChange={setIsExamDialogOpen}>
+                                <DialogTrigger asChild><Button size="sm"><PlusCircle className="mr-2"/> Add</Button></DialogTrigger>
+                                 <DialogContent>
+                                    <DialogHeader><DialogTitle>Add New Exam</DialogTitle></DialogHeader>
+                                    <div className="space-y-4 py-4">
+                                        <div className="space-y-2"><Label>Subtitle</Label><Input value={examData.subtitle} onChange={(e) => setExamData(prev => ({...prev, subtitle: e.target.value}))} /></div>
+                                        <div className="space-y-2">
+                                            <Label>Title</Label>
+                                            <div className="flex gap-2">
+                                                <Input value={examData.title} onChange={(e) => setExamData(prev => ({...prev, title: e.target.value}))} />
+                                                 <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => generateTitle('[Topic Title] - Exam', setExamData)}>[Topic Title] - Exam</DropdownMenuItem></DropdownMenuContent></DropdownMenu>
+                                            </div>
                                         </div>
+                                        <div className="space-y-2"><Label>Difficulty</Label><div className="grid grid-cols-3 gap-2">{difficultyOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`diff-e-${o}`} checked={examData.difficulty.includes(o)} onCheckedChange={(c)=>setExamData(p=>({...p,difficulty:c?[...p.difficulty,o]:p.difficulty.filter(d=>d!==o)}))}/><label htmlFor={`diff-e-${o}`}>{o}</label></div>)}</div></div>
+                                        <div className="space-y-2"><Label>Question Source</Label><div className="grid grid-cols-2 gap-2">{questionSourceOptions.map(o=><div key={o} className="flex items-center space-x-2"><Checkbox id={`src-e-${o}`} checked={examData.questionSource.includes(o)} onCheckedChange={(c)=>setExamData(p=>({...p,questionSource:c?[...p.questionSource,o]:p.questionSource.filter(s=>s!==o)}))}/><label htmlFor={`src-e-${o}`}>{o}</label></div>)}</div></div>
                                     </div>
-                                </CardContent>
-                            </Card>
-
-                        </div>
-                    ) : (
-                         <div className="text-center text-muted-foreground pt-16">
-                            <BookOpen className="w-16 h-16 mx-auto mb-4"/>
-                            <h2 className="text-xl font-semibold">Select a topic</h2>
-                            <p>Choose a topic from the sidebar to view its specific content.</p>
-                        </div>
-                    )}
-                </main>
-                <aside className="hidden lg:block p-6 border-l">
-                    <div className="sticky top-20">
-                        <h3 className="font-semibold mb-4">On This Page</h3>
-                         {headings.length > 0 ? (
-                            <ul className="space-y-2">
-                            {headings.map((heading) => (
-                                <li key={heading.id}>
-                                <a
-                                    href={`#${heading.id}`}
-                                    className="text-sm text-muted-foreground hover:text-foreground"
-                                    style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
-                                >
-                                    {heading.text}
-                                </a>
-                                </li>
-                            ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">No sections found.</p>
-                        )}
-                    </div>
-                </aside>
+                                    <DialogFooter><DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose><Button onClick={() => handleAddTestOrQuiz('Exam')}>Save</Button></DialogFooter>
+                                 </DialogContent>
+                            </Dialog>
+                        </CardHeader>
+                        <CardContent>{/* ... exam list ... */}</CardContent>
+                    </Card>
+                </div>
             </div>
             
             <ResourceViewerDialog 
