@@ -475,15 +475,15 @@ export default function ManageChaptersPage() {
             For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
              <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
                 <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('list')}><List className="w-5 h-5"/></Button>
                 <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('grid')}><LayoutGrid className="w-5 h-5"/></Button>
             </div>
-            <Button onClick={handleAddNewClick}>
+            <Button onClick={handleAddNewClick} className="w-full">
                  <PlusCircle className="mr-2" /> Add New Chapter
             </Button>
-            <Button variant="outline" onClick={() => setIsBulkAddOpen(true)}>
+            <Button variant="outline" onClick={() => setIsBulkAddOpen(true)} className="w-full">
                  Bulk Add Chapters
             </Button>
         </div>
@@ -595,11 +595,11 @@ export default function ManageChaptersPage() {
       </AlertDialog>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="max-w-4xl h-full md:h-auto md:max-h-[90vh]">
+            <DialogContent className="max-w-4xl h-full flex flex-col md:max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>{editingChapter ? 'Edit Chapter' : 'Add New Chapter'}</DialogTitle>
                 </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto p-1 max-h-[calc(90vh-120px)] md:max-h-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1 overflow-y-auto flex-1">
                     {/* Left Column for Form */}
                     <div className="space-y-4">
                         <div className="space-y-2">
@@ -612,11 +612,17 @@ export default function ManageChaptersPage() {
                         </div>
                         <div className="space-y-2">
                             <Label>Chapter PDF</Label>
-                            <div className="flex items-center gap-2">
-                                <Input placeholder="PDF URL or upload a file" value={newChapter.chapterPdfUrl} onChange={(e) => setNewChapter(prev => ({...prev, chapterPdfUrl: e.target.value}))} />
-                                <Button type="button" variant="outline" size="icon" onClick={() => chapterPdfFileRef.current?.click()}><Upload className="w-4 h-4"/></Button>
-                                <Input type="file" className="hidden" ref={chapterPdfFileRef} onChange={(e) => handleFileUpload(e, 'chapterPdfUrl')} accept=".pdf"/>
-                            </div>
+                             <div className="flex items-center gap-2">
+                                 <Input 
+                                    placeholder="PDF URL or upload a file" 
+                                    value={newChapter.chapterPdfUrl} 
+                                    onChange={(e) => setNewChapter(prev => ({...prev, chapterPdfUrl: e.target.value}))}
+                                />
+                                 <Button type="button" variant="outline" size="icon" onClick={() => chapterPdfFileRef.current?.click()}>
+                                    <Upload className="w-4 h-4"/>
+                                 </Button>
+                                 <Input type="file" className="hidden" ref={chapterPdfFileRef} onChange={(e) => handleFileUpload(e, 'chapterPdfUrl')} accept=".pdf"/>
+                             </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Access</Label>
@@ -630,15 +636,44 @@ export default function ManageChaptersPage() {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <div className="flex justify-between items-center">
+                             <div className="flex justify-between items-center">
                                 <Label htmlFor="topic-content">Chapter Content</Label>
                                 <Dialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen}>
-                                    <DialogTrigger asChild><Button type="button" variant="outline" size="sm"><Sparkles className="mr-2 h-4 w-4" /> Generate with AI</Button></DialogTrigger>
-                                    <DialogContent><DialogHeader><DialogTitle>Generate Content from Page(s)</DialogTitle><DialogDescription>Upload one or more images of textbook pages to automatically generate content.</DialogDescription></DialogHeader>
-                                        <div className="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary" onClick={() => aiFileInputRef.current?.click()}><Upload className="mx-auto h-12 w-12 text-muted-foreground" /><p>Click to upload or add files</p></div>
+                                    <DialogTrigger asChild>
+                                        <Button type="button" variant="outline" size="sm">
+                                            <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
+                                        </Button>
+                                    </DialogTrigger>
+                                     <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Generate Content from Page(s)</DialogTitle>
+                                            <DialogDescription>Upload one or more images of textbook pages to automatically generate content.</DialogDescription>
+                                        </DialogHeader>
+                                        <div 
+                                            className="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary"
+                                            onClick={() => aiFileInputRef.current?.click()}
+                                        >
+                                            <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                            <p>Click to upload or add files</p>
+                                        </div>
                                         <Input type="file" ref={aiFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,.pdf" multiple />
-                                        {aiFiles.length > 0 && (<ScrollArea className="h-32 w-full rounded-md border p-2"><ul className="text-sm text-muted-foreground space-y-2">{aiFiles.map((file, index) => (<li key={index} className="flex items-center justify-between"><span className="truncate pr-2">{file.name}</span><Button variant="ghost" size="sm" onClick={() => removeAiFile(file)}><Trash2 className="w-4 h-4 text-destructive"/></Button></li>))}</ul></ScrollArea>)}
-                                        <DialogFooter><Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || aiFiles.length === 0}>{isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}</Button></DialogFooter>
+                                        {aiFiles.length > 0 && (
+                                            <ScrollArea className="h-32 w-full rounded-md border p-2">
+                                                <ul className="text-sm text-muted-foreground space-y-2">
+                                                    {aiFiles.map((file, index) => (
+                                                        <li key={index} className="flex items-center justify-between">
+                                                            <span className="truncate pr-2">{file.name}</span>
+                                                            <Button variant="ghost" size="sm" onClick={() => removeAiFile(file)}><Trash2 className="w-4 h-4 text-destructive"/></Button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </ScrollArea>
+                                        )}
+                                        <DialogFooter>
+                                            <Button type="button" onClick={handleAIGenerateContent} disabled={isGenerating || aiFiles.length === 0}>
+                                                {isGenerating ? <><Loader2 className="animate-spin mr-2"/> Generating...</> : "Generate"}
+                                            </Button>
+                                        </DialogFooter>
                                     </DialogContent>
                                 </Dialog>
                             </div>
@@ -733,3 +768,5 @@ export default function ManageChaptersPage() {
     </div>
   );
 }
+
+    
