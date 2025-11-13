@@ -49,6 +49,8 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
     const [textbook, setTextbook] = useState<Textbook | null>(initialTextbook);
     const [chaptersWithTopics, setChaptersWithTopics] = useState<(Chapter & {topics: Topic[], practiceSets: PracticeSet[]})[]>([]);
     const [exams, setExams] = useState<Exam[]>([]);
+    const [mockTests, setMockTests] = useState<Exam[]>([]);
+    const [quizzes, setQuizzes] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -81,8 +83,16 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                 }));
                 
                 const allExams = await getAllContent("Exam") as Exam[];
+                const allMockTests = await getAllContent("Mock Test") as Exam[];
+                const allQuizzes = await getAllContent("Quiz") as Exam[];
+
                 const textbookExams = allExams.filter(exam => (exam as any).textbookId === textbookId);
+                const textbookMockTests = allMockTests.filter(test => (test as any).textbookId === textbookId);
+                const textbookQuizzes = allQuizzes.filter(quiz => (quiz as any).textbookId === textbookId);
+                
                 setExams(textbookExams);
+                setMockTests(textbookMockTests);
+                setQuizzes(textbookQuizzes);
 
                 setChaptersWithTopics(chaptersWithDetails);
 
@@ -147,9 +157,11 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
             </header>
             
             <Tabs defaultValue="chapters" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-2xl mx-auto">
                     <TabsTrigger value="chapters">Chapters</TabsTrigger>
-                    <TabsTrigger value="exams">Exams</TabsTrigger>
+                    {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
+                    {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
+                    {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
                 </TabsList>
                 <TabsContent value="chapters" className="mt-8">
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -215,51 +227,131 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                 </TabsContent>
                 <TabsContent value="exams" className="mt-8">
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {exams.length > 0 ? (
-                             exams.map((exam) => (
-                                <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                                <CardHeader className="p-0 relative">
-                                    <Image
-                                    src={`https://picsum.photos/seed/${exam.id}/400/225`}
-                                    alt={exam.title}
-                                    width={400}
-                                    height={225}
-                                    className="w-full h-auto object-cover"
-                                    />
-                                    <div className="absolute top-2 right-2">
-                                    <ContentBadge type={exam.access} />
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="flex-grow p-4">
-                                    <p className="text-sm font-medium text-primary">{exam.subject}</p>
-                                    <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{exam.title}</CardTitle>
-                                    <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                                    <div className="flex items-center gap-1.5">
-                                        <HelpCircle className="w-4 h-4" />
-                                        <span>{exam.questions.length} Questions</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Clock className="w-4 h-4" />
-                                        <span>{exam.duration} min</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <BarChart className="w-4 h-4" />
-                                        <span>{exam.difficulty}</span>
-                                    </div>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="p-4 pt-0">
-                                    <Button asChild className="w-full">
-                                    <Link href={getUrlForTest(exam.testType, exam.id)}>Start Exam</Link>
-                                    </Button>
-                                </CardFooter>
-                                </Card>
-                            ))
-                        ) : (
-                            <div className="col-span-full text-center py-16 text-muted-foreground">
-                                <p>No exams found for this textbook.</p>
-                            </div>
-                        )}
+                        {exams.map((exam) => (
+                            <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                            <CardHeader className="p-0 relative">
+                                <Image
+                                src={`https://picsum.photos/seed/${exam.id}/400/225`}
+                                alt={exam.title}
+                                width={400}
+                                height={225}
+                                className="w-full h-auto object-cover"
+                                />
+                                <div className="absolute top-2 right-2">
+                                <ContentBadge type={exam.access} />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-grow p-4">
+                                <p className="text-sm font-medium text-primary">{exam.subject}</p>
+                                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{exam.title}</CardTitle>
+                                <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                                <div className="flex items-center gap-1.5">
+                                    <HelpCircle className="w-4 h-4" />
+                                    <span>{exam.questions.length} Questions</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{exam.duration} min</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <BarChart className="w-4 h-4" />
+                                    <span>{exam.difficulty}</span>
+                                </div>
+                                </div>
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0">
+                                <Button asChild className="w-full">
+                                <Link href={getUrlForTest(exam.testType, exam.id)}>Start Exam</Link>
+                                </Button>
+                            </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </TabsContent>
+                <TabsContent value="mock-tests" className="mt-8">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {mockTests.map((test) => (
+                            <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                            <CardHeader className="p-0 relative">
+                                <Image
+                                src={`https://picsum.photos/seed/${test.id}/400/225`}
+                                alt={test.title}
+                                width={400}
+                                height={225}
+                                className="w-full h-auto object-cover"
+                                />
+                                <div className="absolute top-2 right-2">
+                                <ContentBadge type={test.access} />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-grow p-4">
+                                <p className="text-sm font-medium text-primary">{test.subject}</p>
+                                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{test.title}</CardTitle>
+                                <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                                <div className="flex items-center gap-1.5">
+                                    <HelpCircle className="w-4 h-4" />
+                                    <span>{test.questions.length} Questions</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{test.duration} min</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <BarChart className="w-4 h-4" />
+                                    <span>{test.difficulty}</span>
+                                </div>
+                                </div>
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0">
+                                <Button asChild className="w-full">
+                                <Link href={getUrlForTest(test.testType, test.id)}>Start Test</Link>
+                                </Button>
+                            </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </TabsContent>
+                <TabsContent value="quizzes" className="mt-8">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {quizzes.map((quiz) => (
+                            <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                            <CardHeader className="p-0 relative">
+                                <Image
+                                src={`https://picsum.photos/seed/${quiz.id}/400/225`}
+                                alt={quiz.title}
+                                width={400}
+                                height={225}
+                                className="w-full h-auto object-cover"
+                                />
+                                <div className="absolute top-2 right-2">
+                                <ContentBadge type={quiz.access} />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-grow p-4">
+                                <p className="text-sm font-medium text-primary">{quiz.subject}</p>
+                                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
+                                <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                                <div className="flex items-center gap-1.5">
+                                    <HelpCircle className="w-4 h-4" />
+                                    <span>{quiz.questions.length} Questions</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Clock className="w-4 h-4" />
+                                    <span>{quiz.duration} min</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <BarChart className="w-4 h-4" />
+                                    <span>{quiz.difficulty}</span>
+                                </div>
+                                </div>
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0">
+                                <Button asChild className="w-full">
+                                <Link href={getUrlForTest(quiz.testType, quiz.id)}>Start Quiz</Link>
+                                </Button>
+                            </CardFooter>
+                            </Card>
+                        ))}
                     </div>
                 </TabsContent>
             </Tabs>
