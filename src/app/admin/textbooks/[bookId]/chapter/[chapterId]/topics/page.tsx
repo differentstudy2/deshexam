@@ -24,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -674,17 +674,22 @@ export default function ManageTopicsPage() {
                         {topics.map((topic) => (
                             <Card key={topic.id} className="flex flex-col">
                                 <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
+                                    <div className="relative aspect-video bg-gray-100 dark:bg-gray-800 rounded-t-lg">
+                                        <Image
+                                            src={topic.featureImage || '/image/logo.png'}
+                                            alt={topic.title}
+                                            fill
+                                            className="object-contain p-2"
+                                        />
+                                    </div>
+                                </Link>
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
                                     <CardHeader className="p-4 flex-row items-center gap-3 hover:bg-accent/50 transition-colors">
                                         <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                                         <CardTitle className="text-base font-semibold flex-grow">{topic.title}</CardTitle>
                                         <ChevronRight className="w-5 h-5 flex-shrink-0" />
                                     </CardHeader>
                                 </Link>
-                                <CardContent className="p-4 pt-0 flex-grow">
-                                  <p className="text-sm text-muted-foreground line-clamp-2">
-                                    {topic.content ? `${topic.content.substring(0, 100)}...` : "No content yet."}
-                                  </p>
-                                </CardContent>
                                 <CardFooter className="p-4 pt-0 flex gap-2">
                                      <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
                                         <Edit className="h-3 w-3 mr-1"/> Edit
@@ -757,7 +762,7 @@ export default function ManageTopicsPage() {
                                 {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
                              </Button>
                         </div>
-                        <Input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileUpload(e, 'resources')} />
+                        <Input type="file" ref={fileInputRef} className="hidden" />
                     </div>
                 </div>
                 <DialogFooter>
@@ -779,5 +784,3 @@ export default function ManageTopicsPage() {
     </div>
   );
 }
-
-    
