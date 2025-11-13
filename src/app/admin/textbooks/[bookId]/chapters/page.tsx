@@ -2,9 +2,17 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter } from '@/lib/types';
+import type { Textbook, Chapter, Resource } from '@/lib/types';
 import {
   addDoc,
   collection,
@@ -16,13 +24,13 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, BookOpen, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight, List, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,20 +41,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogClose,
-} from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import { uploadFile } from '@/lib/firebase/firestore';
 import { ImageUploader } from "@/components/feature/image-uploader";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DeshExamLogo } from "@/components/icons";
 
 
 export default function ManageChaptersPage() {
@@ -65,6 +63,7 @@ export default function ManageChaptersPage() {
   const [isBulkAdding, setIsBulkAdding] = useState(false);
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [view, setView] = useState<'list' | 'grid'>('list');
 
   const fetchChapters = useCallback(async () => {
     if (!textbookId) return;
@@ -141,7 +140,7 @@ export default function ManageChaptersPage() {
         
         toast({
             title: 'Chapters Added',
-            description: `${chapterTitles.length} chapters have been added successfully.`,
+            description: `${'chapterTitles.length'} chapters have been added successfully.`,
         });
         
         setBulkChaptersText('');
@@ -226,6 +225,10 @@ export default function ManageChaptersPage() {
           </p>
         </div>
         <div className="flex gap-2">
+             <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
+                <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('list')}><List className="w-5 h-5"/></Button>
+                <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('grid')}><LayoutGrid className="w-5 h-5"/></Button>
+            </div>
             <Button onClick={handleAddNewClick}>
                  <PlusCircle className="mr-2" /> Add New Chapter
             </Button>
@@ -243,25 +246,55 @@ export default function ManageChaptersPage() {
             </CardDescription>
         </CardHeader>
         <CardContent>
-        {chapters.length > 0 ? (
-            <div className="space-y-2">
-            {chapters.map((chapter) => (
-                <div key={chapter.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50">
-                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-medium flex-grow">
-                    {chapter.title}
-                </Link>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => handleEditClick(chapter)}><Edit className="h-4 w-4"/></Button>
-                    <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(chapter)}><Trash2 className="h-4 w-4"/></Button>
+            {chapters.length > 0 ? (
+                view === 'list' ? (
+                     <div className="space-y-2">
+                    {chapters.map((chapter) => (
+                        <div key={chapter.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50">
+                        <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-medium flex-grow flex items-center gap-2">
+                            <BookOpen className="w-4 h-4 text-muted-foreground"/>
+                            {chapter.title}
+                        </Link>
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditClick(chapter)}><Edit className="h-4 w-4"/></Button>
+                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(chapter)}><Trash2 className="h-4 w-4"/></Button>
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {chapters.map((chapter) => (
+                            <Card key={chapter.id} className="flex flex-col bg-slate-800 text-white">
+                                <div className="h-48 flex items-center justify-center p-4">
+                                    <DeshExamLogo />
+                                </div>
+                                <div className="p-4 border-t border-slate-700">
+                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-semibold hover:text-primary transition-colors flex justify-between items-center">
+                                       <span className="flex items-center gap-2">
+                                            <BookOpen className="w-4 h-4"/>
+                                            {chapter.title}
+                                       </span>
+                                        <ChevronRight />
+                                    </Link>
+                                </div>
+                                <CardFooter className="p-4 border-t border-slate-700 flex gap-2">
+                                    <Button variant="secondary" size="sm" className="w-full" onClick={() => handleEditClick(chapter)}>
+                                        <Edit className="h-4 w-4 mr-2" /> Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" className="w-full" onClick={() => handleDeleteClick(chapter)}>
+                                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                )
+            ) : (
+                <div className="text-center text-muted-foreground py-4">
+                No chapters added yet.
                 </div>
-                </div>
-            ))}
-            </div>
-        ) : (
-            <div className="text-center text-muted-foreground py-4">
-            No chapters added yet.
-            </div>
-        )}
+            )}
         </CardContent>
         </Card>
       
@@ -326,25 +359,7 @@ export default function ManageChaptersPage() {
                         <Label>Feature Image</Label>
                         <ImageUploader fieldName="featureImage" onUrlChange={(url) => setNewChapter(prev => ({ ...prev, featureImage: url }))} value={newChapter.featureImage} />
                     </div>
-                    <div className="space-y-2">
-                        <Label>Chapter PDF</Label>
-                        <Input 
-                            placeholder="PDF URL" 
-                            value={newChapter.chapterPdfUrl} 
-                            onChange={(e) => setNewChapter(prev => ({...prev, chapterPdfUrl: e.target.value}))}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="chapter-content">Chapter Content</Label>
-                        <Textarea
-                            id="chapter-content"
-                            placeholder="Add the main educational content for the chapter itself. You can use Markdown."
-                            value={newChapter.content}
-                            onChange={(e) => setNewChapter({...newChapter, content: e.target.value})}
-                            className="min-h-[150px]"
-                        />
-                    </div>
-                    <div className="space-y-2">
+                     <div className="space-y-2">
                         <Label>Access</Label>
                         <Select value={newChapter.access} onValueChange={(value) => setNewChapter(prev => ({...prev, access: value as 'free'|'pass'|'pro'}))}>
                             <SelectTrigger><SelectValue/></SelectTrigger>
@@ -357,9 +372,7 @@ export default function ManageChaptersPage() {
                     </div>
                 </div>
                  <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                    </DialogClose>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                     <Button onClick={handleAddOrUpdateChapter}>
                         {editingChapter ? 'Update Chapter' : 'Add Chapter'}
                     </Button>
