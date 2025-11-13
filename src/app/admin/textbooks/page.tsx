@@ -7,7 +7,7 @@ import { db } from '@/lib/firebase/client';
 import { deleteTextbook, getAllTextbooks, getSubjects, getClasses, getGradesByClass, getBoards, getSchoolsByClass } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import { collection, getDocs, doc } from 'firebase/firestore';
-import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye, Award } from 'lucide-react';
+import { Book, Edit, Trash2, PlusCircle, Layers, FileText, CheckSquare, Eye, Award, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
 import {
@@ -217,10 +217,9 @@ export default function ManageTextbooksPage() {
                     </Button>
                 </div>
                  <Button asChild className="w-full">
-                    <Link href={`/admin/textbooks/${book.id}`}>Manage Chapters</Link>
-                </Button>
-                 <Button asChild className="w-full">
-                    <Link href={`/admin/textbooks/${book.id}/add-exam`}>Add Exam</Link>
+                    <Link href={`/admin/textbooks/${book.id}`}>
+                      <Settings className="mr-2 h-4 w-4" /> Manage Book
+                    </Link>
                 </Button>
                 <Button variant="destructive" className="w-full" onClick={() => handleDeleteClick(book)}>
                     <Trash2 className="mr-2 h-4 w-4" /> Delete
