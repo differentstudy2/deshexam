@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -41,23 +41,31 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 type Exam = {
     id: string;
     title: string;
+    subtitle?: string;
     subject: string;
     testType: string;
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     textbookId?: string;
+    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
 }
+
+const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
+
 
 function getUrlForExam(examId: string) {
     return `/exam/${examId}`;
@@ -72,7 +80,13 @@ export default function ManageTextbookExamsPage() {
     const [loading, setLoading] = useState(true);
     const [examToDelete, setExamToDelete] = useState<Exam | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [newExamData, setNewExamData] = useState({ title: '', description: '' });
+    const [editingExam, setEditingExam] = useState<Exam | null>(null);
+    const [examData, setExamData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({
+        title: '',
+        subtitle: '',
+        difficulty: ['Medium'],
+        questionSource: ['Random from Chapter']
+    });
 
     const fetchExams = async () => {
         if (!textbookId) return;
@@ -116,31 +130,44 @@ export default function ManageTextbookExamsPage() {
         }
     };
     
-    const handleAddExam = async () => {
-        if (!newExamData.title) {
-            toast({ variant: 'destructive', title: 'Title is required' });
+    const handleOpenDialog = (exam: Exam | null) => {
+        setEditingExam(exam);
+        const difficultyArray = (exam?.difficulty && Array.isArray(exam.difficulty) ? exam.difficulty : ['Medium']) as any[];
+        const sourceArray = (exam?.questionSource && Array.isArray(exam.questionSource) ? exam.questionSource : ['Random from Chapter']) as any[];
+        const subtitle = exam ? exam.subtitle || `Exam ${exams.findIndex(t => t.id === exam.id) + 1}` : `Exam ${exams.length + 1}`;
+        setExamData(exam ? { title: exam.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+        setIsDialogOpen(true);
+    };
+
+    const handleAddOrUpdate = async () => {
+        if (!examData.title.trim()) {
+            toast({ variant: 'destructive', title: 'Title is required.' });
             return;
         }
-        
-        const contentToSave = {
-            ...newExamData,
+
+        const contentToSave = { 
+            ...examData, 
             testType: 'Exam',
             textbookId: textbookId,
             access: 'free',
-            questions: [],
+            questions: editingExam?.questions || [],
         };
         
         try {
-            await addContent(contentToSave);
-            toast({ title: 'Exam Created!', description: 'You can now add questions to it.' });
+            if (editingExam) {
+                await updateContent(editingExam.id, contentToSave);
+                toast({ title: 'Exam Updated' });
+            } else {
+                await addContent(contentToSave);
+                toast({ title: 'Exam Added' });
+            }
             setIsDialogOpen(false);
-            setNewExamData({ title: '', description: '' });
+            setEditingExam(null);
             fetchExams();
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Error Creating Exam', description: (error as Error).message });
+            toast({ variant: 'destructive', title: 'Error saving exam', description: (error as Error).message });
         }
     };
-
 
     return (
         <div className="space-y-6">
@@ -161,41 +188,70 @@ export default function ManageTextbookExamsPage() {
                 </div>
                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button onClick={() => handleOpenDialog(null)}>
                             <PlusCircle className="mr-2" />
                             Add New Exam
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Add New Exam</DialogTitle>
-                            <DialogDescription>
-                                Create a new exam shell. You can add questions after creating it.
-                            </DialogDescription>
+                            <DialogTitle>{editingExam ? 'Edit Exam' : 'Add New Exam'}</DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                         <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="exam-subtitle">Subtitle</Label>
+                                <Input id="exam-subtitle" value={examData.subtitle} onChange={e => setExamData(p => ({...p, subtitle: e.target.value}))} />
+                            </div>
                             <div className="space-y-2">
                                 <Label htmlFor="exam-title">Title</Label>
-                                <Input 
-                                    id="exam-title" 
-                                    value={newExamData.title} 
-                                    onChange={(e) => setNewExamData(prev => ({...prev, title: e.target.value}))} 
-                                    placeholder="e.g., Mid-Term Exam"
-                                />
+                                <Input id="exam-title" value={examData.title} onChange={e => setExamData(p => ({...p, title: e.target.value}))} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Difficulty</Label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {difficultyOptions.map(option => (
+                                        <div key={option} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`diff-${option}`}
+                                                checked={examData.difficulty.includes(option)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentDifficulties = examData.difficulty;
+                                                    const newDifficulties = checked
+                                                        ? [...currentDifficulties, option]
+                                                        : currentDifficulties.filter(d => d !== option);
+                                                    setExamData(prev => ({...prev, difficulty: newDifficulties }));
+                                                }}
+                                            />
+                                            <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                              <div className="space-y-2">
-                                <Label htmlFor="exam-description">Description</Label>
-                                <Textarea 
-                                    id="exam-description" 
-                                    value={newExamData.description} 
-                                    onChange={(e) => setNewExamData(prev => ({...prev, description: e.target.value}))} 
-                                    placeholder="A brief description of the exam."
-                                />
+                                <Label>Question Source</Label>
+                                 <div className="grid grid-cols-2 gap-2">
+                                    {questionSourceOptions.map(option => (
+                                         <div key={option} className="flex items-center space-x-2">
+                                             <Checkbox
+                                                id={`source-${option}`}
+                                                checked={examData.questionSource.includes(option)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentSources = examData.questionSource;
+                                                    const newSources = checked
+                                                        ? [...currentSources, option]
+                                                        : currentSources.filter(s => s !== option);
+                                                    setExamData(prev => ({...prev, questionSource: newSources }));
+                                                }}
+                                            />
+                                            <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                         </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                         <DialogFooter>
                             <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                            <Button onClick={handleAddExam}>Create Exam</Button>
+                            <Button onClick={handleAddOrUpdate}>Save</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
@@ -227,7 +283,7 @@ export default function ManageTextbookExamsPage() {
                             ) : exams.length > 0 ? (
                                 exams.map((exam) => (
                                 <TableRow key={exam.id}>
-                                    <TableCell className="font-medium">{exam.title}</TableCell>
+                                    <TableCell className="font-medium">{exam.subtitle ? `${exam.subtitle}: ${exam.title}` : exam.title}</TableCell>
                                     <TableCell>{exam.subject}</TableCell>
                                     <TableCell><ContentBadge type={exam.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
@@ -237,8 +293,8 @@ export default function ManageTextbookExamsPage() {
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/exams/${exam.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
-                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/edit-content/${exam.id}`}><Edit className="mr-2 h-4 w-4"/>Edit Details</Link>
+                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(exam)}>
+                                            <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setExamToDelete(exam)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
