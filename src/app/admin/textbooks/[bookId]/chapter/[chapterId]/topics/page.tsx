@@ -24,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -54,8 +54,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageUploader } from '@/components/feature/image-uploader';
+import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { DeshExamLogo } from '@/components/icons';
+import { ContentBadge } from '@/components/content-badge';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -79,6 +80,11 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
     )
 }
 
+const ChapterIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+);
+
+
 export default function ManageTopicsPage() {
   const params = useParams();
   const textbookId = params.bookId as string;
@@ -92,6 +98,9 @@ export default function ManageTopicsPage() {
   const [loading, setLoading] = useState(true);
   const [topicToDelete, setTopicToDelete] = useState<Topic | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+  const [bulkChaptersText, setBulkChaptersText] = useState('');
+  const [isBulkAdding, setIsBulkAdding] = useState(false);
   const { toast } = useToast();
   
   const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
@@ -100,6 +109,7 @@ export default function ManageTopicsPage() {
   const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chapterPdfFileRef = useRef<HTMLInputElement>(null);
   const topicPdfFileRef = useRef<HTMLInputElement>(null);
 
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
@@ -166,6 +176,40 @@ export default function ManageTopicsPage() {
         title: "Error saving topic",
         description: (error as Error).message,
       });
+    }
+  };
+
+  const handleBulkAddChapters = async () => {
+    if (!bulkChaptersText.trim()) return;
+    setIsBulkAdding(true);
+    try {
+        const chapterTitles = bulkChaptersText.split('\n').map(t => t.trim()).filter(Boolean);
+        const chaptersCollectionRef = collection(db, 'textbooks', textbookId, 'chapters');
+
+        for (const title of chapterTitles) {
+            await addDoc(chaptersCollectionRef, {
+                title: title,
+                content: '',
+                access: 'pass'
+            });
+        }
+        
+        toast({
+            title: 'Chapters Added',
+            description: `${'chapterTitles.length'} chapters have been added successfully.`,
+        });
+        
+        setBulkChaptersText('');
+        setIsBulkAddOpen(false);
+        fetchChapterAndTopics(); // Refresh the list
+    } catch (error) {
+         toast({
+            variant: "destructive",
+            title: "Error adding chapters",
+            description: (error as Error).message,
+        });
+    } finally {
+        setIsBulkAdding(false);
     }
   };
 
@@ -241,7 +285,7 @@ export default function ManageTopicsPage() {
     setResourceToDelete(null);
   }
   
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'pdfUrl') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'pdfUrl' | 'featureImage' | 'chapterPdfUrl') => {
     const file = e.target.files?.[0];
     if (file) {
         setIsUploading(true);
@@ -249,6 +293,14 @@ export default function ManageTopicsPage() {
             const downloadURL = await uploadFile(file);
             if(fieldToUpdate === 'pdfUrl') {
                 setNewTopic(prev => ({ ...prev, pdfUrl: downloadURL }));
+            } else if (fieldToUpdate === 'featureImage') {
+                setNewTopic(prev => ({...prev, featureImage: downloadURL}));
+            } else if (fieldToUpdate === 'chapterPdfUrl') {
+                if (chapter) {
+                    const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapter.id);
+                    await updateDoc(chapterRef, { chapterPdfUrl: downloadURL });
+                    fetchChapterAndTopics(); // re-fetch to update state
+                }
             } else {
                  setNewResource(prev => ({...prev, url: downloadURL}));
             }
@@ -439,10 +491,10 @@ export default function ManageTopicsPage() {
                             value={newTopic.pdfUrl} 
                             onChange={(e) => setNewTopic(prev => ({...prev, pdfUrl: e.target.value}))}
                         />
-                         <Button type="button" variant="outline" size="icon" onClick={() => chapterPdfFileRef.current?.click()}>
+                         <Button type="button" variant="outline" size="icon" onClick={() => topicPdfFileRef.current?.click()}>
                             <Upload className="w-4 h-4"/>
                          </Button>
-                         <Input type="file" className="hidden" ref={chapterPdfFileRef} onChange={(e) => handleFileUpload(e, 'pdfUrl')} accept=".pdf"/>
+                         <Input type="file" className="hidden" ref={topicPdfFileRef} onChange={(e) => handleFileUpload(e, 'pdfUrl')} accept=".pdf"/>
                      </div>
                 </div>
                 <div className="space-y-2">
@@ -621,29 +673,17 @@ export default function ManageTopicsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {topics.map((topic) => (
                             <Card key={topic.id} className="flex flex-col">
-                                <CardHeader className="relative p-0 h-40 bg-slate-800 flex items-center justify-center rounded-t-lg">
-                                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`} className="w-full h-full">
-                                        {topic.featureImage ? (
-                                             <Image 
-                                                src={topic.featureImage} 
-                                                alt={topic.title} 
-                                                fill 
-                                                className="object-cover"
-                                            />
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center h-full text-white/80 p-4">
-                                                <DeshExamLogo />
-                                            </div>
-                                        )}
-                                    </Link>
-                                </CardHeader>
-                                <CardContent className="p-4 flex-grow">
-                                     <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`} className="block">
-                                        <CardTitle className="text-base font-semibold flex items-center gap-2 hover:text-primary transition-colors">
-                                            <span className="flex-grow">{topic.title}</span>
-                                            <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted-foreground" />
-                                        </CardTitle>
-                                    </Link>
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topic.id}`}>
+                                    <CardHeader className="p-4 flex-row items-center gap-3 hover:bg-accent/50 transition-colors">
+                                        <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                                        <CardTitle className="text-base font-semibold flex-grow">{topic.title}</CardTitle>
+                                        <ChevronRight className="w-5 h-5 flex-shrink-0" />
+                                    </CardHeader>
+                                </Link>
+                                <CardContent className="p-4 pt-0 flex-grow">
+                                  <p className="text-sm text-muted-foreground line-clamp-2">
+                                    {topic.content ? `${topic.content.substring(0, 100)}...` : "No content yet."}
+                                  </p>
                                 </CardContent>
                                 <CardFooter className="p-4 pt-0 flex gap-2">
                                      <Button variant="outline" size="sm" onClick={() => handleEditClick(topic)} className="w-full">
@@ -717,7 +757,7 @@ export default function ManageTopicsPage() {
                                 {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
                              </Button>
                         </div>
-                        <Input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'resources')} className="hidden" />
+                        <Input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileUpload(e, 'resources')} />
                     </div>
                 </div>
                 <DialogFooter>
@@ -739,3 +779,5 @@ export default function ManageTopicsPage() {
     </div>
   );
 }
+
+    
