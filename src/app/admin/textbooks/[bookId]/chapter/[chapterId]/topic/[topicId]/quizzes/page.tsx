@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
   Card,
   CardContent,
@@ -41,13 +43,16 @@ import {
     DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Textbook, Chapter, Question, Topic } from '@/lib/types';
+
 
 type Quiz = {
     id: string;
@@ -61,12 +66,11 @@ type Quiz = {
     topicId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
-    questions?: any[];
+    questions?: Question[];
 }
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
-
 
 export default function ManageTopicQuizzesPage() {
     const params = useParams();
@@ -78,20 +82,32 @@ export default function ManageTopicQuizzesPage() {
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [loading, setLoading] = useState(true);
     const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [chapter, setChapter] = useState<Chapter | null>(null);
+    const [topic, setTopic] = useState<Topic | null>(null);
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
-    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({
+    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
         subtitle: '',
         difficulty: ['Medium'],
         questionSource: ['Random from Topic']
     });
 
-
     const fetchQuizzes = async () => {
         if (!topicId) return;
         setLoading(true);
         try {
+            const [textbookSnap, chapterSnap, topicSnap] = await Promise.all([
+                getDoc(doc(db, 'textbooks', textbookId)),
+                getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId)),
+                getDoc(doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics`, topicId))
+            ]);
+            if (textbookSnap.exists()) setTextbook({id: textbookSnap.id, ...textbookSnap.data()} as Textbook);
+            if (chapterSnap.exists()) setChapter({id: chapterSnap.id, ...chapterSnap.data()} as Chapter);
+            if (topicSnap.exists()) setTopic({id: topicSnap.id, ...topicSnap.data()} as Topic);
+
             const allQuizzes = (await getAllContent("Quiz")) as Quiz[];
             const topicQuizzes = allQuizzes.filter(quiz => quiz.topicId === topicId);
             setQuizzes(topicQuizzes);
@@ -129,13 +145,13 @@ export default function ManageTopicQuizzesPage() {
             setQuizToDelete(null);
         }
     };
-
-     const handleOpenDialog = (quiz: Quiz | null) => {
+    
+    const handleOpenDialog = (quiz: Quiz | null) => {
         setEditingQuiz(quiz);
-        const difficultyArray = (quiz?.difficulty && Array.isArray(quiz.difficulty) ? quiz.difficulty : ['Medium']) as any[];
-        const sourceArray = (quiz?.questionSource && Array.isArray(quiz.questionSource) ? quiz.questionSource : ['Random from Topic']) as any[];
+        const difficultyArray = (quiz?.difficulty && Array.isArray(quiz.difficulty) ? quiz.difficulty : ['Medium']) as ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+        const sourceArray = (quiz?.questionSource && Array.isArray(quiz.questionSource) ? quiz.questionSource : ['Random from Topic']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
         
-        const subtitle = quiz ? quiz.subtitle || `Quiz ${quizzes.findIndex(t => t.id === quiz.id) + 1}` : `Quiz ${quizzes.length + 1}`;
+        const subtitle = quiz ? quiz.subtitle || `Quiz ${quizzes.findIndex(q => q.id === quiz.id) + 1}` : `Quiz ${quizzes.length + 1}`;
         setQuizData(quiz ? { title: quiz.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Topic'] });
         setIsDialogOpen(true);
     };
@@ -145,7 +161,7 @@ export default function ManageTopicQuizzesPage() {
             toast({ variant: 'destructive', title: 'Title is required.' });
             return;
         }
-
+        
         const contentToSave: any = { 
             ...quizData, 
             testType: 'Quiz',
@@ -171,7 +187,15 @@ export default function ManageTopicQuizzesPage() {
             toast({ variant: 'destructive', title: 'Error saving quiz', description: (error as Error).message });
         }
     };
-
+    
+    const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Topic Title]', topic?.title || '')
+            .replace('[Chapter Title]', chapter?.title || '')
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setQuizData(prev => ({ ...prev, title }));
+    };
 
     return (
         <div className="space-y-6">
@@ -221,7 +245,7 @@ export default function ManageTopicQuizzesPage() {
                                     <TableCell><ContentBadge type={quiz.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/quiz/${quiz.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={`/textbook-solutions/quiz/${quiz.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicId}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz/${quiz.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
@@ -258,7 +282,18 @@ export default function ManageTopicQuizzesPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="quiz-title">Title</Label>
-                            <Input id="quiz-title" value={quizData.title} onChange={e => setQuizData(p => ({...p, title: e.target.value}))} />
+                             <div className="flex gap-2">
+                                <Input id="quiz-title" value={quizData.title} onChange={e => setQuizData(p => ({...p, title: e.target.value}))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] Quick Quiz')}>[Topic Title] Quick Quiz</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Topic Title] Pop Quiz')}>[Topic Title] Pop Quiz</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
@@ -266,17 +301,17 @@ export default function ManageTopicQuizzesPage() {
                                 {difficultyOptions.map(option => (
                                     <div key={option} className="flex items-center space-x-2">
                                         <Checkbox
-                                            id={`diff-${option}`}
-                                            checked={quizData.difficulty.includes(option)}
+                                            id={`diff-quiz-${option}`}
+                                            checked={quizData.difficulty.includes(option as any)}
                                             onCheckedChange={(checked) => {
                                                 const currentDifficulties = quizData.difficulty;
                                                 const newDifficulties = checked
-                                                    ? [...currentDifficulties, option]
+                                                    ? [...currentDifficulties, option as any]
                                                     : currentDifficulties.filter(d => d !== option);
-                                                setQuizData(prev => ({...prev, difficulty: newDifficulties as any[] }));
+                                                setQuizData(prev => ({...prev, difficulty: newDifficulties }));
                                             }}
                                         />
-                                        <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        <label htmlFor={`diff-quiz-${option}`} className="text-sm font-medium leading-none">{option}</label>
                                     </div>
                                 ))}
                             </div>
@@ -287,17 +322,17 @@ export default function ManageTopicQuizzesPage() {
                                 {questionSourceOptions.map(option => (
                                      <div key={option} className="flex items-center space-x-2">
                                          <Checkbox
-                                            id={`source-${option}`}
-                                            checked={quizData.questionSource.includes(option)}
+                                            id={`source-quiz-${option}`}
+                                            checked={quizData.questionSource.includes(option as any)}
                                             onCheckedChange={(checked) => {
                                                 const currentSources = quizData.questionSource;
                                                 const newSources = checked
-                                                    ? [...currentSources, option]
+                                                    ? [...currentSources, option as any]
                                                     : currentSources.filter(s => s !== option);
-                                                setQuizData(prev => ({...prev, questionSource: newSources as any[] }));
+                                                setQuizData(prev => ({...prev, questionSource: newSources }));
                                             }}
                                         />
-                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        <label htmlFor={`source-quiz-${option}`} className="text-sm font-medium leading-none">{option}</label>
                                      </div>
                                 ))}
                             </div>

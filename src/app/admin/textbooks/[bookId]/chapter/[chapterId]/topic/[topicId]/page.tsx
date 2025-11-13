@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,7 +8,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Loader2, Award, CheckSquare, FileQuestion, Book } from "lucide-react";
+import { ArrowLeft, Loader2, Award, CheckSquare, FileQuestion, Book, BookOpen } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import type { Topic, Chapter, Textbook } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -67,20 +68,20 @@ export default function ManageTopicPage() {
         {
             title: "Manage Quizzes",
             description: "Create and manage quizzes for this topic.",
-            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quiz`,
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/quizzes`,
             icon: <Award />,
         },
         {
             title: "Manage Exams",
             description: "Create and manage exams for this topic.",
-            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/exam`,
+            link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/exams`,
             icon: <Award />,
         },
         {
             title: "Manage Additional Resources",
             description: "Add videos, PDFs, and other supplementary materials.",
             link: `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}/resources`,
-            icon: <Book />,
+            icon: <BookOpen />,
         }
     ];
 
@@ -121,7 +122,6 @@ export default function ManageTopicPage() {
             </header>
 
             <section>
-                <h2 className="text-2xl font-semibold font-headline mb-4">Manage Content</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {managementActions.map(action => (
                         <Card key={action.title} className="hover:shadow-md transition-shadow">
