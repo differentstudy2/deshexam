@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -29,26 +29,41 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash2, PlusCircle } from 'lucide-react';
+import { Eye, Edit, Trash2, PlusCircle, ArrowLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getChaptersByTextbookId, getTextbookById } from '@/lib/firebase/firestore';
+import { getChaptersByTextbookId, getTextbookById, deleteQuestionFromChapter } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { Textbook, Chapter, Question } from '@/lib/types';
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 export default function ManageTextbookQuestionsPage() {
     const params = useParams();
+    const router = useRouter();
     const textbookId = params.bookId as string;
     const { toast } = useToast();
 
     const [textbook, setTextbook] = useState<Textbook | null>(null);
     const [allQuestions, setAllQuestions] = useState<{question: Question, chapter: Chapter}[]>([]);
+    const [chapters, setChapters] = useState<Chapter[]>([]);
     const [loading, setLoading] = useState(true);
     const [itemToDelete, setItemToDelete] = useState<{question: Question, chapter: Chapter} | null>(null);
     
+    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+    const [selectedChapterForAdd, setSelectedChapterForAdd] = useState('');
+
     useEffect(() => {
         const fetchData = async () => {
             if (!textbookId) return;
@@ -57,9 +72,11 @@ export default function ManageTextbookQuestionsPage() {
                 const textbookData = await getTextbookById(textbookId);
                 setTextbook(textbookData as Textbook);
 
-                const chapters = await getChaptersByTextbookId(textbookId);
+                const chaptersData = await getChaptersByTextbookId(textbookId);
+                setChapters(chaptersData);
+                
                 let questions: {question: Question, chapter: Chapter}[] = [];
-                for(const chapter of chapters) {
+                for(const chapter of chaptersData) {
                     const chapterData = (await getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapter.id))).data() as Chapter;
                     if(chapterData.textbookQuestions) {
                         questions = [...questions, ...chapterData.textbookQuestions.map(q => ({question: q, chapter: chapterData}))];
@@ -85,9 +102,7 @@ export default function ManageTextbookQuestionsPage() {
         if (!itemToDelete) return;
         try {
             const { question, chapter } = itemToDelete;
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapter.id);
-            const updatedQuestions = chapter.textbookQuestions?.filter(q => q.id !== question.id) || [];
-            await updateDoc(chapterRef, { textbookQuestions: updatedQuestions });
+            await deleteQuestionFromChapter(textbookId, chapter.id, question.id);
             
             toast({
                 title: 'Question Deleted',
@@ -102,6 +117,13 @@ export default function ManageTextbookQuestionsPage() {
             });
         } finally {
             setItemToDelete(null);
+        }
+    };
+    
+    const handleContinue = () => {
+        if (selectedChapterForAdd) {
+            router.push(`/admin/textbooks/${textbookId}/chapter/${selectedChapterForAdd}/questions/add`);
+            setIsAddDialogOpen(false);
         }
     };
 
@@ -123,12 +145,36 @@ export default function ManageTextbookQuestionsPage() {
                         All textbook questions for "{textbook?.title}".
                     </p>
                 </div>
-                 <Button asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/add-question`}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add New Question
-                    </Link>
-                </Button>
+                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button><PlusCircle className="mr-2 h-4 w-4" /> Add New Question</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Add New Question</DialogTitle>
+                            <DialogDescription>Select the chapter to add the question to.</DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="chapter-select">Chapter</Label>
+                                <Select value={selectedChapterForAdd} onValueChange={setSelectedChapterForAdd}>
+                                    <SelectTrigger id="chapter-select">
+                                        <SelectValue placeholder="Select a chapter..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {chapters.map(chap => (
+                                            <SelectItem key={chap.id} value={chap.id}>{chap.title}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+                            <Button onClick={handleContinue} disabled={!selectedChapterForAdd}>Continue</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                 </Dialog>
             </div>
              <Card>
                 <CardHeader>
