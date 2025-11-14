@@ -33,8 +33,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getChaptersByTextbookId, getTextbookById, updateDoc, doc } from '@/lib/firebase/firestore';
+import { getChaptersByTextbookId, getTextbookById } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { Textbook, Chapter, Question } from '@/lib/types';
 
 
@@ -192,4 +193,3 @@ export default function ManageTextbookQuestionsPage() {
         </div>
     );
 }
-
