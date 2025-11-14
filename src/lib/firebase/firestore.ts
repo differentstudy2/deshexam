@@ -2205,4 +2205,24 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
     }
 }
 
+export const deleteQuestionFromChapter = async (textbookId: string, chapterId: string, questionId: string) => {
+    const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+    try {
+        const chapterSnap = await getDoc(chapterRef);
+        if (!chapterSnap.exists()) {
+            throw new Error("Chapter not found.");
+        }
+        const chapterData = chapterSnap.data();
+        const questionToDelete = chapterData.textbookQuestions?.find((q: any) => q.id === questionId);
+        if (questionToDelete) {
+            await updateDoc(chapterRef, {
+                textbookQuestions: arrayRemove(questionToDelete)
+            });
+        }
+    } catch (e) {
+        console.error("Error deleting question from chapter: ", e);
+        throw new Error("Failed to delete question from chapter.");
+    }
+};
     
+
