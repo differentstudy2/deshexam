@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, PlusCircle, Trash2, GripVertical, FileJson, Save, Image as ImageIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Trash2, GripVertical, FileJson, Save, Image as ImageIcon, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
@@ -20,6 +20,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploader } from '@/components/feature/image-uploader';
+import { Dialog, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { generateTextbookQuestions, AITextbookQuestionGeneratorInput, AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-question-generator';
+import type { Chapter } from '@/lib/types';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 const optionSchema = z.object({
@@ -56,6 +60,13 @@ const questionSchema = z.object({
 
 
 type QuestionFormValues = z.infer<typeof questionSchema>;
+type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
+
+const aiGeneratorFormSchema = z.object({
+    sourceText: z.string().min(10, "Source text must be at least 10 characters long."),
+    numQuestions: z.coerce.number().int().min(1).max(10),
+    questionTypes: z.array(z.string()).min(1, "Please select at least one question type."),
+});
 
 
 const MatchingPairsField = ({ control, fieldNamePrefix, setValue }: { control: any, fieldNamePrefix: string, setValue: any }) => {
@@ -211,6 +222,9 @@ export default function AddChapterQuestionPage() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
+    const [chapter, setChapter] = useState<Chapter | null>(null);
+    const [loadingChapter, setLoadingChapter] = useState(true);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
@@ -227,6 +241,31 @@ export default function AddChapterQuestionPage() {
             subQuestions: [],
         },
     });
+
+    const aiForm = useForm<AIGeneratorFormValues>({
+        resolver: zodResolver(aiGeneratorFormSchema),
+        defaultValues: {
+            sourceText: '',
+            numQuestions: 5,
+            questionTypes: ['Multiple Choice'],
+        }
+    });
+
+    useEffect(() => {
+        const fetchChapter = async () => {
+            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterRef);
+            if (chapterSnap.exists()) {
+                const data = chapterSnap.data() as Chapter;
+                setChapter(data);
+                aiForm.setValue('sourceText', data.content || '');
+            } else {
+                toast({ variant: 'destructive', title: "Chapter not found." });
+            }
+            setLoadingChapter(false);
+        };
+        fetchChapter();
+    }, [textbookId, chapterId, toast, aiForm]);
 
     const questionType = form.watch('type');
 
@@ -268,16 +307,109 @@ export default function AddChapterQuestionPage() {
             toast({ variant: 'destructive', title: 'Error adding question', description: (error as Error).message });
         }
     };
+    
+    const handleAIGenerate = async (data: AIGeneratorFormValues) => {
+        setIsGenerating(true);
+        try {
+            const result: AITextbookQuestionGeneratorOutput = await generateTextbookQuestions(data);
+            
+            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterRef);
+            if (!chapterSnap.exists()) throw new Error("Chapter not found.");
+            
+            const existingQuestions = chapterSnap.data().textbookQuestions || [];
+            const newQuestions = result.questions.map(q => ({...q, id: new Date().getTime().toString() + Math.random().toString(16).slice(2) }));
+            const updatedQuestions = [...existingQuestions, ...newQuestions];
+            
+            await updateDoc(chapterRef, { textbookQuestions: updatedQuestions });
+
+            toast({ title: "Questions Generated!", description: `${result.questions.length} questions have been added to the chapter.` });
+            router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
+
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'AI Generation Failed', description: (error as Error).message });
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     return (
         <div className="space-y-6">
-            <div>
+            <div className="flex justify-between items-center">
                 <Button asChild variant="ghost">
                     <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Questions
                     </Link>
                 </Button>
+                 <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline"><Sparkles className="mr-2"/> Generate with AI</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-xl">
+                        <DialogHeader>
+                            <DialogTitle>Generate Questions with AI</DialogTitle>
+                            <DialogDescription>
+                                AI will use the chapter's content to generate questions.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <Form {...aiForm}>
+                           <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                                <FormField control={aiForm.control} name="sourceText" render={({ field }) => (
+                                    <FormItem><FormLabel>Source Content</FormLabel><FormControl><Textarea {...field} readOnly className="h-24 bg-secondary" /></FormControl><FormMessage/></FormItem>
+                                )} />
+                                <div className="grid grid-cols-2 gap-4">
+                                     <FormField control={aiForm.control} name="numQuestions" render={({ field }) => (
+                                        <FormItem><FormLabel>Number of Questions</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage/></FormItem>
+                                    )} />
+                                     <FormField
+                                        control={aiForm.control}
+                                        name="questionTypes"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Question Types</FormLabel>
+                                                <div className="space-y-2">
+                                                    {['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Grouped', 'Matching'].map(type => (
+                                                        <FormField
+                                                            key={type}
+                                                            control={aiForm.control}
+                                                            name="questionTypes"
+                                                            render={({ field }) => {
+                                                                return (
+                                                                <FormItem key={type} className="flex flex-row items-start space-x-3 space-y-0">
+                                                                    <FormControl>
+                                                                        <Checkbox
+                                                                            checked={field.value?.includes(type)}
+                                                                            onCheckedChange={(checked) => {
+                                                                                return checked
+                                                                                ? field.onChange([...field.value, type])
+                                                                                : field.onChange(field.value?.filter((value) => value !== type))
+                                                                            }}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormLabel className="font-normal">
+                                                                        {type}
+                                                                    </FormLabel>
+                                                                </FormItem>
+                                                                )
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit" disabled={isGenerating}>
+                                        {isGenerating ? <Loader2 className="animate-spin" /> : "Generate"}
+                                    </Button>
+                                </DialogFooter>
+                           </form>
+                        </Form>
+                    </DialogContent>
+                 </Dialog>
             </div>
             <header>
                 <h1 className="font-headline text-3xl font-bold">Add New Question</h1>
@@ -295,7 +427,7 @@ export default function AddChapterQuestionPage() {
                                     <FormControl><Textarea {...field} /></FormControl>
                                     <FormDescription>
                                         {questionType === 'Fill in the Blank' && 'Use four underscores `____` to indicate where the blank should be.'}
-                                        {questionType === 'Matching' && 'Provide the instruction for matching, e.g., "Match the items from Column A to Column B."'}
+                                        {questionType === 'Matching' && 'Provide the instruction for matching, e.g., "Match Column A with Column B."'}
                                         {questionType === 'Grouped' && 'Enter the main instruction or passage that applies to all sub-questions below.'}
                                     </FormDescription>
                                     <FormMessage />
