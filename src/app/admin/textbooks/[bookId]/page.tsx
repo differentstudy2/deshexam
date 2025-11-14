@@ -2,11 +2,11 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase/client';
 import type { Textbook } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
-import { ArrowLeft, Book, CheckSquare, Edit, FileQuestion, Library, Award } from 'lucide-react';
+import { ArrowLeft, Book, CheckSquare, Edit, FileQuestion, Library, Award, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
