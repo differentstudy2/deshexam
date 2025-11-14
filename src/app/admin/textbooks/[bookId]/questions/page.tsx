@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, PlusCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { getChaptersByTextbookId, getTextbookById } from '@/lib/firebase/firestore';
@@ -123,6 +123,12 @@ export default function ManageTextbookQuestionsPage() {
                         All textbook questions for "{textbook?.title}".
                     </p>
                 </div>
+                 <Button asChild>
+                    <Link href={`/admin/textbooks/${textbookId}/add-question`}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add New Question
+                    </Link>
+                </Button>
             </div>
              <Card>
                 <CardHeader>
