@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown, Clock, HelpCircle, BarChart } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -405,7 +405,7 @@ export default function ChapterClientPage() {
         )
     };
 
-    function getUrlForTest(testType: string, testId: string) {
+    function getUrlForTest(testType: string, testId: string, topicId?: string) {
         const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
         const topicSegment = topicId ? `/topic/${topicId}` : '/topic/null';
         return `/textbook-solutions/${typeSlug}/${testId}/textbook/${textbookId}/chapter/${chapterId}${topicSegment}`;
@@ -438,7 +438,7 @@ export default function ChapterClientPage() {
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
                     <Button asChild className="w-full">
-                      <Link href={getUrlForTest(item.testType, item.id)}>Start {type}</Link>
+                      <Link href={getUrlForTest(item.testType, item.id, (item as any).topicId)}>Start {type}</Link>
                     </Button>
                   </CardFooter>
                 </Card>
