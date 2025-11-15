@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback } from 'react';
@@ -209,10 +208,12 @@ export default function ChapterClientPage() {
             
             const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
             
+            // Fetch chapter-level practice sets
             const practiceSetsRef = collection(chapterDocRef, 'practiceSets');
             const practiceSetsSnap = await getDocs(practiceSetsRef);
             chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
             
+            // Fetch chapter-level resources
             const resourcesRef = collection(chapterDocRef, 'resources');
             const resourcesSnap = await getDocs(resourcesRef);
             chapterData.resources = resourcesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Resource));
@@ -529,7 +530,7 @@ export default function ChapterClientPage() {
                         <Tabs defaultValue="content" className="w-full mt-8">
                             <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
-                                <TabsTrigger value="resources">Resources</TabsTrigger>
+                                {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
                                 {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
                                 {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
@@ -619,4 +620,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
