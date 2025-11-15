@@ -157,9 +157,12 @@ export default function ChapterClientPage() {
     const [textbook, setTextbook] = useState<Textbook | null>(null);
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
-    const [exams, setExams] = useState<Exam[]>([]);
-    const [mockTests, setMockTests] = useState<Exam[]>([]);
-    const [quizzes, setQuizzes] = useState<Exam[]>([]);
+    
+    const [exams, setExams] = useState<Exam[] | null>(null);
+    const [mockTests, setMockTests] = useState<Exam[] | null>(null);
+    const [quizzes, setQuizzes] = useState<Exam[] | null>(null);
+    const [loadingTabData, setLoadingTabData] = useState(false);
+    
     const [error, setError] = useState<string | null>(null);
     
     const textbookId = params.bookId as string;
@@ -175,7 +178,7 @@ export default function ChapterClientPage() {
     const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
 
-    const fetchPageData = useCallback(async () => {
+    const fetchInitialData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -193,16 +196,6 @@ export default function ChapterClientPage() {
             chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
             setChapters(chaptersData);
             
-            const [allExams, allMockTests, allQuizzes] = await Promise.all([
-                getAllContent("Exam"),
-                getAllContent("Mock Test"),
-                getAllContent("Quiz")
-            ]);
-
-            setExams((allExams as Exam[]).filter((exam: any) => exam.chapterId === chapterId));
-            setMockTests((allMockTests as Exam[]).filter((test: any) => test.chapterId === chapterId));
-            setQuizzes((allQuizzes as Exam[]).filter((quiz: any) => quiz.chapterId === chapterId));
-
             const chapterDocRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
             const chapterSnap = await getDoc(chapterDocRef);
             if (!chapterSnap.exists()) throw new Error("Chapter not found.");
@@ -221,13 +214,13 @@ export default function ChapterClientPage() {
         } finally {
             setLoading(false);
         }
-    }, [textbookId, chapterId, toast, router]);
+    }, [textbookId, chapterId, toast]);
 
     useEffect(() => {
         if(textbookId && chapterId) {
-            fetchPageData();
+            fetchInitialData();
         }
-    }, [fetchPageData, textbookId, chapterId]);
+    }, [fetchInitialData, textbookId, chapterId]);
 
 
     const searchParams = useSearchParams();
@@ -341,6 +334,28 @@ export default function ChapterClientPage() {
         }
     };
 
+    const handleTabChange = async (tab: string) => {
+        const fetchContent = async (type: "Exam" | "Mock Test" | "Quiz", setter: React.Dispatch<React.SetStateAction<Exam[] | null>>) => {
+            setLoadingTabData(true);
+            try {
+                const allContent = await getAllContent(type) as Exam[];
+                setter(allContent.filter((item: any) => item.chapterId === chapterId));
+            } catch (e) {
+                toast({ variant: "destructive", title: `Error loading ${type}s`, description: (e as Error).message });
+            } finally {
+                setLoadingTabData(false);
+            }
+        };
+
+        if (tab === 'exams' && exams === null) {
+            fetchContent('Exam', setExams);
+        } else if (tab === 'mock-tests' && mockTests === null) {
+            fetchContent('Mock Test', setMockTests);
+        } else if (tab === 'quizzes' && quizzes === null) {
+            fetchContent('Quiz', setQuizzes);
+        }
+    };
+
     if (loading) {
         return (
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr]">
@@ -391,7 +406,7 @@ export default function ChapterClientPage() {
                 onChapterToggle={fetchChapterTopics}
                 loadingTopics={loadingTopics}
                 textbookId={textbookId}
-                exams={exams}
+                exams={[]}
             />
         </div>
     );
@@ -434,40 +449,48 @@ export default function ChapterClientPage() {
         return `/textbook-solutions/${typeSlug}/${testId}/textbook/${textbookId}/chapter/${chapterId}${topicSegment}`;
     }
 
-    const ContentList = ({ items, type }: { items: Exam[], type: string }) => (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item) => (
-                <Card key={item.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                  <CardHeader className="p-0 relative">
-                    <Image
-                      src={`https://picsum.photos/seed/${item.id}/400/225`}
-                      alt={item.title}
-                      width={400}
-                      height={225}
-                      className="w-full h-auto object-cover"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <ContentBadge type={item.access} />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow p-4">
-                    <p className="text-sm font-medium text-primary">{item.subject}</p>
-                    <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{item.title}</CardTitle>
-                    <div className="flex items-center text-sm text-muted-foreground space-x-4">
-                      <div className="flex items-center gap-1.5"><HelpCircle className="w-4 h-4" /><span>{item.questions?.length || 0} Qs</span></div>
-                      <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{item.duration} min</span></div>
-                      <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{item.difficulty}</span></div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Button asChild className="w-full">
-                      <Link href={getUrlForTest(item.testType, item.id, (item as any).topicId)}>Start {type}</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-            ))}
-        </div>
-    );
+    const ContentList = ({ items, type }: { items: Exam[] | null, type: string }) => {
+        if(items === null) {
+            return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>
+        }
+        if(items.length === 0) {
+            return <p className="text-muted-foreground text-center py-8">No {type.toLowerCase()}s available for this chapter.</p>
+        }
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {items.map((item) => (
+                    <Card key={item.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                    <CardHeader className="p-0 relative">
+                        <Image
+                        src={`https://picsum.photos/seed/${item.id}/400/225`}
+                        alt={item.title}
+                        width={400}
+                        height={225}
+                        className="w-full h-auto object-cover"
+                        />
+                        <div className="absolute top-2 right-2">
+                        <ContentBadge type={item.access} />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow p-4">
+                        <p className="text-sm font-medium text-primary">{item.subject}</p>
+                        <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{item.title}</CardTitle>
+                        <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                        <div className="flex items-center gap-1.5"><HelpCircle className="w-4 h-4" /><span>{item.questions?.length || 0} Qs</span></div>
+                        <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{item.duration} min</span></div>
+                        <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{item.difficulty}</span></div>
+                        </div>
+                    </CardContent>
+                    <CardFooter className="p-4 pt-0">
+                        <Button asChild className="w-full">
+                        <Link href={getUrlForTest(item.testType, item.id, (item as any).topicId)}>Start {type}</Link>
+                        </Button>
+                    </CardFooter>
+                    </Card>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background">
@@ -549,15 +572,15 @@ export default function ChapterClientPage() {
                             <p className="prose dark:prose-invert lg:prose-lg max-w-none my-8 text-muted-foreground">{activeChapter.description}</p>
                         )}
                         
-                        <Tabs defaultValue="content" className="w-full mt-8">
+                        <Tabs defaultValue="content" className="w-full mt-8" onValueChange={handleTabChange}>
                             <TabsList className="grid w-full grid-cols-2 md:grid-cols-8 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
                                 {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
                                 {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
-                                {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
-                                {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
-                                {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
+                                <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>
+                                <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
+                                <TabsTrigger value="exams">Exams</TabsTrigger>
                             </TabsList>
                             <TabsContent value="content" className="mt-6">
                                  {activeChapter?.content ? (
@@ -604,13 +627,13 @@ export default function ChapterClientPage() {
                                 ) : <p className="text-muted-foreground text-center py-8">No practice sets available.</p>}
                              </TabsContent>
                              <TabsContent value="mock-tests" className="mt-6">
-                                {mockTests.length > 0 ? <ContentList items={mockTests} type="Mock Test" /> : <p className="text-muted-foreground text-center py-8">No mock tests available.</p>}
+                                <ContentList items={mockTests} type="Mock Test" />
                              </TabsContent>
                              <TabsContent value="quizzes" className="mt-6">
-                                {quizzes.length > 0 ? <ContentList items={quizzes} type="Quiz" /> : <p className="text-muted-foreground text-center py-8">No quizzes available.</p>}
+                                <ContentList items={quizzes} type="Quiz" />
                             </TabsContent>
                             <TabsContent value="exams" className="mt-6">
-                                {exams.length > 0 ? <ContentList items={exams} type="Exam" /> : <p className="text-muted-foreground text-center py-8">No exams available.</p>}
+                                <ContentList items={exams} type="Exam" />
                             </TabsContent>
                         </Tabs>
                     </div>
