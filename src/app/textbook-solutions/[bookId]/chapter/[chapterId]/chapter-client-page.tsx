@@ -33,7 +33,7 @@ import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentBadge } from '@/components/content-badge';
 
 
@@ -532,7 +532,6 @@ export default function ChapterClientPage() {
                                 {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
                                 {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
                                 {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
-                                {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                             </TabsList>
                             <TabsContent value="content" className="mt-6">
                                  {activeChapter?.content ? (
@@ -544,6 +543,19 @@ export default function ChapterClientPage() {
                                         <BookOpen className="w-16 h-16 mx-auto mb-4"/>
                                         <h2 className="text-xl font-semibold">No Content Yet</h2>
                                         <p>There is no written content available for this chapter yet. Check out the other tabs for resources or practice sets!</p>
+                                    </div>
+                                 )}
+                                {activeChapter?.resources && activeChapter.resources.length > 0 && (
+                                    <div className="mt-12">
+                                     <h2 className="font-headline text-2xl font-bold mb-4">Additional Resources</h2>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {activeChapter.resources.map(res => (
+                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
+                                                {getResourceIcon(res.type)}
+                                                <span className="flex-grow text-left">{res.title}</span>
+                                            </Button>
+                                        ))}
+                                    </div>
                                     </div>
                                  )}
                             </TabsContent>
@@ -574,18 +586,6 @@ export default function ChapterClientPage() {
                             </TabsContent>
                             <TabsContent value="exams" className="mt-6">
                                 {exams.length > 0 ? <ContentList items={exams} type="Exam" /> : <p className="text-muted-foreground text-center py-8">No exams available.</p>}
-                            </TabsContent>
-                             <TabsContent value="resources" className="mt-6">
-                                {activeChapter?.resources && activeChapter.resources.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {activeChapter.resources.map(res => (
-                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                                {getResourceIcon(res.type)}
-                                                <span className="flex-grow text-left">{res.title}</span>
-                                            </Button>
-                                        ))}
-                                    </div>
-                                ) : <p className="text-muted-foreground text-center py-8">No additional resources available.</p>}
                             </TabsContent>
                         </Tabs>
                     </div>
