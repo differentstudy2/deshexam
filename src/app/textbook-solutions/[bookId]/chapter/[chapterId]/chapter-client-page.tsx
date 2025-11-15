@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -59,7 +59,7 @@ const ExamIcon = () => (
 
 const SidebarNav = ({
   chapters,
-  topics,
+  topicsByChapter,
   activeChapterId,
   activeTopicId,
   onChapterToggle,
@@ -68,56 +68,81 @@ const SidebarNav = ({
   exams,
 }: {
   chapters: Chapter[];
-  topics: { [key: string]: Topic[] };
+  topicsByChapter: { [key: string]: Topic[] };
   activeChapterId: string | null;
   activeTopicId: string | null;
   onChapterToggle: (chapterId: string) => void;
   loadingTopics: string | null;
   textbookId: string;
   exams: any[];
-}) => (
+}) => {
+    const hasTopics = (chapterId: string) => {
+        return topicsByChapter[chapterId] && topicsByChapter[chapterId].length > 0;
+    }
+    return (
     <div className="flex flex-col h-full">
         <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
-          {chapters.map((chapter, index) => (
-            <AccordionItem value={chapter.id} key={chapter.id}>
-              <AccordionTrigger
-                className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md justify-start"
-              >
-                 <div className="flex items-center gap-3">
-                    <ChapterIcon />
-                    <span>{chapter.title}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pt-2 pb-0">
-                {loadingTopics === chapter.id ? (
-                    <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
-                ) : (
-                    <ul className="space-y-1 pl-4 border-l">
-                     {(topics[chapter.id] || []).map(topic => (
-                       <li key={topic.id}>
-                         <Button
-                           variant="ghost"
-                           asChild
-                           className={cn(
-                             "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
-                             activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
+          {chapters.map((chapter, index) => {
+              const chapterHasTopics = hasTopics(chapter.id);
+              if (chapterHasTopics) {
+                  return (
+                    <AccordionItem value={chapter.id} key={chapter.id}>
+                        <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md justify-start">
+                           <div className="flex items-center gap-3">
+                               <ChapterIcon />
+                               <span>{chapter.title}</span>
+                           </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pb-0">
+                           {loadingTopics === chapter.id ? (
+                               <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
+                           ) : (
+                               <ul className="space-y-1 pl-4 border-l">
+                                {(topicsByChapter[chapter.id] || []).map(topic => (
+                                  <li key={topic.id}>
+                                    <Button
+                                      variant="ghost"
+                                      asChild
+                                      className={cn(
+                                        "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
+                                        activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
+                                      )}
+                                    >
+                                      <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-muted-foreground" />
+                                        <span>{topic.title}</span>
+                                      </Link>
+                                    </Button>
+                                  </li>
+                                ))}
+                                {(!topicsByChapter[chapter.id] || topicsByChapter[chapter.id].length === 0) && (
+                                   <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
+                                )}
+                              </ul>
                            )}
-                         >
-                           <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
-                             <FileText className="w-4 h-4 text-muted-foreground" />
-                             <span>{topic.title}</span>
-                           </Link>
-                         </Button>
-                       </li>
-                     ))}
-                     {(!topics[chapter.id] || topics[chapter.id].length === 0) && (
-                        <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
-                     )}
-                   </ul>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                        </AccordionContent>
+                    </AccordionItem>
+                  )
+              }
+              // If no topics, render as a direct link
+              return (
+                  <div key={chapter.id} className="border-b">
+                      <Button
+                        variant="ghost"
+                        asChild
+                        className={cn(
+                          "w-full justify-start text-left h-auto py-3 px-3 text-base font-medium rounded-none",
+                          activeChapterId === chapter.id && !activeTopicId ? "bg-primary/10 text-primary font-semibold" : ""
+                        )}
+                      >
+                          <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="flex items-center gap-3">
+                            <ChapterIcon />
+                            <span>{chapter.title}</span>
+                          </Link>
+                      </Button>
+                  </div>
+              )
+          })}
         </Accordion>
 
         {exams.length > 0 && (
@@ -146,7 +171,7 @@ const SidebarNav = ({
             </Accordion>
         )}
     </div>
-);
+)};
 
 
 export default function ChapterClientPage() {
@@ -242,11 +267,11 @@ export default function ChapterClientPage() {
       const activeContentSource = currentActiveTopic || chapters.find(c => c.id === chapterId);
       if (activeContentSource?.content) {
         const idMap = new Map();
-        const matches = activeContentSource.content.matchAll(/^(#+)\\s+(.*)/gm);
+        const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
         const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
-          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\\w-]+/g, '');
+          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
           
           let id = baseId;
           let count = 1;
@@ -411,7 +436,7 @@ export default function ChapterClientPage() {
          <div className="p-2">
             <SidebarNav 
                 chapters={chapters}
-                topics={topicsByChapter}
+                topicsByChapter={topicsByChapter}
                 activeChapterId={chapterId}
                 activeTopicId={activeTopicId}
                 onChapterToggle={fetchChapterTopics}
@@ -531,7 +556,7 @@ export default function ChapterClientPage() {
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm overflow-hidden">
-                     <ol className="flex items-center gap-1.5 whitespace-nowrap">
+                    <ol className="flex items-center gap-1.5 whitespace-nowrap">
                         {breadcrumbs.map((crumb, index) => (
                            <li key={index} className="flex items-center gap-1.5">
                                <Link href={crumb.href} className="hover:text-foreground truncate max-w-[100px] sm:max-w-none">{crumb.name}</Link>
