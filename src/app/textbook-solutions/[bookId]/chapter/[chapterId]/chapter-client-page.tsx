@@ -213,11 +213,9 @@ export default function ChapterClientPage() {
             const practiceSetsSnap = await getDocs(practiceSetsRef);
             chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
             
-            // Fetch chapter-level resources
-            const resourcesRef = collection(chapterDocRef, 'resources');
-            const resourcesSnap = await getDocs(resourcesRef);
-            chapterData.resources = resourcesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Resource));
-
+            // This was the missing piece: The resources are an array on the chapter document.
+            // No extra fetch is needed if they are already on the document.
+            // The `chapterData` variable now holds the resources if they exist.
 
             setActiveChapter(chapterData);
 
