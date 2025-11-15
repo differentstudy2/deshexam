@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -26,7 +25,7 @@ import {
     deleteQuestionFromContent,
     getContentById
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -183,7 +182,7 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
             await Promise.all(deletePromises);
             const updatedTest = await getContentById(quizId);
             setTest(updatedTest as Quiz);
-            toast({ title: `${selectedQuestions.length} question(s) deleted.` });
+            toast({ title: `${'selectedQuestions.length'} question(s) deleted.` });
             setSelectedQuestions([]);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error deleting questions', description: (error as Error).message });
@@ -201,7 +200,7 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
             
             const updatedTest = await getContentById(quizId);
             setTest(updatedTest as Quiz);
-            toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions have been added.`});
+            toast({ title: 'Import Successful!', description: `${'questionsToImport.length'} questions have been added.`});
             setIsImportDialogOpen(false);
             setJsonText('');
           } catch (error) {
@@ -255,7 +254,7 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
             
             const updatedTest = await getContentById(quizId);
             setTest(updatedTest as Quiz);
-            toast({ title: 'Questions Generated!', description: `${result.questions.length} new questions have been added.` });
+            toast({ title: 'Questions Generated!', description: `${'result.questions.length'} new questions have been added.` });
             setIsAIGeneratorOpen(false);
         } catch (error) {
             toast({ variant: "destructive", title: 'AI Generation Failed', description: (error as Error).message });
@@ -369,3 +368,4 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
         </div>
     );
 }
+ 
