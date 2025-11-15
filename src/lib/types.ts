@@ -5,6 +5,7 @@ export type Resource = {
     type: 'video' | 'audio' | 'pdf' | 'doc';
     title: string;
     url: string;
+    featureImage?: string;
 };
 
 export type Textbook = {

@@ -17,6 +17,9 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import Image from "next/image";
+import { ImageUploader } from "@/components/feature/image-uploader";
+
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -30,7 +33,10 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
 
     return (
         <div className="flex items-center gap-4 p-3 border rounded-md">
-            {getIcon()}
+            {resource.featureImage && (
+                <Image src={resource.featureImage} alt={resource.title} width={64} height={36} className="w-16 h-9 object-cover rounded-sm" />
+            )}
+            {!resource.featureImage && getIcon()}
             <div className="flex-grow">
                 <p className="font-semibold">{resource.title}</p>
                 <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate hover:underline">{resource.url}</a>
@@ -52,7 +58,7 @@ export default function ManageResourcesPage() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
-    const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
+    const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string, featureImage?: string }>({ type: 'video', title: '', url: '', featureImage: '' });
     const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,9 +80,9 @@ export default function ManageResourcesPage() {
     const openResourceDialog = (resource: Resource | null) => {
         setEditingResource(resource);
         if (resource) {
-            setNewResource({ type: resource.type, title: resource.title, url: resource.url });
+            setNewResource({ type: resource.type, title: resource.title, url: resource.url, featureImage: resource.featureImage || '' });
         } else {
-            setNewResource({ type: 'video', title: '', url: '' });
+            setNewResource({ type: 'video', title: '', url: '', featureImage: '' });
         }
         setIsDialogOpen(true);
     }
@@ -140,6 +146,22 @@ export default function ManageResourcesPage() {
             }
         }
     };
+    
+    const getYouTubeId = (url: string) => {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        const url = e.target.value;
+        const ytId = getYouTubeId(url);
+        if (ytId) {
+            const thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+            const videoTitle = `YouTube Video: ${ytId}`; // Placeholder, can't fetch title client-side easily
+            setNewResource(prev => ({...prev, featureImage: thumbnailUrl, title: prev.title || videoTitle}));
+        }
+    }
 
 
     if (loading) {
@@ -186,6 +208,14 @@ export default function ManageResourcesPage() {
                         <DialogTitle>{editingResource ? 'Edit' : 'Add'} Resource</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label>Feature Image</Label>
+                            <ImageUploader 
+                                fieldName="featureImage"
+                                onUrlChange={(url) => setNewResource(prev => ({...prev, featureImage: url}))}
+                                value={newResource.featureImage}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label>Resource Type</Label>
                             <Select value={newResource.type} onValueChange={(v) => setNewResource({...newResource, type: v as any})}>
@@ -205,7 +235,12 @@ export default function ManageResourcesPage() {
                          <div className="space-y-2">
                             <Label>URL / File</Label>
                             <div className="flex gap-2">
-                                <Input placeholder="https://example.com/resource" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
+                                <Input 
+                                    placeholder="https://example.com/resource" 
+                                    value={newResource.url} 
+                                    onChange={(e) => setNewResource({...newResource, url: e.target.value})}
+                                    onBlur={handleUrlBlur}
+                                />
                                  <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
                                     {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
                                  </Button>
