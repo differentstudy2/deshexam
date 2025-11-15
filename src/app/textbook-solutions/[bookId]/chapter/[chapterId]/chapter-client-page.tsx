@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Lightbulb, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown, Clock, HelpCircle, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -26,7 +26,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardFooter, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -34,6 +34,7 @@ import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ContentBadge } from '@/components/content-badge';
 
 
 const getResourceIcon = (type: string) => {
@@ -156,6 +157,8 @@ export default function ChapterClientPage() {
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
     const [exams, setExams] = useState<Exam[]>([]);
+    const [mockTests, setMockTests] = useState<Exam[]>([]);
+    const [quizzes, setQuizzes] = useState<Exam[]>([]);
     const [error, setError] = useState<string | null>(null);
     
     const textbookId = params.bookId as string;
@@ -175,10 +178,9 @@ export default function ChapterClientPage() {
         setLoading(true);
         setError(null);
         try {
-            const [textbookSnap, chaptersQuerySnap, allExams] = await Promise.all([
+            const [textbookSnap, chaptersQuerySnap] = await Promise.all([
                 getDoc(doc(db, 'textbooks', textbookId)),
                 getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
-                getAllContent("Exam")
             ]);
 
             if (!textbookSnap.exists()) throw new Error("Textbook not found.");
@@ -190,7 +192,16 @@ export default function ChapterClientPage() {
             chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
             setChapters(chaptersData);
             
-            setExams((allExams as Exam[]).filter((exam: any) => exam.textbookId === textbookId));
+            const [allExams, allMockTests, allQuizzes] = await Promise.all([
+                getAllContent("Exam"),
+                getAllContent("Mock Test"),
+                getAllContent("Quiz")
+            ]);
+
+            setExams((allExams as Exam[]).filter((exam: any) => exam.chapterId === chapterId));
+            setMockTests((allMockTests as Exam[]).filter((test: any) => test.chapterId === chapterId));
+            setQuizzes((allQuizzes as Exam[]).filter((quiz: any) => quiz.chapterId === chapterId));
+
 
             const chapterDocRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
             const chapterSnap = await getDoc(chapterDocRef);
@@ -392,7 +403,48 @@ export default function ChapterClientPage() {
                 </div>
             </div>
         )
+    };
+
+    function getUrlForTest(testType: string, testId: string) {
+        const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+        const topicSegment = topicId ? `/topic/${topicId}` : '/topic/null';
+        return `/textbook-solutions/${typeSlug}/${testId}/textbook/${textbookId}/chapter/${chapterId}${topicSegment}`;
     }
+
+    const ContentList = ({ items, type }: { items: Exam[], type: string }) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item) => (
+                <Card key={item.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                  <CardHeader className="p-0 relative">
+                    <Image
+                      src={`https://picsum.photos/seed/${item.id}/400/225`}
+                      alt={item.title}
+                      width={400}
+                      height={225}
+                      className="w-full h-auto object-cover"
+                    />
+                    <div className="absolute top-2 right-2">
+                      <ContentBadge type={item.access} />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-grow p-4">
+                    <p className="text-sm font-medium text-primary">{item.subject}</p>
+                    <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{item.title}</CardTitle>
+                    <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                      <div className="flex items-center gap-1.5"><HelpCircle className="w-4 h-4" /><span>{item.questions?.length || 0} Qs</span></div>
+                      <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{item.duration} min</span></div>
+                      <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{item.difficulty}</span></div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="p-4 pt-0">
+                    <Button asChild className="w-full">
+                      <Link href={getUrlForTest(item.testType, item.id)}>Start {type}</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+            ))}
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-background">
@@ -401,14 +453,14 @@ export default function ChapterClientPage() {
                     <SheetTrigger asChild>
                         <Button variant="outline" size="icon"><Menu /></Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="p-0 w-80">
-                         <SheetHeader className="p-4 border-b">
-                            <SheetTitle className="sr-only">Main Navigation</SheetTitle>
-                            <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
-                                <ArrowLeft className="w-4 h-4" /> {textbook?.title}
-                            </Link>
-                        </SheetHeader>
-                        {sidebarContent}
+                     <SheetContent side="left" className="p-0 w-80">
+                       <SheetHeader className="p-4 border-b">
+                           <SheetTitle className="sr-only">Main Navigation</SheetTitle>
+                           <Link href={`/textbook-solutions/${textbookId}`} className="flex items-center gap-2 font-semibold">
+                               <ArrowLeft className="w-4 h-4" /> {textbook?.title}
+                           </Link>
+                       </SheetHeader>
+                       {sidebarContent}
                     </SheetContent>
                 </Sheet>
                  <nav className="text-sm overflow-hidden">
@@ -477,11 +529,11 @@ export default function ChapterClientPage() {
                         <Tabs defaultValue="content" className="w-full mt-8">
                             <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
-                                <TabsTrigger value="resources">Resources</TabsTrigger>
-                                <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>
-                                <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>
-                                <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
-                                <TabsTrigger value="exams">Exams</TabsTrigger>
+                                {currentActiveChapter?.resources && currentActiveChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
+                                {currentActiveChapter?.practiceSets && currentActiveChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
+                                {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
+                                {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
+                                {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
                             </TabsList>
                             <TabsContent value="content" className="mt-6">
                                  {currentActiveChapter?.content ? (
@@ -496,8 +548,8 @@ export default function ChapterClientPage() {
                                     </div>
                                  )}
                             </TabsContent>
-                            <TabsContent value="resources" className="mt-6">
-                                {currentActiveChapter?.resources && currentActiveChapter.resources.length > 0 ? (
+                            {currentActiveChapter?.resources && currentActiveChapter.resources.length > 0 && (
+                                <TabsContent value="resources" className="mt-6">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {currentActiveChapter.resources.map(res => (
                                             <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
@@ -506,28 +558,30 @@ export default function ChapterClientPage() {
                                             </Button>
                                         ))}
                                     </div>
-                                ) : (
-                                    <p className="text-center text-muted-foreground py-16">No additional resources available for this chapter.</p>
-                                )}
-                            </TabsContent>
-                             <TabsContent value="practice-sets" className="mt-6">
-                                {currentActiveChapter?.practiceSets && currentActiveChapter.practiceSets.length > 0 ? (
+                                </TabsContent>
+                            )}
+                             {currentActiveChapter?.practiceSets && currentActiveChapter.practiceSets.length > 0 && (
+                                <TabsContent value="practice-sets" className="mt-6">
                                     <div className="space-y-4">
                                         {currentActiveChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
                                     </div>
-                                ) : (
-                                     <p className="text-center text-muted-foreground py-16">No chapter-level practice sets available. Check individual topics.</p>
-                                )}
-                             </TabsContent>
-                             <TabsContent value="mock-tests" className="mt-6">
-                                <p className="text-center text-muted-foreground py-16">Mock tests for this chapter will be shown here.</p>
-                             </TabsContent>
-                             <TabsContent value="quizzes" className="mt-6">
-                                <p className="text-center text-muted-foreground py-16">Quizzes for this chapter will be shown here.</p>
-                             </TabsContent>
-                              <TabsContent value="exams" className="mt-6">
-                                <p className="text-center text-muted-foreground py-16">Exams for this chapter will be shown here.</p>
-                             </TabsContent>
+                                </TabsContent>
+                             )}
+                             {mockTests.length > 0 && (
+                                <TabsContent value="mock-tests" className="mt-6">
+                                    <ContentList items={mockTests} type="Mock Test" />
+                                </TabsContent>
+                             )}
+                             {quizzes.length > 0 && (
+                                <TabsContent value="quizzes" className="mt-6">
+                                    <ContentList items={quizzes} type="Quiz" />
+                                </TabsContent>
+                            )}
+                            {exams.length > 0 && (
+                                <TabsContent value="exams" className="mt-6">
+                                    <ContentList items={exams} type="Exam" />
+                                </TabsContent>
+                            )}
                         </Tabs>
                     </div>
                 </main>
@@ -558,4 +612,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
