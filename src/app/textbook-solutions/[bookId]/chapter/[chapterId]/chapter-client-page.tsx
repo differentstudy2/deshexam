@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -202,12 +202,17 @@ export default function ChapterClientPage() {
             setMockTests((allMockTests as Exam[]).filter((test: any) => test.chapterId === chapterId));
             setQuizzes((allQuizzes as Exam[]).filter((quiz: any) => quiz.chapterId === chapterId));
 
-
             const chapterDocRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
             const chapterSnap = await getDoc(chapterDocRef);
             if (!chapterSnap.exists()) throw new Error("Chapter not found.");
             
             const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
+            
+            // Also fetch practice sets directly attached to the chapter
+            const practiceSetsRef = collection(chapterDocRef, 'practiceSets');
+            const practiceSetsSnap = await getDocs(practiceSetsRef);
+            chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
+            
             setActiveChapter(chapterData);
 
         } catch (e: any) {
@@ -597,7 +602,7 @@ export default function ChapterClientPage() {
                             questions={pdfContent.questions} 
                             textbookTitle={textbook?.title || ''} 
                             chapterTitle={activeChapter?.title || ''}
-                            topicTitle={""}
+                            topicTitle={activeTopic?.title || ''}
                             board={textbook?.board || ''}
                             className={textbook?.class || ''}
                             subject={textbook?.subject || ''}
@@ -609,5 +614,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
-    
