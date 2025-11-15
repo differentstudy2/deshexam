@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart, Video, Mic, File as FileIcon, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -241,11 +241,11 @@ export default function ChapterClientPage() {
       const activeContentSource = currentActiveTopic || chapters.find(c => c.id === chapterId);
       if (activeContentSource?.content) {
         const idMap = new Map();
-        const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
+        const matches = activeContentSource.content.matchAll(/^(#+)\\s+(.*)/gm);
         const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
-          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+          const baseId = text.toLowerCase().replace(/\\s+/g, '-').replace(/[^\\w-]+/g, '');
           
           let id = baseId;
           let count = 1;
@@ -390,22 +390,12 @@ export default function ChapterClientPage() {
                   <Button size="sm" asChild className="flex-1">
                       <Link href={`/textbook-solutions/practice-set/${practiceSet.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicContext?.id || 'null'}`}>Start Practice</Link>
                   </Button>
-                  <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="flex-1"
-                      onClick={() => handleDownloadPdf(practiceSet, topicContext)}
-                      disabled={isGeneratingPdf === practiceSet.id}
-                  >
-                      {isGeneratingPdf === practiceSet.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
-                      Download PDF
-                  </Button>
                 </div>
             </div>
         )
     };
 
-    function getUrlForTest(testType: string, testId: string, topicId?: string) {
+    function getUrlForTest(testType: string, testId: string, topicId?: string | null) {
         const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
         const topicSegment = topicId ? `/topic/${topicId}` : '/topic/null';
         return `/textbook-solutions/${typeSlug}/${testId}/textbook/${textbookId}/chapter/${chapterId}${topicSegment}`;
@@ -529,8 +519,9 @@ export default function ChapterClientPage() {
                         <Tabs defaultValue="content" className="w-full mt-8">
                             <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
-                                {currentActiveChapter?.resources && currentActiveChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
-                                {currentActiveChapter?.practiceSets && currentActiveChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
+                                {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
+                                {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
+                                {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
                                 {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
                                 {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
                                 {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
@@ -548,10 +539,18 @@ export default function ChapterClientPage() {
                                     </div>
                                  )}
                             </TabsContent>
-                            {currentActiveChapter?.resources && currentActiveChapter.resources.length > 0 && (
+                             <TabsContent value="questions" className="mt-6">
+                                {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {/* Questions rendering logic here */}
+                                        <p>Questions will be displayed here.</p>
+                                    </div>
+                                ) : <p className="text-muted-foreground text-center py-8">No textbook questions available.</p>}
+                            </TabsContent>
+                            {activeChapter?.resources && activeChapter.resources.length > 0 && (
                                 <TabsContent value="resources" className="mt-6">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {currentActiveChapter.resources.map(res => (
+                                        {activeChapter.resources.map(res => (
                                             <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
                                                 {getResourceIcon(res.type)}
                                                 <span className="flex-grow text-left">{res.title}</span>
@@ -560,10 +559,10 @@ export default function ChapterClientPage() {
                                     </div>
                                 </TabsContent>
                             )}
-                             {currentActiveChapter?.practiceSets && currentActiveChapter.practiceSets.length > 0 && (
+                             {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
                                 <TabsContent value="practice-sets" className="mt-6">
                                     <div className="space-y-4">
-                                        {currentActiveChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
+                                        {activeChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
                                     </div>
                                 </TabsContent>
                              )}
