@@ -239,3 +239,7 @@ h3.name.text-lg.font-semibold {
   font-size: .75rem !important;
   line-height: 1rem !important;
 }
+
+.flex.items-center.gap-3 {
+  text-align: left;
+}

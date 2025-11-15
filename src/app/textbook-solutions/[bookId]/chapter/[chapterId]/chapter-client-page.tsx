@@ -35,6 +35,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentBadge } from '@/components/content-badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 const getResourceIcon = (type: string) => {
@@ -208,14 +209,9 @@ export default function ChapterClientPage() {
             
             const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
             
-            // Fetch chapter-level practice sets
             const practiceSetsRef = collection(chapterDocRef, 'practiceSets');
             const practiceSetsSnap = await getDocs(practiceSetsRef);
             chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
-            
-            // This was the missing piece: The resources are an array on the chapter document.
-            // No extra fetch is needed if they are already on the document.
-            // The `chapterData` variable now holds the resources if they exist.
 
             setActiveChapter(chapterData);
 
@@ -345,16 +341,44 @@ export default function ChapterClientPage() {
         }
     };
 
-    if (loading && !textbook) {
-        return <div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>;
+    if (loading) {
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr]">
+                <aside className="hidden md:block h-full bg-card border-r">
+                     <div className="sticky top-0 h-screen overflow-y-auto">
+                        <div className="p-4 border-b">
+                            <Skeleton className="h-6 w-3/4" />
+                        </div>
+                        <div className="p-2 space-y-2">
+                            {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+                        </div>
+                    </div>
+                </aside>
+                <main className="p-6 md:p-8">
+                     <header className="relative p-8 md:p-12 min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
+                        <Skeleton className="absolute inset-0 z-0"/>
+                        <div className="relative z-20 space-y-3">
+                            <Skeleton className="h-12 w-80" />
+                            <Skeleton className="h-8 w-40" />
+                        </div>
+                    </header>
+                    <div className="mt-8 space-y-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-64 w-full" />
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    if (error) {
+        return <div className="text-center py-10 text-destructive">{error}</div>;
     }
     
-    const currentActiveChapter = chapters.find(c => c.id === chapterId);
-
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        { name: currentActiveChapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
+        { name: activeChapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
     ];
 
     const sidebarContent = (
@@ -500,19 +524,19 @@ export default function ChapterClientPage() {
                         <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
                             <div className="absolute inset-0 z-0">
                                 <Image 
-                                    src={currentActiveChapter?.featureImage || '/image/logo.png'}
-                                    alt={currentActiveChapter?.title || 'Chapter background'}
+                                    src={activeChapter?.featureImage || '/image/logo.png'}
+                                    alt={activeChapter?.title || 'Chapter background'}
                                     fill
                                     className="object-cover opacity-20"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
                             </div>
                             <div className="relative z-20">
-                                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">{currentActiveChapter?.title}</h1>
-                                {currentActiveChapter?.chapterPdfUrl && (
+                                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">{activeChapter?.title}</h1>
+                                {activeChapter?.chapterPdfUrl && (
                                     <div className="mt-4">
                                         <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-                                            <a href={currentActiveChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
+                                            <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
                                                 <FileText className="mr-2" /> View Chapter PDF
                                             </a>
                                         </Button>
@@ -521,12 +545,12 @@ export default function ChapterClientPage() {
                             </div>
                         </header>
                         
-                        {currentActiveChapter?.description && (
-                            <p className="prose dark:prose-invert lg:prose-lg max-w-none my-8 text-muted-foreground">{currentActiveChapter.description}</p>
+                        {activeChapter?.description && (
+                            <p className="prose dark:prose-invert lg:prose-lg max-w-none my-8 text-muted-foreground">{activeChapter.description}</p>
                         )}
                         
                         <Tabs defaultValue="content" className="w-full mt-8">
-                            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
+                            <TabsList className="grid w-full grid-cols-2 md:grid-cols-8 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
                                 {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
