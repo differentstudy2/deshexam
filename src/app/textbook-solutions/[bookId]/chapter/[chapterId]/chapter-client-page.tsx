@@ -13,11 +13,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown, LayoutGrid, List, Search } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown, LayoutGrid, List, Search, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -639,11 +639,32 @@ export default function ChapterClientPage() {
                                             resourceView === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2' : 'space-y-3'
                                          )}>
                                             {filteredResources.map(res => (
-                                                <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3 text-left" onClick={() => handleResourceClick(res)}>
-                                                    {getResourceIcon(res.type)}
-                                                    <span className="flex-grow">{res.title}</span>
-                                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                                </Button>
+                                                <Card 
+                                                    key={res.id} 
+                                                    onClick={() => handleResourceClick(res)}
+                                                    className={cn(
+                                                        "cursor-pointer hover:bg-accent transition-colors",
+                                                        resourceView === 'grid' && "flex flex-col"
+                                                    )}
+                                                >
+                                                     {resourceView === 'grid' && (
+                                                        <div className="relative aspect-video w-full bg-secondary rounded-t-lg overflow-hidden">
+                                                            {res.featureImage ? (
+                                                                <Image src={res.featureImage} alt={res.title} fill className="object-cover" />
+                                                            ) : getResourceIcon(res.type)}
+                                                            {res.type === 'video' && (
+                                                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                                    <PlayCircle className="w-12 h-12 text-white/80" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <div className="p-4 flex items-center gap-3">
+                                                         {resourceView === 'list' && getResourceIcon(res.type)}
+                                                        <span className="flex-grow font-medium">{res.title}</span>
+                                                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                    </div>
+                                                </Card>
                                             ))}
                                         </div>
                                     </div>
