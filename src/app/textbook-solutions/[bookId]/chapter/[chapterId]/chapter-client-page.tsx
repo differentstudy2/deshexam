@@ -527,6 +527,7 @@ export default function ChapterClientPage() {
                         <Tabs defaultValue="content" className="w-full mt-8">
                             <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
+                                {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
                                 {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
                                 {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
@@ -545,10 +546,10 @@ export default function ChapterClientPage() {
                                         <p>There is no written content available for this chapter yet. Check out the other tabs for resources or practice sets!</p>
                                     </div>
                                  )}
-                                {activeChapter?.resources && activeChapter.resources.length > 0 && (
-                                    <div className="mt-12">
-                                     <h2 className="font-headline text-2xl font-bold mb-4">Additional Resources</h2>
-                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            </TabsContent>
+                            <TabsContent value="resources" className="mt-6">
+                                {activeChapter?.resources && activeChapter.resources.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {activeChapter.resources.map(res => (
                                             <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
                                                 {getResourceIcon(res.type)}
@@ -556,8 +557,7 @@ export default function ChapterClientPage() {
                                             </Button>
                                         ))}
                                     </div>
-                                    </div>
-                                 )}
+                                ) : <p className="text-muted-foreground text-center py-8">No additional resources available.</p>}
                             </TabsContent>
                              <TabsContent value="questions" className="mt-6">
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 ? (
@@ -617,3 +617,5 @@ export default function ChapterClientPage() {
         </div>
     );
 }
+
+    
