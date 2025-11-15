@@ -17,7 +17,7 @@ import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -214,7 +214,8 @@ export default function ChapterClientPage() {
             
             const resourcesRef = collection(chapterDocRef, 'resources');
             const resourcesSnap = await getDocs(resourcesRef);
-            chapterData.resources = resourcesSnap.docs.map(d => ({id: d.id, ...d.data()}) as Resource);
+            chapterData.resources = resourcesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Resource));
+
 
             setActiveChapter(chapterData);
 
@@ -224,7 +225,7 @@ export default function ChapterClientPage() {
         } finally {
             setLoading(false);
         }
-    }, [textbookId, chapterId, toast]);
+    }, [textbookId, chapterId, toast, router]);
 
     useEffect(() => {
         if(textbookId && chapterId) {
