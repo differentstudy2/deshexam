@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Video, Mic, File as FileIcon, ExternalLink, Lightbulb, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
 import Link from 'next/link';
@@ -32,9 +32,8 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 import Image from 'next/image';
-import { usePageData } from './use-page-data';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 
 const getResourceIcon = (type: string) => {
@@ -149,24 +148,18 @@ const SidebarNav = ({
 
 export default function ChapterClientPage() {
     const params = useParams();
-    const searchParams = useSearchParams();
     const router = useRouter();
     const { toast } = useToast();
     
-    const { 
-        loading, 
-        textbook, 
-        chapters, 
-        activeChapter, 
-        activeTopic, 
-        exams, 
-        error,
-        fetchPageData,
-    } = usePageData();
+    const [loading, setLoading] = useState(true);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [chapters, setChapters] = useState<Chapter[]>([]);
+    const [activeChapter, setActiveChapter] = useState<Chapter | null>(null);
+    const [exams, setExams] = useState<Exam[]>([]);
+    const [error, setError] = useState<string | null>(null);
     
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
-    const topicId = params.topicId as string;
     
     const [topicsByChapter, setTopicsByChapter] = useState<{ [chapterId: string]: Topic[] }>({});
     const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
@@ -178,15 +171,55 @@ export default function ChapterClientPage() {
     const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
 
+    const fetchPageData = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const [textbookSnap, chaptersQuerySnap, allExams] = await Promise.all([
+                getDoc(doc(db, 'textbooks', textbookId)),
+                getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
+                getAllContent("Exam")
+            ]);
 
-    const activeTopicId = useMemo(() => {
-        const topicId = searchParams.get('topic');
-        if (topicId) return topicId;
-        if (topicsByChapter[chapterId] && topicsByChapter[chapterId].length > 0) {
-            return null;
+            if (!textbookSnap.exists()) throw new Error("Textbook not found.");
+            
+            const textbookData = { id: textbookSnap.id, ...textbookSnap.data() } as Textbook;
+            setTextbook(textbookData);
+
+            const chaptersData = chaptersQuerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Chapter));
+            chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+            setChapters(chaptersData);
+            
+            setExams((allExams as Exam[]).filter((exam: any) => exam.textbookId === textbookId));
+
+            const chapterDocRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterDocRef);
+            if (!chapterSnap.exists()) throw new Error("Chapter not found.");
+            
+            const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
+            setActiveChapter(chapterData);
+
+        } catch (e: any) {
+            setError(e.message);
+            toast({ variant: "destructive", title: "Error loading data", description: e.message });
+        } finally {
+            setLoading(false);
         }
+    }, [textbookId, chapterId, toast]);
+
+    useEffect(() => {
+        if(textbookId && chapterId) {
+            fetchPageData();
+        }
+    }, [fetchPageData, textbookId, chapterId]);
+
+
+    const searchParams = useSearchParams();
+    const activeTopicId = useMemo(() => {
+        const topicIdFromParams = searchParams.get('topic');
+        if (topicIdFromParams) return topicIdFromParams;
         return null;
-    }, [searchParams, topicsByChapter, chapterId]);
+    }, [searchParams]);
 
     const currentActiveTopic = useMemo(() => {
         if (!topicsByChapter[chapterId] || !activeTopicId) return null;
@@ -246,8 +279,8 @@ export default function ChapterClientPage() {
     const handleDownloadPdf = async (practiceSet: PracticeSet, topicContext?: Topic) => {
         setIsGeneratingPdf(practiceSet.id);
         try {
-            const topicId = topicContext ? topicContext.id : 'null';
-            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topicId, practiceSet.id);
+            const topicIdForPath = topicContext ? topicContext.id : 'null';
+            const questions = await getQuestionsByPracticeSet(textbookId, chapterId, topicIdForPath, practiceSet.id);
             setPdfContent({ practiceSet, questions });
 
             setTimeout(async () => {
@@ -513,7 +546,11 @@ export default function ChapterClientPage() {
                             questions={pdfContent.questions} 
                             textbookTitle={textbook?.title || ''} 
                             chapterTitle={activeChapter?.title || ''}
-                            topicTitle={activeTopic?.title || ''}
+                            topicTitle={""}
+                            board={textbook?.board || ''}
+                            className={textbook?.class || ''}
+                            subject={textbook?.subject || ''}
+                            totalMarks={pdfContent.questions.reduce((acc, q) => acc + (q.marks || 1), 0)}
                         />
                     </div>
                 </div>
@@ -521,3 +558,4 @@ export default function ChapterClientPage() {
         </div>
     );
 }
+
