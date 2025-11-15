@@ -11,7 +11,7 @@ import { db } from '@/lib/firebase/client';
 import { uploadFile } from '@/lib/firebase/firestore';
 import type { Chapter, Resource, Textbook } from '@/lib/types';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import Image from "next/image";
 import { ImageUploader } from "@/components/feature/image-uploader";
+import { getYoutubeVideoMetadata } from '@/ai/flows/get-youtube-video-metadata';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -33,10 +34,11 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
 
     return (
         <div className="flex items-center gap-4 p-3 border rounded-md">
-            {resource.featureImage && (
+            {resource.featureImage ? (
                 <Image src={resource.featureImage} alt={resource.title} width={64} height={36} className="w-16 h-9 object-cover rounded-sm" />
+            ) : (
+                getIcon()
             )}
-            {!resource.featureImage && getIcon()}
             <div className="flex-grow">
                 <p className="font-semibold">{resource.title}</p>
                 <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate hover:underline">{resource.url}</a>
@@ -61,6 +63,7 @@ export default function ManageResourcesPage() {
     const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string, featureImage?: string }>({ type: 'video', title: '', url: '', featureImage: '' });
     const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isFetchingMeta, setIsFetchingMeta] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const fetchChapter = async () => {
@@ -147,19 +150,26 @@ export default function ManageResourcesPage() {
         }
     };
     
-    const getYouTubeId = (url: string) => {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleUrlBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
         const url = e.target.value;
-        const ytId = getYouTubeId(url);
-        if (ytId) {
-            const thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-            const videoTitle = `YouTube Video: ${ytId}`; // Placeholder, can't fetch title client-side easily
-            setNewResource(prev => ({...prev, featureImage: thumbnailUrl, title: prev.title || videoTitle}));
+        const ytIdRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/;
+        const match = url.match(ytIdRegex);
+
+        if (match && match[1]) {
+            setIsFetchingMeta(true);
+            try {
+                const metadata = await getYoutubeVideoMetadata({ url });
+                setNewResource(prev => ({
+                    ...prev, 
+                    title: prev.title || metadata.title,
+                    featureImage: prev.featureImage || metadata.thumbnailUrl,
+                }));
+                 toast({ title: 'YouTube data fetched!', description: 'Title and thumbnail have been updated.'});
+            } catch (error) {
+                 toast({ variant: 'destructive', title: 'Could not fetch YouTube data', description: (error as Error).message });
+            } finally {
+                setIsFetchingMeta(false);
+            }
         }
     }
 
@@ -209,7 +219,7 @@ export default function ManageResourcesPage() {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                          <div className="space-y-2">
-                            <Label>Feature Image</Label>
+                            <Label>Feature Image (Optional)</Label>
                             <ImageUploader 
                                 fieldName="featureImage"
                                 onUrlChange={(url) => setNewResource(prev => ({...prev, featureImage: url}))}
@@ -234,16 +244,22 @@ export default function ManageResourcesPage() {
                         </div>
                          <div className="space-y-2">
                             <Label>URL / File</Label>
-                            <div className="flex gap-2">
+                            <div className="relative">
                                 <Input 
                                     placeholder="https://example.com/resource" 
                                     value={newResource.url} 
                                     onChange={(e) => setNewResource({...newResource, url: e.target.value})}
                                     onBlur={handleUrlBlur}
+                                    disabled={isFetchingMeta}
                                 />
-                                 <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                                    {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
-                                 </Button>
+                                <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                                    {isFetchingMeta && <Loader2 className="animate-spin text-muted-foreground" />}
+                                </div>
+                                <div className="absolute right-1 top-1/2 -translate-y-1/2">
+                                     <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                                        {isUploading ? <Loader2 className="animate-spin"/> : <Upload className="w-4 h-4"/>}
+                                     </Button>
+                                </div>
                             </div>
                             <Input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
                         </div>

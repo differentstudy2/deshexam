@@ -16,3 +16,4 @@ import '@/ai/flows/ai-metadata-generator.ts';
 import '@/ai/flows/send-push-notification.ts';
 import '@/ai/flows/text-to-speech.ts';
 import '@/ai/flows/ai-summary-generator.ts';
+import '@/ai/flows/get-youtube-video-metadata.ts';
