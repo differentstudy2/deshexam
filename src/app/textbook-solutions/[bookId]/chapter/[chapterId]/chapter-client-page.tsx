@@ -208,16 +208,14 @@ export default function ChapterClientPage() {
             
             const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
             
-            // Also fetch practice sets directly attached to the chapter
             const practiceSetsRef = collection(chapterDocRef, 'practiceSets');
             const practiceSetsSnap = await getDocs(practiceSetsRef);
             chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
-
-            const resourcesRef = collection(chapterDocRef, "resources");
+            
+            const resourcesRef = collection(chapterDocRef, 'resources');
             const resourcesSnap = await getDocs(resourcesRef);
             chapterData.resources = resourcesSnap.docs.map(d => ({id: d.id, ...d.data()}) as Resource);
 
-            
             setActiveChapter(chapterData);
 
         } catch (e: any) {
@@ -530,17 +528,32 @@ export default function ChapterClientPage() {
                             <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
-                                {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                                 {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
                                 {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
                                 {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
                                 {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
                             </TabsList>
                             <TabsContent value="content" className="mt-6">
-                                 {currentActiveChapter?.content ? (
-                                    <article className="prose dark:prose-invert lg:prose-lg max-w-none">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{currentActiveChapter.content}</ReactMarkdown>
-                                    </article>
+                                 {activeChapter?.content ? (
+                                    <>
+                                        <article className="prose dark:prose-invert lg:prose-lg max-w-none">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeChapter.content}</ReactMarkdown>
+                                        </article>
+                                        
+                                        {activeChapter.resources && activeChapter.resources.length > 0 && (
+                                            <>
+                                            <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Additional Resources</h2>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {activeChapter.resources.map(res => (
+                                                    <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
+                                                        {getResourceIcon(res.type)}
+                                                        <span className="flex-grow text-left">{res.title}</span>
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                            </>
+                                        )}
+                                    </>
                                  ) : (
                                     <div className="text-center text-muted-foreground py-16">
                                         <BookOpen className="w-16 h-16 mx-auto mb-4"/>
@@ -560,18 +573,6 @@ export default function ChapterClientPage() {
                                         ))}
                                     </div>
                                 ) : <p className="text-muted-foreground text-center py-8">No textbook questions available.</p>}
-                            </TabsContent>
-                            <TabsContent value="resources" className="mt-6">
-                                {activeChapter?.resources && activeChapter.resources.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {activeChapter.resources.map(res => (
-                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                                {getResourceIcon(res.type)}
-                                                <span className="flex-grow text-left">{res.title}</span>
-                                            </Button>
-                                        ))}
-                                    </div>
-                                ) : <p className="text-muted-foreground text-center py-8">No resources available.</p>}
                             </TabsContent>
                             <TabsContent value="practice-sets" className="mt-6">
                                 {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 ? (
@@ -620,4 +621,3 @@ export default function ChapterClientPage() {
     );
 }
 
-    
