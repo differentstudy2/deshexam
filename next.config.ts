@@ -53,6 +53,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'archive.org',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   async rewrites() {
