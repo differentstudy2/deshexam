@@ -249,11 +249,11 @@ export default function ChapterClientPage() {
       const activeContentSource = currentActiveTopic || chapters.find(c => c.id === chapterId);
       if (activeContentSource?.content) {
         const idMap = new Map();
-        const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
+        const matches = activeContentSource.content.matchAll(/^(#+)\\s+(.*)/gm);
         const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
-          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\\w-]+/g, '');
           
           let id = baseId;
           let count = 1;
@@ -532,28 +532,13 @@ export default function ChapterClientPage() {
                                 {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
                                 {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
                                 {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
+                                {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                             </TabsList>
                             <TabsContent value="content" className="mt-6">
                                  {activeChapter?.content ? (
-                                    <>
-                                        <article className="prose dark:prose-invert lg:prose-lg max-w-none">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeChapter.content}</ReactMarkdown>
-                                        </article>
-                                        
-                                        {activeChapter.resources && activeChapter.resources.length > 0 && (
-                                            <>
-                                            <h2 className="font-headline text-2xl font-bold mt-12 mb-4">Additional Resources</h2>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {activeChapter.resources.map(res => (
-                                                    <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                                        {getResourceIcon(res.type)}
-                                                        <span className="flex-grow text-left">{res.title}</span>
-                                                    </Button>
-                                                ))}
-                                            </div>
-                                            </>
-                                        )}
-                                    </>
+                                    <article className="prose dark:prose-invert lg:prose-xl max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeChapter.content}</ReactMarkdown>
+                                    </article>
                                  ) : (
                                     <div className="text-center text-muted-foreground py-16">
                                         <BookOpen className="w-16 h-16 mx-auto mb-4"/>
@@ -590,6 +575,18 @@ export default function ChapterClientPage() {
                             <TabsContent value="exams" className="mt-6">
                                 {exams.length > 0 ? <ContentList items={exams} type="Exam" /> : <p className="text-muted-foreground text-center py-8">No exams available.</p>}
                             </TabsContent>
+                            <TabsContent value="resources" className="mt-6">
+                                {activeChapter?.resources && activeChapter.resources.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {activeChapter.resources.map(res => (
+                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
+                                                {getResourceIcon(res.type)}
+                                                <span className="flex-grow text-left">{res.title}</span>
+                                            </Button>
+                                        ))}
+                                    </div>
+                                ) : <p className="text-muted-foreground text-center py-8">No additional resources available.</p>}
+                            </TabsContent>
                         </Tabs>
                     </div>
                 </main>
@@ -620,4 +617,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
