@@ -32,7 +32,9 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
 import Image from 'next/image';
+import { usePageData } from './use-page-data';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 
 const getResourceIcon = (type: string) => {
@@ -151,18 +153,25 @@ export default function ChapterClientPage() {
     const router = useRouter();
     const { toast } = useToast();
     
+    const { 
+        loading, 
+        textbook, 
+        chapters, 
+        activeChapter, 
+        activeTopic, 
+        exams, 
+        error,
+        fetchPageData,
+    } = usePageData();
+    
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
+    const topicId = params.topicId as string;
     
-    const [textbook, setTextbook] = useState<Textbook | null>(null);
-    const [chapters, setChapters] = useState<Chapter[]>([]);
-    const [topics, setTopics] = useState<{ [chapterId: string]: Topic[] }>({});
-    const [exams, setExams] = useState<any[]>([]);
-    
-    const [loading, setLoading] = useState(true);
+    const [topicsByChapter, setTopicsByChapter] = useState<{ [chapterId: string]: Topic[] }>({});
     const [loadingTopics, setLoadingTopics] = useState<string | null>(null);
-    const [isSheetOpen, setIsSheetOpen] = useState(false);
     
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [viewerOpen, setViewerOpen] = useState(false);
     const [viewerResource, setViewerResource] = useState<Resource | null>(null);
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
@@ -173,19 +182,19 @@ export default function ChapterClientPage() {
     const activeTopicId = useMemo(() => {
         const topicId = searchParams.get('topic');
         if (topicId) return topicId;
-        if (topics[chapterId] && topics[chapterId].length > 0) {
+        if (topicsByChapter[chapterId] && topicsByChapter[chapterId].length > 0) {
             return null;
         }
         return null;
-    }, [searchParams, topics, chapterId]);
+    }, [searchParams, topicsByChapter, chapterId]);
 
-    const activeTopic = useMemo(() => {
-        if (!topics[chapterId] || !activeTopicId) return null;
-        return topics[chapterId].find(t => t.id === activeTopicId);
-    }, [topics, chapterId, activeTopicId]);
+    const currentActiveTopic = useMemo(() => {
+        if (!topicsByChapter[chapterId] || !activeTopicId) return null;
+        return topicsByChapter[chapterId].find(t => t.id === activeTopicId);
+    }, [topicsByChapter, chapterId, activeTopicId]);
     
     useEffect(() => {
-      const activeContentSource = activeTopic || chapters.find(c => c.id === chapterId);
+      const activeContentSource = currentActiveTopic || chapters.find(c => c.id === chapterId);
       if (activeContentSource?.content) {
         const idMap = new Map();
         const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
@@ -208,72 +217,27 @@ export default function ChapterClientPage() {
       } else {
         setHeadings([]);
       }
-    }, [activeTopic, chapters, chapterId]);
+    }, [currentActiveTopic, chapters, chapterId]);
 
     const fetchChapterTopics = useCallback(async (cId: string) => {
-        if (!cId || topics[cId]) return;
+        if (!cId || topicsByChapter[cId]) return; 
         setLoadingTopics(cId);
         try {
             const topicsData = await getTopicsByChapterId(textbookId, cId);
-            setTopics(prev => ({ ...prev, [cId]: topicsData }));
+            setTopicsByChapter(prev => ({ ...prev, [cId]: topicsData }));
         } catch (e) {
             toast({ variant: "destructive", title: "Error loading topics", description: (e as Error).message });
         } finally {
             setLoadingTopics(null);
         }
-    }, [textbookId, topics, toast]);
+    }, [textbookId, topicsByChapter, toast]);
 
     useEffect(() => {
-        const fetchPageData = async () => {
-            setLoading(true);
-            try {
-                const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-                
-                const [textbookSnap, chaptersQuerySnap, chapterSnap, allExams] = await Promise.all([
-                    getDoc(doc(db, 'textbooks', textbookId)),
-                    getDocs(query(collection(db, `textbooks/${textbookId}/chapters`), orderBy('title'))),
-                    getDoc(chapterRef),
-                    getAllContent("Exam")
-                ]);
-
-                if (textbookSnap.exists()) setTextbook({ id: textbookSnap.id, ...textbookSnap.data() } as Textbook);
-                
-                const chaptersData = chaptersQuerySnap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as Chapter));
-                chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-
-                if (chapterSnap.exists()) {
-                    const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
-                    const chapterPracticeSetsRef = collection(chapterRef, 'practiceSets');
-                    const practiceSetsSnap = await getDocs(chapterPracticeSetsRef);
-                    chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
-                    
-                    const chapterIndex = chaptersData.findIndex(c => c.id === chapterId);
-                    if(chapterIndex > -1) {
-                         chaptersData[chapterIndex] = chapterData;
-                    } else {
-                        chaptersData.push(chapterData);
-                        chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
-                    }
-                }
-                
-                setChapters(chaptersData);
-                setExams(allExams.filter((exam: any) => exam.textbookId === textbookId));
-
-
-                if (chapterId) {
-                    await fetchChapterTopics(chapterId);
-                }
-
-            } catch (e) {
-                toast({ variant: "destructive", title: "Error loading data", description: (e as Error).message });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPageData();
-    }, [textbookId, chapterId, toast, fetchChapterTopics]);
-
+        if (chapterId && !topicsByChapter[chapterId]) {
+            fetchChapterTopics(chapterId);
+        }
+    }, [chapterId, topicsByChapter, fetchChapterTopics]);
+    
     const handleResourceClick = (resource: Resource) => {
         setViewerResource(resource);
         setViewerOpen(true);
@@ -332,19 +296,19 @@ export default function ChapterClientPage() {
         return <div className="flex items-center justify-center min-h-[calc(100vh-200px)]"><Loader2 className="w-8 h-8 animate-spin"/></div>;
     }
     
-    const activeChapter = chapters.find(c => c.id === chapterId);
+    const currentActiveChapter = chapters.find(c => c.id === chapterId);
 
     const breadcrumbs = [
         { name: 'Textbooks', href: '/textbook-solutions'},
         { name: textbook?.title || 'Textbook', href: `/textbook-solutions/${textbookId}` },
-        { name: activeChapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
+        { name: currentActiveChapter?.title || 'Chapter', href: `/textbook-solutions/${textbookId}/chapter/${chapterId}` },
     ];
 
     const sidebarContent = (
          <div className="p-2">
             <SidebarNav 
                 chapters={chapters}
-                topics={topics}
+                topics={topicsByChapter}
                 activeChapterId={chapterId}
                 activeTopicId={activeTopicId}
                 onChapterToggle={fetchChapterTopics}
@@ -452,19 +416,19 @@ export default function ChapterClientPage() {
                         <header className="relative p-8 md:p-12 text-center md:text-left min-h-[250px] flex items-center justify-center md:justify-start bg-slate-900 text-white rounded-lg overflow-hidden">
                             <div className="absolute inset-0 z-0">
                                 <Image 
-                                    src={activeChapter?.featureImage || '/image/logo.png'}
-                                    alt={activeChapter?.title || 'Chapter background'}
+                                    src={currentActiveChapter?.featureImage || '/image/logo.png'}
+                                    alt={currentActiveChapter?.title || 'Chapter background'}
                                     fill
                                     className="object-cover opacity-20"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
                             </div>
                             <div className="relative z-20">
-                                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">{activeChapter?.title}</h1>
-                                {activeChapter?.chapterPdfUrl && (
+                                <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">{currentActiveChapter?.title}</h1>
+                                {currentActiveChapter?.chapterPdfUrl && (
                                     <div className="mt-4">
                                         <Button asChild className="bg-green-500 hover:bg-green-600 text-white">
-                                            <a href={activeChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
+                                            <a href={currentActiveChapter.chapterPdfUrl} target="_blank" rel="noopener noreferrer">
                                                 <FileText className="mr-2" /> View Chapter PDF
                                             </a>
                                         </Button>
@@ -473,66 +437,65 @@ export default function ChapterClientPage() {
                             </div>
                         </header>
                         
-                        {activeChapter?.description && (
-                            <p className="prose dark:prose-invert lg:prose-lg max-w-none my-8 text-muted-foreground">{activeChapter.description}</p>
+                        {currentActiveChapter?.description && (
+                            <p className="prose dark:prose-invert lg:prose-lg max-w-none my-8 text-muted-foreground">{currentActiveChapter.description}</p>
                         )}
                         
-                        {activeChapter?.content && (
-                            <article className="prose dark:prose-invert lg:prose-lg max-w-none my-8">
-                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeChapter.content}</ReactMarkdown>
-                            </article>
-                        )}
-
-                        <section id="practice-sets" className="my-8">
-                            <h2 className="font-headline text-3xl font-bold mb-6">Practice Sets</h2>
-                            {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
-                                <div className="space-y-4 mb-6">
-                                    <h3 className="font-semibold">Chapter Level Practice</h3>
-                                    {activeChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
-                                </div>
-                            )}
-
-                             {topics[chapterId] && topics[chapterId].length > 0 && (
-                                <Accordion type="multiple" className="w-full space-y-4">
-                                    {topics[chapterId].map((topic, index) => (
-                                        (topic.practiceSets && topic.practiceSets.length > 0) && (
-                                            <AccordionItem value={topic.id} key={topic.id} className="border rounded-lg bg-card/50">
-                                                <AccordionTrigger className="p-4 hover:no-underline font-semibold">
-                                                    Topic: {topic.title}
-                                                </AccordionTrigger>
-                                                <AccordionContent className="p-4 border-t">
-                                                     <div className="space-y-4">
-                                                        {topic.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} topicContext={topic} />)}
-                                                    </div>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        )
-                                    ))}
-                                </Accordion>
-                            )}
-                        </section>
-                        
-                        {activeChapter?.resources && activeChapter.resources.length > 0 && (
-                            <section id="resources" className="my-8">
-                                <h2 className="font-headline text-3xl font-bold mb-6">Additional Resources</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {activeChapter.resources.map(res => (
-                                        <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                            {getResourceIcon(res.type)}
-                                            <span className="flex-grow text-left">{res.title}</span>
-                                        </Button>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {(!activeTopic && (!topics[chapterId] || topics[chapterId].length === 0) && !activeChapter?.content && !activeChapter?.practiceSets?.length && !activeChapter?.resources?.length) && (
-                            <div className="text-center text-muted-foreground py-16">
-                                <BookOpen className="w-16 h-16 mx-auto mb-4"/>
-                                <h2 className="text-xl font-semibold">No Content Yet</h2>
-                                <p>There is no content available for this chapter yet. Check back later!</p>
-                            </div>
-                        )}
+                        <Tabs defaultValue="content" className="w-full mt-8">
+                            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto">
+                                <TabsTrigger value="content">Content</TabsTrigger>
+                                <TabsTrigger value="resources">Resources</TabsTrigger>
+                                <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>
+                                <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>
+                                <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
+                                <TabsTrigger value="exams">Exams</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="content" className="mt-6">
+                                 {currentActiveChapter?.content ? (
+                                    <article className="prose dark:prose-invert lg:prose-lg max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{currentActiveChapter.content}</ReactMarkdown>
+                                    </article>
+                                 ) : (
+                                    <div className="text-center text-muted-foreground py-16">
+                                        <BookOpen className="w-16 h-16 mx-auto mb-4"/>
+                                        <h2 className="text-xl font-semibold">No Content Yet</h2>
+                                        <p>There is no written content available for this chapter yet. Check out the other tabs for resources or practice sets!</p>
+                                    </div>
+                                 )}
+                            </TabsContent>
+                            <TabsContent value="resources" className="mt-6">
+                                {currentActiveChapter?.resources && currentActiveChapter.resources.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {currentActiveChapter.resources.map(res => (
+                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
+                                                {getResourceIcon(res.type)}
+                                                <span className="flex-grow text-left">{res.title}</span>
+                                            </Button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-center text-muted-foreground py-16">No additional resources available for this chapter.</p>
+                                )}
+                            </TabsContent>
+                             <TabsContent value="practice-sets" className="mt-6">
+                                {currentActiveChapter?.practiceSets && currentActiveChapter.practiceSets.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {currentActiveChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
+                                    </div>
+                                ) : (
+                                     <p className="text-center text-muted-foreground py-16">No chapter-level practice sets available. Check individual topics.</p>
+                                )}
+                             </TabsContent>
+                             <TabsContent value="mock-tests" className="mt-6">
+                                <p className="text-center text-muted-foreground py-16">Mock tests for this chapter will be shown here.</p>
+                             </TabsContent>
+                             <TabsContent value="quizzes" className="mt-6">
+                                <p className="text-center text-muted-foreground py-16">Quizzes for this chapter will be shown here.</p>
+                             </TabsContent>
+                              <TabsContent value="exams" className="mt-6">
+                                <p className="text-center text-muted-foreground py-16">Exams for this chapter will be shown here.</p>
+                             </TabsContent>
+                        </Tabs>
                     </div>
                 </main>
             </div>
@@ -558,4 +521,3 @@ export default function ChapterClientPage() {
         </div>
     );
 }
-
