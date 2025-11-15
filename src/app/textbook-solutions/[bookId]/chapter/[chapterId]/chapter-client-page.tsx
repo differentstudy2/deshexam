@@ -605,7 +605,7 @@ export default function ChapterClientPage() {
                             questions={pdfContent.questions} 
                             textbookTitle={textbook?.title || ''} 
                             chapterTitle={activeChapter?.title || ''}
-                            topicTitle={activeTopic?.title || ''}
+                            topicTitle={topic?.title || ''}
                             board={textbook?.board || ''}
                             className={textbook?.class || ''}
                             subject={textbook?.subject || ''}
@@ -618,4 +618,3 @@ export default function ChapterClientPage() {
     );
 }
 
-    
