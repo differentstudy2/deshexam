@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown, LayoutGrid, List, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -36,6 +36,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentBadge } from '@/components/content-badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 
 
 const getResourceIcon = (type: string) => {
@@ -177,6 +178,8 @@ export default function ChapterClientPage() {
     const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
     const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
+    const [resourceView, setResourceView] = useState<'grid' | 'list'>('grid');
+    const [resourceFilter, setResourceFilter] = useState('');
 
     const fetchInitialData = useCallback(async () => {
         setLoading(true);
@@ -355,6 +358,14 @@ export default function ChapterClientPage() {
             fetchContent('Quiz', setQuizzes);
         }
     };
+    
+    const filteredResources = useMemo(() => {
+        if (!activeChapter?.resources) return [];
+        if (!resourceFilter) return activeChapter.resources;
+        return activeChapter.resources.filter(res => 
+            res.title.toLowerCase().includes(resourceFilter.toLowerCase())
+        );
+    }, [activeChapter, resourceFilter]);
 
     if (loading) {
         return (
@@ -437,6 +448,16 @@ export default function ChapterClientPage() {
                 <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
                   <Button size="sm" asChild className="flex-1">
                       <Link href={`/textbook-solutions/practice-set/${practiceSet.id}/textbook/${textbookId}/chapter/${chapterId}/topic/${topicContext?.id || 'null'}`}>Start Practice</Link>
+                  </Button>
+                  <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handleDownloadPdf(practiceSet, topicContext)}
+                      disabled={isGeneratingPdf === practiceSet.id}
+                  >
+                      {isGeneratingPdf === practiceSet.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <FileDown className="mr-2 h-4 w-4"/>}
+                      Download PDF
                   </Button>
                 </div>
             </div>
@@ -573,7 +594,7 @@ export default function ChapterClientPage() {
                         )}
                         
                         <Tabs defaultValue="content" className="w-full mt-8" onValueChange={handleTabChange}>
-                            <TabsList className="grid w-full grid-cols-2 md:grid-cols-8 h-auto">
+                            <TabsList className="grid w-full grid-cols-2 md:grid-cols-7 h-auto">
                                 <TabsTrigger value="content">Content</TabsTrigger>
                                 {activeChapter?.resources && activeChapter.resources.length > 0 && <TabsTrigger value="resources">Resources</TabsTrigger>}
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 && <TabsTrigger value="questions">Questions</TabsTrigger>}
@@ -597,13 +618,34 @@ export default function ChapterClientPage() {
                             </TabsContent>
                             <TabsContent value="resources" className="mt-6">
                                 {activeChapter?.resources && activeChapter.resources.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {activeChapter.resources.map(res => (
-                                            <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
-                                                {getResourceIcon(res.type)}
-                                                <span className="flex-grow text-left">{res.title}</span>
-                                            </Button>
-                                        ))}
+                                    <div className="space-y-4">
+                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                            <div className="relative w-full sm:max-w-xs">
+                                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                <Input 
+                                                    placeholder="Filter resources..." 
+                                                    className="pl-9"
+                                                    value={resourceFilter}
+                                                    onChange={(e) => setResourceFilter(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="flex items-center gap-1 rounded-md bg-muted p-1">
+                                                <Button variant={resourceView === 'list' ? 'secondary' : 'ghost'} size="sm" onClick={() => setResourceView('list')}><List className="w-4 h-4 mr-2"/>List</Button>
+                                                <Button variant={resourceView === 'grid' ? 'secondary' : 'ghost'} size="sm" onClick={() => setResourceView('grid')}><LayoutGrid className="w-4 h-4 mr-2"/>Grid</Button>
+                                            </div>
+                                        </div>
+                                         <div className={cn(
+                                            "gap-4",
+                                            resourceView === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2' : 'space-y-3'
+                                         )}>
+                                            {filteredResources.map(res => (
+                                                <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3 text-left" onClick={() => handleResourceClick(res)}>
+                                                    {getResourceIcon(res.type)}
+                                                    <span className="flex-grow">{res.title}</span>
+                                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                </Button>
+                                            ))}
+                                        </div>
                                     </div>
                                 ) : <p className="text-muted-foreground text-center py-8">No additional resources available.</p>}
                             </TabsContent>
