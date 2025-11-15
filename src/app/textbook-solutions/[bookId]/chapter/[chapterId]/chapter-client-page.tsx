@@ -575,7 +575,7 @@ export default function ChapterClientPage() {
                             <TabsContent value="exams" className="mt-6">
                                 {exams.length > 0 ? <ContentList items={exams} type="Exam" /> : <p className="text-muted-foreground text-center py-8">No exams available.</p>}
                             </TabsContent>
-                            <TabsContent value="resources" className="mt-6">
+                             <TabsContent value="resources" className="mt-6">
                                 {activeChapter?.resources && activeChapter.resources.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {activeChapter.resources.map(res => (
