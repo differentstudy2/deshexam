@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -49,6 +49,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Textbook } from '@/lib/types';
+
 
 type MockTest = {
     id: string;
@@ -76,26 +78,34 @@ export default function ManageTextbookMockTestsPage() {
     const [tests, setTests] = useState<MockTest[]>([]);
     const [loading, setLoading] = useState(true);
     const [testToDelete, setTestToDelete] = useState<MockTest | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
-    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({
+    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
         title: '',
         subtitle: '',
         difficulty: ['Medium'],
         questionSource: ['Random from Chapter']
     });
 
-    const fetchTests = async () => {
+    const fetchTestsAndTextbook = async () => {
         if (!textbookId) return;
         setLoading(true);
         try {
-            const allTests = (await getAllContent("Mock Test")) as MockTest[];
-            const textbookTests = allTests.filter(test => test.textbookId === textbookId);
+            const [fetchedTests, textbookData] = await Promise.all([
+                getAllContent("Mock Test"),
+                getTextbookById(textbookId),
+            ]);
+
+            setTextbook(textbookData as Textbook);
+
+            const textbookTests = (fetchedTests as MockTest[]).filter(test => test.textbookId === textbookId);
             setTests(textbookTests);
         } catch (error) {
              toast({
                 variant: "destructive",
-                title: 'Error fetching mock tests',
+                title: 'Error fetching data',
                 description: (error as Error).message,
             });
         } finally {
@@ -104,7 +114,7 @@ export default function ManageTextbookMockTestsPage() {
     };
 
     useEffect(() => {
-        fetchTests();
+        fetchTestsAndTextbook();
     }, [textbookId, toast]);
 
     const handleDelete = async () => {
@@ -129,8 +139,8 @@ export default function ManageTextbookMockTestsPage() {
 
      const handleOpenDialog = (test: MockTest | null) => {
         setEditingTest(test);
-        const difficultyArray = (test?.difficulty && Array.isArray(test.difficulty) ? test.difficulty : ['Medium']) as any[];
-        const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as any[];
+        const difficultyArray = (test?.difficulty && Array.isArray(test.difficulty) ? test.difficulty : ['Medium']) as ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+        const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
         
         const subtitle = test ? test.subtitle || `Mock Test ${tests.findIndex(t => t.id === test.id) + 1}` : `Mock Test ${tests.length + 1}`;
         setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
@@ -161,12 +171,18 @@ export default function ManageTextbookMockTestsPage() {
             }
             setIsDialogOpen(false);
             setEditingTest(null);
-            fetchTests();
+            fetchTestsAndTextbook();
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error saving mock test', description: (error as Error).message });
         }
     };
-
+    
+    const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setTestData(prev => ({ ...prev, title }));
+    };
 
     return (
         <div className="space-y-6">
@@ -253,7 +269,18 @@ export default function ManageTextbookMockTestsPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="test-title">Title</Label>
-                            <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
+                            <div className="flex gap-2">
+                                <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
@@ -262,13 +289,13 @@ export default function ManageTextbookMockTestsPage() {
                                     <div key={option} className="flex items-center space-x-2">
                                         <Checkbox
                                             id={`diff-${option}`}
-                                            checked={testData.difficulty.includes(option)}
+                                            checked={testData.difficulty.includes(option as any)}
                                             onCheckedChange={(checked) => {
                                                 const currentDifficulties = testData.difficulty;
                                                 const newDifficulties = checked
-                                                    ? [...currentDifficulties, option]
+                                                    ? [...currentDifficulties, option as any]
                                                     : currentDifficulties.filter(d => d !== option);
-                                                setTestData(prev => ({...prev, difficulty: newDifficulties as any[] }));
+                                                setTestData(prev => ({...prev, difficulty: newDifficulties }));
                                             }}
                                         />
                                         <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
@@ -283,13 +310,13 @@ export default function ManageTextbookMockTestsPage() {
                                      <div key={option} className="flex items-center space-x-2">
                                          <Checkbox
                                             id={`source-${option}`}
-                                            checked={testData.questionSource.includes(option)}
+                                            checked={testData.questionSource.includes(option as any)}
                                             onCheckedChange={(checked) => {
                                                 const currentSources = testData.questionSource;
                                                 const newSources = checked
-                                                    ? [...currentSources, option]
+                                                    ? [...currentSources, option as any]
                                                     : currentSources.filter(s => s !== option);
-                                                setTestData(prev => ({...prev, questionSource: newSources as any[] }));
+                                                setTestData(prev => ({...prev, questionSource: newSources }));
                                             }}
                                         />
                                         <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
