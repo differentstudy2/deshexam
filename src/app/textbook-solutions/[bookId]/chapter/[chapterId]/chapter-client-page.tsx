@@ -212,6 +212,11 @@ export default function ChapterClientPage() {
             const practiceSetsRef = collection(chapterDocRef, 'practiceSets');
             const practiceSetsSnap = await getDocs(practiceSetsRef);
             chapterData.practiceSets = practiceSetsSnap.docs.map(d => ({id: d.id, ...d.data()}) as PracticeSet);
+
+            const resourcesRef = collection(chapterDocRef, "resources");
+            const resourcesSnap = await getDocs(resourcesRef);
+            chapterData.resources = resourcesSnap.docs.map(d => ({id: d.id, ...d.data()}) as Resource);
+
             
             setActiveChapter(chapterData);
 
@@ -614,3 +619,5 @@ export default function ChapterClientPage() {
         </div>
     );
 }
+
+    
