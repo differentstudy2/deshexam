@@ -241,11 +241,11 @@ export default function ChapterClientPage() {
       const activeContentSource = currentActiveTopic || chapters.find(c => c.id === chapterId);
       if (activeContentSource?.content) {
         const idMap = new Map();
-        const matches = activeContentSource.content.matchAll(/^(#+)\\s+(.*)/gm);
+        const matches = activeContentSource.content.matchAll(/^(#+)\s+(.*)/gm);
         const newHeadings = Array.from(matches).map((match, index) => {
           const level = match[1].length;
           const text = match[2];
-          const baseId = text.toLowerCase().replace(/\\s+/g, '-').replace(/[^\\w-]+/g, '');
+          const baseId = text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
           
           let id = baseId;
           let count = 1;
@@ -542,13 +542,17 @@ export default function ChapterClientPage() {
                              <TabsContent value="questions" className="mt-6">
                                 {activeChapter?.textbookQuestions && activeChapter.textbookQuestions.length > 0 ? (
                                     <div className="space-y-4">
-                                        {/* Questions rendering logic here */}
-                                        <p>Questions will be displayed here.</p>
+                                        {activeChapter.textbookQuestions.map((q, i) => (
+                                            <div key={q.id || i} className="p-4 border rounded-md">
+                                                <p className="font-semibold">{i + 1}. {q.text}</p>
+                                                <div className="text-sm mt-2 text-green-600"><strong>Answer:</strong> {String(q.correctAnswer)}</div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : <p className="text-muted-foreground text-center py-8">No textbook questions available.</p>}
                             </TabsContent>
-                            {activeChapter?.resources && activeChapter.resources.length > 0 && (
-                                <TabsContent value="resources" className="mt-6">
+                            <TabsContent value="resources" className="mt-6">
+                                {activeChapter?.resources && activeChapter.resources.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {activeChapter.resources.map(res => (
                                             <Button key={res.id} variant="outline" className="justify-start gap-3 h-auto py-3" onClick={() => handleResourceClick(res)}>
@@ -557,30 +561,24 @@ export default function ChapterClientPage() {
                                             </Button>
                                         ))}
                                     </div>
-                                </TabsContent>
-                            )}
-                             {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 && (
-                                <TabsContent value="practice-sets" className="mt-6">
+                                ) : <p className="text-muted-foreground text-center py-8">No resources available.</p>}
+                            </TabsContent>
+                            <TabsContent value="practice-sets" className="mt-6">
+                                {activeChapter?.practiceSets && activeChapter.practiceSets.length > 0 ? (
                                     <div className="space-y-4">
                                         {activeChapter.practiceSets.map(ps => <PracticeSetItem key={ps.id} practiceSet={ps} isChapterLevel />)}
                                     </div>
-                                </TabsContent>
-                             )}
-                             {mockTests.length > 0 && (
-                                <TabsContent value="mock-tests" className="mt-6">
-                                    <ContentList items={mockTests} type="Mock Test" />
-                                </TabsContent>
-                             )}
-                             {quizzes.length > 0 && (
-                                <TabsContent value="quizzes" className="mt-6">
-                                    <ContentList items={quizzes} type="Quiz" />
-                                </TabsContent>
-                            )}
-                            {exams.length > 0 && (
-                                <TabsContent value="exams" className="mt-6">
-                                    <ContentList items={exams} type="Exam" />
-                                </TabsContent>
-                            )}
+                                ) : <p className="text-muted-foreground text-center py-8">No practice sets available.</p>}
+                             </TabsContent>
+                             <TabsContent value="mock-tests" className="mt-6">
+                                {mockTests.length > 0 ? <ContentList items={mockTests} type="Mock Test" /> : <p className="text-muted-foreground text-center py-8">No mock tests available.</p>}
+                             </TabsContent>
+                             <TabsContent value="quizzes" className="mt-6">
+                                {quizzes.length > 0 ? <ContentList items={quizzes} type="Quiz" /> : <p className="text-muted-foreground text-center py-8">No quizzes available.</p>}
+                            </TabsContent>
+                            <TabsContent value="exams" className="mt-6">
+                                {exams.length > 0 ? <ContentList items={exams} type="Exam" /> : <p className="text-muted-foreground text-center py-8">No exams available.</p>}
+                            </TabsContent>
                         </Tabs>
                     </div>
                 </main>
