@@ -190,13 +190,13 @@ export default function ManageResourcesPage() {
     }
     
     const handleAITitleGenerate = async () => {
-        if (!newResource.url) {
-            toast({ variant: "destructive", title: "URL Required", description: "Please provide a URL to generate a title from." });
+        if (!topic?.title) {
+            toast({ variant: "destructive", title: "Topic Not Loaded", description: "The topic context is missing for title generation." });
             return;
         }
         setIsGeneratingTitle(true);
         try {
-            const result = await generateTitle({ source: newResource.url });
+            const result = await generateTitle({ source: topic.title });
             setNewResource(prev => ({ ...prev, title: result.title }));
             toast({ title: "SEO Title Generated!" });
         } catch (error) {
@@ -271,11 +271,11 @@ export default function ManageResourcesPage() {
                                 </SelectContent>
                             </Select>
                         </div>
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <Label>Title</Label>
                             <div className="flex items-center gap-2">
                                 <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
-                                <Button type="button" variant="outline" size="icon" onClick={handleAITitleGenerate} disabled={isGeneratingTitle || !newResource.url}>
+                                <Button type="button" variant="outline" size="icon" onClick={handleAITitleGenerate} disabled={isGeneratingTitle}>
                                     {isGeneratingTitle ? <Loader2 className="h-4 w-4 animate-spin"/> : <Sparkles className="h-4 w-4"/>}
                                 </Button>
                             </div>
