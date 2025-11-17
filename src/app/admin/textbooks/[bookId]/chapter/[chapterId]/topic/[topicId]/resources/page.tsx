@@ -11,7 +11,7 @@ import { db } from '@/lib/firebase/client';
 import { uploadFile } from '@/lib/firebase/firestore';
 import type { Chapter, Resource, Textbook, Topic } from '@/lib/types';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -196,7 +196,8 @@ export default function ManageResourcesPage() {
         }
         setIsGeneratingTitle(true);
         try {
-            const result = await generateTitle({ source: topic.title });
+            const source = `${newResource.type} about ${topic.title}`;
+            const result = await generateTitle({ source });
             setNewResource(prev => ({ ...prev, title: result.title }));
             toast({ title: "SEO Title Generated!" });
         } catch (error) {
