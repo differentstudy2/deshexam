@@ -18,7 +18,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import Image from "next/image";
-import { ImageUploader } from '@/components/feature/image-uploader';
+import { ImageUploader } from "@/components/feature/image-uploader";
 import { getYoutubeVideoMetadata } from '@/ai/flows/get-youtube-video-metadata';
 import { generateTitle } from '@/ai/flows/ai-title-generator';
 
@@ -189,22 +189,17 @@ export default function ManageResourcesPage() {
         }
     }
     
-    const handleAITitleGenerate = async () => {
+    const handleAITitleGenerate = () => {
         if (!topic?.title) {
             toast({ variant: "destructive", title: "Topic Not Loaded", description: "The topic context is missing for title generation." });
             return;
         }
-        setIsGeneratingTitle(true);
-        try {
-            const source = `${newResource.type} about ${topic.title}`;
-            const result = await generateTitle({ source });
-            setNewResource(prev => ({ ...prev, title: result.title }));
-            toast({ title: "SEO Title Generated!" });
-        } catch (error) {
-            toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
-        } finally {
-            setIsGeneratingTitle(false);
-        }
+        
+        const resourceTypeTitleCase = newResource.type.charAt(0).toUpperCase() + newResource.type.slice(1);
+        const newTitle = `${resourceTypeTitleCase} | ${topic.title}`;
+        
+        setNewResource(prev => ({ ...prev, title: newTitle }));
+        toast({ title: "Title Generated!" });
     };
 
 
