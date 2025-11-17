@@ -1,11 +1,11 @@
 
-
 export type Resource = {
     id: string;
     type: 'video' | 'audio' | 'pdf' | 'doc';
     title: string;
     url: string;
     featureImage?: string;
+    duration?: number; // in minutes
 };
 
 export type Textbook = {

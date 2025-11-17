@@ -390,7 +390,8 @@ export default function TopicClientPage() {
 
     function getUrlForTest(testType: string, testId: string) {
         const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
-        return `/${typeSlug}/${testId}`;
+        const topicSegment = topicId ? `/topic/${topicId}` : '/topic/null';
+        return `/textbook-solutions/${typeSlug}/${testId}/textbook/${textbookId}/chapter/${chapterId}${topicSegment}`;
     }
 
     const ContentList = ({ items, type }: { items: Exam[] | null, type: string }) => {
@@ -524,7 +525,7 @@ export default function TopicClientPage() {
                                 </TabsList>
                                 <TabsContent value="content" className="mt-6">
                                      {activeTopic?.content ? (
-                                        <article className="prose dark:prose-invert lg:prose-lg max-w-none">
+                                        <article className="prose dark:prose-invert lg:prose-xl max-w-none">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{activeTopic.content}</ReactMarkdown>
                                         </article>
                                      ) : (
@@ -567,10 +568,13 @@ export default function TopicClientPage() {
                                                         )}
                                                     >
                                                          {resourceView === 'grid' && (
-                                                            <div className="relative aspect-video w-full bg-secondary rounded-t-lg overflow-hidden">
-                                                                {res.featureImage ? (
-                                                                    <Image src={res.featureImage} alt={res.title} fill className="object-cover" />
-                                                                ) : getResourceIcon(res.type)}
+                                                            <div className="relative aspect-video w-full bg-secondary rounded-t-lg overflow-hidden flex items-center justify-center">
+                                                                <Image 
+                                                                    src={res.featureImage || '/image/logo.png'} 
+                                                                    alt={res.title} 
+                                                                    fill 
+                                                                    className="object-cover" 
+                                                                />
                                                                 {res.type === 'video' && (
                                                                     <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                                                                         <PlayCircle className="w-12 h-12 text-white/80" />
@@ -580,7 +584,10 @@ export default function TopicClientPage() {
                                                         )}
                                                         <div className="p-4 flex items-center gap-3">
                                                              {resourceView === 'list' && getResourceIcon(res.type)}
-                                                            <span className="flex-grow font-medium">{res.title}</span>
+                                                            <div className="flex-grow">
+                                                                <p className="font-medium">{res.title}</p>
+                                                                {res.duration && <p className="text-xs text-muted-foreground">{res.duration} min</p>}
+                                                            </div>
                                                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                                         </div>
                                                     </Card>
