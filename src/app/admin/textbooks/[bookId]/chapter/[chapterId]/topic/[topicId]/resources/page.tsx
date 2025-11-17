@@ -11,12 +11,16 @@ import { db } from '@/lib/firebase/client';
 import { uploadFile } from '@/lib/firebase/firestore';
 import type { Chapter, Resource, Textbook, Topic } from '@/lib/types';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import Image from "next/image";
+import { ImageUploader } from "@/components/feature/image-uploader";
+import { getYoutubeVideoMetadata } from '@/ai/flows/get-youtube-video-metadata';
+
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
     const getIcon = () => {
@@ -31,7 +35,11 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
 
     return (
         <div className="flex items-center gap-4 p-3 border rounded-md">
-            {getIcon()}
+            {resource.featureImage ? (
+                <Image src={resource.featureImage} alt={resource.title} width={64} height={36} className="w-16 h-9 object-cover rounded-sm" />
+            ) : (
+                getIcon()
+            )}
             <div className="flex-grow">
                 <p className="font-semibold">{resource.title}</p>
                 <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate hover:underline">{resource.url}</a>
@@ -54,9 +62,10 @@ export default function ManageResourcesPage() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingResource, setEditingResource] = useState<Resource | null>(null);
-    const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string }>({ type: 'video', title: '', url: '' });
+    const [newResource, setNewResource] = useState<{ type: 'video' | 'audio' | 'pdf' | 'doc', title: string, url: string, featureImage?: string }>({ type: 'video', title: '', url: '', featureImage: '' });
     const [resourceToDelete, setResourceToDelete] = useState<Resource | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isFetchingMeta, setIsFetchingMeta] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const fetchTopic = async () => {
@@ -76,9 +85,9 @@ export default function ManageResourcesPage() {
     const openResourceDialog = (resource: Resource | null) => {
         setEditingResource(resource);
         if (resource) {
-            setNewResource({ type: resource.type, title: resource.title, url: resource.url });
+            setNewResource({ type: resource.type, title: resource.title, url: resource.url, featureImage: resource.featureImage || '' });
         } else {
-            setNewResource({ type: 'video', title: '', url: '' });
+            setNewResource({ type: 'video', title: '', url: '', featureImage: '' });
         }
         setIsDialogOpen(true);
     }
@@ -142,6 +151,29 @@ export default function ManageResourcesPage() {
             }
         }
     };
+    
+    const handleUrlBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+        const url = e.target.value;
+        const ytIdRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/;
+        const match = url.match(ytIdRegex);
+
+        if (match && match[1]) {
+            setIsFetchingMeta(true);
+            try {
+                const metadata = await getYoutubeVideoMetadata({ url });
+                setNewResource(prev => ({
+                    ...prev, 
+                    title: prev.title || metadata.title,
+                    featureImage: prev.featureImage || metadata.thumbnailUrl,
+                }));
+                 toast({ title: 'YouTube data fetched!', description: 'Title and thumbnail have been updated.'});
+            } catch (error) {
+                 toast({ variant: 'destructive', title: 'Could not fetch YouTube data', description: (error as Error).message });
+            } finally {
+                setIsFetchingMeta(false);
+            }
+        }
+    }
 
 
     if (loading) {
@@ -188,6 +220,14 @@ export default function ManageResourcesPage() {
                         <DialogTitle>{editingResource ? 'Edit' : 'Add'} Resource</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label>Feature Image (Optional)</Label>
+                            <ImageUploader 
+                                fieldName="featureImage"
+                                onUrlChange={(url) => setNewResource(prev => ({...prev, featureImage: url}))}
+                                value={newResource.featureImage}
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label>Resource Type</Label>
                             <Select value={newResource.type} onValueChange={(v) => setNewResource({...newResource, type: v as any})}>
@@ -206,11 +246,22 @@ export default function ManageResourcesPage() {
                         </div>
                          <div className="space-y-2">
                             <Label>URL / File</Label>
-                            <div className="flex gap-2">
-                                <Input placeholder="https://example.com/resource" value={newResource.url} onChange={(e) => setNewResource({...newResource, url: e.target.value})} />
-                                 <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
-                                    {isUploading ? <Loader2 className="animate-spin"/> : <Upload />}
-                                 </Button>
+                            <div className="relative">
+                                <Input 
+                                    placeholder="https://example.com/resource" 
+                                    value={newResource.url} 
+                                    onChange={(e) => setNewResource({...newResource, url: e.target.value})}
+                                    onBlur={handleUrlBlur}
+                                    disabled={isFetchingMeta}
+                                />
+                                <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                                    {isFetchingMeta && <Loader2 className="animate-spin text-muted-foreground" />}
+                                </div>
+                                <div className="absolute right-1 top-1/2 -translate-y-1/2">
+                                     <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                                        {isUploading ? <Loader2 className="animate-spin"/> : <Upload className="w-4 h-4"/>}
+                                     </Button>
+                                </div>
                             </div>
                             <Input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
                         </div>
