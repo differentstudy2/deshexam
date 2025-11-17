@@ -18,7 +18,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import Image from "next/image";
-import { ImageUploader } from "@/components/feature/image-uploader";
+import { ImageUploader } from '@/components/feature/image-uploader';
 import { getYoutubeVideoMetadata } from '@/ai/flows/get-youtube-video-metadata';
 
 
@@ -32,6 +32,14 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
             default: return <LinkIcon className="w-5 h-5 text-muted-foreground" />;
         }
     }
+    
+    const getDomainName = (url: string) => {
+        try {
+            return new URL(url).hostname;
+        } catch (e) {
+            return url;
+        }
+    }
 
     return (
         <div className="flex items-center gap-4 p-3 border rounded-md">
@@ -40,9 +48,11 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
             ) : (
                 getIcon()
             )}
-            <div className="flex-grow">
-                <p className="font-semibold">{resource.title}</p>
-                <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate hover:underline">{resource.url}</a>
+            <div className="flex-grow overflow-hidden">
+                <p className="font-semibold truncate">{resource.title}</p>
+                <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate hover:underline">
+                    {getDomainName(resource.url)}
+                </a>
             </div>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}><Edit className="w-4 h-4" /></Button>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}><Trash2 className="w-4 h-4" /></Button>
@@ -184,9 +194,9 @@ export default function ManageResourcesPage() {
         <div className="space-y-6">
             <div>
                 <Button variant="ghost" asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`}>
+                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topics`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Topic Management
+                        Back to Topics
                     </Link>
                 </Button>
             </div>
@@ -263,7 +273,7 @@ export default function ManageResourcesPage() {
                                      </Button>
                                 </div>
                             </div>
-                            <Input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+                            <Input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'resources')} className="hidden" />
                         </div>
                     </div>
                     <DialogFooter>
