@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { db } from '@/lib/firebase/client';
 import { uploadFile } from '@/lib/firebase/firestore';
 import type { Chapter, Resource, Textbook, Topic } from '@/lib/types';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
@@ -52,8 +53,8 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
                 </div>
             )}
             <div className="flex-grow overflow-hidden">
-                <p className="font-semibold truncate">{resource.title}</p>
-                <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary truncate hover:underline">
+                <p className="font-semibold">{resource.title}</p>
+                 <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground truncate hover:underline">
                     {getDomainName(resource.url)}
                 </a>
             </div>
@@ -189,17 +190,24 @@ export default function ManageResourcesPage() {
         }
     }
     
-    const handleAITitleGenerate = () => {
+    const handleAITitleGenerate = async () => {
         if (!topic?.title) {
             toast({ variant: "destructive", title: "Topic Not Loaded", description: "The topic context is missing for title generation." });
             return;
         }
-        
-        const resourceTypeTitleCase = newResource.type.charAt(0).toUpperCase() + newResource.type.slice(1);
-        const newTitle = `${resourceTypeTitleCase} | ${topic.title}`;
-        
-        setNewResource(prev => ({ ...prev, title: newTitle }));
-        toast({ title: "Title Generated!" });
+
+        setIsGeneratingTitle(true);
+        try {
+            const resourceTypeTitleCase = newResource.type.charAt(0).toUpperCase() + newResource.type.slice(1);
+            const sourceForAI = `${resourceTypeTitleCase} about ${topic.title}`;
+            const result = await generateTitle({ source: sourceForAI });
+            setNewResource(prev => ({ ...prev, title: result.title }));
+            toast({ title: "AI Title Generated!" });
+        } catch (error) {
+            toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGeneratingTitle(false);
+        }
     };
 
 
