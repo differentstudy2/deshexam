@@ -20,6 +20,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import Image from "next/image";
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { getYoutubeVideoMetadata } from '@/ai/flows/get-youtube-video-metadata';
+import { generateTitle } from '@/ai/flows/ai-title-generator';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -35,7 +36,7 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
     
     const getDomainName = (url: string) => {
         try {
-            return new URL(url).hostname;
+            return new URL(url).hostname.replace('www.', '');
         } catch (e) {
             return url;
         }
@@ -46,7 +47,9 @@ const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEd
             {resource.featureImage ? (
                 <Image src={resource.featureImage} alt={resource.title} width={64} height={36} className="w-16 h-9 object-cover rounded-sm" />
             ) : (
-                getIcon()
+                <div className="w-16 h-9 flex items-center justify-center bg-secondary rounded-sm">
+                    {getIcon()}
+                </div>
             )}
             <div className="flex-grow overflow-hidden">
                 <p className="font-semibold truncate">{resource.title}</p>
@@ -77,6 +80,7 @@ export default function ManageResourcesPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [isFetchingMeta, setIsFetchingMeta] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
 
     const fetchTopic = async () => {
         setLoading(true);
@@ -184,6 +188,23 @@ export default function ManageResourcesPage() {
             }
         }
     }
+    
+    const handleAITitleGenerate = async () => {
+        if (!newResource.url) {
+            toast({ variant: "destructive", title: "URL Required", description: "Please provide a URL to generate a title from." });
+            return;
+        }
+        setIsGeneratingTitle(true);
+        try {
+            const result = await generateTitle({ source: newResource.url });
+            setNewResource(prev => ({ ...prev, title: result.title }));
+            toast({ title: "SEO Title Generated!" });
+        } catch (error) {
+            toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
+        } finally {
+            setIsGeneratingTitle(false);
+        }
+    };
 
 
     if (loading) {
@@ -250,9 +271,14 @@ export default function ManageResourcesPage() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2">
+                         <div className="space-y-2">
                             <Label>Title</Label>
-                            <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
+                            <div className="flex items-center gap-2">
+                                <Input placeholder="Resource Title" value={newResource.title} onChange={(e) => setNewResource({...newResource, title: e.target.value})} />
+                                <Button type="button" variant="outline" size="icon" onClick={handleAITitleGenerate} disabled={isGeneratingTitle || !newResource.url}>
+                                    {isGeneratingTitle ? <Loader2 className="h-4 w-4 animate-spin"/> : <Sparkles className="h-4 w-4"/>}
+                                </Button>
+                            </div>
                         </div>
                          <div className="space-y-2">
                             <Label>URL / File</Label>
@@ -273,7 +299,7 @@ export default function ManageResourcesPage() {
                                      </Button>
                                 </div>
                             </div>
-                            <Input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, 'resources')} className="hidden" />
+                            <Input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
                         </div>
                     </div>
                     <DialogFooter>
