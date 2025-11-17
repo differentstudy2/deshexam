@@ -201,7 +201,8 @@ export default function ManageResourcesPage() {
             const resourceTypeTitleCase = newResource.type.charAt(0).toUpperCase() + newResource.type.slice(1);
             const sourceForAI = `${resourceTypeTitleCase} about ${topic.title}`;
             const result = await generateTitle({ source: sourceForAI });
-            setNewResource(prev => ({ ...prev, title: result.title }));
+            const finalTitle = `${resourceTypeTitleCase} | ${result.title}`;
+            setNewResource(prev => ({ ...prev, title: finalTitle }));
             toast({ title: "AI Title Generated!" });
         } catch (error) {
             toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
