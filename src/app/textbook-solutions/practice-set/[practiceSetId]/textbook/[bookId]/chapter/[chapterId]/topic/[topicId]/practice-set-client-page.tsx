@@ -98,6 +98,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
+  const [clientDate, setClientDate] = useState('');
 
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -121,6 +122,9 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }, [answers, test, highestAttemptedIndex]);
 
   useEffect(() => {
+    // This will only run on the client, after hydration
+    setClientDate(new Date().toLocaleDateString());
+
     const processInitialData = () => {
         if (user) {
             getUserProfile(user.uid).then(setStudent);
@@ -495,7 +499,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     {topic?.title && <div><strong>Topic:</strong> {topic?.title}</div>}
                     <div><strong>Chapter:</strong> {chapter?.title}</div>
                     <div><strong>Full Marks:</strong> {totalMarks}</div>
-                    <div><strong>Date:</strong> {new Date().toLocaleDateString()}</div>
+                    <div><strong>Date:</strong> {clientDate}</div>
                     <div><strong>Duration:</strong> {test.duration || totalMarks} minutes</div>
                 </div>
             </header>
