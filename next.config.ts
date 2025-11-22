@@ -77,7 +77,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/textbook-solutions/:bookId/exam/:examId',
-        destination: '/exam/:examId',
+        destination: '/content/:examId',
       },
       {
         source: '/practice-questions/:id*',
