@@ -52,7 +52,7 @@ const cleanDataForFirebase = (data: any): any => {
         const cleanedData: { [key: string]: any } = {};
         for (const key in data) {
             const value = data[key];
-            if (value !== undefined && value !== null) {
+            if (value !== undefined) { // Change from value !== null && value !== undefined
                 cleanedData[key] = cleanDataForFirebase(value);
             }
         }
@@ -666,9 +666,11 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
             board: textbookData.board || null,
             class: textbookData.class || null,
             subject: textbookData.subject || null,
+            chapterId: submissionData.chapterId || null,
         };
 
-        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), dataToSave);
+        const cleanedData = cleanDataForFirebase(dataToSave);
+        const docRef = await addDoc(collection(db, "practiceSetSubmissions"), cleanedData);
         return docRef.id;
     } catch (e) {
         console.error("Error adding practice set submission: ", e);
@@ -2082,8 +2084,8 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
 };
 
 
-export const updateQuestionInPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string, questionData: any) => {
-    const path = topicId
+export const updateQuestionInPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string, questionId: string, questionData: any) => {
+    const path = (topicId && topicId !== 'null')
         ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
         : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
     const questionRef = doc(db, path, questionId);
@@ -2095,8 +2097,8 @@ export const updateQuestionInPracticeSet = async (textbookId: string, chapterId:
     }
 };
 
-export const deleteQuestionFromPracticeSet = async (textbookId: string, chapterId: string, topicId: string, practiceSetId: string, questionId: string) => {
-    const path = topicId
+export const deleteQuestionFromPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string, questionId: string) => {
+    const path = (topicId && topicId !== 'null')
         ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
         : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
     const questionRef = doc(db, path, questionId);
@@ -2225,4 +2227,5 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
