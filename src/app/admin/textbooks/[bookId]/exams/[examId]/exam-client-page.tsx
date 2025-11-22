@@ -23,7 +23,8 @@ import {
     addQuestionToContent,
     updateContent,
     deleteQuestionFromContent,
-    getContentById
+    getContentById,
+    getChaptersByTextbookId,
 } from '@/lib/firebase/firestore';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -70,7 +71,7 @@ const jsonExample = `
 `;
 
 const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['chapterContent', 'topic', 'text', 'file']),
+    sourceType: z.enum(['textbookContent', 'topic', 'text', 'file']),
     sourceTopic: z.string().optional(),
     sourceText: z.string().optional(),
     sourceFile: z.string().optional(),
@@ -79,7 +80,7 @@ const aiGeneratorFormSchema = z.object({
     questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
 }).refine(data => {
     if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
-    if (data.sourceType === 'text' || data.sourceType === 'chapterContent') return !!data.sourceText && data.sourceText.length >= 3;
+    if (data.sourceType === 'text' || data.sourceType === 'textbookContent') return !!data.sourceText && data.sourceText.length >= 3;
     if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
     return false;
 }, {
@@ -88,13 +89,16 @@ const aiGeneratorFormSchema = z.object({
 });
 type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
-export default function ExamClientPage({ initialTest, initialTextbook, initialChapter }: { initialTest: Exam, initialTextbook: Textbook, initialChapter: Chapter | null }) {
+
+export default function ExamClientPage({ initialTest, initialTextbook }: { initialTest: Exam, initialTextbook: Textbook }) {
     const params = useParams();
     const { toast } = useToast();
     const { user } = useAuth();
     
     const examId = params.examId as string;
+    const textbookId = params.bookId as string;
     const [test, setTest] = useState(initialTest);
+    const [fullTextbookContent, setFullTextbookContent] = useState('');
 
     const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -124,15 +128,34 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
     const aiForm = useForm<AIGeneratorFormValues>({
         resolver: zodResolver(aiGeneratorFormSchema),
         defaultValues: {
-          sourceType: 'chapterContent',
+          sourceType: 'textbookContent',
           sourceTopic: '',
-          sourceText: initialChapter?.content || '',
+          sourceText: '',
           sourceFile: '',
           numQuestions: 5,
           difficulty: 'Medium',
           questionType: 'Any',
         },
     });
+
+    useEffect(() => {
+        const fetchFullTextbookContent = async () => {
+            if (!textbookId) return;
+            try {
+                const chapters = await getChaptersByTextbookId(textbookId);
+                const content = chapters.map(c => c.content).filter(Boolean).join('\n\n---\n\n');
+                setFullTextbookContent(content);
+                aiForm.setValue('sourceText', content);
+            } catch (error) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Could not load textbook content',
+                    description: (error as Error).message
+                });
+            }
+        };
+        fetchFullTextbookContent();
+    }, [textbookId, aiForm, toast]);
 
     const openQuestionDialog = (question: Question | null) => {
         setEditingQuestion(question);
@@ -253,7 +276,7 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
         setIsGenerating(true);
         try {
             const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
-                         : aiData.sourceType === 'chapterContent' ? initialChapter?.content
+                         : aiData.sourceType === 'textbookContent' ? fullTextbookContent
                          : aiData.sourceType === 'text' ? aiData.sourceText
                          : aiData.sourceType === 'file' ? aiData.sourceFile
                          : null;
@@ -272,7 +295,7 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
                 numQuestions: aiData.numQuestions,
                 difficulty: aiData.difficulty,
                 questionType: aiData.questionType,
-                sourceType: (aiData.sourceType === 'file' || aiData.sourceType === 'chapterContent') ? 'text' : aiData.sourceType,
+                sourceType: (aiData.sourceType === 'file' || aiData.sourceType === 'textbookContent') ? 'text' : aiData.sourceType,
                 source: source,
             };
 
@@ -361,18 +384,18 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
                                 </DialogHeader>
                                 <Form {...aiForm}>
                                     <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
-                                        <Tabs defaultValue="chapterContent" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as any)}>
+                                        <Tabs defaultValue="textbookContent" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as any)}>
                                             <TabsList className="grid w-full grid-cols-4">
-                                                <TabsTrigger value="chapterContent">Chapter's Content</TabsTrigger>
+                                                <TabsTrigger value="textbookContent">Textbook Content</TabsTrigger>
                                                 <TabsTrigger value="topic">Topic</TabsTrigger>
                                                 <TabsTrigger value="text">Paste Text</TabsTrigger>
                                                 <TabsTrigger value="file">From File</TabsTrigger>
                                             </TabsList>
-                                            <TabsContent value="chapterContent" className="pt-4">
+                                            <TabsContent value="textbookContent" className="pt-4">
                                                 <FormItem>
-                                                    <FormLabel>Chapter Content</FormLabel>
+                                                    <FormLabel>Full Textbook Content</FormLabel>
                                                     <FormControl>
-                                                        <Textarea readOnly value={initialChapter?.content || "No content available for this chapter."} className="min-h-[150px] bg-secondary"/>
+                                                        <Textarea readOnly value={fullTextbookContent || "Loading textbook content..."} className="min-h-[150px] bg-secondary"/>
                                                     </FormControl>
                                                 </FormItem>
                                             </TabsContent>
@@ -529,3 +552,4 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
         </div>
     );
 }
+
