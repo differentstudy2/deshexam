@@ -76,6 +76,10 @@ const nextConfig: NextConfig = {
         destination: '/content/:id*',
       },
       {
+        source: '/textbook-solutions/:bookId/exam/:examId',
+        destination: '/exam/:examId',
+      },
+      {
         source: '/practice-questions/:id*',
         destination: '/content/:id*',
       },
@@ -92,3 +96,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+    

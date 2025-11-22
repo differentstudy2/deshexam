@@ -31,14 +31,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-  DialogClose
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogTrigger,
+    DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
@@ -61,14 +61,15 @@ type Exam = {
     textbookId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
+    questions?: any[];
 }
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 
-function getUrlForExam(examId: string) {
-    return `/exam/${examId}`;
+function getUrlForExam(bookId: string, examId: string) {
+    return `/textbook-solutions/${bookId}/exam/${examId}`;
 }
 
 export default function ManageTextbookExamsPage() {
@@ -219,7 +220,7 @@ export default function ManageTextbookExamsPage() {
                                                     const newDifficulties = checked
                                                         ? [...currentDifficulties, option]
                                                         : currentDifficulties.filter(d => d !== option);
-                                                    setExamData(prev => ({...prev, difficulty: newDifficulties }));
+                                                    setExamData(prev => ({...prev, difficulty: newDifficulties as any[] }));
                                                 }}
                                             />
                                             <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
@@ -240,7 +241,7 @@ export default function ManageTextbookExamsPage() {
                                                     const newSources = checked
                                                         ? [...currentSources, option]
                                                         : currentSources.filter(s => s !== option);
-                                                    setExamData(prev => ({...prev, questionSource: newSources }));
+                                                    setExamData(prev => ({...prev, questionSource: newSources as any[] }));
                                                 }}
                                             />
                                             <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
@@ -288,7 +289,7 @@ export default function ManageTextbookExamsPage() {
                                     <TableCell><ContentBadge type={exam.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={getUrlForExam(exam.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={getUrlForExam(textbookId, exam.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/exams/${exam.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
@@ -333,3 +334,5 @@ export default function ManageTextbookExamsPage() {
         </div>
     );
 }
+
+    
