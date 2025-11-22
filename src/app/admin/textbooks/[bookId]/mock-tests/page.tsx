@@ -235,7 +235,7 @@ export default function ManageTextbookMockTestsPage() {
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}/chapter/null/topic/null`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                          <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/edit-content/${test.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
