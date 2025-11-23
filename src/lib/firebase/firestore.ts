@@ -801,13 +801,25 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
         const formatSubmission = (doc: DocumentSnapshot) => {
             const data = doc.data() as any;
             if (!data) return null;
+
+            const submittedAt = data.submittedAt;
+            let dateValue = new Date(); // Default to now if invalid
+            if (submittedAt && typeof submittedAt.toDate === 'function') {
+                dateValue = submittedAt.toDate();
+            } else if (submittedAt) {
+                const d = new Date(submittedAt);
+                if (!isNaN(d.getTime())) {
+                    dateValue = d;
+                }
+            }
+            
             const isPracticeSet = !!data.practiceSetId;
             return {
                 id: doc.id,
                 userId: data.userId,
                 score: data.score,
                 totalQuestions: data.totalQuestions,
-                submittedAt: data.submittedAt.toDate(), // Keep as Date object for sorting
+                submittedAt: dateValue, // Keep as Date object for sorting
                 testId: isPracticeSet ? data.practiceSetId : data.testId,
                 testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
                 testType: isPracticeSet ? "Practice Set" : data.testType,
@@ -2227,5 +2239,6 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
