@@ -46,6 +46,11 @@ type Quiz = {
     textbookId?: string;
 }
 
+function getUrlForQuiz(bookId: string, quizId: string) {
+    return `/textbook-solutions/quiz/${quizId}/textbook/${bookId}`;
+}
+
+
 export default function ManageTextbookQuizzesPage() {
     const params = useParams();
     const textbookId = params.bookId as string;
@@ -153,7 +158,7 @@ export default function ManageTextbookQuizzesPage() {
                                     <TableCell><ContentBadge type={quiz.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/quiz/${quiz.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={getUrlForQuiz(textbookId, quiz.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                          <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/edit-content/${quiz.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
