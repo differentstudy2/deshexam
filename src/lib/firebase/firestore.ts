@@ -164,7 +164,6 @@ export const getQuestionById = async (questionId: string) => {
         throw new Error("Question ID is required to fetch a question.");
     }
     try {
-        // First, try the top-level questions collection
         const questionDoc = await getDoc(doc(db, "questions", questionId));
         if (questionDoc.exists()) {
              const data = questionDoc.data();
@@ -185,7 +184,6 @@ export const getQuestionById = async (questionId: string) => {
             };
         }
         
-        // If not found, search within all textbook chapters
         const textbooksSnapshot = await getDocs(collection(db, "textbooks"));
         for (const textbookDoc of textbooksSnapshot.docs) {
             const chaptersSnapshot = await getDocs(collection(db, `textbooks/${textbookDoc.id}/chapters`));
@@ -193,7 +191,13 @@ export const getQuestionById = async (questionId: string) => {
                 const chapterData = chapterDoc.data();
                 const question = chapterData.textbookQuestions?.find((q: any) => q.id === questionId);
                 if (question) {
-                    return { ...question, chapterTitle: chapterData.title, textbookTitle: textbookDoc.data().title };
+                    return { 
+                        ...question, 
+                        // Provide default/fallback values for fields that might be missing
+                        createdAt: new Date(), // Use current date as a fallback
+                        authorName: 'Textbook Author', // Fallback author
+                        subject: textbookDoc.data().subject,
+                    };
                 }
             }
         }
@@ -853,7 +857,12 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
             ? testSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1].id) || practiceSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1].id)
             : null;
 
-        return { submissions: allSubmissions, lastVisible: lastVisible || null, hasMore };
+        const submissionsWithFormattedDate = allSubmissions.map(sub => ({
+            ...sub,
+            submittedAt: sub.submittedAt.toLocaleDateString(),
+        }));
+
+        return { submissions: submissionsWithFormattedDate, lastVisible: lastVisible || null, hasMore };
     } catch (e) {
         console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -2252,6 +2261,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
