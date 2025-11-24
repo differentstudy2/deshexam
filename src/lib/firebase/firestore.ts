@@ -786,31 +786,15 @@ export const getSubmissionsByUserId = async (userId: string) => {
 
 export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
-        const testSubsQuery = query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
-        const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
-
-        let queryToUse = testSubsQuery;
-        if(startAfterDoc) {
-            queryToUse = query(testSubsQuery, startAfter(startAfterDoc));
-        }
-
-        const testSubsSnapshot = await getDocs(queryToUse);
-        const practiceSubsSnapshot = await getDocs(practiceSubsQuery);
-
-
         const formatSubmission = (doc: DocumentSnapshot) => {
             const data = doc.data() as any;
             if (!data) return null;
 
-            const submittedAt = data.submittedAt;
             let dateValue = new Date(); // Default to now if invalid
-            if (submittedAt && typeof submittedAt.toDate === 'function') {
-                dateValue = submittedAt.toDate();
-            } else if (submittedAt) {
-                const d = new Date(submittedAt);
-                if (!isNaN(d.getTime())) {
-                    dateValue = d;
-                }
+            if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
+                dateValue = data.submittedAt.toDate();
+            } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
+                dateValue = new Date(data.submittedAt);
             }
             
             const isPracticeSet = !!data.practiceSetId;
@@ -823,14 +807,22 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
                 testId: isPracticeSet ? data.practiceSetId : data.testId,
                 testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
                 testType: isPracticeSet ? "Practice Set" : data.testType,
-                ...(isPracticeSet && {
-                    textbookId: data.textbookId,
-                    chapterId: data.chapterId,
-                    topicId: data.topicId,
-                })
             };
         };
 
+        const testSubsQuery = startAfterDoc 
+            ? query(collection(db, "submissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
+            : query(collection(db, "submissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+
+        const practiceSubsQuery = startAfterDoc
+            ? query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), startAfter(startAfterDoc), limit(itemsPerPage))
+            : query(collection(db, "practiceSetSubmissions"), orderBy("submittedAt", "desc"), limit(itemsPerPage));
+
+        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
+            getDocs(testSubsQuery),
+            getDocs(practiceSubsQuery),
+        ]);
+        
         const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
         const practiceSubmissions = practiceSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
 
@@ -840,9 +832,11 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
 
         const hasMore = allSubmissions.length === itemsPerPage; 
         
-        const lastVisible = testSubsSnapshot.docs[testSubsSnapshot.docs.length - 1];
+        const lastVisible = allSubmissions.length > 0
+            ? testSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1].id) || practiceSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1].id)
+            : null;
 
-        return { submissions: allSubmissions, lastVisible: lastVisible, hasMore };
+        return { submissions: allSubmissions, lastVisible: lastVisible || null, hasMore };
     } catch (e) {
         console.error("Error getting paginated submissions: ", e);
         throw new Error("Failed to fetch submissions.");
@@ -2227,7 +2221,9 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
             throw new Error("Chapter not found.");
         }
         const chapterData = chapterSnap.data();
-        const questionToDelete = chapterData.textbookQuestions?.find((q: any) => q.id === questionId);
+        const questions = chapterData.textbookQuestions || [];
+        const questionToDelete = questions.find((q: any) => q.id === questionId);
+        
         if (questionToDelete) {
             await updateDoc(chapterRef, {
                 textbookQuestions: arrayRemove(questionToDelete)
@@ -2239,6 +2235,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
