@@ -164,6 +164,7 @@ export const getQuestionById = async (questionId: string) => {
         throw new Error("Question ID is required to fetch a question.");
     }
     try {
+        // First, try the top-level questions collection
         const questionDoc = await getDoc(doc(db, "questions", questionId));
         if (questionDoc.exists()) {
              const data = questionDoc.data();
@@ -182,14 +183,28 @@ export const getQuestionById = async (questionId: string) => {
                 ...data,
                 createdAt: formattedDate,
             };
-        } else {
-            return null;
         }
+        
+        // If not found, search within all textbook chapters
+        const textbooksSnapshot = await getDocs(collection(db, "textbooks"));
+        for (const textbookDoc of textbooksSnapshot.docs) {
+            const chaptersSnapshot = await getDocs(collection(db, `textbooks/${textbookDoc.id}/chapters`));
+            for (const chapterDoc of chaptersSnapshot.docs) {
+                const chapterData = chapterDoc.data();
+                const question = chapterData.textbookQuestions?.find((q: any) => q.id === questionId);
+                if (question) {
+                    return { ...question, chapterTitle: chapterData.title, textbookTitle: textbookDoc.data().title };
+                }
+            }
+        }
+        
+        return null;
+
     } catch (e) {
         console.error("Error getting document: ", e);
         throw new Error("Failed to fetch question.");
     }
-}
+};
 
 export const deleteQuestion = async (questionId: string) => {
     if (!questionId) {
@@ -793,6 +808,8 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
             let dateValue = new Date(); // Default to now if invalid
             if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
                 dateValue = data.submittedAt.toDate();
+            } else if (data.submittedAt instanceof Date) { // It might already be a Date object
+                dateValue = data.submittedAt;
             } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
                 dateValue = new Date(data.submittedAt);
             }
@@ -2235,6 +2252,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
