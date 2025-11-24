@@ -205,6 +205,11 @@ export default function ManageTextbookQuestionsPage() {
                                     <TableCell>{item.chapter.title}</TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
+                                            <Link href={`/question/${item.question.id}`} target="_blank">
+                                                <Eye className="mr-2 h-4 w-4"/>View
+                                            </Link>
+                                        </Button>
+                                        <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${item.chapter.id}/questions/${item.question.id}/edit`}>
                                                 <Edit className="mr-2 h-4 w-4"/>Edit
                                             </Link>
