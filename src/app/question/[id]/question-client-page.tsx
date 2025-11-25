@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar, Book, Layers, BarChart } from 'lucide-react';
+import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar, Book, Layers, BarChart, Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -57,6 +57,8 @@ type Question = {
   createdAt: Date;
   authorName: string;
   subject?: string;
+  textbookId?: string;
+  chapterId?: string;
 };
 
 type Comment = {
@@ -227,6 +229,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
   const userHasLiked = user && question.likedBy?.includes(user.uid);
   const userHasDisliked = user && question.dislikedBy?.includes(user.uid);
+  const editUrl = question.textbookId && question.chapterId 
+    ? `/admin/textbooks/${question.textbookId}/chapter/${question.chapterId}/questions/${question.id}/edit`
+    : null;
 
   return (
     <div className="bg-secondary/30">
@@ -323,7 +328,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         <Info /> Explanation
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="prose dark:prose-invert max-w-none">
+                                <CardContent className="prose dark:prose-invert max-w-none text-sm custom-prose-style">
                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.explanation}</ReactMarkdown>
                                 </CardContent>
                             </Card>
@@ -379,6 +384,12 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     <Calendar className="w-4 h-4 text-muted-foreground" />
                                     <span>Asked on: <span className="font-semibold">{question.createdAt.toLocaleDateString()}</span></span>
                                 </div>
+                                 {question.subject && (
+                                     <div className="flex items-center gap-2">
+                                        <Book className="w-4 h-4 text-muted-foreground" />
+                                        <span>Subject: <span className="font-semibold">{question.subject}</span></span>
+                                    </div>
+                                 )}
                             </CardContent>
                         </Card>
                          <Card>
@@ -406,6 +417,14 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </Button>
                             </CardContent>
                         </Card>
+                        {editUrl && (
+                             <Button asChild variant="secondary" className="w-full">
+                                <Link href={editUrl}>
+                                    <Edit className="mr-2 h-4 w-4"/>
+                                    Edit Question
+                                </Link>
+                            </Button>
+                        )}
                         <Button variant="outline" onClick={() => router.back()} className="w-full">
                             <ArrowLeft className="mr-2 h-4 w-4"/>
                             Go Back
@@ -417,3 +436,4 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
+

@@ -191,12 +191,14 @@ export const getQuestionById = async (questionId: string) => {
                 const chapterData = chapterDoc.data();
                 const question = chapterData.textbookQuestions?.find((q: any) => q.id === questionId);
                 if (question) {
-                    return { 
-                        ...question, 
+                    return {
+                        ...question,
                         // Provide default/fallback values for fields that might be missing
                         createdAt: new Date(), // Use current date as a fallback
                         authorName: 'Textbook Author', // Fallback author
                         subject: textbookDoc.data().subject,
+                        textbookId: textbookDoc.id,
+                        chapterId: chapterDoc.id,
                     };
                 }
             }
@@ -2261,6 +2263,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
