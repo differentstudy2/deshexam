@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar } from 'lucide-react';
+import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar, Book, Layers, BarChart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -21,6 +21,11 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 type Option = {
   text: string;
@@ -134,7 +139,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                 newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
             }
         }
-    } else { // dislike
+    } else if (type === 'dislike') {
         if (hasDisliked) { // User is un-disliking
             newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
         } else { // User is disliking
@@ -144,7 +149,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
             }
         }
     }
-
+    
     const updatedQuestion = {
         ...question,
         likedBy: newLikedBy,
@@ -229,7 +234,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
             <div className="max-w-6xl mx-auto">
                 <header className="mb-8">
                     {question.subject && <Badge className="mb-2">{question.subject}</Badge>}
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{question.text}</h1>
+                    <div className="prose dark:prose-invert lg:prose-xl max-w-none">
+                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                            {question.text}
+                        </ReactMarkdown>
+                    </div>
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -253,8 +262,14 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                 : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                                             }
                                             <div className="flex-1">
-                                                <span className="font-medium">{option.text}</span>
-                                                {option.explanation && <p className="text-xs text-muted-foreground mt-1">{option.explanation}</p>}
+                                                <div className="prose dark:prose-invert max-w-none custom-prose-style">
+                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                </div>
+                                                {option.explanation && 
+                                                <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
+                                                </div>
+                                                }
                                             </div>
                                         </div>
                                     )
@@ -308,8 +323,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         <Info /> Explanation
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <p>{question.explanation}</p>
+                                <CardContent className="prose dark:prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.explanation}</ReactMarkdown>
                                 </CardContent>
                             </Card>
                         )}
