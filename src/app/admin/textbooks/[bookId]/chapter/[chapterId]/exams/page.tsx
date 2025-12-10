@@ -4,7 +4,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
   Card,
   CardContent,
@@ -49,6 +51,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Textbook, Chapter } from '@/lib/types';
+
 
 type Exam = {
     id: string;
@@ -85,12 +89,22 @@ export default function ManageChapterExamsPage() {
         difficulty: ['Medium'],
         questionSource: ['Random from Chapter']
     });
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [chapter, setChapter] = useState<Chapter | null>(null);
 
 
     const fetchExams = async () => {
         if (!chapterId) return;
         setLoading(true);
         try {
+            const [textbookSnap, chapterSnap] = await Promise.all([
+                getTextbookById(textbookId),
+                getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId))
+            ]);
+
+            setTextbook(textbookSnap as Textbook);
+            if (chapterSnap.exists()) setChapter({id: chapterSnap.id, ...chapterSnap.data()} as Chapter);
+
             const allExams = (await getAllContent("Exam")) as Exam[];
             const chapterExams = allExams.filter(exam => exam.chapterId === chapterId);
             setExams(chapterExams);
@@ -168,6 +182,14 @@ export default function ManageChapterExamsPage() {
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error saving exam', description: (error as Error).message });
         }
+    };
+    
+    const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Chapter Title]', chapter?.title || '')
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setExamData(prev => ({ ...prev, title }));
     };
 
 
@@ -256,7 +278,18 @@ export default function ManageChapterExamsPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="exam-title">Title</Label>
-                            <Input id="exam-title" value={examData.title} onChange={e => setExamData(p => ({...p, title: e.target.value}))} />
+                            <div className="flex gap-2">
+                                <Input id="exam-title" value={examData.title} onChange={e => setExamData(p => ({...p, title: e.target.value}))} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Exam')}>[Chapter Title] - Exam</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Chapter Exam: [Chapter Title]')}>[Subject] Chapter Exam: [Chapter Title]</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
