@@ -186,7 +186,7 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
     }
     
     const handleSelectQuestion = (questionId: string) => {
-        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, id]);
+        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, questionId]);
     };
     
     const handleSelectAllQuestions = (checked: boolean) => {
@@ -530,3 +530,4 @@ export default function ExamClientPage({ initialTest, initialTextbook, initialCh
         </div>
     );
 }
+
