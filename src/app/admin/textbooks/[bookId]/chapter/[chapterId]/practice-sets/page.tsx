@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, PracticeSet, Textbook } from '@/lib/types';
 
@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Sparkles } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Sparkles, FileQuestion } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -34,6 +34,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from '@/components/ui/table';
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
@@ -61,39 +63,39 @@ export default function ManageChapterPracticeSetsPage() {
     });
     const [practiceSetToDelete, setPracticeSetToDelete] = useState<PracticeSet | null>(null);
 
-    useEffect(() => {
+    const fetchPracticeSets = async () => {
         if (!textbookId || !chapterId) return;
 
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const textbookData = await getTextbookById(textbookId);
-                setTextbook(textbookData as Textbook);
+        setLoading(true);
+        try {
+            const textbookData = await getTextbookById(textbookId);
+            setTextbook(textbookData as Textbook);
 
-                const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-                const chapterSnap = await getDoc(chapterRef);
+            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+            const chapterSnap = await getDoc(chapterRef);
 
-                if (chapterSnap.exists()) {
-                    setChapter({ id: chapterSnap.id, ...chapterSnap.data() } as Chapter);
-                } else {
-                    toast({ variant: 'destructive', title: 'Chapter not found' });
-                    router.back();
-                    return;
-                }
-
-                const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`);
-                const practiceSetsSnap = await getDocs(practiceSetsRef);
-                const sets = practiceSetsSnap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeSet));
-                setPracticeSets(sets);
-
-            } catch (error) {
-                toast({ variant: 'destructive', title: 'Error fetching data', description: (error as Error).message });
-            } finally {
-                setLoading(false);
+            if (chapterSnap.exists()) {
+                setChapter({ id: chapterSnap.id, ...chapterSnap.data() } as Chapter);
+            } else {
+                toast({ variant: 'destructive', title: 'Chapter not found' });
+                router.back();
+                return;
             }
-        };
 
-        fetchData();
+            const practiceSetsRef = collection(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`);
+            const practiceSetsSnap = await getDocs(query(practiceSetsRef));
+            const sets = practiceSetsSnap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeSet));
+            setPracticeSets(sets);
+
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error fetching data', description: (error as Error).message });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchPracticeSets();
     }, [textbookId, chapterId, toast, router]);
 
     const handleOpenDialog = (ps: PracticeSet | null) => {
@@ -116,7 +118,7 @@ export default function ManageChapterPracticeSetsPage() {
     };
 
     const handleAddOrUpdate = async () => {
-        if (!practiceSetData.title.trim() || practiceSetData.difficulty.length === 0) {
+        if (!practiceSetData.title.trim()) {
             toast({ variant: 'destructive', title: 'Please fill all required fields.' });
             return;
         }
@@ -136,10 +138,7 @@ export default function ManageChapterPracticeSetsPage() {
             setPracticeSetData({ title: '', subtitle: '', difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
             setIsDialogOpen(false);
             setEditingPracticeSet(null);
-            
-            const practiceSetsSnap = await getDocs(practiceSetsRef);
-            const sets = practiceSetsSnap.docs.map(d => ({ id: d.id, ...d.data() } as PracticeSet));
-            setPracticeSets(sets);
+            fetchPracticeSets();
 
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error saving practice set', description: (error as Error).message });
@@ -151,6 +150,12 @@ export default function ManageChapterPracticeSetsPage() {
 
         try {
             const psRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/practiceSets`, practiceSetToDelete.id);
+            // Recursively delete questions subcollection
+            const questionsRef = collection(psRef, 'questions');
+            const questionsSnap = await getDocs(questionsRef);
+            const deletePromises = questionsSnap.docs.map(qDoc => deleteDoc(qDoc.ref));
+            await Promise.all(deletePromises);
+
             await deleteDoc(psRef);
             toast({ title: 'Practice Set Deleted' });
             
@@ -170,17 +175,13 @@ export default function ManageChapterPracticeSetsPage() {
         setPracticeSetData(prev => ({ ...prev, title }));
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-    
     return (
         <div className="space-y-6">
             <div>
                 <Button variant="ghost" asChild>
-                    <Link href={`/admin/textbooks/${textbookId}`}>
+                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Chapters
+                        Back to Chapter
                     </Link>
                 </Button>
             </div>
@@ -198,38 +199,55 @@ export default function ManageChapterPracticeSetsPage() {
                     <Button size="sm" onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2"/> Add Practice Set</Button>
                 </CardHeader>
                 <CardContent>
-                    {practiceSets.length > 0 ? (
-                        <ul className="space-y-2">
-                            {practiceSets.map(ps => {
-                                const difficulties = Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : [];
-                                const sources = Array.isArray(ps.questionSource) ? ps.questionSource : ps.questionSource ? [ps.questionSource] : [];
-                                return (
-                                <li key={ps.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-2">
-                                    <div className="flex-grow flex items-center gap-2 flex-wrap">
-                                        <span className="font-semibold">{ps.subtitle || 'Practice Set'}:</span>
-                                        <span className="font-medium">{ps.title}</span>
-                                        {difficulties.map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
-                                        {sources.map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
-                                    </div>
-                                    <div className="flex gap-2 flex-shrink-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Title</TableHead>
+                                <TableHead className="hidden md:table-cell">Difficulty</TableHead>
+                                <TableHead className="hidden lg:table-cell">Source</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {loading ? (
+                            Array.from({ length: 3 }).map((_, i) => (
+                                <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-48" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto" /></TableCell>
+                                </TableRow>
+                            ))
+                          ) : practiceSets.length > 0 ? (
+                            practiceSets.map((ps) => (
+                                <TableRow key={ps.id}>
+                                    <TableCell className="font-medium">{ps.subtitle}: {ps.title}</TableCell>
+                                    <TableCell className="hidden md:table-cell">
+                                        <div className="flex flex-wrap gap-1">
+                                            {(Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty]).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="hidden lg:table-cell">
+                                        <div className="flex flex-wrap gap-1">
+                                            {(Array.isArray(ps.questionSource) ? ps.questionSource : [ps.questionSource]).map(s => s && <Badge key={s} variant="outline">{s}</Badge>)}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-right space-x-2">
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/null/practice-set/${ps.id}`}>
-                                                Manage Questions
+                                                <FileQuestion className="mr-2 h-4 w-4"/>Manage Questions
                                             </Link>
                                         </Button>
-                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(ps)}>
-                                            <Edit className="mr-2 h-4 w-4" /> Edit
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => setPracticeSetToDelete(ps)}>
-                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                        </Button>
-                                    </div>
-                                </li>
-                            )})}
-                        </ul>
-                    ) : (
-                        <p className="text-muted-foreground text-center py-8">No practice sets created for this chapter yet.</p>
-                    )}
+                                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(ps)}><Edit className="mr-2 h-4 w-4"/>Edit</Button>
+                                        <Button variant="destructive" size="sm" onClick={() => setPracticeSetToDelete(ps)}><Trash2 className="mr-2 h-4 w-4"/>Delete</Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                          ) : (
+                            <TableRow><TableCell colSpan={4} className="h-24 text-center">No practice sets added yet.</TableCell></TableRow>
+                          )}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
 
@@ -327,3 +345,5 @@ export default function ManageChapterPracticeSetsPage() {
         </div>
     )
 }
+
+    
