@@ -218,6 +218,7 @@ export default function ManageTextbookMockTestsPage() {
                                 <TableHead className="w-20">Image</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Subject</TableHead>
+                                <TableHead>Questions</TableHead>
                                 <TableHead>Access</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -229,8 +230,9 @@ export default function ManageTextbookMockTestsPage() {
                                     <TableCell><Skeleton className="h-10 w-16 rounded-md" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell><Skeleton className="h-5 w-12" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto" /></TableCell>
                                 </TableRow>
                             ))
                             ) : tests.length > 0 ? (
@@ -247,6 +249,7 @@ export default function ManageTextbookMockTestsPage() {
                                     </TableCell>
                                     <TableCell className="font-medium">{test.subtitle ? `${test.subtitle}: ${test.title}` : test.title}</TableCell>
                                     <TableCell>{test.subject}</TableCell>
+                                    <TableCell>{test.questions?.length || 0}</TableCell>
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
@@ -265,7 +268,7 @@ export default function ManageTextbookMockTestsPage() {
                                 </TableRow>
                             ))) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center h-24">
+                                    <TableCell colSpan={6} className="text-center h-24">
                                     No mock tests added to this textbook yet.
                                     </TableCell>
                                 </TableRow>
