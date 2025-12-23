@@ -3,9 +3,6 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Question, Textbook, Chapter } from '@/lib/types';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,22 +15,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, FileJson, Sparkles, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 import { 
-    getPracticeSetById,
     addQuestionToPracticeSet,
+    updatePracticeSet,
+    getPracticeSetById,
     getQuestionsByPracticeSet,
     updateQuestionInPracticeSet,
     deleteQuestionFromPracticeSet
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/use-auth';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
-import QuestionForm from '@/app/admin/textbooks/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set/[practiceSetId]/question-form';
+import type { Question, PracticeSet } from '@/lib/types';
+import QuestionForm from './question-form';
 
 
 const questionSchema = z.object({
@@ -125,10 +124,11 @@ export default function ManageTextbookPracticeSetQuestionsPage() {
             setQuestions(fetchedQuestions as Question[]);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error fetching data', description: (error as Error).message });
+            router.push(`/admin/textbooks/${textbookId}/practice-sets`);
         } finally {
             setLoading(false);
         }
-    }, [textbookId, practiceSetId, toast]);
+    }, [textbookId, practiceSetId, toast, router]);
 
     useEffect(() => {
         fetchData();
@@ -137,9 +137,12 @@ export default function ManageTextbookPracticeSetQuestionsPage() {
     const openQuestionDialog = (question: Question | null) => {
         setEditingQuestion(question);
         if (question) {
-            form.reset({ ...question });
+            form.reset({
+                ...question,
+                 options: question.options || (question.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
+            });
         } else {
-            form.reset({ text: '', type: 'Multiple Choice', marks: 1, options: Array(4).fill({ text: '', explanation: '' }), correctAnswer: '', explanation: '' });
+            form.reset({ text: '', type: 'Multiple Choice', marks: 1, options: [{ text: '', explanation: '' }, { text: '', explanation: '' }, { text: '', explanation: '' }, { text: '', explanation: '' }], correctAnswer: '', explanation: '' });
         }
         setIsQuestionDialogOpen(true);
     }
@@ -239,7 +242,7 @@ export default function ManageTextbookPracticeSetQuestionsPage() {
     const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
         setIsGenerating(true);
         try {
-            if (!aiData.sourceText?.trim()) {
+             if (!aiData.sourceText?.trim()) {
                 throw new Error("Source text for AI generation cannot be empty.");
             }
             const input: AIQuestionGeneratorInput = {
@@ -400,8 +403,7 @@ export default function ManageTextbookPracticeSetQuestionsPage() {
                                                 <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone and will permanently delete this question.</AlertDialogDescription></AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDeleteQuestion(q.id)}>Delete</AlertDialogAction>
-                                                </AlertDialogFooter>
+                                                    <AlertDialogAction onClick={() => handleDeleteQuestion(q.id)}>Delete</AlertDialogAction></AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
                                     </div>
