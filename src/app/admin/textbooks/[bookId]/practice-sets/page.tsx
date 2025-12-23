@@ -34,29 +34,26 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
     DialogFooter,
     DialogTrigger,
     DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
 import { ContentBadge } from '@/components/content-badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
-import type { PracticeSet, Textbook } from '@/lib/types';
+import type { PracticeSet } from '@/lib/types';
 
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
-
 
 function getUrlForPracticeSet(bookId: string, practiceSetId: string) {
     return `/textbook-solutions/practice-set/${practiceSetId}/textbook/${bookId}`;
@@ -121,11 +118,12 @@ export default function ManageTextbookPracticeSetsPage() {
             setItemToDelete(null);
         }
     };
-    
+
     const handleOpenDialog = (item: PracticeSet | null) => {
         setEditingItem(item);
         const difficultyArray = (item?.difficulty && Array.isArray(item.difficulty) ? item.difficulty : ['Medium']) as any[];
         const sourceArray = (item?.questionSource && Array.isArray(item.questionSource) ? item.questionSource : ['Random from Chapter']) as any[];
+        
         const subtitle = item ? item.subtitle || `Practice Set ${practiceSets.findIndex(t => t.id === item.id) + 1}` : `Practice Set ${practiceSets.length + 1}`;
         setItemData(item ? { title: item.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: item.featureImage || '' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '' });
         setIsDialogOpen(true);
@@ -160,6 +158,7 @@ export default function ManageTextbookPracticeSetsPage() {
             toast({ variant: 'destructive', title: 'Error saving practice set', description: (error as Error).message });
         }
     };
+
 
     return (
         <div className="space-y-6">
@@ -341,5 +340,3 @@ export default function ManageTextbookPracticeSetsPage() {
         </div>
     );
 }
-
-    
