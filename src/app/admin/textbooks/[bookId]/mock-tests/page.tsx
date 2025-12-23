@@ -49,7 +49,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import type { Textbook } from '@/lib/types';
+import type { Textbook, Chapter, Question } from '@/lib/types';
+import { ImageUploader } from '@/components/feature/image-uploader';
+import Image from 'next/image';
 
 
 type MockTest = {
@@ -63,7 +65,8 @@ type MockTest = {
     textbookId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
-    questions?: any[];
+    questions?: Question[];
+    featureImage?: string;
 }
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
@@ -82,11 +85,12 @@ export default function ManageTextbookMockTestsPage() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
-    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
+    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[], featureImage?: string}>({
         title: '',
         subtitle: '',
         difficulty: ['Medium'],
-        questionSource: ['Random from Chapter']
+        questionSource: ['Random from Chapter'],
+        featureImage: '',
     });
 
     const fetchTestsAndTextbook = async () => {
@@ -143,7 +147,7 @@ export default function ManageTextbookMockTestsPage() {
         const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
         
         const subtitle = test ? test.subtitle || `Mock Test ${tests.findIndex(t => t.id === test.id) + 1}` : `Mock Test ${tests.length + 1}`;
-        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: test.featureImage || '' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '' });
         setIsDialogOpen(true);
     };
 
@@ -211,6 +215,7 @@ export default function ManageTextbookMockTestsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-20">Image</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Subject</TableHead>
                                 <TableHead>Access</TableHead>
@@ -221,6 +226,7 @@ export default function ManageTextbookMockTestsPage() {
                             {loading ? (
                                 Array.from({ length: 3 }).map((_, i) => (
                                 <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-10 w-16 rounded-md" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-16" /></TableCell>
@@ -230,6 +236,15 @@ export default function ManageTextbookMockTestsPage() {
                             ) : tests.length > 0 ? (
                                 tests.map((test) => (
                                 <TableRow key={test.id}>
+                                    <TableCell>
+                                        <Image 
+                                            src={test.featureImage || '/image/logo.png'} 
+                                            alt={test.title}
+                                            width={64}
+                                            height={40}
+                                            className="rounded-md object-cover"
+                                        />
+                                    </TableCell>
                                     <TableCell className="font-medium">{test.subtitle ? `${test.subtitle}: ${test.title}` : test.title}</TableCell>
                                     <TableCell>{test.subject}</TableCell>
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
@@ -247,7 +262,7 @@ export default function ManageTextbookMockTestsPage() {
                                 </TableRow>
                             ))) : (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center h-24">
+                                    <TableCell colSpan={5} className="text-center h-24">
                                     No mock tests added to this textbook yet.
                                     </TableCell>
                                 </TableRow>
@@ -263,6 +278,14 @@ export default function ManageTextbookMockTestsPage() {
                         <DialogTitle>{editingTest ? 'Edit Mock Test' : 'Add New Mock Test'}</DialogTitle>
                     </DialogHeader>
                      <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label>Feature Image</Label>
+                            <ImageUploader
+                                fieldName="featureImage"
+                                onUrlChange={(url) => setTestData(p => ({ ...p, featureImage: url }))}
+                                value={testData.featureImage}
+                            />
+                        </div>
                          <div className="space-y-2">
                             <Label htmlFor="test-subtitle">Subtitle</Label>
                             <Input id="test-subtitle" value={testData.subtitle} onChange={e => setTestData(p => ({...p, subtitle: e.target.value}))} />
@@ -353,3 +376,5 @@ export default function ManageTextbookMockTestsPage() {
         </div>
     );
 }
+
+    

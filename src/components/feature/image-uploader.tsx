@@ -101,7 +101,9 @@ export const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: st
                     </Tabs>
                 </DialogContent>
             </Dialog>
-            {value && <Image src={value} alt="Preview" width={40} height={40} className="w-20 h-20 object-cover mt-2 rounded-md" />}
+            {value && <Image src={value} alt="Preview" width={80} height={80} className="w-20 h-20 object-cover mt-2 rounded-md" />}
         </div>
     );
 };
+
+    
