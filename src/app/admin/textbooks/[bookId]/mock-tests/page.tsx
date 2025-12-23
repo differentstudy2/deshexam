@@ -252,8 +252,8 @@ export default function ManageTextbookMockTestsPage() {
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
-                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/edit-content/${test.id}`}><Edit className="mr-2 h-4 w-4"/>Edit</Link>
+                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
+                                            <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
