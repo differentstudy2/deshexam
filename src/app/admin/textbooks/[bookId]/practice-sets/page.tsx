@@ -29,82 +29,88 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogTrigger,
+    DialogClose
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getChaptersByTextbookId, deletePracticeSet } from '@/lib/firebase/firestore';
-import type { PracticeSet, Chapter } from '@/lib/types';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
+import { ContentBadge } from '@/components/content-badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ImageUploader } from '@/components/feature/image-uploader';
+import Image from 'next/image';
+import type { PracticeSet, Textbook } from '@/lib/types';
+
+
+const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
+
+
+function getUrlForPracticeSet(bookId: string, practiceSetId: string) {
+    return `/textbook-solutions/practice-set/${practiceSetId}/textbook/${bookId}`;
+}
 
 export default function ManageTextbookPracticeSetsPage() {
     const params = useParams();
     const textbookId = params.bookId as string;
     const { toast } = useToast();
 
-    const [practiceSets, setPracticeSets] = useState<(PracticeSet & { chapterTitle: string })[]>([]);
+    const [practiceSets, setPracticeSets] = useState<PracticeSet[]>([]);
     const [loading, setLoading] = useState(true);
-    const [itemToDelete, setItemToDelete] = useState<(PracticeSet & { chapterTitle: string }) | null>(null);
+    const [itemToDelete, setItemToDelete] = useState<PracticeSet | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState<PracticeSet | null>(null);
+    const [itemData, setItemData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[], featureImage?: string}>({
+        title: '',
+        subtitle: '',
+        difficulty: ['Medium'],
+        questionSource: ['Random from Chapter'],
+        featureImage: '',
+    });
+
+    const fetchPracticeSets = async () => {
+        if (!textbookId) return;
+        setLoading(true);
+        try {
+            const allPracticeSets = await getAllContent('Practice Set') as PracticeSet[];
+            const textbookPracticeSets = allPracticeSets.filter(ps => ps.textbookId === textbookId && !ps.chapterId && !ps.topicId);
+            setPracticeSets(textbookPracticeSets);
+        } catch (error) {
+             toast({
+                variant: "destructive",
+                title: 'Error fetching practice sets',
+                description: (error as Error).message,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchPracticeSets = async () => {
-            if (!textbookId) return;
-            setLoading(true);
-            try {
-                const chapters = await getChaptersByTextbookId(textbookId);
-                let allPracticeSets: (PracticeSet & { chapterTitle: string })[] = [];
-
-                for (const chapter of chapters) {
-                    const chapterRef = collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/practiceSets`);
-                    const chapterSetsSnap = await getDocs(chapterRef);
-                    chapterSetsSnap.forEach(doc => {
-                        allPracticeSets.push({ id: doc.id, ...doc.data(), chapterTitle: chapter.title } as PracticeSet & { chapterTitle: string });
-                    });
-                    
-                    const topicsRef = collection(db, `textbooks/${textbookId}/chapters/${chapter.id}/topics`);
-                    const topicsSnap = await getDocs(topicsRef);
-                    for (const topicDoc of topicsSnap.docs) {
-                         const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
-                         const practiceSetsSnap = await getDocs(practiceSetsRef);
-                         practiceSetsSnap.forEach(doc => {
-                            allPracticeSets.push({ id: doc.id, ...doc.data(), chapterTitle: chapter.title } as PracticeSet & { chapterTitle: string });
-                         });
-                    }
-                }
-                setPracticeSets(allPracticeSets);
-
-            } catch (error) {
-                 toast({
-                    variant: "destructive",
-                    title: 'Error fetching practice sets',
-                    description: (error as Error).message,
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchPracticeSets();
     }, [textbookId, toast]);
 
     const handleDelete = async () => {
         if (!itemToDelete) return;
         try {
-            // This is a simplified delete. For a real app, you'd need to find the exact path.
-            // This will likely fail if the practice set is under a topic.
-            // A more robust solution would store chapter/topic path on the practice set document.
-            const chapter = (await getChaptersByTextbookId(textbookId)).find(c => c.title === itemToDelete.chapterTitle);
-            if (chapter) {
-                 await deletePracticeSet(textbookId, chapter.id, (itemToDelete as any).topicId || null, itemToDelete.id);
-                 toast({
-                    title: 'Practice Set Deleted',
-                    description: `"${itemToDelete.title}" has been successfully deleted.`,
-                });
-                setPracticeSets(prev => prev.filter(ps => ps.id !== itemToDelete.id));
-            } else {
-                 throw new Error("Could not find parent chapter to delete practice set.");
-            }
+            await deleteContent(itemToDelete.id);
+            toast({
+                title: 'Practice Set Deleted',
+                description: `"${itemToDelete.title}" has been successfully deleted.`,
+            });
+            setPracticeSets(practiceSets.filter(ps => ps.id !== itemToDelete.id));
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -113,6 +119,45 @@ export default function ManageTextbookPracticeSetsPage() {
             });
         } finally {
             setItemToDelete(null);
+        }
+    };
+    
+    const handleOpenDialog = (item: PracticeSet | null) => {
+        setEditingItem(item);
+        const difficultyArray = (item?.difficulty && Array.isArray(item.difficulty) ? item.difficulty : ['Medium']) as any[];
+        const sourceArray = (item?.questionSource && Array.isArray(item.questionSource) ? item.questionSource : ['Random from Chapter']) as any[];
+        const subtitle = item ? item.subtitle || `Practice Set ${practiceSets.findIndex(t => t.id === item.id) + 1}` : `Practice Set ${practiceSets.length + 1}`;
+        setItemData(item ? { title: item.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: item.featureImage || '' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '' });
+        setIsDialogOpen(true);
+    };
+
+    const handleAddOrUpdate = async () => {
+        if (!itemData.title.trim()) {
+            toast({ variant: 'destructive', title: 'Title is required.' });
+            return;
+        }
+
+        const contentToSave: any = { 
+            ...itemData, 
+            testType: 'Practice Set',
+            textbookId: textbookId,
+            access: 'free',
+            questions: editingItem?.questions || [],
+        };
+        
+        try {
+            if (editingItem) {
+                await updateContent(editingItem.id, contentToSave);
+                toast({ title: 'Practice Set Updated' });
+            } else {
+                await addContent(contentToSave);
+                toast({ title: 'Practice Set Added' });
+            }
+            setIsDialogOpen(false);
+            setEditingItem(null);
+            fetchPracticeSets();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error saving practice set', description: (error as Error).message });
         }
     };
 
@@ -130,10 +175,86 @@ export default function ManageTextbookPracticeSetsPage() {
                 <div>
                     <h1 className="font-headline text-3xl font-bold">Manage Practice Sets</h1>
                     <p className="text-muted-foreground">
-                        All practice sets associated with this textbook.
+                        Practice sets associated with this textbook.
                     </p>
                 </div>
-                {/* Add button would require selecting a chapter first, so we'll omit it from this central page for now */}
+                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button onClick={() => handleOpenDialog(null)}>
+                            <PlusCircle className="mr-2" />
+                            Add New Practice Set
+                        </Button>
+                    </DialogTrigger>
+                     <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{editingItem ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
+                        </DialogHeader>
+                         <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <Label>Feature Image</Label>
+                                <ImageUploader
+                                    fieldName="featureImage"
+                                    onUrlChange={(url) => setItemData(p => ({ ...p, featureImage: url }))}
+                                    value={itemData.featureImage}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="item-subtitle">Subtitle</Label>
+                                <Input id="item-subtitle" value={itemData.subtitle} onChange={e => setItemData(p => ({...p, subtitle: e.target.value}))} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="item-title">Title</Label>
+                                <Input id="item-title" value={itemData.title} onChange={e => setItemData(p => ({...p, title: e.target.value}))} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Difficulty</Label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {difficultyOptions.map(option => (
+                                        <div key={option} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`diff-${option}`}
+                                                checked={itemData.difficulty.includes(option)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentDifficulties = itemData.difficulty;
+                                                    const newDifficulties = checked
+                                                        ? [...currentDifficulties, option]
+                                                        : currentDifficulties.filter(d => d !== option);
+                                                    setItemData(prev => ({...prev, difficulty: newDifficulties as any[] }));
+                                                }}
+                                            />
+                                            <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Question Source</Label>
+                                 <div className="grid grid-cols-2 gap-2">
+                                    {questionSourceOptions.map(option => (
+                                         <div key={option} className="flex items-center space-x-2">
+                                             <Checkbox
+                                                id={`source-${option}`}
+                                                checked={itemData.questionSource.includes(option)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentSources = itemData.questionSource;
+                                                    const newSources = checked
+                                                        ? [...currentSources, option]
+                                                        : currentSources.filter(s => s !== option);
+                                                    setItemData(prev => ({...prev, questionSource: newSources as any[] }));
+                                                }}
+                                            />
+                                            <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                         </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                            <Button onClick={handleAddOrUpdate}>Save</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
              <Card>
                 <CardHeader>
@@ -143,32 +264,46 @@ export default function ManageTextbookPracticeSetsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-20">Image</TableHead>
                                 <TableHead>Title</TableHead>
-                                <TableHead>Chapter</TableHead>
+                                <TableHead>Access</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {loading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
+                                Array.from({ length: 3 }).map((_, i) => (
                                 <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-10 w-16 rounded-md" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-1/4" /></TableCell>
+                                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                     <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto" /></TableCell>
                                 </TableRow>
                             ))
                             ) : practiceSets.length > 0 ? (
                                 practiceSets.map((item) => (
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-medium">{item.subtitle}: {item.title}</TableCell>
-                                    <TableCell>{item.chapterTitle}</TableCell>
+                                    <TableCell>
+                                        <Image 
+                                            src={item.featureImage || '/image/logo.png'} 
+                                            alt={item.title}
+                                            width={64}
+                                            height={40}
+                                            className="rounded-md object-cover"
+                                        />
+                                    </TableCell>
+                                    <TableCell className="font-medium">{item.subtitle ? `${item.subtitle}: ${item.title}` : item.title}</TableCell>
+                                    <TableCell><ContentBadge type={item.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
-                                        <Button variant="outline" size="sm" asChild>
-                                           <Link href={`/admin/textbooks/${textbookId}/chapter/${(item as any).chapterId}/topic/${(item as any).topicId || 'null'}/practice-set/${item.id}`}>
-                                                <FileQuestion className="mr-2 h-4 w-4"/>Manage Questions
-                                            </Link>
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={getUrlForPracticeSet(textbookId, item.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
-                                        {/* Edit button would require a more complex dialog or page */}
+                                         <Button asChild variant="outline" size="sm">
+                                            <Link href={`/admin/textbooks/${textbookId}/practice-sets/${item.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
+                                        </Button>
+                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(item)}>
+                                            <Edit className="mr-2 h-4 w-4"/>Edit
+                                        </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setItemToDelete(item)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
                                         </Button>
@@ -176,8 +311,8 @@ export default function ManageTextbookPracticeSetsPage() {
                                 </TableRow>
                             ))) : (
                                 <TableRow>
-                                    <TableCell colSpan={3} className="text-center h-24">
-                                    No practice sets found for this textbook.
+                                    <TableCell colSpan={4} className="text-center h-24">
+                                    No practice sets added to this textbook yet.
                                     </TableCell>
                                 </TableRow>
                             )}

@@ -1,4 +1,5 @@
 
+
 export type Resource = {
     id: string;
     type: 'video' | 'audio' | 'pdf' | 'doc';
@@ -55,6 +56,12 @@ export type PracticeSet = {
     duration?: number;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
+    textbookId?: string;
+    chapterId?: string;
+    topicId?: string;
+    featureImage?: string;
+    questions?: Question[];
+    access: 'free' | 'premium' | 'pro';
 };
 
 export type Solution = {

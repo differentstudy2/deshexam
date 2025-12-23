@@ -61,7 +61,7 @@ export default function ManageTextbookPage() {
     },
     {
         title: "Manage Practice Sets",
-        description: "Create and configure practice sets for chapters or topics.",
+        description: "Create and configure practice sets for the entire textbook.",
         link: `/admin/textbooks/${textbookId}/practice-sets`,
         icon: <CheckSquare />,
     },

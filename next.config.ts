@@ -88,8 +88,8 @@ const nextConfig: NextConfig = {
         destination: '/content/:id*',
       },
       {
-        source: '/practice-set/:id*',
-        destination: '/textbook-solutions/practice-set/:id*',
+        source: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId',
+        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId/chapter/null/topic/null',
       },
       {
         source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
@@ -100,5 +100,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-    
