@@ -190,7 +190,7 @@ export default function ManageTextbookPracticeSetsPage() {
                             <DialogTitle>{editingItem ? 'Edit Practice Set' : 'Add New Practice Set'}</DialogTitle>
                         </DialogHeader>
                          <div className="space-y-4 py-4">
-                            <div className="space-y-2">
+                             <div className="space-y-2">
                                 <Label>Feature Image</Label>
                                 <ImageUploader
                                     fieldName="featureImage"
@@ -298,7 +298,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForPracticeSet(textbookId, item.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
-                                         <Button asChild variant="outline" size="sm">
+                                        <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/practice-sets/${item.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(item)}>
@@ -341,3 +341,5 @@ export default function ManageTextbookPracticeSetsPage() {
         </div>
     );
 }
+
+    
