@@ -97,7 +97,7 @@ const nextConfig: NextConfig = {
       },
        {
         source: '/textbook-solutions/:bookId/practice-set/:practiceSetId',
-        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId',
+        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId/chapter/null/topic/null',
       },
     ];
   }
