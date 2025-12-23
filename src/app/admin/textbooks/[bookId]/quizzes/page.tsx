@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -30,21 +30,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogTrigger,
+    DialogClose
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import type { Question } from '@/lib/types';
+
 
 type Quiz = {
     id: string;
     title: string;
+    subtitle?: string;
     subject: string;
     testType: string;
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     textbookId?: string;
+    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
+    questions?: Question[];
 }
+
+const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
+const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 function getUrlForQuiz(bookId: string, quizId: string) {
     return `/textbook-solutions/quiz/${quizId}/textbook/${bookId}`;
@@ -59,6 +82,14 @@ export default function ManageTextbookQuizzesPage() {
     const [quizzes, setQuizzes] = useState<Quiz[]>([]);
     const [loading, setLoading] = useState(true);
     const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+    const [quizData, setQuizData] = useState<{title: string, subtitle: string, difficulty: string[], questionSource: string[]}>({
+        title: '',
+        subtitle: '',
+        difficulty: ['Medium'],
+        questionSource: ['Random from Chapter']
+    });
 
     useEffect(() => {
         const fetchQuizzes = async () => {
@@ -100,7 +131,46 @@ export default function ManageTextbookQuizzesPage() {
             setQuizToDelete(null);
         }
     };
+    
+    const handleOpenDialog = (quiz: Quiz | null) => {
+        setEditingQuiz(quiz);
+        const difficultyArray = (quiz?.difficulty && Array.isArray(quiz.difficulty) ? quiz.difficulty : ['Medium']) as any[];
+        const sourceArray = (quiz?.questionSource && Array.isArray(quiz.questionSource) ? quiz.questionSource : ['Random from Chapter']) as any[];
+        
+        const subtitle = quiz ? quiz.subtitle || `Quiz ${quizzes.findIndex(q => q.id === quiz.id) + 1}` : `Quiz ${quizzes.length + 1}`;
+        setQuizData(quiz ? { title: quiz.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+        setIsDialogOpen(true);
+    };
 
+    const handleAddOrUpdate = async () => {
+        if (!quizData.title.trim()) {
+            toast({ variant: 'destructive', title: 'Title is required.' });
+            return;
+        }
+        
+        const contentToSave: any = { 
+            ...quizData, 
+            testType: 'Quiz',
+            textbookId: textbookId,
+            access: 'free',
+            questions: editingQuiz?.questions || [],
+        };
+        
+        try {
+            if (editingQuiz) {
+                await updateContent(editingQuiz.id, contentToSave);
+                toast({ title: 'Quiz Updated' });
+            } else {
+                await addContent(contentToSave);
+                toast({ title: 'Quiz Added' });
+            }
+            setIsDialogOpen(false);
+            setEditingQuiz(null);
+            fetchQuizzes();
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Error saving quiz', description: (error as Error).message });
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -119,12 +189,7 @@ export default function ManageTextbookQuizzesPage() {
                         Quizzes associated with this textbook.
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href={`/admin/textbooks/${textbookId}/add-quiz`}>
-                        <PlusCircle className="mr-2" />
-                        Add New Quiz
-                    </Link>
-                </Button>
+                <Button onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2" /> Add New Quiz</Button>
             </div>
              <Card>
                 <CardHeader>
@@ -153,7 +218,7 @@ export default function ManageTextbookQuizzesPage() {
                             ) : quizzes.length > 0 ? (
                                 quizzes.map((quiz) => (
                                 <TableRow key={quiz.id}>
-                                    <TableCell className="font-medium">{quiz.title}</TableCell>
+                                    <TableCell className="font-medium">{quiz.subtitle}: {quiz.title}</TableCell>
                                     <TableCell>{quiz.subject}</TableCell>
                                     <TableCell><ContentBadge type={quiz.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
@@ -179,6 +244,71 @@ export default function ManageTextbookQuizzesPage() {
                     </Table>
                 </CardContent>
             </Card>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingQuiz ? 'Edit Quiz' : 'Add New Quiz'}</DialogTitle>
+                    </DialogHeader>
+                     <div className="space-y-4 py-4">
+                         <div className="space-y-2">
+                            <Label htmlFor="quiz-subtitle">Subtitle</Label>
+                            <Input id="quiz-subtitle" value={quizData.subtitle} onChange={e => setQuizData(p => ({...p, subtitle: e.target.value}))} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="quiz-title">Title</Label>
+                            <Input id="quiz-title" value={quizData.title} onChange={e => setQuizData(p => ({...p, title: e.target.value}))} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Difficulty</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {difficultyOptions.map(option => (
+                                    <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`diff-quiz-${option}`}
+                                            checked={quizData.difficulty.includes(option)}
+                                            onCheckedChange={(checked) => {
+                                                const currentDifficulties = quizData.difficulty;
+                                                const newDifficulties = checked
+                                                    ? [...currentDifficulties, option]
+                                                    : currentDifficulties.filter(d => d !== option);
+                                                setQuizData(prev => ({...prev, difficulty: newDifficulties as any[] }));
+                                            }}
+                                        />
+                                        <label htmlFor={`diff-quiz-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Question Source</Label>
+                             <div className="grid grid-cols-2 gap-2">
+                                {questionSourceOptions.map(option => (
+                                     <div key={option} className="flex items-center space-x-2">
+                                         <Checkbox
+                                            id={`source-quiz-${option}`}
+                                            checked={quizData.questionSource.includes(option)}
+                                            onCheckedChange={(checked) => {
+                                                const currentSources = quizData.questionSource;
+                                                const newSources = checked
+                                                    ? [...currentSources, option]
+                                                    : currentSources.filter(s => s !== option);
+                                                setQuizData(prev => ({...prev, questionSource: newSources as any[] }));
+                                            }}
+                                        />
+                                        <label htmlFor={`source-quiz-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                     </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                        <Button onClick={handleAddOrUpdate}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
 
             <AlertDialog open={!!quizToDelete} onOpenChange={() => setQuizToDelete(null)}>
                 <AlertDialogContent>
