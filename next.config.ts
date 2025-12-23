@@ -95,8 +95,14 @@ const nextConfig: NextConfig = {
         source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
         destination: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
       },
+       {
+        source: '/textbook-solutions/:bookId/practice-set/:practiceSetId',
+        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId/chapter/null/topic/null',
+      },
     ];
   }
 };
 
 export default nextConfig;
+
+    
