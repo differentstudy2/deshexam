@@ -79,6 +79,10 @@ const nextConfig: NextConfig = {
         source: '/textbook-solutions/:bookId/exam/:examId',
         destination: '/textbook-solutions/exam/:examId/textbook/:bookId',
       },
+       {
+        source: '/textbook-solutions/:bookId/practice-set/:practiceSetId',
+        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId',
+      },
       {
         source: '/textbook-solutions/:bookId/quiz/:quizId',
         destination: '/textbook-solutions/quiz/:quizId/textbook/:bookId',
@@ -88,16 +92,8 @@ const nextConfig: NextConfig = {
         destination: '/content/:id*',
       },
       {
-        source: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId',
-        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId/chapter/null/topic/null',
-      },
-      {
         source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
         destination: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
-      },
-       {
-        source: '/textbook-solutions/:bookId/practice-set/:practiceSetId',
-        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId/chapter/null/topic/null',
       },
     ];
   }
