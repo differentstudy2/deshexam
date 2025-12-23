@@ -352,7 +352,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     const contentWidth = pdfWidth - margin * 2;
                     const imgWidth = canvas.width;
                     const imgHeight = canvas.height;
-                    const ratio = imgHeight / imgWidth;
+                    const ratio = imgWidth / imgHeight;
                     const finalImgHeight = contentWidth * ratio;
 
                     let position = 0;
