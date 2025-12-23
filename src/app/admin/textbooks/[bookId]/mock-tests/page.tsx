@@ -252,6 +252,9 @@ export default function ManageTextbookMockTestsPage() {
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
+                                        <Button asChild variant="outline" size="sm">
+                                            <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
+                                        </Button>
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
                                             <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
@@ -271,7 +274,7 @@ export default function ManageTextbookMockTestsPage() {
                     </Table>
                 </CardContent>
             </Card>
-            
+
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
