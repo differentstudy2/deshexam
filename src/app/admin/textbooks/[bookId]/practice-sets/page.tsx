@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -34,19 +35,20 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
     DialogTrigger,
     DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
 import { ContentBadge } from '@/components/content-badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
 import type { PracticeSet } from '@/lib/types';
@@ -56,7 +58,7 @@ const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 function getUrlForPracticeSet(bookId: string, practiceSetId: string) {
-    return `/textbook-solutions/practice-set/${practiceSetId}/textbook/${bookId}`;
+    return `/textbook-solutions/${bookId}/practice-set/${practiceSetId}`;
 }
 
 export default function ManageTextbookPracticeSetsPage() {
