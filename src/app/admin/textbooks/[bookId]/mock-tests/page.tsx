@@ -141,7 +141,7 @@ export default function ManageTextbookMockTestsPage() {
         }
     };
 
-     const handleOpenDialog = (test: MockTest | null) => {
+    const handleOpenDialog = (test: MockTest | null) => {
         setEditingTest(test);
         const difficultyArray = (test?.difficulty && Array.isArray(test.difficulty) ? test.difficulty : ['Medium']) as ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
         const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
@@ -376,5 +376,3 @@ export default function ManageTextbookMockTestsPage() {
         </div>
     );
 }
-
-    
