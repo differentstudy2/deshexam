@@ -4,9 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
-import { getDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -99,13 +97,14 @@ export default function ManageTextbookQuizzesPage() {
         if (!textbookId) return;
         setLoading(true);
         try {
-             const [textbookSnap] = await Promise.all([
-                getDoc(doc(db, 'textbooks', textbookId)),
-            ]);
-            if (textbookSnap.exists()) setTextbook({id: textbookSnap.id, ...textbookSnap.data()} as Textbook);
+             const [textbookData, allQuizzes] = await Promise.all([
+                getTextbookById(textbookId),
+                getAllContent("Quiz")
+             ]);
 
-            const allQuizzes = (await getAllContent("Quiz")) as Quiz[];
-            const textbookQuizzes = allQuizzes.filter(quiz => quiz.textbookId === textbookId);
+            setTextbook(textbookData as Textbook);
+
+            const textbookQuizzes = (allQuizzes as Quiz[]).filter(quiz => quiz.textbookId === textbookId);
             setQuizzes(textbookQuizzes);
         } catch (error) {
              toast({
@@ -244,7 +243,7 @@ export default function ManageTextbookQuizzesPage() {
                                             <Link href={getUrlForQuiz(textbookId, quiz.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                          <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/edit-content/${quiz.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
+                                            <Link href={`/admin/textbooks/${textbookId}/quizzes/${quiz.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(quiz)}>
                                             <Edit className="mr-2 h-4 w-4"/>Edit
