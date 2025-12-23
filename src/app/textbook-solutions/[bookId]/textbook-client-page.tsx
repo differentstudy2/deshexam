@@ -11,13 +11,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question } from '@/lib/types';
+import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -51,6 +51,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
     const [exams, setExams] = useState<Exam[]>([]);
     const [mockTests, setMockTests] = useState<Exam[]>([]);
     const [quizzes, setQuizzes] = useState<Exam[]>([]);
+    const [practiceSets, setPracticeSets] = useState<PracticeSet[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -85,14 +86,17 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                 const allExams = await getAllContent("Exam") as Exam[];
                 const allMockTests = await getAllContent("Mock Test") as Exam[];
                 const allQuizzes = await getAllContent("Quiz") as Exam[];
+                const allPracticeSets = await getAllContent("Practice Set") as PracticeSet[];
 
                 const textbookExams = allExams.filter(exam => (exam as any).textbookId === textbookId);
                 const textbookMockTests = allMockTests.filter(test => (test as any).textbookId === textbookId);
                 const textbookQuizzes = allQuizzes.filter(quiz => (quiz as any).textbookId === textbookId);
+                const textbookPracticeSets = allPracticeSets.filter(ps => ps.textbookId === textbookId && !ps.chapterId && !ps.topicId);
                 
                 setExams(textbookExams);
                 setMockTests(textbookMockTests);
                 setQuizzes(textbookQuizzes);
+                setPracticeSets(textbookPracticeSets);
 
                 setChaptersWithTopics(chaptersWithDetails);
 
@@ -120,8 +124,11 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
     );
 
     function getUrlForTest(testType: string, testId: string) {
-      const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
-      return `/${typeSlug}/${testId}`;
+        const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+        if (typeSlug === 'practice-set') {
+            return `/textbook-solutions/${textbookId}/practice-set/${testId}`;
+        }
+        return `/${typeSlug}/${testId}`;
     }
 
     const bgColors = [
@@ -157,8 +164,9 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
             </header>
             
             <Tabs defaultValue="chapters" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 max-w-2xl mx-auto">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 max-w-2xl mx-auto">
                     <TabsTrigger value="chapters">Chapters</TabsTrigger>
+                    {practiceSets.length > 0 && <TabsTrigger value="practice-sets">Practice Sets</TabsTrigger>}
                     {exams.length > 0 && <TabsTrigger value="exams">Exams</TabsTrigger>}
                     {mockTests.length > 0 && <TabsTrigger value="mock-tests">Mock Tests</TabsTrigger>}
                     {quizzes.length > 0 && <TabsTrigger value="quizzes">Quizzes</TabsTrigger>}
@@ -221,6 +229,39 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                                        )}
                                    </ul>
                                 </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </TabsContent>
+                <TabsContent value="practice-sets" className="mt-8">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {practiceSets.map((ps: any) => (
+                            <Card key={ps.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                            <CardHeader className="p-0 relative">
+                                <Image
+                                src={ps.featureImage || `https://picsum.photos/seed/${ps.id}/400/225`}
+                                alt={ps.title}
+                                width={400}
+                                height={225}
+                                className="w-full h-auto object-cover"
+                                />
+                                <div className="absolute top-2 right-2">
+                                <ContentBadge type={ps.access} />
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-grow p-4">
+                                <p className="text-sm font-medium text-primary">{ps.subject}</p>
+                                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{ps.title}</CardTitle>
+                                 <div className="flex flex-wrap gap-2">
+                                    {(Array.isArray(ps.difficulty) ? ps.difficulty : [ps.difficulty]).filter(Boolean).map(d => <Badge key={d} variant="secondary">{d}</Badge>)}
+                                    {(Array.isArray(ps.questionSource) ? ps.questionSource : [ps.questionSource]).filter(Boolean).map(s => <Badge key={s} variant="outline">{s.replace('-', ' ')}</Badge>)}
+                                </div>
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0">
+                                <Button asChild className="w-full">
+                                <Link href={getUrlForTest(ps.testType, ps.id)}>Start Practice</Link>
+                                </Button>
+                            </CardFooter>
                             </Card>
                         ))}
                     </div>
@@ -359,5 +400,3 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
       </div>
     );
 }
-
-    
