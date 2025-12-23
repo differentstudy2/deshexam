@@ -24,7 +24,7 @@ import {
     getContentById,
     getChaptersByTextbookId,
 } from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -32,6 +32,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
 import type { Question, Textbook, Exam } from '@/lib/types';
 import QuestionForm from './question-form';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const questionSchema = z.object({
   id: z.string().optional(),
@@ -550,3 +551,5 @@ export default function MockTestClientPage({ initialTest, initialTextbook }: { i
         </div>
     );
 }
+
+    
