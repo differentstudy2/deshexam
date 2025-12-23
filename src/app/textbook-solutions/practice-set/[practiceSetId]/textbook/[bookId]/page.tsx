@@ -95,6 +95,7 @@ export default async function TextbookPracticeSetPage({ params }: PageProps) {
         testType: 'Practice Set'
     };
 
+    // Since this is a textbook-level practice set, chapter and topic are null.
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: null = null;
 
