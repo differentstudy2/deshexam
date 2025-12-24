@@ -4,22 +4,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -274,69 +267,53 @@ export default function ManageTextbookExamsPage() {
                     <CardTitle>Exams ({exams.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-20">Image</TableHead>
-                                <TableHead>Title</TableHead>
-                                <TableHead>Subject</TableHead>
-                                <TableHead>Access</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                Array.from({ length: 3 }).map((_, i) => (
-                                <TableRow key={i}>
-                                    <TableCell><Skeleton className="h-10 w-16 rounded-md" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
-                                </TableRow>
-                            ))
-                            ) : exams.length > 0 ? (
-                                exams.map((exam) => (
-                                <TableRow key={exam.id}>
-                                    <TableCell>
-                                        <Image 
-                                            src={exam.featureImage || '/image/logo.png'} 
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <Card key={i}><CardContent className="p-4"><Skeleton className="h-48 w-full" /></CardContent></Card>
+                            ))}
+                        </div>
+                    ) : exams.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {exams.map((exam) => (
+                                <Card key={exam.id} className="flex flex-col">
+                                    <CardHeader className="p-0 relative h-40">
+                                        <Image
+                                            src={exam.featureImage || `https://picsum.photos/seed/${exam.id}/400/225`}
                                             alt={exam.title}
-                                            width={64}
-                                            height={40}
-                                            className="rounded-md object-cover"
+                                            fill
+                                            className="object-cover rounded-t-lg"
                                         />
-                                    </TableCell>
-                                    <TableCell className="font-medium">{exam.subtitle ? `${exam.subtitle}: ${exam.title}` : exam.title}</TableCell>
-                                    <TableCell>{exam.subject}</TableCell>
-                                    <TableCell><ContentBadge type={exam.access} /></TableCell>
-                                    <TableCell className="text-right space-x-2">
+                                        <div className="absolute top-2 right-2"><ContentBadge type={exam.access} /></div>
+                                    </CardHeader>
+                                    <CardContent className="p-4 flex-grow">
+                                        <CardTitle className="font-headline text-lg mb-1">{exam.subtitle}: {exam.title}</CardTitle>
+                                        <CardDescription>{exam.subject}</CardDescription>
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0 grid grid-cols-2 gap-2">
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForExam(textbookId, exam.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/textbooks/${textbookId}/exams/${exam.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
+                                            <Link href={`/admin/textbooks/${textbookId}/exams/${exam.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Questions</Link>
                                         </Button>
-                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(exam)}>
+                                        <Button variant="outline" size="sm" onClick={() => handleOpenDialog(exam)}>
                                             <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setExamToDelete(exam)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
                                         </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))) : (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="text-center h-24">
-                                    No exams added to this textbook yet.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-16 text-muted-foreground">
+                            <p>No exams added to this textbook yet.</p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
-
             <AlertDialog open={!!examToDelete} onOpenChange={() => setExamToDelete(null)}>
                 <AlertDialogContent>
                 <AlertDialogHeader>
@@ -357,5 +334,3 @@ export default function ManageTextbookExamsPage() {
         </div>
     );
 }
-
-    
