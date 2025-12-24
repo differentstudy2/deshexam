@@ -138,7 +138,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                                 <Skeleton className="h-48 rounded-t-lg" />
                                 <CardHeader className="p-4 space-y-2">
                                     <Skeleton className="h-4 w-1/3" />
-                                    <Skeleton className="h-6 w-3/4" />
+                                    <Skeleton className="h-6 w-full" />
                                 </CardHeader>
                                 <CardContent className="p-4 pt-0">
                                     <Skeleton className="h-20 w-full" />
