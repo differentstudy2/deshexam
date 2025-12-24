@@ -27,6 +27,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentBadge } from '@/components/content-badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Exam = {
   id: string;
@@ -112,9 +113,39 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
     
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-                <Loader2 className="w-8 h-8 animate-spin"/>
-                <p className="ml-2">Loading Chapters...</p>
+             <div className="bg-secondary/30 min-h-screen">
+                <div className="container mx-auto px-4 py-12">
+                    <header className="mb-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 rounded-lg bg-card p-6">
+                        <Skeleton className="rounded-md shadow-lg w-[120px] h-[170px] md:w-[150px] md:h-[210px]" />
+                        <div className="flex-grow space-y-3 text-center md:text-left">
+                            <Skeleton className="h-10 w-3/4 mx-auto md:mx-0" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6 mx-auto md:mx-0" />
+                            <div className="flex justify-center md:justify-start gap-2 pt-2">
+                                <Skeleton className="h-6 w-20" />
+                                <Skeleton className="h-6 w-24" />
+                                <Skeleton className="h-6 w-20" />
+                            </div>
+                        </div>
+                    </header>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2 max-w-2xl mx-auto mb-8">
+                        {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                         {[...Array(8)].map((_, i) => (
+                            <Card key={i}>
+                                <Skeleton className="h-48 rounded-t-lg" />
+                                <CardHeader className="p-4 space-y-2">
+                                    <Skeleton className="h-4 w-1/3" />
+                                    <Skeleton className="h-6 w-3/4" />
+                                </CardHeader>
+                                <CardContent className="p-4 pt-0">
+                                    <Skeleton className="h-20 w-full" />
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }
