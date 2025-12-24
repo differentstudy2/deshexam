@@ -13,33 +13,162 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Topic, Textbook, Resource, PracticeSet, Question, Exam } from '@/lib/types';
 import { collection, doc, getDoc, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart } from 'lucide-react';
+import { ArrowLeft, BookOpen, FileText, CheckSquare, Loader2, Menu, ChevronRight, Lock, Award, Clock, HelpCircle, BarChart, Video, Mic, File as FileIcon, ExternalLink, Smile, Frown, Annoyed, Facebook, Twitter, Linkedin, Link2, FileDown, LayoutGrid, List, Search, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { getTopicsByChapterId, getAllContent } from '@/lib/firebase/firestore';
+import { getTopicsByChapterId, getAllContent, getPracticeSetsByTopicId, getQuestionsByPracticeSet } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { ResourceViewerDialog } from '@/components/feature/resource-viewer-dialog';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardFooter, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentBadge } from '@/components/content-badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 
-type Exam = {
-  id: string;
-  title: string;
-  subject: string;
-  questions: any[];
-  duration: number;
-  difficulty: string;
-  access: "free" | "premium" | "pro";
-  testType: string;
-  featureImage?: string;
+
+const getResourceIcon = (type: string) => {
+    switch(type) {
+        case 'video': return <Video className="w-4 h-4 text-muted-foreground" />;
+        case 'audio': return <Mic className="w-4 h-4 text-muted-foreground" />;
+        case 'pdf': return <FileIcon className="w-4 h-4 text-muted-foreground" />;
+        default: return <ExternalLink className="w-4 h-4 text-muted-foreground" />;
+    }
 };
+
+const ChapterIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+);
+
+const ExamIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m14 2 4 4 4-4"></path><path d="M18 6V4"></path><path d="M6 10H4"></path><path d="M6 14H4"></path><path d="M6 18H4"></path><path d="M14 10h6"></path><path d="M14 14h6"></path><path d="M14 18h6"></path><path d="M4 20h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"></path></svg>
+);
+
+
+const SidebarNav = ({
+  chapters,
+  topicsByChapter,
+  activeChapterId,
+  activeTopicId,
+  onChapterToggle,
+  loadingTopics,
+  textbookId,
+  exams,
+}: {
+  chapters: Chapter[];
+  topicsByChapter: { [key: string]: Topic[] };
+  activeChapterId: string | null;
+  activeTopicId: string | null;
+  onChapterToggle: (chapterId: string) => void;
+  loadingTopics: string | null;
+  textbookId: string;
+  exams: any[];
+}) => {
+    const hasTopics = (chapterId: string) => {
+        return topicsByChapter[chapterId] && topicsByChapter[chapterId].length > 0;
+    }
+    return (
+    <div className="flex flex-col h-full">
+        <Accordion type="single" collapsible defaultValue={activeChapterId || undefined} className="w-full" onValueChange={onChapterToggle}>
+          {chapters.map((chapter, index) => {
+              const chapterHasTopics = hasTopics(chapter.id);
+              if (chapterHasTopics) {
+                  return (
+                    <AccordionItem value={chapter.id} key={chapter.id}>
+                        <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md justify-start">
+                           <div className="flex items-center gap-3">
+                               <ChapterIcon />
+                               <span>{chapter.title}</span>
+                           </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2 pb-0">
+                           {loadingTopics === chapter.id ? (
+                               <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin"/></div>
+                           ) : (
+                               <ul className="space-y-1 pl-4 border-l">
+                                {(topicsByChapter[chapter.id] || []).map(topic => (
+                                  <li key={topic.id}>
+                                    <Button
+                                      variant="ghost"
+                                      asChild
+                                      className={cn(
+                                        "w-full justify-start text-left h-auto py-1.5 px-2 text-base",
+                                        activeTopicId === topic.id ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary" : ""
+                                      )}
+                                    >
+                                      <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}/topic/${topic.id}`} className="flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-muted-foreground" />
+                                        <span>{topic.title}</span>
+                                      </Link>
+                                    </Button>
+                                  </li>
+                                ))}
+                                {(!topicsByChapter[chapter.id] || topicsByChapter[chapter.id].length === 0) && (
+                                   <p className="p-2 text-sm text-muted-foreground">No topics in this chapter.</p>
+                                )}
+                              </ul>
+                           )}
+                        </AccordionContent>
+                    </AccordionItem>
+                  )
+              }
+              // If no topics, render as a direct link
+              return (
+                  <div key={chapter.id} className="border-b">
+                      <Button
+                        variant="ghost"
+                        asChild
+                        className={cn(
+                          "w-full justify-start text-left h-auto py-3 px-3 text-base font-medium rounded-none",
+                          activeChapterId === chapter.id && !activeTopicId ? "bg-primary/10 text-primary font-semibold" : ""
+                        )}
+                      >
+                          <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} className="flex items-center gap-3">
+                            <ChapterIcon />
+                            <span>{chapter.title}</span>
+                          </Link>
+                      </Button>
+                  </div>
+              )
+          })}
+        </Accordion>
+
+        {exams.length > 0 && (
+            <Accordion type="single" collapsible className="w-full mt-4 pt-4 border-t">
+                 <AccordionItem value="exams">
+                    <AccordionTrigger className="hover:no-underline [&[data-state=open]]:bg-accent/50 px-3 rounded-md">
+                        <div className="flex items-center gap-3">
+                            <ExamIcon/>
+                            <span>Exams</span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2 pb-0">
+                        <ul className="space-y-1 pl-4 border-l">
+                            {exams.map(exam => (
+                                <li key={exam.id}>
+                                    <Button variant="ghost" asChild className="w-full justify-start text-left h-auto py-1.5 px-2 text-base">
+                                        <Link href={`/exam/${exam.id}`}>
+                                            {exam.title}
+                                        </Link>
+                                    </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        )}
+    </div>
+)};
+
 
 export default function TextbookClientPage({ textbook: initialTextbook }: { textbook: Textbook }) {
     const params = useParams();
