@@ -191,8 +191,9 @@ export default function DashboardPage() {
                                 <Image
                                 src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
                                 alt={book.title}
-                                fill
-                                className="object-contain p-2"
+                                width={200}
+                                height={280}
+                                className="w-full h-full object-contain p-2"
                                 data-ai-hint={`${book.subject || ''} textbook`}
                                 />
                             </Link>
