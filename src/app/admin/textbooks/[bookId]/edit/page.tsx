@@ -52,6 +52,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Link from 'next/link';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty.'),
@@ -60,6 +61,7 @@ const formSchema = z.object({
   classCategory: z.string().optional(),
   class: z.string().optional(),
   featureImage: z.string().optional(),
+  pdfUrl: z.string().optional(),
   board: z.string().optional(),
   state: z.string().optional(),
   examCategory: z.string().optional(),
@@ -180,6 +182,8 @@ export default function EditContentPage() {
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -190,6 +194,7 @@ export default function EditContentPage() {
       classCategory: '',
       class: '',
       featureImage: '',
+      pdfUrl: '',
       board: '',
       state: '',
       examCategory: '',
@@ -322,6 +327,29 @@ export default function EditContentPage() {
         });
     } finally {
       setIsGeneratingDesc(false);
+    }
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        setIsUploadingPdf(true);
+        try {
+            const downloadURL = await uploadFile(file);
+            form.setValue('pdfUrl', downloadURL, { shouldDirty: true });
+             toast({
+                title: 'PDF Uploaded',
+                description: 'The PDF file has been uploaded.',
+            });
+        } catch (error) {
+           toast({
+            variant: "destructive",
+            title: 'Upload Failed',
+            description: (error as Error).message,
+           });
+        } finally {
+            setIsUploadingPdf(false);
+        }
     }
   };
   
@@ -479,9 +507,7 @@ export default function EditContentPage() {
                                     </FormControl>
                                     <SelectContent>
                                     {classCategories.map((c) => (
-                                        <SelectItem key={c.id} value={c.id}>
-                                        {c.name}
-                                        </SelectItem>
+                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                     ))}
                                     </SelectContent>
                                 </Select>
@@ -503,9 +529,7 @@ export default function EditContentPage() {
                                     </FormControl>
                                     <SelectContent>
                                     {grades.map((g) => (
-                                        <SelectItem key={g.id} value={g.name}>
-                                        {g.name}
-                                        </SelectItem>
+                                        <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
                                     ))}
                                     </SelectContent>
                                 </Select>
@@ -597,23 +621,43 @@ export default function EditContentPage() {
                </div>
 
 
-               <FormField
-                    control={form.control}
-                    name="featureImage"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Feature Image</FormLabel>
-                        <div className="flex items-center gap-4">
-                            <ImageUploader
-                                fieldName={field.name}
-                                onUrlChange={(url) => form.setValue('featureImage', url)}
-                            />
-                            {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="featureImage"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Feature Image</FormLabel>
+                            <div className="flex items-center gap-4">
+                                <ImageUploader
+                                    fieldName={field.name}
+                                    onUrlChange={(url) => form.setValue('featureImage', url)}
+                                />
+                                {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="pdfUrl"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Textbook PDF (Optional)</FormLabel>
+                             <div className="flex items-center gap-2">
+                                <Input placeholder="PDF URL..." {...field} value={field.value ?? ''} />
+                                <Button type="button" variant="outline" size="icon" onClick={() => pdfInputRef.current?.click()} disabled={isUploadingPdf}>
+                                    {isUploadingPdf ? <Loader2 className="animate-spin"/> : <Upload/>}
+                                 </Button>
+                                 <Input type="file" ref={pdfInputRef} className="hidden" accept=".pdf" onChange={handlePdfUpload}/>
+                             </div>
+                             {field.value && <Link href={field.value} target="_blank" className="text-sm text-primary underline">View Uploaded PDF</Link>}
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
                 
                 <div className='space-y-2 lg:col-span-3'>
                       <FormField
@@ -693,6 +737,9 @@ export default function EditContentPage() {
                     <Save className="mr-2 h-4 w-4"/>
                     {form.formState.isSubmitting ? "Updating..." : "Update Textbook"}
                 </Button>
+                 <Button variant="outline" asChild>
+                    <Link href="/admin/textbooks">Cancel</Link>
+                </Button>
            </div>
         </form>
       </Form>
@@ -700,3 +747,4 @@ export default function EditContentPage() {
   );
 }
 
+    
