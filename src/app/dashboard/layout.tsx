@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
 
 export default function DashboardLayout({
   children,
@@ -42,12 +43,13 @@ export default function DashboardLayout({
             <DashboardSidebar user={user} logOut={logOut} />
         </Sidebar>
         <SidebarInset>
-            <main className="p-4 md:p-6 lg:p-8">
-                {children}
-            </main>
+            <div className="flex flex-col min-h-screen">
+                <main className="flex-grow p-4 md:p-6 lg:p-8">
+                    {children}
+                </main>
+                <Footer />
+            </div>
         </SidebarInset>
     </SidebarProvider>
   );
 }
-
-    
