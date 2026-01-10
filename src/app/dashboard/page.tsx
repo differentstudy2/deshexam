@@ -189,15 +189,15 @@ export default function DashboardPage() {
                         <CardHeader className="p-0 relative bg-gray-100 dark:bg-gray-800 flex items-center justify-center aspect-[2/3]">
                             <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
                                 <Image
-                                src={(book as any).featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
+                                src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
                                 alt={book.title}
                                 fill
                                 className="object-contain p-2"
-                                data-ai-hint={`${(book as any).subject || ''} textbook`}
+                                data-ai-hint={`${book.subject || ''} textbook`}
                                 />
                             </Link>
                             <div className="absolute top-2 right-2">
-                                <ContentBadge type={(book as any).access} />
+                                <ContentBadge type={book.access} />
                             </div>
                         </CardHeader>
                         <CardContent className="flex-grow p-4 space-y-2">
