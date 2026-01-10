@@ -183,7 +183,7 @@ export default function DashboardPage() {
                   <CardTitle>Recommended Textbook Solutions</CardTitle>
                   <CardDescription>Based on your profile, we think you'll find these helpful.</CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {recommendedTextbooks.map(book => (
                     <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                         <CardHeader className="p-0 relative bg-gray-100 dark:bg-gray-800 flex items-center justify-center aspect-[2/3]">
