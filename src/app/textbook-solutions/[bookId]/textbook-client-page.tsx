@@ -351,7 +351,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                     height={210}
                     className="rounded-md shadow-lg object-cover w-[120px] h-[170px] md:w-[150px] md:h-[210px]"
                 />
-                <div className="text-center md:text-left">
+                <div className="text-center md:text-left flex-grow">
                     <h1 className="font-headline text-3xl md:text-4xl font-bold tracking-tight">{textbook?.title}</h1>
                     {textbook?.description && <p className="mt-2 text-muted-foreground max-w-2xl">{textbook.description}</p>}
                     <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
@@ -360,6 +360,15 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                         {textbook?.subject && <Badge variant="secondary">{textbook.subject}</Badge>}
                     </div>
                 </div>
+                 {(textbook as any)?.pdfUrl && (
+                    <div className="flex-shrink-0">
+                        <Button asChild>
+                            <a href={(textbook as any).pdfUrl} target="_blank" rel="noopener noreferrer">
+                                <FileDown className="mr-2" /> Download Textbook
+                            </a>
+                        </Button>
+                    </div>
+                )}
             </header>
             
             <Tabs defaultValue="chapters" className="w-full">
