@@ -85,10 +85,8 @@ export default function DashboardPage() {
             
             if (userProfile && allTextbooks.length > 0) {
                 const filteredTextbooks = allTextbooks.filter(book => {
-                    const boardMatch = userProfile.board ? book.board === userProfile.board : true;
-                    const classMatch = userProfile.grade ? book.class === userProfile.grade : true;
-                    const subjectMatch = userProfile.subject ? book.subject === userProfile.subject : false;
-                    return subjectMatch || boardMatch || classMatch;
+                    // Only match based on the grade/class
+                    return userProfile.grade ? book.class === userProfile.grade : false;
                 }).slice(0, 3); // Limit to 3 recommendations
                 setRecommendedTextbooks(filteredTextbooks);
             }
