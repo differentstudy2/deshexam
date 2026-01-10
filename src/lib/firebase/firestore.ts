@@ -1415,7 +1415,7 @@ export const updateUserProfile = async (userId: string, data: any) => {
     if (!userId) throw new Error("User ID is required to update a profile.");
 
     const userDocRef = doc(db, "users", userId);
-
+    
     try {
         await runTransaction(db, async (transaction) => {
             const userDoc = await transaction.get(userDocRef);
@@ -1425,20 +1425,17 @@ export const updateUserProfile = async (userId: string, data: any) => {
             let oldUsernameRef: any;
             if (isUsernameChanging && currentData.username) {
                 oldUsernameRef = doc(db, "usernames", currentData.username);
-                await transaction.get(oldUsernameRef); 
+                // We don't need to get the doc, just hold the ref for deletion.
             }
 
+            // Merge existing data with new data
             const newData = { ...currentData, ...data };
             if (!userDoc.exists()) {
                 newData.role = 'user';
+                newData.createdAt = serverTimestamp(); // Set createdAt only for new users
             }
-
-            if (data.school === 'add_new_school' && data.newSchool) {
-                const newSchoolId = await addDoc(collection(db, 'schools'), { name: data.newSchool });
-                newData.school = data.newSchool;
-            }
+            
             delete newData.newSchool;
-
 
             if (isUsernameChanging || (!currentData.username && data.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
@@ -1452,14 +1449,10 @@ export const updateUserProfile = async (userId: string, data: any) => {
                 }
             }
             
-            if (userDoc.exists()) {
-                transaction.update(userDocRef, newData);
-            } else {
-                transaction.set(userDocRef, newData);
-            }
+            transaction.set(userDocRef, newData, { merge: true });
         });
     } catch (error) {
-        console.error("Error updating user profile:", error);
+        console.error("Error updating user profile transaction:", error);
         throw new Error("Failed to update user profile.");
     }
 };
@@ -2263,6 +2256,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
