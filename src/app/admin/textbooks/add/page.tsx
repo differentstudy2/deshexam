@@ -624,13 +624,13 @@ export default function AddTextbookPage() {
                         <FormItem>
                             <FormLabel>Textbook PDF (Optional)</FormLabel>
                              <div className="flex items-center gap-2">
-                                <Button type="button" variant="outline" size="sm" onClick={() => pdfInputRef.current?.click()} disabled={isUploadingPdf}>
-                                    {isUploadingPdf ? <Loader2 className="animate-spin mr-2"/> : <Upload className="mr-2"/>}
-                                    Upload PDF
-                                </Button>
+                                <Input placeholder="PDF URL..." {...field} />
+                                <Button type="button" variant="outline" size="icon" onClick={() => pdfInputRef.current?.click()} disabled={isUploadingPdf}>
+                                    {isUploadingPdf ? <Loader2 className="animate-spin"/> : <Upload/>}
+                                 </Button>
                                  <Input type="file" ref={pdfInputRef} className="hidden" accept=".pdf" onChange={handlePdfUpload}/>
-                                {field.value && <Link href={field.value} target="_blank" className="text-sm text-primary underline truncate max-w-xs">View Uploaded PDF</Link>}
                              </div>
+                             {field.value && <Link href={field.value} target="_blank" className="text-sm text-primary underline">View Uploaded PDF</Link>}
                             <FormMessage />
                         </FormItem>
                         )}
@@ -721,5 +721,3 @@ export default function AddTextbookPage() {
     </div>
   );
 }
-
-    
