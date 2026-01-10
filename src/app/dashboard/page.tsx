@@ -88,7 +88,7 @@ export default function DashboardPage() {
                 const boardMatch = userProfile.board ? book.board === userProfile.board : true;
                 const classMatch = userProfile.grade ? book.class === userProfile.grade : true;
                 const subjectMatch = userProfile.subject ? book.subject === userProfile.subject : false; // Only recommend if subject matches
-                return boardMatch && classMatch && subjectMatch;
+                return subjectMatch && (boardMatch || classMatch);
             });
             setRecommendedTextbooks(filteredTextbooks);
         }
