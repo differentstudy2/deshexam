@@ -37,7 +37,7 @@ import {
   getExamTypes,
   getExamsByCategory,
 } from '@/lib/firebase/firestore';
-import { Loader2, Save, Upload, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Loader2, Save, Upload, Image as ImageIcon, Sparkles, Trash2 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
@@ -634,6 +634,11 @@ export default function EditContentPage() {
                                     onUrlChange={(url) => form.setValue('featureImage', url)}
                                 />
                                 {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
+                                {field.value && (
+                                    <Button type="button" variant="destructive" size="sm" onClick={() => form.setValue('featureImage', '')}>
+                                        <Trash2 className="mr-2 h-4 w-4"/> Remove
+                                    </Button>
+                                )}
                             </div>
                             <FormMessage />
                         </FormItem>
@@ -651,6 +656,11 @@ export default function EditContentPage() {
                                     {isUploadingPdf ? <Loader2 className="animate-spin"/> : <Upload/>}
                                  </Button>
                                  <Input type="file" ref={pdfInputRef} className="hidden" accept=".pdf" onChange={handlePdfUpload}/>
+                                 {field.value && (
+                                    <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue('pdfUrl', '')}>
+                                        <Trash2 className="h-4 w-4"/>
+                                    </Button>
+                                 )}
                              </div>
                              {field.value && <Link href={field.value} target="_blank" className="text-sm text-primary underline">View Uploaded PDF</Link>}
                             <FormMessage />
@@ -746,5 +756,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
-    
