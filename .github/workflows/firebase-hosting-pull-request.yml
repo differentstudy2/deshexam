@@ -30,3 +30,4 @@ jobs:
           command: apphosting:deploy
           serviceAccount: ${{ secrets.GCP_SA_KEY }}
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          backend-secrets: GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
