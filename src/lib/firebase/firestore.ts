@@ -1420,26 +1420,30 @@ export const updateUserProfile = async (userId: string, data: any) => {
         await runTransaction(db, async (transaction) => {
             const userDoc = await transaction.get(userDocRef);
             const currentData = userDoc.data() || {};
+            
             const isUsernameChanging = data.displayName && data.displayName !== currentData.displayName;
             
             let oldUsernameRef: any;
             if (isUsernameChanging && currentData.username) {
                 oldUsernameRef = doc(db, "usernames", currentData.username);
-                // We don't need to get the doc, just hold the ref for deletion.
             }
 
-            // Merge existing data with new data
-            const newData = { ...currentData, ...data };
-            if (!userDoc.exists()) {
-                newData.role = 'user';
-                newData.createdAt = serverTimestamp(); // Set createdAt only for new users
-            }
-            
+            let newData = { ...data };
             delete newData.newSchool;
+
+            if (userDoc.exists()) {
+                // For existing users, we just update.
+                transaction.update(userDocRef, newData);
+            } else {
+                // For new users, we set the initial document.
+                newData.role = 'user';
+                newData.createdAt = serverTimestamp();
+                transaction.set(userDocRef, newData);
+            }
 
             if (isUsernameChanging || (!currentData.username && data.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
-                newData.username = newUsername;
+                transaction.update(userDocRef, { username: newUsername });
                 
                 const newUsernameRef = doc(db, "usernames", newUsername);
                 transaction.set(newUsernameRef, { uid: userId });
@@ -1448,8 +1452,6 @@ export const updateUserProfile = async (userId: string, data: any) => {
                     transaction.delete(oldUsernameRef);
                 }
             }
-            
-            transaction.set(userDocRef, newData, { merge: true });
         });
     } catch (error) {
         console.error("Error updating user profile transaction:", error);
@@ -2099,7 +2101,7 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
     try {
         const path = (topicId && topicId !== 'null')
             ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
-            : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+            : `textbook-solutions/practice-set/${practiceSetId}/textbook/${textbookId}/questions`;
         const questionsRef = collection(db, path);
         const q = query(questionsRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
@@ -2256,6 +2258,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
