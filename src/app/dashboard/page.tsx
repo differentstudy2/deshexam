@@ -26,12 +26,15 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { getSubmissionsByUserId, getContentById } from '@/lib/firebase/firestore';
+import { getSubmissionsByUserId, getContentById, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, FileText, BarChart2 } from 'lucide-react';
+import { Eye, PlusCircle, FileText, BarChart2, Book } from 'lucide-react';
 import Link from 'next/link';
 import { ChartConfig } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getUserProfile } from '@/lib/firebase/firestore';
+import type { Textbook } from '@/lib/types';
+import Image from 'next/image';
 
 type Submission = {
   id: string;
@@ -56,13 +59,17 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recommendedTextbooks, setRecommendedTextbooks] = useState<Textbook[]>([]);
+  const [loadingTextbooks, setLoadingTextbooks] = useState(true);
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
+    const fetchDashboardData = async () => {
       if (user) {
         setLoading(true);
+        setLoadingTextbooks(true);
+
+        // Fetch submissions
         const userSubmissions = await getSubmissionsByUserId(user.uid);
-        
         const submissionsWithTestData = await Promise.all(
             userSubmissions.map(async (sub) => {
                 const test = await getContentById(sub.testId);
@@ -71,9 +78,24 @@ export default function DashboardPage() {
         );
         setSubmissions(submissionsWithTestData);
         setLoading(false);
+
+        // Fetch profile and textbooks
+        const userProfile = await getUserProfile(user.uid);
+        const allTextbooks = (await getAllTextbooks()) as Textbook[];
+        
+        if (userProfile && allTextbooks.length > 0) {
+            const filteredTextbooks = allTextbooks.filter(book => {
+                const boardMatch = userProfile.board ? book.board === userProfile.board : true;
+                const classMatch = userProfile.grade ? book.class === userProfile.grade : true;
+                const subjectMatch = userProfile.subject ? book.subject === userProfile.subject : false; // Only recommend if subject matches
+                return boardMatch && classMatch && subjectMatch;
+            });
+            setRecommendedTextbooks(filteredTextbooks);
+        }
+        setLoadingTextbooks(false);
       }
     };
-    fetchSubmissions();
+    fetchDashboardData();
   }, [user]);
 
   const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
@@ -142,6 +164,36 @@ export default function DashboardPage() {
           ))
         )}
       </div>
+      
+      {loadingTextbooks ? (
+          <Skeleton className="h-64 w-full" />
+      ) : recommendedTextbooks.length > 0 && (
+          <Card>
+              <CardHeader>
+                  <CardTitle>Recommended Textbook Solutions</CardTitle>
+                  <CardDescription>Based on your profile, we think you'll find these helpful.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {recommendedTextbooks.slice(0, 3).map(book => (
+                      <Link key={book.id} href={`/textbook-solutions/${book.id}`} className="group">
+                           <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                              <Image 
+                                  src={book.featureImage || `https://picsum.photos/seed/${book.id}/300/150`} 
+                                  alt={book.title} 
+                                  width={300} 
+                                  height={150} 
+                                  className="w-full h-32 object-cover"
+                              />
+                               <div className="p-4">
+                                  <h4 className="font-semibold group-hover:text-primary">{book.title}</h4>
+                                  <p className="text-sm text-muted-foreground">{book.subject}</p>
+                              </div>
+                           </Card>
+                      </Link>
+                  ))}
+              </CardContent>
+          </Card>
+      )}
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <Card>

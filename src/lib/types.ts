@@ -20,6 +20,7 @@ export type Textbook = {
     access: 'free' | 'premium' | 'pro';
     price?: number;
     subscriptionPlan?: 'pass' | 'pro';
+    board?: string;
 };
 
 export type Chapter = {
