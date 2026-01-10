@@ -60,6 +60,7 @@ const formSchema = z.object({
   classCategory: z.string().optional(),
   class: z.string().optional(),
   featureImage: z.string().optional(),
+  pdfUrl: z.string().optional(),
   board: z.string().optional(),
   state: z.string().optional(),
   examCategory: z.string().optional(),
@@ -178,6 +179,8 @@ export default function AddTextbookPage() {
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -188,6 +191,7 @@ export default function AddTextbookPage() {
       classCategory: '',
       class: '',
       featureImage: '',
+      pdfUrl: '',
       board: '',
       state: '',
       examCategory: '',
@@ -305,6 +309,29 @@ export default function AddTextbookPage() {
       setIsGeneratingDesc(false);
     }
   };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+        setIsUploadingPdf(true);
+        try {
+            const downloadURL = await uploadFile(file);
+            form.setValue('pdfUrl', downloadURL, { shouldDirty: true });
+             toast({
+                title: 'PDF Uploaded',
+                description: 'The PDF file has been uploaded.',
+            });
+        } catch (error) {
+           toast({
+            variant: "destructive",
+            title: 'Upload Failed',
+            description: (error as Error).message,
+           });
+        } finally {
+            setIsUploadingPdf(false);
+        }
+    }
+  };
   
   if (loading) {
     return (
@@ -392,9 +419,7 @@ export default function AddTextbookPage() {
                                 </FormControl>
                                 <SelectContent>
                                 {boards.map((b) => (
-                                    <SelectItem key={b.id} value={b.name}>
-                                    {b.name}
-                                    </SelectItem>
+                                    <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
                                 ))}
                                 </SelectContent>
                             </Select>
@@ -416,9 +441,7 @@ export default function AddTextbookPage() {
                                 </FormControl>
                                 <SelectContent>
                                 {states.map((s) => (
-                                    <SelectItem key={s.id} value={s.name}>
-                                    {s.name}
-                                    </SelectItem>
+                                    <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
                                 ))}
                                 </SelectContent>
                             </Select>
@@ -443,9 +466,7 @@ export default function AddTextbookPage() {
                                 </FormControl>
                                 <SelectContent>
                                 {subjects.map((s) => (
-                                    <SelectItem key={s.id} value={s.name}>
-                                    {s.name}
-                                    </SelectItem>
+                                    <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
                                 ))}
                                 </SelectContent>
                             </Select>
@@ -468,9 +489,7 @@ export default function AddTextbookPage() {
                                     </FormControl>
                                     <SelectContent>
                                     {classCategories.map((c) => (
-                                        <SelectItem key={c.id} value={c.id}>
-                                        {c.name}
-                                        </SelectItem>
+                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                     ))}
                                     </SelectContent>
                                 </Select>
@@ -492,9 +511,7 @@ export default function AddTextbookPage() {
                                     </FormControl>
                                     <SelectContent>
                                     {grades.map((g) => (
-                                        <SelectItem key={g.id} value={g.name}>
-                                        {g.name}
-                                        </SelectItem>
+                                        <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
                                     ))}
                                     </SelectContent>
                                 </Select>
@@ -520,9 +537,7 @@ export default function AddTextbookPage() {
                                 </FormControl>
                                 <SelectContent>
                                 {examCategories.map((ec) => (
-                                    <SelectItem key={ec.id} value={ec.name}>
-                                    {ec.name}
-                                    </SelectItem>
+                                    <SelectItem key={ec.id} value={ec.name}>{ec.name}</SelectItem>
                                 ))}
                                 </SelectContent>
                             </Select>
@@ -544,9 +559,7 @@ export default function AddTextbookPage() {
                                 </FormControl>
                                 <SelectContent>
                                 {exams.map((e) => (
-                                    <SelectItem key={e.id} value={e.name}>
-                                    {e.name}
-                                    </SelectItem>
+                                    <SelectItem key={e.id} value={e.name}>{e.name}</SelectItem>
                                 ))}
                                 </SelectContent>
                             </Select>
@@ -586,24 +599,44 @@ export default function AddTextbookPage() {
                </div>
 
 
-               <FormField
-                    control={form.control}
-                    name="featureImage"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Feature Image</FormLabel>
-                        <div className="flex items-center gap-4">
-                            <ImageUploader
-                                fieldName={field.name}
-                                onUrlChange={(url) => form.setValue('featureImage', url)}
-                            />
-                            {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="featureImage"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Feature Image</FormLabel>
+                            <div className="flex items-center gap-4">
+                                <ImageUploader
+                                    fieldName={field.name}
+                                    onUrlChange={(url) => form.setValue('featureImage', url)}
+                                />
+                                {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="pdfUrl"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Textbook PDF (Optional)</FormLabel>
+                             <div className="flex items-center gap-2">
+                                <Button type="button" variant="outline" size="sm" onClick={() => pdfInputRef.current?.click()} disabled={isUploadingPdf}>
+                                    {isUploadingPdf ? <Loader2 className="animate-spin mr-2"/> : <Upload className="mr-2"/>}
+                                    Upload PDF
+                                </Button>
+                                 <Input type="file" ref={pdfInputRef} className="hidden" accept=".pdf" onChange={handlePdfUpload}/>
+                                {field.value && <Link href={field.value} target="_blank" className="text-sm text-primary underline truncate max-w-xs">View Uploaded PDF</Link>}
+                             </div>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+                
                 <div className='space-y-2 lg:col-span-3'>
                       <FormField
                         control={form.control}
@@ -688,3 +721,5 @@ export default function AddTextbookPage() {
     </div>
   );
 }
+
+    
