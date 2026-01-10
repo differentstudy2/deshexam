@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -92,7 +91,7 @@ export default function DashboardPage() {
                 const filteredTextbooks = allTextbooks.filter(book => {
                     // Only match based on the grade/class
                     return userProfile.grade ? book.class === userProfile.grade : false;
-                }).slice(0, 3); // Limit to 3 recommendations
+                });
                 setRecommendedTextbooks(filteredTextbooks);
             }
         } catch(error) {
@@ -348,4 +347,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
