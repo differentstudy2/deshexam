@@ -28,7 +28,7 @@ const features = [
   {
     icon: <ClipboardCheck className="w-8 h-8 text-primary" />,
     title: "Mock Tests",
-    description: "Distraction-free interface with timer and instant scoring.",
+    description: "Distraction-free interface with timer and instant scoring. add more content",
     link: "/mock-tests",
   },
   {

@@ -234,6 +234,7 @@ h3.name.text-lg.font-semibold {
 }
 .prose p {
   margin-bottom: 0.2rem;
+  font-size: 1.5rem;
 }
 .text-xs {
   font-size: .75rem !important;
