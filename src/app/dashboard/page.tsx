@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import {
   Card,
@@ -68,30 +68,38 @@ export default function DashboardPage() {
         setLoading(true);
         setLoadingTextbooks(true);
 
-        // Fetch submissions
-        const userSubmissions = await getSubmissionsByUserId(user.uid);
-        const submissionsWithTestData = await Promise.all(
-            userSubmissions.map(async (sub) => {
-                const test = await getContentById(sub.testId);
-                return { ...sub, test };
-            })
-        );
-        setSubmissions(submissionsWithTestData);
-        setLoading(false);
+        try {
+            // Fetch submissions
+            const userSubmissions = await getSubmissionsByUserId(user.uid);
+            const submissionsWithTestData = await Promise.all(
+                userSubmissions.map(async (sub) => {
+                    const test = await getContentById(sub.testId);
+                    return { ...sub, test };
+                })
+            );
+            setSubmissions(submissionsWithTestData);
 
-        // Fetch profile and textbooks
-        const userProfile = await getUserProfile(user.uid);
-        const allTextbooks = (await getAllTextbooks()) as Textbook[];
-        
-        if (userProfile && allTextbooks.length > 0) {
-            const filteredTextbooks = allTextbooks.filter(book => {
-                const boardMatch = userProfile.board ? book.board === userProfile.board : true;
-                const classMatch = userProfile.grade ? book.class === userProfile.grade : true;
-                const subjectMatch = userProfile.subject ? book.subject === userProfile.subject : false; // Only recommend if subject matches
-                return subjectMatch && (boardMatch || classMatch);
-            });
-            setRecommendedTextbooks(filteredTextbooks);
+            // Fetch profile and textbooks for recommendations
+            const userProfile = await getUserProfile(user.uid);
+            const allTextbooks = (await getAllTextbooks()) as Textbook[];
+            
+            if (userProfile && allTextbooks.length > 0) {
+                const filteredTextbooks = allTextbooks.filter(book => {
+                    const boardMatch = userProfile.board ? book.board === userProfile.board : true;
+                    const classMatch = userProfile.grade ? book.class === userProfile.grade : true;
+                    const subjectMatch = userProfile.subject ? book.subject === userProfile.subject : false;
+                    return subjectMatch || boardMatch || classMatch;
+                }).slice(0, 3); // Limit to 3 recommendations
+                setRecommendedTextbooks(filteredTextbooks);
+            }
+        } catch(error) {
+            console.error("Failed to fetch dashboard data:", error)
+        } finally {
+            setLoading(false);
+            setLoadingTextbooks(false);
         }
+      } else {
+        setLoading(false);
         setLoadingTextbooks(false);
       }
     };
@@ -165,7 +173,7 @@ export default function DashboardPage() {
         )}
       </div>
       
-      {loadingTextbooks ? (
+       {loadingTextbooks ? (
           <Skeleton className="h-64 w-full" />
       ) : recommendedTextbooks.length > 0 && (
           <Card>
@@ -174,7 +182,7 @@ export default function DashboardPage() {
                   <CardDescription>Based on your profile, we think you'll find these helpful.</CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {recommendedTextbooks.slice(0, 3).map(book => (
+                  {recommendedTextbooks.map(book => (
                       <Link key={book.id} href={`/textbook-solutions/${book.id}`} className="group">
                            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
                               <Image 
