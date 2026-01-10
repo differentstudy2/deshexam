@@ -81,23 +81,24 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
     }
 
     return (
-        <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-2 text-center text-xs text-muted-foreground">
-            <div className="flex flex-col items-center gap-1">
+        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-4 gap-1">
+            <div className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
                 <span>{stats.chapterCount} Chapters</span>
             </div>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
                 <span>{stats.topicCount} Topics</span>
             </div>
-             <div className="flex flex-col items-center gap-1">
+             <div className="flex items-center gap-1">
                 <Award className="h-4 w-4" />
                 <span>{stats.examCount} Exams</span>
             </div>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1">
                 <CheckSquare className="h-4 w-4" />
                 <span>{stats.practiceSetCount} Sets</span>
             </div>
         </div>
     );
 };
+

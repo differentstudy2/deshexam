@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -9,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -35,6 +37,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getUserProfile } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import Image from 'next/image';
+import { TextbookStats } from '@/components/feature/textbook-stats';
+import { Badge } from '@/components/ui/badge';
+import { ContentBadge } from '@/components/content-badge';
 
 type Submission = {
   id: string;
@@ -181,21 +186,39 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {recommendedTextbooks.map(book => (
-                      <Link key={book.id} href={`/textbook-solutions/${book.id}`} className="group">
-                           <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                              <Image 
-                                  src={book.featureImage || `https://picsum.photos/seed/${book.id}/300/150`} 
-                                  alt={book.title} 
-                                  width={300} 
-                                  height={150} 
-                                  className="w-full h-32 object-cover"
-                              />
-                               <div className="p-4">
-                                  <h4 className="font-semibold group-hover:text-primary">{book.title}</h4>
-                                  <p className="text-sm text-muted-foreground">{book.subject}</p>
-                              </div>
-                           </Card>
-                      </Link>
+                    <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                        <CardHeader className="p-0 relative bg-gray-100 dark:bg-gray-800 flex items-center justify-center aspect-[2/3]">
+                            <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
+                                <Image
+                                src={(book as any).featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
+                                alt={book.title}
+                                fill
+                                className="object-contain p-2"
+                                data-ai-hint={`${(book as any).subject || ''} textbook`}
+                                />
+                            </Link>
+                            <div className="absolute top-2 right-2">
+                                <ContentBadge type={(book as any).access} />
+                            </div>
+                        </CardHeader>
+                        <CardContent className="flex-grow p-4 space-y-2">
+                            <div className="flex flex-wrap gap-2">
+                                {book.subject && <Badge variant="outline">{book.subject}</Badge>}
+                                {book.class && <Badge variant="outline">{book.class}</Badge>}
+                                {book.board && <Badge variant="outline">{book.board}</Badge>}
+                            </div>
+                            <Link href={`/textbook-solutions/${book.id}`}>
+                                <h3 className="font-bold text-lg hover:text-primary transition-colors">{book.title}</h3>
+                            </Link>
+                            <p className="text-xs text-muted-foreground">by {(book as any).authorName || 'DeshExam'}</p>
+                            <TextbookStats textbookId={book.id} />
+                        </CardContent>
+                        <CardFooter className="p-4 pt-0">
+                            <Button asChild className="w-full">
+                                <Link href={`/textbook-solutions/${book.id}`}><Book className="mr-2"/> View Solutions</Link>
+                            </Button>
+                        </CardFooter>
+                    </Card>
                   ))}
               </CardContent>
           </Card>
@@ -325,3 +348,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
