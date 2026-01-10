@@ -49,6 +49,7 @@ export default function ProfilePage() {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [isAddingNewSchool, setIsAddingNewSchool] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -69,21 +70,55 @@ export default function ProfilePage() {
   const selectedClassCategory = form.watch('classCategory');
 
   useEffect(() => {
-    const fetchMetadata = async () => {
+    const fetchProfileAndMetadata = async () => {
+        if (!user) return;
+        
         try {
-            const [boardsData, classesData] = await Promise.all([getBoards(), getClasses()]);
+            const [boardsData, classesData, userProfile] = await Promise.all([
+                getBoards(), 
+                getClasses(),
+                getUserProfile(user.uid)
+            ]);
             setBoards(boardsData);
             setClassCategories(classesData);
+            
+            const initialFormValues = {
+                displayName: user.displayName || '',
+                email: user.email || '',
+                photoURL: user.photoURL || '',
+                school: userProfile?.school || '',
+                classCategory: userProfile?.classCategory || '',
+                grade: userProfile?.grade || '',
+                targetExam: userProfile?.targetExam || '',
+                board: userProfile?.board || '',
+                semester: userProfile?.semester || '',
+            };
+            form.reset(initialFormValues);
+
+            if (userProfile?.classCategory) {
+                 const [fetchedGrades, fetchedSchools] = await Promise.all([
+                    getGradesByClass(userProfile.classCategory),
+                    getSchoolsByClass(userProfile.classCategory),
+                 ]);
+                 setGrades(fetchedGrades);
+                 setSchools(fetchedSchools);
+            }
         } catch (error) {
-            toast({
+             toast({
                 variant: 'destructive',
-                title: 'Failed to load academic options',
-                description: 'Could not fetch boards or classes.',
+                title: 'Failed to load profile data',
+                description: (error as Error).message,
             });
+        } finally {
+            setIsPageLoading(false);
         }
     }
-    fetchMetadata();
-  }, [toast]);
+    
+    if (user) {
+        fetchProfileAndMetadata();
+    }
+  }, [user, form, toast]);
+
 
   useEffect(() => {
     const fetchDependentData = async () => {
@@ -99,36 +134,11 @@ export default function ProfilePage() {
             setSchools([]);
         }
     };
-    fetchDependentData();
+    if (selectedClassCategory) {
+        fetchDependentData();
+    }
   }, [selectedClassCategory]);
 
-  useEffect(() => {
-    if (user) {
-      // Set default values from auth
-      form.reset({
-        displayName: user.displayName || '',
-        email: user.email || '',
-        photoURL: user.photoURL || '',
-      });
-
-      // Fetch and set extended profile data from Firestore
-      const fetchProfile = async () => {
-        const userProfile = await getUserProfile(user.uid);
-        if (userProfile) {
-          form.reset({
-            ...form.getValues(),
-            school: userProfile.school || '',
-            classCategory: userProfile.classCategory || '',
-            grade: userProfile.grade || '',
-            targetExam: userProfile.targetExam || '',
-            board: userProfile.board || '',
-            semester: userProfile.semester || '',
-          });
-        }
-      };
-      fetchProfile();
-    }
-  }, [user, form]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -213,6 +223,16 @@ export default function ProfilePage() {
           form.setValue('school', value);
       }
   }
+  
+  if (loading || isPageLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="ml-4 text-lg">Loading Profile...</p>
+      </div>
+    );
+  }
+
 
   return (
     <div>

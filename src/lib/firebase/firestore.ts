@@ -1431,15 +1431,13 @@ export const updateUserProfile = async (userId: string, data: any) => {
             let newData = { ...data };
             delete newData.newSchool;
 
-            if (userDoc.exists()) {
-                // For existing users, we just update.
-                transaction.update(userDocRef, newData);
-            } else {
-                // For new users, we set the initial document.
-                newData.role = 'user';
-                newData.createdAt = serverTimestamp();
-                transaction.set(userDocRef, newData);
-            }
+            // Using set with merge instead of separate update/set
+            const newProfileData = {
+                ...currentData,
+                ...newData,
+                ...(userDoc.exists() ? {} : { role: 'user', createdAt: serverTimestamp() }),
+            };
+            transaction.set(userDocRef, newProfileData, { merge: true });
 
             if (isUsernameChanging || (!currentData.username && data.displayName)) {
                 const newUsername = await generateUsername(data.displayName);
@@ -1458,6 +1456,7 @@ export const updateUserProfile = async (userId: string, data: any) => {
         throw new Error("Failed to update user profile.");
     }
 };
+
 
 export const toggleFollowUser = async (targetUserId: string) => {
     const auth = getAuth();
@@ -2258,6 +2257,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
