@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -428,7 +427,7 @@ export default function DashboardPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <ScoreCircle score={sub.totalQuestions > 0 ? (sub.score / sub.totalQuestions) * 100 : 0} />
+                      <ScoreCircle score={sub.totalQuestions > 0 ? (sub.score / sub.totalQuestions) * 100 : 0} size={36} />
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button asChild variant="outline" size="sm">
