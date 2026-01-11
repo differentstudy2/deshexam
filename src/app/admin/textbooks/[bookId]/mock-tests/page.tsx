@@ -50,12 +50,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import type { Textbook, Chapter, Question } from '@/lib/types';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
+import type { Textbook, Chapter, Question } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 
 
 type MockTest = {
@@ -225,9 +225,9 @@ export default function ManageTextbookMockTestsPage() {
                             <TableRow>
                                 <TableHead className="w-20">Image</TableHead>
                                 <TableHead>Title</TableHead>
-                                <TableHead>Questions</TableHead>
-                                <TableHead>Difficulty</TableHead>
-                                <TableHead>Access</TableHead>
+                                <TableHead className="hidden md:table-cell">Questions</TableHead>
+                                <TableHead className="hidden lg:table-cell">Difficulty</TableHead>
+                                <TableHead className="hidden md:table-cell">Access</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -237,9 +237,9 @@ export default function ManageTextbookMockTestsPage() {
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-10 w-16 rounded-md" /></TableCell>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-12" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-12" /></TableCell>
+                                    <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
                                     <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto" /></TableCell>
                                 </TableRow>
                             ))
@@ -256,13 +256,13 @@ export default function ManageTextbookMockTestsPage() {
                                         />
                                     </TableCell>
                                     <TableCell className="font-medium">{test.subtitle ? `${test.subtitle}: ${test.title}` : test.title}</TableCell>
-                                    <TableCell>{test.questions?.length || 0}</TableCell>
-                                    <TableCell>
+                                    <TableCell className="hidden md:table-cell">{test.questions?.length || 0}</TableCell>
+                                    <TableCell className="hidden lg:table-cell">
                                         <div className="flex flex-wrap gap-1">
                                             {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
                                         </div>
                                     </TableCell>
-                                    <TableCell><ContentBadge type={test.access} /></TableCell>
+                                    <TableCell className="hidden md:table-cell"><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
@@ -324,7 +324,7 @@ export default function ManageTextbookMockTestsPage() {
                                     </DropdownMenu>
                                 </div>
                             </div>
-                            <div className="space-y-2">
+                             <div className="space-y-2">
                                 <Label>Access Level</Label>
                                 <Select value={testData.access} onValueChange={(value) => setTestData(prev => ({ ...prev, access: value as 'free' | 'premium' | 'pro' }))}>
                                     <SelectTrigger>
