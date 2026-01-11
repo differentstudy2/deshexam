@@ -17,6 +17,7 @@ import { ScoreCircle } from '@/components/feature/score-circle';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 type Submission = {
   id: string;
@@ -67,7 +68,7 @@ export default function MyResultsPage() {
     const resultsMap = new Map<string, { highestScore: number; bestSubmission: Submission; testTitle: string, subject?: string, testType: string }>();
 
     submissions.forEach(sub => {
-      const score = Math.round((sub.score / sub.totalQuestions) * 100);
+      const score = sub.totalQuestions > 0 ? Math.round((sub.score / sub.totalQuestions) * 100) : 0;
       const existing = resultsMap.get(sub.testId);
 
       if (!existing || score > existing.highestScore) {
@@ -121,11 +122,14 @@ export default function MyResultsPage() {
             {aggregatedResults.map(result => (
                 <Card key={result.bestSubmission.id}>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                           <BarChart className="w-5 h-5 text-primary"/>
-                           {result.testTitle}
-                        </CardTitle>
-                        <CardDescription className="flex items-center gap-2">
+                        <div className="flex justify-between items-start">
+                             <CardTitle className="flex items-center gap-2">
+                                <BarChart className="w-5 h-5 text-primary"/>
+                                {result.testTitle}
+                             </CardTitle>
+                             <Badge variant="secondary">{result.testType}</Badge>
+                        </div>
+                        <CardDescription className="flex items-center gap-2 pt-1">
                            <Book className="w-4 h-4"/>
                            {result.subject || 'General'}
                         </CardDescription>
