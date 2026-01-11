@@ -10,6 +10,7 @@ import { AppProviders } from "./providers"; // Import the new provider
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
 import { Inter, Lexend } from 'next/font/google';
+import { Footer } from "@/components/layout/footer";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -47,6 +48,7 @@ export default function RootLayout({
               <div className="flex flex-col min-h-screen">
                 <Header />
                 <main className="flex-grow">{children}</main>
+                <Footer />
               </div>
               <AuthDialog />
             </AuthDialogProvider>
