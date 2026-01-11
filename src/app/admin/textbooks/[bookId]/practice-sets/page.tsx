@@ -70,6 +70,7 @@ type PracticeSet = {
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
+
 function getUrlForPracticeSet(bookId: string, practiceSetId: string) {
     return `/textbook-solutions/${bookId}/practice-set/${practiceSetId}`;
 }
@@ -141,7 +142,7 @@ export default function ManageTextbookPracticeSetsPage() {
             setItemToDelete(null);
         }
     };
-
+    
     const handleOpenDialog = (item: PracticeSet | null) => {
         setEditingItem(item);
         const difficultyArray = (item?.difficulty && Array.isArray(item.difficulty) ? item.difficulty : ['Medium']) as any[];
