@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
   output: {schema: SolvedTextbookPageAssistantOutputSchema},
   prompt: `You are an expert at extracting and styling text content from images of textbook pages. Your task is to transcribe the text and then format it into clear, stylish, and engaging Markdown.
 
-**Instructions:**
+**Formatting Rules:**
 1.  **Transcribe:** First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists, paragraphs, tables, and any special text.
 2.  **Format and Stylize:** Convert the transcribed text into well-structured GitHub-flavored Markdown. Use the following rules:
     *   **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics, tables).
