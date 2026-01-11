@@ -11,16 +11,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
+  CardFooter
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,10 +45,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
 import type { Textbook } from '@/lib/types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 
 
 type PracticeSet = {
@@ -78,7 +71,7 @@ const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 function getUrlForPracticeSet(bookId: string, practiceSetId: string) {
-    return `/textbook-solutions/practice-set/${practiceSetId}/textbook/${bookId}`;
+    return `/textbook-solutions/${bookId}/practice-set/${practiceSetId}`;
 }
 
 export default function ManageTextbookPracticeSetsPage() {
@@ -351,6 +344,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                         </CardHeader>
                                         <CardContent className="p-4 flex-grow">
                                             <CardTitle className="font-headline text-lg mb-1">{ps.subtitle}: {ps.title}</CardTitle>
+                                            <CardDescription>{ps.subject}</CardDescription>
                                              <div className="flex flex-wrap gap-1 mt-2">
                                                 {(Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
                                             </div>
@@ -378,6 +372,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                     <TableRow>
                                         <TableHead className="w-20 hidden sm:table-cell">Image</TableHead>
                                         <TableHead>Title</TableHead>
+                                        <TableHead className="hidden md:table-cell">Questions</TableHead>
                                         <TableHead className="hidden lg:table-cell">Difficulty</TableHead>
                                         <TableHead className="hidden md:table-cell">Access</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
@@ -390,6 +385,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                                 <Image src={ps.featureImage || `https://picsum.photos/seed/${ps.id}/400/225`} alt={ps.title} width={64} height={36} className="rounded-md object-cover" />
                                             </TableCell>
                                             <TableCell className="font-medium">{ps.subtitle}: {ps.title}</TableCell>
+                                            <TableCell className="hidden md:table-cell">{ps.questions?.length || 0}</TableCell>
                                             <TableCell className="hidden lg:table-cell">
                                                 <div className="flex flex-wrap gap-1">
                                                     {(Array.isArray(ps.difficulty) ? ps.difficulty : ps.difficulty ? [ps.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
