@@ -93,7 +93,7 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
         <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-3 gap-2">
             <div className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
-                <span>{stats.chapterCount} Chapters</span>
+                <span>{stats.chapterCount} Chap.</span>
             </div>
             <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
@@ -105,11 +105,11 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             </div>
              <div className="flex items-center gap-1">
                 <FileQuestion className="h-4 w-4" />
-                <span>{stats.mockTestCount} Mock Tests</span>
+                <span>{stats.mockTestCount} M.Tests</span>
             </div>
              <div className="flex items-center gap-1">
                 <CheckSquare className="h-4 w-4" />
-                <span>{stats.practiceSetCount} Sets</span>
+                <span>{stats.practiceSetCount} P.Sets</span>
             </div>
             <div className="flex items-center gap-1">
                 <Book className="h-4 w-4" />

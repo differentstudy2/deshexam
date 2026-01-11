@@ -33,6 +33,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentBadge } from '@/components/content-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { TextbookStats } from '@/components/feature/textbook-stats';
 
 
 const getResourceIcon = (type: string) => {
@@ -327,7 +328,7 @@ export default function TextbookClientPage({ textbook: initialTextbook }: { text
                     <div className="flex items-center text-sm text-muted-foreground space-x-4">
                     <div className="flex items-center gap-1.5"><HelpCircle className="w-4 h-4" /><span>{item.questions?.length || 0} Qs</span></div>
                     <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{item.duration || item.questions?.length || 0} min</span></div>
-                    {item.difficulty && <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{item.difficulty}</span></div>}
+                    {item.difficulty && <div className="flex items-center gap-1.5"><BarChart className="w-4 h-4" /><span>{Array.isArray(item.difficulty) ? item.difficulty.join(', ') : item.difficulty}</span></div>}
                     </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
