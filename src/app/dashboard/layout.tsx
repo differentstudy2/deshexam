@@ -49,7 +49,6 @@ export default function DashboardLayout({
                         {children}
                     </main>
                 </SidebarInset>
-                <Footer />
             </div>
         </div>
     </SidebarProvider>

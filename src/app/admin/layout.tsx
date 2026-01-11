@@ -73,7 +73,6 @@ export default function AdminLayout({
                         {children}
                     </main>
                 </SidebarInset>
-                <Footer />
             </div>
         </div>
     </SidebarProvider>
