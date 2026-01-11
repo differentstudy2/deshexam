@@ -81,8 +81,8 @@ export default function MockTestsPage() {
       <MockTestFilters subjects={subjects} />
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="flex flex-col overflow-hidden">
                 <Skeleton className="w-full h-[225px]" />
                 <CardContent className="flex-grow p-4 space-y-2">
@@ -100,7 +100,7 @@ export default function MockTestsPage() {
           ))}
         </div>
       ) : tests.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tests.map((test) => (
             <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <CardHeader className="p-0 relative">
