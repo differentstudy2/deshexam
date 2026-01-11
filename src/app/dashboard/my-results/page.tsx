@@ -28,6 +28,9 @@ type Submission = {
   submittedAt: any;
   testType: string;
   subject?: string;
+  board?: string;
+  class?: string;
+  exam?: string;
 };
 
 export default function MyResultsPage() {
@@ -129,10 +132,11 @@ export default function MyResultsPage() {
                              </CardTitle>
                              <Badge variant="secondary">{result.testType}</Badge>
                         </div>
-                        <CardDescription className="flex items-center gap-2 pt-1">
-                           <Book className="w-4 h-4"/>
-                           {result.subject || 'General'}
-                        </CardDescription>
+                         <div className="flex flex-wrap gap-1.5 pt-1">
+                            {result.subject && <Badge variant="outline">{result.subject}</Badge>}
+                            {result.bestSubmission.board && <Badge variant="outline">{result.bestSubmission.board}</Badge>}
+                            {result.bestSubmission.class && <Badge variant="outline">{result.bestSubmission.class}</Badge>}
+                        </div>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center justify-center gap-4">
                         <ScoreCircle score={result.highestScore} size={80} strokeWidth={6} />
