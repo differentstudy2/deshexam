@@ -113,7 +113,7 @@ export default function MockTestsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="flex flex-col overflow-hidden">
-                <Skeleton className="w-full h-[225px]" />
+                <Skeleton className="w-full h-48" />
                 <CardContent className="flex-grow p-4 space-y-2">
                     <Skeleton className="h-4 w-1/4" />
                     <Skeleton className="h-6 w-3/4" />
@@ -132,13 +132,13 @@ export default function MockTestsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tests.map((test) => (
             <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-              <CardHeader className="p-0 relative">
+              <CardHeader className="p-0 relative h-48">
                 <Image
                   src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
                   alt={test.title}
                   width={400}
                   height={225}
-                  className="w-full h-auto object-cover"
+                  className="w-full h-full object-cover"
                   data-ai-hint={`${test.subject} abstract`}
                 />
                 <div className="absolute top-2 right-2">
