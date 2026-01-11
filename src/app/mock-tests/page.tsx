@@ -9,10 +9,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Clock, HelpCircle, BarChart } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
-import { getAllContent, getSubjects, getClasses, getGradesByClass, getBoards } from '@/lib/firebase/firestore';
+import { getAllContent, getSubjects, getClasses, getGradesByClass, getBoards, getAllTextbooks } from '@/lib/firebase/firestore';
 import { MockTestFilters } from "@/components/mock-test-filters";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import type { Textbook } from '@/lib/types';
+
 
 type Test = {
   id: string;
@@ -28,7 +30,7 @@ type Test = {
   topicId?: string;
   board?: string;
   classCategory?: string;
-  class?: string; // This represents grade
+  class?: string;
 };
 
 type MetafieldItem = { id: string, name: string };
@@ -37,6 +39,9 @@ function getUrlForTest(test: Test) {
     if (test.textbookId && test.chapterId) {
         const topicSegment = test.topicId || 'null';
         return `/textbook-solutions/mock-test/${test.id}/textbook/${test.textbookId}/chapter/${test.chapterId}/topic/${topicSegment}`;
+    }
+    if (test.textbookId) {
+        return `/textbook-solutions/mock-test/${test.id}/textbook/${test.textbookId}`;
     }
     const typeSlug = test.testType.toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${test.id}`;
@@ -67,14 +72,31 @@ export default function MockTestsPage() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [fetchedTests, subjectsData, classesData, boardsData] = await Promise.all([
+        const [fetchedTests, allTextbooks, subjectsData, classesData, boardsData] = await Promise.all([
           getAllContent("Mock Test"),
+          getAllTextbooks(),
           getSubjects(),
           getClasses(),
           getBoards(),
         ]);
+        
+        const textbooksMap = new Map((allTextbooks as Textbook[]).map(book => [book.id, book]));
 
-        setTests(fetchedTests as Test[]);
+        const testsWithTextbookMeta = (fetchedTests as Test[]).map(test => {
+            if (test.textbookId && textbooksMap.has(test.textbookId)) {
+                const textbook = textbooksMap.get(test.textbookId);
+                return {
+                    ...test,
+                    subject: test.subject || textbook?.subject,
+                    board: test.board || textbook?.board,
+                    classCategory: test.classCategory || textbook?.classCategory,
+                    class: test.class || textbook?.class,
+                };
+            }
+            return test;
+        });
+
+        setTests(testsWithTextbookMeta);
         setSubjects(subjectsData);
         setClassCategories(classesData);
         setBoards(boardsData);
