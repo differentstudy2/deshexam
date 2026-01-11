@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
+import { Clock, HelpCircle, BarChart } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
 import { getAllContent } from '@/lib/firebase/firestore';
@@ -115,11 +115,11 @@ export default function MockTestsPage() {
                 <div className="flex items-center text-sm text-muted-foreground space-x-4">
                   <div className="flex items-center gap-1.5">
                     <HelpCircle className="w-4 h-4" />
-                    <span>{test.questions.length} Questions</span>
+                    <span>{test.questions?.length || 0} Questions</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
-                    <span>{test.duration} min</span>
+                    <span>{test.duration || test.questions?.length || 0} min</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <BarChart className="w-4 h-4" />
