@@ -37,12 +37,14 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert at extracting and styling text content from images of textbook pages. Your task is to transcribe the text and then format it into clear, stylish, and engaging Markdown.
 
 **Instructions:**
-1.  **Transcribe:** First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists, paragraphs, and any special text.
+1.  **Transcribe:** First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists, paragraphs, tables, and any special text.
 2.  **Format:** Convert the transcribed text into well-structured GitHub-flavored Markdown.
-3.  **Stylize:** Enhance the Markdown with the following elements to make it visually appealing:
+3.  **Stylize:** Enhance the Markdown with the following elements to make it visually appealing and structurally identical to the source image:
     *   **VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+    *   **Images**: If the source image contains illustrations, represent them with a placeholder image using the format \`![Description](https://picsum.photos/seed/keyword/600/400)\`. Replace 'keyword' with a relevant term.
+    *   **Tables**: Recreate any tables using Markdown table syntax.
     *   **Headings:** Use \`#\`, \`##\`, \`###\` for titles and sections.
-    *   **Emphasis:** Use **bold** and *italics* to highlight key terms and concepts.
+    *   **Emphasis:** Use **bold** and *italics* to highlight key terms and concepts, just like in the source.
     *   **Lists:** Use bulleted (\`*\`) or numbered (\`1.\`) lists for items or steps.
     *   **Emojis:** Sparingly use relevant emojis to add visual cues and make the content more engaging (e.g., 💡 for a key idea, 🧪 for a science concept, 📌 for a definition).
     *   **Blockquotes:** Use \`>\` for important definitions or quotes.
@@ -51,7 +53,7 @@ const prompt = ai.definePrompt({
 Textbook Page: {{media url=pageDataUri}}
 
 **Output Requirement:**
-Return a single Markdown string containing the styled content. Ensure the output preserves the original language and meaning of the source text.
+Return a single Markdown string containing the styled content. The structure, including text, tables, math, and placement of images, should closely match the provided textbook page image. Ensure the output preserves the original language and meaning of the source text.
 `,
 });
 
