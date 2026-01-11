@@ -57,15 +57,11 @@ const prompt = ai.definePrompt({
   output: { schema: AIContentGeneratorOutputSchema },
   prompt: `You are an expert at creating educational content. Your task is to generate a {{contentType}} based on the provided source.
 
-**VERY IMPORTANT**: 
-1.  For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. 
-    - Use a single dollar sign for inline math (e.g., $E=mc^2$).
-    - Use double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$).
-2.  Pay close attention to chemical formulas and reactions. Use correct LaTeX syntax.
-    - For subscripts, use the underscore character (e.g., $H_2O$ for H₂O, $Na_2SO_4$ for Na₂SO₄).
-    - For reaction arrows, use \`\\rightarrow\` (e.g., $C + O_2 \\rightarrow CO_2$).
-    - For reaction conditions above an arrow, use \`\\xrightarrow{\\text{condition}}\` (e.g., $2Ag_2O \\xrightarrow{\\text{তাপ}} 4Ag + O_2$).
-3.  If an image would be helpful for a question or an option (especially in subjects like biology, physics, or geography), you MAY add a placeholder image URL. Use the format \`https://picsum.photos/seed/some-keyword/600/400\` for images. Replace 'some-keyword' with a relevant term (e.g., 'mitochondria', 'gravity-apple').
+**Formatting Rules**:
+1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics).
+2.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). Pay close attention to chemical formulas and reactions, using correct LaTeX syntax for subscripts (e.g., $H_2O$) and reaction arrows (e.g., $\\rightarrow$).
+3.  **HTML for Layout**: For complex layouts that Markdown cannot handle (like floating an image to the left of a paragraph), you MAY use simple HTML tags (like \`<img>\`, \`<p>\`, \`<div>\`). You can use inline \`style\` attributes for positioning (e.g., \`float: left; margin-right: 1em;\`).
+4.  **Images**: If an image would be helpful for a question or an option, you MAY add a placeholder image URL. Use the format \`https://picsum.photos/seed/some-keyword/600/400\` for images.
 
 The content should have the following properties:
 - Number of questions: {{numQuestions}}
