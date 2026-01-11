@@ -1,7 +1,7 @@
 
 
 import { db } from "@/lib/firebase/client";
-import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -739,70 +739,65 @@ export const getSubmissionById = async (submissionId: string) => {
 };
 
 
-export const getSubmissionsByUserId = async (userId: string) => {
-    if (!userId) {
-        throw new Error("User ID is required to fetch submissions.");
+export const getSubmissionsByUserId = (
+  userId: string,
+  callback: (submissions: any[]) => void,
+  onError: (error: Error) => void
+) => {
+  if (!userId) {
+    onError(new Error("User ID is required."));
+    return () => {};
+  }
+
+  const formatSubmission = (doc: DocumentSnapshot) => {
+    const data = doc.data() as any;
+    if (!data) return null;
+
+    let dateValue = new Date();
+    if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
+      dateValue = data.submittedAt.toDate();
+    } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
+      dateValue = new Date(data.submittedAt);
     }
-    try {
-        const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
-        const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
+    
+    const isPracticeSet = !!data.practiceSetId;
+    return {
+      id: doc.id,
+      ...data,
+      testId: isPracticeSet ? data.practiceSetId : data.testId,
+      testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
+      testType: isPracticeSet ? "Practice Set" : data.testType,
+      submittedAt: dateValue,
+    };
+  };
 
-        const [testSubsSnapshot, practiceSubsSnapshot] = await Promise.all([
-            getDocs(testSubsQuery),
-            getDocs(practiceSubsQuery),
-        ]);
-        
-        const formatSubmission = (doc: DocumentSnapshot) => {
-            const data = doc.data() as any; // Cast to any to handle potential missing fields gracefully
-            if (!data) return null;
+  const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
+  const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
 
-            const submittedAt = data.submittedAt;
-            let formattedDate = new Date();
-            if (submittedAt && typeof submittedAt.toDate === 'function') {
-                formattedDate = submittedAt.toDate();
-            } else if (submittedAt) {
-                const d = new Date(submittedAt);
-                if (!isNaN(d.getTime())) {
-                    formattedDate = d;
-                }
-            }
-            
-            // Normalize the structure
-            const isPracticeSet = !!data.practiceSetId;
-            const normalizedData = {
-                id: doc.id,
-                userId: data.userId,
-                score: data.score,
-                totalQuestions: data.totalQuestions,
-                submittedAt: formattedDate,
-                testId: isPracticeSet ? data.practiceSetId : data.testId,
-                testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
-                testType: isPracticeSet ? "Practice Set" : data.testType,
-                // Include textbook/chapter/topic info for context if it's a practice set
-                ...(isPracticeSet && {
-                    textbookId: data.textbookId,
-                    chapterId: data.chapterId,
-                    topicId: data.topicId,
-                })
-            };
+  let combinedSubmissions: any[] = [];
+  let testSubmissions: any[] = [];
+  let practiceSubmissions: any[] = [];
 
-            return normalizedData;
-        };
+  const updateAndSort = () => {
+    combinedSubmissions = [...testSubmissions, ...practiceSubmissions];
+    combinedSubmissions.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+    callback(combinedSubmissions);
+  };
+  
+  const unsubscribeTests = onSnapshot(testSubsQuery, (querySnapshot) => {
+      testSubmissions = querySnapshot.docs.map(formatSubmission).filter(Boolean);
+      updateAndSort();
+  }, onError);
 
-        const testSubmissions = testSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
-        const practiceSubmissions = practiceSubsSnapshot.docs.map(formatSubmission).filter(Boolean);
-        
-        const allSubmissions = [...testSubmissions, ...practiceSubmissions];
-        
-        // Sort on the client-side
-        allSubmissions.sort((a, b) => b!.submittedAt.getTime() - a!.submittedAt.getTime());
-        
-        return allSubmissions;
+  const unsubscribePracticeSets = onSnapshot(practiceSubsQuery, (querySnapshot) => {
+      practiceSubmissions = querySnapshot.docs.map(formatSubmission).filter(Boolean);
+      updateAndSort();
+  }, onError);
 
-    } catch (e) {
-        console.error("Error getting documents: ", e);
-        throw new Error("Failed to fetch submissions.");
-    }
+  return () => {
+    unsubscribeTests();
+    unsubscribePracticeSets();
+  };
 };
 
 export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
@@ -2277,6 +2272,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 

@@ -27,7 +27,7 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { getContentById, getAllTextbooks, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
+import { getContentById, getAllTextbooks, getUserProfile, getSubmissionsByUserId, deleteSubmissions } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, FileText, BarChart2, Book, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
@@ -54,6 +54,9 @@ type Submission = {
   submittedAt: any; 
   testType: string;
   subject?: string;
+  board?: string;
+  class?: string;
+  exam?: string;
 };
 
 const chartConfig = {
@@ -83,46 +86,18 @@ export default function DashboardPage() {
     setLoading(true);
     setLoadingTextbooks(true);
 
-    const fetchSubmissions = (collectionName: string, isPracticeSet: boolean) => {
-        const q = query(collection(db, collectionName), where("userId", "==", user.uid));
-        
-        return onSnapshot(q, (querySnapshot) => {
-            const userSubmissions = querySnapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    ...data,
-                    testId: isPracticeSet ? data.practiceSetId : data.testId,
-                    testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
-                    testType: isPracticeSet ? 'Practice Set' : data.testType,
-                    submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt),
-                } as Submission;
-            });
-
-            setSubmissions(prev => {
-                const otherSubmissions = prev.filter(s => (s.testType === 'Practice Set') !== isPracticeSet);
-                const combined = [...otherSubmissions, ...userSubmissions];
-                combined.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
-                return combined;
-            });
-
-            setLoading(false);
-
-        }, (error) => {
-            console.error(`Error fetching real-time ${collectionName}: `, error);
-            if (error.code !== 'permission-denied') {
-              toast({
-                variant: "destructive",
-                title: "Real-time Update Failed",
-                description: `Could not fetch your latest results from ${collectionName}.`,
-              });
-            }
-            setLoading(false);
+    const unsubscribe = getSubmissionsByUserId(user.uid, (userSubmissions) => {
+        setSubmissions(userSubmissions);
+        setLoading(false);
+    }, (error) => {
+        console.error("Error fetching real-time submissions: ", error);
+        toast({
+            variant: "destructive",
+            title: "Real-time Update Failed",
+            description: "Could not fetch your latest results.",
         });
-    };
-
-    const unsubscribeSubmissions = fetchSubmissions('submissions', false);
-    const unsubscribePracticeSets = fetchSubmissions('practiceSetSubmissions', true);
+        setLoading(false);
+    });
 
     const fetchRecommendations = async () => {
         try {
@@ -145,8 +120,7 @@ export default function DashboardPage() {
     fetchRecommendations();
 
     return () => {
-        unsubscribeSubmissions();
-        unsubscribePracticeSets();
+        unsubscribe();
     };
   }, [user, toast]);
 
@@ -313,7 +287,7 @@ export default function DashboardPage() {
                             <Link href={`/textbook-solutions/${book.id}`}>
                                 <h3 className="font-bold text-lg hover:text-primary transition-colors">{book.title}</h3>
                             </Link>
-                            <p className="text-xs text-muted-foreground">by {(book as any).authorName || 'DeshExam'}</p>
+                             <p className="text-xs text-muted-foreground">by {(book as any).authorName || 'DeshExam'}</p>
                             <TextbookStats textbookId={book.id} />
                         </CardContent>
                         <CardFooter className="p-4 pt-0">
@@ -413,7 +387,7 @@ export default function DashboardPage() {
                           <Skeleton className="h-5 w-3/4 mb-1"/>
                           <Skeleton className="h-4 w-1/2"/>
                       </TableCell>
-                       <TableCell><Skeleton className="h-5 w-12"/></TableCell>
+                       <TableCell><Skeleton className="h-10 w-10 rounded-full"/></TableCell>
                        <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto"/></TableCell>
                     </TableRow>
                   ))
@@ -422,8 +396,8 @@ export default function DashboardPage() {
                   <TableRow key={sub.id}>
                     <TableCell>
                       <div className="font-medium">{sub.testTitle}</div>
-                      <div className="text-sm text-muted-foreground">
-                         {sub.subject && `${sub.subject} - `}{sub.testType}
+                      <div className="text-xs text-muted-foreground">
+                        { [sub.subject, sub.testType, sub.board, sub.class].filter(Boolean).join(' - ') }
                       </div>
                     </TableCell>
                     <TableCell>
@@ -440,25 +414,13 @@ export default function DashboardPage() {
                            <RefreshCw className="mr-2 h-4 w-4" /> Retake
                         </Link>
                       </Button>
-                      <AlertDialog>
+                       <AlertDialog>
                           <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm" onClick={() => setSubmissionToDelete(sub)}>
+                              <Button variant="destructive" size="icon" className="h-9 w-9" onClick={() => setSubmissionToDelete(sub)}>
                                   <Trash2 className="h-4 w-4"/>
                               </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent>
-                              <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                      This will permanently delete your submission for "{sub.testTitle}".
-                                  </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-                              </AlertDialogFooter>
-                          </AlertDialogContent>
-                      </AlertDialog>
+                       </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))
