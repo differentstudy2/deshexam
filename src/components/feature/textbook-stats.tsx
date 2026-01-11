@@ -2,22 +2,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, doc } from 'firebase/firestore';
+import { collection, getDocs, doc, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import { Layers, FileText, CheckSquare, Award } from 'lucide-react';
+import { Layers, FileText, CheckSquare, Award, FileQuestion, Book } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
-    const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0, examCount: 0 });
+    const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0, examCount: 0, mockTestCount: 0, quizCount: 0, questionCount: 0 });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
-            let chapterCount = 0;
-            let topicCount = 0;
-            let practiceSetCount = 0;
-            let examCount = 0;
-            
             if (!textbookId) {
                 setLoading(false);
                 return;
@@ -26,28 +21,49 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
             try {
                 const textbookRef = doc(db, 'textbooks', textbookId);
                 const chaptersRef = collection(textbookRef, 'chapters');
-                const examsRef = collection(textbookRef, 'exams');
                 
-                const [chaptersSnapshot, examsSnapshot] = await Promise.all([
+                const [chaptersSnapshot, contentSnapshot] = await Promise.all([
                     getDocs(chaptersRef),
-                    getDocs(examsRef),
+                    getDocs(query(collection(db, "content"), where("textbookId", "==", textbookId)))
                 ]);
 
-                chapterCount = chaptersSnapshot.size;
-                examCount = examsSnapshot.size;
+                let chapterCount = chaptersSnapshot.size;
+                let topicCount = 0;
+                let textbookQuestionCount = 0;
 
                 for (const chapterDoc of chaptersSnapshot.docs) {
                     const topicsRef = collection(chapterDoc.ref, "topics");
                     const topicsSnapshot = await getDocs(topicsRef);
                     topicCount += topicsSnapshot.size;
-
-                     for (const topicDoc of topicsSnapshot.docs) {
-                        const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
-                        const practiceSetsSnapshot = await getDocs(practiceSetsRef);
-                        practiceSetCount += practiceSetsSnapshot.size;
+                    
+                    const chapterData = chapterDoc.data();
+                    if(chapterData.textbookQuestions) {
+                        textbookQuestionCount += chapterData.textbookQuestions.length;
                     }
                 }
-                setStats({ chapterCount, topicCount, practiceSetCount, examCount });
+
+                let examCount = 0;
+                let mockTestCount = 0;
+                let quizCount = 0;
+                let practiceSetCount = 0;
+                
+                contentSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.testType === 'Exam') examCount++;
+                    if (data.testType === 'Mock Test') mockTestCount++;
+                    if (data.testType === 'Quiz') quizCount++;
+                    if (data.testType === 'Practice Set') practiceSetCount++;
+                });
+
+                setStats({ 
+                    chapterCount, 
+                    topicCount, 
+                    practiceSetCount, 
+                    examCount,
+                    mockTestCount,
+                    quizCount,
+                    questionCount: textbookQuestionCount,
+                });
             } catch (error) {
                 console.error("Failed to fetch textbook stats:", error);
             } finally {
@@ -74,10 +90,10 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
     }
 
     return (
-        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-3 gap-2">
+        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-2 gap-2">
             <div className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
-                <span>{stats.chapterCount} Ch.</span>
+                <span>{stats.chapterCount} Chapters</span>
             </div>
             <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
@@ -86,6 +102,18 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
              <div className="flex items-center gap-1">
                 <Award className="h-4 w-4" />
                 <span>{stats.examCount} Exams</span>
+            </div>
+             <div className="flex items-center gap-1">
+                <FileQuestion className="h-4 w-4" />
+                <span>{stats.mockTestCount} Mock Tests</span>
+            </div>
+             <div className="flex items-center gap-1">
+                <CheckSquare className="h-4 w-4" />
+                <span>{stats.practiceSetCount} Sets</span>
+            </div>
+            <div className="flex items-center gap-1">
+                <Book className="h-4 w-4" />
+                <span>{stats.quizCount} Quizzes</span>
             </div>
         </div>
     );
