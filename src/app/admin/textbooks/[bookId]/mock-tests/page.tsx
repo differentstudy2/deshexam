@@ -34,14 +34,14 @@ import {
     DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles, LayoutGrid, List } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles, LayoutGrid, List, MoreHorizontal } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
 import type { Textbook, Chapter, Question } from '@/lib/types';
@@ -80,7 +80,7 @@ export default function ManageTextbookMockTestsPage() {
     const [loading, setLoading] = useState(true);
     const [testToDelete, setTestToDelete] = useState<MockTest | null>(null);
     const [textbook, setTextbook] = useState<Textbook | null>(null);
-    const [view, setView] = useState<'list' | 'grid'>('grid');
+    const [view, setView] = useState<'grid' | 'list'>('grid');
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
@@ -370,7 +370,7 @@ export default function ManageTextbookMockTestsPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-20">Image</TableHead>
+                                        <TableHead className="w-20 hidden sm:table-cell">Image</TableHead>
                                         <TableHead>Title</TableHead>
                                         <TableHead className="hidden md:table-cell">Questions</TableHead>
                                         <TableHead className="hidden lg:table-cell">Difficulty</TableHead>
@@ -381,7 +381,7 @@ export default function ManageTextbookMockTestsPage() {
                                 <TableBody>
                                     {tests.map(test => (
                                         <TableRow key={test.id}>
-                                            <TableCell>
+                                            <TableCell className="hidden sm:table-cell">
                                                 <Image src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`} alt={test.title} width={64} height={36} className="rounded-md object-cover" />
                                             </TableCell>
                                             <TableCell className="font-medium">{test.subtitle}: {test.title}</TableCell>
@@ -438,4 +438,5 @@ export default function ManageTextbookMockTestsPage() {
             </AlertDialog>
         </div>
     );
-}
+
+    
