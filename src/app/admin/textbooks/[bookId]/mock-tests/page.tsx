@@ -11,15 +11,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,6 +47,7 @@ import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 type MockTest = {
@@ -189,6 +183,10 @@ export default function ManageTextbookMockTestsPage() {
             .replace('[Textbook Title]', textbook?.title || '');
         setTestData(prev => ({ ...prev, title }));
     };
+    
+    function getUrlForTest(testType: string, testId: string) {
+        return `/textbook-solutions/mock-test/${testId}/textbook/${textbookId}`;
+    }
 
     return (
         <div className="space-y-6">
@@ -259,7 +257,7 @@ export default function ManageTextbookMockTestsPage() {
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                         <Button asChild variant="outline" size="sm">
                                             <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
@@ -285,94 +283,96 @@ export default function ManageTextbookMockTestsPage() {
             </Card>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh]">
                     <DialogHeader>
                         <DialogTitle>{editingTest ? 'Edit Mock Test' : 'Add New Mock Test'}</DialogTitle>
                     </DialogHeader>
-                     <div className="space-y-4 py-4">
-                         <div className="space-y-2">
-                            <Label>Feature Image</Label>
-                            <ImageUploader
-                                fieldName="featureImage"
-                                onUrlChange={(url) => setTestData(p => ({ ...p, featureImage: url }))}
-                                value={testData.featureImage}
-                            />
-                        </div>
-                         <div className="space-y-2">
-                            <Label htmlFor="test-subtitle">Subtitle</Label>
-                            <Input id="test-subtitle" value={testData.subtitle} onChange={e => setTestData(p => ({...p, subtitle: e.target.value}))} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="test-title">Title</Label>
-                            <div className="flex gap-2">
-                                <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                    <ScrollArea className="max-h-[70vh] p-1">
+                         <div className="space-y-4 py-4 pr-6">
+                             <div className="space-y-2">
+                                <Label>Feature Image</Label>
+                                <ImageUploader
+                                    fieldName="featureImage"
+                                    onUrlChange={(url) => setTestData(p => ({ ...p, featureImage: url }))}
+                                    value={testData.featureImage}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="test-subtitle">Subtitle</Label>
+                                <Input id="test-subtitle" value={testData.subtitle} onChange={e => setTestData(p => ({...p, subtitle: e.target.value}))} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="test-title">Title</Label>
+                                <div className="flex gap-2">
+                                    <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Access Level</Label>
+                                <Select value={testData.access} onValueChange={(value) => setTestData(prev => ({ ...prev, access: value as 'free' | 'premium' | 'pro' }))}>
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="free">Free</SelectItem>
+                                        <SelectItem value="premium">Premium (Paid)</SelectItem>
+                                        <SelectItem value="pro">Pro (Subscription)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Difficulty</Label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {difficultyOptions.map(option => (
+                                        <div key={option} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`diff-${option}`}
+                                                checked={testData.difficulty.includes(option as any)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentDifficulties = testData.difficulty;
+                                                    const newDifficulties = checked
+                                                        ? [...currentDifficulties, option as any]
+                                                        : currentDifficulties.filter(d => d !== option);
+                                                    setTestData(prev => ({...prev, difficulty: newDifficulties }));
+                                                }}
+                                            />
+                                            <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                             <div className="space-y-2">
+                                <Label>Question Source</Label>
+                                 <div className="grid grid-cols-2 gap-2">
+                                    {questionSourceOptions.map(option => (
+                                         <div key={option} className="flex items-center space-x-2">
+                                             <Checkbox
+                                                id={`source-${option}`}
+                                                checked={testData.questionSource.includes(option as any)}
+                                                onCheckedChange={(checked) => {
+                                                    const currentSources = testData.questionSource;
+                                                    const newSources = checked
+                                                        ? [...currentSources, option as any]
+                                                        : currentSources.filter(s => s !== option);
+                                                    setTestData(prev => ({...prev, questionSource: newSources }));
+                                                }}
+                                            />
+                                            <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                         </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                         <div className="space-y-2">
-                            <Label>Access Level</Label>
-                            <Select value={testData.access} onValueChange={(value) => setTestData(prev => ({ ...prev, access: value as 'free' | 'premium' | 'pro' }))}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="free">Free</SelectItem>
-                                    <SelectItem value="premium">Premium (Paid)</SelectItem>
-                                    <SelectItem value="pro">Pro (Subscription)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Difficulty</Label>
-                            <div className="grid grid-cols-3 gap-2">
-                                {difficultyOptions.map(option => (
-                                    <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`diff-${option}`}
-                                            checked={testData.difficulty.includes(option as any)}
-                                            onCheckedChange={(checked) => {
-                                                const currentDifficulties = testData.difficulty;
-                                                const newDifficulties = checked
-                                                    ? [...currentDifficulties, option as any]
-                                                    : currentDifficulties.filter(d => d !== option);
-                                                setTestData(prev => ({...prev, difficulty: newDifficulties }));
-                                            }}
-                                        />
-                                        <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                         <div className="space-y-2">
-                            <Label>Question Source</Label>
-                             <div className="grid grid-cols-2 gap-2">
-                                {questionSourceOptions.map(option => (
-                                     <div key={option} className="flex items-center space-x-2">
-                                         <Checkbox
-                                            id={`source-${option}`}
-                                            checked={testData.questionSource.includes(option as any)}
-                                            onCheckedChange={(checked) => {
-                                                const currentSources = testData.questionSource;
-                                                const newSources = checked
-                                                    ? [...currentSources, option as any]
-                                                    : currentSources.filter(s => s !== option);
-                                                setTestData(prev => ({...prev, questionSource: newSources }));
-                                            }}
-                                        />
-                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
-                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    </ScrollArea>
                     <DialogFooter>
                         <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
                         <Button onClick={handleAddOrUpdate}>Save</Button>
