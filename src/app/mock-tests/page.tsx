@@ -8,13 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
-import { MockTestFilters } from "@/components/mock-test-filters";
-import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { getAllContent } from '@/lib/firebase/firestore';
-import { useAuth } from '@/hooks/use-auth';
+import { MockTestFilters } from "@/components/mock-test-filters";
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Test = {
   id: string;
@@ -37,7 +34,6 @@ export default function MockTestsPage() {
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<string[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
 
   useEffect(() => {
     document.title = "Mock Tests | DeshExam";
@@ -46,7 +42,7 @@ export default function MockTestsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchInitialTests = async () => {
+    const fetchTests = async () => {
       try {
         const fetchedTests = (await getAllContent("Mock Test")) as Test[];
         setTests(fetchedTests);
@@ -63,45 +59,8 @@ export default function MockTestsPage() {
       }
     }
     
-    fetchInitialTests();
-
+    fetchTests();
   }, [toast]);
-
-  useEffect(() => {
-    let unsubscribe: () => void;
-
-    if (user) {
-        const q = query(collection(db, "content"), where("testType", "==", "Mock Test"));
-        
-        unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const fetchedTests = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Test[];
-            
-            setTests(fetchedTests);
-            const uniqueSubjects = Array.from(new Set(fetchedTests.map((test: any) => test.subject))).filter(Boolean) as string[];
-            setSubjects(uniqueSubjects);
-        }, (error) => {
-            console.error("Error fetching mock tests in real-time: ", error);
-            // Don't toast permission errors on public pages for guests
-            if (error.code !== 'permission-denied') {
-              toast({
-                variant: "destructive",
-                title: "Error fetching real-time data",
-                description: (error as Error).message,
-              });
-            }
-        });
-    }
-
-    // Cleanup subscription on component unmount or when user logs out
-    return () => {
-        if (unsubscribe) {
-            unsubscribe();
-        }
-    };
-  }, [toast, user]);
 
   return (
     <div className="container py-12 md:py-16">
