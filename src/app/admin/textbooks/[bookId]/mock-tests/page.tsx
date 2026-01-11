@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 import {
   Card,
   CardContent,
@@ -31,7 +33,7 @@ import {
     DialogDescription,
     DialogFooter,
     DialogTrigger,
-    DialogClose
+    DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles, LayoutGrid, List, MoreHorizontal } from 'lucide-react';
@@ -242,6 +244,8 @@ export default function ManageTextbookMockTestsPage() {
                                                 <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>SEO Title Suggestions</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
                                                 <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
                                                 <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -441,4 +445,3 @@ export default function ManageTextbookMockTestsPage() {
     );
 }
 
-    
