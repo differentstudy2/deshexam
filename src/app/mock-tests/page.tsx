@@ -33,6 +33,7 @@ type Test = {
   board?: string;
   classCategory?: string;
   class?: string;
+  featureImage?: string;
 };
 
 function getUrlForTest(test: Test) {
@@ -78,6 +79,7 @@ export default function MockTestsPage() {
                     board: test.board || textbook?.board,
                     classCategory: test.classCategory || textbook?.classCategory,
                     class: test.class || textbook?.class,
+                    featureImage: test.featureImage || textbook?.featureImage,
                 };
             }
             return test;
@@ -132,7 +134,7 @@ export default function MockTestsPage() {
             <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <CardHeader className="p-0 relative">
                 <Image
-                  src={`https://picsum.photos/seed/${test.id}/400/225`}
+                  src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
                   alt={test.title}
                   width={400}
                   height={225}
