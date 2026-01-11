@@ -27,18 +27,20 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { getSubmissionsByUserId, getContentById, getAllTextbooks } from '@/lib/firebase/firestore';
+import { getContentById, getAllTextbooks, getSubmissionsByUserId, getUserProfile } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, FileText, BarChart2, Book } from 'lucide-react';
 import Link from 'next/link';
 import { ChartConfig } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getUserProfile } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 import Image from 'next/image';
 import { TextbookStats } from '@/components/feature/textbook-stats';
 import { Badge } from '@/components/ui/badge';
 import { ContentBadge } from '@/components/content-badge';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { useToast } from '@/hooks/use-toast';
 
 type Submission = {
   id: string;
@@ -65,62 +67,84 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [recommendedTextbooks, setRecommendedTextbooks] = useState<Textbook[]>([]);
   const [loadingTextbooks, setLoadingTextbooks] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (user) {
-        setLoading(true);
-        setLoadingTextbooks(true);
+    if (!user) {
+        setLoading(false);
+        setLoadingTextbooks(false);
+        return;
+    }
 
+    setLoading(true);
+    setLoadingTextbooks(true);
+
+    const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+        const userSubmissions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
+        
+        const submissionsWithTestData = await Promise.all(
+            userSubmissions.map(async (sub) => {
+                const test = await getContentById(sub.testId);
+                return { ...sub, test };
+            })
+        );
+
+        submissionsWithTestData.sort((a, b) => b.submittedAt.seconds - a.submittedAt.seconds);
+        
+        setSubmissions(submissionsWithTestData);
+        setLoading(false);
+    }, (error) => {
+        console.error("Error fetching real-time submissions: ", error);
+        toast({
+            variant: "destructive",
+            title: "Real-time Update Failed",
+            description: "Could not fetch your latest test results.",
+        });
+        setLoading(false);
+    });
+
+    const fetchRecommendations = async () => {
         try {
-            // Fetch submissions
-            const userSubmissions = await getSubmissionsByUserId(user.uid);
-            const submissionsWithTestData = await Promise.all(
-                userSubmissions.map(async (sub) => {
-                    const test = await getContentById(sub.testId);
-                    return { ...sub, test };
-                })
-            );
-            setSubmissions(submissionsWithTestData);
-
-            // Fetch profile and textbooks for recommendations
             const userProfile = await getUserProfile(user.uid);
             const allTextbooks = (await getAllTextbooks()) as Textbook[];
             
             if (userProfile && allTextbooks.length > 0) {
                 const filteredTextbooks = allTextbooks.filter(book => {
-                    // Only match based on the grade/class
                     return userProfile.grade ? book.class === userProfile.grade : false;
                 });
                 setRecommendedTextbooks(filteredTextbooks);
             }
         } catch(error) {
-            console.error("Failed to fetch dashboard data:", error)
+            console.error("Failed to fetch textbook recommendations:", error);
         } finally {
-            setLoading(false);
             setLoadingTextbooks(false);
         }
-      } else {
-        setLoading(false);
-        setLoadingTextbooks(false);
-      }
-    };
-    fetchDashboardData();
-  }, [user]);
+    }
+    
+    fetchRecommendations();
+
+    return () => unsubscribe();
+  }, [user, toast]);
 
   const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
       const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
       return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
   }
 
-  const averageScore = submissions.length > 0 
-    ? Math.round(submissions.reduce((acc, sub) => acc + (sub.score / sub.totalQuestions) * 100, 0) / submissions.length)
-    : 0;
+  const averageScore = useMemo(() => {
+    if (submissions.length === 0) return 0;
+    const totalPercentage = submissions.reduce((acc, sub) => {
+        const percentage = sub.totalQuestions > 0 ? (sub.score / sub.totalQuestions) * 100 : 0;
+        return acc + percentage;
+    }, 0);
+    return Math.round(totalPercentage / submissions.length);
+  }, [submissions]);
 
-  const chartData = submissions.slice(0, 6).reverse().map((sub, index) => ({
+  const chartData = useMemo(() => submissions.slice(0, 6).reverse().map((sub, index) => ({
       name: `Test #${submissions.length - index}`,
-      score: Math.round((sub.score / sub.totalQuestions) * 100),
-  }));
+      score: sub.totalQuestions > 0 ? Math.round((sub.score / sub.totalQuestions) * 100) : 0,
+  })), [submissions]);
   
   const dashboardStats = [
     { title: "Tests Taken", value: submissions.length, icon: <FileText/>, description: "Total tests completed" },
@@ -350,7 +374,7 @@ export default function DashboardPage() {
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">
-                      {Math.round((sub.score / sub.totalQuestions) * 100)}%
+                      {sub.totalQuestions > 0 ? `${Math.round((sub.score / sub.totalQuestions) * 100)}%` : 'N/A'}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="sm">
@@ -374,5 +398,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
