@@ -44,6 +44,7 @@ const dashboardNavItems = [
   { href: '/dashboard/my-results', label: 'My Results', icon: <FileText className="h-5 w-5" /> },
   { href: '/dashboard/profile', label: 'Profile', icon: <BookUser className="h-5 w-5" /> },
   { href: '/dashboard/settings', label: 'Settings', icon: <Settings className="h-5 w-5" /> },
+  { href: '/pricing', label: 'Plans', icon: <ShoppingCart className="h-5 w-5" /> },
 ];
 
 const adminNavItems = [
