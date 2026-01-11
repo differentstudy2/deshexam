@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -41,7 +42,7 @@ import {
     DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles, LayoutGrid, List, MoreHorizontal } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -49,7 +50,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ImageUploader } from '@/components/feature/image-uploader';
+import Image from 'next/image';
 import type { Textbook, Chapter, Question } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 type MockTest = {
@@ -64,6 +70,7 @@ type MockTest = {
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
     questions?: Question[];
+    featureImage?: string;
 }
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
@@ -86,12 +93,16 @@ export default function ManageTextbookMockTestsPage() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
-    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[]}>({
+    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[], featureImage?: string, access: 'free' | 'premium' | 'pro'}>({
         title: '',
         subtitle: '',
         difficulty: ['Medium'],
-        questionSource: ['Random from Chapter']
+        questionSource: ['Random from Chapter'],
+        featureImage: '',
+        access: 'free',
     });
+    const [view, setView] = useState<'grid' | 'list'>('grid');
+
 
     const fetchTests = async () => {
         if (!textbookId) return;
@@ -103,7 +114,6 @@ export default function ManageTextbookMockTestsPage() {
             ]);
 
             setTextbook(textbookData as Textbook);
-
             const textbookTests = (allTests as MockTest[]).filter(test => test.textbookId === textbookId && !test.chapterId);
             setTests(textbookTests);
         } catch (error) {
@@ -147,7 +157,7 @@ export default function ManageTextbookMockTestsPage() {
         const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
         
         const subtitle = test ? test.subtitle || `Mock Test ${tests.findIndex(t => t.id === test.id) + 1}` : `Mock Test ${tests.length + 1}`;
-        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'] });
+        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: test.featureImage || '', access: test.access || 'free' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '', access: 'free' });
         setIsDialogOpen(true);
     };
 
@@ -161,7 +171,6 @@ export default function ManageTextbookMockTestsPage() {
             ...testData, 
             testType: 'Mock Test',
             textbookId: textbookId,
-            access: 'free',
             questions: editingTest?.questions || [],
         };
         
@@ -205,139 +214,219 @@ export default function ManageTextbookMockTestsPage() {
                         Full-syllabus mock tests associated with this textbook.
                     </p>
                 </div>
-                <Button onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2" /> Add New Mock Test</Button>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button onClick={() => handleOpenDialog(null)}>
+                            <PlusCircle className="mr-2" /> Add New Mock Test
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[90vh]">
+                        <DialogHeader>
+                            <DialogTitle>{editingTest ? 'Edit Mock Test' : 'Add New Mock Test'}</DialogTitle>
+                        </DialogHeader>
+                        <ScrollArea className="max-h-[70vh] p-1">
+                             <div className="space-y-4 py-4 pr-6">
+                                 <div className="space-y-2">
+                                    <Label>Feature Image</Label>
+                                    <ImageUploader
+                                        fieldName="featureImage"
+                                        onUrlChange={(url) => setTestData(p => ({ ...p, featureImage: url }))}
+                                        value={testData.featureImage}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="test-subtitle">Subtitle</Label>
+                                    <Input id="test-subtitle" value={testData.subtitle} onChange={e => setTestData(p => ({...p, subtitle: e.target.value}))} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="test-title">Title</Label>
+                                    <div className="flex gap-2">
+                                        <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>SEO Title Suggestions</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Access Level</Label>
+                                    <Select value={testData.access} onValueChange={(value) => setTestData(prev => ({ ...prev, access: value as 'free' | 'premium' | 'pro' }))}>
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="free">Free</SelectItem>
+                                            <SelectItem value="premium">Premium (Paid)</SelectItem>
+                                            <SelectItem value="pro">Pro (Subscription)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Difficulty</Label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {difficultyOptions.map(option => (
+                                            <div key={option} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`diff-${option}`}
+                                                    checked={testData.difficulty.includes(option as any)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentDifficulties = testData.difficulty;
+                                                        const newDifficulties = checked
+                                                            ? [...currentDifficulties, option as any]
+                                                            : currentDifficulties.filter(d => d !== option);
+                                                        setTestData(prev => ({...prev, difficulty: newDifficulties }));
+                                                    }}
+                                                />
+                                                <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label>Question Source</Label>
+                                     <div className="grid grid-cols-2 gap-2">
+                                        {questionSourceOptions.map(option => (
+                                             <div key={option} className="flex items-center space-x-2">
+                                                 <Checkbox
+                                                    id={`source-${option}`}
+                                                    checked={testData.questionSource.includes(option as any)}
+                                                    onCheckedChange={(checked) => {
+                                                        const currentSources = testData.questionSource;
+                                                        const newSources = checked
+                                                            ? [...currentSources, option as any]
+                                                            : currentSources.filter(s => s !== option);
+                                                        setTestData(prev => ({...prev, questionSource: newSources }));
+                                                    }}
+                                                />
+                                                <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
+                                             </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </ScrollArea>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                            <Button onClick={handleAddOrUpdate}>Save</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
              <Card>
                 <CardHeader>
-                    <CardTitle>Mock Tests ({tests.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Title</TableHead>
-                                <TableHead>Access</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                Array.from({ length: 3 }).map((_, i) => (
-                                <TableRow key={i}>
-                                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                    <TableCell className="text-right"><Skeleton className="h-8 w-32 ml-auto" /></TableCell>
-                                </TableRow>
-                            ))
-                            ) : tests.length > 0 ? (
-                                tests.map((test) => (
-                                <TableRow key={test.id}>
-                                    <TableCell className="font-medium">{test.subtitle}: {test.title}</TableCell>
-                                    <TableCell><ContentBadge type={test.access} /></TableCell>
-                                    <TableCell className="text-right space-x-2">
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={getUrlForTest(textbookId, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
-                                        </Button>
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
-                                        </Button>
-                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
-                                            <Edit className="mr-2 h-4 w-4"/>Edit
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
-                                            <Trash2 className="mr-2 h-4 w-4"/>Delete
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))) : (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="text-center h-24">
-                                    No mock tests added to this textbook yet.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{editingTest ? 'Edit Mock Test' : 'Add New Mock Test'}</DialogTitle>
-                    </DialogHeader>
-                     <div className="space-y-4 py-4">
-                         <div className="space-y-2">
-                            <Label htmlFor="test-subtitle">Subtitle</Label>
-                            <Input id="test-subtitle" value={testData.subtitle} onChange={e => setTestData(p => ({...p, subtitle: e.target.value}))} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="test-title">Title</Label>
-                            <div className="flex gap-2">
-                                <Input id="test-title" value={testData.title} onChange={e => setTestData(p => ({...p, title: e.target.value}))} />
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>SEO Title Suggestions</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Difficulty</Label>
-                            <div className="grid grid-cols-3 gap-2">
-                                {difficultyOptions.map(option => (
-                                    <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`diff-${option}`}
-                                            checked={testData.difficulty.includes(option as any)}
-                                            onCheckedChange={(checked) => {
-                                                const currentDifficulties = testData.difficulty;
-                                                const newDifficulties = checked
-                                                    ? [...currentDifficulties, option as any]
-                                                    : currentDifficulties.filter(d => d !== option);
-                                                setTestData(prev => ({...prev, difficulty: newDifficulties }));
-                                            }}
-                                        />
-                                        <label htmlFor={`diff-${option}`} className="text-sm font-medium leading-none">{option}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                         <div className="space-y-2">
-                            <Label>Question Source</Label>
-                             <div className="grid grid-cols-2 gap-2">
-                                {questionSourceOptions.map(option => (
-                                     <div key={option} className="flex items-center space-x-2">
-                                         <Checkbox
-                                            id={`source-${option}`}
-                                            checked={testData.questionSource.includes(option as any)}
-                                            onCheckedChange={(checked) => {
-                                                const currentSources = testData.questionSource;
-                                                const newSources = checked
-                                                    ? [...currentSources, option as any]
-                                                    : currentSources.filter(s => s !== option);
-                                                setTestData(prev => ({...prev, questionSource: newSources }));
-                                            }}
-                                        />
-                                        <label htmlFor={`source-${option}`} className="text-sm font-medium leading-none">{option}</label>
-                                     </div>
-                                ))}
-                            </div>
+                    <div className="flex justify-between items-center">
+                        <CardTitle>Mock Tests ({tests.length})</CardTitle>
+                         <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
+                            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('list')}><List className="w-5 h-5"/></Button>
+                            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('grid')}><LayoutGrid className="w-5 h-5"/></Button>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
-                        <Button onClick={handleAddOrUpdate}>Save</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <Card key={i}><CardContent className="p-4"><Skeleton className="h-48 w-full" /></CardContent></Card>
+                            ))}
+                        </div>
+                    ) : tests.length > 0 ? (
+                        view === 'grid' ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {tests.map((test) => (
+                                    <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                                        <CardHeader className="p-0 relative h-40">
+                                            <Image
+                                                src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
+                                                alt={test.title}
+                                                fill
+                                                className="object-cover rounded-t-lg"
+                                            />
+                                            <div className="absolute top-2 right-2"><ContentBadge type={test.access} /></div>
+                                        </CardHeader>
+                                        <CardContent className="p-4 flex-grow">
+                                            <CardTitle className="font-headline text-lg mb-1">{test.subtitle}: {test.title}</CardTitle>
+                                            <CardDescription>{test.subject}</CardDescription>
+                                             <div className="flex flex-wrap gap-1 mt-2">
+                                                {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
+                                            </div>
+                                        </CardContent>
+                                        <CardFooter className="p-4 pt-0 grid grid-cols-2 gap-2">
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={getUrlForTest(textbookId, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            </Button>
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Questions</Link>
+                                            </Button>
+                                            <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
+                                                <Edit className="mr-2 h-4 w-4"/>Edit
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
+                                                <Trash2 className="mr-2 h-4 w-4"/>Delete
+                                            </Button>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-20 hidden sm:table-cell">Image</TableHead>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead className="hidden md:table-cell">Questions</TableHead>
+                                        <TableHead className="hidden lg:table-cell">Difficulty</TableHead>
+                                        <TableHead className="hidden md:table-cell">Access</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {tests.map(test => (
+                                        <TableRow key={test.id}>
+                                            <TableCell className="hidden sm:table-cell">
+                                                <Image src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`} alt={test.title} width={64} height={36} className="rounded-md object-cover" />
+                                            </TableCell>
+                                            <TableCell className="font-medium">{test.subtitle}: {test.title}</TableCell>
+                                            <TableCell className="hidden md:table-cell">{test.questions?.length || 0}</TableCell>
+                                            <TableCell className="hidden lg:table-cell">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell"><ContentBadge type={test.access}/></TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon"><MoreHorizontal/></Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuItem asChild><Link href={getUrlForTest(textbookId, test.id)}><Eye className="mr-2"/>View</Link></DropdownMenuItem>
+                                                        <DropdownMenuItem asChild><Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2"/>Manage Questions</Link></DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleOpenDialog(test)}><Edit className="mr-2"/>Edit</DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem className="text-destructive" onClick={() => setTestToDelete(test)}><Trash2 className="mr-2"/>Delete</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )
+                    ) : (
+                        <div className="text-center py-16 text-muted-foreground">
+                            <p>No mock tests added to this textbook yet.</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+            
             <AlertDialog open={!!testToDelete} onOpenChange={() => setTestToDelete(null)}>
                 <AlertDialogContent>
                 <AlertDialogHeader>
@@ -358,3 +447,5 @@ export default function ManageTextbookMockTestsPage() {
         </div>
     );
 }
+
+    
