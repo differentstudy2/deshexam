@@ -79,31 +79,44 @@ export default function DashboardPage() {
     setLoading(true);
     setLoadingTextbooks(true);
 
-    const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        const userSubmissions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
+    const fetchSubmissions = (collectionName: string, isPracticeSet: boolean) => {
+        const q = query(collection(db, collectionName), where("userId", "==", user.uid));
         
-        // Sort by date on the client side to avoid needing a composite index
-        userSubmissions.sort((a, b) => b.submittedAt.toMillis() - a.submittedAt.toMillis());
-        
-        const submissionsWithTestData = await Promise.all(
-            userSubmissions.map(async (sub) => {
-                const test = await getContentById(sub.testId);
-                return { ...sub, test };
-            })
-        );
-        
-        setSubmissions(submissionsWithTestData);
-        setLoading(false);
-    }, (error) => {
-        console.error("Error fetching real-time submissions: ", error);
-        toast({
-            variant: "destructive",
-            title: "Real-time Update Failed",
-            description: "Could not fetch your latest test results.",
+        return onSnapshot(q, (querySnapshot) => {
+            const userSubmissions = querySnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    testId: isPracticeSet ? data.practiceSetId : data.testId,
+                    testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
+                    testType: isPracticeSet ? 'Practice Set' : data.testType,
+                } as Submission;
+            });
+
+            setSubmissions(prev => {
+                const otherSubmissions = prev.filter(s => (s.testType === 'Practice Set') !== isPracticeSet);
+                const combined = [...otherSubmissions, ...userSubmissions];
+                combined.sort((a, b) => b.submittedAt.toMillis() - a.submittedAt.toMillis());
+                return combined;
+            });
+
+            // We can set loading to false after the first fetch from either collection
+            if(loading) setLoading(false);
+
+        }, (error) => {
+            console.error(`Error fetching real-time ${collectionName}: `, error);
+            toast({
+                variant: "destructive",
+                title: "Real-time Update Failed",
+                description: `Could not fetch your latest results from ${collectionName}.`,
+            });
+            if(loading) setLoading(false);
         });
-        setLoading(false);
-    });
+    };
+
+    const unsubscribeSubmissions = fetchSubmissions('submissions', false);
+    const unsubscribePracticeSets = fetchSubmissions('practiceSetSubmissions', true);
 
     const fetchRecommendations = async () => {
         try {
@@ -125,8 +138,12 @@ export default function DashboardPage() {
     
     fetchRecommendations();
 
-    return () => unsubscribe();
-  }, [user, toast]);
+    return () => {
+        unsubscribeSubmissions();
+        unsubscribePracticeSets();
+    };
+  }, [user, toast, loading]);
+
 
   const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
       const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
