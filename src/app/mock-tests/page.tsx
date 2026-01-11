@@ -19,13 +19,16 @@ import type { Textbook } from '@/lib/types';
 type Test = {
   id: string;
   title: string;
+  subtitle?: string;
   subject: string;
   questions: any[];
   duration: number;
-  difficulty: string;
+  difficulty: string | string[];
+  questionSource?: string | string[];
   access: "free" | "premium" | "pro";
   testType: string;
   textbookId?: string;
+  textbookTitle?: string;
   chapterId?: string;
   topicId?: string;
   board?: string;
@@ -87,6 +90,7 @@ export default function MockTestsPage() {
                 const textbook = textbooksMap.get(test.textbookId);
                 return {
                     ...test,
+                    textbookTitle: textbook?.title,
                     subject: test.subject || textbook?.subject,
                     board: test.board || textbook?.board,
                     classCategory: test.classCategory || textbook?.classCategory,
@@ -129,7 +133,7 @@ export default function MockTestsPage() {
 
   const filteredTests = useMemo(() => {
     return tests.filter(test => {
-      const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase()) || (test.subtitle && test.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesSubject = selectedSubject === 'all' || test.subject === selectedSubject;
       const matchesBoard = selectedBoard === 'all' || test.board === selectedBoard;
       const matchesClassCategory = selectedClassCategory === 'all' || test.classCategory === selectedClassCategory;
@@ -207,8 +211,13 @@ export default function MockTestsPage() {
                     {test.board && <Badge variant="outline">{test.board}</Badge>}
                     {test.class && <Badge variant="outline">{test.class}</Badge>}
                 </div>
-                <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{test.title}</CardTitle>
-                <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                <CardTitle className="font-headline text-lg mt-1 leading-snug">
+                  {test.subtitle && <span className="text-primary block text-sm font-medium">{test.subtitle}</span>}
+                  {test.title}
+                </CardTitle>
+                 {test.textbookTitle && <p className="text-xs text-muted-foreground mt-1">From: {test.textbookTitle}</p>}
+                
+                <div className="flex flex-col text-sm text-muted-foreground space-y-2 mt-2">
                   <div className="flex items-center gap-1.5">
                     <HelpCircle className="w-4 h-4" />
                     <span>{test.questions?.length || 0} Questions</span>
@@ -217,10 +226,18 @@ export default function MockTestsPage() {
                     <Clock className="w-4 h-4" />
                     <span>{test.duration || test.questions?.length || 0} min</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <BarChart className="w-4 h-4" />
-                    <span>{test.difficulty}</span>
-                  </div>
+                  {test.difficulty && (
+                    <div className="flex items-center gap-1.5">
+                      <BarChart className="w-4 h-4" />
+                      <span>{Array.isArray(test.difficulty) ? test.difficulty.join(', ') : test.difficulty}</span>
+                    </div>
+                  )}
+                  {test.questionSource && (
+                    <div className="flex items-center gap-1.5">
+                      <BarChart className="w-4 h-4" />
+                      <span>{Array.isArray(test.questionSource) ? test.questionSource.join(', ') : test.questionSource}</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
               <CardFooter className="p-4 pt-0">
