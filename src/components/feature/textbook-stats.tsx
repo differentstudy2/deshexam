@@ -90,7 +90,7 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
     }
 
     return (
-        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-2 gap-2">
+        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-3 gap-2">
             <div className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
                 <span>{stats.chapterCount} Chapters</span>
