@@ -50,7 +50,7 @@ type Submission = {
   totalQuestions: number;
   submittedAt: any; 
   testType: string;
-  test?: any;
+  subject?: string;
 };
 
 const chartConfig = {
@@ -91,13 +91,16 @@ export default function DashboardPage() {
                     testId: isPracticeSet ? data.practiceSetId : data.testId,
                     testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
                     testType: isPracticeSet ? 'Practice Set' : data.testType,
+                    // Convert to JS Date object immediately
+                    submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt),
                 } as Submission;
             });
 
             setSubmissions(prev => {
                 const otherSubmissions = prev.filter(s => (s.testType === 'Practice Set') !== isPracticeSet);
                 const combined = [...otherSubmissions, ...userSubmissions];
-                combined.sort((a, b) => b.submittedAt.toMillis() - a.submittedAt.toMillis());
+                // Now sort using standard JS Date getTime()
+                combined.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
                 return combined;
             });
 
@@ -105,11 +108,11 @@ export default function DashboardPage() {
             if(loading) setLoading(false);
 
         }, (error) => {
-            console.error(`Error fetching real-time ${collectionName}: `, error);
+            console.error(`Error fetching real-time ${'collectionName'}: `, error);
             toast({
                 variant: "destructive",
                 title: "Real-time Update Failed",
-                description: `Could not fetch your latest results from ${collectionName}.`,
+                description: `Could not fetch your latest results from ${'collectionName'}.`,
             });
             if(loading) setLoading(false);
         });
@@ -270,7 +273,7 @@ export default function DashboardPage() {
                             </div>
                         </CardHeader>
                         <CardContent className="flex-grow p-4 space-y-2">
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-1">
                                 {book.subject && <Badge variant="outline">{book.subject}</Badge>}
                                 {book.class && <Badge variant="outline">{book.class}</Badge>}
                                 {book.board && <Badge variant="outline">{book.board}</Badge>}
@@ -386,9 +389,9 @@ export default function DashboardPage() {
                   submissions.slice(0, 5).map((sub) => (
                   <TableRow key={sub.id}>
                     <TableCell>
-                      <div className="font-medium">{sub.test?.title || sub.testTitle}</div>
+                      <div className="font-medium">{sub.testTitle}</div>
                       <div className="text-sm text-muted-foreground">
-                         {sub.test?.subject && `${sub.test.subject} - `}{sub.testType}
+                         {sub.subject && `${sub.subject} - `}{sub.testType}
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">
