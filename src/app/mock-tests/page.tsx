@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, HelpCircle, BarChart } from "lucide-react";
+import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
 import { getAllContent } from '@/lib/firebase/firestore';
@@ -22,11 +22,18 @@ type Test = {
   difficulty: string;
   access: "free" | "premium" | "pro";
   testType: string;
+  textbookId?: string;
+  chapterId?: string;
+  topicId?: string;
 };
 
-function getUrlForTest(testType: string, testId: string) {
-  const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
-  return `/${typeSlug}/${testId}`;
+function getUrlForTest(test: Test) {
+    if (test.textbookId && test.chapterId) {
+        const topicSegment = test.topicId || 'null';
+        return `/textbook-solutions/mock-test/${test.id}/textbook/${test.textbookId}/chapter/${test.chapterId}/topic/${topicSegment}`;
+    }
+    const typeSlug = test.testType.toLowerCase().replace(/\s+/g, '-');
+    return `/${typeSlug}/${test.id}`;
 }
 
 export default function MockTestsPage() {
@@ -129,7 +136,7 @@ export default function MockTestsPage() {
               </CardContent>
               <CardFooter className="p-4 pt-0">
                 <Button asChild className="w-full">
-                  <Link href={getUrlForTest(test.testType, test.id)}>Start Test</Link>
+                  <Link href={getUrlForTest(test)}>Start Test</Link>
                 </Button>
               </CardFooter>
             </Card>
