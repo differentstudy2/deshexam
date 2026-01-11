@@ -217,7 +217,7 @@ export default function MockTestsPage() {
                 </CardTitle>
                  {test.textbookTitle && <p className="text-xs text-muted-foreground mt-1">From: {test.textbookTitle}</p>}
                 
-                <div className="flex flex-col text-sm text-muted-foreground space-y-2 mt-2">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
                   <div className="flex items-center gap-1.5">
                     <HelpCircle className="w-4 h-4" />
                     <span>{test.questions?.length || 0} Questions</span>
