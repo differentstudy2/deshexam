@@ -34,7 +34,7 @@ import {
     DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles, LayoutGrid, List } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
@@ -48,6 +48,8 @@ import type { Textbook, Chapter, Question } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
 
 type MockTest = {
@@ -59,10 +61,10 @@ type MockTest = {
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     textbookId?: string;
-    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
-    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
     questions?: Question[];
     featureImage?: string;
+    difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
+    questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
 }
 
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
@@ -78,6 +80,7 @@ export default function ManageTextbookMockTestsPage() {
     const [loading, setLoading] = useState(true);
     const [testToDelete, setTestToDelete] = useState<MockTest | null>(null);
     const [textbook, setTextbook] = useState<Textbook | null>(null);
+    const [view, setView] = useState<'list' | 'grid'>('grid');
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
@@ -311,7 +314,13 @@ export default function ManageTextbookMockTestsPage() {
             </div>
              <Card>
                 <CardHeader>
-                    <CardTitle>Mock Tests ({tests.length})</CardTitle>
+                    <div className="flex justify-between items-center">
+                        <CardTitle>Mock Tests ({tests.length})</CardTitle>
+                        <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
+                            <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('list')}><List className="w-5 h-5"/></Button>
+                            <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('grid')}><LayoutGrid className="w-5 h-5"/></Button>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {loading ? (
@@ -321,41 +330,87 @@ export default function ManageTextbookMockTestsPage() {
                             ))}
                         </div>
                     ) : tests.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {tests.map((test) => (
-                                <Card key={test.id} className="flex flex-col">
-                                    <CardHeader className="p-0 relative h-40">
-                                        <Image
-                                            src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
-                                            alt={test.title}
-                                            fill
-                                            className="object-cover rounded-t-lg"
-                                        />
-                                        <div className="absolute top-2 right-2"><ContentBadge type={test.access} /></div>
-                                    </CardHeader>
-                                    <CardContent className="p-4 flex-grow">
-                                        <CardTitle className="font-headline text-lg mb-1">{test.subtitle}: {test.title}</CardTitle>
-                                        <div className="flex flex-wrap gap-1">
-                                            {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="p-4 pt-0 grid grid-cols-2 gap-2">
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
-                                        </Button>
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Questions</Link>
-                                        </Button>
-                                         <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
-                                            <Edit className="mr-2 h-4 w-4"/>Edit
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
-                                            <Trash2 className="mr-2 h-4 w-4"/>Delete
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            ))}
-                        </div>
+                        view === 'grid' ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {tests.map((test) => (
+                                    <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                                        <CardHeader className="p-0 relative h-40">
+                                            <Image
+                                                src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
+                                                alt={test.title}
+                                                fill
+                                                className="object-cover rounded-t-lg"
+                                            />
+                                            <div className="absolute top-2 right-2"><ContentBadge type={test.access} /></div>
+                                        </CardHeader>
+                                        <CardContent className="p-4 flex-grow">
+                                            <CardTitle className="font-headline text-lg mb-1">{test.subtitle}: {test.title}</CardTitle>
+                                            <div className="flex flex-wrap gap-1">
+                                                {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
+                                            </div>
+                                        </CardContent>
+                                        <CardFooter className="p-4 pt-0 grid grid-cols-2 gap-2">
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            </Button>
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Questions</Link>
+                                            </Button>
+                                             <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
+                                                <Edit className="mr-2 h-4 w-4"/>Edit
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
+                                                <Trash2 className="mr-2 h-4 w-4"/>Delete
+                                            </Button>
+                                        </CardFooter>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-20">Image</TableHead>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead className="hidden md:table-cell">Questions</TableHead>
+                                        <TableHead className="hidden lg:table-cell">Difficulty</TableHead>
+                                        <TableHead className="hidden md:table-cell">Access</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {tests.map(test => (
+                                        <TableRow key={test.id}>
+                                            <TableCell>
+                                                <Image src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`} alt={test.title} width={64} height={36} className="rounded-md object-cover" />
+                                            </TableCell>
+                                            <TableCell className="font-medium">{test.subtitle}: {test.title}</TableCell>
+                                            <TableCell className="hidden md:table-cell">{test.questions?.length || 0}</TableCell>
+                                            <TableCell className="hidden lg:table-cell">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell"><ContentBadge type={test.access}/></TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon"><MoreHorizontal/></Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuItem asChild><Link href={getUrlForTest(test.testType, test.id)}><Eye className="mr-2"/>View</Link></DropdownMenuItem>
+                                                        <DropdownMenuItem asChild><Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2"/>Manage Questions</Link></DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleOpenDialog(test)}><Edit className="mr-2"/>Edit</DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem className="text-destructive" onClick={() => setTestToDelete(test)}><Trash2 className="mr-2"/>Delete</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )
                     ) : (
                         <div className="text-center py-16 text-muted-foreground">
                             <p>No mock tests added to this textbook yet.</p>
