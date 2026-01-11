@@ -152,6 +152,10 @@ export default function DashboardPage() {
 
   const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
       const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
+      if (testType === 'Practice Set') {
+        const test = (submissions.find(s => s.id === submissionId) as any);
+        return `/textbook-solutions/practice-set/${testId}/results?submissionId=${submissionId}`;
+      }
       return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
   }
 
@@ -422,7 +426,7 @@ export default function DashboardPage() {
                       </Button>
                       <AlertDialog>
                           <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
+                              <Button variant="destructive" size="sm" onClick={() => setSubmissionToDelete(sub)}>
                                   <Trash2 className="h-4 w-4"/>
                               </Button>
                           </AlertDialogTrigger>
@@ -430,12 +434,12 @@ export default function DashboardPage() {
                               <AlertDialogHeader>
                                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                      This will permanently delete this submission. This action cannot be undone.
+                                      This will permanently delete your submission for "{sub.testTitle}".
                                   </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                  <AlertDialogCancel onClick={() => setSubmissionToDelete(null)}>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete()}>Delete</AlertDialogAction>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
                               </AlertDialogFooter>
                           </AlertDialogContent>
                       </AlertDialog>
@@ -470,3 +474,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
