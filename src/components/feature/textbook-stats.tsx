@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Layers, FileText, CheckSquare, Award } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
     const [stats, setStats] = useState({ chapterCount: 0, topicCount: 0, practiceSetCount: 0, examCount: 0 });
@@ -59,29 +60,25 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
 
     if (loading) {
         return (
-            <div className="mt-4 pt-4 border-t grid grid-cols-4 gap-2 text-center text-xs text-muted-foreground">
+            <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-2 text-center text-xs text-muted-foreground">
                 <div className="flex flex-col items-center gap-1">
-                    <Layers className="h-4 w-4" />
-                    <span>... Chapters</span>
+                    <Skeleton className="h-4 w-12"/>
                 </div>
                  <div className="flex flex-col items-center gap-1">
-                    <FileText className="h-4 w-4" />
-                    <span>... Topics</span>
+                    <Skeleton className="h-4 w-12"/>
                 </div>
                  <div className="flex flex-col items-center gap-1">
-                    <Award className="h-4 w-4" />
-                    <span>... Exams</span>
+                    <Skeleton className="h-4 w-12"/>
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                    <CheckSquare className="h-4 w-4" />
-                    <span>... Sets</span>
+                    <Skeleton className="h-4 w-12"/>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-4 gap-1">
+        <div className="mt-4 pt-2 text-center text-xs text-muted-foreground grid grid-cols-2 gap-2">
             <div className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
                 <span>{stats.chapterCount} Chapters</span>
@@ -101,4 +98,3 @@ export const TextbookStats = ({ textbookId }: { textbookId: string }) => {
         </div>
     );
 };
-
