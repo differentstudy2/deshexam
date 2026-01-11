@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, HelpCircle, BarChart } from "lucide-react";
+import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
 import { getAllContent, getAllTextbooks } from '@/lib/firebase/firestore';
@@ -36,6 +36,8 @@ type Test = {
   featureImage?: string;
 };
 
+const ITEMS_PER_PAGE = 12;
+
 function getUrlForTest(test: Test) {
     if (test.textbookId && test.chapterId) {
         const topicSegment = test.topicId || 'null';
@@ -51,6 +53,7 @@ function getUrlForTest(test: Test) {
 export default function MockTestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -99,6 +102,14 @@ export default function MockTestsPage() {
     
     fetchInitialData();
   }, [toast]);
+  
+  const visibleTests = useMemo(() => {
+    return tests.slice(0, visibleCount);
+  }, [tests, visibleCount]);
+
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + ITEMS_PER_PAGE);
+  };
 
   return (
     <div className="container py-12 md:py-16">
@@ -111,7 +122,7 @@ export default function MockTestsPage() {
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i} className="flex flex-col overflow-hidden">
                 <Skeleton className="w-full h-48" />
                 <CardContent className="flex-grow p-4 space-y-2">
@@ -129,62 +140,71 @@ export default function MockTestsPage() {
           ))}
         </div>
       ) : tests.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {tests.map((test) => (
-            <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-              <CardHeader className="p-0 relative h-48">
-                <Image
-                  src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
-                  alt={test.title}
-                  width={400}
-                  height={225}
-                  className="w-full h-full object-cover"
-                  data-ai-hint={`${test.subject} abstract`}
-                />
-                <div className="absolute top-2 right-2">
-                  <ContentBadge type={test.access} />
-                </div>
-              </CardHeader>
-              <CardContent className="flex-grow p-4">
-                <div className="flex flex-wrap gap-1 mb-2">
-                    {test.subject && <Badge variant="secondary">{test.subject}</Badge>}
-                    {test.board && <Badge variant="outline">{test.board}</Badge>}
-                    {test.class && <Badge variant="outline">{test.class}</Badge>}
-                </div>
-                <CardTitle className="font-headline text-lg mt-1 leading-snug">
-                  {test.subtitle && <span className="text-primary block text-sm font-medium">{test.subtitle}</span>}
-                  {test.title}
-                </CardTitle>
-                 {test.textbookTitle && <p className="text-xs text-muted-foreground mt-1">From: {test.textbookTitle}</p>}
-                
-                <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
-                  <div className="flex items-center gap-1.5">
-                    <HelpCircle className="w-4 h-4" />
-                    <span>{test.questions?.length || 0} Questions</span>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {visibleTests.map((test) => (
+              <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                <CardHeader className="p-0 relative h-48">
+                  <Image
+                    src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
+                    alt={test.title}
+                    width={400}
+                    height={225}
+                    className="w-full h-full object-cover"
+                    data-ai-hint={`${test.subject} abstract`}
+                  />
+                  <div className="absolute top-2 right-2">
+                    <ContentBadge type={test.access} />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4" />
-                    <span>{test.duration || test.questions?.length || 0} min</span>
+                </CardHeader>
+                <CardContent className="flex-grow p-4">
+                  <div className="flex flex-wrap gap-1 mb-2">
+                      {test.subject && <Badge variant="secondary">{test.subject}</Badge>}
+                      {test.board && <Badge variant="outline">{test.board}</Badge>}
+                      {test.class && <Badge variant="outline">{test.class}</Badge>}
                   </div>
-                  {test.difficulty && (
+                  <CardTitle className="font-headline text-lg mt-1 leading-snug">
+                    {test.subtitle && <span className="text-primary block text-sm font-medium">{test.subtitle}</span>}
+                    {test.title}
+                  </CardTitle>
+                   {test.textbookTitle && <p className="text-xs text-muted-foreground mt-1">From: {test.textbookTitle}</p>}
+                  
+                  <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
                     <div className="flex items-center gap-1.5">
-                      <BarChart className="w-4 h-4" />
-                      <span>{Array.isArray(test.difficulty) ? test.difficulty.join(', ') : test.difficulty}</span>
+                      <HelpCircle className="w-4 h-4" />
+                      <span>{test.questions?.length || 0} Questions</span>
                     </div>
-                  )}
-                </div>
-                 {test.questionSource && (
-                    <div className="text-xs text-muted-foreground mt-2">Source: {Array.isArray(test.questionSource) ? test.questionSource.join(', ') : test.questionSource}</div>
-                  )}
-              </CardContent>
-              <CardFooter className="p-4 pt-0">
-                <Button asChild className="w-full">
-                  <Link href={getUrlForTest(test)}>Start Test</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" />
+                      <span>{test.duration || test.questions?.length || 0} min</span>
+                    </div>
+                    {test.difficulty && (
+                      <div className="flex items-center gap-1.5">
+                        <BarChart className="w-4 h-4" />
+                        <span>{Array.isArray(test.difficulty) ? test.difficulty.join(', ') : test.difficulty}</span>
+                      </div>
+                    )}
+                  </div>
+                   {test.questionSource && (
+                      <div className="text-xs text-muted-foreground mt-2">Source: {Array.isArray(test.questionSource) ? test.questionSource.join(', ') : test.questionSource}</div>
+                    )}
+                </CardContent>
+                <CardFooter className="p-4 pt-0">
+                  <Button asChild className="w-full">
+                    <Link href={getUrlForTest(test)}>Start Test</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+          {visibleCount < tests.length && (
+            <div className="mt-12 text-center">
+              <Button onClick={handleLoadMore} size="lg">
+                Load More
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="text-center py-16 text-muted-foreground">
           <p>No mock tests found matching your criteria.</p>
