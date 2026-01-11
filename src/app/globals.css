@@ -146,7 +146,7 @@
   }
 
   .prose tr:nth-child(even) {
-    @apply bg-secondary/50;
+    @apply bg-transparent;
   }
 
   .prose pre {
