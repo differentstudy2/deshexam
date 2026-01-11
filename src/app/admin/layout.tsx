@@ -74,7 +74,6 @@ export default function AdminLayout({
                     </main>
                 </SidebarInset>
             </div>
-            <Footer />
         </div>
     </SidebarProvider>
   );
