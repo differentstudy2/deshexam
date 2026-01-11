@@ -44,6 +44,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
+import type { Textbook } from '@/lib/types';
 
 type Exam = {
     id: string;
@@ -85,13 +86,19 @@ export default function ManageTextbookExamsPage() {
         questionSource: ['Random from Chapter'],
         featureImage: '',
     });
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
+
 
     const fetchExams = async () => {
         if (!textbookId) return;
         setLoading(true);
         try {
-            const allExams = await getAllContent('Exam') as Exam[];
-            const textbookExams = allExams.filter(exam => exam.textbookId === textbookId);
+             const [textbookData, allExams] = await Promise.all([
+                getTextbookById(textbookId),
+                getAllContent('Exam'),
+            ]);
+            setTextbook(textbookData as Textbook);
+            const textbookExams = (allExams as Exam[]).filter(exam => exam.textbookId === textbookId && !exam.chapterId);
             setExams(textbookExams);
         } catch (error) {
              toast({
@@ -166,6 +173,14 @@ export default function ManageTextbookExamsPage() {
             toast({ variant: 'destructive', title: 'Error saving exam', description: (error as Error).message });
         }
     };
+    
+     const generateTitle = (template: string) => {
+        const title = template
+            .replace('[Subject]', textbook?.subject || '')
+            .replace('[Textbook Title]', textbook?.title || '');
+        setExamData(prev => ({ ...prev, title }));
+    };
+
 
     return (
         <div className="space-y-6">
@@ -210,7 +225,20 @@ export default function ManageTextbookExamsPage() {
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="exam-title">Title</Label>
-                                <Input id="exam-title" value={examData.title} onChange={e => setExamData(p => ({...p, title: e.target.value}))} />
+                                <div className="flex gap-2">
+                                    <Input id="exam-title" value={examData.title} onChange={e => setExamData(p => ({...p, title: e.target.value}))} />
+                                     <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="icon"><Sparkles className="h-4 w-4" /></Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuLabel>SEO Title Suggestions</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Exam')}>[Subject] Full Syllabus Exam</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] Final Exam')}>[Textbook Title] Final Exam</DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label>Difficulty</Label>
@@ -333,4 +361,5 @@ export default function ManageTextbookExamsPage() {
             </AlertDialog>
         </div>
     );
-}
+
+    
