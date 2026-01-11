@@ -53,6 +53,7 @@ import type { Textbook, Chapter, Question } from '@/lib/types';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 type MockTest = {
@@ -86,12 +87,13 @@ export default function ManageTextbookMockTestsPage() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
-    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[], featureImage?: string}>({
+    const [testData, setTestData] = useState<{title: string, subtitle: string, difficulty: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[], questionSource: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[], featureImage?: string, access: 'free' | 'premium' | 'pro'}>({
         title: '',
         subtitle: '',
         difficulty: ['Medium'],
         questionSource: ['Random from Chapter'],
         featureImage: '',
+        access: 'free',
     });
 
     const fetchTestsAndTextbook = async () => {
@@ -148,7 +150,7 @@ export default function ManageTextbookMockTestsPage() {
         const sourceArray = (test?.questionSource && Array.isArray(test.questionSource) ? test.questionSource : ['Random from Chapter']) as ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
         
         const subtitle = test ? test.subtitle || `Mock Test ${tests.findIndex(t => t.id === test.id) + 1}` : `Mock Test ${tests.length + 1}`;
-        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: test.featureImage || '' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '' });
+        setTestData(test ? { title: test.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: test.featureImage || '', access: test.access || 'free' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '', access: 'free' });
         setIsDialogOpen(true);
     };
 
@@ -162,7 +164,6 @@ export default function ManageTextbookMockTestsPage() {
             ...testData, 
             testType: 'Mock Test',
             textbookId: textbookId,
-            access: 'free',
             questions: editingTest?.questions || [],
         };
         
@@ -315,6 +316,19 @@ export default function ManageTextbookMockTestsPage() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Access Level</Label>
+                            <Select value={testData.access} onValueChange={(value) => setTestData(prev => ({ ...prev, access: value as 'free' | 'premium' | 'pro' }))}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="free">Free</SelectItem>
+                                    <SelectItem value="premium">Premium (Paid)</SelectItem>
+                                    <SelectItem value="pro">Pro (Subscription)</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-2">
                             <Label>Difficulty</Label>
