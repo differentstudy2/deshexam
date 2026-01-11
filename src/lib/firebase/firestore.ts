@@ -880,10 +880,15 @@ export const deleteSubmissions = async (submissionIds: string[]) => {
             // Need to check both collections
             let docRef = doc(db, "submissions", id);
             let docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) {
+            if (docSnap.exists()) {
+                return deleteDoc(docRef);
+            } else {
                 docRef = doc(db, "practiceSetSubmissions", id);
+                docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                   return deleteDoc(docRef);
+                }
             }
-            return deleteDoc(docRef);
         });
         await Promise.all(deletePromises);
     } catch (e) {
@@ -2099,13 +2104,11 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
     if (!practiceSetId) return [];
 
     let path = '';
-    if (textbookId && chapterId && topicId && topicId !== 'null') {
+    if (textbookId && chapterId && chapterId !== 'null' && topicId && topicId !== 'null') {
         path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
-    } else if (textbookId && chapterId && (topicId === 'null' || !topicId)) { // Chapter-level practice set
+    } else if (textbookId && chapterId && chapterId !== 'null' && (topicId === 'null' || !topicId)) { // Chapter-level practice set
         path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
     } else if (textbookId && (chapterId === 'null' || !chapterId)) { // Textbook-level practice set
-        // This case seems to be the source of the error. A practice set at the textbook level
-        // is not nested under chapters or topics in the same way. Assuming they are in a top-level `content` collection.
         const contentDoc = await getDoc(doc(db, 'content', practiceSetId));
         if(contentDoc.exists()) {
              return contentDoc.data().questions || [];
@@ -2274,6 +2277,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 

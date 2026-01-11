@@ -27,9 +27,9 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { getContentById, getAllTextbooks, getUserProfile } from '@/lib/firebase/firestore';
+import { getContentById, getAllTextbooks, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, FileText, BarChart2, Book } from 'lucide-react';
+import { Eye, PlusCircle, FileText, BarChart2, Book, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { ChartConfig } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -41,6 +41,8 @@ import { ContentBadge } from '@/components/content-badge';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+
 
 type Submission = {
   id: string;
@@ -68,6 +70,7 @@ export default function DashboardPage() {
   const [recommendedTextbooks, setRecommendedTextbooks] = useState<Textbook[]>([]);
   const [loadingTextbooks, setLoadingTextbooks] = useState(true);
   const { toast } = useToast();
+  const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -170,6 +173,21 @@ export default function DashboardPage() {
     { title: "Tests Taken", value: submissions.length, icon: <FileText/>, description: "Total tests completed" },
     { title: "Average Score", value: `${averageScore}%`, icon: <BarChart2/>, description: "Your average across all tests" },
   ];
+
+  const handleDelete = async () => {
+    if (!submissionToDelete) return;
+    try {
+        await deleteSubmissions([submissionToDelete.id]);
+        toast({ title: `Submission for "${submissionToDelete.testTitle}" deleted.` });
+        setSubmissionToDelete(null);
+    } catch (error) {
+         toast({
+            variant: "destructive",
+            title: 'Error deleting submission',
+            description: (error as Error).message,
+        });
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -396,12 +414,31 @@ export default function DashboardPage() {
                     <TableCell className="font-semibold">
                       {sub.totalQuestions > 0 ? `${Math.round((sub.score / sub.totalQuestions) * 100)}%` : 'N/A'}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-2">
                       <Button asChild variant="outline" size="sm">
                         <Link href={getUrlForTest(sub.testType, sub.testId, sub.id)}>
                            <Eye className="mr-2 h-4 w-4" /> View
                         </Link>
                       </Button>
+                      <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="sm">
+                                  <Trash2 className="h-4 w-4"/>
+                              </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                              <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                      This will permanently delete this submission. This action cannot be undone.
+                                  </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setSubmissionToDelete(null)}>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete()}>Delete</AlertDialogAction>
+                              </AlertDialogFooter>
+                          </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))
@@ -415,6 +452,21 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+       <AlertDialog open={!!submissionToDelete} onOpenChange={() => setSubmissionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will permanently delete your submission for "{submissionToDelete?.testTitle}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
