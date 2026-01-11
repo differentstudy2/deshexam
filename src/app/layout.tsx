@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { AuthProvider } from "@/hooks/use-auth";
 import Script from "next/script";
-import { ThemeProvider } from "@/components/layout/theme-provider";
+import { AppProviders } from "./providers"; // Import the new provider
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
 import { Inter, Lexend } from 'next/font/google';
@@ -41,12 +41,7 @@ export default function RootLayout({
         />
       </head>
       <body className={cn("antialiased", inter.variable, lexend.variable)}>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
+        <AppProviders>
           <AuthProvider>
             <AuthDialogProvider>
               <div className="flex flex-col min-h-screen">
@@ -58,7 +53,7 @@ export default function RootLayout({
           </AuthProvider>
           <Toaster />
           <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-        </ThemeProvider>
+        </AppProviders>
       </body>
     </html>
   );
