@@ -189,6 +189,18 @@
     @apply grid grid-cols-1 md:grid-cols-2 gap-4 my-6;
   }
 
+  .image-grid > div {
+    @apply border rounded-lg overflow-hidden bg-card shadow-sm text-center;
+  }
+  
+  .image-grid > div > img {
+    @apply w-full h-auto object-cover;
+  }
+  
+  .image-grid > div > p {
+    @apply text-sm text-muted-foreground p-2;
+  }
+
   @media (min-width: 768px) {
     .float-left-responsive {
       float: left;
