@@ -37,7 +37,7 @@ Your task is to write a comprehensive article on the following topic: "{{topic}}
 **Formatting Rules**:
 1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics).
 2.  **LaTeX for Math**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$).
-3.  **Responsive HTML for Layout**: For complex layouts that Markdown cannot handle, you MAY use simple HTML. To float an image, wrap the image and the text in a 'div' with a 'clearfix' class. Then, apply 'float-left-responsive' or 'float-right-responsive' to the image element. To arrange images side-by-side, wrap them in a 'div' with the 'image-grid' class. Example: \`<div class="clearfix"><img src="..." alt="..." class="float-left-responsive"><p>Your text here...</p></div>\`. Do NOT use inline \`style\` attributes.
+3.  **Responsive HTML for Layout**: For complex layouts that Markdown cannot handle, you MAY use simple HTML. To float an image, wrap the image and the text in a 'div' with a 'clearfix' class, then apply 'float-left-responsive' or 'float-right-responsive' to the image element. To arrange images side-by-side in a grid, wrap them in a '<div class="image-grid">', with each image and its caption in a '<figure>' and '<figcaption>' respectively. Example: \`<div class="clearfix"><img src="..." alt="..." class="float-left-responsive"><p>Your text here...</p></div>\`. Do NOT use inline \`style\` attributes.
 
 The article must be well-structured, visually appealing, and easy for students to read and understand.
 Please generate the following:

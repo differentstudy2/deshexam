@@ -188,16 +188,16 @@
   .image-grid {
     @apply grid grid-cols-1 md:grid-cols-2 gap-4 my-6;
   }
-
-  .image-grid > div {
-    @apply border rounded-lg overflow-hidden bg-card shadow-sm text-center;
+  
+  .image-grid > figure {
+    @apply border rounded-lg overflow-hidden bg-card shadow-sm text-center m-0;
   }
   
-  .image-grid > div > img {
+  .image-grid > figure > img {
     @apply w-full h-auto object-cover;
   }
   
-  .image-grid > div > p {
+  .image-grid > figure > figcaption {
     @apply text-sm text-muted-foreground p-2;
   }
 
