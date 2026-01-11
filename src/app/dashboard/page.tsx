@@ -396,8 +396,11 @@ export default function DashboardPage() {
                   <TableRow key={sub.id}>
                     <TableCell>
                       <div className="font-medium">{sub.testTitle}</div>
-                      <div className="text-xs text-muted-foreground">
-                        { [sub.subject, sub.testType, sub.board, sub.class].filter(Boolean).join(' - ') }
+                       <div className="flex flex-wrap gap-1.5 mt-1">
+                          {sub.subject && <Badge variant="outline">{sub.subject}</Badge>}
+                          {sub.testType && <Badge variant="secondary">{sub.testType}</Badge>}
+                          {sub.board && <Badge variant="outline">{sub.board}</Badge>}
+                          {sub.class && <Badge variant="outline">{sub.class}</Badge>}
                       </div>
                     </TableCell>
                     <TableCell>
