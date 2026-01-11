@@ -38,16 +38,16 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-        <Sidebar>
-            <DashboardSidebar user={user} logOut={logOut} />
-        </Sidebar>
-        <SidebarInset>
-            <div className="flex flex-col min-h-screen">
+        <div className="flex flex-1">
+            <Sidebar>
+                <DashboardSidebar user={user} logOut={logOut} />
+            </Sidebar>
+            <SidebarInset>
                 <main className="flex-grow p-4 md:p-6 lg:p-8">
                     {children}
                 </main>
-            </div>
-        </SidebarInset>
+            </SidebarInset>
+        </div>
     </SidebarProvider>
   );
 }
