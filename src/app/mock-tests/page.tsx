@@ -1,15 +1,15 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
+import { Clock, HelpCircle, BarChart } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
-import { getAllContent } from '@/lib/firebase/firestore';
+import { getAllContent, getSubjects, getClasses, getGradesByClass, getBoards } from '@/lib/firebase/firestore';
 import { MockTestFilters } from "@/components/mock-test-filters";
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -25,7 +25,12 @@ type Test = {
   textbookId?: string;
   chapterId?: string;
   topicId?: string;
+  board?: string;
+  classCategory?: string;
+  class?: string; // This represents grade
 };
+
+type MetafieldItem = { id: string, name: string };
 
 function getUrlForTest(test: Test) {
     if (test.textbookId && test.chapterId) {
@@ -39,8 +44,18 @@ function getUrlForTest(test: Test) {
 export default function MockTestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
-  const [subjects, setSubjects] = useState<string[]>([]);
   const { toast } = useToast();
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [classCategories, setClassCategories] = useState<MetafieldItem[]>([]);
+  const [selectedClassCategory, setSelectedClassCategory] = useState('all');
+  const [grades, setGrades] = useState<MetafieldItem[]>([]);
+  const [selectedGrade, setSelectedGrade] = useState('all');
+  const [boards, setBoards] = useState<MetafieldItem[]>([]);
+  const [selectedBoard, setSelectedBoard] = useState('all');
+
 
   useEffect(() => {
     document.title = "Mock Tests | DeshExam";
@@ -49,16 +64,23 @@ export default function MockTestsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchTests = async () => {
+    const fetchInitialData = async () => {
       try {
-        const fetchedTests = (await getAllContent("Mock Test")) as Test[];
-        setTests(fetchedTests);
-        const uniqueSubjects = Array.from(new Set(fetchedTests.map((test) => test.subject))).filter(Boolean) as string[];
-        setSubjects(uniqueSubjects);
+        const [fetchedTests, subjectsData, classesData, boardsData] = await Promise.all([
+          getAllContent("Mock Test"),
+          getSubjects(),
+          getClasses(),
+          getBoards(),
+        ]);
+
+        setTests(fetchedTests as Test[]);
+        setSubjects(subjectsData);
+        setClassCategories(classesData);
+        setBoards(boardsData);
       } catch (error) {
          toast({
           variant: "destructive",
-          title: "Error fetching tests",
+          title: "Error fetching data",
           description: (error as Error).message,
         });
       } finally {
@@ -66,8 +88,33 @@ export default function MockTestsPage() {
       }
     }
     
-    fetchTests();
+    fetchInitialData();
   }, [toast]);
+  
+  useEffect(() => {
+    const fetchGrades = async () => {
+        if(selectedClassCategory !== 'all') {
+            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            setGrades(fetchedGrades);
+        } else {
+            setGrades([]);
+        }
+        setSelectedGrade('all');
+    };
+    fetchGrades();
+  }, [selectedClassCategory]);
+
+  const filteredTests = useMemo(() => {
+    return tests.filter(test => {
+      const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSubject = selectedSubject === 'all' || test.subject === selectedSubject;
+      const matchesBoard = selectedBoard === 'all' || test.board === selectedBoard;
+      const matchesClassCategory = selectedClassCategory === 'all' || test.classCategory === selectedClassCategory;
+      const matchesGrade = selectedGrade === 'all' || test.class === selectedGrade;
+
+      return matchesSearch && matchesSubject && matchesBoard && matchesClassCategory && matchesGrade;
+    });
+  }, [tests, searchQuery, selectedSubject, selectedBoard, selectedClassCategory, selectedGrade]);
 
   return (
     <div className="container py-12 md:py-16">
@@ -78,7 +125,22 @@ export default function MockTestsPage() {
         </p>
       </header>
 
-      <MockTestFilters subjects={subjects} />
+      <MockTestFilters 
+        subjects={subjects}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        selectedSubject={selectedSubject}
+        onSubjectChange={setSelectedSubject}
+        boards={boards}
+        selectedBoard={selectedBoard}
+        onBoardChange={setSelectedBoard}
+        classCategories={classCategories}
+        selectedClassCategory={selectedClassCategory}
+        onClassCategoryChange={setSelectedClassCategory}
+        grades={grades}
+        selectedGrade={selectedGrade}
+        onGradeChange={setSelectedGrade}
+      />
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -99,9 +161,9 @@ export default function MockTestsPage() {
             </Card>
           ))}
         </div>
-      ) : tests.length > 0 ? (
+      ) : filteredTests.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {tests.map((test) => (
+          {filteredTests.map((test) => (
             <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <CardHeader className="p-0 relative">
                 <Image
@@ -144,7 +206,7 @@ export default function MockTestsPage() {
         </div>
       ) : (
         <div className="text-center py-16 text-muted-foreground">
-          <p>No mock tests found.</p>
+          <p>No mock tests found matching your criteria.</p>
         </div>
       )}
     </div>
