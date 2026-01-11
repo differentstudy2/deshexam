@@ -38,7 +38,7 @@ import Image from 'next/image';
 import { TextbookStats } from '@/components/feature/textbook-stats';
 import { Badge } from '@/components/ui/badge';
 import { ContentBadge } from '@/components/content-badge';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -79,7 +79,7 @@ export default function DashboardPage() {
     setLoading(true);
     setLoadingTextbooks(true);
 
-    const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
+    const q = query(collection(db, "submissions"), where("userId", "==", user.uid), orderBy("submittedAt", "desc"));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
         const userSubmissions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
         
@@ -89,8 +89,6 @@ export default function DashboardPage() {
                 return { ...sub, test };
             })
         );
-
-        submissionsWithTestData.sort((a, b) => b.submittedAt.seconds - a.submittedAt.seconds);
         
         setSubmissions(submissionsWithTestData);
         setLoading(false);
@@ -398,3 +396,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
