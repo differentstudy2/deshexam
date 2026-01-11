@@ -4,9 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getAllContent, deleteContent, addContent, updateContent } from '@/lib/firebase/firestore';
-import { getDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { getAllContent, deleteContent, addContent, updateContent, getTextbookById } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -31,27 +29,26 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogTrigger,
+    DialogClose
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, Sparkles, FileQuestion } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileQuestion, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { ContentBadge } from '@/components/content-badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogTrigger,
-  DialogClose,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Textbook, Chapter, Question } from '@/lib/types';
 
 
@@ -63,7 +60,7 @@ type MockTest = {
     testType: string;
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
-    chapterId?: string;
+    textbookId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
     questions?: Question[];
@@ -72,18 +69,20 @@ type MockTest = {
 const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
+function getUrlForTest(bookId: string, mockTestId: string) {
+    return `/textbook-solutions/mock-test/${mockTestId}/textbook/${bookId}`;
+}
 
-export default function ManageChapterMockTestsPage() {
+
+export default function ManageTextbookMockTestsPage() {
     const params = useParams();
     const textbookId = params.bookId as string;
-    const chapterId = params.chapterId as string;
     const { toast } = useToast();
 
     const [tests, setTests] = useState<MockTest[]>([]);
     const [loading, setLoading] = useState(true);
     const [testToDelete, setTestToDelete] = useState<MockTest | null>(null);
     const [textbook, setTextbook] = useState<Textbook | null>(null);
-    const [chapter, setChapter] = useState<Chapter | null>(null);
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingTest, setEditingTest] = useState<MockTest | null>(null);
@@ -95,19 +94,18 @@ export default function ManageChapterMockTestsPage() {
     });
 
     const fetchTests = async () => {
-        if (!chapterId) return;
+        if (!textbookId) return;
         setLoading(true);
         try {
-            const [textbookSnap, chapterSnap] = await Promise.all([
-                getDoc(doc(db, 'textbooks', textbookId)),
-                getDoc(doc(db, `textbooks/${textbookId}/chapters`, chapterId))
+            const [textbookData, allTests] = await Promise.all([
+                getTextbookById(textbookId),
+                getAllContent("Mock Test")
             ]);
-            if (textbookSnap.exists()) setTextbook({id: textbookSnap.id, ...textbookSnap.data()} as Textbook);
-            if (chapterSnap.exists()) setChapter({id: chapterSnap.id, ...chapterSnap.data()} as Chapter);
 
-            const allTests = (await getAllContent("Mock Test")) as MockTest[];
-            const chapterTests = allTests.filter(test => test.chapterId === chapterId);
-            setTests(chapterTests);
+            setTextbook(textbookData as Textbook);
+
+            const textbookTests = (allTests as MockTest[]).filter(test => test.textbookId === textbookId && !test.chapterId);
+            setTests(textbookTests);
         } catch (error) {
              toast({
                 variant: "destructive",
@@ -121,7 +119,7 @@ export default function ManageChapterMockTestsPage() {
     
     useEffect(() => {
         fetchTests();
-    }, [chapterId, toast]);
+    }, [textbookId, toast]);
 
     const handleDelete = async () => {
         if (!testToDelete) return;
@@ -163,7 +161,6 @@ export default function ManageChapterMockTestsPage() {
             ...testData, 
             testType: 'Mock Test',
             textbookId: textbookId,
-            chapterId: chapterId,
             access: 'free',
             questions: editingTest?.questions || [],
         };
@@ -186,7 +183,6 @@ export default function ManageChapterMockTestsPage() {
     
     const generateTitle = (template: string) => {
         const title = template
-            .replace('[Chapter Title]', chapter?.title || '')
             .replace('[Subject]', textbook?.subject || '')
             .replace('[Textbook Title]', textbook?.title || '');
         setTestData(prev => ({ ...prev, title }));
@@ -196,9 +192,9 @@ export default function ManageChapterMockTestsPage() {
         <div className="space-y-6">
             <div>
                 <Button asChild variant="ghost">
-                    <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}`}>
+                    <Link href={`/admin/textbooks/${textbookId}`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Chapter
+                        Back to Textbook
                     </Link>
                 </Button>
             </div>
@@ -206,7 +202,7 @@ export default function ManageChapterMockTestsPage() {
                 <div>
                     <h1 className="font-headline text-3xl font-bold">Manage Mock Tests</h1>
                     <p className="text-muted-foreground">
-                        Mock tests associated with this chapter.
+                        Full-syllabus mock tests associated with this textbook.
                     </p>
                 </div>
                 <Button onClick={() => handleOpenDialog(null)}><PlusCircle className="mr-2" /> Add New Mock Test</Button>
@@ -240,10 +236,10 @@ export default function ManageChapterMockTestsPage() {
                                     <TableCell><ContentBadge type={test.access} /></TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/textbook-solutions/mock-test/${test.id}/textbook/${textbookId}/chapter/${chapterId}/topic/null`}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                            <Link href={getUrlForTest(textbookId, test.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                         </Button>
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/null/mock-test/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
+                                            <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
                                             <Edit className="mr-2 h-4 w-4"/>Edit
@@ -256,7 +252,7 @@ export default function ManageChapterMockTestsPage() {
                             ))) : (
                                 <TableRow>
                                     <TableCell colSpan={4} className="text-center h-24">
-                                    No mock tests added to this chapter yet.
+                                    No mock tests added to this textbook yet.
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -286,8 +282,8 @@ export default function ManageChapterMockTestsPage() {
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>SEO Title Suggestions</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Chapter Title] - Mock Test')}>[Chapter Title] - Mock Test</DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Mock Test')}>[Subject] Full Mock Test</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Mock Test')}>[Subject] Full Syllabus Mock Test</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Complete Mock Test')}>[Textbook Title] - Complete Mock Test</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
