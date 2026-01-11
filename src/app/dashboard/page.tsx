@@ -27,7 +27,7 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { getContentById, getAllTextbooks, getSubmissionsByUserId, getUserProfile } from '@/lib/firebase/firestore';
+import { getContentById, getAllTextbooks, getUserProfile } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Eye, PlusCircle, FileText, BarChart2, Book } from 'lucide-react';
 import Link from 'next/link';
@@ -79,9 +79,12 @@ export default function DashboardPage() {
     setLoading(true);
     setLoadingTextbooks(true);
 
-    const q = query(collection(db, "submissions"), where("userId", "==", user.uid), orderBy("submittedAt", "desc"));
+    const q = query(collection(db, "submissions"), where("userId", "==", user.uid));
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
         const userSubmissions = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
+        
+        // Sort by date on the client side to avoid needing a composite index
+        userSubmissions.sort((a, b) => b.submittedAt.toMillis() - a.submittedAt.toMillis());
         
         const submissionsWithTestData = await Promise.all(
             userSubmissions.map(async (sub) => {
@@ -396,4 +399,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
