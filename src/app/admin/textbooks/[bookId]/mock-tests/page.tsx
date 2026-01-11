@@ -345,7 +345,8 @@ export default function ManageTextbookMockTestsPage() {
                                         </CardHeader>
                                         <CardContent className="p-4 flex-grow">
                                             <CardTitle className="font-headline text-lg mb-1">{test.subtitle}: {test.title}</CardTitle>
-                                            <div className="flex flex-wrap gap-1">
+                                            <p className="text-sm text-muted-foreground">{test.questions?.length || 0} Questions</p>
+                                            <div className="flex flex-wrap gap-1 mt-2">
                                                 {(Array.isArray(test.difficulty) ? test.difficulty : test.difficulty ? [test.difficulty] : []).map(d => d && <Badge key={d} variant="secondary">{d}</Badge>)}
                                             </div>
                                         </CardContent>
@@ -438,5 +439,6 @@ export default function ManageTextbookMockTestsPage() {
             </AlertDialog>
         </div>
     );
+}
 
     
