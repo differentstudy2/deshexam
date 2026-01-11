@@ -88,6 +88,14 @@
     @apply text-foreground text-base leading-relaxed;
   }
 
+  .prose img {
+    @apply rounded-lg border bg-secondary shadow-sm;
+  }
+  
+  .prose .float-left-responsive, .prose .float-right-responsive {
+      @apply mt-0; /* Prevent extra top margin on floated images */
+  }
+
   .prose h1, .prose h2, .prose h3, .prose h4 {
     @apply font-headline font-bold tracking-tight mb-4 mt-8 first:mt-0;
   }
