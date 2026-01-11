@@ -8,6 +8,7 @@ import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
 
 export default function AdminLayout({
   children,
@@ -62,16 +63,19 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-        <Sidebar>
-            <AdminSidebar logOut={logOut} />
-        </Sidebar>
-        <SidebarInset>
-            <div className="flex flex-col min-h-screen">
-                <main className="flex-grow p-4 md:p-6 lg:p-8">
-                    {children}
-                </main>
+        <div className="flex flex-col min-h-screen">
+            <div className="flex flex-1">
+                <Sidebar>
+                    <AdminSidebar logOut={logOut} />
+                </Sidebar>
+                <SidebarInset>
+                    <main className="flex-grow p-4 md:p-6 lg:p-8">
+                        {children}
+                    </main>
+                </SidebarInset>
             </div>
-        </SidebarInset>
+            <Footer />
+        </div>
     </SidebarProvider>
   );
 }
