@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getAllContent, getSubjects, getClasses, getGradesByClass, getBoards } from '@/lib/firebase/firestore';
 import { MockTestFilters } from "@/components/mock-test-filters";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 type Test = {
   id: string;
@@ -179,7 +180,11 @@ export default function MockTestsPage() {
                 </div>
               </CardHeader>
               <CardContent className="flex-grow p-4">
-                <p className="text-sm font-medium text-primary">{test.subject}</p>
+                <div className="flex flex-wrap gap-1 mb-2">
+                    {test.subject && <Badge variant="secondary">{test.subject}</Badge>}
+                    {test.board && <Badge variant="outline">{test.board}</Badge>}
+                    {test.class && <Badge variant="outline">{test.class}</Badge>}
+                </div>
                 <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug">{test.title}</CardTitle>
                 <div className="flex items-center text-sm text-muted-foreground space-x-4">
                   <div className="flex items-center gap-1.5">
