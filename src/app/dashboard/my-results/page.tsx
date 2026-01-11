@@ -68,7 +68,7 @@ export default function MyResultsPage() {
   }, [user, toast]);
 
   const aggregatedResults = useMemo(() => {
-    const resultsMap = new Map<string, { highestScore: number; bestSubmission: Submission; testTitle: string, subject?: string, testType: string }>();
+    const resultsMap = new Map<string, { highestScore: number; bestSubmission: Submission; testTitle: string, subject?: string, testType: string, board?: string, class?: string }>();
 
     submissions.forEach(sub => {
       const score = sub.totalQuestions > 0 ? Math.round((sub.score / sub.totalQuestions) * 100) : 0;
@@ -81,6 +81,8 @@ export default function MyResultsPage() {
           testTitle: sub.testTitle,
           subject: sub.subject,
           testType: sub.testType,
+          board: sub.board,
+          class: sub.class
         });
       }
     });
@@ -126,13 +128,13 @@ export default function MyResultsPage() {
                 <Card key={result.bestSubmission.id}>
                     <CardHeader>
                         <div className="flex justify-between items-start">
-                             <CardTitle className="flex items-center gap-2">
-                                <BarChart className="w-5 h-5 text-primary"/>
+                             <CardTitle className="flex items-start gap-2">
+                                <BarChart className="w-5 h-5 text-primary mt-1 flex-shrink-0"/>
                                 {result.testTitle}
                              </CardTitle>
-                             <Badge variant="secondary">{result.testType}</Badge>
                         </div>
                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            <Badge variant="secondary">{result.testType}</Badge>
                             {result.subject && <Badge variant="outline">{result.subject}</Badge>}
                             {result.bestSubmission.board && <Badge variant="outline">{result.bestSubmission.board}</Badge>}
                             {result.bestSubmission.class && <Badge variant="outline">{result.bestSubmission.class}</Badge>}
