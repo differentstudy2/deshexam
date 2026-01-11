@@ -29,7 +29,7 @@ import {
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { getContentById, getAllTextbooks, getUserProfile, deleteSubmissions } from '@/lib/firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { Eye, PlusCircle, FileText, BarChart2, Book, Trash2 } from 'lucide-react';
+import { Eye, PlusCircle, FileText, BarChart2, Book, Trash2, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { ChartConfig } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -94,7 +94,6 @@ export default function DashboardPage() {
                     testId: isPracticeSet ? data.practiceSetId : data.testId,
                     testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
                     testType: isPracticeSet ? 'Practice Set' : data.testType,
-                    // Convert to JS Date object immediately
                     submittedAt: data.submittedAt?.toDate ? data.submittedAt.toDate() : new Date(data.submittedAt),
                 } as Submission;
             });
@@ -102,7 +101,6 @@ export default function DashboardPage() {
             setSubmissions(prev => {
                 const otherSubmissions = prev.filter(s => (s.testType === 'Practice Set') !== isPracticeSet);
                 const combined = [...otherSubmissions, ...userSubmissions];
-                // Now sort using standard JS Date getTime()
                 combined.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
                 return combined;
             });
@@ -111,11 +109,13 @@ export default function DashboardPage() {
 
         }, (error) => {
             console.error(`Error fetching real-time ${collectionName}: `, error);
-            toast({
+            if (error.code !== 'permission-denied') {
+              toast({
                 variant: "destructive",
                 title: "Real-time Update Failed",
                 description: `Could not fetch your latest results from ${collectionName}.`,
-            });
+              });
+            }
             setLoading(false);
         });
     };
@@ -150,14 +150,24 @@ export default function DashboardPage() {
   }, [user, toast]);
 
 
-  const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
-      const typeSlug = (testType || 'content').toLowerCase().replace(/\s+/g, '-');
-      if (testType === 'Practice Set') {
-        const test = (submissions.find(s => s.id === submissionId) as any);
-        return `/textbook-solutions/practice-set/${testId}/results?submissionId=${submissionId}`;
-      }
-      return `/${typeSlug}/${testId}/results?submissionId=${submissionId}`;
-  }
+  const getUrlForResults = (submission: Submission) => {
+    const typeSlug = (submission.testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    if (submission.testType === 'Practice Set') {
+        const test = (submission as any).test;
+        return `/textbook-solutions/practice-set/${submission.testId}/results?submissionId=${submission.id}`;
+    }
+    return `/${typeSlug}/${submission.testId}/results?submissionId=${submission.id}`;
+  };
+
+  const getUrlForRetake = (submission: Submission) => {
+    const typeSlug = (submission.testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    if (submission.testType === 'Practice Set') {
+        const test = (submission as any);
+        return `/textbook-solutions/practice-set/${test.practiceSetId}/textbook/${test.textbookId}/chapter/${test.chapterId}/topic/${test.topicId || 'null'}`;
+    }
+    return `/${typeSlug}/${submission.testId}`;
+  };
+
 
   const averageScore = useMemo(() => {
     if (submissions.length === 0) return 0;
@@ -293,7 +303,7 @@ export default function DashboardPage() {
                                 <ContentBadge type={book.access} />
                             </div>
                         </CardHeader>
-                        <CardContent className="flex-grow p-4 space-y-2">
+                        <CardContent className="flex-grow p-3 space-y-2">
                             <div className="flex flex-wrap gap-1">
                                 {book.subject && <Badge variant="outline">{book.subject}</Badge>}
                                 {book.class && <Badge variant="outline">{book.class}</Badge>}
@@ -420,8 +430,13 @@ export default function DashboardPage() {
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button asChild variant="outline" size="sm">
-                        <Link href={getUrlForTest(sub.testType, sub.testId, sub.id)}>
+                        <Link href={getUrlForResults(sub)}>
                            <Eye className="mr-2 h-4 w-4" /> View
+                        </Link>
+                      </Button>
+                       <Button asChild variant="secondary" size="sm">
+                        <Link href={getUrlForRetake(sub)}>
+                           <RefreshCw className="mr-2 h-4 w-4" /> Retake
                         </Link>
                       </Button>
                       <AlertDialog>
@@ -474,5 +489,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
