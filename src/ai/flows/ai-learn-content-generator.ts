@@ -37,7 +37,7 @@ Your task is to write a comprehensive article on the following topic: "{{topic}}
 **Formatting Rules**:
 1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics).
 2.  **LaTeX for Math**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$).
-3.  **HTML for Layout**: For complex layouts that Markdown cannot handle (like floating an image to the left of a paragraph), you MAY use simple HTML tags (like \`<img>\`, \`<p>\`, \`<div>\`). You can use inline \`style\` attributes for positioning (e.g., \`float: left; margin-right: 1em;\`). Do not use HTML for basic text styling like colors or fonts.
+3.  **Responsive HTML for Layout**: For complex responsive layouts that Markdown cannot handle, you MAY use simple HTML with specific CSS classes. To float an image to the left of a paragraph, use the class \`float-left-responsive\`. Example: \`<img src="..." alt="..." class="float-left-responsive">\`. Do not use inline \`style\` attributes.
 
 The article must be well-structured, visually appealing, and easy for students to read and understand.
 Please generate the following:
