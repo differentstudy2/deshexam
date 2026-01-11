@@ -71,8 +71,8 @@ const difficultyOptions = ['Beginner', 'Easy', 'Medium', 'Hard', 'Expert'];
 const questionSourceOptions = ['Random from Chapter', 'Random from Topic', 'Textbook Exercise', 'Solved Examples', 'Previous Year Questions'];
 
 
-function getUrlForPracticeSet(practiceSetId: string) {
-    return `/content/${practiceSetId}`;
+function getUrlForPracticeSet(bookId: string, practiceSetId: string) {
+    return `/${bookId}/text-practice-sets/${practiceSetId}`;
 }
 
 export default function ManageTextbookPracticeSetsPage() {
@@ -147,6 +147,7 @@ export default function ManageTextbookPracticeSetsPage() {
         setEditingItem(item);
         const difficultyArray = (item?.difficulty && Array.isArray(item.difficulty) ? item.difficulty : ['Medium']) as any[];
         const sourceArray = (item?.questionSource && Array.isArray(item.questionSource) ? item.questionSource : ['Random from Chapter']) as any[];
+        
         const subtitle = item ? item.subtitle || `Practice Set ${practiceSets.findIndex(t => t.id === item.id) + 1}` : `Practice Set ${practiceSets.length + 1}`;
         setItemData(item ? { title: item.title, subtitle, difficulty: difficultyArray, questionSource: sourceArray, featureImage: item.featureImage || '', access: item.access || 'free' } : { title: '', subtitle, difficulty: ['Medium'], questionSource: ['Random from Chapter'], featureImage: '', access: 'free' });
         setIsDialogOpen(true);
@@ -242,8 +243,8 @@ export default function ManageTextbookPracticeSetsPage() {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>SEO Title Suggestions</DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Practice')}>[Subject] Full Syllabus Practice</DropdownMenuItem>
-                                                <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Practice Set')}>[Textbook Title] - Practice Set</DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => generateTitle('[Subject] Full Syllabus Practice Set')}>[Subject] Full Syllabus Practice Set</DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => generateTitle('[Textbook Title] - Final Practice')}>[Textbook Title] - Final Practice</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
@@ -352,7 +353,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                         </CardContent>
                                         <CardFooter className="p-4 pt-0 grid grid-cols-2 gap-2">
                                             <Button asChild variant="outline" size="sm">
-                                                <Link href={getUrlForPracticeSet(ps.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
+                                                <Link href={getUrlForPracticeSet(textbookId, ps.id)}><Eye className="mr-2 h-4 w-4"/>View</Link>
                                             </Button>
                                             <Button asChild variant="outline" size="sm">
                                                 <Link href={`/admin/textbooks/${textbookId}/practice-sets/${ps.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Questions</Link>
@@ -399,7 +400,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                                         <Button variant="ghost" size="icon"><MoreHorizontal/></Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent>
-                                                        <DropdownMenuItem asChild><Link href={getUrlForPracticeSet(ps.id)}><Eye className="mr-2"/>View</Link></DropdownMenuItem>
+                                                        <DropdownMenuItem asChild><Link href={getUrlForPracticeSet(textbookId, ps.id)}><Eye className="mr-2"/>View</Link></DropdownMenuItem>
                                                         <DropdownMenuItem asChild><Link href={`/admin/textbooks/${textbookId}/practice-sets/${ps.id}`}><FileQuestion className="mr-2"/>Manage Questions</Link></DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => handleOpenDialog(ps)}><Edit className="mr-2"/>Edit</DropdownMenuItem>
                                                         <DropdownMenuSeparator />
