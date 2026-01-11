@@ -2095,19 +2095,36 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     }
 };
 
-export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string) => {
-    if (!textbookId || !chapterId || !practiceSetId) return [];
+export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string) => {
+    if (!practiceSetId) return [];
+
+    let path = '';
+    if (textbookId && chapterId && topicId && topicId !== 'null') {
+        path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
+    } else if (textbookId && chapterId && (topicId === 'null' || !topicId)) { // Chapter-level practice set
+        path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+    } else if (textbookId && (chapterId === 'null' || !chapterId)) { // Textbook-level practice set
+        // This case seems to be the source of the error. A practice set at the textbook level
+        // is not nested under chapters or topics in the same way. Assuming they are in a top-level `content` collection.
+        const contentDoc = await getDoc(doc(db, 'content', practiceSetId));
+        if(contentDoc.exists()) {
+             return contentDoc.data().questions || [];
+        }
+    }
+
+    if (!path) {
+        console.error("Could not determine a valid path for practice set questions.");
+        return [];
+    }
+
     try {
-        const path = (topicId && topicId !== 'null')
-            ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
-            : `textbook-solutions/practice-set/${practiceSetId}/textbook/${textbookId}/questions`;
         const questionsRef = collection(db, path);
         const q = query(questionsRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
-        console.error("Error getting questions by practice set: ", e);
-        throw new Error("Failed to fetch questions.");
+        console.error(`Error getting questions from path "${path}": `, e);
+        throw new Error("Failed to fetch questions for the practice set.");
     }
 };
 
@@ -2257,6 +2274,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
