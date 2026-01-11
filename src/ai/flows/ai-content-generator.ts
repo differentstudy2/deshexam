@@ -63,8 +63,8 @@ const prompt = ai.definePrompt({
     - Use double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$).
 2.  Pay close attention to chemical formulas and reactions. Use correct LaTeX syntax.
     - For subscripts, use the underscore character (e.g., $H_2O$ for H₂O, $Na_2SO_4$ for Na₂SO₄).
-    - For reaction arrows, use `\\rightarrow` (e.g., $C + O_2 \\rightarrow CO_2$).
-    - For reaction conditions above an arrow, use `\\xrightarrow{\\text{condition}}` (e.g., $2Ag_2O \\xrightarrow{\\text{তাপ}} 4Ag + O_2$).
+    - For reaction arrows, use \`\\rightarrow\` (e.g., $C + O_2 \\rightarrow CO_2$).
+    - For reaction conditions above an arrow, use \`\\xrightarrow{\\text{condition}}\` (e.g., $2Ag_2O \\xrightarrow{\\text{তাপ}} 4Ag + O_2$).
 3.  If an image would be helpful for a question or an option (especially in subjects like biology, physics, or geography), you MAY add a placeholder image URL. Use the format \`https://picsum.photos/seed/some-keyword/600/400\` for images. Replace 'some-keyword' with a relevant term (e.g., 'mitochondria', 'gravity-apple').
 
 The content should have the following properties:
