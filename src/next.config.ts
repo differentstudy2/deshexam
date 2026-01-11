@@ -87,7 +87,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/textbook-solutions/:bookId/practice-set/:practiceSetId',
-        destination: '/textbook-solutions/[bookId]/practice-sets/[practiceSetId]',
+        destination: '/content/:practiceSetId',
       },
       {
         source: '/textbook-solutions/:bookId/quiz/:quizId',
@@ -98,10 +98,6 @@ const nextConfig: NextConfig = {
         destination: '/content/:id*',
       },
       {
-        source: '/textbook-solutions/:bookId/practice-set/:practiceSetId',
-        destination: '/textbook-solutions/practice-set/:practiceSetId/textbook/:bookId',
-      },
-      {
         source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
         destination: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
       },
@@ -110,3 +106,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
