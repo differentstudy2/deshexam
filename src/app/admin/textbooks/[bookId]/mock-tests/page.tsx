@@ -56,6 +56,7 @@ import type { Textbook, Chapter, Question } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 
 
 type MockTest = {
@@ -67,6 +68,7 @@ type MockTest = {
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
     textbookId?: string;
+    chapterId?: string;
     difficulty?: ('Beginner' | 'Easy' | 'Medium' | 'Hard' | 'Expert')[];
     questionSource?: ('Random from Chapter' | 'Random from Topic' | 'Textbook Exercise' | 'Solved Examples' | 'Previous Year Questions')[];
     questions?: Question[];
@@ -217,7 +219,8 @@ export default function ManageTextbookMockTestsPage() {
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button onClick={() => handleOpenDialog(null)}>
-                            <PlusCircle className="mr-2" /> Add New Mock Test
+                            <PlusCircle className="mr-2" />
+                            Add New Mock Test
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-h-[90vh]">
@@ -448,4 +451,3 @@ export default function ManageTextbookMockTestsPage() {
     );
 }
 
-    
