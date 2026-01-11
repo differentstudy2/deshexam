@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that generates summaries, explanations, and solved answers for textbook pages.
@@ -39,6 +40,7 @@ const prompt = ai.definePrompt({
 1.  **Transcribe:** First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists, paragraphs, and any special text.
 2.  **Format:** Convert the transcribed text into well-structured GitHub-flavored Markdown.
 3.  **Stylize:** Enhance the Markdown with the following elements to make it visually appealing:
+    *   **VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
     *   **Headings:** Use \`#\`, \`##\`, \`###\` for titles and sections.
     *   **Emphasis:** Use **bold** and *italics* to highlight key terms and concepts.
     *   **Lists:** Use bulleted (\`*\`) or numbered (\`1.\`) lists for items or steps.

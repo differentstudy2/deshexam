@@ -52,6 +52,8 @@ const prompt = ai.definePrompt({
   output: { schema: AIContentGeneratorOutputSchema },
   prompt: `You are an expert at creating educational content. Your task is to generate a {{contentType}} based on the provided source.
 
+**VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+
 The content should have the following properties:
 - Number of questions: {{numQuestions}}
 - Difficulty level: {{difficulty}}

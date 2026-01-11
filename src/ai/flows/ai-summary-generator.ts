@@ -30,6 +30,8 @@ const prompt = ai.definePrompt({
   output: { schema: AISummaryGeneratorOutputSchema },
   prompt: `You are an expert at simplifying complex educational content. Your task is to analyze the following text and generate a clear, easy-to-understand summary and a list of key takeaways.
 
+**VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+
 IMPORTANT: You MUST generate all content (summary, key points) in the same language as the provided source material.
 
 Source Content:

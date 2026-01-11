@@ -47,6 +47,8 @@ const prompt = ai.definePrompt({
   output: { schema: AIQuestionGeneratorOutputSchema },
   prompt: `You are an expert at creating educational questions. Your task is to generate a set of questions based on the provided source.
 
+**VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+
 IMPORTANT: You MUST generate all content (questions, options, explanations) in the same language as the provided source material.
 
 The questions should have the following properties:

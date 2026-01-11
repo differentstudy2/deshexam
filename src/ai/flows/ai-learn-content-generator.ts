@@ -34,6 +34,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert content writer specializing in creating stylish and engaging educational articles.
 Your task is to write a comprehensive article on the following topic: "{{topic}}".
 
+**VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+
 The article must be well-structured, visually appealing, and easy for students to read and understand.
 Please generate the following:
 1.  A compelling and SEO-friendly title for the article.

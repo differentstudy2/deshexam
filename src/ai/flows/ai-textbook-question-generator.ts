@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Generates educational questions specifically for textbook content.
@@ -49,6 +50,8 @@ const prompt = ai.definePrompt({
   input: { schema: AITextbookQuestionGeneratorInputSchema },
   output: { schema: AITextbookQuestionGeneratorOutputSchema },
   prompt: `You are an expert at creating educational questions from a given text. Your task is to generate a set of questions based on the provided textbook content.
+
+**VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
 
 The questions should have the following properties:
 - Number of questions: {{numQuestions}}
