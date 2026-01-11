@@ -104,17 +104,16 @@ export default function DashboardPage() {
                 return combined;
             });
 
-            // We can set loading to false after the first fetch from either collection
-            if(loading) setLoading(false);
+            setLoading(false);
 
         }, (error) => {
-            console.error(`Error fetching real-time ${'collectionName'}: `, error);
+            console.error(`Error fetching real-time ${collectionName}: `, error);
             toast({
                 variant: "destructive",
                 title: "Real-time Update Failed",
-                description: `Could not fetch your latest results from ${'collectionName'}.`,
+                description: `Could not fetch your latest results from ${collectionName}.`,
             });
-            if(loading) setLoading(false);
+            setLoading(false);
         });
     };
 
@@ -145,7 +144,7 @@ export default function DashboardPage() {
         unsubscribeSubmissions();
         unsubscribePracticeSets();
     };
-  }, [user, toast, loading]);
+  }, [user, toast]);
 
 
   const getUrlForTest = (testType: string, testId: string, submissionId: string) => {
