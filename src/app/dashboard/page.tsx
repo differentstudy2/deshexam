@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -42,6 +43,7 @@ import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestor
 import { db } from '@/lib/firebase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ScoreCircle } from '@/components/feature/score-circle';
 
 
 type Submission = {
@@ -425,8 +427,8 @@ export default function DashboardPage() {
                          {sub.subject && `${sub.subject} - `}{sub.testType}
                       </div>
                     </TableCell>
-                    <TableCell className="font-semibold">
-                      {sub.totalQuestions > 0 ? `${Math.round((sub.score / sub.totalQuestions) * 100)}%` : 'N/A'}
+                    <TableCell>
+                      <ScoreCircle score={sub.totalQuestions > 0 ? (sub.score / sub.totalQuestions) * 100 : 0} />
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button asChild variant="outline" size="sm">
