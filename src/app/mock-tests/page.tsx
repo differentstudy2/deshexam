@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -8,8 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Clock, HelpCircle, BarChart } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
-import { getAllContent, getSubjects, getClasses, getGradesByClass, getBoards, getAllTextbooks } from '@/lib/firebase/firestore';
-import { MockTestFilters } from "@/components/mock-test-filters";
+import { getAllContent, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import type { Textbook } from '@/lib/types';
@@ -35,8 +35,6 @@ type Test = {
   class?: string;
 };
 
-type MetafieldItem = { id: string, name: string };
-
 function getUrlForTest(test: Test) {
     if (test.textbookId && test.chapterId) {
         const topicSegment = test.topicId || 'null';
@@ -53,17 +51,6 @@ export default function MockTestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [subjects, setSubjects] = useState<MetafieldItem[]>([]);
-  const [selectedSubject, setSelectedSubject] = useState('all');
-  const [classCategories, setClassCategories] = useState<MetafieldItem[]>([]);
-  const [selectedClassCategory, setSelectedClassCategory] = useState('all');
-  const [grades, setGrades] = useState<MetafieldItem[]>([]);
-  const [selectedGrade, setSelectedGrade] = useState('all');
-  const [boards, setBoards] = useState<MetafieldItem[]>([]);
-  const [selectedBoard, setSelectedBoard] = useState('all');
-
 
   useEffect(() => {
     document.title = "Mock Tests | DeshExam";
@@ -74,12 +61,9 @@ export default function MockTestsPage() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [fetchedTests, allTextbooks, subjectsData, classesData, boardsData] = await Promise.all([
+        const [fetchedTests, allTextbooks] = await Promise.all([
           getAllContent("Mock Test"),
           getAllTextbooks(),
-          getSubjects(),
-          getClasses(),
-          getBoards(),
         ]);
         
         const textbooksMap = new Map((allTextbooks as Textbook[]).map(book => [book.id, book]));
@@ -100,9 +84,6 @@ export default function MockTestsPage() {
         });
 
         setTests(testsWithTextbookMeta);
-        setSubjects(subjectsData);
-        setClassCategories(classesData);
-        setBoards(boardsData);
       } catch (error) {
          toast({
           variant: "destructive",
@@ -116,31 +97,6 @@ export default function MockTestsPage() {
     
     fetchInitialData();
   }, [toast]);
-  
-  useEffect(() => {
-    const fetchGrades = async () => {
-        if(selectedClassCategory !== 'all') {
-            const fetchedGrades = await getGradesByClass(selectedClassCategory);
-            setGrades(fetchedGrades);
-        } else {
-            setGrades([]);
-        }
-        setSelectedGrade('all');
-    };
-    fetchGrades();
-  }, [selectedClassCategory]);
-
-  const filteredTests = useMemo(() => {
-    return tests.filter(test => {
-      const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase()) || (test.subtitle && test.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesSubject = selectedSubject === 'all' || test.subject === selectedSubject;
-      const matchesBoard = selectedBoard === 'all' || test.board === selectedBoard;
-      const matchesClassCategory = selectedClassCategory === 'all' || test.classCategory === selectedClassCategory;
-      const matchesGrade = selectedGrade === 'all' || test.class === selectedGrade;
-
-      return matchesSearch && matchesSubject && matchesBoard && matchesClassCategory && matchesGrade;
-    });
-  }, [tests, searchQuery, selectedSubject, selectedBoard, selectedClassCategory, selectedGrade]);
 
   return (
     <div className="container py-12 md:py-16">
@@ -150,23 +106,6 @@ export default function MockTestsPage() {
           Challenge yourself with our extensive library of mock tests designed to simulate the real exam experience.
         </p>
       </header>
-
-      <MockTestFilters 
-        subjects={subjects}
-        searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
-        selectedSubject={selectedSubject}
-        onSubjectChange={setSelectedSubject}
-        boards={boards}
-        selectedBoard={selectedBoard}
-        onBoardChange={setSelectedBoard}
-        classCategories={classCategories}
-        selectedClassCategory={selectedClassCategory}
-        onClassCategoryChange={setSelectedClassCategory}
-        grades={grades}
-        selectedGrade={selectedGrade}
-        onGradeChange={setSelectedGrade}
-      />
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -187,9 +126,9 @@ export default function MockTestsPage() {
             </Card>
           ))}
         </div>
-      ) : filteredTests.length > 0 ? (
+      ) : tests.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredTests.map((test) => (
+          {tests.map((test) => (
             <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <CardHeader className="p-0 relative">
                 <Image
@@ -216,7 +155,7 @@ export default function MockTestsPage() {
                 </CardTitle>
                  {test.textbookTitle && <p className="text-xs text-muted-foreground mt-1">From: {test.textbookTitle}</p>}
                 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
+                <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
                   <div className="flex items-center gap-1.5">
                     <HelpCircle className="w-4 h-4" />
                     <span>{test.questions?.length || 0} Questions</span>
@@ -231,13 +170,10 @@ export default function MockTestsPage() {
                       <span>{Array.isArray(test.difficulty) ? test.difficulty.join(', ') : test.difficulty}</span>
                     </div>
                   )}
-                  {test.questionSource && (
-                    <div className="flex items-center gap-1.5">
-                      <BarChart className="w-4 h-4" />
-                      <span>{Array.isArray(test.questionSource) ? test.questionSource.join(', ') : test.questionSource}</span>
-                    </div>
-                  )}
                 </div>
+                 {test.questionSource && (
+                    <div className="text-xs text-muted-foreground mt-2">Source: {Array.isArray(test.questionSource) ? test.questionSource.join(', ') : test.questionSource}</div>
+                  )}
               </CardContent>
               <CardFooter className="p-4 pt-0">
                 <Button asChild className="w-full">
