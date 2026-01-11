@@ -63,16 +63,17 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-        <div className="flex flex-col min-h-screen">
-            <div className="flex flex-1">
-                <Sidebar>
-                    <AdminSidebar logOut={logOut} />
-                </Sidebar>
+        <div className="flex min-h-screen">
+            <Sidebar>
+                <AdminSidebar logOut={logOut} />
+            </Sidebar>
+            <div className="flex flex-col flex-1">
                 <SidebarInset>
                     <main className="flex-grow p-4 md:p-6 lg:p-8">
                         {children}
                     </main>
                 </SidebarInset>
+                <Footer />
             </div>
         </div>
     </SidebarProvider>
