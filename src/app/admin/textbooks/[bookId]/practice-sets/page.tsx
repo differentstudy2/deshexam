@@ -248,7 +248,7 @@ export default function ManageTextbookPracticeSetsPage() {
                                         </DropdownMenu>
                                     </div>
                                 </div>
-                                 <div className="space-y-2">
+                                <div className="space-y-2">
                                     <Label>Access Level</Label>
                                     <Select value={itemData.access} onValueChange={(value) => setItemData(prev => ({ ...prev, access: value as 'free' | 'premium' | 'pro' }))}>
                                         <SelectTrigger>
@@ -440,3 +440,4 @@ export default function ManageTextbookPracticeSetsPage() {
         </div>
     );
 }
+
