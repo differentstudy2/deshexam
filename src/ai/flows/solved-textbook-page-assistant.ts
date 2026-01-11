@@ -38,14 +38,12 @@ const prompt = ai.definePrompt({
 
 **Instructions:**
 1.  **Transcribe:** First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists, paragraphs, tables, and any special text.
-2.  **Format:** Convert the transcribed text into well-structured GitHub-flavored Markdown.
-3.  **Stylize:** Enhance the Markdown with the following elements to make it visually appealing and structurally identical to the source image:
-    *   **VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
-    *   **Images**: If the source image contains illustrations, represent them with a placeholder image using the format \`![Description](https://picsum.photos/seed/keyword/600/400)\`. Replace 'keyword' with a relevant term.
-    *   **Tables**: Recreate any tables using Markdown table syntax.
-    *   **Headings:** Use \`#\`, \`##\`, \`###\` for titles and sections.
+2.  **Format and Stylize:** Convert the transcribed text into well-structured GitHub-flavored Markdown. Use the following rules:
+    *   **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics, tables).
+    *   **LaTeX for Math**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+    *   **HTML for Layout**: For complex layouts that Markdown cannot handle (like floating an image to the left of a paragraph), you MAY use simple HTML tags (like \`<img>\`, \`<p>\`, \`<div>\`). You can use inline \`style\` attributes for positioning (e.g., \`float: left; margin-right: 1em; width: 150px;\`). Do not use HTML for basic text styling like colors or fonts.
+    *   **Images**: If the source image contains illustrations, represent them with a placeholder image using the format \`![Description](https://picsum.photos/seed/keyword/600/400)\`.
     *   **Emphasis:** Use **bold** and *italics* to highlight key terms and concepts, just like in the source.
-    *   **Lists:** Use bulleted (\`*\`) or numbered (\`1.\`) lists for items or steps.
     *   **Emojis:** Sparingly use relevant emojis to add visual cues and make the content more engaging (e.g., 💡 for a key idea, 🧪 for a science concept, 📌 for a definition).
     *   **Blockquotes:** Use \`>\` for important definitions or quotes.
 
@@ -65,10 +63,9 @@ const solvedTextbookPageAssistantFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    if (!output) {
+    if (!output?.content) {
       throw new Error('The AI failed to generate any content. Please try again.');
     }
     return output;
   }
 );
-

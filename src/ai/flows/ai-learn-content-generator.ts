@@ -34,13 +34,16 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert content writer specializing in creating stylish and engaging educational articles.
 Your task is to write a comprehensive article on the following topic: "{{topic}}".
 
-**VERY IMPORTANT**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). This is crucial for correct rendering.
+**Formatting Rules**:
+1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics).
+2.  **LaTeX for Math**: For any mathematical expressions, formulas, or equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$).
+3.  **HTML for Layout**: For complex layouts that Markdown cannot handle (like floating an image to the left of a paragraph), you MAY use simple HTML tags (like \`<img>\`, \`<p>\`, \`<div>\`). You can use inline \`style\` attributes for positioning (e.g., \`float: left; margin-right: 1em;\`). Do not use HTML for basic text styling like colors or fonts.
 
 The article must be well-structured, visually appealing, and easy for students to read and understand.
 Please generate the following:
 1.  A compelling and SEO-friendly title for the article.
 2.  A short, one-paragraph description or summary to be used as a meta description.
-3.  The full body of the article as a well-formed GitHub-flavored Markdown string.
+3.  The full body of the article as a well-formed Markdown string, following the formatting rules above.
 
 For the Markdown body, you must use a variety of elements to make the post stylish and organized. Specifically include:
 - A main heading using a '#'.
