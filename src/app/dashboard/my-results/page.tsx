@@ -16,6 +16,7 @@ import { getSubmissionsByUserId } from '@/lib/firebase/firestore';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 type Submission = {
   id: string;
@@ -32,16 +33,35 @@ export default function MyResultsPage() {
   const { user } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    if (user) {
-      getSubmissionsByUserId(user.uid)
-        .then(setSubmissions)
-        .finally(() => setLoading(false));
-    } else if (!loading) {
+    if (!user) {
       setLoading(false);
+      return;
     }
-  }, [user, loading]);
+    
+    setLoading(true);
+    const unsubscribe = getSubmissionsByUserId(
+        user.uid, 
+        (userSubmissions) => {
+            setSubmissions(userSubmissions);
+            setLoading(false);
+        }, 
+        (error) => {
+            console.error("Error fetching submissions:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Error loading results',
+                description: error.message,
+            });
+            setLoading(false);
+        }
+    );
+
+    return () => unsubscribe();
+    
+  }, [user, toast]);
 
   const aggregatedResults = useMemo(() => {
     const resultsMap = new Map<string, { highestScore: number; bestSubmission: Submission; testTitle: string, subject?: string, testType: string }>();
