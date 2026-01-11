@@ -256,7 +256,7 @@ export default function ManageTextbookMockTestsPage() {
                                             <Link href={`/admin/textbooks/${textbookId}/mock-tests/${test.id}`}><FileQuestion className="mr-2 h-4 w-4"/>Manage Questions</Link>
                                         </Button>
                                          <Button variant="outline" size="sm" onClick={() => handleOpenDialog(test)}>
-                                            <Edit className="mr-2 h-4 w-4"/>Edit.prose p.prose p
+                                            <Edit className="mr-2 h-4 w-4"/>Edit
                                         </Button>
                                         <Button variant="destructive" size="sm" onClick={() => setTestToDelete(test)}>
                                             <Trash2 className="mr-2 h-4 w-4"/>Delete
