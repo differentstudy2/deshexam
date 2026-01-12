@@ -58,10 +58,10 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert at creating educational content. Your task is to generate a {{contentType}} based on the provided source.
 
 **Formatting Rules**:
-1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics). Use simple, clear Markdown. For example, to bold a word, use **word**, not complex cases like **'word'**. Avoid putting emphasis markers like \`**\` or \`*\` right next to punctuation.
+1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics). Use simple, clear Markdown. For example, to bold a word, use **word**, not complex cases like **'word'**. Avoid putting emphasis markers like \`**\` or \`*\` right next to punctuation. Pay close attention to lettered lists like (a), (b), (c) and preserve their structure.
 2.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). Pay close attention to chemical formulas and reactions, using correct LaTeX syntax for subscripts (e.g., $H_2O$) and reaction arrows (e.g., $\\rightarrow$).
 3.  **Responsive HTML for Layout**: For complex layouts that Markdown cannot handle, you MAY use simple HTML. To float an image, wrap the image and the text in a '<div class="clearfix">', then apply 'float-left-responsive' or 'float-right-responsive' to the image element. To arrange images side-by-side, use a '<div class="image-grid">' and wrap each image/caption in a '<figure>' and '<figcaption>'. Do NOT use inline \`style\` attributes.
-4.  **Images**: If an image would be helpful for a question or an option, you MUST add a placeholder image URL. Use the format \`https://picsum.photos/seed/relevant-keyword/600/400\` where 'relevant-keyword' is a specific, relevant term from the content (e.g., 'newton-apple', 'cell-division').
+4.  **Images**: If an image would be helpful for a question or an option, you MUST add a placeholder image URL. Use the format \`![Description](https://picsum.photos/seed/relevant-keyword/600/400)\` where 'relevant-keyword' is a specific, relevant term from the content (e.g., 'newton-apple', 'cell-division'). The entire image tag MUST be on a single line.
 
 The content should have the following properties:
 - Number of questions: {{numQuestions}}
