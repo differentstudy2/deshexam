@@ -24,7 +24,7 @@ import {
   deleteDoc,
   orderBy
 } from 'firebase/firestore';
-import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight, List, LayoutGrid, BookOpen } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Edit, Trash2, Library, Video, File as FileIcon, Mic, Upload, Loader2, Link as LinkIcon, Sparkles, BrainCircuit, ImageIcon, ChevronRight, List, LayoutGrid, BookOpen, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -321,7 +321,7 @@ export default function ManageChaptersPage() {
             }
             toast({ title: 'File uploaded!', description: 'URL has been set.' });
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
+            toast({ variant: "destructive", title: 'Upload Failed', description: (error as Error).message });
         } finally {
             setIsUploading(false);
         }
@@ -493,7 +493,7 @@ export default function ManageChaptersPage() {
         <CardHeader>
             <CardTitle>Existing Chapters</CardTitle>
             <CardDescription>
-                A list of all chapters in this textbook. Click a chapter to manage its topics.
+                  A list of all chapters in this textbook. Click a chapter to manage its topics.
             </CardDescription>
         </CardHeader>
         <CardContent>
@@ -507,6 +507,11 @@ export default function ManageChaptersPage() {
                                     <span className="flex-1">{chapter.title}</span>
                                 </Link>
                                 <div className="flex items-center gap-2 self-end sm:self-center">
+                                    <Button asChild variant="ghost" size="sm">
+                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} target="_blank">
+                                            <Eye className="h-4 w-4"/>
+                                        </Link>
+                                    </Button>
                                     <Button variant="ghost" size="sm" onClick={() => handleEditClick(chapter)}><Edit className="h-4 w-4"/></Button>
                                     <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDeleteClick(chapter)}><Trash2 className="h-4 w-4"/></Button>
                                 </div>
@@ -535,6 +540,11 @@ export default function ManageChaptersPage() {
                                 <CardFooter className="p-4 pt-0 flex gap-2">
                                      <Button variant="outline" size="sm" className="w-full" onClick={() => handleEditClick(chapter)}>
                                         <Edit className="h-3 w-3 mr-1"/> Edit
+                                    </Button>
+                                    <Button variant="ghost" size="sm" asChild>
+                                        <Link href={`/textbook-solutions/${textbookId}/chapter/${chapter.id}`} target="_blank">
+                                            <Eye className="h-3 w-3"/>
+                                        </Link>
                                     </Button>
                                     <Button variant="destructive" size="sm" className="w-full" onClick={() => handleDeleteClick(chapter)}>
                                         <Trash2 className="h-3 w-3 mr-1"/> Delete
@@ -768,5 +778,3 @@ export default function ManageChaptersPage() {
     </div>
   );
 }
-
-    
