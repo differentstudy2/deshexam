@@ -66,6 +66,7 @@ import type { AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-q
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 const ResourceItem = ({ resource, onEdit, onDelete }: { resource: Resource, onEdit: () => void, onDelete: () => void }) => {
@@ -315,7 +316,11 @@ export default function ManageChaptersPage() {
             if(fieldToUpdate === 'featureImage') {
                 setNewChapter(prev => ({...prev, featureImage: downloadURL}));
             } else if (fieldToUpdate === 'chapterPdfUrl') {
-                setNewChapter(prev => ({...prev, chapterPdfUrl: downloadURL}));
+                if (chapter) {
+                    const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapter.id);
+                    await updateDoc(chapterRef, { chapterPdfUrl: downloadURL });
+                    fetchChapters(); // re-fetch to update state
+                }
             } else {
                  setNewResource(prev => ({...prev, url: downloadURL}));
             }
@@ -360,6 +365,7 @@ export default function ManageChaptersPage() {
                 const result = await solvedTextbookPageAssistant({ pageDataUri });
                 combinedContent += (combinedContent ? '\n\n---\n\n' : '') + result.content;
                 
+                // Update content in real-time after each page
                 setNewChapter(prev => ({...prev, content: combinedContent}));
             }
             
@@ -459,14 +465,6 @@ export default function ManageChaptersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <Button variant="ghost" asChild>
-          <Link href={`/admin/textbooks`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Textbooks
-          </Link>
-        </Button>
-      </div>
-      <div>
         <h1 className="font-headline text-3xl font-bold">
           Manage Chapters
         </h1>
@@ -474,7 +472,13 @@ export default function ManageChaptersPage() {
           For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
         </p>
       </div>
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <Button asChild variant="ghost">
+            <Link href={`/admin/textbooks`}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Textbooks
+            </Link>
+           </Button>
           <Button onClick={handleAddNewClick} className="w-full">
               <PlusCircle className="mr-2" /> Add New Chapter
           </Button>
