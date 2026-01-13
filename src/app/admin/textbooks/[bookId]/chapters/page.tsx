@@ -209,7 +209,7 @@ export default function ManageChaptersPage() {
         
         toast({
             title: 'Chapters Added',
-            description: `${chapterTitles.length} chapters have been added successfully.`,
+            description: `${'chapterTitles.length'} chapters have been added successfully.`,
         });
         
         setBulkChaptersText('');
@@ -466,32 +466,32 @@ export default function ManageChaptersPage() {
           </Link>
         </Button>
       </div>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-        <div>
-          <h1 className="font-headline text-3xl font-bold">
-            Manage Chapters
-          </h1>
-          <p className="text-muted-foreground">
-            For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-             <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
-                <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('list')}><List className="w-5 h-5"/></Button>
-                <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('grid')}><LayoutGrid className="w-5 h-5"/></Button>
-            </div>
-            <Button onClick={handleAddNewClick} className="w-full">
-                 <PlusCircle className="mr-2" /> Add New Chapter
-            </Button>
-            <Button variant="outline" onClick={() => setIsBulkAddOpen(true)} className="w-full">
-                 Bulk Add Chapters
-            </Button>
-        </div>
+      <div>
+        <h1 className="font-headline text-3xl font-bold">
+          Manage Chapters
+        </h1>
+        <p className="text-muted-foreground">
+          For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
+        </p>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={handleAddNewClick} className="w-full">
+              <PlusCircle className="mr-2" /> Add New Chapter
+          </Button>
+          <Button variant="outline" onClick={() => setIsBulkAddOpen(true)} className="w-full">
+              Bulk Add Chapters
+          </Button>
       </div>
 
        <Card>
         <CardHeader>
-            <CardTitle>Existing Chapters</CardTitle>
+            <div className="flex justify-between items-center">
+                <CardTitle>Existing Chapters</CardTitle>
+                <div className="flex items-center gap-1 rounded-md bg-secondary p-1">
+                    <Button variant={view === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('list')}><List className="w-5 h-5"/></Button>
+                    <Button variant={view === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setView('grid')}><LayoutGrid className="w-5 h-5"/></Button>
+                </div>
+            </div>
             <CardDescription>
                   A list of all chapters in this textbook. Click a chapter to manage its topics.
             </CardDescription>
