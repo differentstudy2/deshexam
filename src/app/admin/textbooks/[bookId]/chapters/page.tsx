@@ -314,7 +314,7 @@ export default function ManageChaptersPage() {
         try {
             const downloadURL = await uploadFile(file);
             if(fieldToUpdate === 'featureImage') {
-                setNewChapter(prev => ({...prev, featureImage: downloadURL}));
+                setNewChapter(prev => ({ ...prev, featureImage: downloadURL }));
             } else if (fieldToUpdate === 'chapterPdfUrl') {
                 if (chapter) {
                     const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapter.id);
@@ -457,22 +457,16 @@ export default function ManageChaptersPage() {
   if (loading) {
     return (
         <div className="space-y-6">
-            <Skeleton className="h-8 w-48" />
+            <div className="flex justify-between items-center">
+                <Skeleton className="h-10 w-48" />
+                <Skeleton className="h-10 w-32" />
+            </div>
             <div className="space-y-2">
                 <Skeleton className="h-10 w-3/4" />
                 <Skeleton className="h-5 w-1/2" />
             </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                    <Card key={i}>
-                        <CardHeader>
-                            <Skeleton className="h-48 w-full" />
-                        </CardHeader>
-                        <CardContent>
-                             <Skeleton className="h-10 w-full" />
-                        </CardContent>
-                    </Card>
-                ))}
+                {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
             </div>
         </div>
     );
@@ -484,23 +478,22 @@ export default function ManageChaptersPage() {
 
   return (
     <div className="space-y-6">
+       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
         <div>
+          <h1 className="font-headline text-3xl font-bold">
+            Manage Chapters
+          </h1>
+          <p className="text-muted-foreground">
+            For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
+          </p>
+        </div>
+         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button asChild variant="ghost">
                 <Link href={`/admin/textbooks`}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Textbooks
                 </Link>
             </Button>
-        </div>
-        <div>
-            <h1 className="font-headline text-3xl font-bold">
-            Manage Chapters
-            </h1>
-            <p className="text-muted-foreground">
-            For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
-            </p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button onClick={handleAddNewClick} className="w-full">
                 <PlusCircle className="mr-2" /> Add New Chapter
             </Button>
@@ -508,7 +501,8 @@ export default function ManageChaptersPage() {
                 Bulk Add Chapters
             </Button>
         </div>
-
+      </div>
+      
        <Card>
         <CardHeader>
             <div className="flex justify-between items-center">
@@ -528,7 +522,7 @@ export default function ManageChaptersPage() {
                      <div className="space-y-2">
                         {chapters.map((chapter) => (
                            <div key={chapter.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-md hover:bg-accent/50 gap-2">
-                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`} className="font-medium flex-grow flex items-center gap-2">
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-medium flex-grow flex items-center gap-2">
                                     <BookOpen className="w-4 h-4 text-muted-foreground"/>
                                     <span className="flex-1">{chapter.title}</span>
                                 </Link>
@@ -548,7 +542,7 @@ export default function ManageChaptersPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg aspect-[4/3]">
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg aspect-[4/3]">
                                     <Image
                                         src={chapter.featureImage || '/image/logo.png'}
                                         alt={chapter.title}
@@ -556,7 +550,7 @@ export default function ManageChaptersPage() {
                                         className="object-contain p-2"
                                     />
                                 </Link>
-                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`}>
                                     <CardHeader className="p-4 flex-row items-center gap-3 hover:bg-accent/50 transition-colors">
                                         <ChapterIcon />
                                         <CardTitle className="text-base font-semibold flex-grow">{chapter.title}</CardTitle>
@@ -729,7 +723,7 @@ export default function ManageChaptersPage() {
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="summary"><AccordionTrigger>Generate Summary</AccordionTrigger>
                                         <AccordionContent className="pt-4 space-y-4"><Button onClick={handleGenerateSummary} disabled={isGeneratingSummary || !newChapter.content} className="w-full">{isGeneratingSummary ? <Loader2 className="animate-spin"/> : "Generate Summary & Key Points"}</Button>
-                                            {generatedSummary && (<div className="space-y-4 border-t pt-4"><div><h4 className="font-semibold">Generated Summary:</h4><p className="text-sm text-muted-foreground">{generatedSummary.summary}</p></div><div><h4 className="font-semibold">Key Points:</h4><ul className="list-disc list-inside text-sm text-muted-foreground">{generatedSummary.keyPoints.map((pt: string, i: number) => <li key={i}>{pt}</li>)}</ul></div><Button variant="secondary" size="sm" onClick={handleUseSummary} className="w-full">Append to Content</Button></div>)}
+                                            {generatedSummary && (<div className="space-y-4 border-t pt-4"><div><h4 className="font-semibold">Generated Summary:</h4><p className="text-sm text-muted-foreground">{generatedSummary.summary}</p></div><div><h4 className="font-semibold">Key Points:</h4><ul className="list-disc list-inside text-sm text-muted-foreground">{generatedSummary.keyPoints.map((pt: string, i: number) => <li key={i}>{pt}</li>)}</ul></div><Button variant="secondary" size="sm" onClick={handleUseSummary} className="w-full">Append to Chapter Content</Button></div>)}
                                         </AccordionContent>
                                     </AccordionItem>
                                     <AccordionItem value="questions"><AccordionTrigger>Generate Questions</AccordionTrigger>
@@ -804,4 +798,3 @@ export default function ManageChaptersPage() {
     </div>
   );
 }
-
