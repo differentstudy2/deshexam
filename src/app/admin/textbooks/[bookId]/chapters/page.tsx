@@ -210,7 +210,7 @@ export default function ManageChaptersPage() {
         
         toast({
             title: 'Chapters Added',
-            description: `${'chapterTitles.length'} chapters have been added successfully.`,
+            description: `${chapterTitles.length} chapters have been added successfully.`,
         });
         
         setBulkChaptersText('');
@@ -363,7 +363,7 @@ export default function ManageChaptersPage() {
                 });
                 
                 const result = await solvedTextbookPageAssistant({ pageDataUri });
-                combinedContent += (combinedContent ? '\\n\\n---\\n\\n' : '') + result.content;
+                combinedContent += (combinedContent ? '\n\n---\n\n' : '') + result.content;
                 
                 // Update content in real-time after each page
                 setNewChapter(prev => ({...prev, content: combinedContent}));
@@ -420,35 +420,35 @@ export default function ManageChaptersPage() {
 
     const handleUseSummary = () => {
         if (!generatedSummary) return;
-        const summaryText = `## Summary\\n\\n${generatedSummary.summary}\\n\\n### Key Points\\n\\n${generatedSummary.keyPoints.map((p: string) => `- ${p}`).join('\\n')}`;
-        setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\\n\\n' : '') + summaryText }));
+        const summaryText = `## Summary\n\n${generatedSummary.summary}\n\n### Key Points\n\n${generatedSummary.keyPoints.map((p: string) => `- ${p}`).join('\n')}`;
+        setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + summaryText }));
         toast({ title: "Summary added to content!" });
         setGeneratedSummary(null);
     }
 
     const handleUseQuestions = () => {
         if (!generatedQuestions) return;
-        let questionsText = "\\n\\n## Practice Questions\\n\\n";
+        let questionsText = "\n\n## Practice Questions\n\n";
         generatedQuestions.forEach((q, index) => {
-            questionsText += `**${index + 1}. ${q.text}**\\n\\n`;
+            questionsText += `**${index + 1}. ${q.text}**\n\n`;
             if (q.type === 'Multiple Choice' && q.options) {
                 q.options.forEach((opt: { text: string; }) => {
-                    questionsText += `- ${opt.text}\\n`;
+                    questionsText += `- ${opt.text}\n`;
                 });
-                questionsText += `\\n> **Answer:** ${q.correctAnswer}\\n`;
+                questionsText += `\n> **Answer:** ${q.correctAnswer}\n`;
             } else if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
-                const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\\n');
-                questionsText += `\\n> **Answer:**\\n${pairs}\\n`;
+                const pairs = q.correctAnswer.map((p: any) => `  - ${p.a} → ${p.b}`).join('\n');
+                questionsText += `\n> **Answer:**\n${pairs}\n`;
             } else if (q.correctAnswer) {
-                 questionsText += `> **Answer:** ${String(q.correctAnswer)}\\n`;
+                 questionsText += `> **Answer:** ${String(q.correctAnswer)}\n`;
             }
 
             if (q.explanation) {
-                questionsText += `\\n> **Explanation:** ${q.explanation}\\n`;
+                questionsText += `\n> **Explanation:** ${q.explanation}\n`;
             }
-            questionsText += "\\n---\\n\\n";
+            questionsText += "\n---\n\n";
         });
-        setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\\n\\n' : '') + questionsText }));
+        setNewChapter(prev => ({ ...prev, content: (prev.content ? prev.content + '\n\n' : '') + questionsText }));
         toast({ title: "Questions added to content!" });
         setGeneratedQuestions(null);
     }
@@ -484,29 +484,29 @@ export default function ManageChaptersPage() {
 
   return (
     <div className="space-y-6">
-       <div className="flex justify-between items-center">
-            <div>
-                <h1 className="font-headline text-3xl font-bold">
-                Manage Chapters
-                </h1>
-                <p className="text-muted-foreground">
-                For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
-                </p>
-            </div>
-             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <Button asChild variant="ghost">
-                    <Link href={`/admin/textbooks`}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Textbooks
-                    </Link>
-                </Button>
-                <Button onClick={handleAddNewClick} className="w-full">
-                    <PlusCircle className="mr-2" /> Add New Chapter
-                </Button>
-                <Button variant="outline" onClick={() => setIsBulkAddOpen(true)} className="w-full">
-                    Bulk Add Chapters
-                </Button>
-            </div>
+        <div>
+            <Button asChild variant="ghost">
+                <Link href={`/admin/textbooks`}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Textbooks
+                </Link>
+            </Button>
+        </div>
+        <div>
+            <h1 className="font-headline text-3xl font-bold">
+            Manage Chapters
+            </h1>
+            <p className="text-muted-foreground">
+            For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
+            </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button onClick={handleAddNewClick} className="w-full">
+                <PlusCircle className="mr-2" /> Add New Chapter
+            </Button>
+            <Button variant="outline" onClick={() => setIsBulkAddOpen(true)} className="w-full">
+                Bulk Add Chapters
+            </Button>
         </div>
 
        <Card>
@@ -805,4 +805,3 @@ export default function ManageChaptersPage() {
   );
 }
 
-    
