@@ -129,12 +129,12 @@ export default function KidsZonePage() {
         </div>
          <div className="text-center mt-16">
             <Image
-                src="https://picsum.photos/seed/kids-fun/800/400"
+                src="https://images.unsplash.com/photo-1565350831386-8c52421af9fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxraWRzJTIwbGVhcm5pbmd8ZW58MHx8fHwxNzY5MTIwNzIzfDA&ixlib=rb-4.1.0&q=80&w=1080"
                 alt="A colorful drawing of kids playing with blocks and books"
                 width={800}
                 height={400}
                 className="rounded-xl shadow-lg mx-auto"
-                data-ai-hint="kids playing drawing"
+                data-ai-hint="kids learning"
             />
         </div>
       </div>
