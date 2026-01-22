@@ -460,3 +460,12 @@ strong {
   font-size: 1.5rem;
   line-height: 1.25rem;
 }
+.prose pre {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  border-radius: calc(var(--radius) - 2px);
+  background-color: hsl(113.54deg 53.74% 15.88%);
+  padding: 1rem;
+  color: hsl(var(--secondary-foreground));
+}

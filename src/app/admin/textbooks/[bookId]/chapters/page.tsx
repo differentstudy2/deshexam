@@ -307,22 +307,16 @@ export default function ManageChaptersPage() {
     setResourceToDelete(null);
   }
   
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'pdfUrl' | 'featureImage' | 'chapterPdfUrl') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'chapterPdfUrl') => {
     const file = e.target.files?.[0];
     if (file) {
         setIsUploading(true);
         try {
             const downloadURL = await uploadFile(file);
-            if(fieldToUpdate === 'featureImage') {
-                setNewChapter(prev => ({ ...prev, featureImage: downloadURL }));
-            } else if (fieldToUpdate === 'chapterPdfUrl') {
-                if (chapter) {
-                    const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapter.id);
-                    await updateDoc(chapterRef, { chapterPdfUrl: downloadURL });
-                    fetchChapters(); // re-fetch to update state
-                }
-            } else {
-                 setNewResource(prev => ({...prev, url: downloadURL}));
+            if (fieldToUpdate === 'chapterPdfUrl') {
+                setNewChapter(prev => ({ ...prev, chapterPdfUrl: downloadURL }));
+            } else if (fieldToUpdate === 'resources') {
+                setNewResource(prev => ({...prev, url: downloadURL}));
             }
             toast({ title: 'File uploaded!', description: 'URL has been set.' });
         } catch (error) {
@@ -457,10 +451,7 @@ export default function ManageChaptersPage() {
   if (loading) {
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <Skeleton className="h-10 w-48" />
-                <Skeleton className="h-10 w-32" />
-            </div>
+            <Skeleton className="h-10 w-48" />
             <div className="space-y-2">
                 <Skeleton className="h-10 w-3/4" />
                 <Skeleton className="h-5 w-1/2" />
@@ -478,7 +469,7 @@ export default function ManageChaptersPage() {
 
   return (
     <div className="space-y-6">
-       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
         <div>
           <h1 className="font-headline text-3xl font-bold">
             Manage Chapters
@@ -489,7 +480,7 @@ export default function ManageChaptersPage() {
         </div>
          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button asChild variant="ghost">
-                <Link href={`/admin/textbooks`}>
+                <Link href="/admin/textbooks">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Textbooks
                 </Link>
@@ -798,3 +789,5 @@ export default function ManageChaptersPage() {
     </div>
   );
 }
+
+    

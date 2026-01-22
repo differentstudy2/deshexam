@@ -446,7 +446,7 @@ export default function ManageTopicsPage() {
     <div className="space-y-6">
       <div>
         <Button variant="ghost" asChild>
-          <Link href={`/admin/textbooks/${textbookId}`}>
+          <Link href={`/admin/textbooks/${textbookId}/chapters`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Chapters
           </Link>
