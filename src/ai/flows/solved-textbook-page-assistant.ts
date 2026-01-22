@@ -39,7 +39,7 @@ const prompt = ai.definePrompt({
 **Formatting Rules**:
 1.  **Transcribe and Format**: First, accurately read all the text from the provided textbook page image. Pay close attention to headings, subheadings, lists (especially lettered lists like \`(a)\`, \`(b)\`), paragraphs, tables, and any special text. Then, convert the transcribed text into well-structured GitHub-flavored Markdown. The structure of your output, including text, tables, math, and placement of images, should closely match the provided textbook page image, including line breaks.
 2.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics). Use simple, clear Markdown. For example, to bold a word, use **word**, not complex cases like **'word'**. Avoid putting emphasis markers like \`**\` or \`*\` right next to punctuation. Pay close attention to lettered lists like (a), (b), (c) and preserve their structure.
-3.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}. This is crucial for correct rendering.
+3.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}. For symbols, use their LaTeX commands, for instance \`\\therefore\` for the 'therefore' symbol (∴). This is crucial for correct rendering.
 4.  **Responsive HTML for Layout**: For complex layouts that Markdown cannot handle, you MAY use simple HTML. To float an image, wrap the image and the text in a '<div class="clearfix">', then apply 'float-left-responsive' or 'float-right-responsive' to the image element. To arrange images side-by-side, use a '<div class="image-grid">' and wrap each image/caption in a '<figure>' and '<figcaption>'. Do NOT use inline \`style\` attributes.
 5.  **Images**: If the source image contains illustrations, represent them with a placeholder image using the format \`![Description](https://picsum.photos/seed/relevant-keyword/600/400)\` where 'relevant-keyword' describes the image content (e.g., 'thermometer', 'plant-cell'). The entire image tag MUST be on a single line.
 6.  **Emphasis:** Use **bold** and *italics* to highlight key terms and concepts, just like in the source.
@@ -68,5 +68,7 @@ const solvedTextbookPageAssistantFlow = ai.defineFlow(
     return output;
   }
 );
+
+    
 
     

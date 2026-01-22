@@ -52,7 +52,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert at creating educational questions from a given text. Your task is to generate a set of questions based on the provided textbook content.
 
 **Formatting Rules**:
-1.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}.
+1.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}. For symbols, use their LaTeX commands, for instance \`\\therefore\` for the 'therefore' symbol (∴).
 2.  **Language**: You MUST generate all content in the same language as the provided source material.
 
 The questions should have the following properties:
@@ -88,5 +88,7 @@ const generateTextbookQuestionsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    
 
     
