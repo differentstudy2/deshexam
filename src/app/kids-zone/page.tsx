@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen, Languages } from "lucide-react";
+import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen, Languages, Book } from "lucide-react";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -43,6 +43,18 @@ const kidsFeatures = [
     title: "Learning Hindi",
     description: "Discover the Hindi language with interactive lessons and games.",
     link: "/kids-zone/learning-hindi",
+  },
+   {
+    icon: <BookOpen className="w-12 h-12 text-teal-500" />,
+    title: "Learning Arabic",
+    description: "Discover the Arabic language with fun lessons and games.",
+    link: "/kids-zone/learning-arabic",
+  },
+  {
+    icon: <Book className="w-12 h-12 text-rose-500" />,
+    title: "Learning Urdu",
+    description: "Explore the elegant script and sounds of the Urdu language.",
+    link: "/kids-zone/learning-urdu",
   },
 ];
 
