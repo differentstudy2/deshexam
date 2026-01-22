@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen } from "lucide-react";
+import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen, Om } from "lucide-react";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -37,6 +37,12 @@ const kidsFeatures = [
     title: "Learning Bengali",
     description: "Explore the Bengali language with interactive lessons and games.",
     link: "/kids-zone/learning-bengali",
+  },
+  {
+    icon: <Om className="w-12 h-12 text-pink-500" />,
+    title: "Learning Hindi",
+    description: "Discover the Hindi language with interactive lessons and games.",
+    link: "/kids-zone/learning-hindi",
   },
 ];
 
@@ -89,7 +95,7 @@ export default function KidsZonePage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {kidsFeatures.map((feature, index) => (
             <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
               <CardHeader className="items-center">
