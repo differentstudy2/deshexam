@@ -261,6 +261,11 @@ const QuestionsTable = ({
                                         <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href={`/question/${question.id}`} target="_blank">
+                                                <Eye className="mr-2 h-4 w-4" /> View
+                                            </Link>
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => onEditQuestion(question)}>
                                             <Pencil className="mr-2 h-4 w-4" /> Edit
                                         </DropdownMenuItem>
@@ -539,4 +544,5 @@ export default function ManageQuestionsPage() {
         </div>
     )
 }
+
 
