@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -90,7 +91,7 @@ type Question = {
     id: string;
     text: string;
     authorName: string;
-    createdAt: string;
+    createdAt: any;
     subject: string;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank';
     marks: number;
@@ -251,7 +252,9 @@ const QuestionsTable = ({
                             <TableCell>{question.subject}</TableCell>
                             <TableCell>{question.type}</TableCell>
                             <TableCell>{question.marks}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.createdAt}</TableCell>
+                            <TableCell className="hidden md:table-cell">
+                                {question.createdAt?.toDate ? question.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                            </TableCell>
                             <TableCell className="text-right">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -536,3 +539,4 @@ export default function ManageQuestionsPage() {
         </div>
     )
 }
+

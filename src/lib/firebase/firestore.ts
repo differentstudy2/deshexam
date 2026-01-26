@@ -93,24 +93,10 @@ export const getAllQuestions = async () => {
     try {
         const q = query(collection(db, "questions"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        const questions = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            const createdAt = data.createdAt;
-            let formattedDate = 'N/A';
-            if (createdAt && typeof createdAt.toDate === 'function') {
-                formattedDate = createdAt.toDate().toLocaleDateString();
-            } else if (createdAt) {
-                const d = new Date(createdAt);
-                if (!isNaN(d.getTime())) {
-                    formattedDate = d.toLocaleDateString();
-                }
-            }
-            return {
-                id: doc.id,
-                ...data,
-                createdAt: formattedDate,
-            };
-        });
+        const questions = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
         return questions;
     } catch (e) {
         console.error("Error getting questions: ", e);
@@ -753,7 +739,7 @@ export const getSubmissionsByUserId = (
     const data = doc.data() as any;
     if (!data) return null;
 
-    let dateValue = new Date();
+    let dateValue = new Date(); // Default to now if invalid
     if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
       dateValue = data.submittedAt.toDate();
     } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
@@ -2272,6 +2258,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
