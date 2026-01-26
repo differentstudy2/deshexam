@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -33,6 +34,7 @@ type Article = {
   authorName: string;
   createdAt: string;
   testType: string;
+  featureImage?: string;
 };
 
 type Comment = {
@@ -295,7 +297,7 @@ export default function ArticleClientPage({ article }: { article: Article }) {
             </header>
 
             <Image
-                src={`https://picsum.photos/seed/${article.id}/800/450`}
+                src={article.featureImage || `https://picsum.photos/seed/${article.id}/800/450`}
                 alt={article.title}
                 width={800}
                 height={450}

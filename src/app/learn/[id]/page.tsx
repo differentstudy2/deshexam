@@ -13,7 +13,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const id = params.id;
-  const article = await getContentById(id);
+  const article = await getContentById(id) as any;
 
   if (!article || article.testType !== 'Learn') {
     return {
@@ -36,7 +36,7 @@ export async function generateMetadata(
     openGraph: {
       title: article.title,
       description: article.description,
-      images: [`https://picsum.photos/seed/${id}/800/450`, ...previousImages],
+      images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`, ...previousImages],
       type: 'article',
       publishedTime: publishedTime,
       authors: [article.authorName],
@@ -70,7 +70,7 @@ export default async function LearnArticlePage({ params }: Props) {
         },
         'headline': article.title,
         'description': article.description,
-        'image': `https://picsum.photos/seed/${article.id}/800/450`,  
+        'image': article.featureImage || `https://picsum.photos/seed/${article.id}/800/450`,  
         'author': {
             '@type': 'Person',
             'name': article.authorName,
@@ -92,7 +92,7 @@ export default async function LearnArticlePage({ params }: Props) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <ArticleClientPage article={article} />
+            <ArticleClientPage article={article as any} />
         </>
     );
 }

@@ -45,11 +45,14 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
 import { Label } from '@/components/ui/label';
+import { ImageUploader } from '@/components/feature/image-uploader';
+import Image from 'next/image';
 
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
   description: z.string().min(1, "Description is required."),
+  featureImage: z.string().optional(),
   body: z.string().min(1, "Content body cannot be empty."),
   subject: z.string().optional(),
 });
@@ -73,12 +76,14 @@ export default function AddArticlePage() {
     defaultValues: {
       title: '',
       description: '',
+      featureImage: '',
       body: '',
       subject: '',
     },
   });
   
   const articleBody = form.watch('body');
+  const featureImage = form.watch('featureImage');
 
   const aiLearnForm = useForm<AILearnGeneratorFormValues>({
     resolver: zodResolver(aiLearnGeneratorFormSchema),
@@ -92,6 +97,7 @@ export default function AddArticlePage() {
       const contentToSave = {
         title: data.title,
         description: data.description,
+        featureImage: data.featureImage,
         body: data.body,
         subject: data.subject || 'General',
         testType: 'Learn',
@@ -241,6 +247,23 @@ export default function AddArticlePage() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="featureImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Feature Image</FormLabel>
+                      <FormControl>
+                        <ImageUploader
+                            fieldName={field.name}
+                            onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })}
+                            value={field.value}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                   <FormField
                     control={form.control}
@@ -266,6 +289,7 @@ export default function AddArticlePage() {
               <Label className="text-lg font-semibold">Preview</Label>
               <Card className="mt-2 min-h-[500px]">
                 <CardContent className="p-6">
+                   {featureImage && <Image src={featureImage} alt="Feature image preview" width={800} height={450} className="w-full h-auto rounded-md mb-6" />}
                   <article className="prose dark:prose-invert max-w-none">
                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                           {articleBody || "Start typing to see a preview..."}

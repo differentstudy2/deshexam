@@ -31,11 +31,11 @@ export default async function LearnPage() {
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articles.map((article) => (
+        {articles.map((article: any) => (
           <Card key={article.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
             <CardHeader className="p-0 relative">
               <Image
-                src={`https://picsum.photos/seed/${article.id}/400/225`}
+                src={article.featureImage || `https://picsum.photos/seed/${article.id}/400/225`}
                 alt={article.title}
                 width={400}
                 height={225}
