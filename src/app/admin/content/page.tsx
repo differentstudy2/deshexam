@@ -97,7 +97,7 @@ const optionSchema = z.object({
 const questionFormSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  subject: z.string().optional(),
+  subject: z.string().min(1, { message: 'Subject is required.' }),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
   marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
@@ -453,7 +453,7 @@ export default function ManageContentPage() {
     } else {
       questionForm.reset({
         text: '',
-        subject: subjectFilter !== 'all' ? subjectFilter : '',
+        subject: subjectFilter !== 'all' ? subjectFilter : undefined,
         type: 'Multiple Choice',
         marks: 1,
         options: Array(4).fill({ text: '', explanation: '' }),
@@ -482,6 +482,7 @@ export default function ManageContentPage() {
                 id: newQuestionId,
                 authorName: user.displayName || 'Me', 
                 createdAt: new Date().toLocaleDateString(),
+                subject: data.subject || '',
              };
             setAllQuestions(prev => [newQuestion, ...prev]);
             toast({ title: 'Question added successfully!' });
@@ -1343,5 +1344,6 @@ export default function ManageContentPage() {
 }
 
     
+
 
 
