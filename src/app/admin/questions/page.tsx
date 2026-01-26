@@ -187,95 +187,6 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
 };
 
 
-const QuestionsTable = ({ 
-    questions, 
-    loading,
-    selectedQuestions,
-    onSelectQuestion,
-    onSelectAllQuestions,
-    isAllQuestionsSelected,
-    onEditQuestion,
-    onDeleteQuestion,
-}: { 
-    questions: Question[], 
-    loading: boolean,
-    selectedQuestions: string[],
-    onSelectQuestion: (id: string) => void,
-    onSelectAllQuestions: (checked: boolean) => void,
-    isAllQuestionsSelected: boolean,
-    onEditQuestion: (question: Question) => void,
-    onDeleteQuestion: (question: Question) => void,
-}) => (
-     <div className="overflow-x-auto">
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead className="w-12">
-                         <Checkbox
-                            checked={isAllQuestionsSelected}
-                            onCheckedChange={(checked) => onSelectAllQuestions(Boolean(checked))}
-                            aria-label="Select all questions"
-                        />
-                    </TableHead>
-                    <TableHead className="w-[60%]">Question Text</TableHead>
-                    <TableHead className="hidden md:table-cell">Author</TableHead>
-                    <TableHead className="hidden md:table-cell">Subject</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {loading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                        <TableRow key={i}>
-                            <TableCell><Skeleton className="h-5 w-5" /></TableCell>
-                            <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                            <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
-                        </TableRow>
-                    ))
-                ) : questions.length > 0 ? (
-                    questions.map((question) => (
-                        <TableRow key={question.id} data-state={selectedQuestions.includes(question.id) && "selected"}>
-                             <TableCell>
-                                <Checkbox
-                                    checked={selectedQuestions.includes(question.id)}
-                                    onCheckedChange={() => onSelectQuestion(question.id)}
-                                    aria-label={`Select question ${question.id}`}
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
-                            <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
-                            <TableCell className="text-right">
-                                <div className="flex gap-2 justify-end">
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href={`/question/${question.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => onEditQuestion(question)}>
-                                        <Pencil className="mr-2 h-4 w-4"/>Edit
-                                    </Button>
-                                    <Button variant="destructive" size="sm" onClick={() => onDeleteQuestion(question)}>
-                                        <Trash2 className="mr-2 h-4 w-4"/>Delete
-                                    </Button>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ))
-                ) : (
-                    <TableRow>
-                        <TableCell colSpan={6} className="h-24 text-center">No questions found.</TableCell>
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
-    </div>
-);
-
-
 export default function ManageQuestionsPage() {
     const { toast } = useToast();
     const { user } = useAuth();
@@ -355,7 +266,7 @@ export default function ManageQuestionsPage() {
         if (question) {
             questionForm.reset({
                 ...question,
-                options: question.options || (question.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
+                options: question.options || (question.type === 'Multiple Choice' ? Array.from({ length: 4 }, () => ({ text: '', explanation: '' })) : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
             });
         } else {
           questionForm.reset({
@@ -363,7 +274,7 @@ export default function ManageQuestionsPage() {
             subject: subjectFilter !== 'all' ? subjectFilter : '',
             type: 'Multiple Choice',
             marks: 1,
-            options: Array(4).fill({ text: '', explanation: '' }),
+            options: Array.from({ length: 4 }, () => ({ text: '', explanation: '' })),
             correctAnswer: '',
             explanation: '',
           });
