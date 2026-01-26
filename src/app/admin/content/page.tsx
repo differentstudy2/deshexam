@@ -66,12 +66,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ContentBadge } from '@/components/content-badge';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { generateContent, AIContentGeneratorInput } from '@/ai/flows/ai-content-generator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useAuth } from '@/hooks/use-auth';
 
 
 type Content = {
@@ -89,46 +83,6 @@ type Content = {
     chapter: string;
 }
 
-const optionSchema = z.object({
-  text: z.string().min(1, 'Option text cannot be empty.'),
-  explanation: z.string().optional(),
-});
-
-const questionFormSchema = z.object({
-  id: z.string().optional(),
-  text: z.string().min(1, 'Question text cannot be empty.'),
-  subject: z.string().min(1, { message: 'Subject is required.' }),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
-  marks: z.coerce.number().int().positive('Marks must be a positive number.'),
-  options: z.array(optionSchema).optional(),
-  correctAnswer: z.string().optional(),
-  explanation: z.string().optional(),
-});
-
-type QuestionFormValues = z.infer<typeof questionFormSchema>;
-
-type Question = {
-    id: string;
-    text: string;
-    authorName: string;
-    createdAt: string;
-    subject: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank';
-    marks: number;
-    options?: {text: string, explanation?: string}[];
-    correctAnswer?: string;
-    explanation?: string;
-};
-
-const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['topic', 'text', 'file']),
-    source: z.string().min(3, 'Source must be at least 3 characters.'),
-    numQuestions: z.coerce.number().int().min(1).max(20),
-    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Any']),
-});
-type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
-
 type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
@@ -144,8 +98,6 @@ type BulkAction =
     | { type: 'chapter', value: string }
     | { type: 'examCategory', value: string }
     | { type: 'exam', value: string }
-    | { type: 'delete-questions' }
-    | { type: 'add-questions-to-content', contentIds: string[] }
     | null;
 
 function getUrlForTest(testType: string, testId: string) {
@@ -304,96 +256,11 @@ const ContentTable = ({
     );
 };
 
-const QuestionsTable = ({ 
-    questions, 
-    loading,
-    selectedQuestions,
-    onSelectQuestion,
-    onSelectAllQuestions,
-    isAllQuestionsSelected,
-    onEditQuestion
-}: { 
-    questions: Question[], 
-    loading: boolean,
-    selectedQuestions: string[],
-    onSelectQuestion: (id: string) => void,
-    onSelectAllQuestions: (checked: boolean) => void,
-    isAllQuestionsSelected: boolean,
-    onEditQuestion: (question: Question) => void
-}) => (
-     <div className="overflow-x-auto">
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead className="w-12">
-                         <Checkbox
-                            checked={isAllQuestionsSelected}
-                            onCheckedChange={(checked) => onSelectAllQuestions(Boolean(checked))}
-                            aria-label="Select all questions"
-                        />
-                    </TableHead>
-                    <TableHead className="w-[60%]">Question Text</TableHead>
-                    <TableHead className="hidden md:table-cell">Author</TableHead>
-                    <TableHead className="hidden md:table-cell">Subject</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {loading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                        <TableRow key={i}>
-                            <TableCell><Skeleton className="h-5 w-5" /></TableCell>
-                            <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                            <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
-                        </TableRow>
-                    ))
-                ) : questions.length > 0 ? (
-                    questions.map((question) => (
-                        <TableRow key={question.id} data-state={selectedQuestions.includes(question.id) && "selected"}>
-                             <TableCell>
-                                <Checkbox
-                                    checked={selectedQuestions.includes(question.id)}
-                                    onCheckedChange={() => onSelectQuestion(question.id)}
-                                    aria-label={`Select question ${question.id}`}
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
-                            <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
-                            <TableCell className="text-right">
-                                <div className="flex gap-2 justify-end">
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href={`/question/${question.id}`}><Eye className="mr-2 h-4 w-4"/>View</Link>
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => onEditQuestion(question)}>
-                                        <Pencil className="mr-2 h-4 w-4"/>Edit
-                                    </Button>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    ))
-                ) : (
-                    <TableRow>
-                        <TableCell colSpan={6} className="h-24 text-center">No questions found.</TableCell>
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
-    </div>
-);
-
 const ITEMS_PER_PAGE = 10;
 
 export default function ManageContentPage() {
   const { toast } = useToast();
-  const { user } = useAuth();
   const [allContent, setAllContent] = useState<Content[]>([]);
-  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [isAddToContentDialogOpen, setIsAddToContentDialogOpen] = useState(false);
@@ -410,115 +277,22 @@ export default function ManageContentPage() {
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [accessFilter, setAccessFilter] = useState('all');
   const [selectedContent, setSelectedContent] = useState<string[]>([]);
-  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-  const [dialogSelectedContent, setDialogSelectedContent] = useState<string[]>([]);
   
   const [contentCurrentPage, setContentCurrentPage] = useState(1);
-  const [questionsCurrentPage, setQuestionsCurrentPage] = useState(1);
-
-  const [isQuestionFormDialogOpen, setIsQuestionFormDialogOpen] = useState(false);
-  const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
-  const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const aiForm = useForm<AIGeneratorFormValues>({
-    resolver: zodResolver(aiGeneratorFormSchema),
-    defaultValues: {
-      sourceType: 'topic',
-      source: '',
-      numQuestions: 5,
-      difficulty: 'Medium',
-      questionType: 'Any',
-    },
-  });
-  
-  const questionForm = useForm<QuestionFormValues>({
-    resolver: zodResolver(questionFormSchema),
-  });
-
-  const { fields: optionFields, append: appendOption, remove: removeOption, replace: replaceOptions } = useFieldArray({
-    control: questionForm.control,
-    name: 'options',
-  });
-
-  const openQuestionDialog = (question: Question | null) => {
-    setQuestionToEdit(question);
-    if (question) {
-        questionForm.reset({
-            ...question,
-             options: question.options || (question.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
-        });
-        replaceOptions(question.options || []);
-    } else {
-      questionForm.reset({
-        text: '',
-        subject: subjectFilter !== 'all' ? subjectFilter : undefined,
-        type: 'Multiple Choice',
-        marks: 1,
-        options: Array(4).fill({ text: '', explanation: '' }),
-        correctAnswer: '',
-        explanation: '',
-      });
-      replaceOptions([{text:'', explanation:''},{text:'', explanation:''},{text:'', explanation:''},{text:'', explanation:''}])
-    }
-    setIsQuestionFormDialogOpen(true);
-  };
-  
-  const handleQuestionFormSubmit = async (data: QuestionFormValues) => {
-    if (!user) {
-        toast({variant: 'destructive', title: 'Not authenticated'});
-        return;
-    }
-    try {
-        if (questionToEdit) {
-            await updateQuestion(questionToEdit.id, data);
-            toast({ title: 'Question updated successfully!' });
-            setAllQuestions(prev => prev.map(q => q.id === questionToEdit.id ? { ...q, ...data, id: questionToEdit.id, authorName: q.authorName, createdAt: q.createdAt } : q));
-        } else {
-            const newQuestionId = await addQuestion(data);
-            const newQuestion: Question = { 
-                ...data, 
-                id: newQuestionId,
-                authorName: user.displayName || 'Me', 
-                createdAt: new Date().toLocaleDateString(),
-                subject: data.subject || '',
-             };
-            setAllQuestions(prev => [newQuestion, ...prev]);
-            toast({ title: 'Question added successfully!' });
-        }
-        setIsQuestionFormDialogOpen(false);
-        setQuestionToEdit(null);
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: `Error ${questionToEdit ? 'updating' : 'adding'} question`,
-            description: (error as Error).message,
-        });
-    }
-  };
 
   const allTabs = useMemo(() => {
-    const baseTabs = [{ id: 'all', name: 'All' }, ...contentTypes];
-    if (!baseTabs.some(tab => tab.name.toLowerCase() === 'questions')) {
-      baseTabs.push({ id: 'questions', name: 'Questions' });
-    }
-    if (!baseTabs.some(tab => tab.name.toLowerCase() === 'exam')) {
-      baseTabs.push({ id: 'exam', name: 'Exam' });
-    }
-    return baseTabs;
+    return [{ id: 'all', name: 'All' }, ...contentTypes];
   }, [contentTypes]);
 
   const fetchInitialData = async () => {
       try {
         setLoading(true);
-        const [content, types, subjectData, boardData, examTypeData, questionData] = await Promise.all([
+        const [content, types, subjectData, boardData, examTypeData] = await Promise.all([
           getAllContent(),
           getContentTypes(),
           getSubjects(),
           getBoards(),
           getExamTypes(),
-          getAllQuestions(),
         ]);
         
         const formattedContent = content.map((c: any) => {
@@ -543,7 +317,6 @@ export default function ManageContentPage() {
         });
 
         setAllContent(formattedContent);
-        setAllQuestions(questionData as Question[]);
         setContentTypes(types);
         setSubjects(subjectData);
         setBoards(boardData);
@@ -590,33 +363,16 @@ export default function ManageContentPage() {
     });
   }, [allContent, activeTab, searchQuery, subjectFilter, accessFilter]);
 
-  const filteredQuestions = useMemo(() => {
-    return allQuestions.filter(item => {
-        const matchesSearch = item.text.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesSubject = subjectFilter === 'all' || item.subject === subjectFilter;
-        return matchesSearch && matchesSubject;
-    });
-  }, [allQuestions, searchQuery, subjectFilter]);
-
   const paginatedContent = useMemo(() => {
       const startIndex = (contentCurrentPage - 1) * ITEMS_PER_PAGE;
       const endIndex = startIndex + ITEMS_PER_PAGE;
       return filteredContent.slice(startIndex, endIndex);
   }, [filteredContent, contentCurrentPage]);
   
-  const paginatedQuestions = useMemo(() => {
-      const startIndex = (questionsCurrentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      return filteredQuestions.slice(startIndex, endIndex);
-  }, [filteredQuestions, questionsCurrentPage]);
-  
   const totalContentPages = Math.ceil(filteredContent.length / ITEMS_PER_PAGE);
-  const totalQuestionPages = Math.ceil(filteredQuestions.length / ITEMS_PER_PAGE);
-
 
   useEffect(() => {
     setContentCurrentPage(1);
-    setQuestionsCurrentPage(1);
   }, [searchQuery, activeTab, subjectFilter, accessFilter]);
 
   const openDeleteDialog = (item: Content) => {
@@ -626,11 +382,7 @@ export default function ManageContentPage() {
   
   const openBulkActionDialog = (action: BulkAction) => {
     setBulkAction(action);
-    if(action?.type === 'add-questions-to-content') {
-        setIsAddToContentDialogOpen(true);
-    } else {
-        setIsAlertDialogOpen(true);
-    }
+    setIsAlertDialogOpen(true);
   }
 
   const handleSelectContent = (id: string) => {
@@ -647,29 +399,12 @@ export default function ManageContentPage() {
 
   const isAllContentSelected = selectedContent.length > 0 && selectedContent.length === filteredContent.length;
 
-  const handleSelectQuestion = (id: string) => {
-    setSelectedQuestions(prev => prev.includes(id) ? prev.filter(qid => qid !== id) : [...prev, id]);
-  }
-
-  const handleSelectAllQuestions = (checked: boolean) => {
-    if (checked) {
-        setSelectedQuestions(filteredQuestions.map(q => q.id));
-    } else {
-        setSelectedQuestions([]);
-    }
-  }
-
-  const isAllQuestionsSelected = selectedQuestions.length > 0 && selectedQuestions.length === filteredQuestions.length;
-
-
   const handleConfirmAction = async () => {
     if(contentToDelete) { // Single content delete
         await handleDeleteContent([contentToDelete.id]);
     } else if (bulkAction) { // Bulk actions
         if (bulkAction.type === 'delete') {
             await handleDeleteContent(selectedContent);
-        } else if (bulkAction.type === 'delete-questions') {
-            await handleDeleteQuestions(selectedQuestions);
         } else if (bulkAction.type === 'access') {
             await handleBulkUpdate({ access: bulkAction.value });
         } else if (bulkAction.type === 'board') {
@@ -682,18 +417,13 @@ export default function ManageContentPage() {
             await handleBulkUpdate({ examCategory: bulkAction.value });
         } else if (bulkAction.type === 'exam') {
             await handleBulkUpdate({ exam: bulkAction.value });
-        } else if (bulkAction.type === 'add-questions-to-content' && bulkAction.contentIds) {
-            await handleAddQuestionsToContent(bulkAction.contentIds, selectedQuestions);
         }
     }
     
     setIsAlertDialogOpen(false);
-    setIsAddToContentDialogOpen(false);
     setContentToDelete(null);
     setBulkAction(null);
     setSelectedContent([]);
-    setSelectedQuestions([]);
-    setDialogSelectedContent([]);
   };
 
   const handleDeleteContent = async (ids: string[]) => {
@@ -713,28 +443,10 @@ export default function ManageContentPage() {
     }
   };
 
-  const handleDeleteQuestions = async (ids: string[]) => {
-    try {
-      await Promise.all(ids.map(id => deleteQuestion(id)));
-      setAllQuestions(allQuestions.filter(item => !ids.includes(item.id)));
-      toast({
-        title: "Question(s) Deleted",
-        description: `${ids.length} question(s) have been deleted.`,
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: 'Error deleting questions',
-        description: (error as Error).message,
-      });
-    }
-  };
-
   const handleBulkUpdate = async (updateData: { [key: string]: any }) => {
     try {
         await Promise.all(selectedContent.map(id => updateContent(id, updateData)));
         
-        // Optimistically update UI or refetch data
         setAllContent(allContent.map(item => 
             selectedContent.includes(item.id) ? { ...item, ...updateData } : item
         ));
@@ -752,78 +464,6 @@ export default function ManageContentPage() {
     }
   }
 
-  const handleAddQuestionsToContent = async (contentIds: string[], questionIds: string[]) => {
-    try {
-        const questionsToAdd = allQuestions.filter(q => questionIds.includes(q.id));
-        await Promise.all(contentIds.map(id => addQuestionToContent(id, questionsToAdd)));
-      
-        toast({
-            title: "Questions Added",
-            description: `${questionIds.length} questions have been added to ${contentIds.length} content item(s).`,
-        });
-    } catch (error) {
-       toast({
-        variant: "destructive",
-        title: 'Error adding questions',
-        description: (error as Error).message,
-      });
-    }
-  };
-
-  const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
-    setIsGenerating(true);
-    try {
-        const input: AIContentGeneratorInput = {
-            ...aiData,
-            contentType: 'Question Bank',
-        };
-        const result = await generateContent(input);
-
-        // Add each generated question to the database
-        const newQuestionIds = await Promise.all(result.questions.map(q => addQuestion(q)));
-        
-        // Refetch all questions to update the table
-        const questionData = await getAllQuestions();
-        setAllQuestions(questionData as Question[]);
-
-        toast({
-            title: 'Questions Generated!',
-            description: `${result.questions.length} new questions have been added to the question bank.`,
-        });
-        setIsAiGeneratorOpen(false);
-
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: 'AI Generation Failed',
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-        if (file.type === 'text/plain') {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target?.result as string;
-                aiForm.setValue('source', text, { shouldValidate: true });
-                aiForm.setValue('sourceType', 'text');
-            };
-            reader.readAsText(file);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Invalid File Type',
-                description: 'Please upload a .txt file.',
-            });
-        }
-    }
-  };
-  
   const getAlertDialogDescription = () => {
       if (contentToDelete) {
           return `This action cannot be undone. This will permanently delete "${contentToDelete.title}".`;
@@ -831,7 +471,6 @@ export default function ManageContentPage() {
       if (bulkAction) {
           const actionTextMap: { [key: string]: string } = {
             'delete': `This will permanently delete ${selectedContent.length} item(s).`,
-            'delete-questions': `This will permanently delete ${selectedQuestions.length} question(s).`,
             'access': `This will change the access level for ${selectedContent.length} item(s) to "${(bulkAction as any).value}".`,
             'board': `This will change the board for ${selectedContent.length} item(s) to "${boards.find(b => b.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
             'subject': `This will change the subject for ${selectedContent.length} item(s) to "${subjects.find(s => s.name === (bulkAction as any).value)?.name || (bulkAction as any).value}".`,
@@ -889,7 +528,7 @@ export default function ManageContentPage() {
                             {subjects.map(sub => <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>)}
                         </SelectContent>
                     </Select>
-                    <Select value={accessFilter} onValueChange={setAccessFilter} disabled={activeTab === 'Questions'}>
+                    <Select value={accessFilter} onValueChange={setAccessFilter}>
                         <SelectTrigger>
                             <SelectValue placeholder="Filter by access" />
                         </SelectTrigger>
@@ -900,7 +539,7 @@ export default function ManageContentPage() {
                             <SelectItem value="pro">Pro</SelectItem>
                         </SelectContent>
                     </Select>
-                     {selectedContent.length > 0 && activeTab !== 'Questions' && (
+                     {selectedContent.length > 0 && (
                          <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full">
@@ -980,132 +619,20 @@ export default function ManageContentPage() {
                 </TabsList>
                 {allTabs.map(type => (
                     <TabsContent key={type.id} value={type.name}>
-                        {type.name === 'Questions' ? (
-                            <>
-                                <div className="flex items-center justify-end mb-4 gap-2">
-                                     <Button variant="outline" onClick={() => openQuestionDialog(null)}>
-                                        <FilePlus className="mr-2 h-4 w-4" />
-                                        Add New Question
-                                    </Button>
-                                    <Collapsible>
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="outline" type="button">
-                                            <Sparkles className="mr-2 h-4 w-4" />
-                                            Generate Questions with AI
-                                            </Button>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <Card className="mt-4">
-                                                <CardHeader>
-                                                    <CardTitle>Generate Questions</CardTitle>
-                                                    <CardDescription>Generate a set of questions to add to the question bank.</CardDescription>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <Form {...aiForm}>
-                                                        <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
-                                                            <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
-                                                                <TabsList className="grid w-full grid-cols-3">
-                                                                    <TabsTrigger value="topic">From Topic</TabsTrigger>
-                                                                    <TabsTrigger value="text">From Text</TabsTrigger>
-                                                                    <TabsTrigger value="file">From File</TabsTrigger>
-                                                                </TabsList>
-                                                                <TabsContent value="topic" className="pt-4">
-                                                                    <FormField control={aiForm.control} name="source" render={({ field }) => ( <FormItem> <FormLabel>Topic</FormLabel> <FormControl> <Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                                                                </TabsContent>
-                                                                <TabsContent value="text" className="pt-4">
-                                                                    <FormField control={aiForm.control} name="source" render={({ field }) => ( <FormItem> <FormLabel>Paste Text</FormLabel> <FormControl> <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /> </FormControl> <FormMessage /> </FormItem> )}/>
-                                                                </TabsContent>
-                                                                <TabsContent value="file" className="pt-4">
-                                                                    <FormItem>
-                                                                        <FormLabel>Upload File</FormLabel>
-                                                                        <FormControl>
-                                                                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                                                                <div className="space-y-1 text-center">
-                                                                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                                                                    <div className="flex text-sm text-muted-foreground">
-                                                                                        <p className="pl-1">
-                                                                                            {aiForm.watch('source') ? 'File selected' : 'Upload a .txt file'}
-                                                                                        </p>
-                                                                                    </div>
-                                                                                    <p className="text-xs text-muted-foreground">
-                                                                                        {aiForm.watch('source') ? aiForm.watch('source').substring(0, 50) + '...' : 'Text file up to 10MB'}
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </FormControl>
-                                                                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt"/>
-                                                                        <FormMessage />
-                                                                    </FormItem>
-                                                                </TabsContent>
-                                                            </Tabs>
-                                                            <div className="grid grid-cols-2 gap-4">
-                                                                <FormField control={aiForm.control} name="numQuestions" render={({ field }) => ( <FormItem> <FormLabel>Number of Questions</FormLabel> <FormControl> <Input type="number" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                                                                <FormField control={aiForm.control} name="difficulty" render={({ field }) => ( <FormItem> <FormLabel>Difficulty</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Easy">Easy</SelectItem> <SelectItem value="Medium">Medium</SelectItem> <SelectItem value="Hard">Hard</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
-                                                            </div>
-                                                            <FormField control={aiForm.control} name="questionType" render={({ field }) => ( <FormItem> <FormLabel>Question Type</FormLabel> <Select onValueChange={field.onChange} defaultValue={field.value}> <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl> <SelectContent> <SelectItem value="Any">Any</SelectItem> <SelectItem value="Multiple Choice">Multiple Choice</SelectItem> <SelectItem value="True/False">True/False</SelectItem> <SelectItem value="Short Answer">Short Answer</SelectItem> <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem> </SelectContent> </Select> <FormMessage /> </FormItem> )}/>
-                                                            <DialogFooter> <Button type="submit" disabled={isGenerating}> {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"} </Button> </DialogFooter>
-                                                        </form>
-                                                    </Form>
-                                                </CardContent>
-                                            </Card>
-                                        </CollapsibleContent>
-                                    </Collapsible>
-                                </div>
-                                <QuestionsTable 
-                                    questions={paginatedQuestions} 
-                                    loading={loading}
-                                    selectedQuestions={selectedQuestions}
-                                    onSelectQuestion={handleSelectQuestion}
-                                    onSelectAllQuestions={handleSelectAllQuestions}
-                                    isAllQuestionsSelected={isAllQuestionsSelected}
-                                    onEditQuestion={openQuestionDialog}
-                                />
-                                <PaginationControls 
-                                    currentPage={questionsCurrentPage} 
-                                    totalPages={totalQuestionPages} 
-                                    onPageChange={setQuestionsCurrentPage} 
-                                />
-                                {selectedQuestions.length > 0 && (
-                                     <div className="flex items-center space-x-2 mt-4">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" className="w-full sm:w-auto">
-                                                    Bulk Actions ({selectedQuestions.length}) <Filter className="ml-2 h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
-                                                <DropdownMenuItem onClick={() => setIsAddToContentDialogOpen(true)}>
-                                                    Add to Content
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="text-destructive" onClick={() => openBulkActionDialog({ type: 'delete-questions' })}>
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete Selected
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                           <ContentTable 
-                                content={paginatedContent.filter(c => activeTab === 'All' || c.testType === type.name)}
-                                loading={loading}
-                                openDeleteDialog={openDeleteDialog}
-                                selectedContent={selectedContent}
-                                onSelect={handleSelectContent}
-                                onSelectAll={handleSelectAllContent}
-                                isAllSelected={isAllContentSelected}
-                            />
-                             <PaginationControls 
-                                currentPage={contentCurrentPage} 
-                                totalPages={totalContentPages} 
-                                onPageChange={setContentCurrentPage} 
-                            />
-                            </>
-                        )}
+                       <ContentTable 
+                            content={paginatedContent.filter(c => activeTab === 'All' || c.testType === type.name)}
+                            loading={loading}
+                            openDeleteDialog={openDeleteDialog}
+                            selectedContent={selectedContent}
+                            onSelect={handleSelectContent}
+                            onSelectAll={handleSelectAllContent}
+                            isAllSelected={isAllContentSelected}
+                        />
+                         <PaginationControls 
+                            currentPage={contentCurrentPage} 
+                            totalPages={totalContentPages} 
+                            onPageChange={setContentCurrentPage} 
+                        />
                     </TabsContent>
                 ))}
             </Tabs>
@@ -1127,223 +654,6 @@ export default function ManageContentPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Dialog open={isAddToContentDialogOpen} onOpenChange={setIsAddToContentDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add Questions to Content</DialogTitle>
-            <DialogDescription>
-                Select one or more content items to add the {selectedQuestions.length} selected questions to.
-            </DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="max-h-[300px] my-4">
-            <div className="space-y-2 p-1">
-                {allContent.map(c => (
-                    <div key={c.id} className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary">
-                        <Checkbox
-                            id={`content-${c.id}`}
-                            checked={dialogSelectedContent.includes(c.id)}
-                            onCheckedChange={() => {
-                                setDialogSelectedContent(prev => 
-                                    prev.includes(c.id)
-                                    ? prev.filter(id => id !== c.id)
-                                    : [...prev, c.id]
-                                );
-                            }}
-                        />
-                        <label htmlFor={`content-${c.id}`} className="flex-grow cursor-pointer">{c.title}</label>
-                    </div>
-                ))}
-            </div>
-          </ScrollArea>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => { setIsAddToContentDialogOpen(false); setDialogSelectedContent([]); }}>Cancel</Button>
-            <Button onClick={() => {
-                handleConfirmAction();
-            }}
-            disabled={dialogSelectedContent.length === 0}
-            >
-                Add Questions
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isQuestionFormDialogOpen} onOpenChange={setIsQuestionFormDialogOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{questionToEdit ? 'Edit Question' : 'Add New Question'}</DialogTitle>
-            <DialogDescription>
-                {questionToEdit ? 'Modify the question details below.' : 'Add a new question to the question bank.'}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...questionForm}>
-            <form onSubmit={questionForm.handleSubmit(handleQuestionFormSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
-                <FormField
-                    control={questionForm.control}
-                    name="subject"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Subject</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a subject" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {subjects.map(sub => (
-                                        <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={questionForm.control}
-                    name="text"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Question Text</FormLabel>
-                            <FormControl>
-                                <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={questionForm.control}
-                    name="type"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Question Type</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
-                                <SelectContent>
-                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                    <SelectItem value="True/False">True/False</SelectItem>
-                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                    <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={questionForm.control}
-                    name="explanation"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Explanation</FormLabel>
-                            <FormControl>
-                                <Textarea placeholder="Explain why the correct answer is right." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={questionForm.control}
-                    name="marks"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Marks</FormLabel>
-                            <FormControl>
-                                <Input type="number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                {questionForm.watch('type') === 'Multiple Choice' && (
-                     <div className="space-y-4">
-                        <FormLabel>Options</FormLabel>
-                        <Controller
-                            control={questionForm.control}
-                            name="correctAnswer"
-                            render={({ field }) => (
-                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {optionFields.map((option, optionIndex) => (
-                                         <div key={option.id} className="flex items-start gap-4">
-                                            <FormControl>
-                                                <RadioGroupItem value={questionForm.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}`} className="mt-2.5" />
-                                            </FormControl>
-                                            <div className="space-y-2 flex-1">
-                                                <FormField
-                                                    control={questionForm.control}
-                                                    name={`options.${optionIndex}.text`}
-                                                    render={({ field: optionField }) => (
-                                                        <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={questionForm.control}
-                                                    name={`options.${optionIndex}.explanation`}
-                                                    render={({ field: explanationField }) => (
-                                                        <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
-                                                    )}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </RadioGroup>
-                            )}
-                        />
-                        <FormMessage>{questionForm.formState.errors.correctAnswer?.message}</FormMessage>
-                    </div>
-                )}
-                 {questionForm.watch('type') === 'True/False' && (
-                     <FormField
-                        control={questionForm.control}
-                        name="correctAnswer"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Correct Answer</FormLabel>
-                                <FormControl>
-                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
-                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem>
-                                        <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                )}
-                 {(questionForm.watch('type') === 'Short Answer' || questionForm.watch('type') === 'Fill in the Blank') && (
-                    <FormField
-                        control={questionForm.control}
-                        name="correctAnswer"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Answer</FormLabel>
-                                <FormControl>
-                                    <Input {...field} placeholder="Enter the correct answer" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                )}
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsQuestionFormDialogOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={questionForm.formState.isSubmitting}>
-                    {questionForm.formState.isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Changes'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
-
-    
-
-
-
