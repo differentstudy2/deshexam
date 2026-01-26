@@ -513,7 +513,7 @@ export default function ManageChaptersPage() {
                      <div className="space-y-2">
                         {chapters.map((chapter) => (
                            <div key={chapter.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-md hover:bg-accent/50 gap-2">
-                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="font-medium flex-grow flex items-center gap-2">
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`} className="font-medium flex-grow flex items-center gap-2">
                                     <BookOpen className="w-4 h-4 text-muted-foreground"/>
                                     <span className="flex-1">{chapter.title}</span>
                                 </Link>
