@@ -101,6 +101,91 @@ type Question = {
 
 const ITEMS_PER_PAGE = 10;
 
+const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], onClose: () => void }) => {
+    const questionType = form.watch('type');
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
+                <FormField control={form.control} name="subject" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Subject</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                                {subjects.map(sub => (<SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+                <FormField control={form.control} name="text" render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                <FormField control={form.control} name="type" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Question Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                                <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                <SelectItem value="True/False">True/False</SelectItem>
+                                <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+                <FormField control={form.control} name="explanation" render={({ field }) => (
+                    <FormItem><FormLabel>Explanation</FormLabel><FormControl><Textarea placeholder="Explain why the correct answer is right." {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="marks" render={({ field }) => (
+                    <FormItem><FormLabel>Marks</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                {questionType === 'Multiple Choice' && (
+                    <div className="space-y-4">
+                        <FormLabel>Options</FormLabel>
+                        <Controller
+                            control={form.control}
+                            name="correctAnswer"
+                            render={({ field }) => (
+                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {Array.from({length: 4}).map((_, optionIndex) => (
+                                        <div key={optionIndex} className="flex items-start gap-4">
+                                            <FormControl><RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}`} className="mt-2.5" /></FormControl>
+                                            <div className="space-y-2 flex-1">
+                                                <FormField control={form.control} name={`options.${optionIndex}.text`} render={({ field: optionField }) => (<Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />)} />
+                                                <FormField control={form.control} name={`options.${optionIndex}.explanation`} render={({ field: explanationField }) => (<Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />)}/>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </RadioGroup>
+                            )}
+                        />
+                        <FormMessage>{form.formState.errors.correctAnswer?.message}</FormMessage>
+                    </div>
+                )}
+                {questionType === 'True/False' && (
+                    <FormField control={form.control} name="correctAnswer" render={({ field }) => (
+                        <FormItem><FormLabel>Correct Answer</FormLabel>
+                        <FormControl><RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4"><FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem><FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem></RadioGroup></FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}/>
+                )}
+                {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
+                    <FormField control={form.control} name="correctAnswer" render={({ field }) => (
+                        <FormItem><FormLabel>Answer</FormLabel><FormControl><Input {...field} placeholder="Enter the correct answer" /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                )}
+                <DialogFooter className="pt-4">
+                    <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+                    <Button type="submit" disabled={isSubmitting}>{isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Changes'}</Button>
+                </DialogFooter>
+            </form>
+        </Form>
+    );
+};
+
 
 const QuestionsTable = ({ 
     questions, 
@@ -420,84 +505,13 @@ export default function ManageQuestionsPage() {
                         {questionToEdit ? 'Modify the question details below.' : 'Add a new question to the question bank.'}
                     </DialogDescription>
                 </DialogHeader>
-                <Form {...questionForm}>
-                    <form onSubmit={questionForm.handleSubmit(handleQuestionFormSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
-                        <FormField control={questionForm.control} name="subject" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Subject</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        {subjects.map(sub => (<SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>))}
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}/>
-                        <FormField control={questionForm.control} name="text" render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                        <FormField control={questionForm.control} name="type" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Question Type</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                        <SelectItem value="True/False">True/False</SelectItem>
-                                        <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                        <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}/>
-                        <FormField control={questionForm.control} name="explanation" render={({ field }) => (
-                            <FormItem><FormLabel>Explanation</FormLabel><FormControl><Textarea placeholder="Explain why the correct answer is right." {...field} /></FormControl><FormMessage /></FormItem>
-                        )}/>
-                        <FormField control={questionForm.control} name="marks" render={({ field }) => (
-                            <FormItem><FormLabel>Marks</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-                        )}/>
-                        {questionForm.watch('type') === 'Multiple Choice' && (
-                            <div className="space-y-4">
-                                <FormLabel>Options</FormLabel>
-                                <Controller
-                                    control={questionForm.control}
-                                    name="correctAnswer"
-                                    render={({ field }) => (
-                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {Array.from({length: 4}).map((_, optionIndex) => (
-                                                <div key={optionIndex} className="flex items-start gap-4">
-                                                    <FormControl><RadioGroupItem value={questionForm.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}`} className="mt-2.5" /></FormControl>
-                                                    <div className="space-y-2 flex-1">
-                                                        <FormField control={questionForm.control} name={`options.${optionIndex}.text`} render={({ field: optionField }) => (<Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />)} />
-                                                        <FormField control={questionForm.control} name={`options.${optionIndex}.explanation`} render={({ field: explanationField }) => (<Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />)}/>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </RadioGroup>
-                                    )}
-                                />
-                                <FormMessage>{questionForm.formState.errors.correctAnswer?.message}</FormMessage>
-                            </div>
-                        )}
-                        {questionForm.watch('type') === 'True/False' && (
-                            <FormField control={questionForm.control} name="correctAnswer" render={({ field }) => (
-                                <FormItem><FormLabel>Correct Answer</FormLabel>
-                                <FormControl><RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4"><FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel>True</FormLabel></FormItem><FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel>False</FormLabel></FormItem></RadioGroup></FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}/>
-                        )}
-                        {(questionForm.watch('type') === 'Short Answer' || questionForm.watch('type') === 'Fill in the Blank') && (
-                            <FormField control={questionForm.control} name="correctAnswer" render={({ field }) => (
-                                <FormItem><FormLabel>Answer</FormLabel><FormControl><Input {...field} placeholder="Enter the correct answer" /></FormControl><FormMessage /></FormItem>
-                            )}/>
-                        )}
-                        <DialogFooter className="pt-4">
-                            <Button type="button" variant="ghost" onClick={() => setIsQuestionFormDialogOpen(false)}>Cancel</Button>
-                            <Button type="submit" disabled={questionForm.formState.isSubmitting}>{questionForm.formState.isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Changes'}</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                <QuestionForm 
+                    form={questionForm} 
+                    onSubmit={handleQuestionFormSubmit} 
+                    isSubmitting={questionForm.formState.isSubmitting} 
+                    subjects={subjects}
+                    onClose={() => setIsQuestionFormDialogOpen(false)}
+                />
                 </DialogContent>
             </Dialog>
 
