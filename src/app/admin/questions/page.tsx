@@ -151,7 +151,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {Array.from({length: 4}).map((_, optionIndex) => (
                                         <div key={optionIndex} className="flex items-start gap-4">
-                                            <FormControl><RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} id={`option-${optionIndex}`} className="mt-2.5" /></FormControl>
+                                            <FormControl><RadioGroupItem value={form.getValues(`options.${optionIndex}.text`)} id={`q${form.getValues('id')}-opt-${optionIndex}`} className="mt-2.5" /></FormControl>
                                             <div className="space-y-2 flex-1">
                                                 <FormField control={form.control} name={`options.${optionIndex}.text`} render={({ field: optionField }) => (<Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />)} />
                                                 <FormField control={form.control} name={`options.${optionIndex}.explanation`} render={({ field: explanationField }) => (<Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />)}/>
@@ -183,6 +183,99 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
                 </DialogFooter>
             </form>
         </Form>
+    );
+};
+
+const QuestionsTable = ({
+    questions,
+    loading,
+    selectedQuestions,
+    onSelectQuestion,
+    onSelectAllQuestions,
+    isAllQuestionsSelected,
+    onEditQuestion,
+    onDeleteQuestion
+}: {
+    questions: Question[];
+    loading: boolean;
+    selectedQuestions: string[];
+    onSelectQuestion: (id: string) => void;
+    onSelectAllQuestions: (checked: boolean) => void;
+    isAllQuestionsSelected: boolean;
+    onEditQuestion: (question: Question) => void;
+    onDeleteQuestion: (question: Question) => void;
+}) => {
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead className="w-12">
+                        <Checkbox
+                            checked={isAllQuestionsSelected}
+                            onCheckedChange={(checked) => onSelectAllQuestions(Boolean(checked))}
+                            aria-label="Select all"
+                        />
+                    </TableHead>
+                    <TableHead>Question Text</TableHead>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Marks</TableHead>
+                    <TableHead className="hidden md:table-cell">Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <TableRow key={i}>
+                            <TableCell><Skeleton className="h-5 w-5" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell><Skeleton className="h-5 w-12" /></TableCell>
+                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
+                        </TableRow>
+                    ))
+                ) : questions.length > 0 ? (
+                    questions.map((question) => (
+                        <TableRow key={question.id} data-state={selectedQuestions.includes(question.id) && "selected"}>
+                            <TableCell>
+                                <Checkbox
+                                    checked={selectedQuestions.includes(question.id)}
+                                    onCheckedChange={() => onSelectQuestion(question.id)}
+                                    aria-label={`Select question`}
+                                />
+                            </TableCell>
+                            <TableCell className="font-medium max-w-sm truncate">{question.text}</TableCell>
+                            <TableCell>{question.subject}</TableCell>
+                            <TableCell>{question.type}</TableCell>
+                            <TableCell>{question.marks}</TableCell>
+                            <TableCell className="hidden md:table-cell">{question.createdAt}</TableCell>
+                            <TableCell className="text-right">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => onEditQuestion(question)}>
+                                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => onDeleteQuestion(question)} className="text-destructive">
+                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={7} className="text-center h-24">No questions found.</TableCell>
+                    </TableRow>
+                )}
+            </TableBody>
+        </Table>
     );
 };
 
