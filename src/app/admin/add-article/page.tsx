@@ -38,6 +38,13 @@ import {
 } from '@/components/ui/dialog';
 import { generateLearnContent, AILearnContentGeneratorOutput } from '@/ai/flows/ai-learn-content-generator';
 import { Textarea } from '@/components/ui/textarea';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
+import { Label } from '@/components/ui/label';
 
 
 const formSchema = z.object({
@@ -70,6 +77,8 @@ export default function AddArticlePage() {
       subject: '',
     },
   });
+  
+  const articleBody = form.watch('body');
 
   const aiLearnForm = useForm<AILearnGeneratorFormValues>({
     resolver: zodResolver(aiLearnGeneratorFormSchema),
@@ -182,83 +191,96 @@ export default function AddArticlePage() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Article Details</CardTitle>
-              <CardDescription>
-                Provide the essential information for your new article.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your article title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject / Category</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Science, History, Technology" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Summary / Description</FormLabel>
-                    <FormControl>
-                       <Input placeholder="Provide a brief, one-paragraph summary of the article." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <Card>
+              <CardHeader>
+                <CardTitle>Article Details</CardTitle>
+                <CardDescription>
+                  Provide the essential information for your new article.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="body"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content Body</FormLabel>
+                      <FormLabel>Title</FormLabel>
                       <FormControl>
-                        <Textarea
-                            {...field}
-                            placeholder="Write your article content here."
-                            className="min-h-[300px]"
-                        />
+                        <Input placeholder="Your article title" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-            </CardContent>
-            <CardFooter>
-                 <Button 
-                    type="submit"
-                    disabled={form.formState.isSubmitting}
-                >
-                    {form.formState.isSubmitting ? "Publishing..." : "Publish Article"}
-                </Button>
-            </CardFooter>
-          </Card>
+                
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject / Category</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Science, History, Technology" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Summary / Description</FormLabel>
+                      <FormControl>
+                         <Input placeholder="Provide a brief, one-paragraph summary of the article." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                  <FormField
+                    control={form.control}
+                    name="body"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Content Body</FormLabel>
+                        <FormControl>
+                          <Textarea
+                              {...field}
+                              placeholder="Write your article content here."
+                              className="min-h-[400px] font-mono"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+              </CardContent>
+            </Card>
+            
+            <div>
+              <Label className="text-lg font-semibold">Preview</Label>
+              <Card className="mt-2 min-h-[500px]">
+                <CardContent className="p-6">
+                  <article className="prose dark:prose-invert max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                          {articleBody || "Start typing to see a preview..."}
+                      </ReactMarkdown>
+                  </article>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          <Button 
+              type="submit"
+              disabled={form.formState.isSubmitting}
+          >
+              {form.formState.isSubmitting ? "Publishing..." : "Publish Article"}
+          </Button>
         </form>
       </Form>
     </div>

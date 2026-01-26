@@ -307,7 +307,7 @@ export default function ManageChaptersPage() {
     setResourceToDelete(null);
   }
   
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'chapterPdfUrl') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldToUpdate: 'resources' | 'chapterPdfUrl' | 'featureImage') => {
     const file = e.target.files?.[0];
     if (file) {
         setIsUploading(true);
@@ -315,8 +315,10 @@ export default function ManageChaptersPage() {
             const downloadURL = await uploadFile(file);
             if (fieldToUpdate === 'chapterPdfUrl') {
                 setNewChapter(prev => ({ ...prev, chapterPdfUrl: downloadURL }));
+            } else if (fieldToUpdate === 'featureImage') {
+                setNewChapter(prev => ({...prev, featureImage: downloadURL}));
             } else if (fieldToUpdate === 'resources') {
-                setNewResource(prev => ({...prev, url: downloadURL}));
+                 setNewResource(prev => ({...prev, url: downloadURL}));
             }
             toast({ title: 'File uploaded!', description: 'URL has been set.' });
         } catch (error) {
@@ -471,6 +473,12 @@ export default function ManageChaptersPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
         <div>
+           <Button asChild variant="ghost">
+              <Link href="/admin/textbooks">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Textbooks
+              </Link>
+          </Button>
           <h1 className="font-headline text-3xl font-bold">
             Manage Chapters
           </h1>
@@ -478,13 +486,7 @@ export default function ManageChaptersPage() {
             For textbook: <span className="font-semibold text-foreground">{textbook?.title}</span>
           </p>
         </div>
-         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button asChild variant="ghost">
-                <Link href="/admin/textbooks">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Textbooks
-                </Link>
-            </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button onClick={handleAddNewClick} className="w-full">
                 <PlusCircle className="mr-2" /> Add New Chapter
             </Button>
@@ -533,7 +535,7 @@ export default function ManageChaptersPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {chapters.map((chapter) => (
                             <Card key={chapter.id} className="flex flex-col">
-                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg aspect-[4/3]">
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`} className="block relative bg-gray-100 dark:bg-gray-800 rounded-t-lg aspect-[4/3]">
                                     <Image
                                         src={chapter.featureImage || '/image/logo.png'}
                                         alt={chapter.title}
@@ -541,7 +543,7 @@ export default function ManageChaptersPage() {
                                         className="object-contain p-2"
                                     />
                                 </Link>
-                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}/topics`}>
+                                <Link href={`/admin/textbooks/${textbookId}/chapter/${chapter.id}`}>
                                     <CardHeader className="p-4 flex-row items-center gap-3 hover:bg-accent/50 transition-colors">
                                         <ChapterIcon />
                                         <CardTitle className="text-base font-semibold flex-grow">{chapter.title}</CardTitle>
@@ -790,4 +792,3 @@ export default function ManageChaptersPage() {
   );
 }
 
-    
