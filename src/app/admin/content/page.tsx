@@ -97,6 +97,7 @@ const optionSchema = z.object({
 const questionFormSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
+  subject: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank']),
   marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
@@ -452,6 +453,7 @@ export default function ManageContentPage() {
     } else {
       questionForm.reset({
         text: '',
+        subject: subjectFilter !== 'all' ? subjectFilter : '',
         type: 'Multiple Choice',
         marks: 1,
         options: Array(4).fill({ text: '', explanation: '' }),
@@ -1178,6 +1180,28 @@ export default function ManageContentPage() {
             <form onSubmit={questionForm.handleSubmit(handleQuestionFormSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
                 <FormField
                     control={questionForm.control}
+                    name="subject"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Subject</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a subject" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {subjects.map(sub => (
+                                        <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={questionForm.control}
                     name="text"
                     render={({ field }) => (
                         <FormItem>
@@ -1319,4 +1343,5 @@ export default function ManageContentPage() {
 }
 
     
+
 
