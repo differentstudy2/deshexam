@@ -395,7 +395,7 @@ export default function ManageContentPage() {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
-  const [isQuestionDialogOpwn, setIsQuestionDialogOpen] = useState(false);
+  const [isAddToContentDialogOpen, setIsAddToContentDialogOpen] = useState(false);
   const [contentToDelete, setContentToDelete] = useState<Content | null>(null);
   const [bulkAction, setBulkAction] = useState<BulkAction>(null);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
@@ -415,7 +415,7 @@ export default function ManageContentPage() {
   const [contentCurrentPage, setContentCurrentPage] = useState(1);
   const [questionsCurrentPage, setQuestionsCurrentPage] = useState(1);
 
-  const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
+  const [isQuestionFormDialogOpen, setIsQuestionFormDialogOpen] = useState(false);
   const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
   const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -460,7 +460,7 @@ export default function ManageContentPage() {
       });
       replaceOptions([{text:'', explanation:''},{text:'', explanation:''},{text:'', explanation:''},{text:'', explanation:''}])
     }
-    setIsQuestionDialogOpen(true);
+    setIsQuestionFormDialogOpen(true);
   };
   
   const handleQuestionFormSubmit = async (data: QuestionFormValues) => {
@@ -484,7 +484,7 @@ export default function ManageContentPage() {
             setAllQuestions(prev => [newQuestion, ...prev]);
             toast({ title: 'Question added successfully!' });
         }
-        setIsQuestionDialogOpen(false);
+        setIsQuestionFormDialogOpen(false);
         setQuestionToEdit(null);
     } catch (error) {
         toast({
@@ -624,7 +624,7 @@ export default function ManageContentPage() {
   const openBulkActionDialog = (action: BulkAction) => {
     setBulkAction(action);
     if(action?.type === 'add-questions-to-content') {
-        setIsQuestionDialogOpen(true);
+        setIsAddToContentDialogOpen(true);
     } else {
         setIsAlertDialogOpen(true);
     }
@@ -685,7 +685,7 @@ export default function ManageContentPage() {
     }
     
     setIsAlertDialogOpen(false);
-    setIsQuestionDialogOpen(false);
+    setIsAddToContentDialogOpen(false);
     setContentToDelete(null);
     setBulkAction(null);
     setSelectedContent([]);
@@ -1072,7 +1072,7 @@ export default function ManageContentPage() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
                                                 <DropdownMenuLabel>Modify Selected Questions</DropdownMenuLabel>
-                                                <DropdownMenuItem onClick={() => setIsQuestionDialogOpen(true)}>
+                                                <DropdownMenuItem onClick={() => setIsAddToContentDialogOpen(true)}>
                                                     Add to Content
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
@@ -1125,7 +1125,7 @@ export default function ManageContentPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={isQuestionDialogOpwn} onOpenChange={setIsQuestionDialogOpen}>
+      <Dialog open={isAddToContentDialogOpen} onOpenChange={setIsAddToContentDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add Questions to Content</DialogTitle>
@@ -1154,7 +1154,7 @@ export default function ManageContentPage() {
             </div>
           </ScrollArea>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => { setIsQuestionDialogOpen(false); setDialogSelectedContent([]); }}>Cancel</Button>
+            <Button variant="ghost" onClick={() => { setIsAddToContentDialogOpen(false); setDialogSelectedContent([]); }}>Cancel</Button>
             <Button onClick={() => {
                 handleConfirmAction();
             }}
@@ -1166,7 +1166,7 @@ export default function ManageContentPage() {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
+      <Dialog open={isQuestionFormDialogOpen} onOpenChange={setIsQuestionFormDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{questionToEdit ? 'Edit Question' : 'Add New Question'}</DialogTitle>
@@ -1305,7 +1305,7 @@ export default function ManageContentPage() {
                     />
                 )}
               <DialogFooter className="pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsQuestionDialogOpen(false)}>Cancel</Button>
+                <Button type="button" variant="ghost" onClick={() => setIsQuestionFormDialogOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={questionForm.formState.isSubmitting}>
                     {questionForm.formState.isSubmitting ? <Loader2 className="animate-spin" /> : 'Save Changes'}
                 </Button>
@@ -1319,3 +1319,4 @@ export default function ManageContentPage() {
 }
 
     
+
