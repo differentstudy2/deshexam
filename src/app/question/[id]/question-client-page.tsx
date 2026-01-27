@@ -473,7 +473,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     );
   }
 
-  const allOptionsSelected = question && question.type === 'Matching' && question.matchingOptions?.columnA.length === Object.keys(answers[question.id] || {}).length;
+  const allOptionsSelected = question && question.type === 'Matching' && question.matchingOptions?.columnA?.length === Object.keys(answers[question.id] || {}).length;
 
   if (loading) {
     return (
@@ -564,11 +564,12 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     )}
                                                     <div className="flex-1">
-                                                        <div className="font-medium prose dark:prose-invert max-w-none" style={{ fontSize: '1.5rem' }}>
+                                                        <div className="flex items-center justify-between prose dark:prose-invert max-w-none" style={{fontSize: '1.5rem'}}>
                                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                            {isSelected && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
                                                         </div>
                                                         {isAnswerRevealed && option.explanation && (
-                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{ fontSize: '1rem' }}>
+                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{fontSize: '1rem'}}>
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
                                                             </div>
                                                         )}
@@ -587,15 +588,14 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         const isCorrectAnswer = question.correctAnswer === optionText;
                                         const isSelected = selectedAnswer === optionText;
                                         const explanation = question.options?.find(o => o.text === optionText)?.explanation;
+                                        
                                         return (
                                             <Card
                                                 key={index}
                                                 onClick={() => !isAnswerRevealed && handleAnswerClick(optionText)}
                                                 className={cn(
                                                     "cursor-pointer transition-all border-2",
-                                                    isAnswerRevealed && isCorrectAnswer
-                                                        ? "border-green-500 bg-green-100/20"
-                                                        : "border-border hover:bg-accent",
+                                                    isAnswerRevealed && isCorrectAnswer ? "border-green-500 bg-green-100/20" : "border-border hover:bg-accent",
                                                     isAnswerRevealed && isSelected && !isCorrectAnswer ? "border-destructive bg-red-100/20" : ""
                                                 )}
                                             >
@@ -612,7 +612,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                     <div className="flex-1">
                                                         <div className="font-medium text-lg">{optionText}</div>
                                                         {isAnswerRevealed && explanation && (
-                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none">
+                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{fontSize: '1rem'}}>
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{explanation}</ReactMarkdown>
                                                             </div>
                                                         )}
@@ -757,4 +757,5 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         </div>
     </div>
   );
-}
+
+    
