@@ -95,10 +95,17 @@ export const getAllQuestions = async () => {
         const querySnapshot = await getDocs(q);
         const questions = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            const createdAt = data.createdAt;
+             let formattedDate = 'Just now';
+             if (createdAt && typeof createdAt.toDate === 'function') {
+                formattedDate = createdAt.toDate().toLocaleDateString();
+             } else if(createdAt && !isNaN(new Date(createdAt).getTime())) {
+                 formattedDate = new Date(createdAt).toLocaleDateString();
+             }
             return {
                 id: doc.id,
                 ...doc.data(),
-                createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Just now'
+                createdAt: formattedDate
             };
         });
         return questions;
@@ -686,7 +693,7 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
         return docRef.id;
     } catch (e) {
         console.error("Error adding practice set submission: ", e);
-        throw new Error("Failed to submit practice set results.");
+        throw new Error("Failed to add practice set results.");
     }
 };
 
@@ -2096,7 +2103,7 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
         path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
     } else if (textbookId && chapterId && chapterId !== 'null' && (topicId === 'null' || !topicId)) { // Chapter-level practice set
         path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
-    } else if (textbookId && (chapterId === 'null' || !chapterId)) { // Textbook-level practice set
+    } else if (textbookId && (chapterId === 'null' || !chapterId)) {
         const contentDoc = await getDoc(doc(db, 'content', practiceSetId));
         if(contentDoc.exists()) {
              return contentDoc.data().questions || [];
@@ -2265,6 +2272,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 

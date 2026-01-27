@@ -1,22 +1,16 @@
 
-
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getQuestionById, addComment, getComments, handleQuestionVote } from '@/lib/firebase/firestore';
+import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar, Book, Layers, BarChart, Edit } from 'lucide-react';
+import { Loader2, ArrowLeft, MessageSquare, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatDistanceToNow } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -27,58 +21,128 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import type { Textbook, Question, Comment } from '@/lib/types';
 
 
-type Option = {
-  text: string;
-  explanation?: string;
+const UserProfileCard = ({ user }: { user: any }) => {
+    if (!user) return null;
+    return (
+        <Card>
+            <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                    <Avatar className="h-12 w-12">
+                        <AvatarImage src={user.photoURL || `https://picsum.photos/seed/${user.uid}/48/48`} />
+                        <AvatarFallback>{user.displayName?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="font-semibold">{user.displayName}</p>
+                        <Badge variant="outline">Helping Hand</Badge>
+                    </div>
+                </div>
+                <Separator className="my-4" />
+                <div className="space-y-2 text-sm">
+                    <p className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-primary"/> 125 pts</p>
+                     <div className="flex items-center gap-2 text-muted-foreground">
+                        <Brain className="w-4 h-4"/> Brainly Space
+                     </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                         <User className="w-4 h-4"/> First Contact
+                     </div>
+                </div>
+                 <Button asChild variant="link" className="px-0 mt-4">
+                    <Link href="/dashboard">
+                        View My Achievements <ChevronRight className="w-4 h-4" />
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
+    );
 };
 
-type MatchingItem = {
-    text: string;
-    image?: string;
-};
+const TextbookSolutionsSection = () => {
+    const [textbooks, setTextbooks] = useState<Textbook[]>([]);
+    const [loading, setLoading] = useState(true);
 
-type MatchingOptions = {
-    columnA: MatchingItem[];
-    columnB: MatchingItem[];
+    useEffect(() => {
+        const fetchTextbooks = async () => {
+            try {
+                const data = await getAllTextbooks();
+                setTextbooks(data as Textbook[]);
+            } catch (error) {
+                console.error("Failed to fetch textbooks for showcase", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTextbooks();
+    }, []);
+
+    if (loading) {
+        return (
+             <div className="mt-12">
+                <Skeleton className="h-8 w-1/2 mb-4" />
+                <div className="flex gap-4">
+                   {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-48 w-40" />)}
+                </div>
+             </div>
+        );
+    }
+    
+    if (textbooks.length === 0) return null;
+
+    return (
+        <div className="mt-12">
+            <div className="flex justify-between items-center mb-4">
+                 <h2 className="text-2xl font-bold font-headline">Find Sociology textbook solutions?</h2>
+                 <Button variant="ghost" asChild>
+                    <Link href="/textbook-solutions">See all</Link>
+                 </Button>
+            </div>
+             <div className="flex gap-2 mb-4">
+                <Button variant="outline" size="sm">Class 12</Button>
+                <Button variant="outline" size="sm">Class 11</Button>
+                <Button variant="outline" size="sm">Class 10</Button>
+                <Button variant="outline" size="sm">Class 9</Button>
+            </div>
+            <Carousel opts={{ align: "start", loop: false }}>
+                <CarouselContent className="-ml-4">
+                    {textbooks.slice(0, 8).map((book) => (
+                         <CarouselItem key={book.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 pl-4">
+                            <Card className="h-full hover:shadow-md transition-shadow">
+                                 <Link href={`/textbook-solutions/${book.id}`}>
+                                    <div className="aspect-[2/3] w-full bg-secondary rounded-t-lg overflow-hidden">
+                                      <Image src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`} alt={book.title} width={200} height={280} className="w-full h-full object-cover" />
+                                    </div>
+                                    <CardContent className="p-2 text-center">
+                                        <p className="text-sm font-semibold truncate">{book.title}</p>
+                                        <p className="text-xs text-muted-foreground">{book.subject}</p>
+                                    </CardContent>
+                                 </Link>
+                            </Card>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-[-12px]" />
+                <CarouselNext className="right-[-12px]" />
+            </Carousel>
+        </div>
+    )
 }
 
-type Question = {
-  id: string;
-  text: string;
-  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive';
-  options?: Option[];
-  matchingOptions?: MatchingOptions;
-  correctAnswer: any;
-  explanation?: string;
-  likes: number;
-  dislikes: number;
-  likedBy: string[];
-  dislikedBy: string[];
-  createdAt: Date;
-  authorName: string;
-  subject?: string;
-  textbookId?: string;
-  chapterId?: string;
-};
-
-type Comment = {
-    id: string;
-    text: string;
-    authorId: string;
-    authorName: string;
-    authorPhotoURL?: string;
-    createdAt: Date;
-}
 
 export default function QuestionClientPage({ questionId }: { questionId: string }) {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
@@ -86,13 +150,10 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   useEffect(() => {
     if (!questionId) return;
 
-    const fetchQuestionAndComments = async () => {
+    const fetchQuestion = async () => {
       try {
         setLoading(true);
-        const [questionData, commentsData] = await Promise.all([
-          getQuestionById(questionId),
-          getComments('questions', questionId),
-        ]);
+        const questionData = await getQuestionById(questionId);
         if (!questionData) {
             toast({
               variant: "destructive",
@@ -102,7 +163,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
             return;
         }
         setQuestion(questionData as Question);
-        setComments(commentsData as Comment[]);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -114,10 +174,10 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
       }
     };
 
-    fetchQuestionAndComments();
+    fetchQuestion();
   }, [questionId, toast, router]);
 
-  const handleVote = async (type: 'like' | 'dislike') => {
+  const handleVote = async (type: 'like') => {
     if (!user || !question) {
         toast({ variant: "destructive", title: "Please log in to vote." });
         return;
@@ -126,47 +186,27 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
     setIsVoting(true);
     
-    // Optimistic UI update
     const originalQuestion = { ...question };
     const hasLiked = question.likedBy?.includes(user.uid);
-    const hasDisliked = question.dislikedBy?.includes(user.uid);
 
     let newLikedBy = [...(question.likedBy || [])];
-    let newDislikedBy = [...(question.dislikedBy || [])];
 
-    if (type === 'like') {
-        if (hasLiked) { // User is un-liking
-            newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-        } else { // User is liking
-            newLikedBy.push(user.uid);
-            if (hasDisliked) { // If they previously disliked, remove dislike
-                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-            }
-        }
-    } else if (type === 'dislike') {
-        if (hasDisliked) { // User is un-disliking
-            newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-        } else { // User is disliking
-            newDislikedBy.push(user.uid);
-            if (hasLiked) { // If they previously liked, remove like
-                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-            }
-        }
+    if (hasLiked) {
+        newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+    } else {
+        newLikedBy.push(user.uid);
     }
     
     const updatedQuestion = {
         ...question,
         likedBy: newLikedBy,
-        dislikedBy: newDislikedBy,
         likes: newLikedBy.length,
-        dislikes: newDislikedBy.length
     };
     setQuestion(updatedQuestion);
 
     try {
         await handleQuestionVote(questionId, type);
     } catch (error) {
-        // Revert UI on error
         setQuestion(originalQuestion);
         toast({
           variant: "destructive",
@@ -175,33 +215,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         });
     } finally {
         setIsVoting(false);
-    }
-  }
-
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-        toast({ variant: "destructive", title: "Please log in to comment." });
-        return;
-    }
-    if (!newComment.trim()) return;
-
-    setIsSubmittingComment(true);
-    try {
-        await addComment('questions', questionId, { text: newComment });
-        setNewComment('');
-        // Refetch comments to show the new one
-        const updatedComments = await getComments('questions', questionId);
-        setComments(updatedComments as Comment[]);
-        toast({ title: "Comment posted!" });
-    } catch (error) {
-         toast({
-          variant: "destructive",
-          title: 'Error posting comment',
-          description: (error as Error).message,
-        });
-    } finally {
-        setIsSubmittingComment(false);
     }
   }
 
@@ -228,219 +241,114 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
       </div>
     );
   }
-
+  
   const userHasLiked = user && question.likedBy?.includes(user.uid);
-  const userHasDisliked = user && question.dislikedBy?.includes(user.uid);
-  const editUrl = question.textbookId && question.chapterId 
-    ? `/admin/textbooks/${question.textbookId}/chapter/${question.chapterId}/questions/${question.id}/edit`
-    : null;
 
   return (
     <div className="bg-secondary/30">
-        <div className="container py-12">
-            <div className="max-w-6xl mx-auto">
-                <header className="mb-8">
-                    {question.subject && <Badge className="mb-2">{question.subject}</Badge>}
-                    <div className="prose dark:prose-invert lg:prose-xl max-w-none">
-                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                            {question.text}
-                        </ReactMarkdown>
-                    </div>
-                </header>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <Card>
-                            <CardContent className="pt-6">
-                            {question.type === 'Multiple Choice' && question.options && (
-                                <div className="space-y-3">
-                                {question.options.map((option, optIndex) => {
-                                    const isCorrect = question.correctAnswer === option.text;
-                                    return (
-                                        <div key={optIndex} className={cn(
-                                            "p-4 rounded-lg border-2 flex items-start gap-3 transition-colors",
-                                            isCorrect 
-                                                ? "bg-green-100 dark:bg-green-900/30 border-green-500"
-                                                : "bg-card"
-                                        )}>
-                                            {isCorrect 
-                                                ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
-                                                : <div className="w-5 h-5 mt-0.5 shrink-0" />
-                                            }
-                                            <div className="flex-1">
-                                                <div className="prose dark:prose-invert max-w-none custom-prose-style">
-                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                                </div>
-                                                {option.explanation && 
-                                                <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
-                                                </div>
-                                                }
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                                </div>
-                            )}
-                             {question.type === 'True/False' && (
-                                <div className="space-y-3">
-                                {['True', 'False'].map((tf) => {
-                                    const isCorrect = question.correctAnswer === tf;
-                                    return (
-                                    <div key={tf} className={cn("p-4 rounded-lg border-2 flex items-center gap-3", isCorrect ? "bg-green-100 dark:bg-green-900/30 border-green-500" : "bg-card")}>
-                                        {isCorrect ? <CheckCircle className="w-5 h-5 text-green-600" /> : <div className="w-5 h-5"/>}
-                                        <span className="font-medium">{tf}</span>
-                                    </div>
-                                    )
-                                })}
-                                </div>
-                            )}
-                            {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                                <div className="p-4 rounded-lg border-2 bg-green-100 dark:bg-green-900/30 border-green-500">
-                                    <Label className="text-sm font-semibold text-green-800 dark:text-green-300">Correct Answer</Label>
-                                    <p className="text-lg font-medium mt-1">{question.correctAnswer}</p>
-                                </div>
-                            )}
-                            {question.type === 'Matching' && (
-                                 <div className="space-y-4">
-                                    <h4 className="font-bold">Correct Matches</h4>
-                                    {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, index: number) => (
-                                        <div key={index} className="flex items-center justify-between gap-2 p-3 border rounded-md bg-green-50 dark:bg-green-900/20">
-                                            <div className="flex flex-col items-center text-center">
-                                                {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
-                                                <span className="font-medium">{pair.a}</span>
-                                            </div>
-                                            <GripVertical className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                            <div className="flex flex-col items-center text-center">
-                                                {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={50} height={50} className="rounded-md object-cover mb-1" />}
-                                                <span className="font-medium">{pair.b}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                 </div>
-                            )}
-                            {question.type === 'Descriptive' && (
-                                <div className="p-4 rounded-lg border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                                    <Label className="text-sm font-semibold text-blue-800 dark:text-blue-300">Model Answer</Label>
-                                    <div className="prose dark:prose-invert max-w-none mt-1">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{question.correctAnswer}</ReactMarkdown>
+        <div className="container py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <div className="flex justify-between items-start">
+                                <div className="flex items-center gap-3">
+                                    <Avatar>
+                                        <AvatarImage src={`https://picsum.photos/seed/${question.authorName}/40/40`} />
+                                        <AvatarFallback>{question.authorName?.[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold">{question.authorName}</p>
+                                        <p className="text-xs text-muted-foreground">{new Date(question.createdAt).toLocaleDateString()} &middot; {question.subject}</p>
                                     </div>
                                 </div>
-                            )}
-                            </CardContent>
-                        </Card>
-                        
-                        {question.explanation && (
-                            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
-                                        <Info /> Explanation
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="prose dark:prose-invert max-w-none text-sm custom-prose-style">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{question.explanation}</ReactMarkdown>
-                                </CardContent>
-                            </Card>
-                        )}
-                        
-                        <Card>
-                            <CardHeader><CardTitle className="flex items-center gap-2"><MessageSquare /> Comments ({comments.length})</CardTitle></CardHeader>
+                                <Badge variant="outline" className="text-green-600 border-green-600">Answered</Badge>
+                            </div>
+                             <div className="prose dark:prose-invert max-w-none pt-4">
+                                <h2>{question.text}</h2>
+                            </div>
+                        </CardHeader>
+                        {!showAnswer && (
                             <CardContent>
-                                <form onSubmit={handleCommentSubmit} className="space-y-4">
-                                    <Textarea placeholder={user ? "Share your thoughts or ask a question..." : "Please log in to comment."} value={newComment} onChange={(e) => setNewComment(e.target.value)} disabled={!user || isSubmittingComment} />
-                                    <div className="flex justify-end">
-                                        <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
-                                            {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Comment"}
-                                        </Button>
-                                    </div>
-                                </form>
-                                <Separator className="my-6" />
-                                <div className="space-y-6">
-                                    {comments.length > 0 ? comments.map(comment => (
-                                        <div key={comment.id} className="flex items-start gap-4">
-                                            <Avatar>
-                                               <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
-                                                <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
-                                                    <span className="text-muted-foreground">{formatDistanceToNow(comment.createdAt, { addSuffix: true })}</span>
-                                                </div>
-                                                <p className="text-foreground mt-1">{comment.text}</p>
-                                            </div>
-                                        </div>
-                                    )) : (
-                                        <p className="text-center text-muted-foreground">No comments yet. Be the first to start the discussion!</p>
-                                    )}
-                                </div>
+                                <Button onClick={() => setShowAnswer(true)}>See Answer</Button>
                             </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Sidebar */}
-                    <aside className="space-y-6">
-                        <Card>
-                             <CardHeader>
-                                <CardTitle>Question Details</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3 text-sm">
-                                <div className="flex items-center gap-2">
-                                    <User className="w-4 h-4 text-muted-foreground" />
-                                    <span>Asked by: <span className="font-semibold">{question.authorName}</span></span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                                    <span>Asked on: <span className="font-semibold">{question.createdAt.toLocaleDateString()}</span></span>
-                                </div>
-                                 {question.subject && (
-                                     <div className="flex items-center gap-2">
-                                        <Book className="w-4 h-4 text-muted-foreground" />
-                                        <span>Subject: <span className="font-semibold">{question.subject}</span></span>
-                                    </div>
-                                 )}
-                            </CardContent>
-                        </Card>
-                         <Card>
-                             <CardHeader>
-                                <CardTitle>Community Feedback</CardTitle>
-                            </CardHeader>
-                            <CardContent className="flex items-center gap-2">
-                                <Button 
-                                    variant={userHasLiked ? "default" : "outline"}
-                                    size="sm" 
-                                    onClick={() => handleVote('like')} 
-                                    disabled={isVoting}
-                                    className={cn("flex-1", userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
-                                >
-                                    <ThumbsUp className="mr-2 h-4 w-4" /> Like ({question.likes || 0})
-                                </Button>
-                                <Button 
-                                    variant={userHasDisliked ? "destructive" : "outline"} 
-                                    size="sm" 
-                                    onClick={() => handleVote('dislike')} 
-                                    disabled={isVoting}
-                                    className="flex-1"
-                                >
-                                    <ThumbsDown className="mr-2 h-4 w-4" /> Dislike ({question.dislikes || 0})
-                                </Button>
-                            </CardContent>
-                        </Card>
-                        {editUrl && (
-                             <Button asChild variant="secondary" className="w-full">
-                                <Link href={editUrl}>
-                                    <Edit className="mr-2 h-4 w-4"/>
-                                    Edit Question
-                                </Link>
-                            </Button>
                         )}
-                        <Button variant="outline" onClick={() => router.back()} className="w-full">
-                            <ArrowLeft className="mr-2 h-4 w-4"/>
-                            Go Back
-                        </Button>
-                    </aside>
+                    </Card>
+
+                    {showAnswer && (
+                        <Card>
+                            <CardHeader>
+                                <p className="text-sm text-muted-foreground">{question.likes || 0} {question.likes === 1 ? 'person' : 'people'} found this helpful</p>
+                                <div className="flex items-center gap-3">
+                                    <Avatar>
+                                        <AvatarImage src={`https://picsum.photos/seed/answerer/40/40`} />
+                                        <AvatarFallback>A</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold">{question.authorName}</p>
+                                        <p className="text-xs text-muted-foreground">Ambitious &middot; 46 answers &middot; 819 people helped</p>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="prose dark:prose-invert max-w-none">
+                                <h4 className="font-bold">Answer:</h4>
+                                <div className="mb-4">
+                                    <h5 className="font-semibold">Explanation:</h5>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {question.explanation || "No explanation provided."}
+                                    </ReactMarkdown>
+                                </div>
+                                <Button variant="outline">
+                                    Explore all similar answers <ArrowRight className="ml-2 w-4 h-4"/>
+                                </Button>
+                            </CardContent>
+                            <CardFooter className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <Button variant="ghost" size="icon" onClick={() => handleVote('like')} disabled={isVoting}>
+                                        <Heart className={cn("w-5 h-5", userHasLiked && "fill-red-500 text-red-500")} />
+                                    </Button>
+                                    <span className="text-sm font-bold">{question.likes || 0}</span>
+                                    <div className="flex items-center">
+                                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                                        <span className="ml-1 font-bold">5.0</span>
+                                        <span className="ml-1 text-xs text-muted-foreground">(1 vote)</span>
+                                    </div>
+                                </div>
+                                <Button variant="ghost" size="icon">
+                                    <Flag className="w-5 h-5 text-muted-foreground" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    )}
+                    
+                    <TextbookSolutionsSection />
+                    
+                    <Card className="text-center">
+                        <CardHeader>
+                            <CardTitle>Still have questions?</CardTitle>
+                        </CardHeader>
+                         <CardContent className="flex justify-center gap-4">
+                             <Button variant="outline">Find More Answers</Button>
+                             <Button>+ Ask Your Question</Button>
+                        </CardContent>
+                    </Card>
                 </div>
+
+                <aside className="space-y-6">
+                    <UserProfileCard user={user} />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-center text-lg">Advertisement</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex items-center justify-center h-48 bg-secondary rounded-b-lg">
+                            <span className="text-muted-foreground">Ad Space</span>
+                        </CardContent>
+                    </Card>
+                </aside>
+            </div>
+             <div className="flex justify-between items-center mt-12">
+                <Button variant="ghost"><ChevronLeft className="mr-2"/> Previous</Button>
+                <Button variant="ghost">Next <ChevronRight className="ml-2"/></Button>
             </div>
         </div>
     </div>

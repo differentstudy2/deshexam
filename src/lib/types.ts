@@ -106,7 +106,29 @@ export type Question = {
     dislikes: number;
     likedBy: string[];
     dislikedBy: string[];
+    authorName: string;
+    authorId: string;
+    createdAt: Date;
+    subject?: string;
+    textbookId?: string;
+    chapterId?: string;
 };
+
+export type Comment = {
+    id: string;
+    text: string;
+    authorId: string;
+    authorName: string;
+    authorPhotoURL?: string;
+    createdAt: Date;
+    rating?: number;
+    likes: number;
+    dislikes: number;
+    likedBy: string[];
+    dislikedBy: string[];
+    parentId: string | null;
+    replies?: Comment[];
+}
 
 export type Exam = {
   id: string;
