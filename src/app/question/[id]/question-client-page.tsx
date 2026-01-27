@@ -329,9 +329,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                     </Card>
 
                     {isAnswerRevealed && (
-                        <Card>
+                        <Card className="mt-6">
                             <CardHeader>
-                                <CardTitle>Answer & Explanation</CardTitle>
+                                <CardTitle>Answer &amp; Explanation</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="prose dark:prose-invert max-w-none">
@@ -417,3 +417,4 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
+
