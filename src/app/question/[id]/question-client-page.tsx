@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -510,13 +510,13 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     )}
                                                     <div className="flex-1">
-                                                        <div className="text-2xl font-medium prose dark:prose-invert max-w-none custom-prose-style">
+                                                        <div className="text-2xl font-medium prose dark:prose-invert max-w-none custom-prose-style" style={{ fontSize: '1.5rem' }}>
                                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                                                                 {option.text}
                                                             </ReactMarkdown>
                                                         </div>
                                                         {isAnswerRevealed && option.explanation && (
-                                                            <div className="mt-2 text-base text-muted-foreground prose dark:prose-invert max-w-none custom-prose-style">
+                                                            <div className="mt-2 text-base text-muted-foreground prose dark:prose-invert max-w-none custom-prose-style" style={{ fontSize: '1rem' }}>
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                                                                     {option.explanation}
                                                                 </ReactMarkdown>
