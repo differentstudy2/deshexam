@@ -26,6 +26,8 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import type { Textbook } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Question = { 
   id: string; 
@@ -234,21 +236,18 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         
         const q = questionData as Question;
 
-        // If it's a matching question, ensure matchingOptions is correctly structured.
         if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
-            // If matchingOptions doesn't exist, create it from correctAnswer
             if (!q.matchingOptions) {
                 const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
                 const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
                 let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
                 
-                // Shuffle column B
                 for (let i = columnB.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
                 }
                 q.matchingOptions = { columnA, columnB };
-            } else if (q.matchingOptions.columnB) { // If it does exist, just shuffle column B for the user display
+            } else if (q.matchingOptions.columnB) {
                  const shuffledColumnB = [...(q.matchingOptions.columnB || [])].sort(() => Math.random() - 0.5);
                  q.matchingOptions.columnB = shuffledColumnB;
             }
@@ -624,58 +623,79 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     })}
                                 </div>
                             )}
+                            {question.type === 'Short Answer' && (
+                                <div className="mt-4 p-4 rounded-md bg-green-100/50 border border-green-200 dark:border-green-800">
+                                    <h4 className="font-semibold text-green-700 dark:text-green-300">Correct Answer:</h4>
+                                    <p className="text-lg font-bold">{question.correctAnswer}</p>
+                                </div>
+                            )}
+                            {question.type === 'Fill in the Blank' && (
+                                <div className="space-y-4">
+                                    <Input 
+                                        placeholder="Your answer..." 
+                                        onChange={(e) => setSelectedAnswer(e.target.value)}
+                                        disabled={isAnswerRevealed}
+                                        className="text-base"
+                                    />
+                                    {isAnswerRevealed && (
+                                        <div className="mt-4 p-4 rounded-md bg-green-100/50 border border-green-200 dark:border-green-800">
+                                            <h4 className="font-semibold text-green-700 dark:text-green-300">Correct Answer:</h4>
+                                            <p className="text-lg font-bold">{question.correctAnswer}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                             {question.type === 'Matching' && question.matchingOptions?.columnA && (
-                                !isAnswerRevealed ? (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4 items-start">
-                                            <div>
-                                                <h4 className="font-bold text-center mb-2">Column A</h4>
-                                                <ul className="space-y-2">
-                                                    {question.matchingOptions.columnA.map((itemA, index) => (
-                                                        <li key={index} className="p-3 border rounded-md text-center bg-secondary">
-                                                            {itemA.image && <Image src={itemA.image} alt={itemA.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
-                                                            {itemA.text}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-center mb-2">Column B</h4>
-                                                <ul className="space-y-2">
-                                                    {question.matchingOptions.columnB.map((itemB, index) => (
-                                                            <li key={index} className="p-3 border rounded-md text-center bg-secondary">
-                                                            {itemB.image && <Image src={itemB.image} alt={itemB.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
-                                                            {itemB.text}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4 items-start">
+                                        <div>
+                                            <h4 className="font-bold text-center mb-2">Column A</h4>
+                                            <ul className="space-y-2">
+                                                {question.matchingOptions.columnA.map((item, index) => (
+                                                    <li key={index} className="p-3 border rounded-md text-center bg-secondary flex flex-col items-center">
+                                                        {item.image && <Image src={item.image} alt={item.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
+                                                        {item.text}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-center mb-2">Column B</h4>
+                                            <ul className="space-y-2">
+                                                {question.matchingOptions.columnB.map((item, index) => (
+                                                    <li key={index} className="p-3 border rounded-md text-center bg-secondary flex flex-col items-center">
+                                                         {item.image && <Image src={item.image} alt={item.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
+                                                        {item.text}
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
                                     </div>
-                                ) : (
-                                    <div className="space-y-3">
-                                        <h4 className="font-bold">Correct Matches</h4>
-                                        {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
-                                            <div key={pairIndex} className="p-3 border rounded-lg bg-green-100/20 border-green-500">
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <div className="flex flex-col items-center text-center">
-                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
-                                                        <span className="font-semibold">{pair.a}</span>
-                                                    </div>
-                                                    <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                    <div className="flex flex-col items-center text-center">
-                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={50} height={50} className="rounded-md object-cover mb-1" />}
-                                                        <span className="font-semibold">{pair.b}</span>
+                                    {isAnswerRevealed && (
+                                        <div className="space-y-3 mt-4">
+                                            <h4 className="font-bold">Correct Matches</h4>
+                                            {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
+                                                <div key={pairIndex} className="p-3 border rounded-lg bg-green-100/20 border-green-500">
+                                                    <div className="flex items-center justify-center gap-4">
+                                                        <div className="flex flex-col items-center text-center">
+                                                            {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
+                                                            <span className="font-semibold">{pair.a}</span>
+                                                        </div>
+                                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                        <div className="flex flex-col items-center text-center">
+                                                            {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={50} height={50} className="rounded-md object-cover mb-1" />}
+                                                            <span className="font-semibold">{pair.b}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </CardContent>
                         <CardFooter className="flex-wrap gap-4">
-                             {!isAnswerRevealed && (
+                             {!isAnswerRevealed && (question.type === 'Fill in the Blank' || question.type === 'Matching') && (
                                 <Button onClick={handleShowAnswerClick}>See Answer</Button>
                             )}
                             <div className="flex items-center gap-2">
