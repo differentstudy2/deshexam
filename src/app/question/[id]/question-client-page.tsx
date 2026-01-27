@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star, ChevronLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star, ChevronLeft, GripVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -26,12 +26,17 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import type { Textbook } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Question = { 
   id: string; 
   text: string; 
   type: string; 
   options?: {text: string, explanation?: string}[];
+  matchingOptions?: {
+    columnA: { text: string; image?: string }[];
+    columnB: { text: string; image?: string }[];
+  };
   correctAnswer: any; 
   explanation?: string; 
   likes: number;
@@ -176,6 +181,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const [isVoting, setIsVoting] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
@@ -223,8 +229,17 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
             router.push('/dashboard/all-questions');
             return;
         }
-        setQuestion(questionData as Question);
-        fetchComments(); // Fetch comments after question is loaded
+        
+        const q = questionData as Question;
+        if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
+            const shuffledColumnB = [...(q.matchingOptions?.columnB || [])].sort(() => Math.random() - 0.5);
+            q.matchingOptions = {
+                ...(q.matchingOptions!),
+                columnB: shuffledColumnB
+            };
+        }
+        setQuestion(q);
+        fetchComments();
       } catch (error) {
         toast({
           variant: "destructive",
@@ -287,8 +302,20 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
   const handleShowAnswerClick = () => {
     setShowAnswer(true);
+    setSelectedAnswer('reveal');
   };
   
+  const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
+    if (isAnswerRevealed) return;
+    setAnswers(prev => {
+        const newAnswers = { ...prev };
+        const currentMatchingAnswers = newAnswers[questionId] || {};
+        currentMatchingAnswers[columnAItem] = columnBItem;
+        newAnswers[questionId] = currentMatchingAnswers;
+        return newAnswers;
+    });
+  }
+
   const handleCommentSubmit = async (e: React.FormEvent, parentId: string | null = null) => {
     e.preventDefault();
     if (!user) {
@@ -446,6 +473,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     );
   }
 
+  const allOptionsSelected = question && question.type === 'Matching' && question.matchingOptions?.columnA.length === Object.keys(answers[question.id] || {}).length;
 
   if (loading) {
     return (
@@ -582,11 +610,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     )}
                                                     <div className="flex-1">
-                                                        <div className="font-medium prose dark:prose-invert max-w-none" style={{ fontSize: '1.5rem' }}>
-                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{optionText}</ReactMarkdown>
-                                                        </div>
+                                                        <div className="font-medium text-lg">{optionText}</div>
                                                         {isAnswerRevealed && explanation && (
-                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{ fontSize: '1rem' }}>
+                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none">
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{explanation}</ReactMarkdown>
                                                             </div>
                                                         )}
@@ -598,59 +624,85 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </div>
                             </CardContent>
                         )}
-                        {!isAnswerRevealed && (
-                            <CardFooter>
-                                <Button onClick={handleShowAnswerClick}>See Answer</Button>
-                            </CardFooter>
+                        {question.type === 'Matching' && question.matchingOptions && (
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                        <div className="font-bold text-center">Column A</div>
+                                        <div></div>
+                                        <div className="font-bold text-center">Column B</div>
+                                    </div>
+                                    {question.matchingOptions.columnA.map((itemA, itemIndex) => {
+                                        const userChoice = isAnswerRevealed ? answers[question.id]?.[itemA.text] : undefined;
+                                        const correctChoice = isAnswerRevealed ? question.correctAnswer.find((p: any) => p.a === itemA.text)?.b : undefined;
+                                        const isPairCorrect = userChoice === correctChoice;
+
+                                        return (
+                                            <div key={itemIndex} className={cn("grid grid-cols-[1fr_auto_1fr] gap-4 items-center p-2 border rounded-lg", isAnswerRevealed && (isPairCorrect ? 'border-green-500 bg-green-100/20' : 'border-destructive bg-red-100/20'))}>
+                                                <div className="p-2 border-r text-center font-semibold">{itemA.text}</div>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                {!isAnswerRevealed ? (
+                                                    <Select onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} value={answers[question.id]?.[itemA.text] || ''}>
+                                                        <SelectTrigger><SelectValue placeholder="Select a match" /></SelectTrigger>
+                                                        <SelectContent>
+                                                            {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                                                <SelectItem key={bIndex} value={itemB.text}>{itemB.text}</SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : (
+                                                    <div className='flex flex-col'>
+                                                        <div className={cn('flex items-center gap-2', !isPairCorrect && 'text-destructive')}>
+                                                            {!isPairCorrect && <XCircle className="w-5 h-5"/>}
+                                                            <span>{userChoice || <span className="text-muted-foreground italic">No Answer</span>}</span>
+                                                        </div>
+                                                        {!isPairCorrect && (
+                                                            <div className="flex items-center gap-2 mt-1 text-green-600 text-sm">
+                                                                <CheckCircle className="w-5 h-5"/>
+                                                                <span>Correct: {correctChoice}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </CardContent>
                         )}
+                        <CardFooter className="flex-wrap gap-4">
+                            {!isAnswerRevealed && (
+                                question.type === 'Matching' 
+                                ? <Button onClick={() => setSelectedAnswer('checked')} disabled={!allOptionsSelected}>Check Matches</Button>
+                                : <Button onClick={handleShowAnswerClick}>See Answer</Button>
+                            )}
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="icon" onClick={() => handleVote('like')} disabled={isVoting}>
+                                    <Heart className={cn("w-5 h-5", userHasLiked && "fill-red-500 text-red-500")} />
+                                </Button>
+                                <span className="text-sm font-bold">{question.likes || 0}</span>
+                            </div>
+                            <Button variant="ghost" size="icon">
+                                <Flag className="w-5 h-5 text-muted-foreground" />
+                            </Button>
+                        </CardFooter>
                     </Card>
 
-                    {isAnswerRevealed && (question.explanation || (question.type !== 'Multiple Choice' && question.type !== 'True/False' && question.correctAnswer)) && (
-                        <Card className="mt-6">
+                     {isAnswerRevealed && question.explanation && (
+                        <Card>
                              <CardHeader>
                                 <CardTitle>Answer & Explanation</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
-                                {question.type !== 'Multiple Choice' && question.type !== 'True/False' && (
-                                    <div className="prose dark:prose-invert max-w-none">
-                                        <h4 className="font-bold">Correct Answer:</h4>
-                                        <div className="mt-2 p-3 rounded-lg border bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{String(question.correctAnswer)}</ReactMarkdown>
-                                        </div>
-                                    </div>
-                                )}
-                                {question.explanation && (
-                                    <>
-                                        <Separator />
-                                        <div className="prose dark:prose-invert max-w-none">
-                                            <h5 className="font-semibold">General Explanation:</h5>
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                                {question.explanation}
-                                            </ReactMarkdown>
-                                        </div>
-                                    </>
-                                )}
+                                <div className="prose dark:prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {question.explanation}
+                                    </ReactMarkdown>
+                                </div>
                             </CardContent>
                         </Card>
                     )}
 
-                    <CardFooter className="flex justify-between items-center bg-card rounded-lg">
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => handleVote('like')} disabled={isVoting}>
-                                <Heart className={cn("w-5 h-5", userHasLiked && "fill-red-500 text-red-500")} />
-                            </Button>
-                            <span className="text-sm font-bold">{question.likes || 0}</span>
-                            <div className="flex items-center">
-                                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                                <span className="ml-1 font-bold">5.0</span>
-                                <span className="ml-1 text-xs text-muted-foreground">(1 vote)</span>
-                            </div>
-                        </div>
-                        <Button variant="ghost" size="icon">
-                            <Flag className="w-5 h-5 text-muted-foreground" />
-                        </Button>
-                    </CardFooter>
-                    
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
