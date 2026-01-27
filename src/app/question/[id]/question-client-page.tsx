@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star, ChevronLeft, GripVertical } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, Flag, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -28,6 +28,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
 
 type Question = { 
   id: string; 
@@ -207,7 +209,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const [isVoting, setIsVoting] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
@@ -257,11 +258,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         }
         
         const q = questionData as Question;
-
+        
         if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
             const pairs = q.correctAnswer.map((p: any, index: number) => ({ ...p, originalIndex: index }));
             const columnA = pairs.map((p: any) => ({ text: p.a, image: p.aImage, originalIndex: p.originalIndex }));
-            let columnB = pairs.map((p: any) => ({ text: p.b, image: p.bImage, originalIndex: p.originalIndex }));
+            let columnB = [...pairs.map((p: any) => ({ text: p.b, image: p.bImage, originalIndex: p.originalIndex }))];
 
             for (let i = columnB.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -269,6 +270,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
             }
             q.matchingOptions = { columnA, columnB };
         }
+
         setQuestion(q);
         fetchComments();
       } catch (error) {
@@ -549,10 +551,119 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             </div>
                         </CardHeader>
                         <CardContent>
-                            {/* ... (existing option rendering logic) ... */}
+                            {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => {
+                                const isCorrect = isAnswerRevealed && option.text === question.correctAnswer;
+                                const isSelected = selectedAnswer === option.text;
+                                const isWrong = isSelected && !isCorrect;
+
+                                return (
+                                <div key={optIndex} className="mt-2">
+                                    <Button
+                                    variant="outline"
+                                    className={cn(
+                                        "w-full justify-start h-auto p-4 text-left",
+                                        isAnswerRevealed && isCorrect && "bg-green-100 dark:bg-green-900/20 border-green-500",
+                                        isAnswerRevealed && isWrong && "bg-red-100 dark:bg-red-900/20 border-destructive"
+                                    )}
+                                    onClick={() => !isAnswerRevealed && setSelectedAnswer(option.text)}
+                                    >
+                                    <div className="flex items-center gap-3 w-full">
+                                        <div className="border rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                            {isAnswerRevealed && isCorrect && <CheckCircle className="w-5 h-5 text-green-500"/>}
+                                            {isAnswerRevealed && isWrong && <XCircle className="w-5 h-5 text-destructive"/>}
+                                        </div>
+                                        <div className="flex-1">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                        </div>
+                                    </div>
+                                    </Button>
+                                    {isAnswerRevealed && option.explanation && (
+                                         <p className="text-xs text-muted-foreground mt-1 pl-10">{option.explanation}</p>
+                                    )}
+                                </div>
+                                )
+                            })}
+                             {question.type === 'True/False' && (
+                                <RadioGroup onValueChange={(value) => setSelectedAnswer(value)} value={selectedAnswer || ''} className="space-y-2">
+                                    {['True', 'False'].map((option, optIndex) => {
+                                        const isCorrect = isAnswerRevealed && option === question.correctAnswer;
+                                        const isSelected = selectedAnswer === option;
+                                        const isWrong = isSelected && !isCorrect;
+                                        return (
+                                        <div key={optIndex}>
+                                             <Label htmlFor={`q-${question.id}-${option}`} className={cn(
+                                                "flex items-center p-4 border rounded-lg cursor-pointer",
+                                                isAnswerRevealed && isCorrect && "bg-green-100 dark:bg-green-900/20 border-green-500",
+                                                isAnswerRevealed && isWrong && "bg-red-100 dark:bg-red-900/20 border-destructive"
+                                            )}>
+                                                <RadioGroupItem value={option} id={`q-${question.id}-${option}`} className="mr-3" disabled={isAnswerRevealed}/>
+                                                {option}
+                                            </Label>
+                                        </div>
+                                        )
+                                    })}
+                                </RadioGroup>
+                            )}
+
+                             {question.type === 'Matching' && (
+                                <div className="space-y-6">
+                                    <Card>
+                                        <CardContent className="pt-6">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <h4 className="font-bold text-center mb-2">Column A</h4>
+                                                    <div className="space-y-2">
+                                                        {question.matchingOptions?.columnA.map((item, index) => (
+                                                            <div key={`a-${index}`} className="p-3 border rounded-md text-center bg-secondary">
+                                                                {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                                {item.text}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-center mb-2">Column B</h4>
+                                                    <div className="space-y-2">
+                                                        {question.matchingOptions?.columnB.map((item, index) => (
+                                                            <div key={`b-${index}`} className="p-3 border rounded-md text-center bg-secondary">
+                                                                {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                                {item.text}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="border-green-500 bg-green-50/50 dark:bg-green-900/10">
+                                        <CardHeader>
+                                            <CardTitle>Correct Matches</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-2">
+                                            {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
+                                                <div key={pairIndex} className="p-3 border border-green-500/30 bg-green-100/30 dark:bg-green-900/20 rounded-lg flex justify-between items-center gap-4">
+                                                    <div className="flex-1 flex flex-col items-center text-center">
+                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.a}</span>
+                                                    </div>
+                                                    <GripVertical className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                                    <div className="flex-1 flex flex-col items-center text-center">
+                                                            {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.b}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            )}
+
+                             {['Fill in the Blank'].includes(question.type) && !isAnswerRevealed && (
+                                <Input placeholder="Type your answer here..." onChange={(e) => setSelectedAnswer(e.target.value)} />
+                            )}
                         </CardContent>
                         <CardFooter className="flex-wrap gap-4">
-                            {['Fill in the Blank'].includes(question.type) && !isAnswerRevealed && (
+                            {!['Short Answer', 'Descriptive', 'Matching'].includes(question.type) && !isAnswerRevealed && (
                                 <Button onClick={handleShowAnswerClick}>See Answer</Button>
                             )}
                             <div className="flex items-center gap-2">
@@ -572,37 +683,15 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </CardFooter>
                     </Card>
 
-                    {(isAnswerRevealed && (question.type === 'Fill in the Blank' || question.type === 'Matching')) && (
-                        <Card>
+                   {(isAnswerRevealed && (question.type === 'Fill in the Blank')) && typeof question.correctAnswer === 'string' && (
+                       <Card>
                            <CardHeader>
                                <CardTitle>Correct Answer</CardTitle>
                            </CardHeader>
-                           <CardContent>
-                               {question.type === 'Matching' && Array.isArray(question.correctAnswer) ? (
-                                    <div className="space-y-2">
-                                       {question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
-                                           <div key={pairIndex} className="p-3 border rounded-lg bg-green-100/20 border-green-500/50">
-                                               <div className="flex items-center justify-center gap-4 text-center">
-                                                   <div className="flex flex-col items-center">
-                                                       {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
-                                                       <span className="font-semibold">{pair.a}</span>
-                                                   </div>
-                                                   <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                   <div className="flex flex-col items-center">
-                                                       {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
-                                                       <span className="font-semibold">{pair.b}</span>
-                                                   </div>
-                                               </div>
-                                           </div>
-                                       ))}
-                                   </div>
-                               ) : (
-                                    <div className="text-lg font-bold prose dark:prose-invert max-w-none">
-                                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                           {question.correctAnswer}
-                                       </ReactMarkdown>
-                                   </div>
-                               )}
+                           <CardContent className="text-lg font-bold prose dark:prose-invert max-w-none">
+                               <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                   {question.correctAnswer}
+                               </ReactMarkdown>
                            </CardContent>
                        </Card>
                    )}
@@ -687,8 +776,4 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         </div>
     </div>
   );
-
-    
 }
-
-    
