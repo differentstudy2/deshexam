@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -388,10 +388,10 @@ const QuestionsTable = ({
                         />
                     </TableHead>
                     <TableHead>Question Text</TableHead>
+                    <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead className="hidden md:table-cell">Subject</TableHead>
-                    <TableHead className="hidden md:table-cell">Type</TableHead>
                     <TableHead className="hidden lg:table-cell">Marks</TableHead>
-                    <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                    <TableHead className="hidden xl:table-cell">Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
             </TableHeader>
@@ -401,10 +401,10 @@ const QuestionsTable = ({
                         <TableRow key={i}>
                             <TableCell><Skeleton className="h-5 w-5" /></TableCell>
                             <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                            <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-12" /></TableCell>
-                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell className="hidden xl:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
                             <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
                         </TableRow>
                     ))
@@ -418,7 +418,7 @@ const QuestionsTable = ({
                                     aria-label={`Select question`}
                                 />
                             </TableCell>
-                            <TableCell className="font-medium max-w-sm truncate">
+                            <TableCell className="font-medium max-w-[200px] sm:max-w-sm md:max-w-md truncate">
                                 <ReactMarkdown 
                                     remarkPlugins={[remarkGfm, remarkMath]} 
                                     rehypePlugins={[rehypeRaw, rehypeKatex]}
@@ -429,10 +429,10 @@ const QuestionsTable = ({
                                     {question.text}
                                 </ReactMarkdown>
                             </TableCell>
+                            <TableCell className="hidden sm:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
-                            <TableCell className="hidden md:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.marks}</TableCell>
-                            <TableCell className="hidden lg:table-cell">
+                            <TableCell className="hidden xl:table-cell">
                                 {question.createdAt}
                             </TableCell>
                             <TableCell className="text-right">
@@ -497,7 +497,15 @@ export default function ManageQuestionsPage() {
             
             setSubjects(subjectData);
             setAllQuestions(questionData.map((q: any) => {
-                return { ...q, createdAt: q.createdAt || 'N/A' };
+                 const data = q as any;
+                 const createdAt = data.createdAt;
+                 let formattedDate = 'Just now';
+                 if (createdAt && typeof createdAt.toDate === 'function') {
+                    formattedDate = createdAt.toDate().toLocaleDateString();
+                 } else if(createdAt && !isNaN(new Date(createdAt).getTime())) {
+                     formattedDate = new Date(createdAt).toLocaleDateString();
+                 }
+                return { ...q, createdAt: formattedDate };
             }) as Question[]);
 
         } catch (error) {
@@ -572,11 +580,12 @@ export default function ManageQuestionsPage() {
             return;
         }
         try {
+            const dataToSave = cleanDataForFirebase(data);
             if (questionToEdit) {
-                await updateQuestion(questionToEdit.id, data);
+                await updateQuestion(questionToEdit.id, dataToSave);
                 toast({ title: 'Question updated successfully!' });
             } else {
-                await addQuestion(data);
+                await addQuestion(dataToSave);
                 toast({ title: 'Question added successfully!' });
             }
             setIsQuestionFormDialogOpen(false);
@@ -610,6 +619,23 @@ export default function ManageQuestionsPage() {
             setQuestionToDelete(null);
         }
       };
+      
+      function cleanDataForFirebase(data: any): any {
+        if (Array.isArray(data)) {
+            return data.map(item => cleanDataForFirebase(item));
+        }
+        if (data !== null && typeof data === 'object') {
+            const cleanedData: { [key: string]: any } = {};
+            for (const key in data) {
+                const value = data[key];
+                if (value !== undefined) {
+                    cleanedData[key] = cleanDataForFirebase(value);
+                }
+            }
+            return cleanedData;
+        }
+        return data;
+    };
 
     return(
         <div className="space-y-6">
