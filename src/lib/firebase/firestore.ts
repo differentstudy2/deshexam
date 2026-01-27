@@ -93,10 +93,14 @@ export const getAllQuestions = async () => {
     try {
         const q = query(collection(db, "questions"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        const questions = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-        }));
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...doc.data(),
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : 'Just now'
+            };
+        });
         return questions;
     } catch (e) {
         console.error("Error getting questions: ", e);
@@ -215,7 +219,8 @@ export const updateQuestion = async (questionId: string, data: any) => {
         throw new Error("Question ID is required to update a question.");
     }
     try {
-        await updateDoc(doc(db, "questions", questionId), data);
+        const cleanedData = cleanDataForFirebase(data);
+        await updateDoc(doc(db, "questions", questionId), cleanedData);
     } catch (e) {
         console.error("Error updating document: ", e);
         throw new Error("Failed to update question.");
@@ -742,6 +747,8 @@ export const getSubmissionsByUserId = (
     let dateValue = new Date(); // Default to now if invalid
     if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
       dateValue = data.submittedAt.toDate();
+    } else if (data.submittedAt instanceof Date) { // It might already be a Date object
+      dateValue = data.submittedAt;
     } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
       dateValue = new Date(data.submittedAt);
     }
@@ -2037,7 +2044,7 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
     }
 };
 
-export const getPracticeSetById = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string) => {
+export const getPracticeSetById = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string) => {
     if (!textbookId || !chapterId || !practiceSetId) return null;
     try {
         const path = (topicId && topicId !== 'null')
@@ -2258,6 +2265,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 
