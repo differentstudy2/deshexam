@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MessageSquare, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowLeft, MessageSquare, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight, ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -299,7 +299,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </ReactMarkdown>
                                 </div>
                                 <Button variant="outline">
-                                    Explore all similar answers <ArrowRight className="ml-2 w-4 h-4"/>
+                                    Explore all similar answers <ArrowRight className="ml-2 w-4 w-4"/>
                                 </Button>
                             </CardContent>
                             <CardFooter className="flex justify-between items-center">
