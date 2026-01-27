@@ -1,11 +1,12 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, Flag, Heart } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronLeft, ChevronRight, Flag, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -605,7 +606,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </RadioGroup>
                             )}
 
-                             {question.type === 'Matching' && (
+                             {question.type === 'Matching' && question.matchingOptions && (
                                 <div className="space-y-6">
                                     <Card>
                                         <CardContent className="pt-6">
@@ -613,7 +614,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                 <div>
                                                     <h4 className="font-bold text-center mb-2">Column A</h4>
                                                     <div className="space-y-2">
-                                                        {question.matchingOptions?.columnA.map((item, index) => (
+                                                        {question.matchingOptions.columnA.map((item, index) => (
                                                             <div key={`a-${index}`} className="p-3 border rounded-md text-center bg-secondary">
                                                                 {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
                                                                 {item.text}
@@ -624,7 +625,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                 <div>
                                                     <h4 className="font-bold text-center mb-2">Column B</h4>
                                                     <div className="space-y-2">
-                                                        {question.matchingOptions?.columnB.map((item, index) => (
+                                                        {question.matchingOptions.columnB.map((item, index) => (
                                                             <div key={`b-${index}`} className="p-3 border rounded-md text-center bg-secondary">
                                                                 {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
                                                                 {item.text}
@@ -636,9 +637,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         </CardContent>
                                     </Card>
                                     <Card className="border-green-500 bg-green-50/50 dark:bg-green-900/10">
-                                        <CardHeader>
-                                            <CardTitle>Correct Matches</CardTitle>
-                                        </CardHeader>
+                                        <CardHeader><CardTitle>Correct Matches</CardTitle></CardHeader>
                                         <CardContent className="space-y-2">
                                             {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
                                                 <div key={pairIndex} className="p-3 border border-green-500/30 bg-green-100/30 dark:bg-green-900/20 rounded-lg flex justify-between items-center gap-4">
