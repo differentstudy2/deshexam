@@ -538,51 +538,47 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             </div>
                         </CardHeader>
                         <CardContent>
-                            {question.type === 'Multiple Choice' && question.options && (
-                                <div className="space-y-3">
-                                    {question.options.map((option, index) => {
-                                        const isCorrectAnswer = question.correctAnswer === option.text;
-                                        const isSelected = selectedAnswer === option.text;
-                                        return (
-                                            <Card
-                                                key={index}
-                                                onClick={() => !isAnswerRevealed && handleAnswerClick(option.text)}
-                                                className={cn(
-                                                    "cursor-pointer transition-all border-2",
-                                                    isAnswerRevealed && isCorrectAnswer
-                                                        ? "border-green-500 bg-green-100/20"
-                                                        : "border-border hover:bg-accent",
-                                                    isAnswerRevealed && isSelected && !isCorrectAnswer ? "border-destructive bg-red-100/20" : ""
-                                                )}
-                                            >
-                                                <CardContent className="p-4 flex items-start gap-4">
-                                                     {isAnswerRevealed ? (
-                                                        isCorrectAnswer ? 
-                                                        <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
-                                                        isSelected ? 
-                                                        <XCircle className="w-6 h-6 text-destructive mt-1 flex-shrink-0" /> :
-                                                        <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
-                                                    ) : (
-                                                        <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
-                                                    )}
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between prose dark:prose-invert max-w-none" style={{fontSize: '1.5rem'}}>
-                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                                            {isSelected && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
-                                                        </div>
-                                                        {isAnswerRevealed && option.explanation && (
-                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{fontSize: '1rem'}}>
-                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
-                                                            </div>
-                                                        )}
+                           {question.type === 'Multiple Choice' && question.options?.map((option, index) => {
+                                const isCorrectAnswer = question.correctAnswer === option.text;
+                                const isSelected = selectedAnswer === option.text;
+                                return (
+                                    <Card
+                                        key={index}
+                                        onClick={() => !isAnswerRevealed && handleAnswerClick(option.text)}
+                                        className={cn(
+                                            "cursor-pointer transition-all border-2 mb-3",
+                                            isAnswerRevealed && isCorrectAnswer
+                                                ? "border-green-500 bg-green-100/20"
+                                                : "border-border hover:bg-accent",
+                                            isAnswerRevealed && isSelected && !isCorrectAnswer ? "border-destructive bg-red-100/20" : ""
+                                        )}
+                                    >
+                                        <CardContent className="p-4 flex items-start gap-4">
+                                             {isAnswerRevealed ? (
+                                                isCorrectAnswer ? 
+                                                <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
+                                                isSelected ? 
+                                                <XCircle className="w-6 h-6 text-destructive mt-1 flex-shrink-0" /> :
+                                                <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
+                                            ) : (
+                                                <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
+                                            )}
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between prose dark:prose-invert max-w-none custom-prose-style" style={{fontSize: '1.5rem'}}>
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                    {isSelected && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
+                                                </div>
+                                                {isAnswerRevealed && option.explanation && (
+                                                    <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{fontSize: '1rem'}}>
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
                                                     </div>
-                                                </CardContent>
-                                            </Card>
-                                        )
-                                    })}
-                                </div>
-                            )}
-                            {question.type === 'True/False' && (
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )
+                            })}
+                             {question.type === 'True/False' && (
                                 <div className="space-y-3">
                                     {['True', 'False'].map((optionText, index) => {
                                         const isCorrectAnswer = question.correctAnswer === optionText;
@@ -600,7 +596,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                 )}
                                             >
                                                 <CardContent className="p-4 flex items-start gap-4">
-                                                     {isAnswerRevealed ? (
+                                                    {isAnswerRevealed ? (
                                                         isCorrectAnswer ? 
                                                         <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
                                                         isSelected ? 
@@ -623,13 +619,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     })}
                                 </div>
                             )}
-                            {question.type === 'Short Answer' && (
-                                <div className="mt-4 p-4 rounded-md bg-green-100/50 border border-green-200 dark:border-green-800">
-                                    <h4 className="font-semibold text-green-700 dark:text-green-300">Correct Answer:</h4>
-                                    <p className="text-lg font-bold">{question.correctAnswer}</p>
-                                </div>
-                            )}
-                            {question.type === 'Fill in the Blank' && (
+                             {question.type === 'Fill in the Blank' && (
                                 <div className="space-y-4">
                                     <Input 
                                         placeholder="Your answer..." 
@@ -637,12 +627,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         disabled={isAnswerRevealed}
                                         className="text-base"
                                     />
-                                    {isAnswerRevealed && (
-                                        <div className="mt-4 p-4 rounded-md bg-green-100/50 border border-green-200 dark:border-green-800">
-                                            <h4 className="font-semibold text-green-700 dark:text-green-300">Correct Answer:</h4>
-                                            <p className="text-lg font-bold">{question.correctAnswer}</p>
-                                        </div>
-                                    )}
                                 </div>
                             )}
                             {question.type === 'Matching' && question.matchingOptions?.columnA && (
@@ -653,7 +637,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             <ul className="space-y-2">
                                                 {question.matchingOptions.columnA.map((item, index) => (
                                                     <li key={index} className="p-3 border rounded-md text-center bg-secondary flex flex-col items-center">
-                                                        {item.image && <Image src={item.image} alt={item.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
+                                                        {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
                                                         {item.text}
                                                     </li>
                                                 ))}
@@ -664,33 +648,13 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             <ul className="space-y-2">
                                                 {question.matchingOptions.columnB.map((item, index) => (
                                                     <li key={index} className="p-3 border rounded-md text-center bg-secondary flex flex-col items-center">
-                                                         {item.image && <Image src={item.image} alt={item.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
+                                                         {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
                                                         {item.text}
                                                     </li>
                                                 ))}
                                             </ul>
                                         </div>
                                     </div>
-                                    {isAnswerRevealed && (
-                                        <div className="space-y-3 mt-4">
-                                            <h4 className="font-bold">Correct Matches</h4>
-                                            {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
-                                                <div key={pairIndex} className="p-3 border rounded-lg bg-green-100/20 border-green-500">
-                                                    <div className="flex items-center justify-center gap-4">
-                                                        <div className="flex flex-col items-center text-center">
-                                                            {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
-                                                            <span className="font-semibold">{pair.a}</span>
-                                                        </div>
-                                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                        <div className="flex flex-col items-center text-center">
-                                                            {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={50} height={50} className="rounded-md object-cover mb-1" />}
-                                                            <span className="font-semibold">{pair.b}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
                             )}
                         </CardContent>
@@ -715,17 +679,63 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </CardFooter>
                     </Card>
 
-                     {isAnswerRevealed && question.explanation && (
+                    {question.type === 'Short Answer' && (
                         <Card>
-                             <CardHeader>
-                                <CardTitle>Answer & Explanation</CardTitle>
+                            <CardHeader>
+                                <CardTitle>Answer</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="prose dark:prose-invert max-w-none text-base">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                        {question.explanation}
-                                    </ReactMarkdown>
-                                </div>
+                            <CardContent className="prose dark:prose-invert max-w-none">
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                    {question.correctAnswer}
+                                </ReactMarkdown>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {isAnswerRevealed && (question.type === 'Fill in the Blank' || question.type === 'Matching') && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Correct Answer</CardTitle>
+                            </CardHeader>
+                             <CardContent>
+                                {question.type === 'Matching' && Array.isArray(question.correctAnswer) ? (
+                                    <div className="space-y-2">
+                                        {question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
+                                            <div key={pairIndex} className="p-3 border rounded-lg bg-green-100/20 border-green-500/50">
+                                                <div className="flex items-center justify-center gap-4 text-center">
+                                                    <div className="flex flex-col items-center">
+                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.a}</span>
+                                                    </div>
+                                                    <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                    <div className="flex flex-col items-center">
+                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.b}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-lg font-bold prose dark:prose-invert max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                            {question.correctAnswer}
+                                        </ReactMarkdown>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {((isAnswerRevealed && (question.type !== 'Short Answer')) || (question.type === 'Short Answer')) && question.explanation && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Explanation</CardTitle>
+                            </CardHeader>
+                            <CardContent className="prose dark:prose-invert max-w-none">
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                    {question.explanation}
+                                </ReactMarkdown>
                             </CardContent>
                         </Card>
                     )}
