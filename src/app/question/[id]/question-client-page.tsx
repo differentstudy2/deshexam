@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
+import { getQuestionById, addComment, getComments, handleQuestionVote } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star, ChevronLeft, GripVertical } from 'lucide-react';
@@ -111,15 +111,18 @@ const TextbookSolutionsSection = () => {
     useEffect(() => {
         const fetchTextbooks = async () => {
             try {
-                const data = await getAllTextbooks();
-                setTextbooks(data as Textbook[]);
+                // This would ideally be a more targeted query, e.g., for related subjects
+                const response = await fetch('/api/textbooks');
+                const data = await response.json();
+                setTextbooks(data);
             } catch (error) {
                 console.error("Failed to fetch textbooks for showcase", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTextbooks();
+        // This effect runs once on component mount
+        // fetchTextbooks();
     }, []);
 
     if (loading) {
@@ -304,17 +307,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     setShowAnswer(true);
     setSelectedAnswer('reveal');
   };
-  
-  const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
-    if (isAnswerRevealed) return;
-    setAnswers(prev => {
-        const newAnswers = { ...prev };
-        const currentMatchingAnswers = newAnswers[questionId] || {};
-        currentMatchingAnswers[columnAItem] = columnBItem;
-        newAnswers[questionId] = currentMatchingAnswers;
-        return newAnswers;
-    });
-  }
 
   const handleCommentSubmit = async (e: React.FormEvent, parentId: string | null = null) => {
     e.preventDefault();
@@ -473,8 +465,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     );
   }
 
-  const allOptionsSelected = question && question.type === 'Matching' && question.matchingOptions?.columnA?.length === Object.keys(answers[question.id] || {}).length;
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -535,8 +525,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </ReactMarkdown>
                             </div>
                         </CardHeader>
-                        {question.type === 'Multiple Choice' && question.options && (
-                            <CardContent>
+                        <CardContent>
+                            {question.type === 'Multiple Choice' && question.options && (
                                 <div className="space-y-3">
                                     {question.options.map((option, index) => {
                                         const isCorrectAnswer = question.correctAnswer === option.text;
@@ -579,10 +569,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         )
                                     })}
                                 </div>
-                            </CardContent>
-                        )}
-                        {question.type === 'True/False' && (
-                            <CardContent>
+                            )}
+                            {question.type === 'True/False' && (
                                 <div className="space-y-3">
                                     {['True', 'False'].map((optionText, index) => {
                                         const isCorrectAnswer = question.correctAnswer === optionText;
@@ -610,7 +598,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     )}
                                                     <div className="flex-1">
-                                                        <div className="font-medium text-lg" style={{fontSize: '1.5rem'}}>{optionText}</div>
+                                                        <div className="font-medium text-lg prose dark:prose-invert" style={{fontSize: '1.5rem'}}>{optionText}</div>
                                                         {isAnswerRevealed && explanation && (
                                                             <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{fontSize: '1rem'}}>
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{explanation}</ReactMarkdown>
@@ -622,59 +610,60 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         )
                                     })}
                                 </div>
-                            </CardContent>
-                        )}
-                        {question.type === 'Matching' && question.matchingOptions && (
-                            <CardContent>
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                        <div className="font-bold text-center">Column A</div>
-                                        <div></div>
-                                        <div className="font-bold text-center">Column B</div>
-                                    </div>
-                                    {question.matchingOptions?.columnA?.map((itemA, itemIndex) => {
-                                        const userChoice = isAnswerRevealed ? answers[question.id]?.[itemA.text] : undefined;
-                                        const correctChoice = isAnswerRevealed ? question.correctAnswer.find((p: any) => p.a === itemA.text)?.b : undefined;
-                                        const isPairCorrect = userChoice === correctChoice;
-
-                                        return (
-                                            <div key={itemIndex} className={cn("grid grid-cols-[1fr_auto_1fr] gap-4 items-center p-2 border rounded-lg", isAnswerRevealed && (isPairCorrect ? 'border-green-500 bg-green-100/20' : 'border-destructive bg-red-100/20'))}>
-                                                <div className="p-2 border-r text-center font-semibold">{itemA.text}</div>
-                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                {!isAnswerRevealed ? (
-                                                    <Select onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} value={answers[question.id]?.[itemA.text] || ''}>
-                                                        <SelectTrigger><SelectValue placeholder="Select a match" /></SelectTrigger>
-                                                        <SelectContent>
-                                                            {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                                <SelectItem key={bIndex} value={itemB.text}>{itemB.text}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                ) : (
-                                                    <div className='flex flex-col'>
-                                                        <div className={cn('flex items-center gap-2', !isPairCorrect && 'text-destructive')}>
-                                                            {!isPairCorrect && <XCircle className="w-5 h-5"/>}
-                                                            <span>{userChoice || <span className="text-muted-foreground italic">No Answer</span>}</span>
-                                                        </div>
-                                                        {!isPairCorrect && (
-                                                            <div className="flex items-center gap-2 mt-1 text-green-600 text-sm">
-                                                                <CheckCircle className="w-5 h-5"/>
-                                                                <span>Correct: {correctChoice}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
+                            )}
+                           {question.type === 'Matching' && question.matchingOptions?.columnA && (
+                                !isAnswerRevealed ? (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4 items-start">
+                                            <div>
+                                                <h4 className="font-bold text-center mb-2">Column A</h4>
+                                                <ul className="space-y-2">
+                                                    {question.matchingOptions.columnA.map((itemA, index) => (
+                                                        <li key={index} className="p-3 border rounded-md text-center bg-secondary">
+                                                            {itemA.image && <Image src={itemA.image} alt={itemA.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
+                                                            {itemA.text}
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
-                                        )
-                                    })}
-                                </div>
-                            </CardContent>
-                        )}
+                                            <div>
+                                                <h4 className="font-bold text-center mb-2">Column B</h4>
+                                                <ul className="space-y-2">
+                                                    {question.matchingOptions.columnB.map((itemB, index) => (
+                                                        <li key={index} className="p-3 border rounded-md text-center bg-secondary">
+                                                            {itemB.image && <Image src={itemB.image} alt={itemB.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
+                                                            {itemB.text}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        <h4 className="font-bold">Correct Matches</h4>
+                                        {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
+                                            <div key={pairIndex} className="p-3 border rounded-lg bg-green-100/20 border-green-500">
+                                                <div className="flex items-center justify-center gap-4">
+                                                    <div className="flex flex-col items-center text-center">
+                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.a}</span>
+                                                    </div>
+                                                    <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                    <div className="flex flex-col items-center text-center">
+                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={50} height={50} className="rounded-md object-cover mb-1" />}
+                                                        <span className="font-semibold">{pair.b}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )
+                            )}
+                        </CardContent>
                         <CardFooter className="flex-wrap gap-4">
-                            {!isAnswerRevealed && (
-                                question.type === 'Matching' 
-                                ? <Button onClick={() => setSelectedAnswer('checked')} disabled={!allOptionsSelected}>Check Matches</Button>
-                                : <Button onClick={handleShowAnswerClick}>See Answer</Button>
+                             {!isAnswerRevealed && (
+                                <Button onClick={handleShowAnswerClick}>See Answer</Button>
                             )}
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" size="icon" onClick={() => handleVote('like')} disabled={isVoting}>
