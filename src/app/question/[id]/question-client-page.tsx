@@ -26,7 +26,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import type { Textbook } from '@/lib/types';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Question = { 
   id: string; 
@@ -234,12 +233,25 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         }
         
         const q = questionData as Question;
+
+        // If it's a matching question, ensure matchingOptions is correctly structured.
         if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
-            const shuffledColumnB = [...(q.matchingOptions?.columnB || [])].sort(() => Math.random() - 0.5);
-            q.matchingOptions = {
-                ...(q.matchingOptions!),
-                columnB: shuffledColumnB
-            };
+            // If matchingOptions doesn't exist, create it from correctAnswer
+            if (!q.matchingOptions) {
+                const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
+                
+                // Shuffle column B
+                for (let i = columnB.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
+                }
+                q.matchingOptions = { columnA, columnB };
+            } else if (q.matchingOptions.columnB) { // If it does exist, just shuffle column B for the user display
+                 const shuffledColumnB = [...(q.matchingOptions.columnB || [])].sort(() => Math.random() - 0.5);
+                 q.matchingOptions.columnB = shuffledColumnB;
+            }
         }
         setQuestion(q);
         fetchComments();
@@ -423,6 +435,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                           {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
                       </span>
                   </div>
+                   {displayRating && <StarRating rating={displayRating} />}
               </div>
               <p className="text-foreground mt-1">{comment.text}</p>
               <div className="flex items-center gap-1 mt-2">
@@ -611,7 +624,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     })}
                                 </div>
                             )}
-                           {question.type === 'Matching' && question.matchingOptions?.columnA && (
+                            {question.type === 'Matching' && question.matchingOptions?.columnA && (
                                 !isAnswerRevealed ? (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4 items-start">
@@ -630,7 +643,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                 <h4 className="font-bold text-center mb-2">Column B</h4>
                                                 <ul className="space-y-2">
                                                     {question.matchingOptions.columnB.map((itemB, index) => (
-                                                        <li key={index} className="p-3 border rounded-md text-center bg-secondary">
+                                                            <li key={index} className="p-3 border rounded-md text-center bg-secondary">
                                                             {itemB.image && <Image src={itemB.image} alt={itemB.text} width={80} height={80} className="mx-auto mb-2 rounded-md" />}
                                                             {itemB.text}
                                                         </li>
@@ -674,6 +687,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             <Button variant="ghost" size="icon">
                                 <Flag className="w-5 h-5 text-muted-foreground" />
                             </Button>
+                             <div className="flex items-center">
+                                 <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                                 <span className="ml-1 font-bold">5.0</span>
+                                 <span className="ml-1 text-xs text-muted-foreground">(1 vote)</span>
+                             </div>
                         </CardFooter>
                     </Card>
 
@@ -749,5 +767,3 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
     
 }
-
-    
