@@ -13,20 +13,21 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 
-// Initialize Firebase Admin SDK
-let app: App;
-if (!getApps().length) {
-    // Load credentials from environment variables for security
+// Initialize Firebase Admin SDK with a unique name to avoid conflicts
+const adminAppName = 'firebase-admin-app-deshexam';
+let adminApp: App;
+
+if (!getApps().some(app => app.name === adminAppName)) {
     const serviceAccount = JSON.parse(process.env.GCP_SA_KEY || '{}');
     
-    app = initializeApp({
+    adminApp = initializeApp({
         credential: cert(serviceAccount),
-    });
+    }, adminAppName);
 } else {
-  app = getApps()[0];
+  adminApp = getApps().find(app => app.name === adminAppName)!;
 }
 
-const db = getFirestore(app);
+const db = getFirestore(adminApp);
 
 const PushNotificationInputSchema = z.object({
   title: z.string().describe('The title of the notification.'),
@@ -76,7 +77,7 @@ const sendPushNotificationFlow = ai.defineFlow(
         tokens: tokens,
       };
 
-      const response = await getMessaging(app).sendEachForMulticast(message as any);
+      const response = await getMessaging(adminApp).sendEachForMulticast(message as any);
       console.log(`${response.successCount} messages were sent successfully`);
 
       if (response.failureCount > 0) {
