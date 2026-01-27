@@ -47,7 +47,7 @@ type MatchingOptions = {
 type Question = {
   id: string;
   text: string;
-  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Matching';
+  type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive';
   options?: Option[];
   matchingOptions?: MatchingOptions;
   correctAnswer: any;
@@ -262,11 +262,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             "p-4 rounded-lg border-2 flex items-start gap-3 transition-colors",
                                             isCorrect 
                                                 ? "bg-green-100 dark:bg-green-900/30 border-green-500"
-                                                : "bg-red-100 dark:bg-red-900/20 border-destructive/30"
+                                                : "bg-card"
                                         )}>
                                             {isCorrect 
                                                 ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
-                                                : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
+                                                : <div className="w-5 h-5 mt-0.5 shrink-0" />
                                             }
                                             <div className="flex-1">
                                                 <div className="prose dark:prose-invert max-w-none custom-prose-style">
@@ -288,8 +288,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 {['True', 'False'].map((tf) => {
                                     const isCorrect = question.correctAnswer === tf;
                                     return (
-                                    <div key={tf} className={cn("p-4 rounded-lg border-2 flex items-center gap-3", isCorrect ? "bg-green-100 dark:bg-green-900/30 border-green-500" : "bg-red-100 dark:bg-red-900/20 border-destructive/30")}>
-                                        {isCorrect ? <CheckCircle className="w-5 h-5 text-green-600" /> : <XCircle className="w-5 h-5 text-destructive" />}
+                                    <div key={tf} className={cn("p-4 rounded-lg border-2 flex items-center gap-3", isCorrect ? "bg-green-100 dark:bg-green-900/30 border-green-500" : "bg-card")}>
+                                        {isCorrect ? <CheckCircle className="w-5 h-5 text-green-600" /> : <div className="w-5 h-5"/>}
                                         <span className="font-medium">{tf}</span>
                                     </div>
                                     )
@@ -319,6 +319,14 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         </div>
                                     ))}
                                  </div>
+                            )}
+                            {question.type === 'Descriptive' && (
+                                <div className="p-4 rounded-lg border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                                    <Label className="text-sm font-semibold text-blue-800 dark:text-blue-300">Model Answer</Label>
+                                    <div className="prose dark:prose-invert max-w-none mt-1">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{question.correctAnswer}</ReactMarkdown>
+                                    </div>
+                                </div>
                             )}
                             </CardContent>
                         </Card>

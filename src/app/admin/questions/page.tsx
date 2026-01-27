@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -63,6 +63,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 
 
 type Subject = { id: string, name: string };
@@ -80,21 +81,21 @@ const questionFormSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   subject: z.string().min(1, { message: 'Subject is required.' }),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
 }).refine(data => {
-    if (data.type === 'Multiple Choice' || data.type === 'Short Answer' || data.type === 'Fill in the Blank' || data.type === 'True/False') {
+    if (['Multiple Choice', 'Short Answer', 'Fill in the Blank', 'True/False'].includes(data.type)) {
         return !!data.correctAnswer;
     }
     if (data.type === 'Matching') {
         return Array.isArray(data.correctAnswer) && data.correctAnswer.length > 0;
     }
-    return true;
+    return true; // For Descriptive, correctAnswer is not strictly required.
 }, {
-    message: 'Correct answer is required.',
+    message: 'Correct answer is required for this question type.',
     path: ['correctAnswer'],
 });
 
@@ -106,7 +107,7 @@ type Question = {
     authorName: string;
     createdAt: string;
     subject: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive';
     marks: number;
     options?: {text: string, explanation?: string}[];
     correctAnswer?: string;
@@ -155,12 +156,13 @@ const MatchingPairsField = ({ control }: { control: any }) => {
 
 const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], onClose: () => void }) => {
     const questionType = form.watch('type');
+    const questionText = form.watch('text');
+    const questionExplanation = form.watch('explanation');
+    const descriptiveAnswer = form.watch('correctAnswer');
 
     useEffect(() => {
         const type = form.getValues('type');
-        const defaultCorrectAnswer = type === 'Matching' ? [] : undefined;
-        form.setValue('correctAnswer', defaultCorrectAnswer);
-
+        form.setValue('correctAnswer', type === 'Matching' ? [] : '');
         let defaultOptions: any[] | undefined = undefined;
         if (type === 'Multiple Choice') {
             defaultOptions = Array.from({ length: 4 }, () => ({ text: '', explanation: '' }));
@@ -196,6 +198,16 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
                         <FormControl>
                             <Textarea placeholder="What is the capital of India?" {...field} />
                         </FormControl>
+                        {questionText && (
+                            <Card className="mt-2">
+                                <CardHeader className="p-2 border-b"><CardDescription className="text-xs">Preview</CardDescription></CardHeader>
+                                <CardContent className="p-2 text-sm prose dark:prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {questionText}
+                                    </ReactMarkdown>
+                                </CardContent>
+                            </Card>
+                        )}
                         {questionType === 'Fill in the Blank' && (
                             <FormDescription>Use "____" (four underscores) to indicate where the blank should be.</FormDescription>
                         )}
@@ -214,6 +226,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
                                     <SelectItem value="Short Answer">Short Answer</SelectItem>
                                     <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                     <SelectItem value="Matching">Matching</SelectItem>
+                                    <SelectItem value="Descriptive">Descriptive</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />
@@ -296,9 +309,44 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
                         <FormItem><FormLabel>Answer</FormLabel><FormControl><Input {...field} placeholder="Enter the correct answer" /></FormControl><FormMessage /></FormItem>
                     )}/>
                 )}
+                {questionType === 'Descriptive' && (
+                     <FormField control={form.control} name="correctAnswer" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Model Answer / Key Points</FormLabel>
+                            <FormControl>
+                                <Textarea {...field} placeholder="Provide a model answer or key points for grading." className="min-h-[150px]" />
+                            </FormControl>
+                            {descriptiveAnswer && (
+                                <Card className="mt-2">
+                                    <CardHeader className="p-2 border-b"><CardDescription className="text-xs">Preview</CardDescription></CardHeader>
+                                    <CardContent className="p-2 text-sm prose dark:prose-invert max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                            {descriptiveAnswer}
+                                        </ReactMarkdown>
+                                    </CardContent>
+                                </Card>
+                            )}
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                )}
 
                 <FormField control={form.control} name="explanation" render={({ field }) => (
-                    <FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea placeholder="Explain why the correct answer is right." {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem>
+                        <FormLabel>General Explanation</FormLabel>
+                        <FormControl><Textarea placeholder="Explain why the correct answer is right." {...field} /></FormControl>
+                         {questionExplanation && (
+                            <Card className="mt-2">
+                                <CardHeader className="p-2 border-b"><CardDescription className="text-xs">Preview</CardDescription></CardHeader>
+                                <CardContent className="p-2 text-sm prose dark:prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {questionExplanation}
+                                    </ReactMarkdown>
+                                </CardContent>
+                            </Card>
+                        )}
+                        <FormMessage />
+                    </FormItem>
                 )}/>
                 <DialogFooter className="pt-4">
                     <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
@@ -371,9 +419,9 @@ const QuestionsTable = ({
                                 />
                             </TableCell>
                             <TableCell className="font-medium max-w-sm truncate">
-                                 <ReactMarkdown 
+                                <ReactMarkdown 
                                     remarkPlugins={[remarkGfm, remarkMath]} 
-                                    rehypePlugins={[rehypeKatex]}
+                                    rehypePlugins={[rehypeRaw, rehypeKatex]}
                                     components={{
                                         p: ({node, ...props}) => <span {...props} />,
                                     }}
@@ -448,21 +496,8 @@ export default function ManageQuestionsPage() {
             ]);
             
             setSubjects(subjectData);
-            setAllQuestions(questionData.map(q => {
-                const data = q as any;
-                const createdAt = data.createdAt;
-                let formattedDate = 'Just now';
-                if (createdAt && typeof createdAt.toDate === 'function') {
-                    formattedDate = createdAt.toDate().toLocaleDateString();
-                } else if (createdAt) {
-                    try {
-                        const d = new Date(createdAt);
-                        if (!isNaN(d.getTime())) {
-                            formattedDate = d.toLocaleDateString()
-                        }
-                    } catch(e) {/* ignore */}
-                }
-                return { ...data, createdAt: formattedDate };
+            setAllQuestions(questionData.map((q: any) => {
+                return { ...q, createdAt: q.createdAt || 'N/A' };
             }) as Question[]);
 
         } catch (error) {

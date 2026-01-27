@@ -92,7 +92,7 @@ export type SubQuestion = {
 export type Question = {
     id: string;
     text: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Grouped';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Grouped' | 'Descriptive';
     marks: number;
     options?: {text: string, explanation?: string}[];
     matchingOptions?: {
