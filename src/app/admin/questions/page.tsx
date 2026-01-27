@@ -94,7 +94,7 @@ const questionFormSchema = z.object({
   board: z.string().optional(),
   classCategory: z.string().optional(),
   class: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive', 'Grouped']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.any().optional(),
@@ -107,7 +107,7 @@ const questionFormSchema = z.object({
     if (data.type === 'Matching') {
         return Array.isArray(data.correctAnswer) && data.correctAnswer.length > 0;
     }
-    return true; // For Descriptive, correctAnswer is not strictly required.
+    return true;
 }, {
     message: 'Correct answer is required for this question type.',
     path: ['correctAnswer'],
@@ -124,7 +124,7 @@ type Question = {
     board?: string;
     classCategory?: string;
     class?: string;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive' | 'Grouped';
     marks: number;
     options?: {text: string, explanation?: string}[];
     correctAnswer?: any;
@@ -261,28 +261,6 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classCat
         fetchGrades();
     }, [selectedClassCategory]);
 
-    useEffect(() => {
-        const type = form.getValues('type');
-        let defaultOptions: any[] | undefined = undefined;
-        let defaultCorrectAnswer: any = type === 'Matching' ? [] : undefined;
-
-        if (type === 'Multiple Choice') {
-            defaultOptions = Array.from({ length: 4 }, () => ({ text: '', explanation: '' }));
-        } else if (type === 'True/False') {
-            defaultOptions = [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}];
-        }
-        
-        form.setValue('options', defaultOptions);
-        if (form.getValues('correctAnswer') === undefined || form.getValues('type') !== type) {
-            form.setValue('correctAnswer', defaultCorrectAnswer);
-        }
-        
-        if (type === 'Matching' || type === 'Grouped') {
-            form.setValue('marks', 1);
-        }
-
-    }, [questionType, form]);
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
@@ -302,7 +280,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classCat
                     <FormField control={form.control} name="board" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Board</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl>
                                 <SelectContent>
                                     {boards.map(board => (<SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>))}
@@ -376,7 +354,34 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classCat
                     <FormField control={form.control} name="type" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Question Type</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select 
+                                onValueChange={(value) => {
+                                    field.onChange(value);
+                                    let newOptions: any[] | undefined = undefined;
+                                    let newCorrectAnswer: any = '';
+                                    let newSubQuestions: any[] | undefined = undefined;
+
+                                    if (value === 'Multiple Choice') {
+                                        newOptions = Array.from({ length: 4 }, () => ({ text: '', explanation: '' }));
+                                    } else if (value === 'True/False') {
+                                        newOptions = [{ text: 'True', explanation: '' }, { text: 'False', explanation: '' }];
+                                    } else if (value === 'Matching') {
+                                        newCorrectAnswer = [];
+                                    } else if (value === 'Grouped') {
+                                        newSubQuestions = [];
+                                        newCorrectAnswer = undefined;
+                                    }
+                                    
+                                    form.setValue('options', newOptions, { shouldValidate: true });
+                                    form.setValue('correctAnswer', newCorrectAnswer, { shouldValidate: true });
+                                    form.setValue('subQuestions', newSubQuestions, { shouldValidate: true });
+
+                                    if (value === 'Matching' || value === 'Grouped') {
+                                        form.setValue('marks', 1);
+                                    }
+                                }} 
+                                value={field.value}
+                            >
                                 <FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl>
                                 <SelectContent>
                                     <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
@@ -736,7 +741,7 @@ export default function ManageQuestionsPage() {
         if (question) {
             questionForm.reset({
                 ...question,
-                options: question.options || (question.type === 'Multiple Choice' ? Array.from({ length: 4 }, () => ({ text: '', explanation: '' })) : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
+                options: question.options || (question.type === 'Multiple Choice' ? Array.from({ length: 4 }, () => ({ text: '', explanation: '' })) : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : undefined),
             });
         } else {
           questionForm.reset({
