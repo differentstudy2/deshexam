@@ -2,11 +2,11 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { getAllQuestions, deleteQuestion, addQuestion, updateQuestion, getSubjects, getBoards, getClasses } from '@/lib/firebase/firestore';
+import { getAllQuestions, deleteQuestion, addQuestion, updateQuestion, getSubjects, getBoards, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -68,7 +68,9 @@ import rehypeRaw from 'rehype-raw';
 
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
-type Class = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
+
 
 const optionSchema = z.object({
   text: z.string().optional(),
@@ -90,6 +92,7 @@ const questionFormSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   subject: z.string().min(1, { message: 'Subject is required.' }),
   board: z.string().optional(),
+  classCategory: z.string().optional(),
   class: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.'),
@@ -119,6 +122,7 @@ type Question = {
     createdAt: string;
     subject: string;
     board?: string;
+    classCategory?: string;
     class?: string;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive';
     marks: number;
@@ -168,11 +172,94 @@ const MatchingPairsField = ({ control }: { control: any }) => {
 };
 
 
-const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classes, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], boards: Board[], classes: Class[], onClose: () => void }) => {
+const GroupedQuestionsField = ({ control }: { control: any }) => {
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "subQuestions",
+    });
+
+    const subQuestionTypes = useWatch({
+        control,
+        name: "subQuestions",
+    });
+
+    return (
+        <div className="space-y-4">
+            <FormLabel>Sub-Questions</FormLabel>
+            <FormDescription>Add the individual questions that fall under the main instruction.</FormDescription>
+            {fields.map((field, index) => {
+                const subQuestionType = subQuestionTypes?.[index]?.type;
+                return (
+                <Card key={field.id} className="p-4 bg-secondary/50">
+                    <div className="flex justify-between items-center mb-2">
+                         <FormLabel>Sub-Question {index + 1}</FormLabel>
+                         <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                            <Trash2 className="h-4 w-4 text-destructive"/>
+                        </Button>
+                    </div>
+                    <div className="space-y-4">
+                        <FormField control={control} name={`subQuestions.${index}.text`} render={({ field }) => (
+                            <FormItem><FormLabel className="text-xs">Question Text</FormLabel><FormControl><Input {...field} placeholder="e.g., Who is Bina?" /></FormControl><FormMessage/></FormItem>
+                        )}/>
+                        <FormField
+                            control={control}
+                            name={`subQuestions.${index}.type`}
+                            render={({ field: typeField }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs">Question Type</FormLabel>
+                                    <Select onValueChange={typeField.onChange} defaultValue={typeField.value}>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                            <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                            <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                            <SelectItem value="True/False">True/False</SelectItem>
+                                            <SelectItem value="Matching">Matching</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         {/* Dynamically render fields based on sub-question type */}
+                         {(subQuestionType === 'Short Answer' || subQuestionType === 'Fill in the Blank') && (
+                            <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
+                                <FormItem><FormLabel className="text-xs">Correct Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
+                            )}/>
+                        )}
+                        <FormField control={control} name={`subQuestions.${index}.explanation`} render={({ field }) => (
+                             <FormItem><FormLabel className="text-xs">Explanation (Optional)</FormLabel><FormControl><Textarea {...field} placeholder="Optional explanation" rows={2}/></FormControl></FormItem>
+                        )}/>
+                    </div>
+                </Card>
+                )
+            })}
+            <Button type="button" variant="outline" size="sm" onClick={() => append({ text: '', correctAnswer: '', explanation: '', marks: 1, type: 'Short Answer' })}>
+                <PlusCircle className="mr-2 h-4 w-4"/> Add Sub-Question
+            </Button>
+        </div>
+    );
+}
+
+const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classCategories, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], boards: Board[], classCategories: ClassCategory[], onClose: () => void }) => {
     const questionType = form.watch('type');
     const questionText = form.watch('text');
     const questionExplanation = form.watch('explanation');
     const descriptiveAnswer = form.watch('correctAnswer');
+    const selectedClassCategory = form.watch('classCategory');
+    const [grades, setGrades] = useState<Grade[]>([]);
+
+    useEffect(() => {
+        const fetchGrades = async () => {
+            if (selectedClassCategory) {
+                const fetchedGrades = await getGradesByClass(selectedClassCategory);
+                setGrades(fetchedGrades);
+            } else {
+                setGrades([]);
+            }
+        };
+        fetchGrades();
+    }, [selectedClassCategory]);
 
     useEffect(() => {
         const type = form.getValues('type');
@@ -199,7 +286,7 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classes,
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="subject" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Subject</FormLabel>
@@ -224,22 +311,48 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classes,
                             <FormMessage />
                         </FormItem>
                     )}/>
-                    <FormField control={form.control} name="class" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Class</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl><SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger></FormControl>
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <FormField
+                        control={form.control}
+                        name="classCategory"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Class Category</FormLabel>
+                            <Select onValueChange={(value) => { field.onChange(value); form.setValue('class', ''); }} value={field.value || ''}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
                                 <SelectContent>
-                                    {classes.map(c => (<SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>))}
+                                    {classCategories.map(c => (
+                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <FormMessage />
-                        </FormItem>
-                    )}/>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="class"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Grade</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedClassCategory}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a grade" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {grades.map(g => (
+                                        <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
                 <FormField control={form.control} name="text" render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Question Text</FormLabel>
+                        <FormLabel>{questionType === 'Grouped' ? 'Main Instruction / Passage' : 'Question Text'}</FormLabel>
                         <FormControl>
                             <Textarea placeholder="What is the capital of India?" {...field} />
                         </FormControl>
@@ -272,13 +385,14 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classes,
                                     <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                     <SelectItem value="Matching">Matching</SelectItem>
                                     <SelectItem value="Descriptive">Descriptive</SelectItem>
+                                    <SelectItem value="Grouped">Grouped Questions</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />
                         </FormItem>
                     )}/>
                     <FormField control={form.control} name="marks" render={({ field }) => (
-                        <FormItem><FormLabel>Marks</FormLabel><FormControl><Input type="number" {...field} disabled={questionType === 'Matching'} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Marks</FormLabel><FormControl><Input type="number" {...field} disabled={questionType === 'Matching' || questionType === 'Grouped'} /></FormControl><FormMessage /></FormItem>
                     )}/>
                 </div>
 
@@ -375,6 +489,9 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classes,
                         </FormItem>
                     )}/>
                 )}
+                 {questionType === 'Grouped' && (
+                    <GroupedQuestionsField control={form.control} />
+                )}
 
                 <FormField control={form.control} name="explanation" render={({ field }) => (
                     <FormItem>
@@ -435,7 +552,8 @@ const QuestionsTable = ({
                     <TableHead>Question Text</TableHead>
                     <TableHead className="hidden md:table-cell">Subject</TableHead>
                     <TableHead className="hidden lg:table-cell">Board</TableHead>
-                    <TableHead className="hidden xl:table-cell">Class</TableHead>
+                    <TableHead className="hidden lg:table-cell">Class Category</TableHead>
+                    <TableHead className="hidden xl:table-cell">Grade</TableHead>
                     <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead className="hidden lg:table-cell">Marks</TableHead>
                     <TableHead className="hidden xl:table-cell">Created At</TableHead>
@@ -449,6 +567,7 @@ const QuestionsTable = ({
                             <TableCell><Skeleton className="h-5 w-5" /></TableCell>
                             <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden xl:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
                             <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
@@ -480,6 +599,7 @@ const QuestionsTable = ({
                             </TableCell>
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.board}</TableCell>
+                            <TableCell className="hidden lg:table-cell">{question.classCategory}</TableCell>
                             <TableCell className="hidden xl:table-cell">{question.class}</TableCell>
                             <TableCell className="hidden sm:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.marks}</TableCell>
@@ -511,7 +631,7 @@ const QuestionsTable = ({
                     ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={9} className="text-center h-24">No questions found.</TableCell>
+                        <TableCell colSpan={10} className="text-center h-24">No questions found.</TableCell>
                     </TableRow>
                 )}
             </TableBody>
@@ -527,7 +647,7 @@ export default function ManageQuestionsPage() {
     const [loading, setLoading] = useState(true);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [boards, setBoards] = useState<Board[]>([]);
-    const [classes, setClasses] = useState<Class[]>([]);
+    const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('all');
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
@@ -552,7 +672,7 @@ export default function ManageQuestionsPage() {
             
             setSubjects(subjectData);
             setBoards(boardData);
-            setClasses(classData);
+            setClassCategories(classData);
 
             setAllQuestions(questionData.map((q: any) => {
                  const data = q as any;
@@ -628,6 +748,7 @@ export default function ManageQuestionsPage() {
             correctAnswer: '',
             explanation: '',
             board: '',
+            classCategory: '',
             class: '',
           });
         }
@@ -779,7 +900,7 @@ export default function ManageQuestionsPage() {
             </Card>
 
             <Dialog open={isQuestionFormDialogOpen} onOpenChange={setIsQuestionFormDialogOpen}>
-                <DialogContent className="sm:max-w-2xl">
+                <DialogContent className="sm:max-w-4xl">
                 <DialogHeader>
                     <DialogTitle>{questionToEdit ? 'Edit Question' : 'Add New Question'}</DialogTitle>
                     <DialogDescription>
@@ -792,7 +913,7 @@ export default function ManageQuestionsPage() {
                     isSubmitting={questionForm.formState.isSubmitting} 
                     subjects={subjects}
                     boards={boards}
-                    classes={classes}
+                    classCategories={classCategories}
                     onClose={() => setIsQuestionFormDialogOpen(false)}
                 />
                 </DialogContent>
