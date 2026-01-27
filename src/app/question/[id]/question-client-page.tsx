@@ -610,7 +610,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     )}
                                                     <div className="flex-1">
-                                                        <div className="font-medium text-lg">{optionText}</div>
+                                                        <div className="font-medium text-lg" style={{fontSize: '1.5rem'}}>{optionText}</div>
                                                         {isAnswerRevealed && explanation && (
                                                             <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{fontSize: '1rem'}}>
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{explanation}</ReactMarkdown>
@@ -632,7 +632,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         <div></div>
                                         <div className="font-bold text-center">Column B</div>
                                     </div>
-                                    {question.matchingOptions.columnA.map((itemA, itemIndex) => {
+                                    {question.matchingOptions?.columnA?.map((itemA, itemIndex) => {
                                         const userChoice = isAnswerRevealed ? answers[question.id]?.[itemA.text] : undefined;
                                         const correctChoice = isAnswerRevealed ? question.correctAnswer.find((p: any) => p.a === itemA.text)?.b : undefined;
                                         const isPairCorrect = userChoice === correctChoice;
@@ -694,7 +694,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 <CardTitle>Answer & Explanation</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
-                                <div className="prose dark:prose-invert max-w-none">
+                                <div className="prose dark:prose-invert max-w-none text-base">
                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                                         {question.explanation}
                                     </ReactMarkdown>
@@ -757,5 +757,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         </div>
     </div>
   );
+
+    
+}
 
     
