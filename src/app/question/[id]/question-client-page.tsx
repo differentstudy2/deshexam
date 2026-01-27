@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MessageSquare, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight, Star, ChevronLeft, CheckCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, MessageSquare, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight, Star, ChevronLeft, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -143,6 +143,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const [loading, setLoading] = useState(true);
   const [isVoting, setIsVoting] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
@@ -219,6 +220,15 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     }
   }
 
+  const handleAnswerClick = (optionText: string) => {
+    if (selectedAnswer !== null) return;
+    setSelectedAnswer(optionText);
+  };
+
+  const handleShowAnswerClick = () => {
+    setShowAnswer(true);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -244,6 +254,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   }
   
   const userHasLiked = user && question.likedBy?.includes(user.uid);
+  const isAnswerRevealed = showAnswer || selectedAnswer !== null;
 
   return (
     <div className="bg-secondary/30">
@@ -278,24 +289,46 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         {question.type === 'Multiple Choice' && question.options && (
                             <CardContent>
                                 <div className="space-y-3">
-                                    {question.options.map((option, index) => (
-                                        <div key={index} className="p-3 rounded-lg border bg-secondary/50">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                                {option.text}
-                                            </ReactMarkdown>
-                                        </div>
-                                    ))}
+                                    {question.options.map((option, index) => {
+                                        const isSelected = selectedAnswer === option.text;
+                                        const isCorrect = question.correctAnswer === option.text;
+                                        return (
+                                            <div
+                                                key={index}
+                                                onClick={() => handleAnswerClick(option.text)}
+                                                className={cn(
+                                                    "p-3 rounded-lg border flex items-start gap-3 transition-all",
+                                                    !isAnswerRevealed && "cursor-pointer hover:bg-accent",
+                                                    isAnswerRevealed && isCorrect ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800" : "",
+                                                    isAnswerRevealed && isSelected && !isCorrect ? "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800" : "bg-card"
+                                                )}
+                                            >
+                                                {isAnswerRevealed ? (
+                                                    isCorrect ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> :
+                                                    isSelected ? <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" /> :
+                                                    <div className="w-5 h-5 mt-0.5 shrink-0" />
+                                                ) : (
+                                                    <div className="w-5 h-5 mt-0.5 shrink-0 rounded-full border-2 border-muted-foreground" />
+                                                )}
+                                                <div className="flex-1">
+                                                    <div className="prose dark:prose-invert max-w-none custom-prose-style">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </CardContent>
                         )}
-                        {!showAnswer && (
+                        {!isAnswerRevealed && (
                             <CardFooter>
-                                <Button onClick={() => setShowAnswer(true)}>See Answer</Button>
+                                <Button onClick={handleShowAnswerClick}>See Answer</Button>
                             </CardFooter>
                         )}
                     </Card>
 
-                    {showAnswer && (
+                    {isAnswerRevealed && (
                         <Card>
                             <CardHeader>
                                 <p className="text-sm text-muted-foreground">{question.likes || 0} {question.likes === 1 ? 'person' : 'people'} found this helpful</p>
@@ -313,37 +346,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                              <CardContent className="space-y-6">
                                 <div className="prose dark:prose-invert max-w-none">
                                     <h4 className="font-bold">Answer:</h4>
-                                     {question.type === 'Multiple Choice' && question.options ? (
-                                        <div className="space-y-3 mt-2">
-                                            {question.options.map((option, index) => {
-                                                const isCorrect = option.text === question.correctAnswer;
-                                                return (
-                                                    <div key={index} className={cn(
-                                                        "p-3 rounded-lg border flex items-start gap-3",
-                                                        isCorrect 
-                                                            ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                                                            : "bg-card"
-                                                    )}>
-                                                        {isCorrect && <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />}
-                                                        <div className="flex-1">
-                                                            <div className="prose dark:prose-invert max-w-none custom-prose-style">
-                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                                            </div>
-                                                            {option.explanation && (
-                                                                <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
-                                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
-                                    ) : (
-                                         <div className="mt-2 p-3 rounded-lg border bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{String(question.correctAnswer)}</ReactMarkdown>
-                                        </div>
-                                    )}
+                                     <div className="mt-2 p-3 rounded-lg border bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{String(question.correctAnswer)}</ReactMarkdown>
+                                    </div>
                                 </div>
                                 <Separator />
                                 <div className="prose dark:prose-invert max-w-none">
@@ -352,6 +357,21 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         {question.explanation || "No explanation provided."}
                                     </ReactMarkdown>
                                 </div>
+                                 {question.type === 'Multiple Choice' && (
+                                     <div className="prose dark:prose-invert max-w-none">
+                                        <h5 className="font-semibold">Options Explanations:</h5>
+                                        {question.options?.map((option, index) => (
+                                            option.explanation && (
+                                                <div key={index} className="text-sm mt-2">
+                                                    <p className="font-bold my-1">For option "{option.text}":</p>
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                                        {option.explanation}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            )
+                                        ))}
+                                     </div>
+                                 )}
                             </CardContent>
                             <CardFooter className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
