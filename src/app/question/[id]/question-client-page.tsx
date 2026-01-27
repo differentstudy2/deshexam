@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -564,7 +563,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                 <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                             )}
                                             <div className="flex-1">
-                                                <div className="flex items-center justify-between prose dark:prose-invert max-w-none custom-prose-style" style={{fontSize: '1.5rem'}}>
+                                                <div className="flex items-center justify-between prose dark:prose-invert max-w-none" style={{fontSize: '1.5rem'}}>
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                                     {isSelected && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
                                                 </div>
@@ -578,7 +577,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </Card>
                                 )
                             })}
-                             {question.type === 'True/False' && (
+                            {question.type === 'True/False' && (
                                 <div className="space-y-3">
                                     {['True', 'False'].map((optionText, index) => {
                                         const isCorrectAnswer = question.correctAnswer === optionText;
@@ -600,7 +599,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         isCorrectAnswer ? 
                                                         <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
                                                         isSelected ? 
-                                                        <XCircle className="w-6 h-6 text-destructive mt-1 flex-shrink-0" /> :
+                                                        <XCircle className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" /> :
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     ) : (
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
@@ -679,10 +678,10 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </CardFooter>
                     </Card>
 
-                    {question.type === 'Short Answer' && (
+                     {(question.type === 'Short Answer' || question.type === 'Descriptive') && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Answer</CardTitle>
+                                <CardTitle>{question.type === 'Descriptive' ? 'Model Answer' : 'Answer'}</CardTitle>
                             </CardHeader>
                             <CardContent className="prose dark:prose-invert max-w-none">
                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
@@ -693,7 +692,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                     )}
 
                     {isAnswerRevealed && (question.type === 'Fill in the Blank' || question.type === 'Matching') && (
-                        <Card>
+                         <Card>
                             <CardHeader>
                                 <CardTitle>Correct Answer</CardTitle>
                             </CardHeader>
@@ -727,7 +726,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </Card>
                     )}
 
-                    {((isAnswerRevealed && (question.type !== 'Short Answer')) || (question.type === 'Short Answer')) && question.explanation && (
+                    {((isAnswerRevealed && !['Short Answer', 'Descriptive'].includes(question.type)) || ['Short Answer', 'Descriptive'].includes(question.type)) && question.explanation && (
                         <Card>
                             <CardHeader>
                                 <CardTitle>Explanation</CardTitle>
@@ -797,3 +796,5 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
     
 }
+
+    
