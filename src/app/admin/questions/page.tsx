@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -59,6 +58,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/use-auth';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+
 
 type Subject = { id: string, name: string };
 const optionSchema = z.object({
@@ -99,7 +104,7 @@ type Question = {
     id: string;
     text: string;
     authorName: string;
-    createdAt: any;
+    createdAt: string;
     subject: string;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
     marks: number;
@@ -365,7 +370,17 @@ const QuestionsTable = ({
                                     aria-label={`Select question`}
                                 />
                             </TableCell>
-                            <TableCell className="font-medium max-w-sm truncate">{question.text}</TableCell>
+                            <TableCell className="font-medium max-w-sm truncate">
+                                 <ReactMarkdown 
+                                    remarkPlugins={[remarkGfm, remarkMath]} 
+                                    rehypePlugins={[rehypeKatex]}
+                                    components={{
+                                        p: ({node, ...props}) => <span {...props} />,
+                                    }}
+                                >
+                                    {question.text}
+                                </ReactMarkdown>
+                            </TableCell>
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
                             <TableCell className="hidden md:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.marks}</TableCell>
@@ -435,15 +450,16 @@ export default function ManageQuestionsPage() {
             setSubjects(subjectData);
             setAllQuestions(questionData.map(q => {
                 const data = q as any;
-                 const createdAt = data.createdAt;
+                const createdAt = data.createdAt;
                 let formattedDate = 'Just now';
                 if (createdAt && typeof createdAt.toDate === 'function') {
                     formattedDate = createdAt.toDate().toLocaleDateString();
-                } else if (createdAt instanceof Date) {
-                    formattedDate = createdAt.toLocaleDateString();
                 } else if (createdAt) {
                     try {
-                        formattedDate = new Date(createdAt).toLocaleDateString()
+                        const d = new Date(createdAt);
+                        if (!isNaN(d.getTime())) {
+                            formattedDate = d.toLocaleDateString()
+                        }
                     } catch(e) {/* ignore */}
                 }
                 return { ...data, createdAt: formattedDate };

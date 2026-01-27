@@ -26,6 +26,8 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
+
 
 type Option = {
   text: string;
@@ -240,7 +242,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                 <header className="mb-8">
                     {question.subject && <Badge className="mb-2">{question.subject}</Badge>}
                     <div className="prose dark:prose-invert lg:prose-xl max-w-none">
-                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                             {question.text}
                         </ReactMarkdown>
                     </div>
@@ -268,11 +270,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             }
                                             <div className="flex-1">
                                                 <div className="prose dark:prose-invert max-w-none custom-prose-style">
-                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                                 </div>
                                                 {option.explanation && 
                                                 <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
                                                 </div>
                                                 }
                                             </div>
@@ -303,7 +305,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             {question.type === 'Matching' && (
                                  <div className="space-y-4">
                                     <h4 className="font-bold">Correct Matches</h4>
-                                    {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair, index) => (
+                                    {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, index: number) => (
                                         <div key={index} className="flex items-center justify-between gap-2 p-3 border rounded-md bg-green-50 dark:bg-green-900/20">
                                             <div className="flex flex-col items-center text-center">
                                                 {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={50} height={50} className="rounded-md object-cover mb-1" />}
@@ -329,7 +331,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="prose dark:prose-invert max-w-none text-sm custom-prose-style">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.explanation}</ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{question.explanation}</ReactMarkdown>
                                 </CardContent>
                             </Card>
                         )}
@@ -404,7 +406,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     disabled={isVoting}
                                     className={cn("flex-1", userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
                                 >
-                                    <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
+                                    <ThumbsUp className="mr-2 h-4 w-4" /> Like ({question.likes || 0})
                                 </Button>
                                 <Button 
                                     variant={userHasDisliked ? "destructive" : "outline"} 
@@ -413,7 +415,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     disabled={isVoting}
                                     className="flex-1"
                                 >
-                                    <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
+                                    <ThumbsDown className="mr-2 h-4 w-4" /> Dislike ({question.dislikes || 0})
                                 </Button>
                             </CardContent>
                         </Card>
@@ -436,4 +438,3 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
-
