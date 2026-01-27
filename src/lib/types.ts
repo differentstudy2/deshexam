@@ -112,6 +112,9 @@ export type Question = {
     subject?: string;
     textbookId?: string;
     chapterId?: string;
+    board?: string;
+    classCategory?: string;
+    class?: string;
 };
 
 export type Comment = {

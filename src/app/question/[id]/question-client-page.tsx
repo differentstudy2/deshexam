@@ -264,6 +264,12 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </div>
                                 <Badge variant="outline" className="text-green-600 border-green-600">Answered</Badge>
                             </div>
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground pt-4">
+                                {question.board && <Badge variant="secondary">{question.board}</Badge>}
+                                {question.class && <Badge variant="secondary">{question.class}</Badge>}
+                                {question.type && <Badge variant="secondary">{question.type}</Badge>}
+                                {question.marks && <Badge variant="secondary">{question.marks} Mark{question.marks > 1 ? 's' : ''}</Badge>}
+                            </div>
                              <div className="prose dark:prose-invert max-w-none pt-4">
                                 <h2>{question.text}</h2>
                             </div>

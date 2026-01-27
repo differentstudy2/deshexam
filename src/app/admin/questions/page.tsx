@@ -557,7 +557,6 @@ const QuestionsTable = ({
                     <TableHead>Question Text</TableHead>
                     <TableHead className="hidden md:table-cell">Subject</TableHead>
                     <TableHead className="hidden lg:table-cell">Board</TableHead>
-                    <TableHead className="hidden lg:table-cell">Class Category</TableHead>
                     <TableHead className="hidden xl:table-cell">Grade</TableHead>
                     <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead className="hidden lg:table-cell">Marks</TableHead>
@@ -572,7 +571,6 @@ const QuestionsTable = ({
                             <TableCell><Skeleton className="h-5 w-5" /></TableCell>
                             <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden xl:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
                             <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
@@ -604,7 +602,6 @@ const QuestionsTable = ({
                             </TableCell>
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.board}</TableCell>
-                            <TableCell className="hidden lg:table-cell">{question.classCategory}</TableCell>
                             <TableCell className="hidden xl:table-cell">{question.class}</TableCell>
                             <TableCell className="hidden sm:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.marks}</TableCell>
@@ -664,6 +661,15 @@ export default function ManageQuestionsPage() {
     const questionForm = useForm<QuestionFormValues>({
         resolver: zodResolver(questionFormSchema),
     });
+
+    useEffect(() => {
+        if(questionToEdit) {
+            questionForm.reset({
+                 ...questionToEdit,
+                 options: questionToEdit.options || (questionToEdit.type === 'Multiple Choice' ? Array.from({ length: 4 }, () => ({ text: '', explanation: '' })) : questionToEdit.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : undefined),
+            });
+        }
+    }, [questionToEdit, questionForm])
 
     const fetchInitialData = async () => {
         try {
@@ -739,10 +745,7 @@ export default function ManageQuestionsPage() {
     const openQuestionDialog = (question: Question | null) => {
         setQuestionToEdit(question);
         if (question) {
-            questionForm.reset({
-                ...question,
-                options: question.options || (question.type === 'Multiple Choice' ? Array.from({ length: 4 }, () => ({ text: '', explanation: '' })) : question.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : undefined),
-            });
+            questionForm.reset(question);
         } else {
           questionForm.reset({
             text: '',
