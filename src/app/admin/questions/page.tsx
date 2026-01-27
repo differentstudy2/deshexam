@@ -1,12 +1,12 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { getAllQuestions, deleteQuestion, addQuestion, updateQuestion, getSubjects } from '@/lib/firebase/firestore';
+import { getAllQuestions, deleteQuestion, addQuestion, updateQuestion, getSubjects, getBoards, getClasses } from '@/lib/firebase/firestore';
 import {
   Card,
   CardContent,
@@ -67,25 +67,36 @@ import rehypeRaw from 'rehype-raw';
 
 
 type Subject = { id: string, name: string };
+type Board = { id: string, name: string };
+type Class = { id: string, name: string };
+
 const optionSchema = z.object({
-  text: z.string().min(1, 'Option text cannot be empty.'),
+  text: z.string().optional(),
   explanation: z.string().optional(),
 });
 
-const matchingPairSchema = z.object({
-    a: z.string().min(1, 'Column A item cannot be empty.'),
-    b: z.string().min(1, 'Column B item cannot be empty.'),
+const subQuestionSchema = z.object({
+  id: z.string().optional(),
+  text: z.string().optional(),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
+  marks: z.coerce.number().optional(),
+  options: z.array(optionSchema).optional(),
+  correctAnswer: z.any().optional(),
+  explanation: z.string().optional(),
 });
 
 const questionFormSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
   subject: z.string().min(1, { message: 'Subject is required.' }),
+  board: z.string().optional(),
+  class: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.'),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
+  subQuestions: z.array(subQuestionSchema).optional(),
 }).refine(data => {
     if (['Multiple Choice', 'Short Answer', 'Fill in the Blank', 'True/False'].includes(data.type)) {
         return !!data.correctAnswer;
@@ -107,11 +118,14 @@ type Question = {
     authorName: string;
     createdAt: string;
     subject: string;
+    board?: string;
+    class?: string;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Descriptive';
     marks: number;
     options?: {text: string, explanation?: string}[];
-    correctAnswer?: string;
+    correctAnswer?: any;
     explanation?: string;
+    subQuestions?: SubQuestion[];
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -154,7 +168,7 @@ const MatchingPairsField = ({ control }: { control: any }) => {
 };
 
 
-const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], onClose: () => void }) => {
+const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, boards, classes, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], boards: Board[], classes: Class[], onClose: () => void }) => {
     const questionType = form.watch('type');
     const questionText = form.watch('text');
     const questionExplanation = form.watch('explanation');
@@ -162,16 +176,21 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
 
     useEffect(() => {
         const type = form.getValues('type');
-        form.setValue('correctAnswer', type === 'Matching' ? [] : '');
         let defaultOptions: any[] | undefined = undefined;
+        let defaultCorrectAnswer: any = type === 'Matching' ? [] : undefined;
+
         if (type === 'Multiple Choice') {
             defaultOptions = Array.from({ length: 4 }, () => ({ text: '', explanation: '' }));
         } else if (type === 'True/False') {
             defaultOptions = [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}];
         }
-        form.setValue('options', defaultOptions);
         
-        if (type === 'Matching') {
+        form.setValue('options', defaultOptions);
+        if (form.getValues('correctAnswer') === undefined || form.getValues('type') !== type) {
+            form.setValue('correctAnswer', defaultCorrectAnswer);
+        }
+        
+        if (type === 'Matching' || type === 'Grouped') {
             form.setValue('marks', 1);
         }
 
@@ -180,18 +199,44 @@ const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { for
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[70vh] overflow-y-auto p-4">
-                <FormField control={form.control} name="subject" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Subject</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                            <FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl>
-                            <SelectContent>
-                                {subjects.map(sub => (<SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField control={form.control} name="subject" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Subject</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {subjects.map(sub => (<SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="board" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Board</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {boards.map(board => (<SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="class" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Class</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {classes.map(c => (<SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
                 <FormField control={form.control} name="text" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Question Text</FormLabel>
@@ -388,8 +433,10 @@ const QuestionsTable = ({
                         />
                     </TableHead>
                     <TableHead>Question Text</TableHead>
-                    <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead className="hidden md:table-cell">Subject</TableHead>
+                    <TableHead className="hidden lg:table-cell">Board</TableHead>
+                    <TableHead className="hidden xl:table-cell">Class</TableHead>
+                    <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead className="hidden lg:table-cell">Marks</TableHead>
                     <TableHead className="hidden xl:table-cell">Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -401,8 +448,10 @@ const QuestionsTable = ({
                         <TableRow key={i}>
                             <TableCell><Skeleton className="h-5 w-5" /></TableCell>
                             <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                            <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                            <TableCell className="hidden xl:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                            <TableCell className="hidden sm:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                             <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-12" /></TableCell>
                             <TableCell className="hidden xl:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
                             <TableCell className="text-right"><Skeleton className="h-8 w-8" /></TableCell>
@@ -429,8 +478,10 @@ const QuestionsTable = ({
                                     {question.text}
                                 </ReactMarkdown>
                             </TableCell>
-                            <TableCell className="hidden sm:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden md:table-cell">{question.subject}</TableCell>
+                            <TableCell className="hidden lg:table-cell">{question.board}</TableCell>
+                            <TableCell className="hidden xl:table-cell">{question.class}</TableCell>
+                            <TableCell className="hidden sm:table-cell">{question.type}</TableCell>
                             <TableCell className="hidden lg:table-cell">{question.marks}</TableCell>
                             <TableCell className="hidden xl:table-cell">
                                 {question.createdAt}
@@ -460,7 +511,7 @@ const QuestionsTable = ({
                     ))
                 ) : (
                     <TableRow>
-                        <TableCell colSpan={7} className="text-center h-24">No questions found.</TableCell>
+                        <TableCell colSpan={9} className="text-center h-24">No questions found.</TableCell>
                     </TableRow>
                 )}
             </TableBody>
@@ -475,6 +526,8 @@ export default function ManageQuestionsPage() {
     const [allQuestions, setAllQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
     const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [boards, setBoards] = useState<Board[]>([]);
+    const [classes, setClasses] = useState<Class[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('all');
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
@@ -490,12 +543,17 @@ export default function ManageQuestionsPage() {
     const fetchInitialData = async () => {
         try {
             setLoading(true);
-            const [subjectData, questionData] = await Promise.all([
-            getSubjects(),
-            getAllQuestions(),
+            const [subjectData, questionData, boardData, classData] = await Promise.all([
+                getSubjects(),
+                getAllQuestions(),
+                getBoards(),
+                getClasses(),
             ]);
             
             setSubjects(subjectData);
+            setBoards(boardData);
+            setClasses(classData);
+
             setAllQuestions(questionData.map((q: any) => {
                  const data = q as any;
                  const createdAt = data.createdAt;
@@ -569,6 +627,8 @@ export default function ManageQuestionsPage() {
             options: Array.from({ length: 4 }, () => ({ text: '', explanation: '' })),
             correctAnswer: '',
             explanation: '',
+            board: '',
+            class: '',
           });
         }
         setIsQuestionFormDialogOpen(true);
@@ -731,6 +791,8 @@ export default function ManageQuestionsPage() {
                     onSubmit={handleQuestionFormSubmit} 
                     isSubmitting={questionForm.formState.isSubmitting} 
                     subjects={subjects}
+                    boards={boards}
+                    classes={classes}
                     onClose={() => setIsQuestionFormDialogOpen(false)}
                 />
                 </DialogContent>
