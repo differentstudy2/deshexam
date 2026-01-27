@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
+import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star, ChevronLeft, GripVertical } from 'lucide-react';
@@ -105,23 +105,37 @@ const UserProfileCard = ({ user }: { user: any }) => {
     );
 };
 
-const TextbookSolutionsSection = () => {
+const TextbookSolutionsSection = ({ currentClass }: { currentClass?: string }) => {
     const [textbooks, setTextbooks] = useState<Textbook[]>([]);
+    const [allClasses, setAllClasses] = useState<{id: string, name: string}[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedClass, setSelectedClass] = useState<string | 'all'>('all');
 
     useEffect(() => {
-        const fetchTextbooks = async () => {
+        const fetchTextbooksAndClasses = async () => {
             try {
-                const data = await getAllTextbooks();
-                setTextbooks(data as Textbook[]);
+                const [textbookData, classData] = await Promise.all([
+                    getAllTextbooks(),
+                    getClasses()
+                ]);
+                setTextbooks(textbookData as Textbook[]);
+                setAllClasses(classData as {id: string, name: string}[]);
+                if (currentClass) {
+                    setSelectedClass(currentClass);
+                }
             } catch (error) {
-                console.error("Failed to fetch textbooks for showcase", error);
+                console.error("Failed to fetch textbooks or classes for showcase", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchTextbooks();
-    }, []);
+        fetchTextbooksAndClasses();
+    }, [currentClass]);
+
+    const filteredTextbooks = useMemo(() => {
+        if (selectedClass === 'all') return textbooks;
+        return textbooks.filter(book => book.class === selectedClass);
+    }, [selectedClass, textbooks]);
 
     if (loading) {
         return (
@@ -144,15 +158,19 @@ const TextbookSolutionsSection = () => {
                     <Link href="/textbook-solutions">See all</Link>
                  </Button>
             </div>
-             <div className="flex gap-2 mb-4">
-                <Button variant="outline" size="sm">Class 12</Button>
-                <Button variant="outline" size="sm">Class 11</Button>
-                <Button variant="outline" size="sm">Class 10</Button>
-                <Button variant="outline" size="sm">Class 9</Button>
+            <div className="flex gap-2 mb-4 flex-wrap">
+                <Button variant={selectedClass === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setSelectedClass('all')}>
+                    All Classes
+                </Button>
+                {allClasses.map(c => (
+                     <Button key={c.id} variant={selectedClass === c.name ? 'default' : 'outline'} size="sm" onClick={() => setSelectedClass(c.name)}>
+                        {c.name}
+                    </Button>
+                ))}
             </div>
             <Carousel opts={{ align: "start", loop: false }}>
                 <CarouselContent className="-ml-4">
-                    {textbooks.slice(0, 8).map((book) => (
+                    {filteredTextbooks.slice(0, 8).map((book) => (
                          <CarouselItem key={book.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 pl-4">
                             <Card className="h-full hover:shadow-md transition-shadow">
                                  <Link href={`/textbook-solutions/${(book as any).id}`}>
@@ -173,7 +191,7 @@ const TextbookSolutionsSection = () => {
             </Carousel>
         </div>
     )
-}
+};
 
 
 export default function QuestionClientPage({ questionId }: { questionId: string }) {
@@ -305,11 +323,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         setIsVoting(false);
     }
   }
-
-  const handleAnswerClick = (optionText: string) => {
-    if (selectedAnswer !== null) return;
-    setSelectedAnswer(optionText);
-  };
 
   const handleShowAnswerClick = () => {
     setShowAnswer(true);
@@ -499,8 +512,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   }
   
   const userHasLiked = user && question.likedBy?.includes(user.uid);
-  const allOptionsSelected = question && question.type === 'Matching' && question.matchingOptions?.columnA.length === Object.keys(answers[question.id] || {}).length;
-
+  
   return (
     <div className="bg-secondary/30">
         <div className="container py-8">
@@ -535,47 +547,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             </div>
                         </CardHeader>
                         <CardContent>
-                           {question.type === 'Multiple Choice' && question.options?.map((option, index) => {
-                                const isCorrectAnswer = question.correctAnswer === option.text;
-                                const isSelected = selectedAnswer === option.text;
-                                return (
-                                    <Card
-                                        key={index}
-                                        onClick={() => !isAnswerRevealed && handleAnswerClick(option.text)}
-                                        className={cn(
-                                            "cursor-pointer transition-all border-2 mb-3",
-                                            isAnswerRevealed && isCorrectAnswer
-                                                ? "border-green-500 bg-green-100/20"
-                                                : "border-border hover:bg-accent",
-                                            isAnswerRevealed && isSelected && !isCorrectAnswer ? "border-destructive bg-red-100/20" : ""
-                                        )}
-                                    >
-                                        <CardContent className="p-4 flex items-start gap-4">
-                                             {isAnswerRevealed ? (
-                                                isCorrectAnswer ? 
-                                                <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
-                                                isSelected ? 
-                                                <XCircle className="w-6 h-6 text-destructive mt-1 flex-shrink-0" /> :
-                                                <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
-                                            ) : (
-                                                <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
-                                            )}
-                                            <div className="flex-1">
-                                                <div className="flex items-center justify-between prose dark:prose-invert max-w-none custom-prose-style" style={{fontSize: '1.5rem'}}>
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                                    {isSelected && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
-                                                </div>
-                                                {isAnswerRevealed && option.explanation && (
-                                                    <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
-                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.explanation}</ReactMarkdown>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                )
-                            })}
-                            {question.type === 'True/False' && (
+                            {question.type === 'True/False' && question.options && (
                                 <div className="space-y-3">
                                     {['True', 'False'].map((optionText, index) => {
                                         const isCorrectAnswer = question.correctAnswer === optionText;
@@ -585,7 +557,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         return (
                                             <Card
                                                 key={index}
-                                                onClick={() => !isAnswerRevealed && handleAnswerClick(optionText)}
+                                                onClick={() => !isAnswerRevealed && setSelectedAnswer(optionText)}
                                                 className={cn(
                                                     "cursor-pointer transition-all border-2",
                                                     isAnswerRevealed && isCorrectAnswer ? "border-green-500 bg-green-100/20" : "border-border hover:bg-accent",
@@ -646,7 +618,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             )}
                         </CardContent>
                         <CardFooter className="flex-wrap gap-4">
-                            {!isAnswerRevealed && (question.type === 'Fill in the Blank' || question.type === 'Matching') && (
+                            {['Fill in the Blank', 'Matching'].includes(question.type) && !isAnswerRevealed && (
                                 <Button onClick={handleShowAnswerClick}>See Answer</Button>
                             )}
                             <div className="flex items-center gap-2">
@@ -673,7 +645,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             </CardHeader>
                             <CardContent>
                                <div className="text-lg font-bold prose dark:prose-invert max-w-none">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                                         {question.correctAnswer}
                                     </ReactMarkdown>
                                 </div>
@@ -707,7 +679,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </div>
                                 ) : (
                                     <div className="text-lg font-bold prose dark:prose-invert max-w-none">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                                             {question.correctAnswer}
                                         </ReactMarkdown>
                                     </div>
@@ -716,7 +688,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </Card>
                     )}
                     
-                    {question.type === 'Short Answer' || question.type === 'Descriptive' ? (
+                    {['Short Answer', 'Descriptive'].includes(question.type) && (
                         <Card>
                             <CardHeader>
                                 <CardTitle>{question.type === 'Descriptive' ? 'Model Answer' : 'Answer'}</CardTitle>
@@ -727,9 +699,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </ReactMarkdown>
                             </CardContent>
                         </Card>
-                    ) : null}
+                    )}
 
-                    {((isAnswerRevealed && !['Short Answer', 'Descriptive'].includes(question.type)) || ['Short Answer', 'Descriptive'].includes(question.type)) && question.explanation && (
+                    {(isAnswerRevealed || ['Short Answer', 'Descriptive'].includes(question.type)) && question.explanation && (
                         <Card>
                             <CardHeader>
                                 <CardTitle>Explanation</CardTitle>
@@ -773,7 +745,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </CardContent>
                     </Card>
 
-                    <TextbookSolutionsSection />
+                    <TextbookSolutionsSection currentClass={question.class} />
                     
                 </div>
 
@@ -799,5 +771,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
     
 }
+
+    
 
     
