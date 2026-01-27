@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -150,7 +151,7 @@ const MatchingPairsField = ({ control }: { control: any }) => {
 const QuestionForm = ({ form, onSubmit, isSubmitting, subjects, onClose }: { form: any, onSubmit: (data: QuestionFormValues) => void, isSubmitting: boolean, subjects: Subject[], onClose: () => void }) => {
     const questionType = form.watch('type');
 
-    React.useEffect(() => {
+    useEffect(() => {
         const type = form.getValues('type');
         const defaultCorrectAnswer = type === 'Matching' ? [] : undefined;
         form.setValue('correctAnswer', defaultCorrectAnswer);
