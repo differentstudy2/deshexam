@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, MessageSquare, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight, Star, ChevronLeft, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, ArrowRight, Star, ChevronLeft, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -294,43 +294,43 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         const isCorrectAnswer = question.correctAnswer === option.text;
                                         const isSelected = selectedAnswer === option.text;
                                         return (
-                                           <div
+                                           <Card
                                                 key={index}
                                                 onClick={() => !isAnswerRevealed && handleAnswerClick(option.text)}
                                                 className={cn(
-                                                    "p-4 rounded-lg border-2 flex items-start gap-4 transition-all",
-                                                    !isAnswerRevealed && "cursor-pointer hover:bg-accent",
+                                                    "cursor-pointer transition-all border-2",
                                                     isAnswerRevealed && isCorrectAnswer
-                                                        ? "border-green-500 bg-green-100/50"
-                                                        : "border-border bg-card",
-                                                    isAnswerRevealed && isSelected && !isCorrectAnswer ? "border-destructive bg-red-100/50" : ""
+                                                        ? "border-green-500 bg-green-100/20"
+                                                        : "border-border hover:bg-accent",
+                                                    isAnswerRevealed && isSelected && !isCorrectAnswer ? "border-destructive bg-red-100/20" : ""
                                                 )}
                                             >
-                                                {isAnswerRevealed ? (
-                                                    isCorrectAnswer ? 
-                                                    <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
-                                                    isSelected ? 
-                                                    <XCircle className="w-6 h-6 text-destructive mt-1 flex-shrink-0" /> :
-                                                    <div className="w-6 h-6 mt-1 flex-shrink-0" />
-                                                ) : (
-                                                    <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
-                                                )}
-
-                                                <div className="flex-1">
-                                                    <div className="prose dark:prose-invert max-w-none custom-prose-style">
-                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                                            {option.text}
-                                                        </ReactMarkdown>
-                                                    </div>
-                                                     {isAnswerRevealed && option.explanation && (
-                                                        <div className="mt-2 text-sm text-muted-foreground prose dark:prose-invert max-w-none prose-sm">
-                                                           <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                                                {option.explanation}
+                                                <CardContent className="p-4 flex items-start gap-4">
+                                                     {isAnswerRevealed ? (
+                                                        isCorrectAnswer ? 
+                                                        <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" /> :
+                                                        isSelected ? 
+                                                        <XCircle className="w-6 h-6 text-destructive mt-1 flex-shrink-0" /> :
+                                                        <div className="w-6 h-6 mt-1 flex-shrink-0" />
+                                                    ) : (
+                                                        <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <div className="text-2xl font-medium">
+                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                                                {option.text}
                                                             </ReactMarkdown>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                                        {isAnswerRevealed && option.explanation && (
+                                                            <div className="mt-2 text-base text-muted-foreground">
+                                                               <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                                                    {option.explanation}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
                                         )
                                     })}
                                 </div>
