@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, Sparkles, Brain, ChevronRight, Flag, Heart, CheckCircle, XCircle, MessageSquare, ThumbsUp, ThumbsDown, CornerDownRight, Star, ChevronLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -148,7 +149,7 @@ const TextbookSolutionsSection = () => {
                     {textbooks.slice(0, 8).map((book) => (
                          <CarouselItem key={book.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 pl-4">
                             <Card className="h-full hover:shadow-md transition-shadow">
-                                 <Link href={`/textbook-solutions/${book.id}`}>
+                                 <Link href={`/textbook-solutions/${(book as any).id}`}>
                                     <div className="aspect-[2/3] w-full bg-secondary rounded-t-lg overflow-hidden">
                                       <Image src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`} alt={book.title} width={200} height={280} className="w-full h-full object-contain" />
                                     </div>
@@ -358,7 +359,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     return topLevelComments;
   }, [comments]);
   
-   const renderComment = (comment: Comment, isReply: boolean = false) => {
+  const renderComment = (comment: Comment, isReply: boolean = false) => {
     const userHasLiked = user && comment.likedBy?.includes(user.uid);
     const userHasDisliked = user && comment.dislikedBy?.includes(user.uid);
     const userRootComment = comments.find(c => c.authorId === comment.authorId && !c.parentId && c.rating);
@@ -510,13 +511,13 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                                         <div className="w-6 h-6 mt-1 flex-shrink-0 rounded-full border-2 border-muted-foreground" />
                                                     )}
                                                     <div className="flex-1">
-                                                        <div className="text-2xl font-medium prose dark:prose-invert max-w-none custom-prose-style" style={{ fontSize: '1.5rem' }}>
+                                                        <div className="font-medium prose dark:prose-invert max-w-none" style={{ fontSize: '1.5rem' }}>
                                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                                                                 {option.text}
                                                             </ReactMarkdown>
                                                         </div>
                                                         {isAnswerRevealed && option.explanation && (
-                                                            <div className="mt-2 text-base text-muted-foreground prose dark:prose-invert max-w-none custom-prose-style" style={{ fontSize: '1rem' }}>
+                                                            <div className="mt-2 text-muted-foreground prose dark:prose-invert max-w-none" style={{ fontSize: '1rem' }}>
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                                                                     {option.explanation}
                                                                 </ReactMarkdown>
