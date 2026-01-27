@@ -271,7 +271,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </Avatar>
                                     <div>
                                         <p className="font-semibold">{question.authorName}</p>
-                                        <p className="text-xs text-muted-foreground">{new Date(question.createdAt).toLocaleDateString()} &middot; {question.subject}</p>
+                                        <p className="text-xs text-muted-foreground">{new Date(question.createdAt).toLocaleDateString()}</p>
                                     </div>
                                 </div>
                                 <Badge variant="outline" className="text-green-600 border-green-600">Answered</Badge>
@@ -295,7 +295,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         return (
                                             <div
                                                 key={index}
-                                                onClick={() => handleAnswerClick(option.text)}
+                                                onClick={() => !isAnswerRevealed && handleAnswerClick(option.text)}
                                                 className={cn(
                                                     "p-3 rounded-lg border flex items-start gap-3 transition-all",
                                                     !isAnswerRevealed && "cursor-pointer hover:bg-accent",
@@ -331,36 +331,28 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                     {isAnswerRevealed && (
                         <Card>
                             <CardHeader>
-                                <p className="text-sm text-muted-foreground">{question.likes || 0} {question.likes === 1 ? 'person' : 'people'} found this helpful</p>
-                                <div className="flex items-center gap-3">
-                                    <Avatar>
-                                        <AvatarImage src={`https://picsum.photos/seed/answerer/40/40`} />
-                                        <AvatarFallback>A</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-semibold">{question.authorName}</p>
-                                        <p className="text-xs text-muted-foreground">Ambitious &middot; 46 answers &middot; 819 people helped</p>
-                                    </div>
-                                </div>
+                                <CardTitle>Answer & Explanation</CardTitle>
                             </CardHeader>
-                             <CardContent className="space-y-6">
+                            <CardContent className="space-y-6">
                                 <div className="prose dark:prose-invert max-w-none">
-                                    <h4 className="font-bold">Answer:</h4>
+                                    <h4 className="font-bold">Correct Answer:</h4>
                                      <div className="mt-2 p-3 rounded-lg border bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{String(question.correctAnswer)}</ReactMarkdown>
                                     </div>
                                 </div>
                                 <Separator />
-                                <div className="prose dark:prose-invert max-w-none">
-                                    <h5 className="font-semibold">Explanation:</h5>
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                        {question.explanation || "No explanation provided."}
-                                    </ReactMarkdown>
-                                </div>
-                                 {question.type === 'Multiple Choice' && (
+                                {question.explanation && (
+                                    <div className="prose dark:prose-invert max-w-none">
+                                        <h5 className="font-semibold">General Explanation:</h5>
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                            {question.explanation}
+                                        </ReactMarkdown>
+                                    </div>
+                                )}
+                                 {question.type === 'Multiple Choice' && question.options?.some(opt => opt.explanation) && (
                                      <div className="prose dark:prose-invert max-w-none">
                                         <h5 className="font-semibold">Options Explanations:</h5>
-                                        {question.options?.map((option, index) => (
+                                        {question.options.map((option, index) => (
                                             option.explanation && (
                                                 <div key={index} className="text-sm mt-2">
                                                     <p className="font-bold my-1">For option "{option.text}":</p>
@@ -373,7 +365,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                      </div>
                                  )}
                             </CardContent>
-                            <CardFooter className="flex justify-between items-center">
+                             <CardFooter className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
                                     <Button variant="ghost" size="icon" onClick={() => handleVote('like')} disabled={isVoting}>
                                         <Heart className={cn("w-5 h-5", userHasLiked && "fill-red-500 text-red-500")} />
