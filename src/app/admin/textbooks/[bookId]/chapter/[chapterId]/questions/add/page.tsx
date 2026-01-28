@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +22,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { Dialog, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { generateTextbookQuestions, AITextbookQuestionGeneratorInput, AITextbookQuestionGeneratorOutput } from '@/ai/flows/ai-textbook-question-generator';
-import type { Chapter } from '@/lib/types';
+import { addQuestion, getTextbookById } from '@/lib/firebase/firestore';
+import type { Chapter, Question, Textbook } from '@/lib/types';
 import { Checkbox } from '@/components/ui/checkbox';
 
 
@@ -223,6 +224,7 @@ export default function AddChapterQuestionPage() {
     const router = useRouter();
     const { toast } = useToast();
     const [chapter, setChapter] = useState<Chapter | null>(null);
+    const [textbook, setTextbook] = useState<Textbook | null>(null);
     const [loadingChapter, setLoadingChapter] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -252,19 +254,32 @@ export default function AddChapterQuestionPage() {
     });
 
     useEffect(() => {
-        const fetchChapter = async () => {
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const chapterSnap = await getDoc(chapterRef);
-            if (chapterSnap.exists()) {
-                const data = chapterSnap.data() as Chapter;
-                setChapter(data);
-                aiForm.setValue('sourceText', data.content || '');
-            } else {
-                toast({ variant: 'destructive', title: "Chapter not found." });
+        const fetchPrerequisites = async () => {
+            setLoadingChapter(true);
+            try {
+                const textbookData = await getTextbookById(textbookId);
+                if (textbookData) {
+                    setTextbook(textbookData as Textbook);
+                } else {
+                    toast({ variant: "destructive", title: "Textbook not found." });
+                }
+
+                const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
+                const chapterSnap = await getDoc(chapterRef);
+                if (chapterSnap.exists()) {
+                    const data = chapterSnap.data() as Chapter;
+                    setChapter(data);
+                    aiForm.setValue('sourceText', data.content || '');
+                } else {
+                    toast({ variant: 'destructive', title: "Chapter not found." });
+                }
+            } catch (e) {
+                 toast({ variant: "destructive", title: "Error loading page data", description: (e as Error).message });
+            } finally {
+                setLoadingChapter(false);
             }
-            setLoadingChapter(false);
         };
-        fetchChapter();
+        fetchPrerequisites();
     }, [textbookId, chapterId, toast, aiForm]);
 
     const questionType = form.watch('type');
@@ -285,22 +300,21 @@ export default function AddChapterQuestionPage() {
 
     const onSubmit = async (data: QuestionFormValues) => {
         try {
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const chapterSnap = await getDoc(chapterRef);
-
-            if (!chapterSnap.exists()) {
-                throw new Error("Chapter not found.");
+            if (!textbook) {
+                throw new Error("Textbook data is not available.");
             }
-
-            const existingQuestions = chapterSnap.data().textbookQuestions || [];
-            const newQuestion = { ...data, id: new Date().getTime().toString() };
-            const updatedQuestions = [...existingQuestions, newQuestion];
+            const questionData = {
+                ...data,
+                subject: textbook.subject,
+                board: textbook.board,
+                classCategory: textbook.classCategory,
+                class: textbook.class,
+                textbookId: textbookId,
+                chapterId: chapterId,
+            };
+            await addQuestion(questionData);
             
-            await updateDoc(chapterRef, {
-                textbookQuestions: updatedQuestions
-            });
-            
-            toast({ title: "Question Added", description: "The new question has been added to the chapter." });
+            toast({ title: "Question Added", description: "The new question has been added to the main question bank." });
             router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
 
         } catch (error) {
@@ -311,23 +325,29 @@ export default function AddChapterQuestionPage() {
     const handleAIGenerate = async (data: AIGeneratorFormValues) => {
         setIsGenerating(true);
         try {
+            if (!textbook) {
+                throw new Error("Textbook data has not been loaded.");
+            }
             const result: AITextbookQuestionGeneratorOutput = await generateTextbookQuestions(data);
             
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const chapterSnap = await getDoc(chapterRef);
-            if (!chapterSnap.exists()) throw new Error("Chapter not found.");
-            
-            const existingQuestions = chapterSnap.data().textbookQuestions || [];
-            const newQuestions = result.questions.map(q => ({...q, id: new Date().getTime().toString() + Math.random().toString(16).slice(2) }));
-            const updatedQuestions = [...existingQuestions, ...newQuestions];
-            
-            await updateDoc(chapterRef, { textbookQuestions: updatedQuestions });
+            for (const question of result.questions) {
+                const questionData = {
+                    ...question,
+                    subject: textbook.subject,
+                    board: textbook.board,
+                    classCategory: textbook.classCategory,
+                    class: textbook.class,
+                    textbookId: textbookId,
+                    chapterId: chapterId,
+                };
+                await addQuestion(questionData);
+            }
 
-            toast({ title: "Questions Generated!", description: `${result.questions.length} questions have been added to the chapter.` });
+            toast({ title: "Questions Generated!", description: `${result.questions.length} questions have been added to the main question bank.` });
             router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
 
         } catch (error) {
-            toast({ variant: 'destructive', title: 'AI Generation Failed', description: (error as Error).message });
+            toast({ variant: "destructive", title: "AI Generation Failed", description: (error as Error).message });
         } finally {
             setIsGenerating(false);
         }
