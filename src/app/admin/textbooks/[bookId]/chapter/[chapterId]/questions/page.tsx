@@ -1,12 +1,10 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
-import type { Chapter, Question } from '@/lib/types';
 import {
   Card,
   CardContent,
@@ -14,17 +12,37 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, FileJson, Eye } from 'lucide-react';
+import { Eye, PlusCircle, ArrowLeft, Edit, Trash2, FileJson } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import type { Chapter, Question } from '@/lib/types';
+import { getChapterById, getQuestionsByChapterId, deleteQuestion } from '@/lib/firebase/firestore';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
 
 
 const jsonExample = `
@@ -132,32 +150,35 @@ export default function ManageChapterQuestionsPage() {
     const fetchData = useCallback(async () => {
         if (!textbookId || !chapterId) return;
         setLoading(true);
+        try {
+            const [chapterData, questionsData] = await Promise.all([
+                getChapterById(textbookId, chapterId),
+                getQuestionsByChapterId(chapterId),
+            ]);
 
-        const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-        const chapterSnap = await getDoc(chapterRef);
-        if (chapterSnap.exists()) {
-            const chapterData = { id: chapterSnap.id, ...chapterSnap.data() } as Chapter;
-            setChapter(chapterData);
-            setQuestions(chapterData.textbookQuestions || []);
+            setChapter(chapterData as Chapter);
+            setQuestions(questionsData as Question[]);
+        } catch (error) {
+             toast({
+                variant: "destructive",
+                title: "Error fetching data",
+                description: (error as Error).message,
+            });
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-    }, [textbookId, chapterId]);
+    }, [textbookId, chapterId, toast]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
     
-    const saveQuestionsToFirestore = async (updatedQuestions: Question[]) => {
-        const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-        await updateDoc(chapterRef, { textbookQuestions: updatedQuestions });
-    }
     
     const handleDeleteQuestion = async (questionId: string) => {
         if(!questionId) return;
         try {
-            const updatedQuestions = questions.filter(q => q.id !== questionId);
-            await saveQuestionsToFirestore(updatedQuestions);
-            setQuestions(updatedQuestions);
+            await deleteQuestion(questionId);
+            setQuestions(prev => prev.filter(q => q.id !== questionId));
             toast({ title: 'Question Deleted' });
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
@@ -180,86 +201,15 @@ export default function ManageChapterQuestionsPage() {
     
     const handleDeleteSelected = async () => {
         try {
-            const updatedQuestions = questions.filter(q => !selectedQuestions.includes(q.id));
-            await saveQuestionsToFirestore(updatedQuestions);
-            setQuestions(updatedQuestions);
+            const deletePromises = selectedQuestions.map(id => deleteQuestion(id));
+            await Promise.all(deletePromises);
             toast({ title: `${selectedQuestions.length} question(s) deleted.` });
+            setQuestions(prev => prev.filter(q => !selectedQuestions.includes(q.id)));
             setSelectedQuestions([]);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error deleting questions', description: (error as Error).message });
         }
     }
-    
-    const processJsonImport = async (jsonText: string) => {
-        try {
-            const parsedJson = JSON.parse(jsonText);
-            const questionsToImport = (parsedJson.questions || []).map((q: any) => ({
-                ...q,
-                id: new Date().getTime().toString() + Math.random().toString(36).substring(2, 9),
-            }));
-
-            if (!Array.isArray(questionsToImport) || questionsToImport.length === 0) {
-                throw new Error("No valid question array found in the JSON.");
-            }
-            
-            const updatedQuestions = [...questions, ...questionsToImport];
-            await saveQuestionsToFirestore(updatedQuestions);
-            setQuestions(updatedQuestions);
-            
-            toast({
-              title: 'Import Successful!',
-              description: `${questionsToImport.length} questions have been added.`,
-            });
-            setIsImportDialogOpen(false);
-            setJsonText('');
-          } catch (error) {
-            toast({
-              variant: 'destructive',
-              title: 'Import Failed',
-              description: (error as Error).message,
-            });
-          } finally {
-            setIsImporting(false);
-          }
-    }
-
-    const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        if (file.type !== 'application/json' && file.type !== 'text/plain') {
-          toast({
-            variant: 'destructive',
-            title: 'Invalid File Type',
-            description: 'Please upload a valid JSON or TXT file.',
-          });
-          return;
-        }
-
-        setIsImporting(true);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = e.target?.result as string;
-          processJsonImport(text);
-           if(importFileRef.current) {
-                importFileRef.current.value = '';
-            }
-        };
-        reader.readAsText(file);
-      };
-      
-      const handleBulkImportFromText = () => {
-        if (!jsonText.trim()) {
-             toast({
-                variant: "destructive",
-                title: 'Import Failed',
-                description: "Textbox cannot be empty."
-            });
-            return;
-        }
-        setIsImporting(true);
-        processJsonImport(jsonText);
-      }
     
     if (loading) return <div className="flex items-center justify-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>
 
@@ -303,14 +253,14 @@ export default function ManageChapterQuestionsPage() {
                                     <TabsContent value="upload">
                                         <div className="py-4"><div className="grid w-full max-w-sm items-center gap-1.5">
                                             <Label htmlFor="json-import">JSON/TXT File</Label>
-                                            <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                            <Input id="json-import" type="file" accept=".json,.txt" ref={importFileRef} disabled={isImporting} />
                                             {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
                                         </div></div>
                                     </TabsContent>
                                     <TabsContent value="paste">
                                         <div className="py-4 space-y-4">
                                             <Textarea placeholder='Paste your JSON content here...' value={jsonText} onChange={(e) => setJsonText(e.target.value)} className="min-h-[200px] font-mono text-xs" disabled={isImporting}/>
-                                            <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>{isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}</Button>
+                                            <Button disabled={isImporting || !jsonText.trim()}>{isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}</Button>
                                         </div>
                                     </TabsContent>
                                 </Tabs>
@@ -357,7 +307,7 @@ export default function ManageChapterQuestionsPage() {
                                 <label htmlFor="select-all" className="flex-1 font-semibold text-sm">Select All</label>
                             </li>
                             {questions.map(q => (
-                                <li key={q.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-4">
+                                <li key={q.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md hover:bg-accent/50 gap-4">
                                     <div className="flex items-start flex-1 min-w-0">
                                         <Checkbox id={`select-${q.id}`} checked={selectedQuestions.includes(q.id)} onCheckedChange={() => handleSelectQuestion(q.id)} className="mr-4 mt-1" />
                                         <label htmlFor={`select-${q.id}`} className="flex-1">{q.text}</label>
@@ -408,5 +358,3 @@ export default function ManageChapterQuestionsPage() {
         </div>
     )
 }
-
-    

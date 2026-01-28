@@ -115,6 +115,19 @@ export const getAllQuestions = async () => {
     }
 }
 
+export const getQuestionsByChapterId = async (chapterId: string) => {
+    if (!chapterId) return [];
+    try {
+        const q = query(collection(db, "questions"), where("chapterId", "==", chapterId), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+        console.error("Error getting questions by chapter: ", e);
+        throw new Error("Failed to fetch questions for the chapter.");
+    }
+};
+
+
 export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc: DocumentSnapshot | null = null) => {
     try {
         let q;
@@ -2272,6 +2285,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
     
+
 
 
 

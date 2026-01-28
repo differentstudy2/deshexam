@@ -1,11 +1,12 @@
 
+
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { Chapter, Question, SubQuestion } from '@/lib/types';
+import type { Chapter, Question } from '@/lib/types';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploader } from '@/components/feature/image-uploader';
+import { getQuestionById, updateQuestion } from '@/lib/firebase/firestore';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
@@ -34,25 +36,14 @@ const matchingPairSchema = z.object({
     bImage: z.string().optional(),
 });
 
-const subQuestionSchema = z.object({
-  id: z.string().optional(),
-  text: z.string().min(1, 'Sub-question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
-  marks: z.coerce.number().min(1).default(1),
-  options: z.array(optionSchema).optional(),
-  correctAnswer: z.any().optional(),
-  explanation: z.string().optional(),
-});
-
 const questionSchema = z.object({
   id: z.string(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Grouped']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').default(1),
   options: z.array(optionSchema).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
-  subQuestions: z.array(subQuestionSchema).optional(),
 }).refine(data => {
     if (data.type === 'Multiple Choice') {
         return !!data.correctAnswer && data.options?.some(opt => opt.text === data.correctAnswer);
@@ -63,7 +54,7 @@ const questionSchema = z.object({
     if (data.type === 'True/False') {
         return data.correctAnswer === 'True' || data.correctAnswer === 'False';
     }
-    return !!data.correctAnswer || data.type === 'Grouped';
+    return !!data.correctAnswer;
 }, {
     message: "A valid correct answer is required for this question type.",
     path: ["correctAnswer"],
@@ -73,10 +64,10 @@ const questionSchema = z.object({
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
 
-const MatchingPairsField = ({ control, setValue, fieldNamePrefix }: { control: any, setValue: any, fieldNamePrefix: string }) => {
+const MatchingPairsField = ({ control, setValue }: { control: any, setValue: any }) => {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: `${fieldNamePrefix}.correctAnswer`,
+        name: "correctAnswer",
     });
 
     return (
@@ -95,16 +86,16 @@ const MatchingPairsField = ({ control, setValue, fieldNamePrefix }: { control: a
                     </div>
                     <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
                         <div className="space-y-2">
-                            <FormField control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
-                            <Controller control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
-                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.aImage`, url, { shouldValidate: true })} value={field.value} />
+                            <FormField control={control} name={`correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
+                            <Controller control={control} name={`correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`correctAnswer.${pairIndex}.aImage`, url, { shouldValidate: true })} value={field.value} />
                             )} />
                         </div>
                         <GripVertical className="h-5 w-5 text-muted-foreground pt-2" />
                         <div className="space-y-2">
-                             <FormField control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
-                             <Controller control={control} name={`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
-                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`${fieldNamePrefix}.correctAnswer.${pairIndex}.bImage`, url, { shouldValidate: true })} value={field.value} />
+                             <FormField control={control} name={`correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
+                             <Controller control={control} name={`correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => setValue(`correctAnswer.${pairIndex}.bImage`, url, { shouldValidate: true })} value={field.value} />
                             )} />
                         </div>
                     </div>
@@ -117,110 +108,6 @@ const MatchingPairsField = ({ control, setValue, fieldNamePrefix }: { control: a
     );
 };
 
-
-const GroupedQuestionsField = ({ control, setValue }: { control: any, setValue: any }) => {
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "subQuestions",
-    });
-
-    return (
-        <div className="space-y-4">
-            <FormLabel>Sub-Questions</FormLabel>
-            <FormDescription>Add the individual questions that fall under the main instruction.</FormDescription>
-            {fields.map((field, index) => (
-                <Card key={field.id} className="p-4 bg-secondary/50">
-                    <div className="flex justify-between items-center mb-2">
-                         <FormLabel>Sub-Question {index + 1}</FormLabel>
-                         <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                            <Trash2 className="h-4 w-4 text-destructive"/>
-                        </Button>
-                    </div>
-                    <div className="space-y-4">
-                        <FormField control={control} name={`subQuestions.${index}.text`} render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs">Question Text</FormLabel><FormControl><Input {...field} placeholder="e.g., Who is Bina?" /></FormControl><FormMessage/></FormItem>
-                        )}/>
-                        <FormField
-                            control={control}
-                            name={`subQuestions.${index}.type`}
-                            render={({ field: typeField }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">Question Type</FormLabel>
-                                    <Select onValueChange={typeField.onChange} defaultValue={typeField.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
-                                            <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                            <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                            <SelectItem value="True/False">True/False</SelectItem>
-                                            <SelectItem value="Matching">Matching</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         {/* Dynamically render fields based on sub-question type */}
-                        <Controller
-                            control={control}
-                            name={`subQuestions.${index}`}
-                            render={({ field: subQuestionField }) => {
-                                const subQuestionType = subQuestionField.value.type;
-                                if (subQuestionType === 'Multiple Choice') {
-                                    return (
-                                        <div className="space-y-2">
-                                            <FormLabel className="text-xs">Options</FormLabel>
-                                            <RadioGroup onValueChange={(val) => setValue(`subQuestions.${index}.correctAnswer`, val)}>
-                                                {[0, 1, 2, 3].map(optIndex => (
-                                                    <div key={optIndex} className="flex items-center gap-2">
-                                                        <RadioGroupItem value={subQuestionField.value.options?.[optIndex]?.text || ''} />
-                                                        <FormField control={control} name={`subQuestions.${index}.options.${optIndex}.text`} render={({ field }) => (
-                                                            <Input {...field} placeholder={`Option ${optIndex + 1}`} />
-                                                        )}/>
-                                                    </div>
-                                                ))}
-                                            </RadioGroup>
-                                        </div>
-                                    )
-                                }
-                                if (subQuestionType === 'True/False') {
-                                    return (
-                                        <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs">Correct Answer</FormLabel>
-                                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
-                                                    <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="True" /></FormControl><FormLabel className="font-normal">True</FormLabel></FormItem>
-                                                    <FormItem className="flex items-center space-x-2"><FormControl><RadioGroupItem value="False" /></FormControl><FormLabel className="font-normal">False</FormLabel></FormItem>
-                                                </RadioGroup>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}/>
-                                    )
-                                }
-                                if (subQuestionType === 'Matching') {
-                                    return <MatchingPairsField control={control} fieldNamePrefix={`subQuestions.${index}`} setValue={setValue} />
-                                }
-                                // Default to Short Answer / Fill in the blank
-                                return (
-                                    <FormField control={control} name={`subQuestions.${index}.correctAnswer`} render={({ field }) => (
-                                        <FormItem><FormLabel className="text-xs">Correct Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage/></FormItem>
-                                    )}/>
-                                );
-                            }}
-                        />
-
-                        <FormField control={control} name={`subQuestions.${index}.explanation`} render={({ field }) => (
-                             <FormItem><FormLabel className="text-xs">Explanation (Optional)</FormLabel><FormControl><Textarea {...field} placeholder="Optional explanation" rows={2}/></FormControl></FormItem>
-                        )}/>
-                    </div>
-                </Card>
-            ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => append({ text: '', correctAnswer: '', explanation: '', marks: 1, type: 'Short Answer' })}>
-                <PlusCircle className="mr-2 h-4 w-4"/> Add Sub-Question
-            </Button>
-        </div>
-    );
-}
 
 export default function EditChapterQuestionPage() {
     const params = useParams();
@@ -240,44 +127,32 @@ export default function EditChapterQuestionPage() {
     useEffect(() => {
         const fetchQuestion = async () => {
             setLoading(true);
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const chapterSnap = await getDoc(chapterRef);
+            try {
+                const questionData = await getQuestionById(questionId);
 
-            if (chapterSnap.exists()) {
-                const chapterData = chapterSnap.data() as Chapter;
-                const questionToEdit = chapterData.textbookQuestions?.find(q => q.id === questionId);
-
-                if (questionToEdit) {
-                    form.reset(questionToEdit);
+                if (questionData) {
+                    form.reset(questionData as QuestionFormValues);
                 } else {
                     toast({ variant: 'destructive', title: 'Question not found' });
                     router.back();
                 }
-            } else {
-                 toast({ variant: 'destructive', title: 'Chapter not found' });
-                 router.back();
+            } catch(e) {
+                toast({ variant: 'destructive', title: 'Error fetching question', description: (e as Error).message });
+                router.back();
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
         fetchQuestion();
-    }, [textbookId, chapterId, questionId, form, toast, router]);
+    }, [questionId, form, toast, router]);
 
     const questionType = form.watch('type');
 
     const onSubmit = async (data: QuestionFormValues) => {
         try {
-            const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
-            const chapterSnap = await getDoc(chapterRef);
-            if (chapterSnap.exists()) {
-                const chapterData = chapterSnap.data() as Chapter;
-                const updatedQuestions = chapterData.textbookQuestions?.map(q => 
-                    q.id === questionId ? data : q
-                ) || [];
-                
-                await updateDoc(chapterRef, { textbookQuestions: updatedQuestions });
-                toast({ title: "Question Updated", description: "The question has been successfully updated." });
-                router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
-            }
+            await updateQuestion(questionId, data);
+            toast({ title: "Question Updated", description: "The question has been successfully updated." });
+            router.push(`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions`);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error updating question', description: (error as Error).message });
         }
@@ -307,7 +182,7 @@ export default function EditChapterQuestionPage() {
                         <CardHeader><CardTitle>Question Details</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                            <FormField name="text" control={form.control} render={({ field }) => (
-                                <FormItem><FormLabel>{questionType === 'Grouped' ? 'Main Instruction' : 'Question Text'}</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Question Text</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
                             )}/>
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField name="type" control={form.control} render={({ field }) => (
@@ -320,13 +195,12 @@ export default function EditChapterQuestionPage() {
                                                 <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                 <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                                 <SelectItem value="Matching">Matching</SelectItem>
-                                                <SelectItem value="Grouped">Grouped Questions</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     <FormMessage /></FormItem>
                                 )}/>
                                 <FormField name="marks" control={form.control} render={({ field }) => (
-                                    <FormItem><FormLabel>Marks</FormLabel><FormControl><Input type="number" {...field} disabled={questionType === 'Matching' || questionType === 'Grouped'} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem><FormLabel>Marks</FormLabel><FormControl><Input type="number" {...field} disabled={questionType === 'Matching'} /></FormControl><FormMessage /></FormItem>
                                 )}/>
                             </div>
                             
@@ -378,17 +252,13 @@ export default function EditChapterQuestionPage() {
                             )}
 
                             {questionType === 'Matching' && (
-                                <MatchingPairsField control={form.control} fieldNamePrefix="" setValue={form.setValue} />
+                                <MatchingPairsField control={form.control} setValue={form.setValue} />
                             )}
                             
                             {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
                                 <FormField name="correctAnswer" control={form.control} render={({ field }) => (
                                     <FormItem><FormLabel>Correct Answer</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                                 )}/>
-                            )}
-
-                             {questionType === 'Grouped' && (
-                                <GroupedQuestionsField control={form.control} setValue={form.setValue} />
                             )}
 
                             <FormField name="explanation" control={form.control} render={({ field }) => (
