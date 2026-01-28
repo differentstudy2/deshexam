@@ -2,7 +2,8 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Question } from '@/lib/types';
@@ -15,7 +16,6 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, FileJson, Eye } from 'lucide-react';
-import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,6 +24,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 
 const jsonExample = `
@@ -110,11 +111,11 @@ const jsonExampleMatching = `
 
 export default function ManageChapterQuestionsPage() {
     const params = useParams();
-    const { toast } = useToast();
-
+    const router = useRouter();
     const textbookId = params.bookId as string;
     const chapterId = params.chapterId as string;
-    
+    const { toast } = useToast();
+
     const [chapter, setChapter] = useState<Chapter | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
@@ -389,6 +390,23 @@ export default function ManageChapterQuestionsPage() {
                     ) : ( <p className="text-muted-foreground text-center py-8">No questions added to this chapter yet.</p>)}
                 </CardContent>
             </Card>
+
+            <AlertDialog open={!!questionToDelete} onOpenChange={() => setQuestionToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete this question. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteQuestion(questionToDelete!.id)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
+
+    
