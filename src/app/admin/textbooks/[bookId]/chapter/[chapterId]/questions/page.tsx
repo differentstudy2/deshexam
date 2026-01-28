@@ -9,22 +9,21 @@ import type { Chapter, Question } from '@/lib/types';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, FileJson } from 'lucide-react';
+import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, FileJson, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 
 const jsonExample = `
@@ -363,6 +362,11 @@ export default function ManageChapterQuestionsPage() {
                                         <label htmlFor={`select-${q.id}`} className="flex-1">{q.text}</label>
                                     </div>
                                     <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
+                                        <Button asChild variant="ghost" size="icon">
+                                            <Link href={`/question/${q.id}`} target="_blank">
+                                                <Eye className="h-4 w-4"/>
+                                            </Link>
+                                        </Button>
                                         <Button asChild variant="ghost" size="icon">
                                             <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions/${q.id}/edit`}>
                                                 <Edit className="h-4 w-4"/>
