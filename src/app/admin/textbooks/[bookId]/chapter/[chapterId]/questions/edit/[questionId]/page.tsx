@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -7,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Chapter, Question } from '@/lib/types';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -21,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useFieldArray, Controller } from 'react-hook-form';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { getQuestionById, updateQuestion } from '@/lib/firebase/firestore';
 
@@ -136,12 +136,11 @@ export default function EditChapterQuestionPage() {
                     toast({ variant: 'destructive', title: 'Question not found' });
                     router.back();
                 }
-            } catch(e) {
-                toast({ variant: 'destructive', title: 'Error fetching question', description: (e as Error).message });
+            } catch (e) {
+                toast({ variant: "destructive", title: "Error fetching question data", description: (e as Error).message });
                 router.back();
-            } finally {
-                setLoading(false);
             }
+            setLoading(false);
         };
         fetchQuestion();
     }, [questionId, form, toast, router]);

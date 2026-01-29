@@ -49,6 +49,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { Chapter, Question, Textbook } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function ManageChapterQuestionsPage() {
     const params = useParams();
@@ -73,10 +74,7 @@ export default function ManageChapterQuestionsPage() {
             setChapter(chapterData as Chapter);
             
             const questionsData = await getQuestionsByChapterId(chapterId);
-            // client-side sort
-            const sortedQuestions = (questionsData as Question[]).sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime());
-
-            setQuestions(sortedQuestions as Question[]);
+            setQuestions(questionsData as Question[]);
 
         } catch (error) {
              toast({
@@ -98,10 +96,14 @@ export default function ManageChapterQuestionsPage() {
         if(!questionId) return;
         try {
             await deleteQuestion(questionId);
-            setQuestions(prev => prev.filter(q => q.id !== questionId));
             toast({ title: 'Question Deleted' });
+            fetchData(); // Refetch data to update the list
         } catch (error) {
-            toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
+            toast({
+                variant: 'destructive',
+                title: 'Error deleting question',
+                description: (error as Error).message,
+            });
         } finally {
             setItemToDelete(null);
         }
@@ -195,12 +197,12 @@ export default function ManageChapterQuestionsPage() {
                                             </Link>
                                         </Button>
                                         <Button asChild variant="outline" size="sm">
-                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions/${item.id}/edit`}>
+                                            <Link href={`/admin/textbooks/${textbookId}/chapter/${chapterId}/questions/edit/${item.id}`}>
                                                 <Edit className="mr-2 h-4 w-4"/>Edit
                                             </Link>
                                         </Button>
                                         <AlertDialog>
-                                            <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4"/></Button></AlertDialogTrigger>
+                                            <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="text-destructive" onClick={() => setItemToDelete(item)}><Trash2 className="h-4 w-4"/></Button></AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone and will permanently delete this question.</AlertDialogDescription></AlertDialogHeader>
                                                 <AlertDialogFooter>

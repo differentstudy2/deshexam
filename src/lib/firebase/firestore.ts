@@ -2282,7 +2282,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         throw new Error("Failed to update progress.");
     }
 }
-
+    
 export const deleteQuestionFromChapter = async (textbookId: string, chapterId: string, questionId: string) => {
     const chapterRef = doc(db, `textbooks/${textbookId}/chapters`, chapterId);
     try {
@@ -2304,7 +2304,6 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
         throw new Error("Failed to delete question from chapter.");
     }
 };
-    
 
 
 
