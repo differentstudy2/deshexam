@@ -533,7 +533,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </Avatar>
                                     <div>
                                         <p className="font-semibold">{question.authorName}</p>
-                                        <p className="text-xs text-muted-foreground">{new Date(question.createdAt.seconds * 1000).toLocaleDateString()}</p>
+                                        <p className="text-xs text-muted-foreground">{question.createdAt.toLocaleDateString()}</p>
                                     </div>
                                 </div>
                                 <Badge variant="outline" className="text-green-600 border-green-600">Answered</Badge>
