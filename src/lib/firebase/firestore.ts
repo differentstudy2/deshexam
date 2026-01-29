@@ -118,9 +118,29 @@ export const getAllQuestions = async () => {
 export const getQuestionsByChapterId = async (chapterId: string) => {
     if (!chapterId) return [];
     try {
-        const q = query(collection(db, "questions"), where("chapterId", "==", chapterId), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "questions"), where("chapterId", "==", chapterId));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            const createdAt = data.createdAt;
+            const createdAtTimestamp = createdAt?.toDate ? createdAt.toDate().getTime() : (createdAt ? new Date(createdAt).getTime() : 0);
+            return {
+                id: doc.id,
+                ...data,
+                createdAtTimestamp: createdAtTimestamp
+            };
+        });
+
+        questions.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
+        
+        return questions.map(q => {
+            const { createdAtTimestamp, ...rest } = q;
+            const createdAtDate = new Date(q.createdAtTimestamp);
+            return {
+                ...rest,
+                createdAt: !isNaN(createdAtDate.getTime()) ? createdAtDate.toLocaleDateString() : 'N/A'
+            };
+        });
     } catch (e) {
         console.error("Error getting questions by chapter: ", e);
         throw new Error("Failed to fetch questions for the chapter.");
@@ -1852,8 +1872,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersSnapshot),
-            getDocs(monthOrdersSnapshot),
+            getDocs(todayOrdersQuery),
+            getDocs(monthOrdersQuery),
             getCountFromServer(usersCollection),
         ]);
 
@@ -2304,3 +2324,6 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
 
 
 
+
+
+    
