@@ -1,8 +1,9 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -12,7 +13,16 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getSubjects, getPaginatedQuestions, getUserProfile, getAllUsers } from '@/lib/firebase/firestore';
+import {
+  getSubjects,
+  getPaginatedQuestions,
+  getUserProfile,
+  getAllUsers,
+  addQuestion,
+  getBoards,
+  getClasses,
+  getGradesByClass,
+} from '@/lib/firebase/firestore';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -26,39 +36,68 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-    LayoutGrid,
-    Book,
-    BriefcaseBusiness,
-    School,
-    GraduationCap,
-    FlaskConical,
-    Atom,
-    Dna,
-    Globe,
-    Languages,
-    Palette,
-    Music,
-    History,
-    Landmark,
-    MoreHorizontal,
-    Plus,
-    User,
-    Users,
-    Trophy,
-    BrainCircuit,
-    TrendingUp,
-    Computer,
-    Leaf,
-    BookOpen,
-    Calculator,
-    Clapperboard,
-    Loader2
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+import {
+  LayoutGrid,
+  Book,
+  BriefcaseBusiness,
+  School,
+  GraduationCap,
+  FlaskConical,
+  Atom,
+  Dna,
+  Globe,
+  Languages,
+  Palette,
+  Music,
+  History,
+  Landmark,
+  MoreHorizontal,
+  Plus,
+  User,
+  Users,
+  Trophy,
+  BrainCircuit,
+  TrendingUp,
+  Computer,
+  Leaf,
+  BookOpen,
+  Calculator,
+  Clapperboard,
+  Loader2,
+  Send,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Badge } from '@/components/ui/badge';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
 
 type Subject = { id: string, name: string };
+type Board = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
+
 type Question = {
     id: string;
     text: string;
@@ -74,6 +113,16 @@ type UserProfile = {
   username?: string;
   points?: number;
 };
+
+const questionFormSchema = z.object({
+  text: z.string().min(10, "Question must be at least 10 characters long."),
+  subject: z.string().min(1, "Please select a subject."),
+  board: z.string().optional(),
+  classCategory: z.string().optional(),
+  grade: z.string().optional(),
+});
+
+type QuestionFormValues = z.infer<typeof questionFormSchema>;
 
 const subjectIcons: { [key: string]: React.ReactNode } = {
   'All subjects': <LayoutGrid />,
@@ -111,6 +160,8 @@ const ITEMS_PER_PAGE = 10;
 export default function QuestionsPage() {
     const { user } = useAuth();
     const { toast } = useToast();
+    const { openAuthDialog } = useAuthDialog();
+
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [leaderboardUsers, setLeaderboardUsers] = useState<UserProfile[]>([]);
@@ -121,37 +172,27 @@ export default function QuestionsPage() {
     const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
     const [selectedSubject, setSelectedSubject] = useState('All subjects');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const [subjectsData, leaderboardData] = await Promise.all([
-                    getSubjects(),
-                    getAllUsers(),
-                ]);
-                setSubjects([{ id: 'all', name: 'All subjects' }, ...subjectsData]);
-                
-                const usersWithPoints = leaderboardData.map(u => ({...u, points: Math.floor(Math.random() * 1000)}));
-                usersWithPoints.sort((a, b) => b.points - a.points);
-                setLeaderboardUsers(usersWithPoints.slice(0, 5));
+    // State for "Ask Question" dialog
+    const [isAskDialogOpen, setIsAskDialogOpen] = useState(false);
+    const [boards, setBoards] = useState<Board[]>([]);
+    const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
+    const [grades, setGrades] = useState<Grade[]>([]);
+    const [loadingMetadata, setLoadingMetadata] = useState(true);
 
-                if (user) {
-                    const profileData = await getUserProfile(user.uid);
-                    setUserProfile({...profileData, points: Math.floor(Math.random() * 200)} as UserProfile);
-                }
+    const askForm = useForm<QuestionFormValues>({
+        resolver: zodResolver(questionFormSchema),
+        defaultValues: {
+            text: '',
+            subject: '',
+            board: '',
+            classCategory: '',
+            grade: '',
+        },
+    });
 
-                await fetchQuestions(true);
+    const selectedClassCategoryForAsk = askForm.watch('classCategory');
 
-            } catch (error) {
-                toast({ variant: 'destructive', title: 'Error fetching initial data', description: (error as Error).message });
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [user, toast]);
-    
-    const fetchQuestions = async (isInitial = false) => {
+    const fetchQuestions = useCallback(async (isInitial = false) => {
         if(isInitial) {
             setQuestions([]);
             setLastVisible(null);
@@ -171,7 +212,92 @@ export default function QuestionsPage() {
             setLoading(false);
             setLoadingMore(false);
         }
-    }
+    }, [toast, lastVisible]);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            setLoadingMetadata(true);
+            try {
+                const [subjectsData, leaderboardData, boardsData, classesData] = await Promise.all([
+                    getSubjects(),
+                    getAllUsers(),
+                    getBoards(),
+                    getClasses(),
+                ]);
+                setSubjects([{ id: 'all', name: 'All subjects' }, ...subjectsData]);
+                setBoards(boardsData);
+                setClassCategories(classesData);
+                
+                const usersWithPoints = leaderboardData.map(u => ({...u, points: Math.floor(Math.random() * 1000)}));
+                usersWithPoints.sort((a, b) => b.points - a.points);
+                setLeaderboardUsers(usersWithPoints.slice(0, 5));
+
+                if (user) {
+                    const profileData = await getUserProfile(user.uid);
+                    setUserProfile({...profileData, points: Math.floor(Math.random() * 200)} as UserProfile);
+                }
+
+                await fetchQuestions(true);
+
+            } catch (error) {
+                toast({ variant: 'destructive', title: 'Error fetching initial data', description: (error as Error).message });
+            } finally {
+                setLoading(false);
+                setLoadingMetadata(false);
+            }
+        };
+        fetchData();
+    }, [user, toast, fetchQuestions]);
+
+    useEffect(() => {
+        const fetchGrades = async () => {
+            if (selectedClassCategoryForAsk) {
+                const fetchedGrades = await getGradesByClass(selectedClassCategoryForAsk);
+                setGrades(fetchedGrades);
+            } else {
+                setGrades([]);
+            }
+        };
+        fetchGrades();
+    }, [selectedClassCategoryForAsk]);
+
+    const onAskSubmit: SubmitHandler<QuestionFormValues> = async (data) => {
+        if (!user) {
+            toast({
+                title: 'Please log in',
+                description: 'You need to be logged in to ask a question.',
+            });
+            openAuthDialog('sign-in');
+            return;
+        }
+
+        try {
+            const questionData = {
+                ...data,
+                type: 'Descriptive',
+                marks: 1, 
+            };
+
+            const newQuestionId = await addQuestion(questionData);
+            
+            toast({
+                title: 'Question Submitted!',
+                description: "Your question has been posted.",
+            });
+            setIsAskDialogOpen(false);
+            askForm.reset();
+            fetchQuestions(true);
+
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error submitting question',
+                description: (error as Error).message,
+            });
+        }
+    };
+    
 
     const filteredQuestions = useMemo(() => {
         if (selectedSubject === 'All subjects') {
@@ -215,9 +341,122 @@ export default function QuestionsPage() {
                             <CardTitle className="font-headline text-3xl font-bold">Get Answers for FREE</CardTitle>
                         </CardHeader>
                         <CardContent className="flex justify-center">
-                            <Button size="lg" asChild>
-                                <Link href="/questions/ask">ASK YOUR QUESTION</Link>
-                            </Button>
+                            <Dialog open={isAskDialogOpen} onOpenChange={setIsAskDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button size="lg">ASK YOUR QUESTION</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-xl">
+                                    <DialogHeader>
+                                        <DialogTitle>Ask a Question</DialogTitle>
+                                        <DialogDescription>
+                                            Post your question to the community. Provide as much detail as possible.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <Form {...askForm}>
+                                        <form onSubmit={askForm.handleSubmit(onAskSubmit)} className="space-y-4">
+                                            <FormField
+                                                control={askForm.control}
+                                                name="text"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Your Question</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder="What is the difference between speed and velocity?"
+                                                                className="min-h-[150px]"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <FormField
+                                                    control={askForm.control}
+                                                    name="subject"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Subject</FormLabel>
+                                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {subjects.filter(s=>s.id !== 'all').map(subject => (
+                                                                        <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={askForm.control}
+                                                    name="board"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Board (Optional)</FormLabel>
+                                                             <Select onValueChange={field.onChange} value={field.value}>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {boards.map(board => (
+                                                                        <SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                 <FormField
+                                                    control={askForm.control}
+                                                    name="classCategory"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Class Category (Optional)</FormLabel>
+                                                            <Select onValueChange={(value) => { field.onChange(value); askForm.setValue('grade', ''); }} value={field.value}>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {classCategories.map(c => (
+                                                                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={askForm.control}
+                                                    name="grade"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Grade (Optional)</FormLabel>
+                                                            <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategoryForAsk}>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a grade" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    {grades.map(g => (
+                                                                        <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <DialogFooter>
+                                                <Button type="submit" disabled={askForm.formState.isSubmitting}>
+                                                    <Send className="mr-2 h-4 w-4" />
+                                                    {askForm.formState.isSubmitting ? "Submitting..." : "Submit Question"}
+                                                </Button>
+                                            </DialogFooter>
+                                        </form>
+                                    </Form>
+                                </DialogContent>
+                            </Dialog>
                         </CardContent>
                     </Card>
                     <div className="flex justify-between items-center">
@@ -293,7 +532,7 @@ export default function QuestionsPage() {
                         <Card>
                             <CardHeader className="items-center text-center">
                                 <Avatar className="w-16 h-16 mb-2">
-                                    <AvatarImage src={userProfile.photoURL} />
+                                    <AvatarImage src={userProfile.photoURL || undefined} />
                                     <AvatarFallback>{userProfile.displayName?.[0]}</AvatarFallback>
                                 </Avatar>
                                 <CardTitle className="text-lg">{userProfile.username}</CardTitle>
