@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, Flag, Heart } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, ChevronLeft, Flag, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -483,10 +483,10 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         className="h-20"
                     />
                     <div className="flex justify-end gap-2">
-                        <Button type="button" variant="ghost" size="sm" onClick={() => setReplyingTo(null)}>Cancel</Button>
-                        <Button type="submit" size="sm" disabled={isSubmittingComment || !replyText.trim()}>
-                        {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Reply"}
-                        </Button>
+                           <Button type="button" variant="ghost" size="sm" onClick={() => setReplyingTo(null)}>Cancel</Button>
+                           <Button type="submit" size="sm" disabled={isSubmittingComment || !replyText.trim()}>
+                            {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Reply"}
+                           </Button>
                     </div>
                 </form>
             </CardContent>
@@ -799,3 +799,4 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
+
