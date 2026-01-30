@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
@@ -186,8 +185,8 @@ function ReviewDisplay() {
   if (!submission || !test || !student) {
     return (
       <div className="text-center min-h-[400px] flex flex-col justify-center">
-        <h2 className="text-2xl font-bold">Review not found</h2>
-        <p className="text-muted-foreground">We couldn't load the review for this test submission.</p>
+        <h2 className="text-2xl font-bold">Results not found</h2>
+        <p className="text-muted-foreground">We couldn't load the results for this test.</p>
         <Button asChild className="mt-4 mx-auto" variant="outline">
           <Link href="/content">Back to Content</Link>
         </Button>
@@ -231,7 +230,7 @@ function ReviewDisplay() {
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center gap-6 mt-4 md:mt-0">
+                    <div className="flex items-end gap-6 mt-4 md:mt-0">
                         <div className="text-center md:text-right">
                             <div className="text-3xl font-bold">{score}/{totalQuestions}</div>
                             <div className="text-xs font-semibold text-muted-foreground">Marks Obtained</div>
@@ -246,8 +245,8 @@ function ReviewDisplay() {
             <CardContent className="space-y-4 pt-0">
                 <Separator />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
-                    {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
+                    <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-1"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
+                    {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full lg:col-span-2"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
 
                     {test.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>}
                     {test.board && <div className="flex items-center gap-2 text-muted-foreground"><Layers className="w-4 h-4"/> <strong>Board:</strong> <span className="text-foreground">{test.board}</span></div>}
@@ -339,7 +338,7 @@ function ReviewDisplay() {
                                                     : "bg-secondary/30"
                                         )}>
                                             {isCorrectAnswer 
-                                                ? <Check className="w-5 h-5 text-white bg-green-500 rounded-full p-0.5 mt-0.5 shrink-0" /> 
+                                                ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
                                                 : <Circle className="w-4 h-4 text-muted-foreground fill-current mt-1 shrink-0" />
                                             }
                                             <div className="flex-1">
@@ -483,8 +482,7 @@ function ReviewDisplay() {
             </CardContent>
         </Card>
       </>
-    </div>
-  );
+    );
 }
 
 export default function TestReviewPage() {
