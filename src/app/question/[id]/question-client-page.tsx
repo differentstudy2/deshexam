@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass, getRelatedQuestions } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -211,8 +211,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const [loading, setLoading] = useState(true);
   const [loadingRelated, setLoadingRelated] = useState(true);
   const [isVoting, setIsVoting] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
@@ -224,9 +222,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [isCommentVoting, setIsCommentVoting] = useState<{[key: string]: boolean}>({});
-
   
-  const isAnswerRevealed = showAnswer || selectedAnswer !== null;
+  const isAnswerRevealed = true;
+  const isDefaultAnswerVisible = true;
 
   const fetchComments = async () => {
     if (!questionId) return;
@@ -346,11 +344,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         setIsVoting(false);
     }
   }
-
-  const handleShowAnswerClick = () => {
-    setShowAnswer(true);
-    setSelectedAnswer('reveal');
-  };
 
   const handleCommentSubmit = async (e: React.FormEvent, parentId: string | null = null) => {
     e.preventDefault();
@@ -620,7 +613,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   }
   
   const userHasLiked = user && question.likedBy?.includes(user.uid);
-  const isDefaultAnswerVisible = showAnswer || selectedAnswer !== null || ['Short Answer', 'Descriptive', 'Matching'].includes(question.type);
 
   return (
     <div className="bg-secondary/30">
@@ -675,8 +667,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         ? question.correctAnswer.includes(option.text) 
                                         : option.text === question.correctAnswer
                                 );
-                                const isSelected = selectedAnswer === option.text;
-                                const isWrong = isSelected && !isCorrect;
 
                                 return (
                                 <div key={optIndex} className="mt-2">
@@ -685,14 +675,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     className={cn(
                                         "w-full justify-start h-auto p-4 text-left",
                                         isAnswerRevealed && isCorrect && "bg-green-100 dark:bg-green-900/20 border-green-500",
-                                        isAnswerRevealed && isWrong && "bg-red-100 dark:bg-red-900/20 border-destructive"
                                     )}
-                                    onClick={() => !isAnswerRevealed && setSelectedAnswer(option.text)}
                                     >
                                     <div className="flex items-center gap-3 w-full">
                                         <div className="border rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
                                             {isAnswerRevealed && isCorrect && <CheckCircle className="w-5 h-5 text-green-500"/>}
-                                            {isAnswerRevealed && isWrong && <XCircle className="w-5 h-5 text-destructive"/>}
                                         </div>
                                         <div className="flex-1">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
@@ -706,19 +693,16 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 )
                             })}
                              {question.type === 'True/False' && (
-                                <RadioGroup onValueChange={(value) => setSelectedAnswer(value)} value={selectedAnswer || ''} className="space-y-2">
+                                <RadioGroup className="space-y-2">
                                     {['True', 'False'].map((option, optIndex) => {
                                         const isCorrect = isAnswerRevealed && option === question.correctAnswer;
-                                        const isSelected = selectedAnswer === option;
-                                        const isWrong = isSelected && !isCorrect;
                                         return (
                                         <div key={optIndex}>
                                              <Label htmlFor={`q-${question.id}-${option}`} className={cn(
-                                                "flex items-center p-4 border rounded-lg cursor-pointer",
-                                                isAnswerRevealed && isCorrect && "bg-green-100 dark:bg-green-900/20 border-green-500",
-                                                isAnswerRevealed && isWrong && "bg-red-100 dark:bg-red-900/20 border-destructive"
+                                                "flex items-center p-4 border rounded-lg",
+                                                isAnswerRevealed && isCorrect && "bg-green-100 dark:bg-green-900/20 border-green-500"
                                             )}>
-                                                <RadioGroupItem value={option} id={`q-${question.id}-${option}`} className="mr-3" disabled={isAnswerRevealed}/>
+                                                <RadioGroupItem value={option} id={`q-${question.id}-${option}`} className="mr-3" disabled/>
                                                 {option}
                                             </Label>
                                         </div>
@@ -726,48 +710,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     })}
                                 </RadioGroup>
                             )}
-
-                             {question.type === 'Matching' && question.matchingOptions && (
-                                <div className="space-y-6">
-                                    <Card>
-                                        <CardContent className="pt-6">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <h4 className="font-bold text-center mb-2">Column A</h4>
-                                                    <div className="space-y-2">
-                                                        {question.matchingOptions.columnA.map((item, index) => (
-                                                            <div key={`a-${index}`} className="p-3 border rounded-md text-center bg-secondary">
-                                                                {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                                {item.text}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-center mb-2">Column B</h4>
-                                                    <div className="space-y-2">
-                                                        {question.matchingOptions.columnB.map((item, index) => (
-                                                            <div key={`b-${index}`} className="p-3 border rounded-md text-center bg-secondary">
-                                                                {item.image && <Image src={item.image} alt={item.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                                {item.text}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            )}
-
-                             {['Fill in the Blank'].includes(question.type) && !isAnswerRevealed && (
-                                <Input placeholder="Type your answer here..." onChange={(e) => setSelectedAnswer(e.target.value)} />
-                            )}
                         </CardContent>
                         <CardFooter className="flex-wrap gap-4">
-                            {!['Short Answer', 'Descriptive', 'Matching'].includes(question.type) && !isAnswerRevealed && (
-                                <Button onClick={handleShowAnswerClick}>See Answer</Button>
-                            )}
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" size="icon" onClick={() => handleVote('like')} disabled={isVoting}>
                                     <Heart className={cn("w-5 h-5", userHasLiked && "fill-red-500 text-red-500")} />
@@ -787,7 +731,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
                     {isDefaultAnswerVisible && (
                       <div className="space-y-6">
-                        {(question.type === 'Fill in the Blank') && question.correctAnswer && (
+                        {(question.type === 'Fill in the Blank' || question.type === 'Short Answer') && question.correctAnswer && (
                            <Card>
                                <CardHeader>
                                    <CardTitle>Correct Answer</CardTitle>
@@ -800,10 +744,10 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                            </Card>
                         )}
                         
-                        {(question.type === 'Short Answer' || question.type === 'Descriptive') && (
+                        {(question.type === 'Descriptive') && (
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>{question.type === 'Descriptive' ? 'Model Answer' : 'Answer'}</CardTitle>
+                                    <CardTitle>Model Answer</CardTitle>
                                 </CardHeader>
                                 <CardContent className="prose dark:prose-invert max-w-none">
                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
@@ -878,7 +822,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </Card>
 
                          <div className="space-y-6">
-                            <h2 className="text-2xl font-bold font-headline">Answers & Discussion ({comments.length})</h2>
+                            <h2 className="text-2xl font-bold font-headline">Answers &amp; Discussion ({comments.length})</h2>
                             {loadingComments ? (
                                 <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
                             ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
@@ -934,3 +878,5 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
+
+    
