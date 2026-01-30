@@ -669,7 +669,12 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </CardHeader>
                         <CardContent>
                             {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => {
-                                const isCorrect = isAnswerRevealed && option.text === question.correctAnswer;
+                                const isCorrectAnswerArray = Array.isArray(question.correctAnswer);
+                                const isCorrect = isAnswerRevealed && (
+                                    isCorrectAnswerArray 
+                                        ? question.correctAnswer.includes(option.text) 
+                                        : option.text === question.correctAnswer
+                                );
                                 const isSelected = selectedAnswer === option.text;
                                 const isWrong = isSelected && !isCorrect;
 
@@ -695,7 +700,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </div>
                                     </Button>
                                     {isAnswerRevealed && option.explanation && (
-                                         <p className="text-xs text-muted-foreground mt-1 pl-10">{option.explanation}</p>
+                                            <p className="text-xs text-muted-foreground mt-1 pl-10">{option.explanation}</p>
                                     )}
                                 </div>
                                 )
@@ -782,14 +787,14 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
                     {isDefaultAnswerVisible && (
                       <div className="space-y-6">
-                        {(question.type === 'Fill in the Blank') && typeof question.correctAnswer === 'string' && (
+                        {(question.type === 'Fill in the Blank') && question.correctAnswer && (
                            <Card>
                                <CardHeader>
                                    <CardTitle>Correct Answer</CardTitle>
                                </CardHeader>
                                <CardContent className="text-lg font-bold prose dark:prose-invert max-w-none">
                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                       {question.correctAnswer}
+                                       {Array.isArray(question.correctAnswer) ? question.correctAnswer.join(' / ') : String(question.correctAnswer)}
                                    </ReactMarkdown>
                                </CardContent>
                            </Card>
