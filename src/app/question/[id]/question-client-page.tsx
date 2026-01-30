@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -527,7 +528,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   }
   
   const userHasLiked = user && question.likedBy?.includes(user.uid);
-  const isDefaultAnswerVisible = isAnswerRevealed || ['Short Answer', 'Descriptive', 'Matching'].includes(question.type);
+  const isDefaultAnswerVisible = showAnswer || selectedAnswer !== null || ['Short Answer', 'Descriptive', 'Matching'].includes(question.type);
 
   return (
     <div className="bg-secondary/30">
@@ -688,7 +689,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                     </Card>
 
                     {isDefaultAnswerVisible && (
-                        <>
+                        <div className="space-y-6">
                             {(question.type === 'Fill in the Blank') && typeof question.correctAnswer === 'string' && (
                                <Card>
                                    <CardHeader>
@@ -748,6 +749,14 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </CardContent>
                                 </Card>
                             )}
+                            <div className="space-y-6">
+                                <h2 className="text-2xl font-bold font-headline">Answers &amp; Discussion ({comments.length})</h2>
+                                {loadingComments ? (
+                                    <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
+                                ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
+                                    <p className="text-center text-muted-foreground py-8">No answers yet. Be the first to contribute!</p>
+                                )}
+                            </div>
 
                             <Card>
                                 <CardHeader>
@@ -771,18 +780,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </CardContent>
                             </Card>
 
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-bold font-headline">Answers &amp; Discussion ({comments.length})</h2>
-                                {loadingComments ? (
-                                    <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
-                                ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
-                                    <p className="text-center text-muted-foreground py-8">No answers yet. Be the first to contribute!</p>
-                                )}
-                            </div>
-                        </>
+                            <TextbookSolutionsSection currentClass={question.class} />
+                        </div>
                     )}
-                    
-                    <TextbookSolutionsSection currentClass={question.class} />
                     
                 </div>
 
@@ -806,3 +806,5 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
+
+    
