@@ -25,6 +25,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/hooks/use-auth';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 
 type Question = {
     id: string;
@@ -133,7 +139,11 @@ export default function AllQuestionsPage() {
                         {questions.length > 0 ? (
                         questions.map((question) => (
                             <TableRow key={question.id}>
-                                <TableCell className="font-medium truncate max-w-sm">{question.text}</TableCell>
+                                <TableCell className="font-medium max-w-sm truncate">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {question.text}
+                                    </ReactMarkdown>
+                                </TableCell>
                                 <TableCell className="hidden md:table-cell">{question.authorName}</TableCell>
                                 <TableCell className="hidden lg:table-cell">{question.createdAt}</TableCell>
                                 <TableCell className="text-right">
