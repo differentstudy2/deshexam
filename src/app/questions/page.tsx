@@ -43,6 +43,7 @@ import {
     MoreHorizontal,
     Plus,
     User,
+    Users,
     Trophy,
     BrainCircuit,
     TrendingUp,
