@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -101,6 +100,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Badge } from '@/components/ui/badge';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
+
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
@@ -206,6 +210,7 @@ export default function QuestionsPage() {
     const fetchQuestions = useCallback(async (isInitial = false) => {
         if(isInitial) {
             setLoading(true);
+            lastVisibleRef.current = null;
         } else {
             setLoadingMore(true);
         }
@@ -218,7 +223,7 @@ export default function QuestionsPage() {
         } catch (error) {
              toast({ variant: 'destructive', title: 'Error fetching questions', description: (error as Error).message });
         } finally {
-            setLoading(false);
+            if(isInitial) setLoading(false);
             setLoadingMore(false);
         }
     }, [toast]);
@@ -536,7 +541,7 @@ export default function QuestionsPage() {
                                     </CardHeader>
                                     <CardContent>
                                         <Link href={`/question/${q.id}`} className="font-semibold text-lg hover:text-primary">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]} className="prose dark:prose-invert max-w-none text-base">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]} className="prose dark:prose-invert max-w-none text-base">
                                                 {q.text}
                                             </ReactMarkdown>
                                         </Link>
@@ -612,7 +617,7 @@ export default function QuestionsPage() {
                                 <li key={u.uid} className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <Avatar className="w-8 h-8">
-                                            <AvatarImage src={u.photoURL} />
+                                            <AvatarImage src={u.photoURL || undefined} />
                                             <AvatarFallback>{u.displayName?.[0]}</AvatarFallback>
                                         </Avatar>
                                         <span className="text-sm font-medium">{u.username}</span>
