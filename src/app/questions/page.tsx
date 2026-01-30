@@ -11,6 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -76,7 +84,6 @@ import {
   MoreHorizontal,
   Plus,
   User,
-  Users,
   Trophy,
   BrainCircuit,
   TrendingUp,
@@ -88,6 +95,7 @@ import {
   Loader2,
   Send,
   Sparkles,
+  Users,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -622,4 +630,5 @@ export default function QuestionsPage() {
             </div>
         </div>
     )
-}
+
+    
