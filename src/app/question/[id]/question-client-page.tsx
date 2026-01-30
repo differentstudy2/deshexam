@@ -29,6 +29,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 
 type Question = { 
@@ -670,10 +671,9 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
                                 return (
                                 <div key={optIndex} className="mt-2">
-                                    <Button
-                                    variant="outline"
+                                    <div
                                     className={cn(
-                                        "w-full justify-start h-auto p-4 text-left",
+                                        "w-full justify-start h-auto p-4 text-left border rounded-lg",
                                         isAnswerRevealed && isCorrect && "bg-green-100 dark:bg-green-900/20 border-green-500",
                                     )}
                                     >
@@ -685,7 +685,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
                                         </div>
                                     </div>
-                                    </Button>
+                                    </div>
                                     {isAnswerRevealed && option.explanation && (
                                             <p className="text-xs text-muted-foreground mt-1 pl-10">{option.explanation}</p>
                                     )}
@@ -878,5 +878,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
+
+    
 
     
