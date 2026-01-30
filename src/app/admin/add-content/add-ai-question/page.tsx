@@ -46,7 +46,7 @@ const aiGeneratorFormSchema = z.object({
     sourceFile: z.string().optional(),
     numQuestions: z.coerce.number().int().min(1).max(20),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive', 'Any']),
 }).refine(data => {
     if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
     if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
@@ -102,7 +102,7 @@ function AIQuestionGeneratorPageComponent() {
                 numQuestions: aiData.numQuestions,
                 difficulty: aiData.difficulty,
                 questionType: aiData.questionType,
-                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                sourceType: aiData.sourceType,
                 source: source,
             };
 
@@ -131,19 +131,23 @@ function AIQuestionGeneratorPageComponent() {
       const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.type === 'text/plain') {
+            if (file.type.startsWith('image/') || file.type === 'application/pdf' || file.type === 'text/plain') {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const text = e.target?.result as string;
-                    aiForm.setValue('sourceFile', text, { shouldValidate: true });
+                    const result = e.target?.result as string;
+                    aiForm.setValue('sourceFile', result, { shouldValidate: true });
                     aiForm.setValue('sourceType', 'file');
                 };
-                reader.readAsText(file);
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
             } else {
                 toast({
                     variant: 'destructive',
                     title: 'Invalid File Type',
-                    description: 'Please upload a .txt file.',
+                    description: 'Please upload an image, PDF, or .txt file.',
                 });
             }
         }
@@ -217,11 +221,11 @@ function AIQuestionGeneratorPageComponent() {
                                                     <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                                     <div className="flex text-sm text-muted-foreground">
                                                         <p className="pl-1">
-                                                            {aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}
+                                                            {aiForm.watch('sourceFile') ? 'File selected' : 'Upload an Image, PDF or .txt file'}
                                                         </p>
                                                     </div>
                                                     <p className="text-xs text-muted-foreground">
-                                                    {aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}
+                                                    {aiForm.watch('sourceFile') ? (aiForm.watch('sourceFile') || '').substring(0, 50) + '...' : 'Text, image or PDF file up to 10MB'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -231,7 +235,7 @@ function AIQuestionGeneratorPageComponent() {
                                             ref={fileInputRef}
                                             onChange={handleFileChange}
                                             className="hidden"
-                                            accept=".txt"
+                                            accept=".txt,image/*,application/pdf"
                                         />
                                         <FormMessage />
                                     </FormItem>
@@ -286,6 +290,7 @@ function AIQuestionGeneratorPageComponent() {
                                                 <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                 <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                                 <SelectItem value="Matching">Matching</SelectItem>
+                                                <SelectItem value="Descriptive">Descriptive</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
