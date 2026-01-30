@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, Crown, Gem } from 'lucide-react';
+import { Check, Circle, Loader2, ArrowLeft, ExternalLink, GripVertical, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, Crown, Gem, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSubmissionById, getContentById, getUserProfile, handleQuestionVote } from '@/lib/firebase/firestore';
@@ -23,6 +23,12 @@ import { ScoreCircle } from '@/components/feature/score-circle';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 
 
 type Option = { text: string; explanation?: string; };
@@ -44,6 +50,7 @@ type Question = {
 type Test = { id: string; title: string; questions: Question[]; testType: string; board: string; subject: string; exam: string; chapter: string; duration: number; difficulty: string;};
 type Submission = { id: string; testId: string; userId: string; score: number; totalQuestions: number; answers: { [key: string]: any }, testType: string; submittedAt: any; };
 type UserProfile = { uid: string; displayName: string; photoURL?: string; school?: string; classGrade?: string; targetExam?: string; subscriptionPlan?: 'pro' | 'pass'; };
+
 
 function ReviewDisplay() {
   const searchParams = useSearchParams();
@@ -74,12 +81,12 @@ function ReviewDisplay() {
         const submissionData = await getSubmissionById(submissionId) as Submission;
         if (submissionData) {
           setSubmission(submissionData);
-          const [testData, studentData] = await Promise.all([
+           const [testData, studentData] = await Promise.all([
              getContentById(submissionData.testId) as Promise<Test>,
              getUserProfile(submissionData.userId) as Promise<UserProfile>
-          ]);
-          setTest(testData);
-          setStudent(studentData);
+           ]);
+           setTest(testData);
+           setStudent(studentData);
         } else {
           throw new Error("Submission not found.");
         }
@@ -176,7 +183,7 @@ function ReviewDisplay() {
     );
   }
 
-  if (!submission || !test) {
+  if (!submission || !test || !student) {
     return (
       <div className="text-center min-h-[400px] flex flex-col justify-center">
         <h2 className="text-2xl font-bold">Review not found</h2>
@@ -188,7 +195,7 @@ function ReviewDisplay() {
     );
   }
 
-  const { answers, score, totalQuestions } = submission;
+  const { answers, score, totalQuestions, testType } = submission;
   const percentage = Math.round((totalQuestions > 0 ? (score / totalQuestions) * 100 : 0));
   const submittedAtDate = submission.submittedAt ? new Date(submission.submittedAt) : null;
 
@@ -206,12 +213,12 @@ function ReviewDisplay() {
                             <div className="flex items-center justify-center md:justify-start gap-2">
                             <h3 className="text-lg font-semibold">{student?.displayName}</h3>
                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
-                             {student?.subscriptionPlan === 'pro' && (
+                             {student.subscriptionPlan === 'pro' && (
                                 <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
                                     <Crown className="w-3.5 h-3.5 mr-1" /> Pass Pro
                                 </Badge>
                             )}
-                            {student?.subscriptionPlan === 'pass' && (
+                            {student.subscriptionPlan === 'pass' && (
                                 <Badge variant="outline" className="border-indigo-300 bg-indigo-50 text-indigo-600">
                                     <Gem className="w-3.5 h-3.5 mr-1" /> Pass
                                 </Badge>
@@ -239,7 +246,7 @@ function ReviewDisplay() {
             <CardContent className="space-y-4 pt-0">
                 <Separator />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                    {test.title && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>}
+                    <div className="flex items-center gap-2 text-muted-foreground col-span-full"><FileQuestion className="w-4 h-4"/> <strong>Test:</strong> <span className="text-foreground">{test.title}</span></div>
                     {test.chapter && <div className="flex items-center gap-2 text-muted-foreground col-span-full"><Layers className="w-4 h-4" /> <strong>Chapter:</strong> <span className="text-foreground">{test.chapter}</span></div>}
 
                     {test.subject && <div className="flex items-center gap-2 text-muted-foreground"><Book className="w-4 h-4"/> <strong>Subject:</strong> <span className="text-foreground">{test.subject}</span></div>}
@@ -269,7 +276,7 @@ function ReviewDisplay() {
             </CardHeader>
             <CardContent className="space-y-6">
             {test.questions.map((question, index) => {
-                const userAnswer = answers[index];
+                const userAnswer = answers[question.id];
                 let isCorrect = false;
                 let matchingScore = 0;
                 let totalPairs = 0;
@@ -316,39 +323,41 @@ function ReviewDisplay() {
                             )}
                         </div>
                         <div className="mt-4 space-y-2">
-                            {question.type === 'Multiple Choice' && question.options?.map((option, optIndex) => {
-                                const isUserAnswer = userAnswer === option.text;
-                                const isCorrectAnswer = question.correctAnswer === option.text;
+                            {question.type === 'Multiple Choice' && question.options && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {question.options.map((option, optIndex) => {
+                                    const isUserAnswer = userAnswer === option.text;
+                                    const isCorrectAnswer = question.correctAnswer === option.text;
 
-                                return (
-                                    <div key={optIndex} className={cn(
-                                        "p-3 rounded-lg border flex items-start gap-3",
-                                        isCorrectAnswer 
-                                            ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                                            : isUserAnswer 
-                                                ? "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-                                                : "bg-secondary/30"
-                                    )}>
-                                        {isCorrectAnswer 
-                                            ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" /> 
-                                            : isUserAnswer 
-                                                ? <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
-                                                : <div className="w-5 h-5 mt-0.5 shrink-0" /> 
-                                        }
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium">{option.text}</span>
-                                                {isUserAnswer && <Badge variant="secondary" className="ml-2">Your Answer</Badge>}
+                                    return (
+                                        <div key={optIndex} className={cn(
+                                            "p-3 rounded-lg border flex items-start gap-3",
+                                            isCorrectAnswer 
+                                                ? "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                                : isUserAnswer 
+                                                    ? "bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                                    : "bg-secondary/30"
+                                        )}>
+                                            {isCorrectAnswer 
+                                                ? <Check className="w-5 h-5 text-white bg-green-500 rounded-full p-0.5 mt-0.5 shrink-0" /> 
+                                                : <Circle className="w-4 h-4 text-muted-foreground fill-current mt-1 shrink-0" />
+                                            }
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between prose dark:prose-invert max-w-none custom-prose-style">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                    {isUserAnswer && <Badge variant={isCorrectAnswer ? "default" : "destructive"} className="ml-2">Your Answer</Badge>}
+                                                </div>
+                                                {option.explanation && (
+                                                    <div className="text-xs text-muted-foreground mt-1 prose dark:prose-invert max-w-none custom-prose-style">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
+                                                    </div>
+                                                )}
                                             </div>
-                                            {option.explanation && (
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {option.explanation}
-                                                </p>
-                                            )}
                                         </div>
-                                    </div>
-                                )
-                            })}
+                                    )
+                                })}
+                                </div>
+                            )}
                             {question.type === 'True/False' && (
                                 <div className="space-y-3">
                                     {['True', 'False'].map((tf, tfIndex) => {
@@ -369,9 +378,9 @@ function ReviewDisplay() {
                                                     {isCorrectAnswer && !isUserAnswer && <Badge variant="outline" className="ml-auto">Correct</Badge>}
                                                 </div>
                                                 {option.explanation && (
-                                                    <p className="text-sm text-muted-foreground mt-2 pl-7">
-                                                        {option.explanation}
-                                                    </p>
+                                                    <div className="text-sm text-muted-foreground mt-2 pl-7 prose dark:prose-invert max-w-none">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.explanation}</ReactMarkdown>
+                                                    </div>
                                                 )}
                                             </div>
                                         )
@@ -383,7 +392,7 @@ function ReviewDisplay() {
                                 <div className="p-3 rounded-lg border bg-red-100 dark:bg-red-900/20 border-red-200 dark:border-red-800">
                                     <div className="flex items-center gap-2">
                                         <XCircle className="w-5 h-5 text-red-600" />
-                                        <span className="font-medium">{userAnswer}</span>
+                                        <span className="font-medium">{userAnswer || "No Answer"}</span>
                                         <Badge variant="destructive" className="ml-auto">Your Answer</Badge>
                                     </div>
                                 </div>
@@ -435,10 +444,16 @@ function ReviewDisplay() {
                             )}
                         </div>
                         {question.explanation && (
-                            <div className="mt-4 p-3 rounded-md bg-gray-100 dark:bg-gray-800">
-                            <h4 className="font-semibold text-sm mb-1">General Explanation</h4>
-                            <p className="text-sm">{question.explanation}</p>
-                            </div>
+                            <Card className="mt-4 bg-secondary/50">
+                                <CardHeader>
+                                    <CardTitle className="text-lg">Explanation</CardTitle>
+                                </CardHeader>
+                                <CardContent className="prose dark:prose-invert max-w-none text-sm">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                        {question.explanation}
+                                    </ReactMarkdown>
+                                </CardContent>
+                            </Card>
                         )}
                          <div className="mt-4 flex items-center gap-2">
                             <Button 
@@ -468,28 +483,26 @@ function ReviewDisplay() {
             </CardContent>
         </Card>
       </>
+    </div>
   );
 }
 
 export default function TestReviewPage() {
-  const params = useParams();
+  const [testType, setTestType] = useState('Test');
   const searchParams = useSearchParams();
-  const testId = params.id as string;
-  const submissionId = searchParams.get('submissionId');
-  const [testType, setTestType] = useState('');
-
+  
   useEffect(() => {
-      const getTestType = async () => {
-          if (submissionId) {
-              const sub = await getSubmissionById(submissionId);
-              if (sub) {
-                setTestType(sub.testType.toLowerCase().replace(/\s+/g, '-'));
-              }
-          }
-      }
-      getTestType();
-  }, [submissionId]);
-
+    const getTestType = async () => {
+        const submissionId = searchParams.get('submissionId');
+        if(submissionId) {
+            const sub = await getSubmissionById(submissionId);
+            if(sub) {
+                setTestType(sub.testType);
+            }
+        }
+    }
+    getTestType();
+  }, [searchParams]);
 
   return (
     <div className="container py-8 sm:py-12 md:max-w-4xl">
@@ -499,7 +512,7 @@ export default function TestReviewPage() {
             <p className="text-muted-foreground">Let's see how you did.</p>
         </div>
         <Button asChild variant="outline">
-            <Link href={`/${testType}/${testId}/results?submissionId=${submissionId}`}>
+            <Link href={`/${testType.toLowerCase().replace(/\\s+/g, '-')}/${useParams().id}/results?submissionId=${searchParams.get('submissionId')}`}>
                 <ArrowLeft className="mr-2 h-4 w-4"/>
                 Back to Results
             </Link>
