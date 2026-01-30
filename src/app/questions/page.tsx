@@ -216,7 +216,7 @@ export default function QuestionsPage() {
                         </CardHeader>
                         <CardContent className="flex justify-center">
                             <Button size="lg" asChild>
-                                <Link href="/admin/questions">ASK YOUR QUESTION</Link>
+                                <Link href="/questions/ask">ASK YOUR QUESTION</Link>
                             </Button>
                         </CardContent>
                     </Card>
