@@ -87,6 +87,7 @@ import {
   Clapperboard,
   Loader2,
   Send,
+  Sparkles,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -120,6 +121,7 @@ const questionFormSchema = z.object({
   board: z.string().optional(),
   classCategory: z.string().optional(),
   grade: z.string().optional(),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Grouped', 'Descriptive']),
 });
 
 type QuestionFormValues = z.infer<typeof questionFormSchema>;
@@ -187,6 +189,7 @@ export default function QuestionsPage() {
             board: '',
             classCategory: '',
             grade: '',
+            type: 'Descriptive',
         },
     });
 
@@ -275,7 +278,6 @@ export default function QuestionsPage() {
         try {
             const questionData = {
                 ...data,
-                type: 'Descriptive',
                 marks: 1, 
             };
 
@@ -340,7 +342,7 @@ export default function QuestionsPage() {
                         <CardHeader className="text-center">
                             <CardTitle className="font-headline text-3xl font-bold">Get Answers for FREE</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex justify-center">
+                        <CardContent className="flex justify-center gap-4">
                             <Dialog open={isAskDialogOpen} onOpenChange={setIsAskDialogOpen}>
                                 <DialogTrigger asChild>
                                     <Button size="lg">ASK YOUR QUESTION</Button>
@@ -392,6 +394,30 @@ export default function QuestionsPage() {
                                                 />
                                                 <FormField
                                                     control={askForm.control}
+                                                    name="type"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Question Type</FormLabel>
+                                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
+                                                                <SelectContent>
+                                                                    <SelectItem value="Descriptive">Descriptive</SelectItem>
+                                                                    <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                                                    <SelectItem value="True/False">True/False</SelectItem>
+                                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                                    <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                                                    <SelectItem value="Matching">Matching</SelectItem>
+                                                                    <SelectItem value="Grouped">Grouped</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <FormField
+                                                    control={askForm.control}
                                                     name="board"
                                                     render={({ field }) => (
                                                         <FormItem>
@@ -408,9 +434,7 @@ export default function QuestionsPage() {
                                                         </FormItem>
                                                     )}
                                                 />
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                 <FormField
+                                                <FormField
                                                     control={askForm.control}
                                                     name="classCategory"
                                                     render={({ field }) => (
@@ -428,6 +452,8 @@ export default function QuestionsPage() {
                                                         </FormItem>
                                                     )}
                                                 />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <FormField
                                                     control={askForm.control}
                                                     name="grade"
@@ -457,6 +483,12 @@ export default function QuestionsPage() {
                                     </Form>
                                 </DialogContent>
                             </Dialog>
+                             <Button asChild variant="outline" size="lg">
+                                <Link href="/admin/add-content/add-ai-question">
+                                    <Sparkles className="mr-2" />
+                                    Add with AI
+                                </Link>
+                            </Button>
                         </CardContent>
                     </Card>
                     <div className="flex justify-between items-center">
