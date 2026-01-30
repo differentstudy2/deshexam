@@ -6,9 +6,9 @@ import Link from 'next/link';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -51,10 +51,12 @@ import {
     Leaf,
     BookOpen,
     Calculator,
-    Clapperboard
+    Clapperboard,
+    Loader2
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Badge } from '@/components/ui/badge';
 
 type Subject = { id: string, name: string };
 type Question = {
