@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -337,7 +336,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const handleCommentSubmit = async (e: React.FormEvent, parentId: string | null = null) => {
     e.preventDefault();
     if (!user) {
-        toast({ variant: "destructive", title: "Please log in to comment." });
+        toast({ variant: "destructive", title: "Please log in to post an answer." });
         return;
     }
     const text = parentId ? replyText : newComment;
@@ -350,11 +349,11 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
         setReplyText('');
         setReplyingTo(null);
         await fetchComments();
-        toast({ title: parentId ? "Reply posted!" : "Comment posted!" });
+        toast({ title: parentId ? "Reply posted!" : "Answer posted!" });
     } catch (error) {
          toast({
           variant: "destructive",
-          title: 'Error posting comment',
+          title: 'Error posting answer',
           description: (error as Error).message,
         });
     } finally {
@@ -533,7 +532,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </Avatar>
                                     <div>
                                         <p className="font-semibold">{question.authorName}</p>
-                                        <p className="text-xs text-muted-foreground">{question.createdAt.toLocaleDateString()}</p>
+                                        <p className="text-xs text-muted-foreground">{new Date(question.createdAt).toLocaleDateString()}</p>
                                     </div>
                                 </div>
                                 <Badge variant="outline" className="text-green-600 border-green-600">Answered</Badge>
@@ -724,20 +723,21 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                            <MessageSquare /> Comments ({comments.length})
+                            <MessageSquare /> Answers &amp; Discussion ({comments.length})
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={(e) => handleCommentSubmit(e)} className="space-y-4">
                                 <Textarea 
-                                    placeholder={user ? "Write a comment..." : "Please log in to write a comment."}
+                                    placeholder={user ? "Contribute your answer or explanation..." : "Please log in to post an answer."}
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     disabled={!user || isSubmittingComment}
+                                    className="min-h-[120px]"
                                 />
                                 <div className="flex justify-end">
                                     <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
-                                        {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Comment"}
+                                        {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Answer"}
                                     </Button>
                                 </div>
                             </form>
@@ -746,7 +746,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 {loadingComments ? (
                                     <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
                                 ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
-                                    <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
+                                    <p className="text-center text-muted-foreground">No answers yet. Be the first to contribute!</p>
                                 )}
                             </div>
                         </CardContent>
