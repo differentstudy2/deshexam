@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronLeft, ChevronRight, Flag, Heart } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, Flag, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -435,59 +435,71 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     const displayRating = userRootComment?.rating;
 
     return (
-      <div key={comment.id} className={cn("flex items-start gap-4", isReply && "mt-4")}>
-          <Avatar>
-            <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
-            <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-              <div className="flex flex-col items-start gap-1">
-                  <div className="flex items-center gap-2 text-sm">
-                      <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
-                      <span className="text-muted-foreground">
-                          {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
-                      </span>
-                  </div>
-                   {displayRating && <StarRating rating={displayRating} />}
-              </div>
-              <p className="text-foreground mt-1">{comment.text}</p>
-              <div className="flex items-center gap-1 mt-2">
-                  <Button variant="ghost" size="sm" onClick={() => handleCommentVote(comment.id, 'like')} disabled={isCommentVoting[comment.id]}>
-                      <ThumbsUp className={cn("mr-2 h-4 w-4", userHasLiked && "fill-current")} /> {comment.likes || 0}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleCommentVote(comment.id, 'dislike')} disabled={isCommentVoting[comment.id]}>
-                      <ThumbsDown className={cn("mr-2 h-4 w-4", userHasDisliked && "fill-current")} /> {comment.dislikes || 0}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}>
-                      <CornerDownRight className="mr-2 h-4 w-4" /> Reply
-                  </Button>
-              </div>
+      <Card key={comment.id} className={cn(isReply && "ml-4 md:ml-8", "bg-card")}>
+        <CardHeader className="p-4">
+            <div className="flex items-start gap-4">
+                <Avatar>
+                    <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
+                    <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                    <div className="flex flex-col items-start gap-1">
+                        <div className="flex items-center gap-2 text-sm">
+                            <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
+                            <span className="text-muted-foreground">
+                                {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
+                            </span>
+                        </div>
+                        {displayRating && <StarRating rating={displayRating} />}
+                    </div>
+                </div>
+            </div>
+        </CardHeader>
+        <CardContent className="px-4 pb-2">
+            <p className="text-foreground">{comment.text}</p>
+        </CardContent>
+        <CardFooter className="p-4 pt-0">
+            <div className="flex items-center gap-1">
+                <Button variant="ghost" size="sm" onClick={() => handleCommentVote(comment.id, 'like')} disabled={isCommentVoting[comment.id]}>
+                    <ThumbsUp className={cn("mr-2 h-4 w-4", userHasLiked && "fill-current")} /> {comment.likes || 0}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleCommentVote(comment.id, 'dislike')} disabled={isCommentVoting[comment.id]}>
+                    <ThumbsDown className={cn("mr-2 h-4 w-4", userHasDisliked && "fill-current")} /> {comment.dislikes || 0}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}>
+                    <CornerDownRight className="mr-2 h-4 w-4" /> Reply
+                </Button>
+            </div>
+        </CardFooter>
+        
+        {replyingTo === comment.id && (
+            <CardContent>
+                <form onSubmit={(e) => handleCommentSubmit(e, comment.id)} className="space-y-2">
+                    <Textarea 
+                        placeholder={`Replying to ${comment.authorName}...`}
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        disabled={isSubmittingComment}
+                        className="h-20"
+                    />
+                    <div className="flex justify-end gap-2">
+                        <Button type="button" variant="ghost" size="sm" onClick={() => setReplyingTo(null)}>Cancel</Button>
+                        <Button type="submit" size="sm" disabled={isSubmittingComment || !replyText.trim()}>
+                        {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Reply"}
+                        </Button>
+                    </div>
+                </form>
+            </CardContent>
+        )}
 
-              {replyingTo === comment.id && (
-                  <form onSubmit={(e) => handleCommentSubmit(e, comment.id)} className="mt-4 space-y-2">
-                      <Textarea 
-                          placeholder={`Replying to ${comment.authorName}...`}
-                          value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
-                          disabled={isSubmittingComment}
-                          className="h-20"
-                      />
-                      <div className="flex justify-end gap-2">
-                           <Button type="button" variant="ghost" size="sm" onClick={() => setReplyingTo(null)}>Cancel</Button>
-                           <Button type="submit" size="sm" disabled={isSubmittingComment || !replyText.trim()}>
-                            {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Reply"}
-                           </Button>
-                      </div>
-                  </form>
-              )}
-
-              {comment.replies && comment.replies.length > 0 && (
-                  <div className="mt-4 pl-4 border-l-2">
-                      {comment.replies.map(reply => renderComment(reply, true))}
-                  </div>
-              )}
-          </div>
-      </div>
+        {comment.replies && comment.replies.length > 0 && (
+            <CardContent>
+                <div className="mt-4 pl-4 border-l-2 space-y-4">
+                    {comment.replies.map(reply => renderComment(reply, true))}
+                </div>
+            </CardContent>
+        )}
+      </Card>
     );
   }
 
@@ -520,6 +532,18 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   return (
     <div className="bg-secondary/30">
         <div className="container py-8">
+             <nav className="text-sm mb-6 flex items-center gap-1.5 text-muted-foreground flex-wrap">
+                <Link href="/" className="hover:text-primary">Home</Link>
+                <ChevronRight className="w-4 h-4" />
+                <Link href="/questions" className="hover:text-primary">Questions</Link>
+                {question.subject && (
+                <>
+                    <ChevronRight className="w-4 h-4" />
+                    <Link href={`/questions?subject=${encodeURIComponent(question.subject)}`} className="hover:text-primary">{question.subject}</Link>
+                </>
+                )}
+            </nav>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                     <Card>
@@ -719,15 +743,13 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                             </CardContent>
                         </Card>
                     )}
-
+                    
                     <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                            <MessageSquare /> Answers &amp; Discussion ({comments.length})
-                            </CardTitle>
+                            <CardTitle>Post Your Answer</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={(e) => handleCommentSubmit(e)} className="space-y-4">
+                             <form onSubmit={(e) => handleCommentSubmit(e)} className="space-y-4">
                                 <Textarea 
                                     placeholder={user ? "Contribute your answer or explanation..." : "Please log in to post an answer."}
                                     value={newComment}
@@ -741,16 +763,17 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                     </Button>
                                 </div>
                             </form>
-                            <Separator className="my-6" />
-                            <div className="space-y-6">
-                                {loadingComments ? (
-                                    <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
-                                ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
-                                    <p className="text-center text-muted-foreground">No answers yet. Be the first to contribute!</p>
-                                )}
-                            </div>
                         </CardContent>
                     </Card>
+
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold font-headline">Answers & Discussion ({comments.length})</h2>
+                        {loadingComments ? (
+                            <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
+                        ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
+                            <p className="text-center text-muted-foreground py-8">No answers yet. Be the first to contribute!</p>
+                        )}
+                    </div>
 
                     <TextbookSolutionsSection currentClass={question.class} />
                     
