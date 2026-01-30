@@ -114,11 +114,7 @@ export default function AllQuestionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-           {loading ? (
-             <div className="flex items-center justify-center min-h-[200px]">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-             </div>
-           ) : !user ? (
+           {!user && !loading ? (
             <div className="text-center py-16 text-muted-foreground">
                 <p>Please log in to view the question bank.</p>
             </div>
@@ -136,7 +132,16 @@ export default function AllQuestionsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {questions.length > 0 ? (
+                        {loading ? (
+                             Array.from({ length: 10 }).map((_, i) => (
+                                <TableRow key={i}>
+                                    <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
+                                    <TableCell className="hidden lg:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                </TableRow>
+                            ))
+                        ) : questions.length > 0 ? (
                         questions.map((question) => (
                             <TableRow key={question.id}>
                                 <TableCell className="font-medium max-w-sm truncate">
