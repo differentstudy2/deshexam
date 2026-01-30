@@ -2305,24 +2305,37 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
 
+export const getRelatedQuestions = async (currentQuestion: Partial<Question>): Promise<Question[]> => {
+    if (!currentQuestion.subject || !currentQuestion.id) {
+        return [];
+    }
+    try {
+        const q = query(
+            collection(db, "questions"),
+            where("subject", "==", currentQuestion.subject),
+            where("__name__", "!=", currentQuestion.id), // Exclude the current question using its document ID
+            limit(5)
+        );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+        const querySnapshot = await getDocs(q);
+        const questions = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            const createdAt = data.createdAt;
+            let formattedDate = 'N/A';
+            if (createdAt && typeof createdAt.toDate === 'function') {
+                formattedDate = createdAt.toDate().toLocaleDateString();
+            } else if (createdAt instanceof Date) {
+                formattedDate = createdAt.toLocaleDateString();
+            }
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: formattedDate,
+            } as Question;
+        });
+        return questions;
+    } catch (e) {
+        console.error("Error getting related questions: ", e);
+        throw new Error("Failed to fetch related questions.");
+    }
+};

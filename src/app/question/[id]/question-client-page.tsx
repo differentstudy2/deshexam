@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass } from '@/lib/firebase/firestore';
+import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass, getRelatedQuestions } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, ChevronLeft, Flag, Heart } from 'lucide-react';
@@ -49,6 +50,8 @@ type Question = {
   authorId: string;
   createdAt: any;
   subject?: string;
+  textbookId?: string;
+  chapterId?: string;
   board?: string;
   class?: string;
   exam?: string;
@@ -204,7 +207,9 @@ const TextbookSolutionsSection = ({ currentClass }: { currentClass?: string }) =
 
 export default function QuestionClientPage({ questionId }: { questionId: string }) {
   const [question, setQuestion] = useState<Question | null>(null);
+  const [relatedQuestions, setRelatedQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRelated, setLoadingRelated] = useState(true);
   const [isVoting, setIsVoting] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -272,6 +277,21 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
         setQuestion(q);
         fetchComments();
+
+        // Fetch related questions
+        setLoadingRelated(true);
+        try {
+            const related = await getRelatedQuestions(q);
+            setRelatedQuestions(related);
+        } catch (relatedError) {
+             toast({
+                variant: "destructive",
+                title: 'Could not load related questions',
+            });
+        } finally {
+            setLoadingRelated(false);
+        }
+
       } catch (error) {
         toast({
           variant: "destructive",
@@ -821,6 +841,37 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                 </CardContent>
                             </Card>
                         )}
+                        
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Related Questions</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {loadingRelated ? (
+                                    <div className="space-y-4">
+                                        <Skeleton className="h-5 w-full" />
+                                        <Skeleton className="h-5 w-4/5" />
+                                        <Skeleton className="h-5 w-full" />
+                                    </div>
+                                ) : relatedQuestions.length > 0 ? (
+                                    <ul className="space-y-4">
+                                        {relatedQuestions.map((rq) => (
+                                            <li key={rq.id}>
+                                                <Link href={`/question/${rq.id}`} className="font-medium hover:text-primary transition-colors group">
+                                                    <p className="flex items-start gap-2">
+                                                        <ChevronRight className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0 group-hover:text-primary" />
+                                                        <span className="flex-1">{rq.text}</span>
+                                                    </p>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-muted-foreground text-center">No related questions found.</p>
+                                )}
+                            </CardContent>
+                        </Card>
+
                          <div className="space-y-6">
                             <h2 className="text-2xl font-bold font-headline">Answers & Discussion ({comments.length})</h2>
                             {loadingComments ? (
@@ -878,4 +929,3 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
-
