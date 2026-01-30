@@ -8,6 +8,7 @@ import type { PracticeSet, Textbook, Chapter, Topic, Question } from '@/lib/type
 import { getPracticeSetById, getQuestionsByPracticeSet, getContentById } from '@/lib/firebase/firestore';
 import PracticeSetClientPage from './practice-set-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
   params: {
@@ -77,8 +78,8 @@ export async function generateMetadata({ params, searchParams }: PageProps, pare
     };
   }
 
-  const title = `${practiceSet.title} | ${topic?.title || chapter.title} | DeshExam`;
-  const description = `Take the interactive practice set "${practiceSet.title}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+  const title = `${formatTitleForBrowser(practiceSet.title)} | ${topic?.title || chapter.title} | DeshExam`;
+  const description = `Take the interactive practice set "${formatTitleForBrowser(practiceSet.title)}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
   const keywords = [
     practiceSet.title,
     topic?.title || '',
@@ -110,8 +111,8 @@ export default async function PracticeSetPage({ params }: PageProps) {
 
 
     const initialTest = {
-        ...practiceSet,
-        questions: questions.map((q: any) => serializeFirestoreTimestamps(q)),
+        ...(practiceSet as any),
+        questions,
         testType: 'Practice Set'
     };
 

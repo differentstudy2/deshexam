@@ -3,6 +3,7 @@ import { getQuestionById } from '@/lib/firebase/firestore';
 import type { Metadata, ResolvingMetadata } from 'next';
 import QuestionClientPage from './question-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
   params: { id: string };
@@ -21,10 +22,12 @@ export async function generateMetadata(
     };
   }
 
-  const description = `View the question: "${question.text.substring(0, 100)}..." and its solution. Discuss with the community on DeshExam.`;
+  const plainTextTitle = formatTitleForBrowser(question.text.substring(0, 60));
+  const title = `${plainTextTitle}${question.text.length > 60 ? '...' : ''}`;
+  const description = `View the question: "${formatTitleForBrowser(question.text.substring(0, 160))}..." and its solution. Discuss with the community on DeshExam.`;
 
   return {
-    title: question.text.substring(0, 50) + "...",
+    title: title,
     description: description,
     keywords: [question.type, 'question', 'answer', 'discussion', 'exam preparation'],
     openGraph: {

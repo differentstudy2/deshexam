@@ -8,6 +8,7 @@ import type { Textbook, Chapter, Exam as Quiz } from '@/lib/types';
 import { getContentById } from '@/lib/firebase/firestore';
 import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type PageProps = {
   params: {
@@ -59,8 +60,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${(quiz as any).title} | ${(textbook as any).title} | DeshExam`;
-  const description = `Take the quiz "${(quiz as any).title}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+  const title = `${formatTitleForBrowser((quiz as any).title)} | ${(textbook as any).title} | DeshExam`;
+  const description = `Take the quiz "${formatTitleForBrowser((quiz as any).title)}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
   const keywords = [
     (quiz as any).title,
     textbook.title,

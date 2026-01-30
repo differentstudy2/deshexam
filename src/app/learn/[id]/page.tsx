@@ -3,6 +3,7 @@ import { getContentById } from '@/lib/firebase/firestore';
 import type { Metadata, ResolvingMetadata } from 'next';
 import ArticleClientPage from './article-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
   params: { id: string };
@@ -30,12 +31,12 @@ export async function generateMetadata(
 
 
   return {
-    title: article.title,
-    description: article.description,
+    title: formatTitleForBrowser(article.title),
+    description: formatTitleForBrowser(article.description),
     keywords: [article.subject, article.title, 'learn', 'tutorial', 'study guide'],
     openGraph: {
-      title: article.title,
-      description: article.description,
+      title: formatTitleForBrowser(article.title),
+      description: formatTitleForBrowser(article.description),
       images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`, ...previousImages],
       type: 'article',
       publishedTime: publishedTime,

@@ -4,6 +4,7 @@ import { getContentById } from '@/lib/firebase/firestore';
 import type { Metadata, ResolvingMetadata } from 'next';
 import TestClientPage from './test-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
   params: { id: string };
@@ -27,8 +28,8 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: test.title,
-    description: `Take the ${test.title} mock test on DeshExam. ${test.description}`,
+    title: formatTitleForBrowser(test.title),
+    description: `Take the ${formatTitleForBrowser(test.title)} mock test on DeshExam. ${formatTitleForBrowser(test.description)}`,
     keywords: [test.title, test.subject, test.testType, 'mock test', 'online test', 'exam preparation'],
     openGraph: {
       images: [`https://picsum.photos/seed/${id}/400/225`, ...previousImages],
