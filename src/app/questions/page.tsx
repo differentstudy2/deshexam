@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -179,7 +179,7 @@ export default function QuestionsPage() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
+    const lastVisibleRef = useRef<DocumentSnapshot | null>(null);
     const [selectedSubject, setSelectedSubject] = useState('All subjects');
 
     // State for "Ask Question" dialog
@@ -205,17 +205,15 @@ export default function QuestionsPage() {
 
     const fetchQuestions = useCallback(async (isInitial = false) => {
         if(isInitial) {
-            setQuestions([]);
-            setLastVisible(null);
             setLoading(true);
         } else {
             setLoadingMore(true);
         }
 
         try {
-            const { questions: newQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(ITEMS_PER_PAGE, isInitial ? null : lastVisible);
+            const { questions: newQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(ITEMS_PER_PAGE, isInitial ? null : lastVisibleRef.current);
             setQuestions(prev => isInitial ? newQuestions : [...prev, ...newQuestions]);
-            setLastVisible(newLastVisible);
+            lastVisibleRef.current = newLastVisible;
             setHasMore(newHasMore);
         } catch (error) {
              toast({ variant: 'destructive', title: 'Error fetching questions', description: (error as Error).message });
@@ -223,7 +221,7 @@ export default function QuestionsPage() {
             setLoading(false);
             setLoadingMore(false);
         }
-    }, [toast, lastVisible]);
+    }, [toast]);
     
     useEffect(() => {
         const fetchData = async () => {
@@ -249,7 +247,7 @@ export default function QuestionsPage() {
                     setUserProfile({...profileData, points: Math.floor(Math.random() * 200)} as UserProfile);
                 }
 
-                await fetchQuestions(true);
+                fetchQuestions(true);
 
             } catch (error) {
                 toast({ variant: 'destructive', title: 'Error fetching initial data', description: (error as Error).message });
@@ -554,7 +552,7 @@ export default function QuestionsPage() {
                                 </Card>
                             ))}
                             {hasMore && (
-                                <Button onClick={() => fetchQuestions()} disabled={loadingMore} className="w-full">
+                                <Button onClick={() => fetchQuestions(false)} disabled={loadingMore} className="w-full">
                                     {loadingMore ? <Loader2 className="animate-spin" /> : "Load More"}
                                 </Button>
                             )}
@@ -630,5 +628,4 @@ export default function QuestionsPage() {
             </div>
         </div>
     )
-
-    
+}
