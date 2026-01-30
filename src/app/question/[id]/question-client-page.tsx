@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -528,7 +527,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   }
   
   const userHasLiked = user && question.likedBy?.includes(user.uid);
-  
+  const isDefaultAnswerVisible = isAnswerRevealed || ['Short Answer', 'Descriptive', 'Matching'].includes(question.type);
+
   return (
     <div className="bg-secondary/30">
         <div className="container py-8">
@@ -659,24 +659,6 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                             </div>
                                         </CardContent>
                                     </Card>
-                                    <Card className="border-green-500 bg-green-50/50 dark:bg-green-900/10">
-                                        <CardHeader><CardTitle>Correct Matches</CardTitle></CardHeader>
-                                        <CardContent className="space-y-2">
-                                            {Array.isArray(question.correctAnswer) && question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
-                                                <div key={pairIndex} className="p-3 border border-green-500/30 bg-green-100/30 dark:bg-green-900/20 rounded-lg flex justify-between items-center gap-4">
-                                                    <div className="flex-1 flex flex-col items-center text-center">
-                                                        {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
-                                                        <span className="font-semibold">{pair.a}</span>
-                                                    </div>
-                                                    <GripVertical className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                                    <div className="flex-1 flex flex-col items-center text-center">
-                                                            {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
-                                                        <span className="font-semibold">{pair.b}</span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </CardContent>
-                                    </Card>
                                 </div>
                             )}
 
@@ -705,76 +687,101 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                         </CardFooter>
                     </Card>
 
-                   {(isAnswerRevealed && (question.type === 'Fill in the Blank')) && typeof question.correctAnswer === 'string' && (
-                       <Card>
-                           <CardHeader>
-                               <CardTitle>Correct Answer</CardTitle>
-                           </CardHeader>
-                           <CardContent className="text-lg font-bold prose dark:prose-invert max-w-none">
-                               <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-                                   {question.correctAnswer}
-                               </ReactMarkdown>
-                           </CardContent>
-                       </Card>
-                   )}
-                    
-                    {(question.type === 'Short Answer' || question.type === 'Descriptive') && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>{question.type === 'Descriptive' ? 'Model Answer' : 'Answer'}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="prose dark:prose-invert max-w-none">
-                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                    {question.correctAnswer}
-                                </ReactMarkdown>
-                            </CardContent>
-                        </Card>
+                    {isDefaultAnswerVisible && (
+                        <>
+                            {(question.type === 'Fill in the Blank') && typeof question.correctAnswer === 'string' && (
+                               <Card>
+                                   <CardHeader>
+                                       <CardTitle>Correct Answer</CardTitle>
+                                   </CardHeader>
+                                   <CardContent className="text-lg font-bold prose dark:prose-invert max-w-none">
+                                       <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                           {question.correctAnswer}
+                                       </ReactMarkdown>
+                                   </CardContent>
+                               </Card>
+                            )}
+                            
+                            {(question.type === 'Short Answer' || question.type === 'Descriptive') && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>{question.type === 'Descriptive' ? 'Model Answer' : 'Answer'}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="prose dark:prose-invert max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                            {question.correctAnswer}
+                                        </ReactMarkdown>
+                                    </CardContent>
+                                </Card>
+                            )}
+                            
+                             {question.type === 'Matching' && Array.isArray(question.correctAnswer) && (
+                                <Card className="border-green-500 bg-green-50/50 dark:bg-green-900/10">
+                                    <CardHeader><CardTitle>Correct Matches</CardTitle></CardHeader>
+                                    <CardContent className="space-y-2">
+                                        {question.correctAnswer.map((pair: {a: string, aImage?: string, b: string, bImage?: string}, pairIndex: number) => (
+                                            <div key={pairIndex} className="p-3 border border-green-500/30 bg-green-100/30 dark:bg-green-900/20 rounded-lg flex justify-between items-center gap-4">
+                                                <div className="flex-1 flex flex-col items-center text-center">
+                                                    {pair.aImage && <Image src={pair.aImage} alt={pair.a} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                    <span className="font-semibold">{pair.a}</span>
+                                                </div>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                                <div className="flex-1 flex flex-col items-center text-center">
+                                                        {pair.bImage && <Image src={pair.bImage} alt={pair.b} width={40} height={40} className="rounded-md object-cover mb-1" />}
+                                                    <span className="font-semibold">{pair.b}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {question.explanation && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Explanation</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="prose dark:prose-invert max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
+                                            {question.explanation}
+                                        </ReactMarkdown>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Post Your Answer</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                     <form onSubmit={(e) => handleCommentSubmit(e)} className="space-y-4">
+                                        <Textarea 
+                                            placeholder={user ? "Contribute your answer or explanation..." : "Please log in to post an answer."}
+                                            value={newComment}
+                                            onChange={(e) => setNewComment(e.target.value)}
+                                            disabled={!user || isSubmittingComment}
+                                            className="min-h-[120px]"
+                                        />
+                                        <div className="flex justify-end">
+                                            <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
+                                                {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Answer"}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+
+                            <div className="space-y-6">
+                                <h2 className="text-2xl font-bold font-headline">Answers &amp; Discussion ({comments.length})</h2>
+                                {loadingComments ? (
+                                    <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
+                                ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
+                                    <p className="text-center text-muted-foreground py-8">No answers yet. Be the first to contribute!</p>
+                                )}
+                            </div>
+                        </>
                     )}
-
-                    {(isAnswerRevealed || ['Short Answer', 'Descriptive'].includes(question.type)) && question.explanation && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Explanation</CardTitle>
-                            </CardHeader>
-                            <CardContent className="prose dark:prose-invert max-w-none">
-                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
-                                    {question.explanation}
-                                </ReactMarkdown>
-                            </CardContent>
-                        </Card>
-                    )}
                     
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Post Your Answer</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                             <form onSubmit={(e) => handleCommentSubmit(e)} className="space-y-4">
-                                <Textarea 
-                                    placeholder={user ? "Contribute your answer or explanation..." : "Please log in to post an answer."}
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    disabled={!user || isSubmittingComment}
-                                    className="min-h-[120px]"
-                                />
-                                <div className="flex justify-end">
-                                    <Button type="submit" disabled={!user || isSubmittingComment || !newComment.trim()}>
-                                        {isSubmittingComment ? <Loader2 className="animate-spin" /> : "Post Answer"}
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold font-headline">Answers & Discussion ({comments.length})</h2>
-                        {loadingComments ? (
-                            <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
-                        ) : nestedComments.length > 0 ? nestedComments.map(comment => renderComment(comment)) : (
-                            <p className="text-center text-muted-foreground py-8">No answers yet. Be the first to contribute!</p>
-                        )}
-                    </div>
-
                     <TextbookSolutionsSection currentClass={question.class} />
                     
                 </div>
@@ -799,4 +806,3 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     </div>
   );
 }
-
