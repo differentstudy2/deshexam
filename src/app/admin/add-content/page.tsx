@@ -34,9 +34,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, getContentTypes, getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
+import { getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon, Book } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useEffect, useState, useRef, Suspense } from 'react';
 import {
   Dialog,
@@ -58,7 +57,7 @@ import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 
 
 const optionSchema = z.object({
@@ -108,7 +107,6 @@ const formSchema = z.object({
   newChapterName: z.string().optional(),
   testType: z.string().optional(),
   description: z.string().optional(),
-  body: z.string().optional(),
   featureImage: z.string().optional(),
   duration: z.coerce
     .number()
@@ -124,7 +122,6 @@ const formSchema = z.object({
 
 
 type FormValues = z.infer<typeof formSchema>;
-type ContentType = { id: string, name: string };
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
@@ -133,26 +130,6 @@ type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
-
-const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['topic', 'text', 'file']),
-    sourceTopic: z.string().optional(),
-    sourceText: z.string().optional(),
-    sourceFile: z.string().optional(),
-    numQuestions: z.coerce.number().int().min(1).max(20),
-    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
-}).refine(data => {
-    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
-    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
-    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
-    return false;
-}, {
-    message: 'Source content must be at least 3 characters.',
-    path: ['sourceTopic'], 
-});
-type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
-
 
 const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlChange: (url: string) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -296,6 +273,45 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
     );
 };
 
+const ContentTypeNavigation = () => {
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentType = searchParams.get('type') || 'Mock Test';
+  
+    const navItems = [
+      { name: 'Mock Test', href: '/admin/add-content?type=Mock Test' },
+      { name: 'Quiz', href: '/admin/add-content?type=Quiz' },
+      { name: 'Practice Questions', href: '/admin/add-content?type=Practice Questions' },
+      { name: 'Exam', href: '/admin/add-content?type=Exam' },
+      { name: 'Learn Article', href: '/admin/add-article' },
+      { name: 'Textbook', href: '/admin/textbooks/add' },
+    ];
+
+    return (
+        <div className="mb-6 flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
+          {navItems.map((item) => {
+            const isActive =
+              (item.href.startsWith('/admin/add-content') && currentType === item.name) ||
+              (pathname === item.href);
+
+            return (
+              <Link key={item.name} href={item.href} passHref legacyBehavior>
+                <a
+                  className={cn(
+                    "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    isActive
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                  )}
+                >
+                  {item.name}
+                </a>
+              </Link>
+            );
+          })}
+        </div>
+      );
+}
 
 function AddContentForm() {
   const { toast } = useToast();
@@ -308,7 +324,6 @@ function AddContentForm() {
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
   const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
@@ -317,9 +332,7 @@ function AddContentForm() {
   const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
   const [isAddingNewExam, setIsAddingNewExam] = useState(false);
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [settings, setSettings] = useState({
     enableMatching: true,
@@ -344,6 +357,7 @@ function AddContentForm() {
     defaultExam: '',
   });
 
+  const contentType = searchParams.get('type') || 'Mock Test';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -366,9 +380,8 @@ function AddContentForm() {
       newExamCategory: '',
       newExam: '',
       newChapterName: '',
-      testType: 'Mock Test',
+      testType: contentType,
       description: '',
-      body: '',
       featureImage: '',
       duration: 0,
       difficulty: 'Medium',
@@ -400,6 +413,107 @@ function AddContentForm() {
 
 
   useEffect(() => {
+    form.setValue('testType', contentType);
+    // You might want to reset other fields when content type changes
+    // form.reset({...});
+  }, [contentType, form]);
+
+
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        setLoadingData(true);
+        const [subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
+            getSubjects(),
+            getBoards(),
+            getClasses(),
+            getStates(),
+            getExamTypes(),
+            getSettings()
+        ]);
+        
+        setSubjects(subjectData);
+        setBoards(boardData);
+        setClassCategories(classData);
+        setStates(stateData);
+        setExamCategories(examTypeData);
+
+        if (siteSettings) {
+          setSettings({
+              enableMatching: siteSettings.enableMatching ?? true,
+              enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
+              enableTrueFalse: siteSettings.enableTrueFalse ?? true,
+              enableShortAnswer: siteSettings.enableShortAnswer ?? true,
+              enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
+              enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
+              enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
+              enableClassMetafield: siteSettings.enableClassMetafield ?? true,
+              enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
+              enableStateMetafield: siteSettings.enableStateMetafield ?? true,
+              enableExamMetafield: siteSettings.enableExamMetafield ?? true,
+              enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
+              defaultBoard: siteSettings.defaultBoard ?? '',
+              defaultClassCategory: siteSettings.defaultClassCategory ?? '',
+              defaultClass: siteSettings.defaultClass ?? '',
+              defaultSubject: siteSettings.defaultSubject ?? '',
+              defaultChapter: siteSettings.defaultChapter ?? '',
+              defaultExamCategory: siteSettings.defaultExamCategory ?? '',
+              defaultState: siteSettings.defaultState ?? '',
+              defaultExam: siteSettings.defaultExam ?? '',
+          });
+
+          const currentValues = form.getValues();
+          form.reset({
+              ...currentValues,
+              board: currentValues.board || siteSettings.defaultBoard || '',
+              classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
+              class: currentValues.class || siteSettings.defaultClass || '',
+              subject: currentValues.subject || siteSettings.defaultSubject || '',
+              examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
+              state: currentValues.state || siteSettings.defaultState || '',
+              testType: contentType || 'Mock Test',
+          });
+          
+          const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
+          if (defaultClassCat) {
+            const fetchedGrades = await getGradesByClass(defaultClassCat);
+            setGrades(fetchedGrades);
+          }
+
+           if (form.getValues('subject')) {
+              const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
+              if (selectedSubject) {
+                  const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+                  setChapters(fetchedChapters);
+                  if (siteSettings.defaultChapter && !form.getValues('chapter')) {
+                    form.setValue('chapter', siteSettings.defaultChapter);
+                  }
+              }
+          }
+          if (form.getValues('examCategory')) {
+              const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
+              if (selectedExamCategory) {
+                  const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
+                  setExams(fetchedExams);
+                   if (siteSettings.defaultExam && !form.getValues('exam')) {
+                    form.setValue('exam', siteSettings.defaultExam);
+                  }
+              }
+          }
+        }
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Error loading data",
+            description: "Could not load form data from the database."
+        });
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    
+    fetchFormData();
+
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
     if (aiQuestionsRaw) {
       try {
@@ -432,6 +546,7 @@ function AddContentForm() {
             form.setValue('title', aiContent.title);
             form.setValue('description', aiContent.description);
             form.setValue('difficulty', aiContent.difficulty);
+            form.setValue('testType', aiContent.contentType);
             replace(aiContent.questions.map((q: any) => ({
                 ...q,
                 options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
@@ -452,149 +567,18 @@ function AddContentForm() {
           }
         }
     }
-    
-    fetchFormData();
   }, [form, replace, toast]);
-
-  const initialContentType = searchParams.get('type');
-  
-  const currentTestType = form.watch('testType');
-
-  const fetchFormData = async () => {
-    try {
-      setLoadingData(true);
-      const [types, subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
-          getContentTypes(),
-          getSubjects(),
-          getBoards(),
-          getClasses(),
-          getStates(),
-          getExamTypes(),
-          getSettings()
-      ]);
-      
-      const allContentTypes = [...types, { id: 'textbook', name: 'Textbook' }, { id: 'exam', name: 'Exam' }];
-      setContentTypes(allContentTypes);
-
-      setSubjects(subjectData);
-      setBoards(boardData);
-      setClassCategories(classData);
-      setStates(stateData);
-      setExamCategories(examTypeData);
-
-      if (siteSettings) {
-        setSettings({
-            enableMatching: siteSettings.enableMatching ?? true,
-            enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
-            enableTrueFalse: siteSettings.enableTrueFalse ?? true,
-            enableShortAnswer: siteSettings.enableShortAnswer ?? true,
-            enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
-            enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
-            enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
-            enableClassMetafield: siteSettings.enableClassMetafield ?? true,
-            enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
-            enableStateMetafield: siteSettings.enableStateMetafield ?? true,
-            enableExamMetafield: siteSettings.enableExamMetafield ?? true,
-            enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
-            defaultBoard: siteSettings.defaultBoard ?? '',
-            defaultClassCategory: siteSettings.defaultClassCategory ?? '',
-            defaultClass: siteSettings.defaultClass ?? '',
-            defaultSubject: siteSettings.defaultSubject ?? '',
-            defaultChapter: siteSettings.defaultChapter ?? '',
-            defaultExamCategory: siteSettings.defaultExamCategory ?? '',
-            defaultState: siteSettings.defaultState ?? '',
-            defaultExam: siteSettings.defaultExam ?? '',
-        });
-
-        const currentValues = form.getValues();
-        form.reset({
-            ...currentValues,
-            board: currentValues.board || siteSettings.defaultBoard || '',
-            classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
-            class: currentValues.class || siteSettings.defaultClass || '',
-            subject: currentValues.subject || siteSettings.defaultSubject || '',
-            examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
-            state: currentValues.state || siteSettings.defaultState || '',
-            testType: initialContentType || currentValues.testType || 'Mock Test',
-        });
-        
-        const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
-        if (defaultClassCat) {
-          const fetchedGrades = await getGradesByClass(defaultClassCat);
-          setGrades(fetchedGrades);
-        }
-
-         if (form.getValues('subject')) {
-            const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
-            if (selectedSubject) {
-                const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
-                setChapters(fetchedChapters);
-                if (siteSettings.defaultChapter && !form.getValues('chapter')) {
-                  form.setValue('chapter', siteSettings.defaultChapter);
-                }
-            }
-        }
-        if (form.getValues('examCategory')) {
-            const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
-            if (selectedExamCategory) {
-                const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
-                setExams(fetchedExams);
-                 if (siteSettings.defaultExam && !form.getValues('exam')) {
-                  form.setValue('exam', siteSettings.defaultExam);
-                }
-            }
-        }
-      }
-
-      if (types.length > 0 && !form.getValues('testType')) {
-        const mockTestType = types.find(t => t.name === 'Mock Test');
-        if (mockTestType) {
-          form.setValue('testType', mockTestType.name);
-        } else {
-          form.setValue('testType', types[0].name);
-        }
-      }
-
-       if (initialContentType) {
-        form.setValue('testType', initialContentType);
-      }
-    } catch (error) {
-      toast({
-          variant: "destructive",
-          title: "Error loading data",
-          description: "Could not load form data from the database."
-      });
-    } finally {
-      setLoadingData(false);
-    }
-  };
-
-
-  const aiForm = useForm<AIGeneratorFormValues>({
-    resolver: zodResolver(aiGeneratorFormSchema),
-    defaultValues: {
-      sourceType: 'topic',
-      sourceTopic: '',
-      sourceText: '',
-      sourceFile: '',
-      numQuestions: 5,
-      difficulty: 'Medium',
-      questionType: 'Any',
-    },
-  });
   
   const questions = form.watch('questions');
   useEffect(() => {
-    if (currentTestType !== 'Learn' && currentTestType !== 'Textbook') {
-        const totalMarks = questions?.reduce((total, q) => {
-            if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
-                return total + (q.correctAnswer.length || 0);
-            }
-            return total + (q.marks || 1);
-        }, 0) || 0;
-        form.setValue('duration', totalMarks, { shouldValidate: true });
-    }
-  }, [questions, currentTestType, form]);
+    const totalMarks = questions?.reduce((total, q) => {
+        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+            return total + (q.correctAnswer.length || 0);
+        }
+        return total + (q.marks || 1);
+    }, 0) || 0;
+    form.setValue('duration', totalMarks, { shouldValidate: true });
+  }, [questions, form]);
 
   const handleFormSubmit = async (data: FormValues, resetType: 'full' | 'partial') => {
     try {
@@ -652,31 +636,6 @@ function AddContentForm() {
         setIsAddingNewChapter(false);
       }
 
-      if (data.testType === 'Learn') {
-        contentToSave = {
-          title: data.title,
-          description: data.description,
-          body: data.body,
-          testType: data.testType,
-          createdAt: data.publishedAt || new Date(),
-        };
-      } else if (data.testType === 'Textbook') {
-         contentToSave = {
-          title: data.title,
-          description: data.description,
-          featureImage: data.featureImage,
-          board: boardName,
-          classCategory: data.classCategory,
-          class: className,
-          subject: subjectName,
-          examCategory: examCategoryName,
-          exam: examName,
-          state: stateName,
-          school: data.school,
-          semester: data.semester,
-          testType: 'Textbook',
-        };
-      } else {
         // Process matching questions
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
@@ -694,7 +653,6 @@ function AddContentForm() {
         });
         
         contentToSave = { ...data, subject: subjectName, board: boardName, class: className, state: stateName, examCategory: examCategoryName, exam: examName, chapter: chapterName, questions: processedQuestions };
-        delete contentToSave.body;
         delete contentToSave.newSubject;
         delete contentToSave.newBoard;
         delete contentToSave.newClass;
@@ -702,9 +660,7 @@ function AddContentForm() {
         delete contentToSave.newExamCategory;
         delete contentToSave.newExam;
         delete contentToSave.newChapterName;
-      }
-
-
+      
       await addContent(contentToSave);
       toast({
         title: 'Content Created!',
@@ -719,12 +675,11 @@ function AddContentForm() {
             classCategory: settings.defaultClassCategory || '',
             class: settings.defaultClass || '',
             subject: settings.defaultSubject || '',
-            chapter: '', // Reset chapter as it depends on subject
+            chapter: '',
             examCategory: settings.defaultExamCategory || '',
             state: settings.defaultState || '',
-            exam: '', // Reset exam as it depends on category
+            exam: '',
             description: '',
-            body: '',
             duration: 0,
             featureImage: '',
             access: 'free',
@@ -752,7 +707,6 @@ function AddContentForm() {
             ...form.getValues(),
             title: '',
             description: '',
-            body: '',
             duration: 0,
             access: 'free',
             featureImage: '',
@@ -806,11 +760,6 @@ function AddContentForm() {
       setIsGeneratingDesc(false);
     }
   };
-
-  const handleTabChange = (value: string) => {
-    form.setValue('testType', value, { shouldValidate: true });
-    form.trigger(); // Trigger validation after changing type
-  }
 
   const handleSubjectChange = async (value: string) => {
       form.setValue('subject', value);
@@ -899,27 +848,6 @@ function AddContentForm() {
       setIsAddingNewChapter(false);
     }
   };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-        if (file.type === 'text/plain') {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target?.result as string;
-                aiForm.setValue('sourceFile', text, { shouldValidate: true });
-                aiForm.setValue('sourceType', 'file');
-            };
-            reader.readAsText(file);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Invalid File Type',
-                description: 'Please upload a .txt file.',
-            });
-        }
-    }
-  };
   
   const accessLevel = form.watch('access');
 
@@ -932,14 +860,13 @@ function AddContentForm() {
     )
   }
   
-
   return (
     <div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
-                <h1 className="font-headline text-3xl font-bold">Add New Content</h1>
+                <h1 className="font-headline text-3xl font-bold">Add New {contentType}</h1>
                 <p className="text-muted-foreground">
-                    Select a content type and fill out the form to create new content.
+                    Fill out the form to create new content.
                 </p>
             </div>
              <Button asChild variant="outline" className="w-full md:w-auto">
@@ -949,17 +876,8 @@ function AddContentForm() {
                 </Link>
             </Button>
         </div>
-
-
-    {contentTypes.length > 0 && (
-      <Tabs defaultValue={initialContentType || form.getValues('testType') || contentTypes[0].name} className="w-full mb-6" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-5">
-          {contentTypes.map((type) => (
-            <TabsTrigger key={type.id} value={type.name}>{type.name}</TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-    )}
+        
+        <ContentTypeNavigation />
 
 
       <Form {...form}>
@@ -986,8 +904,6 @@ function AddContentForm() {
                 )}
               />
                 
-            {currentTestType !== 'Learn' && (
-                <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {settings.enableBoardMetafield && <FormField
                     control={form.control}
@@ -1190,7 +1106,7 @@ function AddContentForm() {
                     </FormItem>
                   )}
                 />}
-                {settings.enableChapterMetafield && currentTestType !== 'Textbook' && <FormField
+                {settings.enableChapterMetafield && <FormField
                     control={form.control}
                     name="chapter"
                     render={({ field }) => (
@@ -1297,8 +1213,6 @@ function AddContentForm() {
                   )}
                 />}
               </div>
-              </>
-            )}
 
               <FormField
                 control={form.control}
@@ -1329,46 +1243,6 @@ function AddContentForm() {
                 )}
               />
 
-              {currentTestType === 'Learn' && (
-                <FormField
-                  control={form.control}
-                  name="body"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content Body</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Write your article content here. You can use Markdown for formatting."
-                          {...field}
-                          className="min-h-[300px]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              {currentTestType === 'Textbook' && (
-                 <FormField
-                    control={form.control}
-                    name="featureImage"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Feature Image</FormLabel>
-                        <div className="flex items-center gap-4">
-                            <ImageUploader
-                                fieldName={field.name}
-                                onUrlChange={(url) => form.setValue('featureImage', url)}
-                            />
-                            {field.value && <Image src={field.value} alt="Feature image preview" width={80} height={80} className="rounded-md object-cover" />}
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-              )}
-
-              {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                   <FormField
                     control={form.control}
@@ -1517,12 +1391,10 @@ function AddContentForm() {
                       )}
                   </div>
                 </div>
-              )}
             </CardContent>
           </Card>
           
-          {currentTestType !== 'Learn' && currentTestType !== 'Textbook' && (
-            <Card>
+          <Card>
               <CardHeader>
                   <CardTitle>Questions</CardTitle>
                   <CardDescription>Add questions to your content.</CardDescription>
@@ -1752,7 +1624,6 @@ function AddContentForm() {
                 </div>
               </CardFooter>
             </Card>
-          )}
           
            <div className="flex items-center gap-4">
                 <Button 
@@ -1786,4 +1657,3 @@ export default function CreateTestPage() {
     )
 }
 
-    
