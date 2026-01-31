@@ -288,7 +288,6 @@ const ContentTypeNavigation = () => {
         <div className="mb-6 flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
-
             return (
               <Link key={item.name} href={item.href} passHref legacyBehavior>
                 <a
@@ -351,7 +350,7 @@ function AddContentForm() {
     defaultExam: '',
   });
 
-  const contentType = 'Mock Test';
+  const contentType = 'Exam';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -856,7 +855,7 @@ function AddContentForm() {
     <div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
-                <h1 className="font-headline text-3xl font-bold">Add New Mock Test</h1>
+                <h1 className="font-headline text-3xl font-bold">Add New Exam</h1>
                 <p className="text-muted-foreground">
                     Fill out the form to create new content.
                 </p>
@@ -1608,7 +1607,7 @@ function AddContentForm() {
                       Add Question Manually
                   </Button>
                    <Button asChild variant="outline">
-                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-content">
+                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-exam">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                         </Link>

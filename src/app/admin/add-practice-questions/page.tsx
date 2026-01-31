@@ -288,7 +288,6 @@ const ContentTypeNavigation = () => {
         <div className="mb-6 flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
-
             return (
               <Link key={item.name} href={item.href} passHref legacyBehavior>
                 <a
@@ -351,7 +350,7 @@ function AddContentForm() {
     defaultExam: '',
   });
 
-  const contentType = 'Mock Test';
+  const contentType = 'Practice Questions';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -436,14 +435,10 @@ function AddContentForm() {
               enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
               enableTrueFalse: siteSettings.enableTrueFalse ?? true,
               enableShortAnswer: siteSettings.enableShortAnswer ?? true,
-              enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
-              enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
-              enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
-              enableClassMetafield: siteSettings.enableClassMetafield ?? true,
-              enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
-              enableStateMetafield: siteSettings.enableStateMetafield ?? true,
-              enableExamMetafield: siteSettings.enableExamMetafield ?? true,
-              enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
+              enableSubjectMetafield: siteSettings.enableBoardMetafield ?? true,
+              enableClassMetafield: siteSettings.enableStateMetafield ?? true,
+              enableExamCategoryMetafield: siteSettings.enableExamMetafield ?? true,
+              enableChapterMetafield: true,
               defaultBoard: siteSettings.defaultBoard ?? '',
               defaultClassCategory: siteSettings.defaultClassCategory ?? '',
               defaultClass: siteSettings.defaultClass ?? '',
@@ -850,13 +845,12 @@ function AddContentForm() {
             <p className="ml-4 text-lg">Loading Form Data...</p>
         </div>
     )
-  }
   
   return (
     <div>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
-                <h1 className="font-headline text-3xl font-bold">Add New Mock Test</h1>
+                <h1 className="font-headline text-3xl font-bold">Add New Practice Questions</h1>
                 <p className="text-muted-foreground">
                     Fill out the form to create new content.
                 </p>
@@ -1608,7 +1602,7 @@ function AddContentForm() {
                       Add Question Manually
                   </Button>
                    <Button asChild variant="outline">
-                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-content">
+                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-practice-questions">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                         </Link>
