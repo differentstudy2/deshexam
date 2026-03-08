@@ -289,17 +289,17 @@ const ContentTypeNavigation = () => {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link key={item.name} href={item.href} passHref legacyBehavior>
-                <a
-                  className={cn(
-                    "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                    isActive
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-                  )}
-                >
-                  {item.name}
-                </a>
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  isActive
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                )}
+              >
+                {item.name}
               </Link>
             );
           })}
@@ -435,7 +435,7 @@ function AddContentForm() {
               enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
               enableTrueFalse: siteSettings.enableTrueFalse ?? true,
               enableShortAnswer: siteSettings.enableShortAnswer ?? true,
-              enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
+              enableFillInTheBlank: true,
               enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
               enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
               enableClassMetafield: siteSettings.enableClassMetafield ?? true,
@@ -1647,5 +1647,3 @@ export default function CreateTestPage() {
         </Suspense>
     )
 }
-
-    

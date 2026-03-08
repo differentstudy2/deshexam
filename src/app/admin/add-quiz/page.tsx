@@ -289,17 +289,17 @@ const ContentTypeNavigation = () => {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link key={item.name} href={item.href} passHref legacyBehavior>
-                <a
-                  className={cn(
-                    "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                    isActive
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-                  )}
-                >
-                  {item.name}
-                </a>
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  isActive
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                )}
+              >
+                {item.name}
               </Link>
             );
           })}
@@ -848,6 +848,7 @@ function AddContentForm() {
             <p className="ml-4 text-lg">Loading Form Data...</p>
         </div>
     )
+  }
   
   return (
     <div>
@@ -1645,5 +1646,3 @@ export default function CreateTestPage() {
         </Suspense>
     )
 }
-
-    
