@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -255,26 +255,34 @@ export default function AddKidsContentPage() {
                                     </div>
 
                                      <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.correctAnswer`}
-                                      render={({ field }) => (
-                                        <FormItem className="space-y-3 pt-4">
-                                          <FormLabel>Correct Answer</FormLabel>
+                                        control={form.control}
+                                        name={`questions.${index}.correctAnswer`}
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-3 pt-4">
+                                            <FormLabel>Correct Answer</FormLabel>
                                             <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="mt-2 grid grid-cols-2 gap-2">
-                                                    {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
-                                                        option.text ? (
-                                                            <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-2 border rounded-md bg-background">
-                                                                <FormControl><RadioGroupItem value={option.text} /></FormControl>
-                                                                <FormLabel className="font-normal w-full truncate">{option.text}</FormLabel>
-                                                            </FormItem>
-                                                        ) : null
-                                                    ))}
+                                                <RadioGroup
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                                className="mt-2 grid grid-cols-2 gap-2"
+                                                >
+                                                {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
+                                                    option.text ? (
+                                                    <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-2 border rounded-md bg-background">
+                                                        <FormControl>
+                                                            <RadioGroupItem value={option.text} />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal w-full truncate cursor-pointer">
+                                                            {option.text}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                    ) : null
+                                                ))}
                                                 </RadioGroup>
                                             </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
+                                            <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                 </div>
                             </Card>

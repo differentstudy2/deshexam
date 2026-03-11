@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -209,26 +209,32 @@ export default function EditKidsContentPage() {
                                     </div>
 
                                      <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.correctAnswer`}
-                                      render={({ field }) => (
-                                        <FormItem className="space-y-3 pt-4">
-                                          <FormLabel>Correct Answer</FormLabel>
-                                            <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="mt-2 grid grid-cols-2 gap-2">
-                                                    {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
-                                                        option.text ? (
-                                                          <div key={optionIndex} className="flex items-center space-x-3 p-2 border rounded-md bg-background">
-                                                                <RadioGroupItem value={option.text} id={`q${index}-opt${optionIndex}`}/>
-                                                                <Label htmlFor={`q${index}-opt${optionIndex}`} className="font-normal w-full truncate cursor-pointer">{option.text}</Label>
-                                                          </div>
-                                                        ) : null
-                                                    ))}
-                                                </RadioGroup>
-                                            </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
+                                        control={form.control}
+                                        name={`questions.${index}.correctAnswer`}
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-3 pt-4">
+                                            <FormLabel>Correct Answer</FormLabel>
+                                            <RadioGroup
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                                className="mt-2 grid grid-cols-2 gap-2"
+                                            >
+                                                {form.watch(`questions.${index}.options`)?.map((option, optionIndex) =>
+                                                    option.text ? (
+                                                        <Label
+                                                            key={optionIndex}
+                                                            htmlFor={`q${index}-opt${optionIndex}`}
+                                                            className="flex items-center space-x-3 space-y-0 rounded-md border p-2 bg-background cursor-pointer has-[:checked]:bg-primary/10 has-[:checked]:border-primary"
+                                                        >
+                                                            <RadioGroupItem value={option.text} id={`q${index}-opt${optionIndex}`} />
+                                                            <span className="font-normal w-full truncate">{option.text}</span>
+                                                        </Label>
+                                                    ) : null
+                                                )}
+                                            </RadioGroup>
+                                            <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                 </div>
                             </Card>
