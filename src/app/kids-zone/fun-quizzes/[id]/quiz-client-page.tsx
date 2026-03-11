@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -240,174 +239,158 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         <div className="relative min-h-screen">
             <div
               className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: "url('https://deshexam.com/image/logo.png')",
+                backgroundSize: '150px',
+                backgroundRepeat: 'repeat',
+                opacity: 0.05,
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/90" />
 
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
-                    <Card ref={quizCardRef} className="relative w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
-                       <div
-                            className="absolute inset-0 z-0"
-                            style={{
-                                backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                                backgroundSize: '100px',
-                                backgroundRepeat: 'repeat',
-                                opacity: 0.1,
-                            }}
-                        />
-                        <div className="relative z-10">
-                            <Confetti active={quizFinished} />
-                            <CardHeader>
-                                <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
-                                <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
-                                <CardDescription className="text-lg">You did an amazing job!</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
-                                <p className="text-xl mt-2 font-semibold">Your Score</p>
-                                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                                    <Button onClick={restartQuiz} size="lg">
-                                        <RefreshCw className="mr-2 h-4 w-4" />
-                                        Play Again
-                                    </Button>
-                                    <Button asChild variant="outline" size="lg">
-                                        <Link href="/kids-zone/fun-quizzes">
-                                            <ArrowLeft className="mr-2 h-4 w-4" />
-                                            Back to Fun Quizzes
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </div>
+                    <Card ref={quizCardRef} className="w-full max-w-xl mx-auto text-center shadow-2xl p-8 bg-card/80 backdrop-blur-sm">
+                        <Confetti active={quizFinished} />
+                        <CardHeader>
+                            <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
+                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
+                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
+                            <p className="text-xl mt-2 font-semibold">Your Score</p>
+                            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button onClick={restartQuiz} size="lg">
+                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                    Play Again
+                                </Button>
+                                <Button asChild variant="outline" size="lg">
+                                    <Link href="/kids-zone/fun-quizzes">
+                                        <ArrowLeft className="mr-2 h-4 w-4" />
+                                        Back to Fun Quizzes
+                                    </Link>
+                                </Button>
+                            </div>
+                        </CardContent>
                     </Card>
                 ) : (
-                    <Card ref={quizCardRef} className="relative w-full max-w-2xl mx-auto shadow-2xl overflow-hidden">
-                         <div
-                            className="absolute inset-0 z-0"
-                            style={{
-                                backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                                backgroundSize: '150px',
-                                backgroundRepeat: 'repeat',
-                                opacity: 0.05,
-                            }}
-                        />
-                         <div className="relative z-10">
-                             <CardHeader className="relative">
-                                <div className="flex flex-wrap justify-between items-center mt-2 gap-4">
-                                    <div className="text-sm text-muted-foreground">
-                                        Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
-                                    </div>
-                                    <div className="flex items-center gap-4 flex-wrap justify-end">
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
-                                            <Switch
-                                                id="autoplay-switch"
-                                                checked={autoplayEnabled}
-                                                onCheckedChange={setAutoplayEnabled}
-                                            />
-                                        </div>
-                                         <div className="flex items-center gap-2">
-                                            <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
-                                            <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[120px] h-8">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="15">15 seconds</SelectItem>
-                                                    <SelectItem value="30">30 seconds</SelectItem>
-                                                    <SelectItem value="60">60 seconds</SelectItem>
-                                                    <SelectItem value="0">Off</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        {timerDuration > 0 && (
-                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                                <Clock className="w-5 h-5" />
-                                                <span>{timeLeft}s</span>
-                                            </div>
-                                        )}
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" size="icon">
-                                                    <ImageDown className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
-                                                    Save as Default
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
-                                                    <Video className="mr-2 h-4 w-4" />
-                                                    Save for Landscape Video (16:9)
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
-                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
-                                                    Save for Short Video (9:16)
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
+                    <Card ref={quizCardRef} className="w-full max-w-2xl mx-auto shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
+                        <CardHeader className="relative">
+                            <div className="flex flex-wrap justify-between items-center mt-2 gap-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                                 </div>
-
-                                {currentQuestion && currentQuestion.image && (
-                                    <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
-                                         <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="cover" />
+                                <div className="flex items-center gap-4 flex-wrap justify-end">
+                                    <div className="flex items-center gap-2">
+                                        <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
+                                        <Switch
+                                            id="autoplay-switch"
+                                            checked={autoplayEnabled}
+                                            onCheckedChange={setAutoplayEnabled}
+                                        />
                                     </div>
-                                )}
-                                
-                                <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
-                                    <span>{currentQuestion?.text}</span>
-                                    {currentQuestion?.audio && (
-                                        <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
-                                            <Volume2 />
-                                        </Button>
+                                     <div className="flex items-center gap-2">
+                                        <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
+                                        <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
+                                            <SelectTrigger id="timer-select" className="w-[120px] h-8">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="15">15 seconds</SelectItem>
+                                                <SelectItem value="30">30 seconds</SelectItem>
+                                                <SelectItem value="60">60 seconds</SelectItem>
+                                                <SelectItem value="0">Off</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    {timerDuration > 0 && (
+                                        <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                            <Clock className="w-5 h-5" />
+                                            <span>{timeLeft}s</span>
+                                        </div>
                                     )}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="flex flex-col items-center gap-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                                    {currentQuestion?.options.map((option, index) => {
-                                        const isSelected = selectedAnswer === option.text;
-                                        const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
-
-                                        return (
-                                            <Button
-                                                key={index}
-                                                onClick={() => handleAnswer(option.text)}
-                                                disabled={!!selectedAnswer}
-                                                className={cn(
-                                                    "h-auto p-4 text-lg justify-between items-center gap-4 transition-all duration-300 transform hover:scale-105",
-                                                    !selectedAnswer && optionBgColors[index % optionBgColors.length],
-                                                    isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white border-green-600',
-                                                    isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white border-destructive',
-                                                    !isSelected && selectedAnswer && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 text-white border-green-600'
-                                                )}
-                                                variant="outline"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                    {option.image && <Image src={option.image} alt={option.text} width={40} height={40} className="rounded-md" />}
-                                                    <span className="text-left">{option.text}</span>
-                                                    {option.audio && (
-                                                        <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                            <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                
-                                                <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
-                                                    {isSelected && isCorrectAnswer && <Check className="w-5 h-5" />}
-                                                    {isSelected && !isCorrectAnswer && <X className="w-5 h-5" />}
-                                                    {!isSelected && selectedAnswer && isCorrectAnswer && <Check className="w-5 h-5" />}
-                                                </div>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="icon">
+                                                <ImageDown className="h-4 w-4" />
                                             </Button>
-                                        );
-                                    })}
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
+                                                Save as Default
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
+                                                <Video className="mr-2 h-4 w-4" />
+                                                Save for Landscape Video (16:9)
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
+                                                <Video className="mr-2 h-4 w-4 rotate-90" />
+                                                Save for Short Video (9:16)
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
-                                 {feedback && <div className={`mt-4 font-bold text-xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
-                            </CardContent>
-                         </div>
+                            </div>
+
+                            {currentQuestion && currentQuestion.image && (
+                                <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
+                                     <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="cover" />
+                                </div>
+                            )}
+                            
+                            <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
+                                <span>{currentQuestion?.text}</span>
+                                {currentQuestion?.audio && (
+                                    <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
+                                        <Volume2 />
+                                    </Button>
+                                )}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                {currentQuestion?.options.map((option, index) => {
+                                    const isSelected = selectedAnswer === option.text;
+                                    const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+
+                                    return (
+                                        <Button
+                                            key={index}
+                                            onClick={() => handleAnswer(option.text)}
+                                            disabled={!!selectedAnswer}
+                                            className={cn(
+                                                "h-auto p-4 text-lg justify-between items-center gap-4 transition-all duration-300 transform hover:scale-105",
+                                                !selectedAnswer && optionBgColors[index % optionBgColors.length],
+                                                isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white border-green-600',
+                                                isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white border-destructive',
+                                                !isSelected && selectedAnswer && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 text-white border-green-600'
+                                            )}
+                                            variant="outline"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                {option.image && <Image src={option.image} alt={option.text} width={40} height={40} className="rounded-md" />}
+                                                <span className="text-left">{option.text}</span>
+                                                {option.audio && (
+                                                    <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
+                                                        <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
+                                                {isSelected && isCorrectAnswer && <Check className="w-5 h-5" />}
+                                                {isSelected && !isCorrectAnswer && <X className="w-5 h-5" />}
+                                                {!isSelected && selectedAnswer && isCorrectAnswer && <Check className="w-5 h-5" />}
+                                            </div>
+                                        </Button>
+                                    );
+                                })}
+                            </div>
+                             {feedback && <div className={`mt-4 font-bold text-xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
+                        </CardContent>
                     </Card>
                 )}
               </div>
