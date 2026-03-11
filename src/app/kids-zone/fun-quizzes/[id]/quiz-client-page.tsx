@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from '@/lib/utils';
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -339,27 +340,30 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 key={index}
                                                 onClick={() => handleAnswer(option.text)}
                                                 disabled={!!selectedAnswer}
-                                                className={`h-auto p-4 text-lg justify-start gap-4 transition-all duration-300 transform
-                                                    ${isSelected && isCorrectAnswer ? 'bg-green-500 hover:bg-green-600 scale-105' : ''}
-                                                    ${isSelected && !isCorrectAnswer ? 'bg-destructive hover:bg-destructive/90 scale-105' : ''}
-                                                    ${!isSelected && selectedAnswer && isCorrectAnswer ? 'bg-green-500 hover:bg-green-600' : ''}
-                                                `}
+                                                className={cn(
+                                                    "h-auto p-4 text-lg justify-between items-center gap-4 transition-all duration-300 transform",
+                                                    isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white',
+                                                    isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white',
+                                                    !isSelected && selectedAnswer && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 text-white'
+                                                )}
                                                 variant="outline"
                                             >
-                                                {isSelected && isCorrectAnswer && <Check />}
-                                                {isSelected && !isCorrectAnswer && <X />}
-                                                {!isSelected && selectedAnswer && isCorrectAnswer && <Check />}
-                                                {!selectedAnswer && <Sparkles className="w-4 h-4 text-yellow-500" />}
+                                                <div className="flex items-center gap-4">
+                                                    <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                    {option.image && <Image src={option.image} alt={option.text} width={40} height={40} className="rounded-md" />}
+                                                    <span className="text-left">{option.text}</span>
+                                                    {option.audio && (
+                                                        <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
+                                                            <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 
-                                                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-
-                                                {option.image && <Image src={option.image} alt={option.text} width={40} height={40} className="rounded-md" />}
-                                                <span className="flex-grow text-left">{option.text}</span>
-                                                {option.audio && (
-                                                    <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                        <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
-                                                    </div>
-                                                )}
+                                                <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
+                                                    {isSelected && isCorrectAnswer && <Check className="w-5 h-5" />}
+                                                    {isSelected && !isCorrectAnswer && <X className="w-5 h-5" />}
+                                                    {!isSelected && selectedAnswer && isCorrectAnswer && <Check className="w-5 h-5" />}
+                                                </div>
                                             </Button>
                                         );
                                     })}
