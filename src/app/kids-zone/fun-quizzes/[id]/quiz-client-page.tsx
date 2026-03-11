@@ -135,7 +135,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTimeLeft(newDuration);
     };
 
-    if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+    if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0 || !currentQuestion) {
         return (
              <div className="container mx-auto px-4 py-12 text-center">
                  <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
@@ -146,17 +148,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         );
     }
     
-    const currentQuestion = shuffledQuestions[currentQuestionIndex];
-    
-    if (!currentQuestion) {
-        return (
-            <div className="container mx-auto px-4 py-12 text-center">
-                <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
-                <p className="mt-4 text-muted-foreground">Loading question...</p>
-            </div>
-        );
-    }
-
     const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
     return (
@@ -191,7 +182,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             ) : (
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-card/70 dark:bg-card/60 backdrop-blur-sm">
                      <CardHeader className="relative">
-                        <Progress value={progress} className="w-full h-2 mb-4" />
                         <div className="flex justify-between items-center mt-2">
                             <div className="text-sm text-muted-foreground">
                                 Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
