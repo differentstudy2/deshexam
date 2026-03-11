@@ -24,9 +24,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { addContent } from '@/lib/firebase/firestore';
-import { Loader2, Sparkles, PlusCircle, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { addContent, uploadFile } from '@/lib/firebase/firestore';
+import { Loader2, Sparkles, PlusCircle, Trash2, Upload } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -60,7 +60,10 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function AddKidsContentPage() {
   const { toast } = useToast();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -80,6 +83,7 @@ export default function AddKidsContentPage() {
   });
 
   const handleFormSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
     try {
       const contentToSave: any = {
         title: data.title,
@@ -106,8 +110,33 @@ export default function AddKidsContentPage() {
         title: 'Error Creating Content',
         description: (error as Error).message,
       });
+    } finally {
+        setIsSubmitting(false);
     }
   }
+
+  const handleAudioUploadClick = (fieldName: string) => {
+    setUploadingAudioField(fieldName);
+    audioInputRef.current?.click();
+  };
+
+  const handleAudioFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && uploadingAudioField) {
+        setIsUploadingAudio(true);
+        try {
+            const downloadURL = await uploadFile(file);
+            form.setValue(uploadingAudioField as any, downloadURL, { shouldValidate: true });
+            toast({ title: 'Audio uploaded!' });
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
+        } finally {
+            setIsUploadingAudio(false);
+            setUploadingAudioField(null);
+            if(audioInputRef.current) audioInputRef.current.value = '';
+        }
+    }
+  };
   
   return (
     <div>
@@ -119,6 +148,8 @@ export default function AddKidsContentPage() {
                 </p>
             </div>
         </div>
+        
+      <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
@@ -235,59 +266,70 @@ export default function AddKidsContentPage() {
                                     <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)}/>
-                                        <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (<FormItem><FormLabel>Question Audio URL</FormLabel><FormControl><Input {...field} placeholder="Audio URL" /></FormControl><FormMessage /></FormItem>)}/>
+                                        <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Question Audio</FormLabel>
+                                                <div className="flex items-center gap-2">
+                                                    <Input {...field} placeholder="Audio URL" />
+                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
+                                                        {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                    </Button>
+                                                </div>
+                                                {field.value && <audio controls src={field.value} className="w-full mt-2" />}
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}/>
                                     </div>
                                     
                                     <div className="space-y-4 pt-2 border-t">
                                         <Label>Options</Label>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {[0, 1, 2, 3].map(optionIndex => (
-                                                <Card key={optionIndex} className="p-4 bg-background">
-                                                    <div className="space-y-4">
-                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
-                                                            <FormItem><FormLabel className="text-xs">Option {optionIndex + 1} Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                                                        )}/>
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (
-                                                                <FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>
-                                                            )}/>
-                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                                <FormItem><FormLabel className="text-xs">Audio URL</FormLabel><FormControl><Input {...audioField} placeholder="Audio URL" /></FormControl><FormMessage /></FormItem>
-                                                            )}/>
-                                                        </div>
-                                                    </div>
-                                                </Card>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <FormField
-                                        control={form.control}
-                                        name={`questions.${index}.correctAnswer`}
-                                        render={({ field }) => (
-                                            <FormItem className="space-y-3 pt-4 border-t">
-                                                <FormLabel>Correct Answer</FormLabel>
-                                                <FormDescription>Select the correct option from the ones you entered above.</FormDescription>
-                                                <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-2">
-                                                        {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
-                                                            option.text ? (
-                                                                <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+                                        <Controller
+                                            control={form.control}
+                                            name={`questions.${index}.correctAnswer`}
+                                            render={({ field: controllerField }) => (
+                                                <RadioGroup onValueChange={controllerField.onChange} value={controllerField.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {[0, 1, 2, 3].map(optionIndex => (
+                                                        <Card key={optionIndex} className="p-4 bg-background">
+                                                            <div className="space-y-4">
+                                                                <div className="flex items-center gap-3">
                                                                     <FormControl>
-                                                                        <RadioGroupItem value={option.text} />
+                                                                        <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
                                                                     </FormControl>
-                                                                    <FormLabel className="font-normal w-full truncate cursor-pointer">
-                                                                        {option.text}
-                                                                    </FormLabel>
-                                                                </FormItem>
-                                                            ) : null
-                                                        ))}
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
+                                                                        <FormItem className="flex-1">
+                                                                            <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
+                                                                            <FormControl><Input {...field} /></FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}/>
+                                                                </div>
+                                                                
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (
+                                                                        <FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>
+                                                                    )}/>
+                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel className="text-xs">Audio</FormLabel>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <Input {...audioField} placeholder="Audio URL" />
+                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
+                                                                                    {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                                </Button>
+                                                                            </div>
+                                                                            {audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}/>
+                                                                </div>
+                                                            </div>
+                                                        </Card>
+                                                    ))}
+                                                </RadioGroup>
+                                            )}
+                                        />
+                                         <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
+                                    </div>
                                 </div>
                             </Card>
                         ))}
@@ -298,8 +340,8 @@ export default function AddKidsContentPage() {
                 )}
               </CardContent>
             </Card>
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Saving..." : "Save Content"}
+          <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Content"}
           </Button>
         </form>
       </Form>
