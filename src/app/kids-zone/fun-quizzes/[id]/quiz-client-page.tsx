@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -49,6 +50,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
+    const optionBgColors = [
+        'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
+        'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
+        'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
+        'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+    ];
+
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
             activeAudioRef.current.pause();
@@ -73,13 +81,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             }
         }
     }, [stopSound]);
-
-    const optionBgColors = [
-        'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
-        'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
-        'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
-        'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
-    ];
 
     const nextQuestion = useCallback(() => {
         stopSound();
@@ -407,9 +408,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </div>
                                             
                                             <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
-                                                {isSelected && isCorrectAnswer && <Check className="w-5 h-5" />}
-                                                {isSelected && !isCorrectAnswer && <X className="w-5 h-5" />}
-                                                {!isSelected && selectedAnswer && isCorrectAnswer && <Check className="w-5 h-5" />}
+                                                {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
                                             </div>
                                         </Button>
                                     );
