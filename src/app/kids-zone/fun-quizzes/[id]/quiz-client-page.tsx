@@ -64,6 +64,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(true);
 
+    const optionBgColors = [
+        'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
+        'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
+        'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
+        'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+    ];
+
     const nextQuestion = useCallback(() => {
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
@@ -276,6 +283,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </Card>
                 ) : (
                     <Card ref={quizCardRef} className="relative w-full max-w-2xl mx-auto shadow-2xl overflow-hidden">
+                         <div
+                            className="absolute inset-0 z-0"
+                            style={{
+                                backgroundImage: "url('https://deshexam.com/image/logo.png')",
+                                backgroundSize: '150px',
+                                backgroundRepeat: 'repeat',
+                                opacity: 0.05,
+                            }}
+                        />
                          <div className="relative z-10">
                              <CardHeader className="relative">
                                 <div className="flex flex-wrap justify-between items-center mt-2 gap-4">
