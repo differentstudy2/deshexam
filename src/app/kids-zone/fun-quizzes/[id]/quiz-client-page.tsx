@@ -155,12 +155,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 className="absolute inset-0 z-0"
                 style={{
                     backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                    backgroundSize: '150px',
+                    backgroundSize: '80px',
                     backgroundRepeat: 'repeat',
                     opacity: 0.05,
                 }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-yellow-50/90 dark:from-orange-900/80 dark:to-gray-900/90 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-gray-900/90 backdrop-blur-sm" />
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
