@@ -192,9 +192,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-card/70 dark:bg-card/60 backdrop-blur-sm">
                      <CardHeader className="relative">
                         <Progress value={progress} className="w-full h-2 mb-4" />
-                        <div className="relative overflow-hidden rounded-full bg-secondary w-full h-2 mb-4">
-                            {timerDuration > 0 && <Progress value={(timeLeft/timerDuration) * 100} className="w-full h-full" />}
-                        </div>
                         <div className="flex justify-between items-center mt-2">
                             <div className="text-sm text-muted-foreground">
                                 Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
