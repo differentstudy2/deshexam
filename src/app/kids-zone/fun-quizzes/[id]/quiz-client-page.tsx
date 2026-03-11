@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -61,6 +62,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [timeLeft, setTimeLeft] = useState(60);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
+    const [autoplayEnabled, setAutoplayEnabled] = useState(true);
 
     const nextQuestion = useCallback(() => {
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
@@ -82,6 +84,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
              setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         }
     }, [quiz]);
+
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+    useEffect(() => {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished) {
+            const autoplayTimeout = setTimeout(() => {
+                playSound('url', currentQuestion.audio);
+            }, 500); 
+
+            return () => clearTimeout(autoplayTimeout);
+        }
+    }, [currentQuestion, autoplayEnabled, quizFinished]);
 
     useEffect(() => {
         if (quizFinished || selectedAnswer || timerDuration === 0) {
@@ -202,15 +216,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     };
 
 
-    const currentQuestion = shuffledQuestions[currentQuestionIndex];
-
-    const optionBgColors = [
-        'bg-blue-100 dark:bg-blue-800/30 hover:bg-blue-200/70 border-blue-200 dark:border-blue-800/50 text-blue-800 dark:text-blue-200',
-        'bg-green-100 dark:bg-green-800/30 hover:bg-green-200/70 border-green-200 dark:border-green-800/50 text-green-800 dark:text-green-200',
-        'bg-yellow-100 dark:bg-yellow-800/30 hover:bg-yellow-200/70 border-yellow-200 dark:border-yellow-800/50 text-yellow-800 dark:text-yellow-200',
-        'bg-red-100 dark:bg-red-800/30 hover:bg-red-200/70 border-red-200 dark:border-red-800/50 text-red-800 dark:text-red-200',
-    ];
-
     if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
         return (
              <div className="container mx-auto px-4 py-12 text-center">
@@ -273,11 +278,19 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     <Card ref={quizCardRef} className="relative w-full max-w-2xl mx-auto shadow-2xl overflow-hidden">
                          <div className="relative z-10">
                              <CardHeader className="relative">
-                                <div className="flex justify-between items-center mt-2">
+                                <div className="flex flex-wrap justify-between items-center mt-2 gap-4">
                                     <div className="text-sm text-muted-foreground">
                                         Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 flex-wrap justify-end">
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
+                                            <Switch
+                                                id="autoplay-switch"
+                                                checked={autoplayEnabled}
+                                                onCheckedChange={setAutoplayEnabled}
+                                            />
+                                        </div>
                                          <div className="flex items-center gap-2">
                                             <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
