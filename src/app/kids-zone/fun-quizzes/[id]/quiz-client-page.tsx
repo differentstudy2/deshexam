@@ -194,8 +194,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             ) : (
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-white/70 backdrop-blur-sm">
                      <CardHeader className="relative">
-                        <Progress value={progress} className="w-full h-2 mb-4" />
-                        {timerDuration > 0 && <div className="flex items-center gap-2 text-lg font-semibold justify-center text-muted-foreground mb-2"><Clock className="w-5 h-5"/>{timeLeft}s</div>}
+                        <Progress value={progress} className="w-full h-2 mb-2" />
+                        {timerDuration > 0 && (
+                             <div className="relative overflow-hidden rounded-full bg-secondary w-full h-2 mb-4">
+                                <Progress value={(timeLeft / timerDuration) * 100} className="w-full h-full" />
+                            </div>
+                        )}
                         {currentQuestion.image && (
                             <div className="relative h-48 w-full rounded-lg overflow-hidden">
                                  <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="cover" />
