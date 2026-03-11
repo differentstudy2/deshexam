@@ -4,14 +4,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { cn } from "@/lib/utils";
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -151,12 +150,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
     return (
-        <div
-            className="relative min-h-screen bg-cover bg-center bg-no-repeat"
-            style={{
-                backgroundImage: "url('https://deshexam.com/image/logo.png')",
-            }}
-        >
+        <div className="relative min-h-screen bg-background">
+            <div 
+                className="absolute inset-0 z-0"
+                style={{
+                    backgroundImage: "url('https://deshexam.com/image/logo.png')",
+                    backgroundSize: '150px',
+                    backgroundRepeat: 'repeat',
+                    opacity: 0.05,
+                }}
+            />
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-yellow-50/90 dark:from-orange-900/80 dark:to-gray-900/90 backdrop-blur-sm" />
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
@@ -224,8 +227,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             )}
                             
                             <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
-                                <span>{currentQuestion.text}</span>
-                                {currentQuestion.audio && (
+                                <span>{currentQuestion?.text}</span>
+                                {currentQuestion?.audio && (
                                     <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
                                         <Volume2 />
                                     </Button>
@@ -234,7 +237,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardHeader>
                         <CardContent className="flex flex-col items-center gap-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                                {currentQuestion.options.map((option, index) => {
+                                {currentQuestion?.options.map((option, index) => {
                                     const isSelected = selectedAnswer === option.text;
                                     const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
 
@@ -274,4 +277,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
