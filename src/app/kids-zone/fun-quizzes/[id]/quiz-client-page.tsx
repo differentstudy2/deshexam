@@ -321,13 +321,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                      <div className="flex items-center gap-2">
                                         <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                         <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                            <SelectTrigger id="timer-select" className="w-[110px] h-8">
+                                            <SelectTrigger id="timer-select" className="w-[90px] h-9">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="15">15 seconds</SelectItem>
-                                                <SelectItem value="30">30 seconds</SelectItem>
-                                                <SelectItem value="60">60 seconds</SelectItem>
+                                                <SelectItem value="15">15s</SelectItem>
+                                                <SelectItem value="30">30s</SelectItem>
+                                                <SelectItem value="60">60s</SelectItem>
                                                 <SelectItem value="0">Off</SelectItem>
                                             </SelectContent>
                                         </Select>
