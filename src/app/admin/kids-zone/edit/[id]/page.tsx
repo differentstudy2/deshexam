@@ -17,7 +17,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,7 +25,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, uploadFile } from '@/lib/firebase/firestore';
-import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
@@ -35,6 +34,19 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 const funQuizQuestionSchema = z.object({
     id: z.string().optional(),
@@ -69,6 +81,30 @@ export default function EditKidsContentPage() {
     const [isUploadingAudio, setIsUploadingAudio] = useState(false);
     const audioInputRef = useRef<HTMLInputElement>(null);
     const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
+
+    const [isImporting, setIsImporting] = useState(false);
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [jsonText, setJsonText] = useState('');
+    const importFileRef = useRef<HTMLInputElement>(null);
+
+    const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "Which animal says 'Moo'?",
+      "image": "https://picsum.photos/seed/cow-image/400/225",
+      "audio": "https://example.com/sounds/cow_question.mp3",
+      "options": [
+        { "text": "Cow", "image": "https://picsum.photos/seed/cow-option/100/100" },
+        { "text": "Dog", "image": "https://picsum.photos/seed/dog-option/100/100" },
+        { "text": "Cat", "image": "https://picsum.photos/seed/cat-option/100/100" },
+        { "text": "Duck", "image": "https://picsum.photos/seed/duck-option/100/100" }
+      ],
+      "correctAnswer": "Cow"
+    }
+  ]
+}
+`;
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -117,6 +153,52 @@ export default function EditKidsContentPage() {
 
         fetchContent();
     }, [contentId, router, toast, form]);
+
+      const processJsonImport = (jsonString: string) => {
+        try {
+            const parsed = JSON.parse(jsonString);
+            const questionsToImport = parsed.questions || [];
+            if(!Array.isArray(questionsToImport) || questionsToImport.length === 0){
+                throw new Error("No valid 'questions' array found in the JSON.");
+            }
+            
+            questionsToImport.forEach((q: any) => {
+                const { success } = funQuizQuestionSchema.safeParse(q);
+                if (!success) {
+                    console.error("Invalid question structure:", q, funQuizQuestionSchema.safeParse(q));
+                    throw new Error(`One or more questions have an invalid structure. Please check the format.`);
+                }
+            });
+
+            append(questionsToImport);
+            toast({ title: 'Import Successful', description: `${questionsToImport.length} questions added.` });
+            setIsImportDialogOpen(false);
+            setJsonText('');
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Import Failed', description: (error as Error).message });
+        } finally {
+            setIsImporting(false);
+        }
+      };
+    
+      const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        setIsImporting(true);
+        const reader = new FileReader();
+        reader.onload = (e) => processJsonImport(e.target?.result as string);
+        reader.readAsText(file);
+        if (importFileRef.current) importFileRef.current.value = '';
+      };
+      
+      const handleBulkImportFromText = () => {
+        if (!jsonText.trim()) { 
+            toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."}); 
+            return; 
+        }
+        setIsImporting(true);
+        processJsonImport(jsonText);
+      }
 
 
     const handleUpdate = async (data: FormValues) => {
@@ -283,7 +365,55 @@ export default function EditKidsContentPage() {
                                             </div>
                                         </Card>
                                     ))}
-                                    <Button type="button" variant="outline" onClick={() => append({ text: '', options: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }], correctAnswer: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Question</Button>
+                                    <div className="flex flex-wrap gap-4">
+                                        <Button type="button" variant="outline" onClick={() => append({ text: '', options: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }], correctAnswer: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Question</Button>
+                                        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-xl">
+                                                <DialogHeader>
+                                                    <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
+                                                    <DialogDescription>
+                                                        Upload a JSON file or paste JSON text containing an array of questions.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <Tabs defaultValue="paste">
+                                                    <TabsList className="grid w-full grid-cols-2">
+                                                        <TabsTrigger value="paste">Paste JSON</TabsTrigger>
+                                                        <TabsTrigger value="upload">Upload File</TabsTrigger>
+                                                    </TabsList>
+                                                    <TabsContent value="paste" className="pt-4 space-y-4">
+                                                        <Textarea
+                                                            placeholder='Paste your JSON content here...'
+                                                            value={jsonText}
+                                                            onChange={(e) => setJsonText(e.target.value)}
+                                                            className="min-h-[200px] font-mono text-xs"
+                                                            disabled={isImporting}
+                                                        />
+                                                        <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                                            {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                                        </Button>
+                                                    </TabsContent>
+                                                    <TabsContent value="upload" className="pt-4">
+                                                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                            <Label htmlFor="json-import">JSON/TXT File</Label>
+                                                            <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                                            {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                                        </div>
+                                                    </TabsContent>
+                                                </Tabs>
+                                                <Accordion type="single" collapsible className="w-full mt-4">
+                                                <AccordionItem value="item-1">
+                                                    <AccordionTrigger>View Example JSON Format</AccordionTrigger>
+                                                    <AccordionContent>
+                                                    <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                                </Accordion>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
                                 </div>
                             )}
                         </CardContent>
