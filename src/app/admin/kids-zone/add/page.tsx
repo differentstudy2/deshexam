@@ -16,7 +16,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -254,13 +253,12 @@ export default function AddKidsContentPage() {
                                       </div>
                                     </div>
 
-                                     <FormField
+                                    <Controller
                                         control={form.control}
                                         name={`questions.${index}.correctAnswer`}
-                                        render={({ field }) => (
+                                        render={({ field, fieldState: { error } }) => (
                                             <FormItem className="space-y-3 pt-4">
-                                            <FormLabel>Correct Answer</FormLabel>
-                                            <FormControl>
+                                                <FormLabel>Correct Answer</FormLabel>
                                                 <RadioGroup
                                                     onValueChange={field.onChange}
                                                     value={field.value}
@@ -277,8 +275,7 @@ export default function AddKidsContentPage() {
                                                         ) : null
                                                     ))}
                                                 </RadioGroup>
-                                            </FormControl>
-                                            <FormMessage />
+                                                {error && <FormMessage>{error.message}</FormMessage>}
                                             </FormItem>
                                         )}
                                     />
