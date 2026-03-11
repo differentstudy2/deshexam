@@ -56,8 +56,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isCorrect, setIsCorrect] = useState(false);
     const [score, setScore] = useState(0);
     const [quizFinished, setQuizFinished] = useState(false);
-    const [timerDuration, setTimerDuration] = useState(30);
-    const [timeLeft, setTimeLeft] = useState(30);
+    const [timerDuration, setTimerDuration] = useState(60);
+    const [timeLeft, setTimeLeft] = useState(60);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
 
