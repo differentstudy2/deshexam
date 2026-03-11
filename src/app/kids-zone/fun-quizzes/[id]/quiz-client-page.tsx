@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -146,6 +146,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     }
     
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
+    
+    if (!currentQuestion) {
+        // This can happen briefly during transitions or if data is missing.
+        // It's a safe fallback.
+        return (
+            <div className="container mx-auto px-4 py-12 text-center">
+                <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+                <p className="mt-4 text-muted-foreground">Loading question...</p>
+            </div>
+        );
+    }
+
     const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
     return (
