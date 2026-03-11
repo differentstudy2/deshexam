@@ -49,7 +49,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
-
+    
     const optionBgColors = [
         'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
         'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
@@ -321,7 +321,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                      <div className="flex items-center gap-2">
                                         <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                         <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                            <SelectTrigger id="timer-select" className="w-[120px] h-8">
+                                            <SelectTrigger id="timer-select" className="w-[110px] h-8">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
