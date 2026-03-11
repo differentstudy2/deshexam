@@ -1,39 +1,52 @@
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, PawPrint, Rocket, Bone } from "lucide-react";
+import { ArrowLeft, Loader2, PawPrint } from "lucide-react";
 import Link from "next/link";
+import { getAllContent } from '@/lib/firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
-const quizCategories = [
-  {
-    title: "Amazing Animals",
-    description: "How much do you know about the animal kingdom?",
-    icon: <PawPrint className="w-10 h-10 text-orange-500" />,
-    bgColor: "bg-orange-100",
-    link: "/kids-zone/fun-quizzes/amazing-animals",
-    comingSoon: false,
-  },
-  {
-    title: "Space Adventure",
-    description: "Explore planets, stars, and galaxies in this cosmic quiz.",
-    icon: <Rocket className="w-10 h-10 text-indigo-500" />,
-    bgColor: "bg-indigo-100",
-    link: "#",
-    comingSoon: true,
-  },
-  {
-    title: "Dinosaur Discovery",
-    description: "Travel back in time and test your dino knowledge.",
-    icon: <Bone className="w-10 h-10 text-yellow-800" />,
-    bgColor: "bg-yellow-200",
-    link: "#",
-    comingSoon: true,
-  },
-];
+type Quiz = {
+  id: string;
+  title: string;
+  description?: string;
+  category: string;
+  testType: string;
+  featureImage?: string;
+};
 
 export default function FunQuizzesPage() {
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        setLoading(true);
+        const allContent = await getAllContent();
+        const funQuizzes = allContent.filter(
+          item => item.testType === 'Quiz' && item.category === 'Fun Quizzes'
+        ) as Quiz[];
+        setQuizzes(funQuizzes);
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching quizzes",
+          description: (error as Error).message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuizzes();
+  }, [toast]);
+
   return (
     <div className="bg-orange-50 dark:bg-orange-900/20 min-h-screen">
       <div className="container mx-auto px-4 py-12">
@@ -54,31 +67,39 @@ export default function FunQuizzesPage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {quizCategories.map((category, index) => (
-            <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center relative">
-               {category.comingSoon && (
-                  <div className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    Coming Soon
+        {loading ? (
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
+           </div>
+        ) : quizzes.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {quizzes.map((quiz, index) => (
+              <Card key={quiz.id} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
+                <CardHeader className="items-center">
+                  <div className={`p-4 rounded-full mb-4 bg-orange-100`}>
+                    {quiz.featureImage ? 
+                      <Image src={quiz.featureImage} alt={quiz.title} width={40} height={40} className="rounded-full" /> 
+                      : <PawPrint className="w-10 h-10 text-orange-500" />
+                    }
                   </div>
-                )}
-              <CardHeader className="items-center">
-                <div className={`p-4 rounded-full mb-4 ${category.bgColor}`}>
-                    {category.icon}
+                  <CardTitle className="font-headline text-2xl">{quiz.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <p className="text-muted-foreground">{quiz.description}</p>
+                </CardContent>
+                <div className="p-6 pt-0">
+                  <Button asChild>
+                    <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
+                  </Button>
                 </div>
-                <CardTitle className="font-headline text-2xl">{category.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-muted-foreground">{category.description}</p>
-              </CardContent>
-              <div className="p-6 pt-0">
-                 <Button asChild disabled={category.comingSoon}>
-                  <Link href={category.link}>Start Quiz</Link>
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 text-muted-foreground">
+            <p>No quizzes found. Create one in the admin panel to get started!</p>
+          </div>
+        )}
       </div>
     </div>
   );

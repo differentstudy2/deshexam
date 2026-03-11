@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
+import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,13 @@ import { Label } from '@/components/ui/label';
 
 const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
-  options: z.array(z.object({ text: z.string().min(1, "Option text cannot be empty.") })).min(4).max(4),
+  image: z.string().optional(),
+  audio: z.string().optional(),
+  options: z.array(z.object({ 
+    text: z.string().min(1, "Option text cannot be empty."),
+    image: z.string().optional(),
+    audio: z.string().optional(),
+  })).min(4).max(4),
   correctAnswer: z.string().min(1, "Please select a correct answer."),
 });
 
@@ -240,31 +246,106 @@ export default function AddKidsContentPage() {
                                     <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                                 </div>
                                 <div className="space-y-4">
-                                    <FormField
+                                     <FormField
                                         control={form.control}
                                         name={`questions.${index}.text`}
                                         render={({ field }) => (
-                                            <FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                            <FormItem>
+                                                <FormLabel>Question Text</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
                                         )}
                                     />
                                     <div className="grid grid-cols-2 gap-4">
-                                      {[0, 1, 2, 3].map(optionIndex => (
                                         <FormField
-                                          key={optionIndex}
-                                          control={form.control}
-                                          name={`questions.${index}.options.${optionIndex}.text`}
-                                          render={({ field }) => (
-                                            <FormItem>
-                                              <FormLabel>Option {optionIndex + 1}</FormLabel>
-                                              <FormControl><Input {...field} /></FormControl>
-                                              <FormMessage />
-                                            </FormItem>
-                                          )}
+                                            control={form.control}
+                                            name={`questions.${index}.image`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Question Image</FormLabel>
+                                                    <FormControl>
+                                                        <ImageUploader
+                                                            fieldName={field.name}
+                                                            onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)}
+                                                            value={field.value}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
                                         />
-                                      ))}
+                                        <FormField
+                                            control={form.control}
+                                            name={`questions.${index}.audio`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Question Audio URL</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} placeholder="Audio URL" />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
                                     
-                                     <FormField
+                                    <div className="space-y-4">
+                                      <Label>Options</Label>
+                                      <div className="grid grid-cols-2 gap-4">
+                                        {[0, 1, 2, 3].map(optionIndex => (
+                                          <div key={optionIndex} className="space-y-3 p-3 border rounded-md bg-background">
+                                            <Label>Option {optionIndex + 1}</Label>
+                                            <FormField
+                                              control={form.control}
+                                              name={`questions.${index}.options.${optionIndex}.text`}
+                                              render={({ field }) => (
+                                                <FormItem>
+                                                  <FormControl><Input {...field} /></FormControl>
+                                                  <FormMessage />
+                                                </FormItem>
+                                              )}
+                                            />
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.options.${optionIndex}.image`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-xs">Image</FormLabel>
+                                                            <FormControl>
+                                                                <ImageUploader
+                                                                    fieldName={field.name}
+                                                                    onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)}
+                                                                    value={field.value}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.options.${optionIndex}.audio`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="text-xs">Audio</FormLabel>
+                                                            <FormControl>
+                                                                <Input {...field} placeholder="Audio URL" />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+
+                                     <Controller
                                       control={form.control}
                                       name={`questions.${index}.correctAnswer`}
                                       render={({ field }) => (
@@ -274,15 +355,15 @@ export default function AddKidsContentPage() {
                                             <RadioGroup
                                               onValueChange={field.onChange}
                                               value={field.value}
-                                              className="grid grid-cols-2 gap-4"
+                                              className="mt-2 grid grid-cols-2 gap-2"
                                             >
-                                                {form.getValues(`questions.${index}.options`)?.map((option, optionIndex) => (
+                                                {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
                                                     option.text ? (
-                                                        <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0">
+                                                        <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-2 border rounded-md bg-background">
                                                             <FormControl>
                                                                 <RadioGroupItem value={option.text} />
                                                             </FormControl>
-                                                            <FormLabel className="font-normal">{option.text}</FormLabel>
+                                                            <FormLabel className="font-normal w-full truncate">{option.text}</FormLabel>
                                                         </FormItem>
                                                     ) : null
                                                 ))}
@@ -318,4 +399,3 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
-    
