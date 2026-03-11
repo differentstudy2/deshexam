@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -47,7 +46,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [timeLeft, setTimeLeft] = useState(60);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
-    const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+    const [autoplayEnabled, setAutoplayEnabled] = useState(false);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
     const stopSound = useCallback(() => {
