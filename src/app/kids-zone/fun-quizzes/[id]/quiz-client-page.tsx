@@ -148,8 +148,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
     
     if (!currentQuestion) {
-        // This can happen briefly during transitions or if data is missing.
-        // It's a safe fallback.
         return (
             <div className="container mx-auto px-4 py-12 text-center">
                 <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
@@ -207,19 +205,25 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-white/70 backdrop-blur-sm">
                      <CardHeader className="relative">
                         <Progress value={progress} className="w-full h-2 mb-2" />
-                        {timerDuration > 0 && (
-                             <div className="relative overflow-hidden rounded-full bg-secondary w-full h-2 mb-4">
-                                <Progress value={(timeLeft / timerDuration) * 100} className="w-full h-full" />
+                        
+                        <div className="flex justify-between items-center mt-2">
+                            <div className="text-sm text-muted-foreground">
+                                Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                             </div>
-                        )}
+                            {timerDuration > 0 && (
+                                <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                    <Clock className="w-5 h-5" />
+                                    <span>{timeLeft}s</span>
+                                </div>
+                            )}
+                        </div>
+
                         {currentQuestion.image && (
-                            <div className="relative h-48 w-full rounded-lg overflow-hidden">
+                            <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
                                  <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="cover" />
                             </div>
                         )}
-                        <div className="absolute top-10 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                            {currentQuestionIndex + 1} / {shuffledQuestions.length}
-                        </div>
+                        
                         <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 pt-4 flex items-center justify-center gap-2">
                             <span>{currentQuestion.text}</span>
                             {currentQuestion.audio && (
