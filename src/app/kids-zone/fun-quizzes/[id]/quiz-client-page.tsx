@@ -4,11 +4,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -47,12 +49,90 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isCorrect, setIsCorrect] = useState(false);
     const [score, setScore] = useState(0);
     const [quizFinished, setQuizFinished] = useState(false);
+    const [timerDuration, setTimerDuration] = useState(30);
+    const [timeLeft, setTimeLeft] = useState(30);
+    const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+    const nextQuestion = useCallback(() => {
+        if (currentQuestionIndex < shuffledQuestions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+            setSelectedAnswer(null);
+            setFeedback('');
+            setIsCorrect(false);
+            if (timerDuration > 0) {
+                setTimeLeft(timerDuration);
+            }
+        } else {
+            setQuizFinished(true);
+            playSound('win');
+        }
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration]);
+    
     useEffect(() => {
         if(quiz && quiz.questions) {
              setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         }
     }, [quiz]);
+
+    useEffect(() => {
+        if (quizFinished || selectedAnswer || timerDuration === 0) {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+            return;
+        }
+
+        timerIntervalRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+                    playSound('incorrect');
+                    setFeedback("Time's up!");
+                    setTimeout(nextQuestion, 1500); 
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+        };
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex]);
+
+    const handleAnswer = (answer: string) => {
+        if (selectedAnswer) return;
+
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+
+        setSelectedAnswer(answer);
+        if (answer === currentQuestion.correctAnswer) {
+            setFeedback('Correct!');
+            setIsCorrect(true);
+            setScore(prev => prev + 1);
+            playSound('correct');
+        } else {
+            setFeedback('Not quite!');
+            playSound('incorrect');
+        }
+
+        setTimeout(nextQuestion, 1500);
+    };
+
+    const restartQuiz = () => {
+        setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
+        setCurrentQuestionIndex(0);
+        setSelectedAnswer(null);
+        setFeedback('');
+        setIsCorrect(false);
+        setScore(0);
+        setQuizFinished(false);
+        setTimeLeft(timerDuration);
+    };
+    
+    const handleTimerChange = (value: string) => {
+        const newDuration = parseInt(value, 10);
+        setTimerDuration(newDuration);
+        setTimeLeft(newDuration);
+    };
 
     if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
         return (
@@ -66,55 +146,32 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     }
     
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
-    const progress = (currentQuestionIndex / shuffledQuestions.length) * 100;
-
-    const handleAnswer = (answer: string) => {
-        if (selectedAnswer) return;
-
-        setSelectedAnswer(answer);
-        if (answer === currentQuestion.correctAnswer) {
-            setFeedback('Correct!');
-            setIsCorrect(true);
-            setScore(prev => prev + 1);
-            playSound('correct');
-        } else {
-            setFeedback('Not quite!');
-            playSound('incorrect');
-        }
-
-        setTimeout(() => {
-            if (currentQuestionIndex < shuffledQuestions.length - 1) {
-                setCurrentQuestionIndex(prev => prev + 1);
-                setSelectedAnswer(null);
-                setFeedback('');
-                setIsCorrect(false);
-            } else {
-                setQuizFinished(true);
-                playSound('win');
-            }
-        }, 1500);
-    };
-
-    const restartQuiz = () => {
-        setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
-        setCurrentQuestionIndex(0);
-        setSelectedAnswer(null);
-        setFeedback('');
-        setIsCorrect(false);
-        setScore(0);
-        setQuizFinished(false);
-    };
+    const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
     return (
         <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/10 min-h-screen">
           <div className="container mx-auto px-4 py-12">
-            <div className="mb-8">
+            <div className="mb-8 flex justify-between items-center">
                 <Button asChild variant="ghost">
                     <Link href="/kids-zone/fun-quizzes">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Fun Quizzes
                     </Link>
                 </Button>
+                <div className="flex items-center gap-2">
+                    <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
+                    <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={quizFinished || selectedAnswer !== null}>
+                        <SelectTrigger id="timer-select" className="w-[120px]">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="15">15 seconds</SelectItem>
+                            <SelectItem value="30">30 seconds</SelectItem>
+                            <SelectItem value="60">60 seconds</SelectItem>
+                            <SelectItem value="0">Off</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
             
             {quizFinished ? (
@@ -138,6 +195,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-white/70 backdrop-blur-sm">
                      <CardHeader className="relative">
                         <Progress value={progress} className="w-full h-2 mb-4" />
+                        {timerDuration > 0 && <div className="flex items-center gap-2 text-lg font-semibold justify-center text-muted-foreground mb-2"><Clock className="w-5 h-5"/>{timeLeft}s</div>}
                         {currentQuestion.image && (
                             <div className="relative h-48 w-full rounded-lg overflow-hidden">
                                  <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="cover" />
@@ -189,6 +247,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 );
                             })}
                         </div>
+                         {feedback && <div className={`mt-4 font-bold text-xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
                     </CardContent>
                 </Card>
             )}
