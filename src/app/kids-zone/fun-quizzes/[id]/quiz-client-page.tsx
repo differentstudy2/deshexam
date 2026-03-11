@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock, ImageDown } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock, ImageDown, Video } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -12,6 +12,12 @@ import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import html2canvas from 'html2canvas';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -136,19 +142,64 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTimeLeft(newDuration);
     };
 
-    const handleSaveAsImage = () => {
+    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' = 'default') => {
         if (quizCardRef.current) {
             html2canvas(quizCardRef.current, {
                 useCORS: true,
-                backgroundColor: null, // To handle transparent backgrounds
-            }).then(canvas => {
+                backgroundColor: null,
+            }).then(sourceCanvas => {
+                let targetCanvas = sourceCanvas;
+                let fileNameSuffix = 'default';
+
+                if (aspectRatio !== 'default') {
+                    const target = document.createElement('canvas');
+                    const targetCtx = target.getContext('2d');
+                    if (!targetCtx) return;
+
+                    let targetWidth, targetHeight;
+                    if (aspectRatio === '9:16') {
+                        targetHeight = 1920; // Standard portrait resolution (e.g., for YouTube Shorts)
+                        targetWidth = 1080;
+                        fileNameSuffix = 'portrait';
+                    } else { // 16:9
+                        targetWidth = 1920; // Standard landscape resolution (e.g., for YouTube videos)
+                        targetHeight = 1080;
+                        fileNameSuffix = 'landscape';
+                    }
+                    
+                    target.width = targetWidth;
+                    target.height = targetHeight;
+
+                    // Create a pleasant gradient background
+                    const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
+                    gradient.addColorStop(0, '#fef3c7'); // amber-100
+                    gradient.addColorStop(1, '#fed7aa'); // orange-200
+                    targetCtx.fillStyle = gradient;
+                    targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+
+                    // Calculate scaling to fit the source canvas onto the target with some padding
+                    const padding = 100;
+                    const scale = Math.min(
+                        (targetWidth - padding * 2) / sourceCanvas.width, 
+                        (targetHeight - padding * 2) / sourceCanvas.height
+                    );
+                    const scaledWidth = sourceCanvas.width * scale;
+                    const scaledHeight = sourceCanvas.height * scale;
+                    const dx = (targetWidth - scaledWidth) / 2;
+                    const dy = (targetHeight - scaledHeight) / 2;
+
+                    targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
+                    targetCanvas = target;
+                }
+
                 const link = document.createElement('a');
-                link.download = `${quiz.title.replace(/\s+/g, '_')}_question_${currentQuestionIndex + 1}.png`;
-                link.href = canvas.toDataURL('image/png');
+                link.download = `${quiz.title.replace(/\s+/g, '_')}_q${currentQuestionIndex + 1}_${fileNameSuffix}.png`;
+                link.href = targetCanvas.toDataURL('image/png');
                 link.click();
             });
         }
     };
+
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
@@ -169,12 +220,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         <div className="relative min-h-screen">
             <div
               className="absolute inset-0 z-0"
-              style={{
-                  backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                  backgroundSize: '200px',
-                  backgroundRepeat: 'repeat',
-                  opacity: 0.2,
-              }}
             />
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/70" />
 
@@ -245,9 +290,26 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 <span>{timeLeft}s</span>
                                             </div>
                                         )}
-                                        <Button variant="outline" size="icon" onClick={handleSaveAsImage}>
-                                            <ImageDown className="h-4 w-4" />
-                                        </Button>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="icon">
+                                                    <ImageDown className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
+                                                    Save as Default
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
+                                                    <Video className="mr-2 h-4 w-4" />
+                                                    Save for Landscape Video (16:9)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
+                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
+                                                    Save for Short Video (9:16)
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
 
