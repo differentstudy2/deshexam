@@ -53,6 +53,7 @@ const adminNavItems = [
     { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-5 w-5" /> },
     { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-5 w-5" /> },
     { href: '/admin/users', label: 'Users', icon: <Users className="h-5 w-5" /> },
+    { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-5 w-5" />},
     { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-5 w-5" /> },
     { href: '/admin/push-notification', label: 'Push Notification', icon: <Send className="h-5 w-5" />},
     { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-5 w-5" />},
