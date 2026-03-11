@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -161,14 +162,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     return (
         <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/10 min-h-screen">
           <div className="container mx-auto px-4 py-12">
-            <div className="mb-8">
-                <Button asChild variant="ghost">
-                    <Link href="/kids-zone/fun-quizzes">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Fun Quizzes
-                    </Link>
-                </Button>
-            </div>
             
             {quizFinished ? (
                 <Card className="w-full max-w-xl mx-auto text-center shadow-2xl p-8">
@@ -181,16 +174,24 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     <CardContent>
                         <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
                         <p className="text-xl mt-2 font-semibold">Your Score</p>
-                        <Button onClick={restartQuiz} className="mt-8" size="lg">
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Play Again
-                        </Button>
+                        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                            <Button onClick={restartQuiz} size="lg">
+                                <RefreshCw className="mr-2 h-4 w-4" />
+                                Play Again
+                            </Button>
+                             <Button asChild variant="outline" size="lg">
+                                <Link href="/kids-zone/fun-quizzes">
+                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    Back to Quizzes
+                                </Link>
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             ) : (
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-white/70 backdrop-blur-sm">
                      <CardHeader className="relative">
-                        <Progress value={progress} className="w-full h-2" />
+                        <Progress value={progress} className="w-full h-2 mb-4" />
                         <div className="flex justify-between items-center mt-2">
                             <div className="text-sm text-muted-foreground">
                                 Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
