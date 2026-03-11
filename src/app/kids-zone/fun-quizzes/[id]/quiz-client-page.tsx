@@ -4,13 +4,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock, ImageDown } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import html2canvas from 'html2canvas';
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -52,6 +53,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [timerDuration, setTimerDuration] = useState(30);
     const [timeLeft, setTimeLeft] = useState(30);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const quizCardRef = useRef<HTMLDivElement>(null);
 
     const nextQuestion = useCallback(() => {
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
@@ -134,6 +136,20 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTimeLeft(newDuration);
     };
 
+    const handleSaveAsImage = () => {
+        if (quizCardRef.current) {
+            html2canvas(quizCardRef.current, {
+                useCORS: true,
+                backgroundColor: null, // To handle transparent backgrounds
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${quiz.title.replace(/\s+/g, '_')}_question_${currentQuestionIndex + 1}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    };
+
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
     if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
@@ -157,14 +173,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                   backgroundImage: "url('https://deshexam.com/image/logo.png')",
                   backgroundSize: '200px',
                   backgroundRepeat: 'repeat',
+                  opacity: 0.2,
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/70 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/70" />
 
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
-                    <Card className="relative w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
+                    <Card ref={quizCardRef} className="relative w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
                         <div
                             className="absolute inset-0 z-0"
                             style={{
@@ -200,7 +217,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </div>
                     </Card>
                 ) : (
-                    <Card className="relative w-full max-w-2xl mx-auto shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
+                    <Card ref={quizCardRef} className="relative w-full max-w-2xl mx-auto shadow-2xl overflow-hidden">
                          <div className="relative z-10">
                              <CardHeader className="relative">
                                 <div className="flex justify-between items-center mt-2">
@@ -228,6 +245,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 <span>{timeLeft}s</span>
                                             </div>
                                         )}
+                                        <Button variant="outline" size="icon" onClick={handleSaveAsImage}>
+                                            <ImageDown className="h-4 w-4" />
+                                        </Button>
                                     </div>
                                 </div>
 
