@@ -231,9 +231,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             className="absolute inset-0 z-0"
                             style={{
                                 backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                                backgroundSize: '150px',
+                                backgroundSize: '200px',
                                 backgroundRepeat: 'repeat',
-                                opacity: 0.05,
+                                opacity: 0.1,
                             }}
                         />
                         <div className="relative z-10">
@@ -346,14 +346,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 `}
                                                 variant="outline"
                                             >
-                                                 {isSelected && isCorrectAnswer && <Check />}
-                                                 {isSelected && !isCorrectAnswer && <X />}
-                                                 {!isSelected && selectedAnswer && isCorrectAnswer && <Check />}
-                                                 {!selectedAnswer && <Sparkles className="w-4 h-4 text-yellow-500" />}
+                                                {isSelected && isCorrectAnswer && <Check />}
+                                                {isSelected && !isCorrectAnswer && <X />}
+                                                {!isSelected && selectedAnswer && isCorrectAnswer && <Check />}
+                                                {!selectedAnswer && <Sparkles className="w-4 h-4 text-yellow-500" />}
+                                                
+                                                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
 
                                                 {option.image && <Image src={option.image} alt={option.text} width={40} height={40} className="rounded-md" />}
                                                 <span className="flex-grow text-left">{option.text}</span>
-                                                 {option.audio && (
+                                                {option.audio && (
                                                     <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
                                                         <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
                                                     </div>
