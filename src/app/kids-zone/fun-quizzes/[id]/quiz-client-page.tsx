@@ -155,50 +155,52 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
               className="absolute inset-0 z-0"
               style={{
                   backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                  backgroundSize: '150px',
+                  backgroundSize: '200px',
                   backgroundRepeat: 'repeat',
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-amber-900/90 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/70 backdrop-blur-sm" />
 
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
-                    <Card className="w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
-                        <Confetti active={quizFinished} />
-                        <CardHeader>
-                            <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
-                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
-                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
-                            <p className="text-xl mt-2 font-semibold">Your Score</p>
-                            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button onClick={restartQuiz} size="lg">
-                                    <RefreshCw className="mr-2 h-4 w-4" />
-                                    Play Again
-                                </Button>
-                                <Button asChild variant="outline" size="lg">
-                                    <Link href="/kids-zone/fun-quizzes">
-                                        <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Back to Fun Quizzes
-                                    </Link>
-                                </Button>
-                            </div>
-                        </CardContent>
+                    <Card className="relative w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
+                        <div
+                            className="absolute inset-0 z-0"
+                            style={{
+                                backgroundImage: "url('https://deshexam.com/image/logo.png')",
+                                backgroundSize: '150px',
+                                backgroundRepeat: 'repeat',
+                                opacity: 0.05,
+                            }}
+                        />
+                        <div className="relative z-10">
+                            <Confetti active={quizFinished} />
+                            <CardHeader>
+                                <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
+                                <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
+                                <CardDescription className="text-lg">You did an amazing job!</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
+                                <p className="text-xl mt-2 font-semibold">Your Score</p>
+                                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                                    <Button onClick={restartQuiz} size="lg">
+                                        <RefreshCw className="mr-2 h-4 w-4" />
+                                        Play Again
+                                    </Button>
+                                    <Button asChild variant="outline" size="lg">
+                                        <Link href="/kids-zone/fun-quizzes">
+                                            <ArrowLeft className="mr-2 h-4 w-4" />
+                                            Back to Fun Quizzes
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </div>
                     </Card>
                 ) : (
                     <Card className="relative w-full max-w-2xl mx-auto shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
-                        <div
-                          className="absolute inset-0 z-0"
-                          style={{
-                              backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                              backgroundSize: '100px',
-                              backgroundRepeat: 'repeat',
-                              opacity: 0.05,
-                          }}
-                        />
                          <div className="relative z-10">
                              <CardHeader className="relative">
                                 <div className="flex justify-between items-center mt-2">
