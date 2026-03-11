@@ -10,7 +10,7 @@ import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { textToSpeech } from '@/ai/flows/ai-textbook-question-generator';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 const playSound = (type: 'correct' | 'incorrect') => {
   if (typeof window !== 'undefined') {
@@ -245,7 +245,8 @@ export default function AdditionAdventurePage() {
     const [isCorrect, setIsCorrect] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [timerDuration, setTimerDuration] = useState(60); 
-    const [timeLeft, setTimeLeft] = useState(timerDuration);
+    const [timeLeft, setTimeLeft] = useState(60);
+    const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const [score, setScore] = useState(0);
     const [totalAttempted, setTotalAttempted] = useState(0);
     const [gameMode, setGameMode] = useState<'input' | 'multipleChoice' | 'voice'>('input');
@@ -298,7 +299,7 @@ export default function AdditionAdventurePage() {
         }
         if (mode === 'voice') {
             const promptText = t.ttsPrompt(num1, num2);
-            textToSpeech({ text: promptText, lang: language === 'en' ? 'en-US' : 'hi-IN' }).then(result => {
+            textToSpeech({ text: promptText, lang: language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-IN' }).then(result => {
                 setAudioUrl(result.audioUrl);
             }).catch(err => console.error("TTS error:", err));
         } else {
@@ -380,7 +381,7 @@ export default function AdditionAdventurePage() {
             'শূন্য': '0', 'এক': '1', 'দুই': '2', 'তিন': '3', 'চার': '4', 'পাঁচ': '5', 'ছয়': '6', 'সাত': '7', 'আট': '8', 'নয়': '9', 'দশ': '10',
             'এগারো': '11', 'বারো': '12', 'তেরো': '13', 'চোদ্দ': '14', 'পনেরো': '15', 'ষোল': '16', 'সতেরো': '17', 'আঠারো': '18', 'উনিশ': '19', 'কুড়ি': '20',
             'একুশ': '21', 'বাইশ': '22', 'তেইশ': '23', 'চব্বিশ': '24', 'পঁচিশ': '25', 'ছাব্বিশ': '26', 'সাতাশ': '27', 'আঠাশ': '28', 'উনત્રીশ': '29', 'ত্রিশ': '30',
-            'একત્રીশ': '31', 'বત્રીশ': '32', 'তেત્રીש': '33', 'চৌત્રીশ': '34', 'পঁয়ત્રીশ': '35', 'ছত্রীশ': '36', 'সাঁইત્રીশ': '37', 'আটત્રીশ': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
+            'একત્રીশ': '31', 'বત્રીশ': '32', 'তেત્રીশ': '33', 'চৌত্রীশ': '34', 'পঁয়ત્રીশ': '35', 'ছত্রীশ': '36', 'সাঁইત્રીশ': '37', 'আটત્રીশ': '38', 'উনচল্লিশ': '39', 'চল্লিশ': '40',
             'একচল্লিশ': '41', 'বিয়াল্লিশ': '42', 'তেতাল্লিশ': '43', 'চুয়াল্লিশ': '44', 'পঁয়তাল্লিশ': '45', 'ছেচল্লিশ': '46', 'সাতচল্লিশ': '47', 'আটচল্লিশ': '48', 'উনপঞ্চাশ': '49', 'পঞ্চাশ': '50',
             'একান্ন': '51', 'বায়ান্ন': '52', 'তিপ্পান্ন': '53', 'চুয়ান্ন': '54', 'পঞ্চান্ন': '55', 'ছাপ্পান্ন': '56', 'সাতান্ন': '57', 'আটান্ন': '58', 'উনষাট': '59', 'ষাট': '60',
             'একষট্টি': '61', 'বাষট্টি': '62', 'তেষট্টি': '63', 'চৌষট্টি': '64', 'পঁয়ষট্টি': '65', 'ছেষট্টি': '66', 'সাতষট্টি': '67', 'আটষট্টি': '68', 'উনসত্তর': '69', 'সত্তর': '70',
@@ -415,23 +416,27 @@ export default function AdditionAdventurePage() {
         }
     }, [problem, generateProblemWithOptions, gameMode, difficultyLevel]);
 
-     useEffect(() => {
-        if (timerDuration === 0 || isSubmitting) {
+    useEffect(() => {
+        if (timerDuration === 0 || isSubmitting || isCorrect) {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
             return;
         }
 
         if (timeLeft <= 0) {
-            handleNewProblem(true);
+            playSound('incorrect');
+            setFeedback({ message: "Time's up!", type: 'incorrect' });
+            setTimeout(() => handleNewProblem(true), 1500);
             return;
         }
 
-        const timer = setInterval(() => {
+        timerIntervalRef.current = setInterval(() => {
             setTimeLeft(prevTime => prevTime - 1);
         }, 1000);
 
-        return () => clearInterval(timer);
-    }, [timeLeft, handleNewProblem, timerDuration, isSubmitting]);
-
+        return () => {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+        };
+    }, [timeLeft, timerDuration, isSubmitting, isCorrect, handleNewProblem]);
     
     useEffect(() => {
         if(feedback.type === 'correct') {
@@ -633,7 +638,9 @@ export default function AdditionAdventurePage() {
                     {timerDuration > 0 && (
                          <div className="flex items-center gap-3 mb-4">
                             <Clock className="w-6 h-6 text-slate-500" />
-                            <Progress value={(timeLeft / timerDuration) * 100} className="w-full h-4" />
+                            <div className="relative overflow-hidden rounded-full bg-secondary w-full h-2">
+                                <Progress value={(timeLeft / timerDuration) * 100} className="w-full h-full" />
+                            </div>
                             <span className="text-xl font-bold text-slate-600">{displayNum(timeLeft)}s</span>
                         </div>
                     )}
