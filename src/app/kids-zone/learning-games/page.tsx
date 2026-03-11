@@ -37,8 +37,14 @@ const games = [
 
 export default function LearningGamesPage() {
   return (
-    <div className="bg-blue-50 dark:bg-blue-900/20 min-h-screen">
-      <div className="container mx-auto px-4 py-12">
+    <div
+      className="relative min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{
+          backgroundImage: "url('https://deshexam.com/image/logo.png')",
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 to-cyan-50/90 dark:from-blue-900/80 dark:to-cyan-900/90 backdrop-blur-sm" />
+      <div className="relative z-10 container mx-auto px-4 py-12">
         <div className="mb-8">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone">

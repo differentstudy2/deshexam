@@ -88,16 +88,22 @@ export default function KidsZonePage() {
   };
 
   return (
-    <div className="bg-yellow-50 dark:bg-yellow-900/20">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-      />
-      <div className="container mx-auto px-4 py-16">
+    <div
+        className="relative min-h-screen bg-cover bg-center bg-no-repeat"
+        style={{
+            backgroundImage: "url('https://deshexam.com/image/logo.png')",
+        }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/90 to-amber-50/90 dark:from-yellow-900/80 dark:to-amber-900/90 backdrop-blur-sm" />
+      <div className="relative z-10 container mx-auto px-4 py-16">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <header className="text-center mb-12">
           <h1 className="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-amber-600">
             Welcome to the Kids Zone!
