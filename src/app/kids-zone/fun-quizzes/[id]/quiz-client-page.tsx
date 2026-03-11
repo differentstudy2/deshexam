@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -247,7 +248,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/90" />
-
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
@@ -393,7 +393,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardContent>
                     </Card>
                 )}
-              </div>
+            </div>
         </div>
     );
 }
