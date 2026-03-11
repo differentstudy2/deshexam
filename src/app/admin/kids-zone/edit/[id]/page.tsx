@@ -211,7 +211,7 @@ export default function EditKidsContentPage() {
                                                         <FormItem>
                                                             <FormLabel>Question Audio</FormLabel>
                                                              <div className="flex items-center gap-2">
-                                                                <Input {...field} placeholder="Audio URL" />
+                                                                <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
                                                                     {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                 </Button>
@@ -251,7 +251,7 @@ export default function EditKidsContentPage() {
                                                                                     <FormItem>
                                                                                         <FormLabel className="text-xs">Audio</FormLabel>
                                                                                          <div className="flex items-center gap-2">
-                                                                                            <Input {...audioField} placeholder="Audio URL" />
+                                                                                            <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
                                                                                             <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
                                                                                                 {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                                             </Button>
