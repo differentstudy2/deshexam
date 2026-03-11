@@ -232,91 +232,61 @@ export default function AddKidsContentPage() {
                                     <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                                 </div>
                                 <div className="space-y-4">
-                                     <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                                    <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)}/>
                                         <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (<FormItem><FormLabel>Question Audio URL</FormLabel><FormControl><Input {...field} placeholder="Audio URL" /></FormControl><FormMessage /></FormItem>)}/>
                                     </div>
                                     
-                                     <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.correctAnswer`}
-                                      render={({ field }) => (
-                                        <FormItem className="space-y-3 pt-2">
-                                          <FormLabel>Options & Correct Answer</FormLabel>
-                                           <FormDescription>
-                                                Fill in the options and select the correct one by clicking the radio button.
-                                            </FormDescription>
-                                          <FormControl>
-                                            <RadioGroup
-                                              onValueChange={field.onChange}
-                                              value={field.value}
-                                              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                                            >
-                                              {[0, 1, 2, 3].map((optionIndex) => {
-                                                const optionTextValue = form.watch(`questions.${index}.options.${optionIndex}.text`);
-                                                return (
+                                    <div className="space-y-4 pt-2 border-t">
+                                        <Label>Options</Label>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {[0, 1, 2, 3].map(optionIndex => (
                                                 <Card key={optionIndex} className="p-4 bg-background">
-                                                  <FormItem className="flex items-center space-x-3 mb-4">
-                                                    <FormControl>
-                                                      <RadioGroupItem value={optionTextValue || ''} disabled={!optionTextValue}/>
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal">
-                                                      Option {optionIndex + 1}
-                                                    </FormLabel>
-                                                  </FormItem>
-                                                  
-                                                  <div className="space-y-4">
-                                                      <FormField
-                                                          control={form.control}
-                                                          name={`questions.${index}.options.${optionIndex}.text`}
-                                                          render={({ field: optionField }) => (
-                                                              <FormItem>
-                                                                  <FormLabel className="text-xs">Option Text</FormLabel>
-                                                                  <FormControl><Input {...optionField} /></FormControl>
-                                                                  <FormMessage />
-                                                              </FormItem>
-                                                          )}
-                                                      />
-                                                      <div className="grid grid-cols-2 gap-2">
-                                                          <FormField
-                                                              control={form.control}
-                                                              name={`questions.${index}.options.${optionIndex}.image`}
-                                                              render={({ field: imageField }) => (
-                                                                  <FormItem>
-                                                                      <FormLabel className="text-xs">Image</FormLabel>
-                                                                      <FormControl>
-                                                                          <ImageUploader
-                                                                              fieldName={imageField.name}
-                                                                              onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)}
-                                                                              value={imageField.value}
-                                                                          />
-                                                                      </FormControl>
-                                                                      <FormMessage />
-                                                                  </FormItem>
-                                                              )}
-                                                          />
-                                                          <FormField
-                                                              control={form.control}
-                                                              name={`questions.${index}.options.${optionIndex}.audio`}
-                                                              render={({ field: audioField }) => (
-                                                                  <FormItem>
-                                                                      <FormLabel className="text-xs">Audio URL</FormLabel>
-                                                                      <FormControl><Input {...audioField} placeholder="Audio URL" /></FormControl>
-                                                                      <FormMessage />
-                                                                  </FormItem>
-                                                              )}
-                                                          />
-                                                      </div>
-                                                  </div>
+                                                    <div className="space-y-4">
+                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
+                                                            <FormItem><FormLabel className="text-xs">Option {optionIndex + 1} Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                                                        )}/>
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (
+                                                                <FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>
+                                                            )}/>
+                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
+                                                                <FormItem><FormLabel className="text-xs">Audio URL</FormLabel><FormControl><Input {...audioField} placeholder="Audio URL" /></FormControl><FormMessage /></FormItem>
+                                                            )}/>
+                                                        </div>
+                                                    </div>
                                                 </Card>
-                                              )}
-                                            )}
-                                            </RadioGroup>
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <FormField
+                                        control={form.control}
+                                        name={`questions.${index}.correctAnswer`}
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-3 pt-4 border-t">
+                                                <FormLabel>Correct Answer</FormLabel>
+                                                <FormDescription>Select the correct option from the ones you entered above.</FormDescription>
+                                                <FormControl>
+                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-2">
+                                                        {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
+                                                            option.text ? (
+                                                                <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+                                                                    <FormControl>
+                                                                        <RadioGroupItem value={option.text} />
+                                                                    </FormControl>
+                                                                    <FormLabel className="font-normal w-full truncate cursor-pointer">
+                                                                        {option.text}
+                                                                    </FormLabel>
+                                                                </FormItem>
+                                                            ) : null
+                                                        ))}
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
                                     />
                                 </div>
                             </Card>
