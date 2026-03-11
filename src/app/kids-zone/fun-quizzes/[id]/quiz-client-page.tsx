@@ -21,21 +21,6 @@ import {
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 
-const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
-  if (typeof window !== 'undefined') {
-    let soundUrl = '';
-    if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
-    else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
-    else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
-    else if (type === 'url' && url) soundUrl = url;
-    
-    if(soundUrl) {
-        const audio = new Audio(soundUrl);
-        audio.play().catch(error => console.error(`Error playing sound:`, error));
-    }
-  }
-};
-
 type Question = {
     text: string;
     image?: string;
@@ -63,6 +48,32 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+    const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    const stopSound = useCallback(() => {
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause();
+            activeAudioRef.current.currentTime = 0;
+            activeAudioRef.current = null;
+        }
+    }, []);
+
+    const playSound = useCallback((type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
+        if (typeof window !== 'undefined') {
+            stopSound(); // Stop any currently playing sound first.
+            let soundUrl = '';
+            if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+            else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+            else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+            else if (type === 'url' && url) soundUrl = url;
+            
+            if(soundUrl) {
+                const audio = new Audio(soundUrl);
+                activeAudioRef.current = audio;
+                audio.play().catch(error => console.error(`Error playing sound:`, error));
+            }
+        }
+    }, [stopSound]);
 
     const optionBgColors = [
         'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
@@ -72,6 +83,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     ];
 
     const nextQuestion = useCallback(() => {
+        stopSound();
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedAnswer(null);
@@ -84,7 +96,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setQuizFinished(true);
             playSound('win');
         }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration]);
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSound, stopSound]);
     
     useEffect(() => {
         if(quiz && quiz.questions) {
@@ -102,7 +114,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
             return () => clearTimeout(autoplayTimeout);
         }
-    }, [currentQuestion, autoplayEnabled, quizFinished]);
+    }, [currentQuestion, autoplayEnabled, quizFinished, playSound]);
 
     useEffect(() => {
         if (quizFinished || selectedAnswer || timerDuration === 0) {
@@ -114,6 +126,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setTimeLeft(prev => {
                 if (prev <= 1) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+                    stopSound();
                     playSound('incorrect');
                     setFeedback("Time's up!");
                     setTimeout(nextQuestion, 1500); 
@@ -126,10 +139,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSound, stopSound]);
+    
+     useEffect(() => {
+        return () => {
+            stopSound();
+        }
+    }, [stopSound]);
 
     const handleAnswer = (answer: string) => {
         if (selectedAnswer) return;
+
+        stopSound();
 
         if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
@@ -148,6 +169,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     };
 
     const restartQuiz = () => {
+        stopSound();
         setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         setCurrentQuestionIndex(0);
         setSelectedAnswer(null);
@@ -241,10 +263,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             <div
               className="absolute inset-0 z-0"
               style={{
-                backgroundImage: "url('https://deshexam.com/image/logo.png')",
+                backgroundImage: "url('/image/logo.png')",
                 backgroundSize: '150px',
                 backgroundRepeat: 'repeat',
-                opacity: 0.05,
+                opacity: 0.1,
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/90" />
@@ -283,12 +305,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                                 </div>
                                 <div className="flex items-center gap-4 flex-wrap justify-end">
-                                    <div className="flex items-center gap-2">
+                                     <div className="flex items-center gap-2">
                                         <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
                                         <Switch
                                             id="autoplay-switch"
                                             checked={autoplayEnabled}
-                                            onCheckedChange={setAutoplayEnabled}
+                                            onCheckedChange={(checked) => {
+                                                setAutoplayEnabled(checked);
+                                                if (!checked) {
+                                                    stopSound();
+                                                }
+                                            }}
                                         />
                                     </div>
                                      <div className="flex items-center gap-2">
