@@ -203,23 +203,26 @@ export default function EditKidsContentPage() {
                                                     </div>
                                                 </div>
 
-                                                <FormField
+                                                <Controller
                                                     control={form.control}
                                                     name={`questions.${index}.correctAnswer`}
                                                     render={({ field }) => (
                                                         <FormItem className="space-y-3 pt-4 border-t">
                                                             <FormLabel>Correct Answer</FormLabel>
+                                                            <FormDescription>Select the correct option from the ones you entered above.</FormDescription>
                                                             <FormControl>
                                                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-2">
                                                                     {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
-                                                                        <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
-                                                                            <FormControl>
-                                                                                <RadioGroupItem value={option.text} disabled={!option.text} />
-                                                                            </FormControl>
-                                                                            <FormLabel className="font-normal w-full truncate cursor-pointer">
-                                                                                {option.text || `Option ${optionIndex + 1}`}
-                                                                            </FormLabel>
-                                                                        </FormItem>
+                                                                        option.text ? (
+                                                                        <div key={optionIndex}>
+                                                                            <RadioGroupItem value={option.text} id={`q-${index}-opt-${optionIndex}`} className="sr-only" />
+                                                                            <Label htmlFor={`q-${index}-opt-${optionIndex}`}
+                                                                                className={cn("flex items-center space-x-3 space-y-0 p-3 border rounded-md cursor-pointer", field.value === option.text && "bg-primary/10 border-primary")}
+                                                                            >
+                                                                                <div className="w-full truncate">{option.text}</div>
+                                                                            </Label>
+                                                                        </div>
+                                                                        ) : null
                                                                     ))}
                                                                 </RadioGroup>
                                                             </FormControl>
