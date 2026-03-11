@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -204,6 +204,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
+    const optionBgColors = [
+        'bg-blue-100 dark:bg-blue-800/30 hover:bg-blue-200/70 border-blue-200 dark:border-blue-800/50 text-blue-800 dark:text-blue-200',
+        'bg-green-100 dark:bg-green-800/30 hover:bg-green-200/70 border-green-200 dark:border-green-800/50 text-green-800 dark:text-green-200',
+        'bg-yellow-100 dark:bg-yellow-800/30 hover:bg-yellow-200/70 border-yellow-200 dark:border-yellow-800/50 text-yellow-800 dark:text-yellow-200',
+        'bg-red-100 dark:bg-red-800/30 hover:bg-red-200/70 border-red-200 dark:border-red-800/50 text-red-800 dark:text-red-200',
+    ];
+
     if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
         return (
              <div className="container mx-auto px-4 py-12 text-center">
@@ -222,17 +229,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             <div
               className="absolute inset-0 z-0"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/70" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/90" />
 
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
                     <Card ref={quizCardRef} className="relative w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
-                        <div
+                       <div
                             className="absolute inset-0 z-0"
                             style={{
                                 backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                                backgroundSize: '200px',
+                                backgroundSize: '100px',
                                 backgroundRepeat: 'repeat',
                                 opacity: 0.1,
                             }}
@@ -341,10 +348,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 onClick={() => handleAnswer(option.text)}
                                                 disabled={!!selectedAnswer}
                                                 className={cn(
-                                                    "h-auto p-4 text-lg justify-between items-center gap-4 transition-all duration-300 transform",
-                                                    isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white',
-                                                    isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white',
-                                                    !isSelected && selectedAnswer && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 text-white'
+                                                    "h-auto p-4 text-lg justify-between items-center gap-4 transition-all duration-300 transform hover:scale-105",
+                                                    !selectedAnswer && optionBgColors[index % optionBgColors.length],
+                                                    isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white border-green-600',
+                                                    isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white border-destructive',
+                                                    !isSelected && selectedAnswer && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 text-white border-green-600'
                                                 )}
                                                 variant="outline"
                                             >
