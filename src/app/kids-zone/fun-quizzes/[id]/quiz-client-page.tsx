@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 const playSound = (type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
   if (typeof window !== 'undefined') {
@@ -140,7 +140,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
              <div className="container mx-auto px-4 py-12 text-center">
                  <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
                  <Button asChild className="mt-4">
-                     <Link href="/kids-zone/fun-quizzes">Back to Quizzes</Link>
+                     <Link href="/kids-zone/fun-quizzes">Back to Fun Quizzes</Link>
                  </Button>
              </div>
         );
@@ -189,14 +189,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-white/70 backdrop-blur-sm">
+                <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-card/70 dark:bg-card/60 backdrop-blur-sm">
                      <CardHeader className="relative">
                         <Progress value={progress} className="w-full h-2 mb-4" />
+                        <div className="relative overflow-hidden rounded-full bg-secondary w-full h-2 mb-4">
+                            {timerDuration > 0 && <Progress value={(timeLeft/timerDuration) * 100} className="w-full h-full" />}
+                        </div>
                         <div className="flex justify-between items-center mt-2">
                             <div className="text-sm text-muted-foreground">
                                 Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                             </div>
-                             <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4">
                                 {timerDuration > 0 && (
                                     <div className="flex items-center gap-2 text-muted-foreground font-semibold">
                                         <Clock className="w-5 h-5" />
@@ -226,7 +229,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </div>
                         )}
                         
-                        <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 pt-4 flex items-center justify-center gap-2">
+                        <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
                             <span>{currentQuestion.text}</span>
                             {currentQuestion.audio && (
                                 <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
