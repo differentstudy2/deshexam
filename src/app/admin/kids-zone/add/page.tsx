@@ -274,6 +274,11 @@ export default function AddKidsContentPage() {
                                                     <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
                                                         {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                     </Button>
+                                                    {field.value && (
+                                                        <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    )}
                                                 </div>
                                                 {field.value && <audio controls src={field.value} className="w-full mt-2" />}
                                                 <FormMessage />
@@ -316,6 +321,11 @@ export default function AddKidsContentPage() {
                                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
                                                                                     {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                                 </Button>
+                                                                                 {audioField.value && (
+                                                                                    <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
+                                                                                        <Trash2 className="w-4 h-4" />
+                                                                                    </Button>
+                                                                                )}
                                                                             </div>
                                                                             {audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
                                                                             <FormMessage />
