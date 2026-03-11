@@ -149,38 +149,48 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
     return (
-        <div className="min-h-screen bg-secondary/30">
+        <div className="min-h-screen">
             <div className="container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
-                    <Card className="w-full max-w-xl mx-auto text-center shadow-2xl p-8">
-                        <Confetti active={quizFinished} />
-                        <CardHeader>
-                            <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
-                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
-                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
-                            <p className="text-xl mt-2 font-semibold">Your Score</p>
-                            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button onClick={restartQuiz} size="lg">
-                                    <RefreshCw className="mr-2 h-4 w-4" />
-                                    Play Again
-                                </Button>
-                                <Button asChild variant="outline" size="lg">
-                                    <Link href="/kids-zone/fun-quizzes">
-                                        <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Back to Fun Quizzes
-                                    </Link>
-                                </Button>
-                            </div>
-                        </CardContent>
+                    <Card className="relative w-full max-w-xl mx-auto text-center shadow-2xl p-8 overflow-hidden">
+                        <div
+                          className="absolute inset-0 z-0"
+                          style={{
+                              backgroundImage: "url('https://deshexam.com/image/logo.png')",
+                              backgroundSize: '100px',
+                              backgroundRepeat: 'repeat',
+                              opacity: 0.05,
+                          }}
+                        />
+                        <div className="relative z-10">
+                            <Confetti active={quizFinished} />
+                            <CardHeader>
+                                <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
+                                <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
+                                <CardDescription className="text-lg">You did an amazing job!</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
+                                <p className="text-xl mt-2 font-semibold">Your Score</p>
+                                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                                    <Button onClick={restartQuiz} size="lg">
+                                        <RefreshCw className="mr-2 h-4 w-4" />
+                                        Play Again
+                                    </Button>
+                                    <Button asChild variant="outline" size="lg">
+                                        <Link href="/kids-zone/fun-quizzes">
+                                            <ArrowLeft className="mr-2 h-4 w-4" />
+                                            Back to Fun Quizzes
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </div>
                     </Card>
                 ) : (
                     <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-card/60 backdrop-blur-sm">
                          <CardHeader className="relative">
-                            <Progress value={progress} className="absolute top-0 left-0 right-0 w-full h-1" />
                             <div className="flex justify-between items-center mt-2">
                                 <div className="text-sm text-muted-foreground">
                                     Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
