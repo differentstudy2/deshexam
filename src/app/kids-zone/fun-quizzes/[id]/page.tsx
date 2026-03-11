@@ -8,6 +8,26 @@ type Props = {
   params: { id: string };
 };
 
+// Helper function to serialize Firestore Timestamps
+const serializeTimestamps = (data: any): any => {
+    if (!data) return data;
+    if (Array.isArray(data)) {
+        return data.map(item => serializeTimestamps(item));
+    }
+    if (typeof data === 'object' && data !== null) {
+        if (data.hasOwnProperty('seconds') && data.hasOwnProperty('nanoseconds') && typeof (data as any).toDate === 'function') {
+            return (data as any).toDate().toISOString();
+        }
+        const newObj: { [key: string]: any } = {};
+        for (const key in data) {
+            newObj[key] = serializeTimestamps(data[key]);
+        }
+        return newObj;
+    }
+    return data;
+};
+
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const quiz = await getContentById(params.id) as any;
   if (!quiz) {
@@ -20,9 +40,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function FunQuizPage({ params }: Props) {
-  const quiz = await getContentById(params.id);
-  if (!quiz || quiz.testType !== 'Quiz' || quiz.category !== 'Fun Quizzes') {
+  const quizData = await getContentById(params.id);
+  if (!quizData || quizData.testType !== 'Quiz' || quizData.category !== 'Fun Quizzes') {
     notFound();
   }
+  
+  const quiz = serializeTimestamps(quizData);
+
   return <QuizClientPage quiz={quiz as any} />;
 }
