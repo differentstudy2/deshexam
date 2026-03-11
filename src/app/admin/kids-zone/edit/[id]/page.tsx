@@ -192,7 +192,7 @@ export default function EditKidsContentPage() {
                                         <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (<FormItem><FormLabel>Question Audio URL</FormLabel><FormControl><Input {...field} placeholder="Audio URL" /></FormControl><FormMessage /></FormItem>)}/>
                                     </div>
                                     
-                                     <div className="space-y-3 pt-2">
+                                    <div className="space-y-3 pt-2">
                                         <Label>Options</Label>
                                         <div className="grid grid-cols-2 gap-4">
                                         {[0, 1, 2, 3].map(optionIndex => (
@@ -218,10 +218,10 @@ export default function EditKidsContentPage() {
                                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="mt-2 grid grid-cols-2 gap-2">
                                                     {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
                                                         option.text ? (
-                                                            <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-2 border rounded-md bg-background">
-                                                                <FormControl><RadioGroupItem value={option.text} /></FormControl>
-                                                                <FormLabel className="font-normal w-full truncate">{option.text}</FormLabel>
-                                                            </FormItem>
+                                                          <div key={optionIndex} className="flex items-center space-x-3 p-2 border rounded-md bg-background">
+                                                                <RadioGroupItem value={option.text} id={`q${index}-opt${optionIndex}`}/>
+                                                                <Label htmlFor={`q${index}-opt${optionIndex}`} className="font-normal w-full truncate cursor-pointer">{option.text}</Label>
+                                                          </div>
                                                         ) : null
                                                     ))}
                                                 </RadioGroup>
