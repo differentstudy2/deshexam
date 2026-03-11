@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -150,18 +149,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
     return (
-        <div className="relative min-h-screen bg-background">
-            <div 
-                className="absolute inset-0 z-0"
-                style={{
-                    backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                    backgroundSize: '80px',
-                    backgroundRepeat: 'repeat',
-                    opacity: 0.05,
-                }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-gray-900/90 backdrop-blur-sm" />
-            <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="min-h-screen bg-secondary/30">
+            <div className="container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
                     <Card className="w-full max-w-xl mx-auto text-center shadow-2xl p-8">
