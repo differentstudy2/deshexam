@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -268,14 +268,12 @@ export default function AddKidsContentPage() {
                                                 >
                                                     {form.watch(`questions.${index}.options`)?.map((option, optionIndex) => (
                                                         option.text ? (
-                                                            <FormItem key={optionIndex} className="flex items-center space-x-3 space-y-0 p-2 border rounded-md bg-background has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
-                                                                <FormControl>
-                                                                    <RadioGroupItem value={option.text} id={`q-${index}-opt-${optionIndex}`} />
-                                                                </FormControl>
-                                                                <FormLabel htmlFor={`q-${index}-opt-${optionIndex}`} className="font-normal w-full truncate cursor-pointer">
+                                                            <div key={optionIndex} className="flex items-center space-x-3 space-y-0 p-2 border rounded-md bg-background has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+                                                                <RadioGroupItem value={option.text} id={`q-${index}-opt-${optionIndex}`} />
+                                                                <Label htmlFor={`q-${index}-opt-${optionIndex}`} className="font-normal w-full truncate cursor-pointer">
                                                                     {option.text}
-                                                                </FormLabel>
-                                                            </FormItem>
+                                                                </Label>
+                                                            </div>
                                                         ) : null
                                                     ))}
                                                 </RadioGroup>
