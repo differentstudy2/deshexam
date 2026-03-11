@@ -25,13 +25,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, uploadFile } from '@/lib/firebase/firestore';
-import { Loader2, Sparkles, PlusCircle, Trash2, Upload } from 'lucide-react';
+import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
@@ -65,6 +77,30 @@ export default function AddKidsContentPage() {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
 
+  const [isImporting, setIsImporting] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [jsonText, setJsonText] = useState('');
+  const importFileRef = useRef<HTMLInputElement>(null);
+
+  const jsonExample = `
+{
+  "questions": [
+    {
+      "text": "Which animal says 'Moo'?",
+      "image": "https://picsum.photos/seed/cow-image/400/225",
+      "audio": "https://example.com/sounds/cow_question.mp3",
+      "options": [
+        { "text": "Cow", "image": "https://picsum.photos/seed/cow-option/100/100" },
+        { "text": "Dog", "image": "https://picsum.photos/seed/dog-option/100/100" },
+        { "text": "Cat", "image": "https://picsum.photos/seed/cat-option/100/100" },
+        { "text": "Duck", "image": "https://picsum.photos/seed/duck-option/100/100" }
+      ],
+      "correctAnswer": "Cow"
+    }
+  ]
+}
+`;
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,6 +117,52 @@ export default function AddKidsContentPage() {
     control: form.control,
     name: 'questions',
   });
+
+  const processJsonImport = (jsonString: string) => {
+    try {
+        const parsed = JSON.parse(jsonString);
+        const questionsToImport = parsed.questions || [];
+        if(!Array.isArray(questionsToImport) || questionsToImport.length === 0){
+            throw new Error("No valid 'questions' array found in the JSON.");
+        }
+        
+        questionsToImport.forEach((q: any) => {
+            const { success } = funQuizQuestionSchema.safeParse(q);
+            if (!success) {
+                console.error("Invalid question structure:", q, funQuizQuestionSchema.safeParse(q));
+                throw new Error(`One or more questions have an invalid structure. Please check the format.`);
+            }
+        });
+
+        append(questionsToImport);
+        toast({ title: 'Import Successful', description: `${questionsToImport.length} questions added.` });
+        setIsImportDialogOpen(false);
+        setJsonText('');
+    } catch (error) {
+        toast({ variant: 'destructive', title: 'Import Failed', description: (error as Error).message });
+    } finally {
+        setIsImporting(false);
+    }
+  };
+    
+  const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = (e) => processJsonImport(e.target?.result as string);
+    reader.readAsText(file);
+    if (importFileRef.current) importFileRef.current.value = '';
+  };
+      
+  const handleBulkImportFromText = () => {
+    if (!jsonText.trim()) { 
+        toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."}); 
+        return; 
+    }
+    setIsImporting(true);
+    processJsonImport(jsonText);
+  }
 
   const handleFormSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
@@ -254,99 +336,151 @@ export default function AddKidsContentPage() {
                 )}
                 
                 {form.watch('category') === 'Fun Quizzes' && (
-                    <div className="space-y-6 pt-4 border-t">
-                        <h3 className="text-lg font-medium">Quiz Questions</h3>
-                        {fields.map((question, index) => (
-                            <Card key={question.id} className="p-4 bg-secondary/50">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h4 className="font-semibold">Question {index + 1}</h4>
-                                    <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                                </div>
-                                <div className="space-y-4">
-                                    <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)}/>
-                                        <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Question Audio</FormLabel>
-                                                <div className="flex items-center gap-2">
-                                                    <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
-                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
-                                                        {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
-                                                    </Button>
-                                                    {!!field.value && (
-                                                        <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
-                                                            <Trash2 className="w-4 h-4" />
+                    <Card>
+                        <CardHeader>
+                            <h3 className="text-lg font-medium">Quiz Questions</h3>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {fields.map((question, index) => (
+                                <Card key={question.id} className="p-4 bg-secondary/50">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h4 className="font-semibold">Question {index + 1}</h4>
+                                        <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)}/>
+                                            <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Question Audio</FormLabel>
+                                                    <div className="flex items-center gap-2">
+                                                        <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
+                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
+                                                            {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                         </Button>
-                                                    )}
-                                                </div>
-                                                {!!field.value && <audio controls src={field.value} className="w-full mt-2" />}
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}/>
-                                    </div>
-                                    
-                                    <div className="space-y-4 pt-2 border-t">
-                                        <Label>Options</Label>
-                                         <Controller
-                                            control={form.control}
-                                            name={`questions.${index}.correctAnswer`}
-                                            render={({ field }) => (
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {[0, 1, 2, 3].map(optionIndex => (
-                                                        <Card key={optionIndex} className="p-4 bg-background">
-                                                            <div className="space-y-4">
-                                                                <div className="flex items-center gap-3">
-                                                                    <FormControl>
-                                                                        <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
-                                                                    </FormControl>
-                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
-                                                                        <FormItem className="flex-1">
-                                                                            <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
-                                                                            <FormControl><Input {...field} /></FormControl>
-                                                                            <FormMessage />
-                                                                        </FormItem>
-                                                                    )}/>
-                                                                </div>
-                                                                
-                                                                <div className="grid grid-cols-2 gap-2">
-                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (
-                                                                        <FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>
-                                                                    )}/>
-                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                                        <FormItem>
-                                                                            <FormLabel className="text-xs">Audio</FormLabel>
-                                                                            <div className="flex items-center gap-2">
-                                                                                <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
-                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
-                                                                                    {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
-                                                                                </Button>
-                                                                                 {!!audioField.value && (
-                                                                                    <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
-                                                                                        <Trash2 className="w-4 h-4" />
+                                                        {!!field.value && (
+                                                            <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    {!!field.value && <audio controls src={field.value} className="w-full mt-2" />}
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}/>
+                                        </div>
+                                        
+                                        <div className="space-y-4 pt-2 border-t">
+                                            <Label>Options</Label>
+                                            <Controller
+                                                control={form.control}
+                                                name={`questions.${index}.correctAnswer`}
+                                                render={({ field }) => (
+                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {[0, 1, 2, 3].map(optionIndex => (
+                                                            <Card key={optionIndex} className="p-4 bg-background">
+                                                                <div className="space-y-4">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <FormControl>
+                                                                            <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
+                                                                        </FormControl>
+                                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
+                                                                            <FormItem className="flex-1">
+                                                                                <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
+                                                                                <FormControl><Input {...field} /></FormControl>
+                                                                                <FormMessage />
+                                                                            </FormItem>
+                                                                        )}/>
+                                                                    </div>
+                                                                    
+                                                                    <div className="grid grid-cols-2 gap-2">
+                                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (
+                                                                            <FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>
+                                                                        )}/>
+                                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
+                                                                            <FormItem>
+                                                                                <FormLabel className="text-xs">Audio</FormLabel>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
+                                                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
+                                                                                        {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                                     </Button>
-                                                                                )}
-                                                                            </div>
-                                                                            {!!audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
-                                                                            <FormMessage />
-                                                                        </FormItem>
-                                                                    )}/>
+                                                                                    {!!audioField.value && (
+                                                                                        <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
+                                                                                            <Trash2 className="w-4 h-4" />
+                                                                                        </Button>
+                                                                                    )}
+                                                                                </div>
+                                                                                {!!audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
+                                                                                <FormMessage />
+                                                                            </FormItem>
+                                                                        )}/>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </Card>
-                                                    ))}
-                                                </RadioGroup>
-                                            )}
-                                        />
-                                         <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
+                                                            </Card>
+                                                        ))}
+                                                    </RadioGroup>
+                                                )}
+                                            />
+                                            <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
+                                        </div>
                                     </div>
-                                </div>
-                            </Card>
-                        ))}
-                        <Button type="button" variant="outline" onClick={() => append({ text: '', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}>
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Question
-                        </Button>
-                    </div>
+                                </Card>
+                            ))}
+                            <div className="flex flex-wrap gap-4">
+                                <Button type="button" variant="outline" onClick={() => append({ text: '', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Add Question
+                                </Button>
+                                <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-xl">
+                                        <DialogHeader>
+                                            <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
+                                            <DialogDescription>
+                                                Upload a JSON file or paste JSON text containing an array of questions.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <Tabs defaultValue="paste">
+                                            <TabsList className="grid w-full grid-cols-2">
+                                                <TabsTrigger value="paste">Paste JSON</TabsTrigger>
+                                                <TabsTrigger value="upload">Upload File</TabsTrigger>
+                                            </TabsList>
+                                            <TabsContent value="paste" className="pt-4 space-y-4">
+                                                <Textarea
+                                                    placeholder='Paste your JSON content here...'
+                                                    value={jsonText}
+                                                    onChange={(e) => setJsonText(e.target.value)}
+                                                    className="min-h-[200px] font-mono text-xs"
+                                                    disabled={isImporting}
+                                                />
+                                                <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                                    {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                                </Button>
+                                            </TabsContent>
+                                            <TabsContent value="upload" className="pt-4">
+                                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                    <Label htmlFor="json-import">JSON/TXT File</Label>
+                                                    <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                                    {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                                </div>
+                                            </TabsContent>
+                                        </Tabs>
+                                        <Accordion type="single" collapsible className="w-full mt-4">
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger>View Example JSON Format</AccordionTrigger>
+                                            <AccordionContent>
+                                            <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                        </Accordion>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        </CardContent>
+                    </Card>
                 )}
               </CardContent>
             </Card>
