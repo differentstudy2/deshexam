@@ -161,27 +161,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     return (
         <div className="bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/10 min-h-screen">
           <div className="container mx-auto px-4 py-12">
-            <div className="mb-8 flex justify-between items-center">
+            <div className="mb-8">
                 <Button asChild variant="ghost">
                     <Link href="/kids-zone/fun-quizzes">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Fun Quizzes
                     </Link>
                 </Button>
-                <div className="flex items-center gap-2">
-                    <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
-                    <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={quizFinished || selectedAnswer !== null}>
-                        <SelectTrigger id="timer-select" className="w-[120px]">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="15">15 seconds</SelectItem>
-                            <SelectItem value="30">30 seconds</SelectItem>
-                            <SelectItem value="60">60 seconds</SelectItem>
-                            <SelectItem value="0">Off</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
             </div>
             
             {quizFinished ? (
@@ -204,18 +190,33 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             ) : (
                 <Card className="w-full max-w-2xl mx-auto shadow-2xl bg-white/70 backdrop-blur-sm">
                      <CardHeader className="relative">
-                        <Progress value={progress} className="w-full h-2 mb-2" />
-                        
+                        <Progress value={progress} className="w-full h-2" />
                         <div className="flex justify-between items-center mt-2">
                             <div className="text-sm text-muted-foreground">
                                 Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                             </div>
-                            {timerDuration > 0 && (
-                                <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                    <Clock className="w-5 h-5" />
-                                    <span>{timeLeft}s</span>
+                             <div className="flex items-center gap-4">
+                                {timerDuration > 0 && (
+                                    <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                        <Clock className="w-5 h-5" />
+                                        <span>{timeLeft}s</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
+                                    <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
+                                        <SelectTrigger id="timer-select" className="w-[120px] h-8">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="15">15 seconds</SelectItem>
+                                            <SelectItem value="30">30 seconds</SelectItem>
+                                            <SelectItem value="60">60 seconds</SelectItem>
+                                            <SelectItem value="0">Off</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         {currentQuestion.image && (
