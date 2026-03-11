@@ -179,10 +179,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 <RefreshCw className="mr-2 h-4 w-4" />
                                 Play Again
                             </Button>
-                             <Button asChild variant="outline" size="lg">
+                            <Button asChild variant="outline" size="lg">
                                 <Link href="/kids-zone/fun-quizzes">
                                     <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Back to Quizzes
+                                    Back to Fun Quizzes
                                 </Link>
                             </Button>
                         </div>
