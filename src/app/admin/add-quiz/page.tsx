@@ -476,7 +476,10 @@ function AddContentForm() {
                   const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
                   setChapters(fetchedChapters);
                   if (siteSettings.defaultChapter && !form.getValues('chapter')) {
-                    form.setValue('chapter', siteSettings.defaultChapter);
+                    const defaultChapterObj = fetchedChapters.find(c => c.chapterName === siteSettings.defaultChapter);
+                    if (defaultChapterObj) {
+                        form.setValue('chapter', defaultChapterObj.id);
+                    }
                   }
               }
           }
@@ -619,8 +622,11 @@ function AddContentForm() {
         setIsAddingNewExam(false);
       }
 
-      let chapterName = data.chapter;
-      if (data.chapter === 'add_new_chapter' && data.newChapterName && subjectId) {
+      let chapterName = '';
+      if (data.chapter && data.chapter !== 'add_new_chapter') {
+        const selectedChapter = chapters.find(c => c.id === data.chapter);
+        chapterName = selectedChapter ? selectedChapter.chapterName : '';
+      } else if (data.chapter === 'add_new_chapter' && data.newChapterName && subjectId) {
         await addChapter(subjectId, { chapterName: data.newChapterName });
         chapterName = data.newChapterName;
         setIsAddingNewChapter(false);
@@ -1106,7 +1112,7 @@ function AddContentForm() {
                             <Select onValueChange={handleChapterChange} value={field.value} disabled={!form.watch('subject') || form.watch('subject') === 'add_new_subject'}>
                                 <FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl>
                                 <SelectContent>
-                                    {chapters.map(chap => <SelectItem key={chap.id} value={`${chap.chapterName}`}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}
+                                    {chapters.map(chap => <SelectItem key={chap.id} value={chap.id}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}
                                     <SelectItem value="add_new_chapter">Add new chapter...</SelectItem>
                                 </SelectContent>
                             </Select>
