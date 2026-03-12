@@ -140,14 +140,36 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
     useEffect(() => {
+        let autoplayTimeout: NodeJS.Timeout;
         if (autoplayEnabled && currentQuestion?.audio && !quizFinished) {
-            const autoplayTimeout = setTimeout(() => {
-                togglePlayUrl(currentQuestion.audio!);
+            autoplayTimeout = setTimeout(() => {
+                stopSound(); // Ensure clean state before playing
+                
+                const audio = new Audio(currentQuestion.audio!);
+                activeAudioRef.current = audio;
+                setPlayingUrl(currentQuestion.audio!);
+                audio.play().catch(error => {
+                    console.error(`Error playing sound:`, error);
+                    setPlayingUrl(null);
+                });
+                audio.onended = () => {
+                    setPlayingUrl(null);
+                    if (activeAudioRef.current === audio) {
+                        activeAudioRef.current = null;
+                    }
+                };
             }, 500); 
-
-            return () => clearTimeout(autoplayTimeout);
         }
-    }, [currentQuestion, autoplayEnabled, quizFinished, togglePlayUrl]);
+
+        return () => {
+            if (autoplayTimeout) clearTimeout(autoplayTimeout);
+             // Stop any playing sound on cleanup (e.g., when component unmounts or dependencies change)
+            if(activeAudioRef.current) {
+                stopSound();
+            }
+        };
+    }, [currentQuestion, autoplayEnabled, quizFinished, stopSound]);
+
 
     useEffect(() => {
         if (quizFinished || selectedAnswer || timerDuration === 0) {
