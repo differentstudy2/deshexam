@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -146,7 +147,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer) {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && !activeAudioRef.current) {
             const autoplayTimeout = setTimeout(() => {
                 if (!activeAudioRef.current || activeAudioRef.current.paused) {
                     playSound(currentQuestion.audio!);
@@ -340,11 +341,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
-                        <Card className="bg-card/60 backdrop-blur-sm">
-                            <CardContent className="p-3">
+                        <Card className="bg-card/60 backdrop-blur-sm mb-2">
+                             <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-center items-center gap-4">
-                                    <div className="text-sm text-muted-foreground">
-                                        Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
+                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                        <FileQuestion className="w-5 h-5" />
+                                        <span className="font-bold text-foreground">{currentQuestionIndex + 1}</span>
+                                        <span>/</span>
+                                        <span>{shuffledQuestions.length}</span>
                                     </div>
                                     <div className="flex items-center gap-4 flex-wrap justify-end">
                                         <div className="flex items-center gap-2">
@@ -416,7 +420,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </CardContent>
                         </Card>
                         <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
-                            <CardHeader className="relative bg-[#0e8107] text-white p-4">
+                            <CardHeader className="relative bg-[#0e8107] text-white p-4 mb-2">
                                 {currentQuestion && currentQuestion.image && (
                                     <div className="relative h-48 w-full mt-4">
                                         <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
@@ -490,3 +494,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+    
