@@ -363,7 +363,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
                             {currentQuestion && currentQuestion.image && (
                                 <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
-                                     <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="cover" />
+                                     <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" />
                                 </div>
                             )}
                             
@@ -395,8 +395,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             )}
                                         >
                                             {option.image && (
-                                                <div className="relative w-full aspect-video bg-secondary">
-                                                    <Image src={option.image} alt={option.text} layout="fill" objectFit="cover" />
+                                                <div className="relative w-full h-48 bg-gray-100 dark:bg-gray-800 p-2">
+                                                    <Image src={option.image} alt={option.text} layout="fill" objectFit="contain" />
                                                 </div>
                                             )}
                                             <div className={cn(
