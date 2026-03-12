@@ -139,18 +139,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
-    useEffect(() => {
-        let autoplayTimeout: NodeJS.Timeout;
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer) {
-             autoplayTimeout = setTimeout(() => {
+     useEffect(() => {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && !playingUrl) {
+            const autoplayTimeout = setTimeout(() => {
                 togglePlayUrl(currentQuestion.audio!);
-            }, 500); 
+            }, 500);
+            return () => clearTimeout(autoplayTimeout);
         }
-
-        return () => {
-            if (autoplayTimeout) clearTimeout(autoplayTimeout);
-        };
-    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, togglePlayUrl]);
+    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, togglePlayUrl, playingUrl]);
 
 
     useEffect(() => {
@@ -401,7 +397,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </CardContent>
                         </Card>
                         <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
-                             <CardHeader className="relative bg-[#0e8107] text-white p-4">
+                             <CardHeader className="relative bg-[#0e8107] text-white p-4 mb-2">
                                 {currentQuestion && currentQuestion.image && (
                                     <div className="relative h-48 w-full mt-4">
                                         <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
