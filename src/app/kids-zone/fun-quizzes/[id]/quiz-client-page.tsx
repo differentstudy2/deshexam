@@ -35,6 +35,13 @@ type Quiz = {
     questions: Question[];
 };
 
+const optionBgColors = [
+    'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
+    'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
+    'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
+    'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+];
+
 export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -50,13 +57,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
     
-    const optionBgColors = [
-        'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
-        'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
-        'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
-        'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
-    ];
-
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
             activeAudioRef.current.pause();
@@ -388,7 +388,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             onClick={() => handleAnswer(option.text)}
                                             disabled={!!selectedAnswer}
                                             className={cn(
-                                                "h-auto p-4 text-lg justify-start items-center transition-all duration-300 transform hover:scale-105",
+                                                "h-auto p-4 text-lg justify-start items-center transition-all duration-300 transform hover:scale-105 flex flex-col gap-4",
                                                 !selectedAnswer && optionBgColors[index % optionBgColors.length],
                                                 isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white border-green-600',
                                                 isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white border-destructive',
@@ -396,24 +396,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             )}
                                             variant="outline"
                                         >
-                                            <div className="flex items-center gap-4 w-full">
-                                                {option.image && (
-                                                    <div className="relative w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
-                                                        <Image src={option.image} alt={option.text} layout="fill" objectFit="cover" />
-                                                    </div>
-                                                )}
-                                                <div className="flex-grow flex flex-col justify-start">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                        <span className="text-left">{option.text}</span>
-                                                        {option.audio && (
-                                                            <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                                <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                            {option.image && (
+                                                <div className="relative w-full aspect-video rounded-md overflow-hidden">
+                                                    <Image src={option.image} alt={option.text} layout="fill" objectFit="cover" />
                                                 </div>
-                                                <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0 ml-auto">
+                                            )}
+                                            <div className="flex items-center justify-between w-full">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                    <span className="text-left">{option.text}</span>
+                                                    {option.audio && (
+                                                        <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
+                                                            <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
                                                     {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
                                                 </div>
                                             </div>
