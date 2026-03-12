@@ -56,8 +56,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isCorrect, setIsCorrect] = useState(false);
     const [score, setScore] = useState(0);
     const [quizFinished, setQuizFinished] = useState(false);
-    const [timerDuration, setTimerDuration] = useState(60);
-    const [timeLeft, setTimeLeft] = useState(60);
+    const [timerDuration, setTimerDuration] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(0);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
@@ -147,12 +147,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer) {
             const autoplayTimeout = setTimeout(() => {
+                // Only play if nothing is currently playing
                 if (!activeAudioRef.current || activeAudioRef.current.paused) {
                     playSound(currentQuestion.audio!);
                 }
-            }, 500);
+            }, 500); 
             return () => clearTimeout(autoplayTimeout);
         }
     }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
@@ -311,7 +312,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 opacity: 0.5,
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/90" />
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-amber-900/90" />
             <div className="relative z-10 container mx-auto px-4 py-12">
                 
                 {quizFinished ? (
@@ -341,7 +342,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
-                        <Card className="bg-card/60 backdrop-blur-sm mb-2">
+                        <Card className="bg-card/60 backdrop-blur-sm">
                              <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
                                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
