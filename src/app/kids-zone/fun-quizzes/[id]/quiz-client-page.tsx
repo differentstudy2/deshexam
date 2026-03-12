@@ -299,7 +299,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 backgroundImage: "url('/image/logo.png')",
                 backgroundSize: '150px',
                 backgroundRepeat: 'repeat',
-                opacity: 0.1,
+                opacity: 0.5,
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-amber-50/80 dark:from-orange-900/70 dark:to-amber-900/90" />
@@ -334,7 +334,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     <div className="w-full max-w-2xl mx-auto">
                         <Card className="mb-4 bg-card/60 backdrop-blur-sm">
                              <CardContent className="p-3">
-                                <div className="flex flex-wrap justify-between items-center gap-4">
+                                <div className="flex flex-wrap justify-between items-center mt-2 gap-4">
                                     <div className="text-sm text-muted-foreground">
                                         Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                                     </div>
@@ -397,14 +397,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </CardContent>
                         </Card>
                         <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
-                             <CardHeader className="relative bg-amber-100/50 dark:bg-amber-900/20 p-4 mb-4">
+                             <CardHeader className="relative bg-[#0e8107] text-white p-4">
                                 {currentQuestion && currentQuestion.image && (
                                     <div className="relative h-48 w-full mt-4">
                                         <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
                                     </div>
                                 )}
                                 
-                                <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
+                                <CardTitle className="text-center text-2xl md:text-3xl font-bold pt-4 flex items-center justify-center gap-2">
                                     <span>{currentQuestion?.text}</span>
                                     {currentQuestion?.audio && (
                                         <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
