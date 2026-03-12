@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Volume2, Clock, ImageDown, Video } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -55,6 +55,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
+    
+    const [playingUrl, setPlayingUrl] = useState<string | null>(null);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
     
     const stopSound = useCallback(() => {
@@ -63,24 +65,55 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             activeAudioRef.current.currentTime = 0;
             activeAudioRef.current = null;
         }
+        setPlayingUrl(null);
     }, []);
 
-    const playSound = useCallback((type: 'correct' | 'incorrect' | 'win' | 'url', url?: string) => {
-        if (typeof window !== 'undefined') {
-            stopSound(); // Stop any currently playing sound first.
-            let soundUrl = '';
-            if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
-            else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
-            else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
-            else if (type === 'url' && url) soundUrl = url;
-            
-            if(soundUrl) {
-                const audio = new Audio(soundUrl);
-                activeAudioRef.current = audio;
-                audio.play().catch(error => console.error(`Error playing sound:`, error));
-            }
+    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
+        if (typeof window === 'undefined') return;
+
+        if (playingUrl && type !== 'win') return;
+
+        stopSound(); 
+        
+        let soundUrl = '';
+        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+        
+        if(soundUrl) {
+            const audio = new Audio(soundUrl);
+            activeAudioRef.current = audio;
+            audio.play().catch(error => console.error(`Error playing sound:`, error));
+            audio.onended = () => {
+                if (activeAudioRef.current === audio) {
+                    activeAudioRef.current = null;
+                }
+            };
         }
-    }, [stopSound]);
+    }, [stopSound, playingUrl]);
+
+    const togglePlayUrl = useCallback((url: string) => {
+        if (typeof window === 'undefined') return;
+
+        if (playingUrl === url && activeAudioRef.current) {
+            stopSound();
+        } else {
+            stopSound();
+            const audio = new Audio(url);
+            activeAudioRef.current = audio;
+            setPlayingUrl(url);
+            audio.play().catch(error => {
+                console.error(`Error playing sound:`, error);
+                setPlayingUrl(null);
+            });
+            audio.onended = () => {
+                setPlayingUrl(null);
+                if (activeAudioRef.current === audio) {
+                    activeAudioRef.current = null;
+                }
+            };
+        }
+    }, [playingUrl, stopSound]);
 
     const nextQuestion = useCallback(() => {
         stopSound();
@@ -94,9 +127,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             }
         } else {
             setQuizFinished(true);
-            playSound('win');
+            playSystemSound('win');
         }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSound, stopSound]);
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
     
     useEffect(() => {
         if(quiz && quiz.questions) {
@@ -109,12 +142,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     useEffect(() => {
         if (autoplayEnabled && currentQuestion?.audio && !quizFinished) {
             const autoplayTimeout = setTimeout(() => {
-                playSound('url', currentQuestion.audio);
+                togglePlayUrl(currentQuestion.audio!);
             }, 500); 
 
             return () => clearTimeout(autoplayTimeout);
         }
-    }, [currentQuestion, autoplayEnabled, quizFinished, playSound]);
+    }, [currentQuestion, autoplayEnabled, quizFinished, togglePlayUrl]);
 
     useEffect(() => {
         if (quizFinished || selectedAnswer || timerDuration === 0) {
@@ -127,7 +160,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 if (prev <= 1) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
                     stopSound();
-                    playSound('incorrect');
+                    playSystemSound('incorrect');
                     setFeedback("Time's up!");
                     setTimeout(nextQuestion, 1500); 
                     return 0;
@@ -139,7 +172,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSound, stopSound]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopSound]);
     
      useEffect(() => {
         return () => {
@@ -159,10 +192,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setFeedback('Correct!');
             setIsCorrect(true);
             setScore(prev => prev + 1);
-            playSound('correct');
+            playSystemSound('correct');
         } else {
             setFeedback('Not quite!');
-            playSound('incorrect');
+            playSystemSound('incorrect');
         }
 
         setTimeout(nextQuestion, 1500);
@@ -322,7 +355,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <div className="flex items-center gap-2">
                                             <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[90px] h-8 text-xs">
+                                                <SelectTrigger id="timer-select" className="w-[80px] h-8 text-xs">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -374,8 +407,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
                                     <span>{currentQuestion?.text}</span>
                                     {currentQuestion?.audio && (
-                                        <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
-                                            <Volume2 />
+                                        <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                            {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
                                         </Button>
                                     )}
                                 </CardTitle>
@@ -413,8 +446,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                         <span className="text-left">{option.text}</span>
                                                         {option.audio && (
-                                                            <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                                <Volume2 className="w-5 h-5"/>
+                                                            <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); togglePlayUrl(option.audio!); }}>
+                                                                {playingUrl === option.audio ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5"/>}
                                                             </Button>
                                                         )}
                                                     </div>
