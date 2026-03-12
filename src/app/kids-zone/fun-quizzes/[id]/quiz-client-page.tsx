@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -143,13 +142,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
      useEffect(() => {
         if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer) {
             const autoplayTimeout = setTimeout(() => {
-                if (!activeAudioRef.current) {
+                if (!activeAudioRef.current || activeAudioRef.current.paused) {
                     playSound(currentQuestion.audio!);
                 }
             }, 500);
             return () => clearTimeout(autoplayTimeout);
         }
-    }, [currentQuestionIndex, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
 
 
     useEffect(() => {
@@ -335,9 +334,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
-                        <Card className="mb-4 bg-card/60 backdrop-blur-sm">
-                             <CardContent className="p-3">
-                                <div className="flex flex-wrap justify-between items-center gap-4">
+                        <Card className="bg-card/60 backdrop-blur-sm">
+                            <CardContent className="p-3">
+                                <div className="flex flex-wrap justify-center items-center gap-4">
                                     <div className="text-sm text-muted-foreground">
                                         Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                                     </div>
@@ -399,7 +398,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
+                        <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-4">
                              <CardHeader className="relative bg-[#0e8107] text-white p-4 mb-2">
                                 {currentQuestion && currentQuestion.image && (
                                     <div className="relative h-48 w-full mt-4">
@@ -407,7 +406,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </div>
                                 )}
                                 
-                                <CardTitle className="text-center text-2xl md:text-3xl font-bold pt-4 flex items-center justify-center gap-2">
+                                <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
                                     <span>{currentQuestion?.text}</span>
                                     {currentQuestion?.audio && (
                                         <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
