@@ -147,12 +147,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer) {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
             const autoplayTimeout = setTimeout(() => {
-                // Only play if nothing is currently playing
-                if (!activeAudioRef.current || activeAudioRef.current.paused) {
-                    playSound(currentQuestion.audio!);
-                }
+                playSound(currentQuestion.audio!);
             }, 500); 
             return () => clearTimeout(autoplayTimeout);
         }
@@ -229,7 +226,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTimeLeft(newDuration);
     };
 
-    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' = 'default') => {
+    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' = 'default') => {
         if (quizCardRef.current) {
             html2canvas(quizCardRef.current, {
                 useCORS: true,
@@ -245,13 +242,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
                     let targetWidth, targetHeight;
                     if (aspectRatio === '9:16') {
-                        targetHeight = 1920; // Standard portrait resolution (e.g., for YouTube Shorts)
+                        targetHeight = 1920;
                         targetWidth = 1080;
                         fileNameSuffix = 'portrait';
-                    } else { // 16:9
-                        targetWidth = 1920; // Standard landscape resolution (e.g., for YouTube videos)
+                    } else if (aspectRatio === '16:9') {
+                        targetWidth = 1920;
                         targetHeight = 1080;
                         fileNameSuffix = 'landscape';
+                    } else { // 1:1 for Instagram
+                        targetWidth = 1080;
+                        targetHeight = 1080;
+                        fileNameSuffix = 'square';
                     }
                     
                     target.width = targetWidth;
@@ -263,9 +264,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     gradient.addColorStop(1, '#fed7aa'); // orange-200
                     targetCtx.fillStyle = gradient;
                     targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+                    
+                    // Add watermark for 9:16 and 1:1
+                    if (aspectRatio === '9:16' || aspectRatio === '1:1') {
+                        targetCtx.fillStyle = "rgba(0, 0, 0, 0.1)";
+                        targetCtx.font = "bold 48px 'Lexend', sans-serif";
+                        targetCtx.textAlign = "center";
+                        targetCtx.fillText("DeshExam", targetWidth / 2, 80);
+                        targetCtx.fillText("DeshExam", targetWidth / 2, targetHeight - 50);
+                    }
 
                     // Calculate scaling to fit the source canvas onto the target with some padding
-                    const padding = 100;
+                    const padding = (aspectRatio === '9:16' || aspectRatio === '1:1') ? 0 : 100;
                     const scale = Math.min(
                         (targetWidth - padding * 2) / sourceCanvas.width, 
                         (targetHeight - padding * 2) / sourceCanvas.height
@@ -413,6 +423,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
                                                     <Video className="mr-2 h-4 w-4 rotate-90" />
                                                     Save for Short Video (9:16)
+                                                </DropdownMenuItem>
+                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                                                    Save for Instagram (1:1)
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
