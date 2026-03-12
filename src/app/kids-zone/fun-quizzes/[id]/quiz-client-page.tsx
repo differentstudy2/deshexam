@@ -381,41 +381,47 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 {currentQuestion?.options.map((option, index) => {
                                     const isSelected = selectedAnswer === option.text;
                                     const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+                                    const isShown = selectedAnswer !== null;
 
                                     return (
-                                        <Button
+                                        <div
                                             key={index}
-                                            onClick={() => handleAnswer(option.text)}
-                                            disabled={!!selectedAnswer}
+                                            onClick={() => !selectedAnswer && handleAnswer(option.text)}
                                             className={cn(
-                                                "h-auto p-4 text-lg justify-start items-center transition-all duration-300 transform hover:scale-105 flex flex-col gap-4",
-                                                !selectedAnswer && optionBgColors[index % optionBgColors.length],
-                                                isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white border-green-600',
-                                                isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white border-destructive',
-                                                !isSelected && selectedAnswer && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 text-white border-green-600'
+                                                "rounded-xl border-2 overflow-hidden transition-all duration-300 transform",
+                                                !selectedAnswer && "cursor-pointer hover:scale-105 hover:shadow-xl",
+                                                isShown && isCorrectAnswer && "border-green-500 ring-4 ring-green-500/50",
+                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-4 ring-destructive/50"
                                             )}
-                                            variant="outline"
                                         >
                                             {option.image && (
-                                                <div className="relative w-full aspect-video rounded-md overflow-hidden">
+                                                <div className="relative w-full aspect-video bg-secondary">
                                                     <Image src={option.image} alt={option.text} layout="fill" objectFit="cover" />
                                                 </div>
                                             )}
-                                            <div className="flex items-center justify-between w-full">
+                                            <div className={cn(
+                                                "p-4 text-lg justify-between items-center flex gap-4",
+                                                 !selectedAnswer && optionBgColors[index % optionBgColors.length],
+                                                 isShown && isCorrectAnswer && 'bg-green-100 dark:bg-green-900/30',
+                                                 isShown && isSelected && !isCorrectAnswer && 'bg-red-100 dark:bg-red-900/30'
+                                            )}>
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                     <span className="text-left">{option.text}</span>
                                                     {option.audio && (
-                                                        <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                            <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
-                                                        </div>
+                                                        <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
+                                                            <Volume2 className="w-5 h-5"/>
+                                                        </Button>
                                                     )}
                                                 </div>
-                                                <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
-                                                    {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
+                                                <div className={cn(
+                                                    "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                                    isSelected ? 'border-primary bg-primary' : 'border-muted-foreground'
+                                                )}>
+                                                    {isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
                                                 </div>
                                             </div>
-                                        </Button>
+                                        </div>
                                     );
                                 })}
                             </div>
