@@ -147,7 +147,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && !activeAudioRef.current) {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
             const autoplayTimeout = setTimeout(() => {
                 if (!activeAudioRef.current || activeAudioRef.current.paused) {
                     playSound(currentQuestion.audio!);
@@ -343,7 +343,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     <div className="w-full max-w-2xl mx-auto">
                         <Card className="bg-card/60 backdrop-blur-sm mb-2">
                              <CardContent className="p-3">
-                                <div className="flex flex-wrap justify-center items-center gap-4">
+                                <div className="flex flex-wrap justify-between items-center gap-4">
                                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                                         <FileQuestion className="w-5 h-5" />
                                         <span className="font-bold text-foreground">{currentQuestionIndex + 1}</span>
@@ -455,7 +455,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 )}
                                             >
                                                 {option.image && (
-                                                    <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-800 p-2">
+                                                     <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-800 p-2">
                                                         <Image src={option.image} alt={option.text} layout="fill" objectFit="contain" />
                                                     </div>
                                                 )}
