@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -43,10 +42,10 @@ type Quiz = {
 };
 
 const optionBgColors = [
-    'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
-    'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
-    'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
-    'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+    'bg-sky-100 dark:bg-sky-900/30',
+    'bg-amber-100 dark:bg-amber-900/30',
+    'bg-lime-100 dark:bg-lime-900/30',
+    'bg-rose-100 dark:bg-rose-900/30',
 ];
 
 export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
@@ -231,6 +230,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
         ctx.font = "bold 32px 'Lexend', sans-serif";
         ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         ctx.save();
         ctx.translate(width / 2, height / 2);
         ctx.rotate(-Math.PI / 4);
@@ -240,7 +240,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const patternWidth = textWidth + 150;
         const patternHeight = 150;
 
-        for (let x = -width; x < width * 1.5; x += patternWidth) {
+        for (let x = -width * 1.5; x < width * 1.5; x += patternWidth) {
             for (let y = -height * 1.5; y < height * 1.5; y += patternHeight) {
                 ctx.fillText(text, x, y);
             }
@@ -255,8 +255,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 backgroundColor: null,
             }).then(sourceCanvas => {
                 let targetCanvas: HTMLCanvasElement;
-                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
-                const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}.png`;
+                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '').replace(/\s+/g, '_').slice(0, 50) : quiz.title.replace(/\s+/g, '_').slice(0, 50);
+                const fileName = `${questionText}.png`;
 
                 const target = document.createElement('canvas');
                 const targetCtx = target.getContext('2d');
@@ -349,11 +349,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 backgroundImage: "url('/image/logo.png')",
                 backgroundSize: '150px',
                 backgroundRepeat: 'repeat',
-                opacity: 0.5,
+                opacity: 0.05,
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-amber-900/90" />
-            <div className="relative z-10 container mx-auto px-4 py-12">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-amber-900/90 backdrop-blur-sm" />
+            <div className="relative z-10 container mx-auto px-4 py-8">
                 
                 {quizFinished ? (
                     <Card ref={quizCardRef} className="w-full max-w-xl mx-auto text-center shadow-2xl p-8 bg-card/80 backdrop-blur-sm">
@@ -382,8 +382,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
-                        <Card className="bg-card/60 backdrop-blur-sm">
-                             <CardContent className="p-3">
+                        <Card className="bg-card/80 backdrop-blur-sm shadow-2xl" ref={quizCardRef}>
+                             <CardHeader className="p-4 border-b">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
                                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                                         <FileQuestion className="w-5 h-5" />
@@ -419,7 +419,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <div className="flex items-center gap-2">
                                             <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[100px] h-9">
+                                                <SelectTrigger id="timer-select" className="w-[80px] h-9">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -466,75 +466,49 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </DropdownMenu>
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
-                            <CardHeader className="relative bg-[#0e8107] text-white p-4 mb-2">
-                                {currentQuestion && currentQuestion.image && (
-                                    <div className="relative h-48 w-full mt-4">
-                                        <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
-                                    </div>
-                                )}
-                                
-                                <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-start gap-2">
-                                    <span>{currentQuestion?.text}</span>
-                                    {currentQuestion?.audio && (
-                                        <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
-                                            {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
-                                        </Button>
-                                    )}
-                                </CardTitle>
+                                <Progress value={progress} className="w-full h-2 mt-4"/>
                             </CardHeader>
-                            <CardContent className="flex flex-col items-center gap-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+
+                            <CardContent className="p-6">
+                                <div className="bg-[#0e8107] text-white p-6 rounded-lg mb-6 min-h-[100px] flex items-center justify-center">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-left">{currentQuestion?.text}</h2>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {currentQuestion?.options.map((option, index) => {
                                         const isSelected = selectedAnswer === option.text;
                                         const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                         const isShown = selectedAnswer !== null;
 
                                         return (
-                                            <Card
+                                            <div
                                                 key={index}
                                                 onClick={() => !selectedAnswer && handleAnswer(option.text)}
                                                 className={cn(
-                                                    "rounded-xl border-2 overflow-hidden transition-all duration-300 transform",
-                                                    !selectedAnswer && "cursor-pointer hover:scale-105 hover:shadow-xl",
-                                                    isShown && isCorrectAnswer && "border-green-500 ring-4 ring-green-500/50",
-                                                    isShown && isSelected && !isCorrectAnswer && "border-destructive ring-4 ring-destructive/50"
+                                                    "rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 flex justify-between items-center",
+                                                    !selectedAnswer && "hover:border-primary",
+                                                    isShown && isCorrectAnswer && "border-green-500 ring-4 ring-green-500/20",
+                                                    isShown && isSelected && !isCorrectAnswer && "border-destructive ring-4 ring-destructive/20",
+                                                    optionBgColors[index % optionBgColors.length]
                                                 )}
                                             >
-                                                {option.image && (
-                                                     <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-800 p-2">
-                                                        <Image src={option.image} alt={option.text} layout="fill" objectFit="contain" />
-                                                    </div>
-                                                )}
+                                                <span className="font-bold text-lg">{String.fromCharCode(65 + index)}. {option.text}</span>
                                                 <div className={cn(
-                                                    "p-4 justify-between items-center flex gap-4",
-                                                    !selectedAnswer && optionBgColors[index % optionBgColors.length],
-                                                    isShown && isCorrectAnswer && 'bg-green-100 dark:bg-green-900/30',
-                                                    isShown && isSelected && !isCorrectAnswer && 'bg-red-100 dark:bg-red-900/30'
+                                                    "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                                    isSelected ? 'border-primary bg-primary' : 'border-gray-400 bg-white'
                                                 )}>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                        <span className="text-left font-bold text-lg">{option.text}</span>
-                                                        {option.audio && (
-                                                            <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); togglePlayUrl(option.audio!); }}>
-                                                                {playingUrl === option.audio ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5"/>}
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                    <div className={cn(
-                                                        "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
-                                                        isSelected ? 'border-primary bg-primary' : 'border-muted-foreground'
-                                                    )}>
-                                                        {isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
-                                                    </div>
+                                                    {isSelected && <Check className="w-4 h-4 text-white" />}
                                                 </div>
-                                            </Card>
+                                            </div>
                                         );
                                     })}
                                 </div>
-                                {feedback && <div className={`mt-4 font-bold text-xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
+
+                                {feedback && (
+                                    <div className={`mt-4 text-center font-bold text-2xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
+                                        {feedback}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
@@ -543,8 +517,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-    
-
-    
-
-
