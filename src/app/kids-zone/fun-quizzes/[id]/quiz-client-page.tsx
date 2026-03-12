@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2 } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -19,6 +19,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 type Question = {
     text: string;
@@ -342,7 +348,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </div>
                                     <div className="flex items-center gap-4 flex-wrap justify-end">
                                         <div className="flex items-center gap-2">
-                                            <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Label htmlFor="autoplay-switch" className="cursor-pointer">
+                                                            <Volume2 className="w-5 h-5 text-slate-600" />
+                                                        </Label>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>Autoplay Audio</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             <Switch
                                                 id="autoplay-switch"
                                                 checked={autoplayEnabled}
@@ -398,8 +415,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-4">
-                             <CardHeader className="relative bg-[#0e8107] text-white p-4 mb-2">
+                        <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
+                            <CardHeader className="relative bg-[#0e8107] text-white p-4">
                                 {currentQuestion && currentQuestion.image && (
                                     <div className="relative h-48 w-full mt-4">
                                         <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
