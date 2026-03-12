@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -110,6 +111,13 @@ export default function TestClientPage({ test }: { test: Test }) {
 
     try {
         let score = 0;
+        const totalMarks = test?.questions.reduce((total, q) => {
+            if (q.type === 'Matching') {
+                return total + (q.correctAnswer?.length || 0);
+            }
+            return total + (q.marks || 1);
+        }, 0) || 0;
+
         test?.questions.forEach((question, index) => {
             if (question.type === 'Matching') {
                 const correctAnswers = question.correctAnswer;
@@ -128,15 +136,6 @@ export default function TestClientPage({ test }: { test: Test }) {
             }
         });
         
-        const totalMarks = test?.questions.reduce((total, q) => {
-            if (q.type === 'Matching') {
-                // Total marks for a matching question is the number of pairs
-                return total + (q.correctAnswer?.length || 0);
-            }
-            return total + (q.marks || 1);
-        }, 0) || 0;
-
-
         const submissionData = {
             testId: test?.id,
             testTitle: test?.title,
@@ -144,7 +143,7 @@ export default function TestClientPage({ test }: { test: Test }) {
             score,
             totalQuestions: totalMarks,
             testType: test?.testType,
-            duration: test?.duration,
+            duration: test?.duration || totalMarks,
         };
 
         const submissionId = await addTestSubmission(submissionData);
