@@ -286,16 +286,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     target.height = targetHeight;
 
                     // Create a pleasant gradient background
+                    const gradients = [
+                        { from: '#DA22FF', to: '#9733EE' },
+                        { from: '#09203F', to: '#537895' },
+                        { from: '#868F96', to: '#596164' },
+                        { from: '#93A5CF', to: '#E4EfE9' },
+                        { from: '#11998E', to: '#38EF7D' }
+                    ];
+                    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
                     const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
-                    gradient.addColorStop(0, '#fef3c7'); // amber-100
-                    gradient.addColorStop(1, '#fed7aa'); // orange-200
+                    gradient.addColorStop(0, randomGradient.from);
+                    gradient.addColorStop(1, randomGradient.to);
                     targetCtx.fillStyle = gradient;
                     targetCtx.fillRect(0, 0, targetWidth, targetHeight);
                     
                     // Add repeating watermark
                     drawWatermark(targetCtx, targetWidth, targetHeight);
 
-                    // Calculate scaling to fit the source canvas onto the target with some padding
                     const padding = 100;
                     const scale = Math.min(
                         (targetWidth - padding * 2) / sourceCanvas.width, 
@@ -496,14 +503,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     </div>
                                                 )}
                                                 <div className={cn(
-                                                    "p-4 text-lg justify-between items-center flex gap-4",
+                                                    "p-4 justify-between items-center flex gap-4",
                                                     !selectedAnswer && optionBgColors[index % optionBgColors.length],
                                                     isShown && isCorrectAnswer && 'bg-green-100 dark:bg-green-900/30',
                                                     isShown && isSelected && !isCorrectAnswer && 'bg-red-100 dark:bg-red-900/30'
                                                 )}>
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                        <span className="text-left">{option.text}</span>
+                                                        <span className="text-left text-base">{option.text}</span>
                                                         {option.audio && (
                                                             <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); togglePlayUrl(option.audio!); }}>
                                                                 {playingUrl === option.audio ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5"/>}
@@ -533,3 +540,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     
 
     
+
