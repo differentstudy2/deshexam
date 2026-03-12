@@ -298,136 +298,141 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <Card ref={quizCardRef} className="w-full max-w-2xl mx-auto shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
-                        <CardHeader className="relative">
-                            <div className="flex flex-wrap justify-between items-center mt-2 gap-4">
-                                <div className="text-sm text-muted-foreground">
-                                    Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
-                                </div>
-                                <div className="flex items-center gap-4 flex-wrap justify-end">
-                                     <div className="flex items-center gap-2">
-                                        <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
-                                        <Switch
-                                            id="autoplay-switch"
-                                            checked={autoplayEnabled}
-                                            onCheckedChange={(checked) => {
-                                                setAutoplayEnabled(checked);
-                                                if (!checked) {
-                                                    stopSound();
-                                                }
-                                            }}
-                                        />
+                    <div className="w-full max-w-2xl mx-auto">
+                        <Card className="mb-4 bg-card/60 backdrop-blur-sm">
+                            <CardContent className="p-3">
+                                <div className="flex flex-wrap justify-between items-center gap-4">
+                                    <div className="text-sm text-muted-foreground">
+                                        Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
                                     </div>
-                                     <div className="flex items-center gap-2">
-                                        <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
-                                        <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                            <SelectTrigger id="timer-select" className="w-[90px] h-8 text-xs">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="15">15s</SelectItem>
-                                                <SelectItem value="30">30s</SelectItem>
-                                                <SelectItem value="60">60s</SelectItem>
-                                                <SelectItem value="0">Off</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    {timerDuration > 0 && (
-                                        <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                            <Clock className="w-5 h-5" />
-                                            <span>{timeLeft}s</span>
+                                    <div className="flex items-center gap-4 flex-wrap justify-end">
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="autoplay-switch" className="text-sm font-medium">Autoplay Audio</Label>
+                                            <Switch
+                                                id="autoplay-switch"
+                                                checked={autoplayEnabled}
+                                                onCheckedChange={(checked) => {
+                                                    setAutoplayEnabled(checked);
+                                                    if (!checked) {
+                                                        stopSound();
+                                                    }
+                                                }}
+                                            />
                                         </div>
-                                    )}
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="outline" size="icon">
-                                                <ImageDown className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
-                                                Save as Default
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
-                                                <Video className="mr-2 h-4 w-4" />
-                                                Save for Landscape Video (16:9)
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
-                                                <Video className="mr-2 h-4 w-4 rotate-90" />
-                                                Save for Short Video (9:16)
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </div>
-
-                            {currentQuestion && currentQuestion.image && (
-                                <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
-                                     <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" />
-                                </div>
-                            )}
-                            
-                            <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
-                                <span>{currentQuestion?.text}</span>
-                                {currentQuestion?.audio && (
-                                    <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
-                                        <Volume2 />
-                                    </Button>
-                                )}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center gap-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                                {currentQuestion?.options.map((option, index) => {
-                                    const isSelected = selectedAnswer === option.text;
-                                    const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
-                                    const isShown = selectedAnswer !== null;
-
-                                    return (
-                                        <div
-                                            key={index}
-                                            onClick={() => !selectedAnswer && handleAnswer(option.text)}
-                                            className={cn(
-                                                "rounded-xl border-2 overflow-hidden transition-all duration-300 transform",
-                                                !selectedAnswer && "cursor-pointer hover:scale-105 hover:shadow-xl",
-                                                isShown && isCorrectAnswer && "border-green-500 ring-4 ring-green-500/50",
-                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-4 ring-destructive/50"
-                                            )}
-                                        >
-                                            {option.image && (
-                                                <div className="relative w-full h-48 bg-gray-100 dark:bg-gray-800 p-2">
-                                                    <Image src={option.image} alt={option.text} layout="fill" objectFit="contain" />
-                                                </div>
-                                            )}
-                                            <div className={cn(
-                                                "p-4 text-lg justify-between items-center flex gap-4",
-                                                 !selectedAnswer && optionBgColors[index % optionBgColors.length],
-                                                 isShown && isCorrectAnswer && 'bg-green-100 dark:bg-green-900/30',
-                                                 isShown && isSelected && !isCorrectAnswer && 'bg-red-100 dark:bg-red-900/30'
-                                            )}>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                    <span className="text-left">{option.text}</span>
-                                                    {option.audio && (
-                                                        <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                            <Volume2 className="w-5 h-5"/>
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                                <div className={cn(
-                                                    "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
-                                                    isSelected ? 'border-primary bg-primary' : 'border-muted-foreground'
-                                                )}>
-                                                    {isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
-                                                </div>
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
+                                            <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
+                                                <SelectTrigger id="timer-select" className="w-[90px] h-8 text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="15">15s</SelectItem>
+                                                    <SelectItem value="30">30s</SelectItem>
+                                                    <SelectItem value="60">60s</SelectItem>
+                                                    <SelectItem value="0">Off</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {timerDuration > 0 && (
+                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                                <Clock className="w-5 h-5" />
+                                                <span>{timeLeft}s</span>
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                             {feedback && <div className={`mt-4 font-bold text-xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
-                        </CardContent>
-                    </Card>
+                                        )}
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="icon">
+                                                    <ImageDown className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
+                                                    Save as Default
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
+                                                    <Video className="mr-2 h-4 w-4" />
+                                                    Save for Landscape Video (16:9)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
+                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
+                                                    Save for Short Video (9:16)
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
+                            <CardHeader className="relative">
+                                {currentQuestion && currentQuestion.image && (
+                                    <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
+                                        <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" />
+                                    </div>
+                                )}
+                                
+                                <CardTitle className="text-center text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 pt-4 flex items-center justify-center gap-2">
+                                    <span>{currentQuestion?.text}</span>
+                                    {currentQuestion?.audio && (
+                                        <Button variant="ghost" size="icon" onClick={() => playSound('url', currentQuestion.audio)}>
+                                            <Volume2 />
+                                        </Button>
+                                    )}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex flex-col items-center gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                    {currentQuestion?.options.map((option, index) => {
+                                        const isSelected = selectedAnswer === option.text;
+                                        const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+                                        const isShown = selectedAnswer !== null;
+
+                                        return (
+                                            <Card
+                                                key={index}
+                                                onClick={() => !selectedAnswer && handleAnswer(option.text)}
+                                                className={cn(
+                                                    "rounded-xl border-2 overflow-hidden transition-all duration-300 transform",
+                                                    !selectedAnswer && "cursor-pointer hover:scale-105 hover:shadow-xl",
+                                                    isShown && isCorrectAnswer && "border-green-500 ring-4 ring-green-500/50",
+                                                    isShown && isSelected && !isCorrectAnswer && "border-destructive ring-4 ring-destructive/50"
+                                                )}
+                                            >
+                                                {option.image && (
+                                                    <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-800 p-2">
+                                                        <Image src={option.image} alt={option.text} layout="fill" objectFit="contain" />
+                                                    </div>
+                                                )}
+                                                <div className={cn(
+                                                    "p-4 text-lg justify-between items-center flex gap-4",
+                                                    !selectedAnswer && optionBgColors[index % optionBgColors.length],
+                                                    isShown && isCorrectAnswer && 'bg-green-100 dark:bg-green-900/30',
+                                                    isShown && isSelected && !isCorrectAnswer && 'bg-red-100 dark:bg-red-900/30'
+                                                )}>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                        <span className="text-left">{option.text}</span>
+                                                        {option.audio && (
+                                                            <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
+                                                                <Volume2 className="w-5 h-5"/>
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    <div className={cn(
+                                                        "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                                        isSelected ? 'border-primary bg-primary' : 'border-muted-foreground'
+                                                    )}>
+                                                        {isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                                {feedback && <div className={`mt-4 font-bold text-xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
+                            </CardContent>
+                        </Card>
+                    </div>
                 )}
             </div>
         </div>
