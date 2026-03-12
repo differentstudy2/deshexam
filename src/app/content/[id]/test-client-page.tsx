@@ -1,25 +1,31 @@
 
-
 'use client';
 
-import { useEffect, useState } from 'react';
-import { addTestSubmission } from '@/lib/firebase/firestore';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter, usePathname, useParams } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, HelpCircle, CheckCircle, XCircle, GripVertical } from "lucide-react";
+import Link from "next/link";
+import Confetti from 'react-dom-confetti';
+import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
+import { addTestSubmission } from '@/lib/firebase/firestore';
 import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-
+import html2canvas from 'html2canvas';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 type Option = {
   text: string;
@@ -55,308 +61,407 @@ type Test = {
   testType: string;
 };
 
-const QUESTIONS_PER_PAGE = 5;
+const playSound = (type: 'correct' | 'incorrect' | 'win') => {
+    if (typeof window !== 'undefined') {
+      let soundUrl = '';
+      if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+      else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+      else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+      
+      if(soundUrl) {
+          const audio = new Audio(soundUrl);
+          audio.play().catch(error => console.error(`Error playing sound:`, error));
+      }
+    }
+};
+
+const shuffleArray = <T,>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
 
 export default function TestClientPage({ test }: { test: Test }) {
-  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const { toast } = useToast();
-  const router = useRouter();
-  const pathname = usePathname();
-  const { user } = useAuth();
-  const { openAuthDialog } = useAuthDialog();
-  const [timeLeft, setTimeLeft] = useState<number | null>(test.duration * 60);
-  const [timeUp, setTimeUp] = useState(false);
+    const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [userAnswers, setUserAnswers] = useState<{ [key: string]: any }>({});
+    const [feedback, setFeedback] = useState<{ [key: string]: 'correct' | 'incorrect' | 'partial' | '' }>({});
+    const [showFeedback, setShowFeedback] = useState<string | null>(null);
+    const [score, setScore] = useState(0);
+    const [quizFinished, setQuizFinished] = useState(false);
+    const [timeLeft, setTimeLeft] = useState<number | null>(test.duration > 0 ? test.duration * 60 : null);
+    const { toast } = useToast();
+    const router = useRouter();
+    const { user } = useAuth();
+    const { openAuthDialog } = useAuthDialog();
+    const quizCardRef = useRef<HTMLDivElement>(null);
+    const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) {
-      if (timeLeft === 0) {
-        setTimeUp(true);
-        handleSubmit();
-      }
-      return;
-    }
+    const startQuiz = useCallback(() => {
+        setShuffledQuestions(shuffleArray(test.questions));
+        setCurrentQuestionIndex(0);
+        setUserAnswers({});
+        setFeedback({});
+        setShowFeedback(null);
+        setScore(0);
+        setQuizFinished(false);
+        if (test.duration > 0) {
+            setTimeLeft(test.duration * 60);
+        }
+    }, [test]);
 
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime ? prevTime - 1 : 0));
-    }, 1000);
+    useEffect(() => {
+        startQuiz();
+    }, [startQuiz]);
+    
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+    const totalMarks = useMemo(() => test.questions.reduce((sum, q) => sum + (q.marks || 1), 0), [test.questions]);
 
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
-
-  const handleAnswerChange = (questionId: string, answer: string) => {
-    setAnswers(prev => ({ ...prev, [questionId]: answer }));
-  };
-
-  const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
-    setAnswers(prev => {
-        const newAnswers = { ...prev };
-        const currentMatchingAnswers = newAnswers[questionId] || {};
-        currentMatchingAnswers[columnAItem] = columnBItem;
-        newAnswers[questionId] = currentMatchingAnswers;
-        return newAnswers;
-    });
-  }
-
-  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    if (!user) {
-        openAuthDialog('sign-in');
-        return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-        let score = 0;
-        const totalMarks = test?.questions.reduce((total, q) => {
-            if (q.type === 'Matching') {
-                return total + (q.correctAnswer?.length || 0);
+    const nextQuestion = useCallback(() => {
+        setShowFeedback(null);
+        if (currentQuestionIndex < shuffledQuestions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+        } else {
+            setQuizFinished(true);
+            playSound('win');
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+            // Auto-submit when the last question is answered
+            if(user) {
+                // We need to do this in a timeout to get the final state of answers
+                setTimeout(() => {
+                    // This is a bit of a hack, but we need to ensure the final answer is in the state
+                    // before we submit. A better solution would use a state callback.
+                     addTestSubmission({
+                        testId: test?.id,
+                        testTitle: test?.title,
+                        answers: userAnswers,
+                        score,
+                        totalQuestions: totalMarks,
+                        testType: test?.testType,
+                        duration: test?.duration,
+                    }).then(submissionId => {
+                        router.push(`/content/${test.id}/results?submissionId=${submissionId}`);
+                    }).catch(error => {
+                         toast({
+                            variant: "destructive",
+                            title: 'Error submitting test',
+                            description: (error as Error).message,
+                        });
+                    });
+                }, 100);
             }
-            return total + (q.marks || 1);
-        }, 0) || 0;
+        }
+    }, [currentQuestionIndex, shuffledQuestions.length, user, test, score, totalMarks, userAnswers, router, toast]);
 
-        test?.questions.forEach((question, index) => {
-            if (question.type === 'Matching') {
-                const correctAnswers = question.correctAnswer;
-                const userAnswersForQuestion = answers[question.id];
-                if (userAnswersForQuestion && Array.isArray(correctAnswers)) {
-                    for (const pair of correctAnswers) {
-                        if (userAnswersForQuestion[pair.a] === pair.b) {
-                            score++; // Award 1 mark for each correct pair
-                        }
+    const handleAnswer = (questionId: string, answer: any) => {
+        if (showFeedback) return;
+
+        let isCorrect = false;
+        let points = 0;
+        const question = shuffledQuestions.find(q => q.id === questionId);
+        if (!question) return;
+
+        if (question.type === 'Matching') {
+            let correctPairs = 0;
+            const totalPairs = question.correctAnswer.length;
+            if (answer && totalPairs > 0) {
+                for (const pair of question.correctAnswer) {
+                    if (answer[pair.a] === pair.b) {
+                        correctPairs++;
                     }
                 }
-            } else {
-                 if (answers[question.id] === question.correctAnswer) {
-                    score += question.marks || 1;
-                }
             }
-        });
+            points = (correctPairs / totalPairs) * (question.marks || 1);
+            isCorrect = correctPairs === totalPairs;
+            setFeedback(prev => ({...prev, [questionId]: correctPairs === 0 ? 'incorrect' : isCorrect ? 'correct' : 'partial' }));
+        } else {
+            isCorrect = answer === question.correctAnswer;
+            if (isCorrect) {
+                points = question.marks || 1;
+            }
+            setFeedback(prev => ({...prev, [questionId]: isCorrect ? 'correct' : 'incorrect' }));
+        }
         
-        const submissionData = {
-            testId: test?.id,
-            testTitle: test?.title,
-            answers,
-            score,
-            totalQuestions: totalMarks,
-            testType: test?.testType,
-            duration: test?.duration || totalMarks,
-        };
-
-        const submissionId = await addTestSubmission(submissionData);
-
-        toast({
-            title: "Test Submitted!",
-            description: "Your results have been recorded.",
-        });
+        if (isCorrect || question.type === 'Matching') {
+           setScore(prev => prev + points);
+        }
         
-        const currentPath = pathname.split('/').slice(0,2).join('/');
-        router.push(`${currentPath}/${test?.id}/results?submissionId=${submissionId}`);
+        setUserAnswers(prev => ({ ...prev, [questionId]: answer }));
+        setShowFeedback(questionId);
+        playSound(isCorrect ? 'correct' : 'incorrect');
 
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: 'Error submitting test',
-            description: (error as Error).message,
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
-  
-    const formatTime = (seconds: number) => {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+        setTimeout(nextQuestion, 2000);
+    };
+    
+    useEffect(() => {
+        if (quizFinished || timeLeft === null) return;
+        
+        timerIntervalRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev !== null && prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    setQuizFinished(true); // End the quiz
+                    return 0;
+                }
+                return prev! - 1;
+            });
+        }, 1000);
+        return () => clearInterval(timerIntervalRef.current!);
+    }, [quizFinished, timeLeft]);
+
+
+    const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+        ctx.font = "bold 32px 'Lexend', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.save();
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(-Math.PI / 4);
+        
+        const text = "DeshExam";
+        const textWidth = ctx.measureText(text).width;
+        const patternWidth = textWidth + 150;
+        const patternHeight = 150;
+
+        for (let x = -width * 1.5; x < width * 1.5; x += patternWidth) {
+            for (let y = -height * 1.5; y < height * 1.5; y += patternHeight) {
+                ctx.fillText(text, x, y);
+            }
+        }
+        ctx.restore();
     };
 
-  const totalPages = test ? Math.ceil(test.questions.length / QUESTIONS_PER_PAGE) : 0;
-  const startIndex = currentPage * QUESTIONS_PER_PAGE;
-  const endIndex = startIndex + QUESTIONS_PER_PAGE;
-  const currentQuestions = test?.questions.slice(startIndex, endIndex);
+    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
+        if (quizCardRef.current) {
+            html2canvas(quizCardRef.current, {
+                useCORS: true,
+                backgroundColor: null,
+            }).then(sourceCanvas => {
+                let targetCanvas: HTMLCanvasElement;
+                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '').replace(/\s+/g, '_').slice(0, 50) : quiz.title.replace(/\s+/g, '_').slice(0, 50);
+                const fileName = `${questionText}.png`;
 
-  return (
-    <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8">
-            <div className="md:col-span-1">
-                <header className="mb-8 p-4">
-                    <p className="text-primary font-semibold">{test.subject}</p>
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter">{test.title}</h1>
-                    <p className="text-muted-foreground mt-2 max-w-3xl">{test.description}</p>
-                    <div className="flex items-center text-sm text-muted-foreground space-x-4 mt-2">
-                        <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-4 h-4" />
-                        <span>{test.questions.length} Questions</span>
-                        </div>
-                        {timeLeft !== null && (
-                            <div className="flex items-center gap-1.5 font-mono text-lg font-semibold text-foreground">
-                                <Clock className="w-4 h-4" />
-                                <span>{formatTime(timeLeft)}</span>
-                            </div>
-                        )}
-                    </div>
-                </header>
+                const target = document.createElement('canvas');
+                const targetCtx = target.getContext('2d');
+                if (!targetCtx) return;
+                
+                if (aspectRatio === 'default') {
+                    target.width = sourceCanvas.width;
+                    target.height = sourceCanvas.height;
+                    targetCtx.drawImage(sourceCanvas, 0, 0);
+                    drawWatermark(targetCtx, target.width, target.height);
+                    targetCanvas = target;
+                } else {
+                    let targetWidth, targetHeight;
+                    if (aspectRatio === '9:16') {
+                        targetHeight = 1920;
+                        targetWidth = 1080;
+                    } else if (aspectRatio === '16:9') {
+                        targetWidth = 1920;
+                        targetHeight = 1080;
+                    } else if (aspectRatio === '4:5') {
+                        targetWidth = 1080;
+                        targetHeight = 1350;
+                    } else { // 1:1 for Instagram
+                        targetWidth = 1080;
+                        targetHeight = 1080;
+                    }
+                    
+                    target.width = targetWidth;
+                    target.height = targetHeight;
 
-                <form onSubmit={handleSubmit}>
-                    <fieldset disabled={timeUp} className="space-y-8">
-                    {currentQuestions && currentQuestions.map((question, index) => {
-                        const questionIndex = startIndex + index;
-                        return (
-                            <Card key={question.id || questionIndex}>
-                            <CardHeader>
-                                <CardTitle>Question {questionIndex + 1}</CardTitle>
-                                <CardDescription className="text-lg text-foreground pt-2">{question.text}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {question.type === 'Multiple Choice' && question.options && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="space-y-2">
-                                    {question.options.map((option, optIndex) => (
-                                    <div key={optIndex} className="flex items-center space-x-2">
-                                        <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-2xl">{option.text}</Label>
-                                    </div>
-                                    ))}
-                                </RadioGroup>
-                                )}
-                                {question.type === 'True/False' && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                    <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                    <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
-                                    </div>
-                                </RadioGroup>
-                                )}
-                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                                <Input 
-                                    placeholder="Your answer..." 
-                                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                                    value={answers[question.id] || ''}
-                                />
-                                )}
-                                {question.type === 'Matching' && question.matchingOptions && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                            <div className="font-bold text-center">Column A</div>
-                                            <div></div>
-                                            <div className="font-bold text-center">Column B</div>
-                                        </div>
-                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                <div className="p-3 border rounded-md text-center bg-secondary">
-                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                    {itemA.text}
-                                                </div>
-                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                <Select 
-                                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                                    value={answers[question.id]?.[itemA.text] || ''}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a match" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB, bIndex) => (
-                                                            <SelectItem key={bIndex} value={itemB.text}>
-                                                                <div className="flex items-center gap-2">
-                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                                    <span>{itemB.text}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                            </Card>
-                        )
-                    })}
-                    </fieldset>
+                    const gradients = [
+                        { from: '#DA22FF', to: '#9733EE' },
+                        { from: '#09203F', to: '#537895' },
+                        { from: '#868F96', to: '#596164' },
+                        { from: '#93A5CF', to: '#E4EfE9' },
+                        { from: '#11998E', to: '#38EF7D' }
+                    ];
+                    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+                    const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
+                    gradient.addColorStop(0, randomGradient.from);
+                    gradient.addColorStop(1, randomGradient.to);
+                    targetCtx.fillStyle = gradient;
+                    targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+                    
+                    drawWatermark(targetCtx, targetWidth, targetHeight);
 
-                    <div className="mt-8 flex justify-between items-center">
-                        <Button 
-                            type="button"
-                            variant="outline" 
-                            onClick={() => setCurrentPage(p => p - 1)} 
-                            disabled={currentPage === 0}
-                        >
-                        <ChevronLeft className="mr-2"/>
-                        Previous
-                        </Button>
-                        
-                        <span className="text-sm text-muted-foreground">
-                            Page {currentPage + 1} of {totalPages}
-                        </span>
+                    const padding = 100;
+                    const scale = Math.min(
+                        (targetWidth - padding * 2) / sourceCanvas.width, 
+                        (targetHeight - padding * 2) / sourceCanvas.height
+                    );
+                    const scaledWidth = sourceCanvas.width * scale;
+                    const scaledHeight = sourceCanvas.height * scale;
+                    const dx = (targetWidth - scaledWidth) / 2;
+                    const dy = (targetHeight - scaledHeight) / 2;
+                    
+                    targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
+                    targetCanvas = target;
+                }
 
-                        <Button 
-                            type="button"
-                            variant="outline" 
-                            onClick={() => setCurrentPage(p => p + 1)} 
-                            disabled={currentPage === totalPages - 1}
-                        >
-                        Next
-                        <ChevronRight className="ml-2"/>
-                        </Button>
-                    </div>
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = targetCanvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    };
+    
+    if (!currentQuestion) {
+        return (
+             <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+             </div>
+        );
+    }
 
+    const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+    const formatTime = (seconds: number) => {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+    };
 
-                    <div className="mt-8 flex justify-center">
-                        <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
-                            {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-            
-            <aside className="md:col-span-1">
-                <div className="sticky top-24">
-                     <Card>
+    return (
+        <div className="relative min-h-screen">
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')",
+                opacity: 0.05,
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 to-green-50/90 dark:from-blue-900/80 dark:to-green-900/90" />
+            <div className="relative z-10 container mx-auto px-4 py-8">
+                
+                {quizFinished ? (
+                    <Card ref={quizCardRef} className="w-full max-w-xl mx-auto text-center shadow-2xl p-8 bg-card/80 backdrop-blur-sm">
+                        <Confetti active={quizFinished} />
                         <CardHeader>
-                            <CardTitle>Question Navigator</CardTitle>
+                            <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
+                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
+                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex flex-wrap gap-2">
-                                {test.questions.map((q, qIndex) => (
-                                    <Button
-                                        key={q.id || qIndex}
-                                        variant={answers[q.id] !== undefined ? 'default' : 'outline'}
-                                        size="sm"
-                                        className="h-8 w-8"
-                                        onClick={() => setCurrentPage(Math.floor(qIndex / QUESTIONS_PER_PAGE))}
-                                    >
-                                        {qIndex + 1}
-                                    </Button>
-                                ))}
+                            <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {totalMarks}</span></p>
+                            <p className="text-xl mt-2 font-semibold">Your Score</p>
+                            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button onClick={startQuiz} size="lg">
+                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                    Play Again
+                                </Button>
+                                <Button asChild variant="outline" size="lg">
+                                    <Link href="/quizzes">
+                                        <ArrowLeft className="mr-2 h-4 w-4" />
+                                        Back to Quizzes
+                                    </Link>
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
-                </div>
-            </aside>
+                ) : (
+                    <div className="w-full max-w-4xl mx-auto">
+                        <Card className="bg-card/60 backdrop-blur-sm">
+                             <CardContent className="p-3">
+                                <div className="flex flex-wrap justify-between items-center gap-4">
+                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                        <FileQuestion className="w-5 h-5" />
+                                        <span className="font-bold text-foreground">{currentQuestionIndex + 1}</span>
+                                        <span>/</span>
+                                        <span>{shuffledQuestions.length}</span>
+                                    </div>
+                                    <div className="flex-grow max-w-lg">
+                                        <Progress value={progress} className="w-full h-2"/>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        {timeLeft !== null && (
+                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                                <Clock className="w-5 h-5" />
+                                                <span>{formatTime(timeLeft)}</span>
+                                            </div>
+                                        )}
+                                         <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="icon">
+                                                    <ImageDown className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>Save as Default</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />Save for Landscape Video (16:9)</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />Save for Short Video (9:16)</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>Save for Instagram (1:1)</DropdownMenuItem>
+                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>Save for Facebook Post (4:5)</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <div ref={quizCardRef}>
+                             <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
+                                <CardHeader className="p-6 pb-2">
+                                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                                        <span>{test.subject}</span>
+                                        <span>{currentQuestion.marks || 1} Mark{currentQuestion.marks > 1 ? 's' : ''}</span>
+                                    </div>
+                                     <CardTitle className="text-left text-2xl md:text-3xl font-semibold !mt-4 prose dark:prose-invert max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                            {currentQuestion.text}
+                                        </ReactMarkdown>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center gap-4 p-6">
+                                    {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                                            {currentQuestion.options.map((option, index) => {
+                                                const isSelected = userAnswers[currentQuestion.id] === option.text; // Fixed: Use userAnswers[currentQuestion.id]
+                                                const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+                                                const isShown = showFeedback === currentQuestion.id;
+                                                return(
+                                                    <Card key={index} onClick={() => handleAnswer(currentQuestion.id, option.text)} className={cn(
+                                                        "rounded-xl border-2 p-4 cursor-pointer transition-all duration-300",
+                                                        !isShown && "hover:scale-105 hover:border-primary",
+                                                        isShown && isCorrectAnswer && "border-green-500 ring-4 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
+                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-4 ring-destructive/50 bg-red-100 dark:bg-red-900/30"
+                                                    )}>
+                                                        <div className="flex items-center gap-4">
+                                                             <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0", isSelected ? 'border-primary bg-primary' : 'border-muted-foreground')}>
+                                                                {isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
+                                                             </div>
+                                                             <div className="prose-sm dark:prose-invert max-w-none">
+                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                             </div>
+                                                        </div>
+                                                    </Card>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
+                                     {(currentQuestion.type === 'Short Answer' || currentQuestion.type === 'Fill in the Blank') && (
+                                        <div className="w-full space-y-4">
+                                            <Input 
+                                                placeholder="Type your answer here..."
+                                                value={userAnswers[currentQuestion.id] || ''}
+                                                onChange={(e) => setUserAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
+                                                disabled={showFeedback === currentQuestion.id}
+                                                className="h-12 text-lg"
+                                            />
+                                            <Button onClick={() => handleAnswer(currentQuestion.id, userAnswers[currentQuestion.id])} disabled={showFeedback === currentQuestion.id || !userAnswers[currentQuestion.id]}>Check Answer</Button>
+                                        </div>
+                                    )}
+                                    {feedback[currentQuestion.id] && showFeedback === currentQuestion.id && (
+                                        <div className={`mt-4 font-bold text-xl ${feedback[currentQuestion.id] === 'correct' ? 'text-green-600' : 'text-destructive'}`}>
+                                            {feedback[currentQuestion.id] === 'correct' ? 'Correct!' : 'Incorrect!'}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
-        
-        <AlertDialog open={timeUp}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Time's Up!</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        The time limit for this test has been reached. Your answers will now be submitted.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogAction onClick={() => handleSubmit()}>
-                    View Results
-                </AlertDialogAction>
-            </AlertDialogContent>
-        </AlertDialog>
-    </div>
-  );
+    );
 }
