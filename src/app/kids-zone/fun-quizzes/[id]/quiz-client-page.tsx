@@ -226,20 +226,47 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTimeLeft(newDuration);
     };
 
+    const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+        ctx.font = "bold 32px 'Lexend', sans-serif";
+        ctx.textAlign = "center";
+        ctx.save();
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(-Math.PI / 4);
+        
+        const text = "DeshExam";
+        const textWidth = ctx.measureText(text).width;
+        const patternWidth = textWidth + 150;
+        const patternHeight = 150;
+
+        for (let x = -width; x < width * 1.5; x += patternWidth) {
+            for (let y = -height * 1.5; y < height * 1.5; y += patternHeight) {
+                ctx.fillText(text, x, y);
+            }
+        }
+        ctx.restore();
+    };
+
     const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' = 'default') => {
         if (quizCardRef.current) {
             html2canvas(quizCardRef.current, {
                 useCORS: true,
                 backgroundColor: null,
             }).then(sourceCanvas => {
-                let targetCanvas = sourceCanvas;
+                let targetCanvas: HTMLCanvasElement;
                 let fileNameSuffix = 'default';
 
-                if (aspectRatio !== 'default') {
-                    const target = document.createElement('canvas');
-                    const targetCtx = target.getContext('2d');
-                    if (!targetCtx) return;
-
+                const target = document.createElement('canvas');
+                const targetCtx = target.getContext('2d');
+                if (!targetCtx) return;
+                
+                if (aspectRatio === 'default') {
+                    target.width = sourceCanvas.width;
+                    target.height = sourceCanvas.height;
+                    targetCtx.drawImage(sourceCanvas, 0, 0);
+                    drawWatermark(targetCtx, target.width, target.height);
+                    targetCanvas = target;
+                } else {
                     let targetWidth, targetHeight;
                     if (aspectRatio === '9:16') {
                         targetHeight = 1920;
@@ -265,17 +292,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     targetCtx.fillStyle = gradient;
                     targetCtx.fillRect(0, 0, targetWidth, targetHeight);
                     
-                    // Add watermark for 9:16 and 1:1
-                    if (aspectRatio === '9:16' || aspectRatio === '1:1') {
-                        targetCtx.fillStyle = "rgba(0, 0, 0, 0.1)";
-                        targetCtx.font = "bold 48px 'Lexend', sans-serif";
-                        targetCtx.textAlign = "center";
-                        targetCtx.fillText("DeshExam", targetWidth / 2, 80);
-                        targetCtx.fillText("DeshExam", targetWidth / 2, targetHeight - 50);
-                    }
+                    // Add repeating watermark
+                    drawWatermark(targetCtx, targetWidth, targetHeight);
 
                     // Calculate scaling to fit the source canvas onto the target with some padding
-                    const padding = (aspectRatio === '9:16' || aspectRatio === '1:1') ? 0 : 100;
+                    const padding = 100;
                     const scale = Math.min(
                         (targetWidth - padding * 2) / sourceCanvas.width, 
                         (targetHeight - padding * 2) / sourceCanvas.height
@@ -284,7 +305,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     const scaledHeight = sourceCanvas.height * scale;
                     const dx = (targetWidth - scaledWidth) / 2;
                     const dy = (targetHeight - scaledHeight) / 2;
-
+                    
                     targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
                     targetCanvas = target;
                 }
@@ -509,4 +530,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+    
+
     
