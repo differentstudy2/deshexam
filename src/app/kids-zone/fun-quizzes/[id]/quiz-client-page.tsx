@@ -321,7 +321,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                      <div className="flex items-center gap-2">
                                         <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                         <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                            <SelectTrigger id="timer-select" className="w-[90px] h-9">
+                                            <SelectTrigger id="timer-select" className="w-[90px] h-8">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -388,7 +388,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             onClick={() => handleAnswer(option.text)}
                                             disabled={!!selectedAnswer}
                                             className={cn(
-                                                "h-auto p-4 text-lg justify-between items-center gap-4 transition-all duration-300 transform hover:scale-105",
+                                                "h-auto p-4 text-lg justify-start items-center transition-all duration-300 transform hover:scale-105",
                                                 !selectedAnswer && optionBgColors[index % optionBgColors.length],
                                                 isSelected && isCorrectAnswer && 'bg-green-500 hover:bg-green-600 scale-105 text-white border-green-600',
                                                 isSelected && !isCorrectAnswer && 'bg-destructive hover:bg-destructive/90 scale-105 text-white border-destructive',
@@ -396,19 +396,27 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             )}
                                             variant="outline"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                {option.image && <Image src={option.image} alt={option.text} width={40} height={40} className="rounded-md" />}
-                                                <span className="text-left">{option.text}</span>
-                                                {option.audio && (
-                                                    <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
-                                                        <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
+                                            <div className="flex flex-col items-center gap-2 w-full">
+                                                {option.image && (
+                                                    <div className="relative w-full aspect-video rounded-md overflow-hidden mb-2">
+                                                        <Image src={option.image} alt={option.text} layout="fill" objectFit="cover" />
                                                     </div>
                                                 )}
-                                            </div>
-                                            
-                                            <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
-                                                {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
+                                                <div className="flex items-center justify-between w-full mt-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                        <span className="text-left">{option.text}</span>
+                                                        {option.audio && (
+                                                            <div onClick={(e) => { e.stopPropagation(); playSound('url', option.audio); }}>
+                                                                <Volume2 className="w-5 h-5 text-muted-foreground hover:text-foreground"/>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
+                                                        {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </Button>
                                     );
