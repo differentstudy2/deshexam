@@ -321,7 +321,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                      <div className="flex items-center gap-2">
                                         <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                         <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                            <SelectTrigger id="timer-select" className="w-[90px] h-8">
+                                            <SelectTrigger id="timer-select" className="w-[90px] h-8 text-xs">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -396,13 +396,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             )}
                                             variant="outline"
                                         >
-                                            <div className="flex flex-col items-center gap-2 w-full">
+                                            <div className="flex items-center gap-4 w-full">
                                                 {option.image && (
-                                                    <div className="relative w-full aspect-video rounded-md overflow-hidden mb-2">
+                                                    <div className="relative w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
                                                         <Image src={option.image} alt={option.text} layout="fill" objectFit="cover" />
                                                     </div>
                                                 )}
-                                                <div className="flex items-center justify-between w-full mt-2">
+                                                <div className="flex-grow flex flex-col justify-start">
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                         <span className="text-left">{option.text}</span>
@@ -412,10 +412,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    
-                                                    <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0">
-                                                        {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
-                                                    </div>
+                                                </div>
+                                                <div className="w-6 h-6 rounded-md border-2 border-current flex items-center justify-center flex-shrink-0 ml-auto">
+                                                    {isSelected && <div className={cn("w-4 h-4 rounded-sm", isCorrectAnswer ? 'bg-white' : 'bg-destructive-foreground')} />}
                                                 </div>
                                             </div>
                                         </Button>
