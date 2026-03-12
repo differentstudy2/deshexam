@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -322,7 +323,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 }
 
                 const link = document.createElement('a');
-                link.download = `${quiz.title.replace(/\s+/g, '_')}_q${currentQuestionIndex + 1}_${fileNameSuffix}.png`;
+                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
+                link.download = `${questionText.replace(/\s+/g, '_').slice(0, 50)}_${fileNameSuffix}.png`;
                 link.href = targetCanvas.toDataURL('image/png');
                 link.click();
             });
@@ -518,7 +520,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 )}>
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                        <span className="text-left text-base">{option.text}</span>
+                                                        <span className="text-left font-bold text-lg">{option.text}</span>
                                                         {option.audio && (
                                                             <Button variant="ghost" size="icon" className="shrink-0 w-8 h-8 rounded-full" onClick={(e) => { e.stopPropagation(); togglePlayUrl(option.audio!); }}>
                                                                 {playingUrl === option.audio ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5"/>}
