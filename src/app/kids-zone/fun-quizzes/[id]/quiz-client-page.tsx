@@ -141,34 +141,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     useEffect(() => {
         let autoplayTimeout: NodeJS.Timeout;
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished) {
-            autoplayTimeout = setTimeout(() => {
-                stopSound(); // Ensure clean state before playing
-                
-                const audio = new Audio(currentQuestion.audio!);
-                activeAudioRef.current = audio;
-                setPlayingUrl(currentQuestion.audio!);
-                audio.play().catch(error => {
-                    console.error(`Error playing sound:`, error);
-                    setPlayingUrl(null);
-                });
-                audio.onended = () => {
-                    setPlayingUrl(null);
-                    if (activeAudioRef.current === audio) {
-                        activeAudioRef.current = null;
-                    }
-                };
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer) {
+             autoplayTimeout = setTimeout(() => {
+                togglePlayUrl(currentQuestion.audio!);
             }, 500); 
         }
 
         return () => {
             if (autoplayTimeout) clearTimeout(autoplayTimeout);
-             // Stop any playing sound on cleanup (e.g., when component unmounts or dependencies change)
-            if(activeAudioRef.current) {
-                stopSound();
-            }
         };
-    }, [currentQuestion, autoplayEnabled, quizFinished, stopSound]);
+    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, togglePlayUrl]);
 
 
     useEffect(() => {
@@ -377,7 +359,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <div className="flex items-center gap-2">
                                             <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[100px] h-8 text-xs">
+                                                <SelectTrigger id="timer-select" className="w-[100px] h-9">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -426,7 +408,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </div>
                                 )}
                                 
-                                <CardTitle className="text-center text-2xl md:text-3xl font-bold pt-4 flex items-center justify-center gap-2">
+                                <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
                                     <span>{currentQuestion?.text}</span>
                                     {currentQuestion?.audio && (
                                         <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
