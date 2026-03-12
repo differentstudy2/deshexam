@@ -255,7 +255,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 backgroundColor: null,
             }).then(sourceCanvas => {
                 let targetCanvas: HTMLCanvasElement;
-                let fileNameSuffix = 'default';
+                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
+                const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}.png`;
 
                 const target = document.createElement('canvas');
                 const targetCtx = target.getContext('2d');
@@ -272,19 +273,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     if (aspectRatio === '9:16') {
                         targetHeight = 1920;
                         targetWidth = 1080;
-                        fileNameSuffix = 'portrait';
                     } else if (aspectRatio === '16:9') {
                         targetWidth = 1920;
                         targetHeight = 1080;
-                        fileNameSuffix = 'landscape';
                     } else if (aspectRatio === '4:5') {
                         targetWidth = 1080;
                         targetHeight = 1350;
-                        fileNameSuffix = 'facebook-post';
                     } else { // 1:1 for Instagram
                         targetWidth = 1080;
                         targetHeight = 1080;
-                        fileNameSuffix = 'square';
                     }
                     
                     target.width = targetWidth;
@@ -323,8 +320,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 }
 
                 const link = document.createElement('a');
-                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
-                link.download = `${questionText.replace(/\s+/g, '_').slice(0, 50)}_${fileNameSuffix}.png`;
+                link.download = fileName;
                 link.href = targetCanvas.toDataURL('image/png');
                 link.click();
             });
@@ -480,7 +476,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </div>
                                 )}
                                 
-                                <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
+                                <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-start gap-2">
                                     <span>{currentQuestion?.text}</span>
                                     {currentQuestion?.audio && (
                                         <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
