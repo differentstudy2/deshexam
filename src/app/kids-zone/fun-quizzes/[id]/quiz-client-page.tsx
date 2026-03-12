@@ -247,7 +247,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         ctx.restore();
     };
 
-    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' = 'default') => {
+    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
         if (quizCardRef.current) {
             html2canvas(quizCardRef.current, {
                 useCORS: true,
@@ -276,6 +276,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         targetWidth = 1920;
                         targetHeight = 1080;
                         fileNameSuffix = 'landscape';
+                    } else if (aspectRatio === '4:5') {
+                        targetWidth = 1080;
+                        targetHeight = 1350;
+                        fileNameSuffix = 'facebook-post';
                     } else { // 1:1 for Instagram
                         targetWidth = 1080;
                         targetHeight = 1080;
@@ -456,6 +460,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
                                                     Save for Instagram (1:1)
                                                 </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
+                                                    Save for Facebook Post (4:5)
+                                                </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
@@ -540,4 +548,5 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     
 
     
+
 
