@@ -333,7 +333,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
                         <Card className="mb-4 bg-card/60 backdrop-blur-sm">
-                            <CardContent className="p-3">
+                             <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
                                     <div className="text-sm text-muted-foreground">
                                         Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
@@ -355,7 +355,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <div className="flex items-center gap-2">
                                             <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[80px] h-8 text-xs">
+                                                <SelectTrigger id="timer-select" className="w-[100px] h-8 text-xs">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -397,10 +397,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </CardContent>
                         </Card>
                         <Card ref={quizCardRef} className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden">
-                            <CardHeader className="relative">
+                             <CardHeader className="relative bg-amber-100/50 dark:bg-amber-900/20 p-4 mb-4">
                                 {currentQuestion && currentQuestion.image && (
-                                    <div className="relative h-48 w-full rounded-lg overflow-hidden mt-4">
-                                        <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" />
+                                    <div className="relative h-48 w-full mt-4">
+                                        <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
                                     </div>
                                 )}
                                 
