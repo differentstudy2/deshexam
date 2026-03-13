@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -57,11 +58,14 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
   explanation: z.string().optional(),
+  image: z.string().optional(),
+  audio: z.string().optional(),
 });
 
 const matchingOptionSchema = z.object({
@@ -74,6 +78,8 @@ const matchingOptionSchema = z.object({
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
+  image: z.string().optional(),
+  audio: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
@@ -130,7 +136,7 @@ type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
 
-const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlChange: (url: string) => void }) => {
+const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: string, onUrlChange: (url: string) => void, value?: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [url, setUrl] = useState('');
     const [isUploading, setIsUploading] = useState(false);
@@ -169,49 +175,59 @@ const ImageUploader = ({ fieldName, onUrlChange }: { fieldName: string, onUrlCha
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" size="sm" type="button"><ImageIcon className="mr-2 h-4 w-4" />Set Image</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Set Image</DialogTitle>
-                </DialogHeader>
-                <Tabs defaultValue="upload">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="upload">Upload</TabsTrigger>
-                        <TabsTrigger value="url">From URL</TabsTrigger>
-                        <TabsTrigger value="ai">Generate with AI</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="upload" className="pt-4">
-                        <div 
-                            className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <div className="space-y-1 text-center">
-                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                <p>Click to upload a file</p>
-                                <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
-                            </div>
-                        </div>
-                        <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/png, image/jpeg, image/gif" />
-                        {isUploading && <div className="mt-2 flex items-center justify-center"><Loader2 className="animate-spin" /> Uploading...</div>}
-                    </TabsContent>
-                    <TabsContent value="url" className="pt-4 space-y-2">
-                        <Label htmlFor="imageUrl">Image URL</Label>
-                        <Input id="imageUrl" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com/image.png" />
-                        <Button type="button" onClick={() => { onUrlChange(url); setIsOpen(false); }}>Set URL</Button>
-                    </TabsContent>
-                    <TabsContent value="ai" className="pt-4 space-y-2">
-                         <Label htmlFor="aiPrompt">Image Prompt</Label>
-                        <Input id="aiPrompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., A majestic dragon soaring" />
-                        <Button type="button" onClick={handleGenerate} disabled={isGenerating}>
-                            {isGenerating ? <><Loader2 className="animate-spin" /> Generating...</> : "Generate"}
-                        </Button>
-                    </TabsContent>
-                </Tabs>
-            </DialogContent>
-        </Dialog>
+        <div className="space-y-2">
+            <div className="flex items-center gap-2">
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" type="button"><ImageIcon className="mr-2 h-4 w-4" />Set Image</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Set Image</DialogTitle>
+                        </DialogHeader>
+                        <Tabs defaultValue="upload">
+                            <TabsList className="grid w-full grid-cols-3">
+                                <TabsTrigger value="upload">Upload</TabsTrigger>
+                                <TabsTrigger value="url">From URL</TabsTrigger>
+                                <TabsTrigger value="ai">Generate with AI</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="upload" className="pt-4">
+                                <div 
+                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <div className="space-y-1 text-center">
+                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                        <p>Click to upload a file</p>
+                                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                                    </div>
+                                </div>
+                                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/png, image/jpeg, image/gif" />
+                                {isUploading && <div className="mt-2 flex items-center justify-center"><Loader2 className="animate-spin" /> Uploading...</div>}
+                            </TabsContent>
+                            <TabsContent value="url" className="pt-4 space-y-2">
+                                <Label htmlFor="imageUrl">Image URL</Label>
+                                <Input id="imageUrl" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com/image.png" />
+                                <Button type="button" onClick={() => { onUrlChange(url); setIsOpen(false); }}>Set URL</Button>
+                            </TabsContent>
+                            <TabsContent value="ai" className="pt-4 space-y-2">
+                                 <Label htmlFor="aiPrompt">Image Prompt</Label>
+                                <Input id="aiPrompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., A majestic dragon soaring" />
+                                <Button type="button" onClick={handleGenerate} disabled={isGenerating}>
+                                    {isGenerating ? <><Loader2 className="animate-spin" /> Generating...</> : <><Sparkles /> Generate</>}
+                                </Button>
+                            </TabsContent>
+                        </Tabs>
+                    </DialogContent>
+                </Dialog>
+                {value && (
+                    <Button variant="destructive" size="sm" type="button" onClick={() => onUrlChange('')}>
+                        <Trash2 className="mr-2 h-4 w-4" /> Remove
+                    </Button>
+                )}
+            </div>
+            {value && <Image src={value} alt="Preview" width={80} height={80} className="w-20 h-20 object-cover mt-2 rounded-md" />}
+        </div>
     );
 };
 
@@ -245,8 +261,7 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
                             <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
                             <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
                                 <>
-                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'aImage', url)} />
-                                  {field.value && <img src={field.value} alt="Preview" className="w-20 h-20 object-cover mt-2 rounded-md" />}
+                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'aImage', url)} value={field.value} />
                                 </>
                             )} />
                         </div>
@@ -257,8 +272,7 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
                              <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
                              <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
                                 <>
-                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'bImage', url)} />
-                                  {field.value && <img src={field.value} alt="Preview" className="w-20 h-20 object-cover mt-2 rounded-md" />}
+                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'bImage', url)} value={field.value} />
                                 </>
                             )} />
                         </div>
@@ -327,6 +341,10 @@ function AddQuizForm() {
   const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+  const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
+
   const [settings, setSettings] = useState({
     enableMatching: true,
     enableMultipleChoice: true,
@@ -410,99 +428,99 @@ function AddQuizForm() {
   }, [contentType, form]);
 
 
-  useEffect(() => {
-    const fetchFormData = async () => {
-      try {
-        setLoadingData(true);
-        const [subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
-            getSubjects(),
-            getBoards(),
-            getClasses(),
-            getStates(),
-            getExamTypes(),
-            getSettings()
-        ]);
-        
-        setSubjects(subjectData);
-        setBoards(boardData);
-        setClassCategories(classData);
-        setStates(stateData);
-        setExamCategories(examTypeData);
+  const fetchFormData = useCallback(async () => {
+    try {
+      setLoadingData(true);
+      const [subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
+          getSubjects(),
+          getBoards(),
+          getClasses(),
+          getStates(),
+          getExamTypes(),
+          getSettings()
+      ]);
+      
+      setSubjects(subjectData);
+      setBoards(boardData);
+      setClassCategories(classData);
+      setStates(stateData);
+      setExamCategories(examTypeData);
 
-        if (siteSettings) {
-          setSettings({
-              enableMatching: siteSettings.enableMatching ?? true,
-              enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
-              enableTrueFalse: siteSettings.enableTrueFalse ?? true,
-              enableShortAnswer: siteSettings.enableShortAnswer ?? true,
-              enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
-              enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
-              enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
-              enableClassMetafield: siteSettings.enableClassMetafield ?? true,
-              enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
-              enableStateMetafield: siteSettings.enableStateMetafield ?? true,
-              enableExamMetafield: siteSettings.enableExamMetafield ?? true,
-              enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
-              defaultBoard: siteSettings.defaultBoard ?? '',
-              defaultClassCategory: siteSettings.defaultClassCategory ?? '',
-              defaultClass: siteSettings.defaultClass ?? '',
-              defaultSubject: siteSettings.defaultSubject ?? '',
-              defaultChapter: siteSettings.defaultChapter ?? '',
-              defaultExamCategory: siteSettings.defaultExamCategory ?? '',
-              defaultState: siteSettings.defaultState ?? '',
-              defaultExam: siteSettings.defaultExam ?? '',
-          });
-
-          const currentValues = form.getValues();
-          form.reset({
-              ...currentValues,
-              board: currentValues.board || siteSettings.defaultBoard || '',
-              classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
-              class: currentValues.class || siteSettings.defaultClass || '',
-              subject: currentValues.subject || siteSettings.defaultSubject || '',
-              examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
-              state: currentValues.state || siteSettings.defaultState || '',
-              testType: contentType,
-          });
-          
-          const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
-          if (defaultClassCat) {
-            const fetchedGrades = await getGradesByClass(defaultClassCat);
-            setGrades(fetchedGrades);
-          }
-
-           if (form.getValues('subject')) {
-              const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
-              if (selectedSubject) {
-                  const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
-                  setChapters(fetchedChapters);
-                  if (siteSettings.defaultChapter && !form.getValues('chapter')) {
-                    form.setValue('chapter', siteSettings.defaultChapter);
-                  }
-              }
-          }
-          if (form.getValues('examCategory')) {
-              const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
-              if (selectedExamCategory) {
-                  const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
-                  setExams(fetchedExams);
-                   if (siteSettings.defaultExam && !form.getValues('exam')) {
-                    form.setValue('exam', siteSettings.defaultExam);
-                  }
-              }
-          }
-        }
-      } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "Error loading data",
-            description: "Could not load form data from the database."
+      if (siteSettings) {
+        setSettings({
+            enableMatching: siteSettings.enableMatching ?? true,
+            enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
+            enableTrueFalse: siteSettings.enableTrueFalse ?? true,
+            enableShortAnswer: siteSettings.enableShortAnswer ?? true,
+            enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
+            enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
+            enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
+            enableClassMetafield: siteSettings.enableClassMetafield ?? true,
+            enableExamCategoryMetafield: siteSettings.enableExamCategoryMetafield ?? true,
+            enableStateMetafield: siteSettings.enableStateMetafield ?? true,
+            enableExamMetafield: siteSettings.enableExamMetafield ?? true,
+            enableChapterMetafield: siteSettings.enableChapterMetafield ?? true,
+            defaultBoard: siteSettings.defaultBoard ?? '',
+            defaultClassCategory: siteSettings.defaultClassCategory ?? '',
+            defaultClass: siteSettings.defaultClass ?? '',
+            defaultSubject: siteSettings.defaultSubject ?? '',
+            defaultChapter: siteSettings.defaultChapter ?? '',
+            defaultExamCategory: siteSettings.defaultExamCategory ?? '',
+            defaultState: siteSettings.defaultState ?? '',
+            defaultExam: siteSettings.defaultExam ?? '',
         });
-      } finally {
-        setLoadingData(false);
+
+        const currentValues = form.getValues();
+        form.reset({
+            ...currentValues,
+            board: currentValues.board || siteSettings.defaultBoard || '',
+            classCategory: currentValues.classCategory || siteSettings.defaultClassCategory || '',
+            class: currentValues.class || siteSettings.defaultClass || '',
+            subject: currentValues.subject || siteSettings.defaultSubject || '',
+            examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
+            state: currentValues.state || siteSettings.defaultState || '',
+            testType: contentType,
+        });
+        
+        const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
+        if (defaultClassCat) {
+          const fetchedGrades = await getGradesByClass(defaultClassCat);
+          setGrades(fetchedGrades);
+        }
+
+         if (form.getValues('subject')) {
+            const selectedSubject = subjectData.find(s => s.name === form.getValues('subject'));
+            if (selectedSubject) {
+                const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
+                setChapters(fetchedChapters);
+                if (siteSettings.defaultChapter && !form.getValues('chapter')) {
+                  form.setValue('chapter', siteSettings.defaultChapter);
+                }
+            }
+        }
+        if (form.getValues('examCategory')) {
+            const selectedExamCategory = examTypeData.find(e => e.name === form.getValues('examCategory'));
+            if (selectedExamCategory) {
+                const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
+                setExams(fetchedExams);
+                 if (siteSettings.defaultExam && !form.getValues('exam')) {
+                  form.setValue('exam', siteSettings.defaultExam);
+                }
+            }
+        }
       }
-    };
-    
+    } catch (error) {
+      toast({
+          variant: "destructive",
+          title: "Error loading data",
+          description: "Could not load form data from the database."
+      });
+    } finally {
+      setLoadingData(false);
+    }
+  }, [form, toast]);
+
+  useEffect(() => {
     fetchFormData();
 
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
@@ -558,7 +576,7 @@ function AddQuizForm() {
           }
         }
     }
-  }, [form, replace, toast]);
+  }, [form, replace, toast, fetchFormData]);
   
   const questions = form.watch('questions');
   useEffect(() => {
@@ -752,6 +770,29 @@ function AddQuizForm() {
     }
   };
 
+  const handleAudioUploadClick = (fieldName: string) => {
+    setUploadingAudioField(fieldName);
+    audioInputRef.current?.click();
+  };
+
+  const handleAudioFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && uploadingAudioField) {
+        setIsUploadingAudio(true);
+        try {
+            const downloadURL = await uploadFile(file);
+            form.setValue(uploadingAudioField as any, downloadURL, { shouldValidate: true });
+            toast({ title: 'Audio uploaded!' });
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Upload Failed', description: (error as Error).message });
+        } finally {
+            setIsUploadingAudio(false);
+            setUploadingAudioField(null);
+            if(audioInputRef.current) audioInputRef.current.value = '';
+        }
+    }
+  };
+
   const handleSubjectChange = async (value: string) => {
       form.setValue('subject', value);
       form.setValue('chapter', '');
@@ -853,6 +894,7 @@ function AddQuizForm() {
   
   return (
     <div>
+        <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div>
                 <h1 className="font-headline text-3xl font-bold">Add New Quiz</h1>
@@ -1458,6 +1500,48 @@ function AddQuizForm() {
                                           </FormItem>
                                       )}
                                   />
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name={`questions.${index}.image`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Question Image</FormLabel>
+                                                    <FormControl>
+                                                        <ImageUploader
+                                                            fieldName={field.name}
+                                                            onUrlChange={(url) => form.setValue(`questions.${index}.image`, url, { shouldValidate: true })}
+                                                            value={field.value}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name={`questions.${index}.audio`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Question Audio</FormLabel>
+                                                    <div className="flex items-center gap-2">
+                                                        <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
+                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
+                                                            {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                        </Button>
+                                                        {!!field.value && (
+                                                            <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    {!!field.value && <audio controls src={field.value} className="w-full mt-2" />}
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                   
                                   {questionType === 'Multiple Choice' && (
                                       <div className="space-y-4">
@@ -1485,6 +1569,47 @@ function AddQuizForm() {
                                                                           <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
                                                                       )}
                                                                   />
+                                                                  <div className="grid grid-cols-2 gap-2">
+                                                                        <FormField
+                                                                            control={form.control}
+                                                                            name={`questions.${index}.options.${optionIndex}.image`}
+                                                                            render={({ field: imageField }) => (
+                                                                                <FormItem>
+                                                                                    <FormLabel className="text-xs">Image</FormLabel>
+                                                                                    <FormControl>
+                                                                                        <ImageUploader
+                                                                                            fieldName={imageField.name}
+                                                                                            onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)}
+                                                                                            value={imageField.value}
+                                                                                        />
+                                                                                    </FormControl>
+                                                                                </FormItem>
+                                                                            )}
+                                                                        />
+                                                                        <FormField
+                                                                            control={form.control}
+                                                                            name={`questions.${index}.options.${optionIndex}.audio`}
+                                                                            render={({ field: audioField }) => (
+                                                                                <FormItem>
+                                                                                    <FormLabel className="text-xs">Audio</FormLabel>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
+                                                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
+                                                                                            {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                                        </Button>
+                                                                                        {!!audioField.value && (
+                                                                                            <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
+                                                                                                <Trash2 className="w-4 h-4" />
+                                                                                            </Button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </FormItem>
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                    {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (
+                                                                        <audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" />
+                                                                    )}
                                                                   <FormField
                                                                       control={form.control}
                                                                       name={`questions.${index}.options.${optionIndex}.explanation`}
