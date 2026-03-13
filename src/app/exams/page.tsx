@@ -1,13 +1,34 @@
 
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import ExamsClientPage from './exams-client';
 import { getAllContent } from '@/lib/firebase/firestore';
 
-export const metadata: Metadata = {
-  title: 'Exams | DeshExam',
-  description: 'Practice with our extensive library of exams for NEET, JEE, UPSC and more. Simulate real exam conditions and get detailed performance analysis.',
-  keywords: ['exams', 'previous year papers', 'exam preparation', 'NEET exams', 'JEE papers', 'UPSC solved papers'],
-};
+export async function generateMetadata(
+  {},
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: 'Official Exam Papers & Previous Year Papers | DeshExam',
+    description: 'Practice with official exam papers and previous year question papers for NEET, JEE, UPSC, and more. Simulate real exam conditions and get detailed performance analysis to ace your preparation.',
+    keywords: ['exam papers', 'previous year papers', 'solved papers', 'exam preparation', 'NEET question papers', 'JEE previous papers', 'UPSC prelims papers'],
+    openGraph: {
+      title: 'Official Exam Papers & Previous Year Papers | DeshExam',
+      description: 'Practice with official exam papers and previous year question papers to ace your preparation.',
+      images: ['https://picsum.photos/seed/exams-og/1200/630', ...previousImages],
+      type: 'website',
+      url: 'https://deshexam.com/exams',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Official Exam Papers & Previous Year Papers | DeshExam',
+      description: 'Practice with official exam papers and previous year question papers to ace your preparation.',
+      images: ['https://picsum.photos/seed/exams-og/1200/630'],
+    },
+  };
+}
+
 
 // Helper to make Timestamps serializable
 const serializeTimestamps = (data: any): any => {

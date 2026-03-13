@@ -1,14 +1,34 @@
 
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import MockTestsClientPage from './mock-tests-client';
 import { getAllContent, getAllTextbooks } from '@/lib/firebase/firestore';
 import type { Textbook } from '@/lib/types';
 
-export const metadata: Metadata = {
-  title: 'Mock Tests | DeshExam',
-  description: 'Practice with our extensive library of mock tests for NEET, JEE, UPSC and more. Simulate real exam conditions and get detailed performance analysis.',
-  keywords: ['mock tests', 'online tests', 'exam preparation', 'NEET practice test', 'JEE mock test', 'UPSC prelims test'],
-};
+export async function generateMetadata(
+  {},
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: 'All Mock Tests | DeshExam',
+    description: 'Find and practice from a vast collection of mock tests for various competitive exams like NEET, JEE, UPSC, and more. Improve your speed, accuracy, and time management skills with our realistic exam simulations.',
+    keywords: ['mock tests', 'online test series', 'exam practice papers', 'NEET mock test', 'JEE Main mock test', 'UPSC prelims mock', 'competitive exam preparation'],
+    openGraph: {
+      title: 'All Mock Tests | DeshExam',
+      description: 'Find and practice from a vast collection of mock tests for various competitive exams.',
+      images: ['https://picsum.photos/seed/mock-tests-og/1200/630', ...previousImages],
+      type: 'website',
+      url: 'https://deshexam.com/mock-tests',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'All Mock Tests | DeshExam',
+      description: 'Find and practice from a vast collection of mock tests for various competitive exams.',
+      images: ['https://picsum.photos/seed/mock-tests-og/1200/630'],
+    },
+  };
+}
 
 // Helper to make Timestamps serializable
 const serializeTimestamps = (data: any): any => {

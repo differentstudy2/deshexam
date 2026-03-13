@@ -58,23 +58,23 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
         </div>
       </section>
 
-      <div className="bg-secondary/30">
+      <div className="bg-background">
         <div className="container py-12 md:py-16">
 
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 3 }).map((_, i) => (
-                 <Card key={i} className="flex flex-col overflow-hidden bg-card-gradient text-white">
+                 <Card key={i} className="flex flex-col overflow-hidden">
                   <CardHeader className="p-0 relative h-48">
-                    <Skeleton className="w-full h-full rounded-t-lg bg-slate-700" />
+                    <Skeleton className="w-full h-full rounded-t-lg" />
                   </CardHeader>
                   <CardContent className="p-4 flex-grow space-y-2">
-                      <Skeleton className="h-4 w-1/3 bg-slate-600" />
-                      <Skeleton className="h-6 w-full bg-slate-600" />
-                      <Skeleton className="h-10 w-full bg-slate-600" />
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-6 w-full" />
+                      <Skeleton className="h-10 w-full" />
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
-                      <Skeleton className="h-10 w-full bg-slate-600" />
+                      <Skeleton className="h-10 w-full" />
                   </CardFooter>
               </Card>
               ))}
@@ -82,7 +82,7 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
           ) : exams.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {exams.map((exam) => (
-                <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
+                <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                   <CardHeader className="p-0 relative h-48">
                     <Image
                       src={exam.featureImage || `https://picsum.photos/seed/${exam.id}/400/225`}
@@ -99,7 +99,7 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
                   <CardContent className="flex-grow p-4">
                     <p className="text-sm font-medium text-primary">{exam.subject}</p>
                     <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{exam.title}</CardTitle>
-                    <p className="text-xs text-slate-300 line-clamp-2">
+                    <p className="text-sm text-muted-foreground line-clamp-2">
                       {exam.description || `A comprehensive exam covering ${exam.subject}.`}
                     </p>
                   </CardContent>

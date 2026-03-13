@@ -32,6 +32,7 @@ type Test = {
   classCategory?: string;
   class?: string;
   featureImage?: string;
+  description?: string;
 };
 
 const ITEMS_PER_PAGE = 12;
@@ -82,22 +83,22 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
           </p>
         </div>
     </section>
-    <div className="bg-secondary/30">
+    <div className="bg-background">
       <div className="container py-12 md:py-16">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Card key={i} className="flex flex-col overflow-hidden bg-card-gradient text-white">
+              <Card key={i} className="flex flex-col overflow-hidden">
                   <CardHeader className="p-0 relative h-48">
-                    <Skeleton className="w-full h-full rounded-t-lg bg-slate-700" />
+                    <Skeleton className="w-full h-full rounded-t-lg" />
                   </CardHeader>
                   <CardContent className="p-4 flex-grow space-y-2">
-                      <Skeleton className="h-4 w-1/3 bg-slate-600" />
-                      <Skeleton className="h-6 w-full bg-slate-600" />
-                      <Skeleton className="h-10 w-full bg-slate-600" />
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-6 w-full" />
+                      <Skeleton className="h-10 w-full" />
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
-                      <Skeleton className="h-10 w-full bg-slate-600" />
+                      <Skeleton className="h-10 w-full" />
                   </CardFooter>
               </Card>
             ))}
@@ -106,7 +107,7 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleTests.map((test) => (
-                <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
+                <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                   <CardHeader className="p-0 relative h-48">
                     <Image
                       src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
@@ -126,12 +127,12 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
                         {test.board && <Badge variant="outline">{test.board}</Badge>}
                         {test.class && <Badge variant="outline">{test.class}</Badge>}
                     </div>
-                    <CardTitle className="font-headline text-lg mt-1 leading-snug">
+                    <CardTitle className="font-headline text-xl mt-1 leading-snug">
                       {test.subtitle && <span className="text-primary block text-sm font-medium">{test.subtitle}</span>}
                       {test.title}
                     </CardTitle>
-                    <p className="text-xs text-slate-300 line-clamp-2 mt-1">
-                      {test.textbookTitle && `From: ${test.textbookTitle}`}
+                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                      {test.description || (test.textbookTitle && `From: ${test.textbookTitle}`)}
                     </p>
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
