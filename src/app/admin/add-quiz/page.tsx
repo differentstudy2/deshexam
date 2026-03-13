@@ -25,7 +25,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, uploadFile, getSubjects, getBoards, getExamTypes, getClasses, getStates, getGradesByClass, getExamsByCategory } from '@/lib/firebase/firestore';
-import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson } from 'lucide-react';
+import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Save } from 'lucide-react';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
@@ -46,6 +46,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 
 
 const quizQuestionSchema = z.object({
@@ -56,6 +60,7 @@ const quizQuestionSchema = z.object({
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
     audio: z.string().optional(),
+    explanation: z.string().optional(),
   })).min(4).max(4),
   correctAnswer: z.string().min(1, "Please select a correct answer."),
   explanation: z.string().optional(),
@@ -78,6 +83,7 @@ const formSchema = z.object({
   access: z.enum(['free', 'premium', 'pro']).default('free'),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
+  publishedAt: z.date().optional(),
 });
 
 
@@ -226,10 +232,41 @@ function AddQuizForm() {
   }, [selectedExamCategory]);
 
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'questions',
   });
+  
+   useEffect(() => {
+    const aiContentRaw = sessionStorage.getItem('aiGeneratedContent');
+    if (aiContentRaw) {
+      try {
+        const aiContent = JSON.parse(aiContentRaw);
+        if (aiContent.testType === 'Quiz') {
+            form.setValue('title', aiContent.title);
+            form.setValue('description', aiContent.description);
+            form.setValue('difficulty', aiContent.difficulty);
+            replace(aiContent.questions.map((q: any) => ({
+                ...q,
+                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+                explanation: q.explanation || ''
+            })));
+            toast({
+                title: 'Quiz Content Loaded!',
+                description: 'AI-generated content has been populated into the form.',
+            });
+        }
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Failed to load AI content',
+        });
+      } finally {
+          sessionStorage.removeItem('aiGeneratedContent');
+      }
+    }
+  }, [replace, toast, form]);
+
 
   const processJsonImport = (jsonString: string) => {
     try {
@@ -338,10 +375,20 @@ function AddQuizForm() {
   
   return (
     <div>
-      <h1 className="font-headline text-3xl font-bold">Add New Quiz</h1>
-      <p className="text-muted-foreground mb-6">
-          Create a new quiz with questions, images, and audio.
-      </p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+            <h1 className="font-headline text-3xl font-bold">Add New Quiz</h1>
+            <p className="text-muted-foreground">
+                Create a new quiz with questions, images, and audio.
+            </p>
+        </div>
+        <Button asChild variant="outline" className="w-full md:w-auto">
+            <Link href="/admin/add-content/ai-content?contentType=Quiz">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate with AI
+            </Link>
+        </Button>
+      </div>
       <ContentTypeNavigation />
         
       <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
@@ -358,7 +405,126 @@ function AddQuizForm() {
               <CardContent className="space-y-6">
                 <FormField control={form.control} name="title" render={({ field }) => ( <FormItem> <FormLabel>Title</FormLabel> <FormControl> <Input placeholder="e.g., Fun Animal Sounds Quiz" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
                 <FormField control={form.control} name="description" render={({ field }) => ( <FormItem> <FormLabel>Description</FormLabel> <FormControl> <Input placeholder="A fun quiz about identifying animal sounds!" {...field} /> </FormControl> <FormMessage /> </FormItem> )}/>
-                <FormField control={form.control} name="featureImage" render={({ field }) => ( <FormItem> <FormLabel>Feature Image</FormLabel> <FormControl> <ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })} value={field.value} /> </FormControl> <FormMessage /> </FormItem> )}/>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="board"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Board</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl>
+                                    <SelectContent>{boards.map((board) => (<SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>))}</SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="classCategory"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Class Category</FormLabel>
+                                <Select onValueChange={(value) => { field.onChange(value); form.setValue('class', ''); }} value={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
+                                    <SelectContent>{classCategories.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}</SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                            <FormField
+                            control={form.control}
+                            name="class"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Grade</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategory}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a grade" /></SelectTrigger></FormControl>
+                                    <SelectContent>{grades.map((g) => (<SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>))}</SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="subject"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Subject</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl>
+                                    <SelectContent>{subjects.map((subject) => ( <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>))}</SelectContent>
+                                </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="difficulty"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Difficulty Level</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a difficulty" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Easy">Easy</SelectItem>
+                                    <SelectItem value="Medium">Medium</SelectItem>
+                                    <SelectItem value="Hard">Hard</SelectItem>
+                                </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="featureImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Feature Image</FormLabel>
+                      <FormControl>
+                        <ImageUploader
+                            fieldName={field.name}
+                            onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })}
+                            value={field.value}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="publishedAt"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                        <FormLabel>Publish Date</FormLabel>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button variant={"outline"} className={cn("pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>
+                                {field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus/>
+                            </PopoverContent>
+                        </Popover>
+                         <FormMessage />
+                        </FormItem>
+                    )}
+                />
               </CardContent>
             </Card>
                 
@@ -399,82 +565,47 @@ function AddQuizForm() {
                                     )}/>
                                 </div>
                                 
-                                <FormField
+                                <Controller
                                   control={form.control}
                                   name={`questions.${index}.correctAnswer`}
                                   render={({ field }) => (
-                                    <FormItem className="space-y-3">
-                                      <FormLabel>Options</FormLabel>
-                                      <FormControl>
-                                        <RadioGroup
-                                          onValueChange={field.onChange}
-                                          value={field.value}
-                                          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                                        >
-                                          {[0, 1, 2, 3].map((optionIndex) => (
-                                            <Card key={optionIndex} className="p-4 bg-background">
-                                              <div className="space-y-4">
-                                                <div className="flex items-center gap-3">
-                                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                                    <FormControl>
-                                                      <RadioGroupItem
-                                                        value={
-                                                          form.watch(`questions.${index}.options.${optionIndex}.text`) || ""
-                                                        }
-                                                        disabled={
-                                                          !form.watch(`questions.${index}.options.${optionIndex}.text`)
-                                                        }
-                                                      />
-                                                    </FormControl>
+                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <FormLabel className="col-span-full">Options</FormLabel>
+                                      {[0, 1, 2, 3].map((optionIndex) => (
+                                        <Card key={optionIndex} className="p-4 bg-background">
+                                          <div className="space-y-4">
+                                            <div className="flex items-center gap-3">
+                                              <FormControl>
+                                                <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`) || ""} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
+                                              </FormControl>
+                                              <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => ( <FormItem className="flex-1"> <FormLabel className="sr-only"> Option {optionIndex + 1} Text </FormLabel> <FormControl><Input {...optionField} /></FormControl> <FormMessage /> </FormItem> )}/>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                              <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
+                                              <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
+                                                  <FormItem>
+                                                      <FormLabel className="text-xs">Audio</FormLabel>
+                                                      <FormControl>
+                                                          <div className="flex items-center gap-2">
+                                                              <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
+                                                              <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
+                                                                  {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                              </Button>
+                                                              {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}> <Trash2 className="w-4 h-4" /> </Button>)}
+                                                          </div>
+                                                      </FormControl>
+                                                      {!!audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
+                                                      <FormMessage />
                                                   </FormItem>
-                                                  <FormField
-                                                    control={form.control}
-                                                    name={`questions.${index}.options.${optionIndex}.text`}
-                                                    render={({ field: optionField }) => (
-                                                      <FormItem className="flex-1">
-                                                        <FormLabel className="sr-only">
-                                                          Option {optionIndex + 1} Text
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                          <Input {...optionField} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                      </FormItem>
-                                                    )}
-                                                  />
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                  <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
-                                                  <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                      <FormItem>
-                                                          <FormLabel className="text-xs">Audio</FormLabel>
-                                                          <FormControl>
-                                                              <div className="flex items-center gap-2">
-                                                                  <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
-                                                                  <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
-                                                                      {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
-                                                                  </Button>
-                                                                  {!!audioField.value && (
-                                                                      <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
-                                                                          <Trash2 className="w-4 h-4" />
-                                                                      </Button>
-                                                                  )}
-                                                              </div>
-                                                          </FormControl>
-                                                          {!!audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}/>
-                                                </div>
-                                              </div>
-                                            </Card>
-                                          ))}
-                                        </RadioGroup>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
+                                              )}/>
+                                            </div>
+                                          </div>
+                                        </Card>
+                                      ))}
+                                    </RadioGroup>
                                   )}
                                 />
+                                <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
                                 <FormField
                                     control={form.control}
                                     name={`questions.${index}.explanation`}
@@ -557,9 +688,15 @@ function AddQuizForm() {
                     </div>
                 </CardContent>
             </Card>
-          <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Quiz"}
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button 
+                type="submit" 
+                disabled={form.formState.isSubmitting}
+            >
+                <Save className="mr-2 h-4 w-4"/>
+                {form.formState.isSubmitting ? "Saving..." : "Save Quiz"}
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
@@ -568,7 +705,7 @@ function AddQuizForm() {
 
 export default function AddQuizPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-12 w-12 animate-spin"/></div>}>
             <AddQuizForm />
         </Suspense>
     )
