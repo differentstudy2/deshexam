@@ -97,7 +97,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
                   <CardContent className="flex-grow p-4">
                     <p className="text-sm font-medium text-primary-foreground/80">{quiz.subject}</p>
                     <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
-                    <p className="text-sm text-primary-foreground/70 line-clamp-2">
+                    <p className="text-sm text-primary-foreground/70 line-clamp-3">
                       {quiz.description || `A fun quiz about ${quiz.subject}.`}
                     </p>
                   </CardContent>

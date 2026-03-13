@@ -76,15 +76,15 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
                                 src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/300`}
                                 alt={quiz.title}
                                 fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="object-cover group-hover:scale-110 transition-transform duration-300"
                                 data-ai-hint="quiz fun kids"
                             />
                         </CardHeader>
                         <CardContent className="p-4 flex-grow">
-                            <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
+                            <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
                                 {quiz.title}
                             </CardTitle>
-                            <p className="text-sm text-slate-300 line-clamp-3">
+                            <p className="text-sm text-slate-300 line-clamp-2">
                                 {quiz.description}
                             </p>
                         </CardContent>
