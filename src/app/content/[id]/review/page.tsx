@@ -80,21 +80,21 @@ function QuestionReview({ question, userAnswer, questionIndex, onVote }: { quest
 
     return (
         <Card className="bg-card/60 backdrop-blur-sm px-6 pb-6 pt-0 shadow-none border scroll-m-24">
-            <CardHeader className="p-0 pb-2">
-                 <CardTitle className="flex items-baseline gap-2 text-xl font-semibold">
+            <CardHeader className="p-6 pb-2 bg-[#0e8107] text-white rounded-t-lg -mx-6 mb-6">
+                 <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert max-w-none text-white">
                     <span className="self-start">{questionIndex + 1}.</span>
                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>
                         {question.text}
                     </ReactMarkdown>
                 </CardTitle>
-                 <div className="flex justify-between items-center text-sm text-muted-foreground">
+                 <div className="flex justify-between items-center text-sm text-white/80">
                      <div className="flex items-center gap-2">
                         {isCorrect ? (
-                            <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">Correct</Badge>
+                            <Badge variant="default" className="bg-white/90 text-green-800 border-green-200">Correct</Badge>
                         ) : (
                             <Badge variant="destructive">Incorrect</Badge>
                         )}
-                        {question.id && <Button asChild variant="ghost" size="sm"><Link href={`/question/${question.id}`} target="_blank"><ExternalLink className="h-4 w-4 mr-2" /> View Discussion</Link></Button>}
+                        {question.id && <Button asChild variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/20"><Link href={`/question/${question.id}`} target="_blank"><ExternalLink className="h-4 w-4 mr-2" /> View Discussion</Link></Button>}
                     </div>
                 </div>
             </CardHeader>
@@ -119,8 +119,8 @@ function QuestionReview({ question, userAnswer, questionIndex, onVote }: { quest
                                         : <XCircle className="w-5 h-5 text-destructive mt-0.5 shrink-0" />
                                     }
                                     <div className="flex-1">
-                                        <div className="flex items-center justify-between">
-                                            <p>{option.text}</p>
+                                        <div className="flex items-center justify-between prose dark:prose-invert max-w-none custom-prose-style">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
                                             {isUserAnswer && <Badge variant={isCorrectAnswer ? "default" : "destructive"} className="ml-2">Your Answer</Badge>}
                                         </div>
                                          {option.explanation && (
@@ -315,44 +315,50 @@ function ReviewDisplay() {
 
         setIsVoting(prev => ({...prev, [questionId]: true}));
         
-        const originalQuestions = test.questions;
-        const updatedQuestions = test.questions.map(q => {
-            if (q.id === questionId) {
-                const hasLiked = q.likedBy?.includes(user.uid);
-                const hasDisliked = q.dislikedBy?.includes(user.uid);
-                let newLikedBy = [...(q.likedBy || [])];
-                let newDislikedBy = [...(q.dislikedBy || [])];
+        const originalQuestions = [...test.questions];
+        const questionIndex = test.questions.findIndex(q => q.id === questionId);
+        if (questionIndex === -1) {
+            setIsVoting(prev => ({...prev, [questionId]: false}));
+            return;
+        }
 
-                if (voteType === 'like') {
-                    if (hasLiked) {
-                        newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-                    } else {
-                        newLikedBy.push(user.uid);
-                        if (hasDisliked) {
-                            newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-                        }
-                    }
-                } else {
-                    if (hasDisliked) {
-                        newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-                    } else {
-                        newDislikedBy.push(user.uid);
-                        if (hasLiked) {
-                            newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-                        }
-                    }
+        const questionToUpdate = { ...test.questions[questionIndex] };
+        
+        const hasLiked = questionToUpdate.likedBy?.includes(user.uid);
+        const hasDisliked = questionToUpdate.dislikedBy?.includes(user.uid);
+        let newLikedBy = [...(questionToUpdate.likedBy || [])];
+        let newDislikedBy = [...(questionToUpdate.dislikedBy || [])];
+
+        if (voteType === 'like') {
+            if (hasLiked) {
+                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+            } else {
+                newLikedBy.push(user.uid);
+                if (hasDisliked) {
+                    newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
                 }
-                return {
-                    ...q,
-                    likedBy: newLikedBy,
-                    dislikedBy: newDislikedBy,
-                    likes: newLikedBy.length,
-                    dislikes: newDislikedBy.length
-                };
             }
-            return q;
-        });
+        } else {
+            if (hasDisliked) {
+                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+            } else {
+                newDislikedBy.push(user.uid);
+                if (hasLiked) {
+                    newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+                }
+            }
+        }
 
+        const updatedQuestion = {
+            ...questionToUpdate,
+            likedBy: newLikedBy,
+            dislikedBy: newDislikedBy,
+            likes: newLikedBy.length,
+            dislikes: newDislikedBy.length
+        };
+        
+        const updatedQuestions = [...test.questions];
+        updatedQuestions[questionIndex] = updatedQuestion;
         setTest(prevTest => prevTest ? { ...prevTest, questions: updatedQuestions } : null);
 
         try {
@@ -463,6 +469,23 @@ function ReviewDisplay() {
                     </>
                 )}
             </div>
+            <Separator />
+             <div className="flex gap-4 justify-center pt-2">
+                <Button asChild>
+                <Link href={`${testType.toLowerCase().replace(/\s+/g, '-')}/${test.id}/review?submissionId=${submissionId}`}>
+                    <FileQuestion className="mr-2"/>
+                    Review Answers
+                </Link>
+                </Button>
+                <Button variant="outline" asChild>
+                <Link href={`${testType.toLowerCase().replace(/\s+/g, '-')}/${test.id}`}>Try Again</Link>
+                </Button>
+            </div>
+            <div className="pt-2 text-center">
+                    <Button variant="link" asChild>
+                        <Link href={`/${testType.toLowerCase().replace(/\s+/g, '-')}s`}>Back to {test.testType}s</Link>
+                    </Button>
+            </div>
         </CardContent>
       </Card>
 
@@ -484,7 +507,8 @@ function ReviewDisplay() {
             </CardContent>
         </Card>
       </>
-    );
+    </div>
+  );
 }
 
 export default function TestReviewPage() {
