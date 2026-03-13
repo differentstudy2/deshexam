@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -62,8 +61,8 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
         <div className="container py-12 md:py-16">
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 3 }).map((_, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
                  <Card key={i} className="flex flex-col overflow-hidden">
                   <CardHeader className="p-0 relative h-48">
                     <Skeleton className="w-full h-full rounded-t-lg" />
@@ -80,7 +79,7 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
               ))}
             </div>
           ) : exams.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {exams.map((exam) => (
                 <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                   <CardHeader className="p-0 relative h-48">
