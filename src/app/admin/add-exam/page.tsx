@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
@@ -61,7 +62,6 @@ import { usePathname } from 'next/navigation';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
-  explanation: z.string().optional(),
 });
 
 const matchingOptionSchema = z.object({
@@ -512,7 +512,7 @@ function AddContentForm() {
         const existingQuestions = form.getValues('questions') || [];
         const combinedQuestions = [...existingQuestions, ...newQuestions.map((q: any) => ({
             ...q,
-            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
             explanation: q.explanation || ''
         }))];
         replace(combinedQuestions);
@@ -540,7 +540,7 @@ function AddContentForm() {
             form.setValue('testType', aiContent.contentType);
             replace(aiContent.questions.map((q: any) => ({
                 ...q,
-                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+                options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
                 explanation: q.explanation || ''
             })));
             toast({
@@ -1485,13 +1485,6 @@ function AddContentForm() {
                                                                           <Input {...optionField} placeholder={`Option ${optionIndex + 1}`} />
                                                                       )}
                                                                   />
-                                                                  <FormField
-                                                                      control={form.control}
-                                                                      name={`questions.${index}.options.${optionIndex}.explanation`}
-                                                                      render={({ field: explanationField }) => (
-                                                                          <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
-                                                                      )}
-                                                                  />
                                                               </div>
                                                           </div>
                                                       ))}
@@ -1520,30 +1513,6 @@ function AddContentForm() {
                                                   </FormItem>
                                               )}
                                           />
-                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.options.0.explanation`}
-                                                  render={({ field }) => (
-                                                      <FormItem>
-                                                          <FormLabel>Explanation for "True"</FormLabel>
-                                                          <FormControl><Textarea placeholder="Explain why it's true..." {...field} /></FormControl>
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}
-                                              />
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.options.1.explanation`}
-                                                  render={({ field }) => (
-                                                      <FormItem>
-                                                          <FormLabel>Explanation for "False"</FormLabel>
-                                                          <FormControl><Textarea placeholder="Explain why it's false..." {...field} /></FormControl>
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}
-                                              />
-                                          </div>
                                       </div>
                                   )}
                                   {questionType === 'Matching' && (
@@ -1593,7 +1562,7 @@ function AddContentForm() {
                             text: '', 
                             type: 'Multiple Choice', 
                             marks: 1, 
-                            options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
+                            options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], 
                             correctAnswer: '', 
                             explanation: '' 
                         };
@@ -1647,3 +1616,5 @@ export default function CreateTestPage() {
         </Suspense>
     )
 }
+
+    

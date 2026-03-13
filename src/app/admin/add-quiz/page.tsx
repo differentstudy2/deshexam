@@ -63,7 +63,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
-  explanation: z.string().optional(),
   image: z.string().optional(),
   audio: z.string().optional(),
 });
@@ -530,7 +529,7 @@ function AddQuizForm() {
         const existingQuestions = form.getValues('questions') || [];
         const combinedQuestions = [...existingQuestions, ...newQuestions.map((q: any) => ({
             ...q,
-            options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+            options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
             explanation: q.explanation || ''
         }))];
         replace(combinedQuestions);
@@ -558,7 +557,7 @@ function AddQuizForm() {
             form.setValue('testType', aiContent.contentType);
             replace(aiContent.questions.map((q: any) => ({
                 ...q,
-                options: q.options || (q.type === 'Multiple Choice' ? [{text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}, {text:'', explanation:''}] : undefined),
+                options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
                 explanation: q.explanation || ''
             })));
             toast({
@@ -1610,13 +1609,6 @@ function AddQuizForm() {
                                                                     {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (
                                                                         <audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" />
                                                                     )}
-                                                                  <FormField
-                                                                      control={form.control}
-                                                                      name={`questions.${index}.options.${optionIndex}.explanation`}
-                                                                      render={({ field: explanationField }) => (
-                                                                          <Textarea {...explanationField} placeholder={`Explanation for Option ${optionIndex + 1}`} />
-                                                                      )}
-                                                                  />
                                                               </div>
                                                           </div>
                                                       ))}
@@ -1645,30 +1637,6 @@ function AddQuizForm() {
                                                   </FormItem>
                                               )}
                                           />
-                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.options.0.explanation`}
-                                                  render={({ field }) => (
-                                                      <FormItem>
-                                                          <FormLabel>Explanation for "True"</FormLabel>
-                                                          <FormControl><Textarea placeholder="Explain why it's true..." {...field} /></FormControl>
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}
-                                              />
-                                               <FormField
-                                                  control={form.control}
-                                                  name={`questions.${index}.options.1.explanation`}
-                                                  render={({ field }) => (
-                                                      <FormItem>
-                                                          <FormLabel>Explanation for "False"</FormLabel>
-                                                          <FormControl><Textarea placeholder="Explain why it's false..." {...field} /></FormControl>
-                                                          <FormMessage />
-                                                      </FormItem>
-                                                  )}
-                                              />
-                                          </div>
                                       </div>
                                   )}
                                   {questionType === 'Matching' && (
@@ -1718,7 +1686,7 @@ function AddQuizForm() {
                             text: '', 
                             type: 'Multiple Choice', 
                             marks: 1, 
-                            options: [{text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}, {text: '', explanation: ''}], 
+                            options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], 
                             correctAnswer: '', 
                             explanation: '' 
                         };

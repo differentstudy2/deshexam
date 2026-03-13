@@ -13,7 +13,7 @@ const QuestionSchema = z.object({
   text: z.string().describe('The text of the question.'),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Grouped']),
   marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').default(1),
-  options: z.array(z.object({ text: z.string(), explanation: z.string().optional() })).optional(),
+  options: z.array(z.object({ text: z.string() })).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
   subQuestions: z.array(z.object({
@@ -21,7 +21,7 @@ const QuestionSchema = z.object({
     text: z.string().optional(),
     type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
     marks: z.coerce.number().optional(),
-    options: z.array(z.object({ text: z.string(), explanation: z.string().optional() })).optional(),
+    options: z.array(z.object({ text: z.string() })).optional(),
     correctAnswer: z.any().optional(),
     explanation: z.string().optional(),
   })).optional(),
@@ -70,7 +70,7 @@ For each question, provide:
 - The question text. For "Fill in the Blank" questions, use "____" to indicate the blank. For "Grouped" questions, provide the main passage or instruction.
 - The question type. You can mix the types from the list provided.
 - The marks for the question (default to 1).
-- For 'Multiple Choice' questions, provide exactly 4 options with explanations for each.
+- For 'Multiple Choice' questions, provide exactly 4 options.
 - The correct answer.
 - A general explanation for the correct answer.
 - For 'Grouped' questions, provide an array of 'subQuestions' with their own properties.
@@ -88,7 +88,5 @@ const generateTextbookQuestionsFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
 
     
