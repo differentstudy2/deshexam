@@ -60,7 +60,7 @@ export default function FunQuizzesPage() {
 
   return (
     <div className="bg-orange-50 dark:bg-orange-900/20 min-h-screen">
-       <section className="relative w-full py-20 md:py-28 lg:py-36 bg-gradient-to-br from-orange-400 to-rose-500">
+       <section className="relative w-full py-20 md:py-28 lg:py-36 bg-gradient-to-br from-black to-[#0f9b0f]">
         <div className="absolute inset-0">
           <Image
             src="https://picsum.photos/seed/kids-quizzes/1920/1080"
@@ -123,7 +123,7 @@ export default function FunQuizzesPage() {
                         </p>
                     </CardContent>
                     <CardFooter className="p-4 pt-0 mt-auto">
-                        <Button asChild className="w-full">
+                        <Button asChild className="w-full bg-gradient-to-r from-black to-[#0f9b0f] text-white">
                             <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
                         </Button>
                     </CardFooter>
