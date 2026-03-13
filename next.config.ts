@@ -65,18 +65,6 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'pixabay.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'cdn.pixabay.com',
-        port: '',
-        pathname: '/**',
-      },
     ],
   },
   async rewrites() {
@@ -98,10 +86,6 @@ const nextConfig: NextConfig = {
         destination: '/textbook-solutions/exam/:examId/textbook/:bookId',
       },
       {
-        source: '/:bookId/text-practice-sets/:practiceSetId',
-        destination: '/content/:practiceSetId',
-      },
-      {
         source: '/textbook-solutions/:bookId/quiz/:quizId',
         destination: '/textbook-solutions/quiz/:quizId/textbook/:bookId',
       },
@@ -109,15 +93,12 @@ const nextConfig: NextConfig = {
         source: '/practice-questions/:id*',
         destination: '/content/:id*',
       },
-      {
-        source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
-        destination: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
-      },
     ];
   }
 };
 
 export default nextConfig;
+
 
 
 
