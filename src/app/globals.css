@@ -208,8 +208,8 @@
 
 .image-grid img {
   width: 100%;
-  height: auto;
-  display: block;
+  height: 250px;
+  display: block; /* নিচের বাড়তি গ্যাপ দূর করতে */
 }
 
 .image-grid figcaption {
@@ -469,3 +469,12 @@ strong {
   padding: 1rem;
   color: hsl(var(--secondary-foreground));
 }
+
+@layer utilities {
+  .bg-orange-50 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 247 237 / 0%);
+  }
+}
+
+    
