@@ -20,7 +20,7 @@ const kidsFeatures = [
     description: "Test your knowledge with exciting quizzes on animals, space, and more!",
     link: "/kids-zone/fun-quizzes",
     image: "https://picsum.photos/seed/fun-quizzes/400/300",
-    imageHint: "quiz animals space"
+    imageHint: "quiz fun kids"
   },
   {
     icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
@@ -102,7 +102,7 @@ export default function KidsZonePage() {
   };
 
   return (
-    <div>
+    <div className="bg-secondary/30">
         <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
@@ -112,25 +112,24 @@ export default function KidsZonePage() {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         
-        <section className="relative w-full py-20 md:py-28 lg:py-36 bg-amber-100 dark:bg-amber-900/20">
+        <section className="relative w-full py-20 md:py-28 lg:py-36" style={{ background: 'linear-gradient(to right, #71B280, #134E5E)' }}>
             <div className="absolute inset-0 z-0">
                 <Image
                     src="https://picsum.photos/seed/kids-zone-hero/1920/1080"
                     alt="A playful and colorful abstract background for kids"
                     fill
-                    className="object-cover opacity-20"
+                    className="object-cover opacity-10"
                     data-ai-hint="kids playful abstract"
                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
             </div>
              <div className="container mx-auto px-4 relative z-10 text-center">
-               <div className="inline-block bg-white/30 dark:bg-black/30 backdrop-blur-sm p-4 rounded-full mb-4 border">
-                 <ToyBrick className="w-12 h-12 text-amber-500" />
+               <div className="inline-block bg-white/20 dark:bg-black/30 backdrop-blur-sm p-4 rounded-full mb-4 border border-white/20">
+                 <ToyBrick className="w-12 h-12 text-white" />
                </div>
-              <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-amber-800 dark:text-amber-200 drop-shadow-lg">
+              <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-yellow-300 animate-gradient-text drop-shadow-lg">
                 Welcome to the Kids Zone!
               </h1>
-              <p className="text-lg md:text-xl mt-4 max-w-3xl mx-auto text-amber-700 dark:text-amber-300 drop-shadow-md">
+              <p className="text-lg md:text-xl mt-4 max-w-3xl mx-auto text-white/90 drop-shadow-md">
                 A safe and exciting world of interactive games, fun quizzes, and engaging activities designed to make learning languages and math an unforgettable adventure for children.
               </p>
             </div>

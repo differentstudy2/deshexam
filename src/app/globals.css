@@ -232,6 +232,23 @@
       margin-bottom: 0.5rem;
     }
   }
+
+  @keyframes gradient-animation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient-text {
+    background-size: 200% auto;
+    animation: gradient-animation 8s ease-in-out infinite;
+  }
 }
 
 .ql-editor {
@@ -476,5 +493,3 @@ strong {
     background-color: rgb(255 247 237 / 0%);
   }
 }
-
-    
