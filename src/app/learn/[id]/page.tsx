@@ -42,6 +42,12 @@ export async function generateMetadata(
       publishedTime: publishedTime,
       authors: [article.authorName],
     },
+     twitter: {
+      card: 'summary_large_image',
+      title: formatTitleForBrowser(article.title),
+      description: formatTitleForBrowser(article.description),
+      images: [article.featureImage || `https://picsum.photos/seed/${id}/800/450`],
+    },
   };
 }
 
