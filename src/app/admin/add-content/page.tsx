@@ -58,6 +58,7 @@ import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 const optionSchema = z.object({
@@ -1530,7 +1531,7 @@ function AddContentForm() {
                                                         </Button>
                                                         {!!field.value && (
                                                             <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
-                                                                <Trash2 className="w-4 w-4" />
+                                                                <Trash2 className="w-4 h-4" />
                                                             </Button>
                                                         )}
                                                     </div>
