@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -68,11 +67,11 @@ export default function FunQuizzesPage() {
         </header>
 
         {loading ? (
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
            </div>
         ) : quizzes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {quizzes.map((quiz, index) => (
               <Card key={quiz.id} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
                 <CardHeader className="items-center">
