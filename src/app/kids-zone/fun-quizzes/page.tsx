@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { ArrowLeft, Loader2, PawPrint } from "lucide-react";
 import Link from "next/link";
 import { getAllContent } from '@/lib/firebase/firestore';
@@ -67,30 +67,46 @@ export default function FunQuizzesPage() {
         </header>
 
         {loading ? (
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-64 w-full" />)}
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+                <Card key={i} className="flex flex-col overflow-hidden">
+                    <Skeleton className="h-48 w-full" />
+                    <CardContent className="p-4 flex-grow space-y-2">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                    </CardContent>
+                    <CardFooter className="p-4 pt-0">
+                        <Skeleton className="h-10 w-full" />
+                    </CardFooter>
+                </Card>
+            ))}
            </div>
         ) : quizzes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {quizzes.map((quiz, index) => (
-              <Card key={quiz.id} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
-                <CardHeader className="items-center">
-                  <div className={`p-4 rounded-full mb-4 bg-orange-100`}>
-                    {quiz.featureImage ? 
-                      <Image src={quiz.featureImage} alt={quiz.title} width={40} height={40} className="rounded-full" /> 
-                      : <PawPrint className="w-10 h-10 text-orange-500" />
-                    }
-                  </div>
-                  <CardTitle className="font-headline text-2xl">{quiz.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-muted-foreground">{quiz.description}</p>
-                </CardContent>
-                <div className="p-6 pt-0">
-                  <Button asChild>
-                    <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
-                  </Button>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {quizzes.map((quiz) => (
+              <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+                  <CardHeader className="p-0 relative h-48">
+                      <Image
+                          src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/300`}
+                          alt={quiz.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                  </CardHeader>
+                  <CardContent className="p-4 flex-grow">
+                      <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
+                          {quiz.title}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                          {quiz.description}
+                      </p>
+                  </CardContent>
+                  <CardFooter className="p-4 pt-0 mt-auto">
+                      <Button asChild className="w-full">
+                          <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
+                      </Button>
+                  </CardFooter>
               </Card>
             ))}
           </div>
