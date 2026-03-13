@@ -39,9 +39,6 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
           />
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center text-white">
-           <div className="inline-block bg-white/20 p-4 rounded-full mb-4">
-             <PawPrint className="w-12 h-12" />
-           </div>
           <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg">
             Fun Quizzes for Kids
           </h1>
