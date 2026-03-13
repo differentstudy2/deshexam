@@ -70,7 +70,7 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
             <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {visibleQuizzes.map((quiz) => (
-                    <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group bg-white dark:bg-slate-900/50">
+                    <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group bg-card-gradient text-white">
                         <CardHeader className="p-0 relative h-48">
                             <Image
                                 src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/300`}
@@ -84,12 +84,12 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
                             <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
                                 {quiz.title}
                             </CardTitle>
-                            <p className="text-sm text-muted-foreground line-clamp-3">
+                            <p className="text-sm text-slate-300 line-clamp-3">
                                 {quiz.description}
                             </p>
                         </CardContent>
                         <CardFooter className="p-4 pt-0 mt-auto">
-                            <Button asChild className="w-full bg-gradient-to-r from-black to-[#0f9b0f] text-white">
+                            <Button asChild className="w-full bg-quiz-button-gradient text-white">
                                 <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
                             </Button>
                         </CardFooter>

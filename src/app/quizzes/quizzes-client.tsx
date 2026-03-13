@@ -102,7 +102,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
                     </p>
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
-                    <Button asChild className="w-full" variant="secondary">
+                    <Button asChild className="w-full bg-quiz-button-gradient text-white">
                       <Link href={getUrlForTest(quiz.testType, quiz.id)}>Start Quiz</Link>
                     </Button>
                   </CardFooter>
