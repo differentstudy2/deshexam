@@ -1,5 +1,4 @@
 
-
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
@@ -68,7 +67,7 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { textbook, chapter, topic, mockTest } = await getPageData(params);
 
   if (!mockTest || !textbook || !chapter) {
@@ -89,10 +88,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     'online quiz',
   ].filter(Boolean);
 
+  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.mockTestId}/1200/630`;
+
   return {
     title,
     description,
     keywords,
+    openGraph: {
+        title,
+        description,
+        url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [imageUrl],
+    },
   };
 }
 
@@ -104,24 +118,37 @@ export default async function MockTestPage({ params }: PageProps) {
         notFound();
     }
 
-    // Since questions are part of the mockTest object, we can just use it.
     const initialTest = {
         ...(mockTest as any),
         testType: 'Mock Test'
     };
+    
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": `${(mockTest as any).title} | ${topic?.title || chapter.title}`,
+      "description": `Take the interactive mock test "${(mockTest as any).title}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook.`,
+      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
+    };
 
     return (
-        <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        }>
-            <PracticeSetClientPage 
-                initialTest={initialTest as any} 
-                initialTextbook={textbook as any} 
-                initialChapter={chapter as any}
-                initialTopic={topic as any}
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-        </Suspense>
+            <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                </div>
+            }>
+                <PracticeSetClientPage 
+                    initialTest={initialTest as any} 
+                    initialTextbook={textbook as any} 
+                    initialChapter={chapter as any}
+                    initialTopic={topic as any}
+                />
+            </Suspense>
+        </>
     )
 }

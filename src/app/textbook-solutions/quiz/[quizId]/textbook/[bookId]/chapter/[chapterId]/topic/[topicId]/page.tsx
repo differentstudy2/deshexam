@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Textbook, Chapter, Topic, Question } from '@/lib/types';
+import type { PracticeSet, Textbook, Chapter, Topic, Question, Exam as Quiz } from '@/lib/types';
 import { getPracticeSetById, getQuestionsByPracticeSet, getContentById } from '@/lib/firebase/firestore';
 import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
 import { notFound } from 'next/navigation';
@@ -67,7 +67,7 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { textbook, chapter, topic, quiz } = await getPageData(params);
 
   if (!quiz || !textbook || !chapter) {
@@ -88,10 +88,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     'online practice',
   ].filter(Boolean);
 
+  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.quizId}/1200/630`;
+
   return {
     title,
     description,
     keywords,
+    openGraph: {
+        title,
+        description,
+        url: `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [imageUrl],
+    },
   };
 }
 
@@ -107,19 +122,34 @@ export default async function QuizPage({ params }: PageProps) {
         ...(quiz as any),
         testType: 'Quiz'
     };
+    
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": `${(quiz as any).title} | ${topic?.title || chapter.title}`,
+      "description": `Take the interactive quiz "${(quiz as any).title}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook.`,
+      "url": `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
+    };
+
 
     return (
-        <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        }>
-            <PracticeSetClientPage 
-                initialTest={initialTest as any} 
-                initialTextbook={textbook as any} 
-                initialChapter={chapter as any}
-                initialTopic={topic as any}
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-        </Suspense>
+            <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                </div>
+            }>
+                <PracticeSetClientPage 
+                    initialTest={initialTest as any} 
+                    initialTextbook={textbook as any} 
+                    initialChapter={chapter as any}
+                    initialTopic={topic as any}
+                />
+            </Suspense>
+        </>
     )
 }

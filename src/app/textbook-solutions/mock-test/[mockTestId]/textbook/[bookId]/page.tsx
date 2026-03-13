@@ -51,7 +51,7 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { textbook, mockTest } = await getPageData(params);
 
   if (!mockTest || !textbook) {
@@ -60,20 +60,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${formatTitleForBrowser((mockTest as any).title)} | ${(textbook as any).title} | DeshExam`;
-  const description = `Take the interactive mock test "${formatTitleForBrowser((mockTest as any).title)}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+  const mockTestTitle = formatTitleForBrowser((mockTest as any).title);
+  const textbookTitle = formatTitleForBrowser((textbook as any).title);
+  
+  const title = `${mockTestTitle} | ${textbookTitle} | DeshExam`;
+  const description = `Take the interactive mock test "${mockTestTitle}" for the ${textbookTitle} textbook. Check your knowledge and prepare for your exams.`;
   const keywords = [
     (mockTest as any).title,
     textbook.title,
     (textbook as any).subject,
     'mock test',
-    'online quiz',
+    'online test',
   ].filter(Boolean);
+
+  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.mockTestId}/1200/630`;
 
   return {
     title,
     description,
     keywords,
+    openGraph: {
+        title,
+        description,
+        url: `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}`,
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [imageUrl],
+    },
   };
 }
 
@@ -91,20 +109,35 @@ export default async function TextbookMockTestPage({ params }: PageProps) {
     };
 
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
-    const mockTopic: Topic | null = null;
+    const mockTopic: null = null;
+    
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": `${(mockTest as any).title} | ${(textbook as any).title}`,
+      "description": `Take the interactive mock test "${(mockTest as any).title}" for the ${(textbook as any).title} textbook. Check your knowledge and prepare for your exams.`,
+      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}`
+    };
+
 
     return (
-        <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        }>
-            <PracticeSetClientPage 
-                initialTest={initialTest as any} 
-                initialTextbook={textbook as any} 
-                initialChapter={mockChapter}
-                initialTopic={mockTopic}
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-        </Suspense>
+            <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                </div>
+            }>
+                <PracticeSetClientPage 
+                    initialTest={initialTest as any} 
+                    initialTextbook={textbook as any} 
+                    initialChapter={mockChapter}
+                    initialTopic={mockTopic}
+                />
+            </Suspense>
+        </>
     )
 }

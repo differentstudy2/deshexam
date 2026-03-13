@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { PracticeSet, Textbook, Chapter, Topic, Question } from '@/lib/types';
+import type { PracticeSet, Textbook, Chapter, Topic, Question, Exam } from '@/lib/types';
 import { getPracticeSetById, getQuestionsByPracticeSet, getContentById } from '@/lib/firebase/firestore';
 import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
 import { notFound } from 'next/navigation';
@@ -51,7 +51,7 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { textbook, exam } = await getPageData(params);
 
   if (!exam || !textbook) {
@@ -60,20 +60,48 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${formatTitleForBrowser((exam as any).title)} | ${(textbook as any).title} | DeshExam`;
-  const description = `Take the exam "${formatTitleForBrowser((exam as any).title)}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+  const examTitle = formatTitleForBrowser((exam as any).title);
+  const textbookTitle = formatTitleForBrowser((textbook as any).title);
+
+  const title = `${examTitle} | ${textbookTitle} | DeshExam`;
+  const description = `Take the exam "${examTitle}" for the ${textbookTitle} textbook. Test your knowledge with official questions and prepare effectively for your exams with DeshExam.`;
   const keywords = [
     (exam as any).title,
     textbook.title,
     (textbook as any).subject,
     'exam',
     'online test',
+    'previous year paper',
+    `${textbook.title} solutions`,
+    `${textbook.subject} exam`,
   ].filter(Boolean);
+
+  const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.examId}/1200/630`;
 
   return {
     title,
     description,
     keywords,
+    openGraph: {
+        title,
+        description,
+        url: `https://deshexam.com/textbook-solutions/exam/${params.examId}/textbook/${params.bookId}`,
+        images: [
+            {
+                url: imageUrl,
+                width: 1200,
+                height: 630,
+                alt: title,
+            },
+        ],
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [imageUrl],
+    },
   };
 }
 
@@ -90,23 +118,36 @@ export default async function TextbookExamPage({ params }: PageProps) {
         testType: 'Exam'
     };
 
-    // Since this is a textbook-level exam, chapter and topic are null.
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: Topic | null = null;
 
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": `${(exam as any).title} | ${(textbook as any).title}`,
+      "description": `Take the exam "${(exam as any).title}" for the ${(textbook as any).title} textbook. Check your knowledge and prepare for your exams with DeshExam.`,
+      "url": `https://deshexam.com/textbook-solutions/exam/${params.examId}/textbook/${params.bookId}`
+    };
+
 
     return (
-        <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        }>
-            <PracticeSetClientPage 
-                initialTest={initialTest as any} 
-                initialTextbook={textbook as any} 
-                initialChapter={mockChapter}
-                initialTopic={mockTopic}
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-        </Suspense>
+            <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                </div>
+            }>
+                <PracticeSetClientPage 
+                    initialTest={initialTest as any} 
+                    initialTextbook={textbook as any} 
+                    initialChapter={mockChapter}
+                    initialTopic={mockTopic}
+                />
+            </Suspense>
+        </>
     )
 }

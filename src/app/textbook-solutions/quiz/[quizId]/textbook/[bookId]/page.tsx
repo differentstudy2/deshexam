@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
-import type { Textbook, Chapter, Exam as Quiz } from '@/lib/types';
+import type { Textbook, Chapter, Exam as Quiz, Topic } from '@/lib/types';
 import { getContentById } from '@/lib/firebase/firestore';
 import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
 import { notFound } from 'next/navigation';
@@ -51,7 +51,7 @@ async function getPageData(params: PageProps['params']) {
     }
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const { textbook, quiz } = await getPageData(params);
 
   if (!quiz || !textbook) {
@@ -60,20 +60,41 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${formatTitleForBrowser((quiz as any).title)} | ${(textbook as any).title} | DeshExam`;
-  const description = `Take the quiz "${formatTitleForBrowser((quiz as any).title)}" for the ${textbook.title} textbook. Check your knowledge and prepare for your exams.`;
+  const quizTitle = formatTitleForBrowser((quiz as any).title);
+  const textbookTitle = formatTitleForBrowser((textbook as any).title);
+
+  const title = `${quizTitle} | ${textbookTitle} | DeshExam`;
+  const description = `Take the quiz "${quizTitle}" for the ${textbookTitle} textbook. Test your knowledge and prepare for your exams with DeshExam.`;
   const keywords = [
     (quiz as any).title,
     textbook.title,
     (textbook as any).subject,
     'quiz',
     'online test',
+    'practice quiz',
+    `${textbook.title} solutions`,
+    `${textbook.subject} quiz`,
   ].filter(Boolean);
+
+   const imageUrl = (textbook as any).featureImage || `https://picsum.photos/seed/${params.quizId}/1200/630`;
 
   return {
     title,
     description,
     keywords,
+    openGraph: {
+        title,
+        description,
+        url: `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`,
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [imageUrl],
+    },
   };
 }
 
@@ -90,23 +111,36 @@ export default async function TextbookQuizPage({ params }: PageProps) {
         testType: 'Quiz'
     };
 
-    // Since this is a textbook-level exam, chapter and topic are null.
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: null = null;
+    
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": `${(quiz as any).title} | ${(textbook as any).title}`,
+      "description": `Take the quiz "${(quiz as any).title}" for the ${(textbook as any).title} textbook. Check your knowledge and prepare for your exams with DeshExam.`,
+      "url": `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`
+    };
 
 
     return (
-        <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen">
-                <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-        }>
-            <PracticeSetClientPage 
-                initialTest={initialTest as any} 
-                initialTextbook={textbook as any} 
-                initialChapter={mockChapter}
-                initialTopic={mockTopic}
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-        </Suspense>
+            <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                </div>
+            }>
+                <PracticeSetClientPage 
+                    initialTest={initialTest as any} 
+                    initialTextbook={textbook as any} 
+                    initialChapter={mockChapter}
+                    initialTopic={mockTopic}
+                />
+            </Suspense>
+        </>
     )
 }
