@@ -7,9 +7,9 @@ import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen, Languages, Book } from
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Kids Zone - Fun Learning Activities | DeshExam',
-  description: 'A fun and safe place for young learners to explore, play, and grow with interactive games and educational activities.',
-  keywords: ['kids learning', 'educational games', 'learning for kids', 'kids zone', 'fun learning', 'online learning for children', 'kids activities'],
+  title: 'Kids Zone | Fun Learning Games & Educational Activities | DeshExam',
+  description: 'Welcome to the DeshExam Kids Zone! A safe and exciting world of interactive games, fun quizzes, and engaging activities designed to make learning languages and math an adventure for children.',
+  keywords: ['kids learning', 'educational games for kids', 'fun learning', 'kids zone', 'online learning for children', 'math games for kids', 'language learning for kids', 'interactive activities for kids'],
 };
 
 
@@ -89,29 +89,45 @@ export default function KidsZonePage() {
 
   return (
     <div className="bg-secondary/30">
-        <div className="container mx-auto px-4 py-16">
-            <script
+        <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-            />
-            <script
+        />
+        <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-            />
-            <header className="text-center mb-12">
-            <h1 className="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-amber-600">
+        />
+        
+        <section className="relative w-full py-20 md:py-28 lg:py-36 bg-amber-100 dark:bg-amber-900/20">
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="https://picsum.photos/seed/kids-zone-hero/1920/1080"
+                    alt="A playful and colorful abstract background for kids"
+                    fill
+                    className="object-cover opacity-20"
+                    data-ai-hint="kids playful abstract"
+                />
+                 <div className="absolute inset-0 bg-gradient-to-t from-amber-100/50 via-amber-100/20 to-transparent dark:from-amber-900/50 dark:via-amber-900/20" />
+            </div>
+             <div className="container mx-auto px-4 relative z-10 text-center">
+               <div className="inline-block bg-white/30 dark:bg-black/30 backdrop-blur-sm p-4 rounded-full mb-4 border">
+                 <ToyBrick className="w-12 h-12 text-amber-500" />
+               </div>
+              <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-amber-800 dark:text-amber-200 drop-shadow-lg">
                 Welcome to the Kids Zone!
-            </h1>
-            <p className="text-lg text-amber-700/80 mt-4 max-w-3xl mx-auto">
-                A fun and safe place for young learners to explore, play, and grow.
-            </p>
-            </header>
+              </h1>
+              <p className="text-lg md:text-xl mt-4 max-w-3xl mx-auto text-amber-700 dark:text-amber-300 drop-shadow-md">
+                A safe and exciting world of interactive games, fun quizzes, and engaging activities designed to make learning languages and math an unforgettable adventure for children.
+              </p>
+            </div>
+        </section>
 
+        <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {kidsFeatures.map((feature, index) => (
-                <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center">
+                <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center bg-card">
                 <CardHeader className="items-center">
-                    <div className="p-4 bg-white rounded-full mb-4 shadow-inner">
+                    <div className="p-4 bg-secondary rounded-full mb-4">
                         {feature.icon}
                     </div>
                     <CardTitle className="font-headline text-2xl">{feature.title}</CardTitle>
