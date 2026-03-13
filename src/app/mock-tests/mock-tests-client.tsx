@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -75,7 +76,7 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
     <section className="relative w-full py-20 md:py-28 lg:py-36 text-white" style={{ background: 'linear-gradient(to right, #71B280, #134E5E)'}}>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg wave-text">
-            <span>Master</span> <span>Your</span> <span>Exams</span> <span>with</span> <span>Realistic</span> <span>Mock</span> <span>Tests</span>
+            <span>Exams</span> <span>with</span> <span>Realistic</span> <span>Mock</span> <span>Tests</span>
           </h1>
           <p className="text-lg md:text-xl mt-4 max-w-3xl mx-auto drop-shadow-md">
             Challenge yourself with our extensive library of mock tests designed to simulate the real exam experience. Get ready to ace your exams with realistic practice and detailed performance analysis.

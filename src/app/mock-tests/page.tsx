@@ -11,11 +11,11 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: 'All Mock Tests | DeshExam',
+    title: 'Exams with Realistic Mock Tests | DeshExam',
     description: 'Find and practice from a vast collection of mock tests for various competitive exams like NEET, JEE, UPSC, and more. Improve your speed, accuracy, and time management skills with our realistic exam simulations.',
     keywords: ['mock tests', 'online test series', 'exam practice papers', 'NEET mock test', 'JEE Main mock test', 'UPSC prelims mock', 'competitive exam preparation'],
     openGraph: {
-      title: 'All Mock Tests | DeshExam',
+      title: 'Exams with Realistic Mock Tests | DeshExam',
       description: 'Find and practice from a vast collection of mock tests for various competitive exams.',
       images: ['https://picsum.photos/seed/mock-tests-og/1200/630', ...previousImages],
       type: 'website',
@@ -23,7 +23,7 @@ export async function generateMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'All Mock Tests | DeshExam',
+      title: 'Exams with Realistic Mock Tests | DeshExam',
       description: 'Find and practice from a vast collection of mock tests for various competitive exams.',
       images: ['https://picsum.photos/seed/mock-tests-og/1200/630'],
     },
