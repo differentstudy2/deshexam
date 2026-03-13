@@ -78,7 +78,7 @@ export default function FunQuizzesPage() {
             Fun Quizzes
           </h1>
           <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto drop-shadow-md">
-            Test your knowledge with exciting quizzes on animals, space, and much more!
+            Challenge your knowledge with our fun and educational quizzes for kids! From amazing animals and mysterious space to general knowledge, GK questions, and science, there's a quiz for every curious mind. Perfect for learning something new while having fun!
           </p>
         </div>
       </section>
