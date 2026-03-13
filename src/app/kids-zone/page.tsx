@@ -118,6 +118,7 @@ export default function KidsZonePage() {
                     src="https://picsum.photos/seed/kids-zone-hero/1920/1080"
                     alt="A playful and colorful abstract background for kids"
                     fill
+                    priority
                     className="object-cover opacity-10"
                     data-ai-hint="kids playful abstract"
                 />
@@ -144,6 +145,7 @@ export default function KidsZonePage() {
                             src={feature.image}
                             alt={feature.title}
                             fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                             className="object-cover group-hover:scale-110 transition-transform duration-300"
                             data-ai-hint={feature.imageHint}
                         />
