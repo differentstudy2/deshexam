@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, HelpCircle, BarChart } from "lucide-react";
+import { Clock, HelpCircle, BarChart, Loader2 } from "lucide-react";
 import { ContentBadge } from "@/components/content-badge";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -53,7 +53,7 @@ export default function QuizzesPage() {
         const uniqueSubjects = Array.from(new Set(fetchedQuizzes.map((quiz) => quiz.subject))).filter(Boolean) as string[];
         setSubjects(uniqueSubjects);
       } catch (error) {
-        toast({
+         toast({
           variant: "destructive",
           title: "Error fetching quizzes",
           description: (error as Error).message,
@@ -110,8 +110,8 @@ export default function QuizzesPage() {
       <MockTestFilters subjects={subjects} />
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="flex flex-col overflow-hidden">
                 <Skeleton className="w-full h-[225px]" />
                 <CardContent className="flex-grow p-4 space-y-2">
@@ -129,7 +129,7 @@ export default function QuizzesPage() {
           ))}
         </div>
       ) : quizzes.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {quizzes.map((quiz) => (
             <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <CardHeader className="p-0 relative">
