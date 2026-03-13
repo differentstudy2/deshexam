@@ -119,14 +119,12 @@ export default function KidsZonePage() {
                     alt="A playful and colorful abstract background for kids"
                     fill
                     priority
+                    sizes="100vw"
                     className="object-cover opacity-10"
                     data-ai-hint="kids playful abstract"
                 />
             </div>
              <div className="container mx-auto px-4 relative z-10 text-center">
-               <div className="inline-block bg-white/20 dark:bg-black/30 backdrop-blur-sm p-4 rounded-full mb-4 border border-white/20">
-                 <ToyBrick className="w-12 h-12 text-white" />
-               </div>
               <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-yellow-300 animate-gradient-text drop-shadow-lg">
                 Welcome to the Kids Zone!
               </h1>
