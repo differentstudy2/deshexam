@@ -73,7 +73,7 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
 
   return (
     <>
-    <section className="relative w-full py-20 md:py-28 lg:py-36 text-white" style={{ background: 'linear-gradient(to right, #71B280, #134E5E)'}}>
+    <section className="relative w-full py-20 md:py-28 lg:py-36 text-white bg-hero-gradient">
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg wave-text">
             <span>Exams</span> <span>with</span> <span>Realistic</span> <span>Mock</span> <span>Tests</span>
@@ -107,7 +107,7 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleTests.map((test) => (
-                <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                <Card key={test.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
                   <CardHeader className="p-0 relative h-48">
                     <Image
                       src={test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`}
@@ -128,10 +128,10 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
                         {test.class && <Badge variant="outline">{test.class}</Badge>}
                     </div>
                     <CardTitle className="font-headline text-xl mt-1 leading-snug">
-                      {test.subtitle && <span className="text-primary block text-sm font-medium">{test.subtitle}</span>}
+                      {test.subtitle && <span className="text-primary-foreground/80 block text-sm font-medium">{test.subtitle}</span>}
                       {test.title}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                    <p className="text-sm text-primary-foreground/70 line-clamp-2 mt-1">
                       {test.description || (test.textbookTitle && `From: ${test.textbookTitle}`)}
                     </p>
                   </CardContent>
@@ -161,3 +161,5 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
     </>
   );
 }
+
+    
