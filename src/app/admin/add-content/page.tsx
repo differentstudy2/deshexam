@@ -277,7 +277,6 @@ const ContentTypeNavigation = () => {
   
     const navItems = [
       { name: 'Mock Test', href: '/admin/add-content' },
-      { name: 'Quiz', href: '/admin/add-quiz' },
       { name: 'Practice Questions', href: '/admin/add-practice-questions' },
       { name: 'Exam', href: '/admin/add-exam' },
       { name: 'Learn Article', href: '/admin/add-article' },
