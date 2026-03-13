@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { addTestSubmission } from '@/lib/firebase/firestore';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import html2canvas from 'html2canvas';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -402,11 +402,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                         <div ref={quizCardRef}>
                              <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
                                 <CardHeader className="p-6 pb-2">
-                                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                                        <span>{test.subject}</span>
-                                        <span>{currentQuestion.marks || 1} Mark{currentQuestion.marks > 1 ? 's' : ''}</span>
-                                    </div>
-                                     <CardTitle className="text-left text-2xl md:text-3xl font-semibold !mt-4 prose dark:prose-invert max-w-none">
+                                    <CardTitle className="text-left text-2xl md:text-3xl font-semibold !mt-4 prose dark:prose-invert max-w-none">
                                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                                             {currentQuestion.text}
                                         </ReactMarkdown>
@@ -416,7 +412,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                                     {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                                             {currentQuestion.options.map((option, index) => {
-                                                const isSelected = userAnswers[currentQuestion.id] === option.text; // Fixed: Use userAnswers[currentQuestion.id]
+                                                const isSelected = userAnswers[currentQuestion.id] === option.text;
                                                 const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                 const isShown = showFeedback === currentQuestion.id;
                                                 return(
@@ -465,4 +461,3 @@ export default function TestClientPage({ test }: { test: Test }) {
         </div>
     );
 }
-
