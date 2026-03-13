@@ -249,6 +249,12 @@
     background-size: 200% auto;
     animation: gradient-animation 8s ease-in-out infinite;
   }
+  
+  .bg-card-gradient {
+    background: #16222A;
+    background: -webkit-linear-gradient(to right, #3A6073, #16222A);
+    background: linear-gradient(to right, #3A6073, #16222A);
+  }
 }
 
 .ql-editor {

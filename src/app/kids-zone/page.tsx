@@ -139,22 +139,22 @@ export default function KidsZonePage() {
         <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {kidsFeatures.map((feature, index) => (
-                <Card key={index} className="overflow-hidden flex flex-col group transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+                <Card key={index} className="overflow-hidden flex flex-col group transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-card-gradient text-white">
                     <CardHeader className="p-0 relative h-48">
                         <Image
                             src={feature.image}
                             alt={feature.title}
                             fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             className="object-cover group-hover:scale-110 transition-transform duration-300"
                             data-ai-hint={feature.imageHint}
                         />
                     </CardHeader>
                     <CardContent className="p-4 flex-grow">
-                        <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
+                        <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug transition-colors text-white">
                             {feature.title}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground line-clamp-3">
+                        <p className="text-sm text-slate-300 line-clamp-3">
                             {feature.description}
                         </p>
                     </CardContent>
