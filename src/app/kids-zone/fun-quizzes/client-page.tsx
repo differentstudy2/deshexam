@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -26,7 +27,7 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
   };
 
   return (
-    <div className="bg-gradient-to-br from-black to-[#0f9b0f] min-h-screen">
+    <div>
        <section className="relative w-full py-20 md:py-28 lg:py-36 bg-gradient-to-br from-black to-[#0f9b0f]">
         <div className="absolute inset-0">
           <Image
@@ -50,66 +51,68 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-12">
-        {loading ? (
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-                <Card key={i} className="flex flex-col overflow-hidden">
-                    <Skeleton className="h-48 w-full" />
-                    <CardContent className="p-4 flex-grow space-y-2">
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                    </CardContent>
-                    <CardFooter className="p-4 pt-0">
-                        <Skeleton className="h-10 w-full" />
-                    </CardFooter>
-                </Card>
-            ))}
-           </div>
-        ) : quizzes.length > 0 ? (
-          <>
+      <div className="bg-secondary/30">
+        <div className="container mx-auto px-4 py-12">
+            {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {visibleQuizzes.map((quiz) => (
-                <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group bg-white dark:bg-slate-900/50">
-                    <CardHeader className="p-0 relative h-48">
-                        <Image
-                            src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/300`}
-                            alt={quiz.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                            data-ai-hint="quiz fun kids"
-                        />
-                    </CardHeader>
-                    <CardContent className="p-4 flex-grow">
-                        <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
-                            {quiz.title}
-                        </CardTitle>
-                        <p className="text-sm text-muted-foreground line-clamp-3">
-                            {quiz.description}
-                        </p>
-                    </CardContent>
-                    <CardFooter className="p-4 pt-0 mt-auto">
-                        <Button asChild className="w-full bg-gradient-to-r from-black to-[#0f9b0f] text-white">
-                            <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
-              ))}
+                {[...Array(8)].map((_, i) => (
+                    <Card key={i} className="flex flex-col overflow-hidden">
+                        <Skeleton className="h-48 w-full" />
+                        <CardContent className="p-4 flex-grow space-y-2">
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6" />
+                        </CardContent>
+                        <CardFooter className="p-4 pt-0">
+                            <Skeleton className="h-10 w-full" />
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
-            {visibleCount < quizzes.length && (
-              <div className="mt-12 text-center">
-                <Button onClick={handleLoadMore} size="lg">
-                  Load More Quizzes
-                </Button>
-              </div>
+            ) : quizzes.length > 0 ? (
+            <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {visibleQuizzes.map((quiz) => (
+                    <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group bg-white dark:bg-slate-900/50">
+                        <CardHeader className="p-0 relative h-48">
+                            <Image
+                                src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/300`}
+                                alt={quiz.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                data-ai-hint="quiz fun kids"
+                            />
+                        </CardHeader>
+                        <CardContent className="p-4 flex-grow">
+                            <CardTitle className="font-headline text-lg mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
+                                {quiz.title}
+                            </CardTitle>
+                            <p className="text-sm text-muted-foreground line-clamp-3">
+                                {quiz.description}
+                            </p>
+                        </CardContent>
+                        <CardFooter className="p-4 pt-0 mt-auto">
+                            <Button asChild className="w-full bg-gradient-to-r from-black to-[#0f9b0f] text-white">
+                                <Link href={`/kids-zone/fun-quizzes/${quiz.id}`}>Start Quiz</Link>
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                ))}
+                </div>
+                {visibleCount < quizzes.length && (
+                <div className="mt-12 text-center">
+                    <Button onClick={handleLoadMore} size="lg">
+                    Load More Quizzes
+                    </Button>
+                </div>
+                )}
+            </>
+            ) : (
+            <div className="text-center py-16 text-muted-foreground">
+                <p>No quizzes found. Create one in the admin panel to get started!</p>
+            </div>
             )}
-          </>
-        ) : (
-          <div className="text-center py-16 text-muted-foreground">
-            <p>No quizzes found. Create one in the admin panel to get started!</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
