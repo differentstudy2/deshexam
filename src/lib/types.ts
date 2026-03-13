@@ -144,6 +144,15 @@ export type Exam = {
   testType: string;
 };
 
+export type Quiz = {
+  id: string;
+  title: string;
+  description?: string;
+  category: string;
+  testType: string;
+  featureImage?: string;
+  questions?: any[];
+};
 
 export type Test = {
   id: string;
