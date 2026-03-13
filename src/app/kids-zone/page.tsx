@@ -88,18 +88,8 @@ export default function KidsZonePage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-background">
-        <div 
-            className="absolute inset-0 z-0"
-            style={{
-                backgroundImage: "url('https://deshexam.com/image/logo.png')",
-                backgroundSize: '150px',
-                backgroundRepeat: 'repeat',
-                opacity: 0.05,
-            }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/90 to-amber-50/90 dark:from-yellow-900/80 dark:to-amber-900/90 backdrop-blur-sm" />
-        <div className="relative z-10 container mx-auto px-4 py-16">
+    <div className="bg-secondary/30">
+        <div className="container mx-auto px-4 py-16">
             <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

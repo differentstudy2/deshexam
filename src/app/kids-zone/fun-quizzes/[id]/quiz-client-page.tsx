@@ -381,7 +381,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="w-full max-w-2xl mx-auto">
+                    <div className="w-full max-w-4xl mx-auto">
                         <Card className="bg-card/60 backdrop-blur-sm">
                              <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
@@ -419,7 +419,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <div className="flex items-center gap-2">
                                             <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[100px] h-9">
+                                                <SelectTrigger id="timer-select" className="w-[80px] h-9">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
