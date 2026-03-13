@@ -50,6 +50,7 @@ const dashboardNavItems = [
 const adminNavItems = [
     { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-5 w-5" /> },
     { href: '/admin/content', label: 'Content', icon: <FileText className="h-5 w-5" /> },
+    { href: '/admin/quizzes', label: 'Quizzes', icon: <Gem className="h-5 w-5" /> },
     { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-5 w-5" /> },
     { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-5 w-5" /> },
     { href: '/admin/users', label: 'Users', icon: <Users className="h-5 w-5" /> },

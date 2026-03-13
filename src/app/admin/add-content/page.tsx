@@ -277,6 +277,7 @@ const ContentTypeNavigation = () => {
   
     const navItems = [
       { name: 'Mock Test', href: '/admin/add-content' },
+      { name: 'Quiz', href: '/admin/add-quiz' },
       { name: 'Practice Questions', href: '/admin/add-practice-questions' },
       { name: 'Exam', href: '/admin/add-exam' },
       { name: 'Learn Article', href: '/admin/add-article' },
@@ -1606,7 +1607,7 @@ function AddContentForm() {
                       Add Question Manually
                   </Button>
                    <Button asChild variant="outline">
-                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-content">
+                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-quiz">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                         </Link>
@@ -1639,10 +1640,10 @@ function AddContentForm() {
   );
 }
 
-export default function CreateTestPage() {
+export default function CreateQuizPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <AddContentForm />
+            <AddQuizForm />
         </Suspense>
     )
 }
