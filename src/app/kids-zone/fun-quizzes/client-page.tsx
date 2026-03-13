@@ -39,8 +39,8 @@ export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizze
           />
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center text-white">
-          <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg">
-            Fun Quizzes for Kids
+          <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg wave-text">
+            <span>Fun</span> <span>Quizzes</span> <span>for</span> <span>Kids</span>
           </h1>
           <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto drop-shadow-md">
             Boost your child's knowledge with fun and educational quizzes! Explore exciting topics like general knowledge (GK), animals, science, and more. Perfect for kids to learn and play.
