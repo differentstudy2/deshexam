@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToyBrick, Puzzle, BookHeart, Gamepad2, BookOpen, Languages, Book } from "lucide-react";
 import type { Metadata } from 'next';
 
@@ -19,42 +19,56 @@ const kidsFeatures = [
     title: "Fun Quizzes",
     description: "Test your knowledge with exciting quizzes on animals, space, and more!",
     link: "/kids-zone/fun-quizzes",
+    image: "https://picsum.photos/seed/fun-quizzes/400/300",
+    imageHint: "quiz animals space"
   },
   {
     icon: <Gamepad2 className="w-12 h-12 text-purple-500" />,
     title: "Learning Games",
     description: "Play engaging games that make education an adventure.",
     link: "/kids-zone/learning-games",
+    image: "https://picsum.photos/seed/learning-games/400/300",
+    imageHint: "learning games"
   },
     {
     icon: <BookHeart className="w-12 h-12 text-blue-500" />,
     title: "Learning English",
     description: "Learn the English alphabet, words, and grammar in a fun way.",
     link: "/kids-zone/learning-english",
+    image: "https://picsum.photos/seed/learning-english/400/300",
+    imageHint: "english alphabet"
   },
   {
     icon: <BookOpen className="w-12 h-12 text-orange-500" />,
     title: "Learning Bengali",
     description: "Explore the Bengali language with interactive lessons and games.",
     link: "/kids-zone/learning-bengali",
+    image: "https://picsum.photos/seed/learning-bengali/400/300",
+    imageHint: "bengali language"
   },
   {
     icon: <Languages className="w-12 h-12 text-pink-500" />,
     title: "Learning Hindi",
     description: "Discover the Hindi language with interactive lessons and games.",
     link: "/kids-zone/learning-hindi",
+    image: "https://picsum.photos/seed/learning-hindi/400/300",
+    imageHint: "hindi language"
   },
    {
     icon: <BookOpen className="w-12 h-12 text-teal-500" />,
     title: "Learning Arabic",
     description: "Discover the Arabic language with fun lessons and games.",
     link: "/kids-zone/learning-arabic",
+    image: "https://picsum.photos/seed/learning-arabic/400/300",
+    imageHint: "arabic language"
   },
   {
     icon: <Book className="w-12 h-12 text-rose-500" />,
     title: "Learning Urdu",
     description: "Explore the elegant script and sounds of the Urdu language.",
     link: "/kids-zone/learning-urdu",
+    image: "https://picsum.photos/seed/learning-urdu/400/300",
+    imageHint: "urdu script"
   },
 ];
 
@@ -88,7 +102,7 @@ export default function KidsZonePage() {
   };
 
   return (
-    <div className="bg-secondary/30">
+    <div>
         <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
@@ -107,7 +121,7 @@ export default function KidsZonePage() {
                     className="object-cover opacity-20"
                     data-ai-hint="kids playful abstract"
                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-amber-100/50 via-amber-100/20 to-transparent dark:from-amber-900/50 dark:via-amber-900/20" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
             </div>
              <div className="container mx-auto px-4 relative z-10 text-center">
                <div className="inline-block bg-white/30 dark:bg-black/30 backdrop-blur-sm p-4 rounded-full mb-4 border">
@@ -125,21 +139,29 @@ export default function KidsZonePage() {
         <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {kidsFeatures.map((feature, index) => (
-                <Card key={index} className="transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl flex flex-col text-center bg-card">
-                <CardHeader className="items-center">
-                    <div className="p-4 bg-secondary rounded-full mb-4">
-                        {feature.icon}
-                    </div>
-                    <CardTitle className="font-headline text-2xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                    <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-                <div className="p-6 pt-0">
-                    <Button asChild>
-                    <Link href={feature.link}>Let's Go!</Link>
-                    </Button>
-                </div>
+                <Card key={index} className="overflow-hidden flex flex-col group transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+                    <CardHeader className="p-0 relative h-48">
+                        <Image
+                            src={feature.image}
+                            alt={feature.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-300"
+                            data-ai-hint={feature.imageHint}
+                        />
+                    </CardHeader>
+                    <CardContent className="p-4 flex-grow">
+                        <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
+                            {feature.title}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                            {feature.description}
+                        </p>
+                    </CardContent>
+                    <CardFooter className="p-4 pt-0 mt-auto">
+                        <Button asChild className="w-full">
+                        <Link href={feature.link}>Let's Go!</Link>
+                        </Button>
+                    </CardFooter>
                 </Card>
             ))}
             </div>
