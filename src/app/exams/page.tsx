@@ -10,11 +10,11 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: 'Official Exam Papers & Previous Year Papers | DeshExam',
+    title: 'Official Exam Papers & Previous Year Papers',
     description: 'Practice with official exam papers and previous year question papers for NEET, JEE, UPSC, and more. Simulate real exam conditions and get detailed performance analysis to ace your preparation.',
     keywords: ['exam papers', 'previous year papers', 'solved papers', 'exam preparation', 'NEET question papers', 'JEE previous papers', 'UPSC prelims papers'],
     openGraph: {
-      title: 'Official Exam Papers & Previous Year Papers | DeshExam',
+      title: 'Official Exam Papers & Previous Year Papers',
       description: 'Practice with official exam papers and previous year question papers to ace your preparation.',
       images: ['https://picsum.photos/seed/exams-og/1200/630', ...previousImages],
       type: 'website',
@@ -22,7 +22,7 @@ export async function generateMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Official Exam Papers & Previous Year Papers | DeshExam',
+      title: 'Official Exam Papers & Previous Year Papers',
       description: 'Practice with official exam papers and previous year question papers to ace your preparation.',
       images: ['https://picsum.photos/seed/exams-og/1200/630'],
     },
