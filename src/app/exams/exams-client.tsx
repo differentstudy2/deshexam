@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -57,8 +58,7 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
         </div>
       </section>
 
-      <div className="bg-background">
-        <div className="container py-12 md:py-16">
+      <div className="container py-12 md:py-16">
 
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -81,7 +81,7 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
           ) : exams.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {exams.map((exam) => (
-                <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
+                <Card key={exam.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
                   <CardHeader className="p-0 relative h-48">
                     <Image
                       src={exam.featureImage || `https://picsum.photos/seed/${exam.id}/400/225`}
@@ -96,9 +96,9 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
                     </div>
                   </CardHeader>
                   <CardContent className="flex-grow p-4">
-                    <p className="text-sm font-medium text-primary">{exam.subject}</p>
+                    <p className="text-sm font-medium text-primary-foreground/80">{exam.subject}</p>
                     <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{exam.title}</CardTitle>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
+                     <p className="text-sm text-primary-foreground/70 line-clamp-2">
                       {exam.description || `A comprehensive exam covering ${exam.subject}.`}
                     </p>
                   </CardContent>
@@ -116,7 +116,6 @@ export default function ExamsClientPage({ initialExams }: { initialExams: Exam[]
             </div>
           )}
         </div>
-      </div>
     </>
   );
 }
