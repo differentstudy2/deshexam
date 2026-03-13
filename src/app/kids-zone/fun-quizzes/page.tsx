@@ -48,14 +48,8 @@ export default function FunQuizzesPage() {
   }, [toast]);
 
   return (
-    <div
-      className="relative min-h-screen bg-cover bg-center bg-no-repeat"
-      style={{
-          backgroundImage: "url('https://deshexam.com/image/logo.png')",
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-amber-50/90 dark:from-orange-900/80 dark:to-amber-900/90 backdrop-blur-sm" />
-      <div className="relative z-10 container mx-auto px-4 py-12">
+    <div className="bg-secondary/30 min-h-screen">
+      <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone">
