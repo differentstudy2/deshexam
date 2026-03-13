@@ -122,9 +122,7 @@ export default function AIContentGeneratorPage() {
             });
             
             let redirectUrl = '/admin/add-content'; // Default for Mock Test
-            if (aiData.contentType === 'Quiz') {
-                redirectUrl = '/admin/add-quiz';
-            } else if (aiData.contentType === 'Practice Questions') {
+            if (aiData.contentType === 'Practice Questions') {
                 redirectUrl = '/admin/add-practice-questions';
             } else if (aiData.contentType === 'Exam') {
                 redirectUrl = '/admin/add-exam';
@@ -263,7 +261,6 @@ export default function AIContentGeneratorPage() {
                                             <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                             <SelectContent>
                                                 <SelectItem value="Mock Test">Mock Test</SelectItem>
-                                                <SelectItem value="Quiz">Quiz</SelectItem>
                                                 <SelectItem value="Practice Questions">Practice Questions</SelectItem>
                                                 <SelectItem value="Exam">Exam</SelectItem>
                                             </SelectContent>
