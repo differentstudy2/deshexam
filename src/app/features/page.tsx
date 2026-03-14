@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import FeaturesClientPage from './features-client';
 
 export const metadata: Metadata = {
-  title: 'Features | DeshExam',
+  title: 'Features for Exam Success: AI Learning, Mock Tests & More',
   description: 'Explore the powerful features of DeshExam, including realistic mock tests, AI-powered learning paths, solved textbooks, quizzes, leaderboards, and more, all designed to help you succeed.',
   keywords: ['deshexam features', 'mock tests', 'ai learning path', 'solved textbooks', 'online quizzes', 'leaderboards'],
   openGraph: {
