@@ -37,7 +37,6 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
-
 type Option = {
   text: string;
 };
@@ -83,6 +82,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const { openAuthDialog } = useAuthDialog();
   
   const practiceSetId = params.practiceSetId as string;
+  const mockTestId = params.mockTestId as string;
   const textbookId = params.bookId as string;
   const chapterId = params.chapterId as string;
   const topicId = params.topicId as string;
@@ -94,32 +94,28 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
   
-  const lastQuestionRef = useRef<HTMLDivElement>(null);
-
   const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
   const [clientDate, setClientDate] = useState('');
 
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const highestVisitedIndex = useRef(0);
 
-  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [visibleQuestions, setVisibleQuestions] = useState(5);
+  useEffect(() => {
+    if (currentQuestionIndex > highestVisitedIndex.current) {
+        highestVisitedIndex.current = currentQuestionIndex;
+    }
+  }, [currentQuestionIndex]);
 
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
-  
-  const highestAttemptedIndex = useMemo(() => {
-    if (!test) return -1;
-    return test.questions.reduce((maxIndex, q, index) => {
-        return answers[q.id] !== undefined ? Math.max(maxIndex, index) : maxIndex;
-    }, -1);
-  }, [answers, test]);
   
   const skippedQuestions = useMemo(() => {
     if (!test) return [];
     return test.questions
       .map((q, index) => ({ q, index }))
-      .filter(({ q, index }) => index < highestAttemptedIndex && answers[q.id] === undefined)
+      .filter(({ q, index }) => index < highestVisitedIndex.current && answers[q.id] === undefined)
       .map(({ index }) => index);
-  }, [answers, test, highestAttemptedIndex]);
+  }, [answers, test, highestVisitedIndex.current]);
 
   useEffect(() => {
     // This will only run on the client, after hydration
@@ -131,7 +127,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         }
         
         if (initialTest) {
-            questionRefs.current = Array(initialTest.questions.length).fill(null);
             const questionsWithMatchingOptions = initialTest.questions.map((q: any) => {
                 if (q.type === 'Matching' && q.correctAnswer) {
                     const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
@@ -235,30 +230,8 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         });
         setIsSubmitting(false);
     }
-  }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, timeLeft, chapterId, textbookId, topicId, toast, router]);
+  }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, timeLeft, chapterId, textbookId, topicId, toast, router, mockTestId]);
   
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && test && visibleQuestions < test.questions.length) {
-                    setVisibleQuestions(prev => prev + 5);
-                }
-            },
-            { threshold: 1.0 }
-        );
-
-        const currentRef = lastQuestionRef.current;
-        if (currentRef) {
-            observer.observe(currentRef);
-        }
-
-        return () => {
-            if (currentRef) {
-                observer.unobserve(currentRef);
-            }
-        };
-    }, [lastQuestionRef, test, visibleQuestions]);
-
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) {
       if (timeLeft === 0) {
@@ -305,7 +278,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
     const handleNavigateToQuestion = (qIndex: number) => {
         setIsConfirming(false);
-        questionRefs.current[qIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setCurrentQuestionIndex(qIndex);
     };
 
     const getConfirmDialogContent = () => {
@@ -378,6 +351,18 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     }, [pdfContent]);
 
 
+  const handleNext = () => {
+    if (test && currentQuestionIndex < test.questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentQuestionIndex > 0) {
+        setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+    
   if (loading) {
       return (
         <div className="container py-8 max-w-4xl mx-auto">
@@ -411,7 +396,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     </CardContent>
                 </Card>
                 <div className="p-6 space-y-8 mt-6">
-                    {[...Array(3)].map((_, i) => (
+                    {[...Array(1)].map((_, i) => (
                         <Card key={i} className="p-6">
                             <Skeleton className="h-6 w-1/2 mb-4" />
                             <div className="space-y-3">
@@ -436,9 +421,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   
   const totalDuration = (test.duration || totalMarks) * 60;
   const backToTopicUrl = topicId !== 'null' 
-    ? `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}`
-    : `/textbook-solutions/${textbookId}/chapter/${chapterId}`;
+    ? `/admin/textbooks/${textbookId}/chapter/${chapterId}/topic/${topicId}`
+    : `/admin/textbooks/${textbookId}/chapter/${chapterId}`;
 
+  const currentQuestion = test.questions[currentQuestionIndex];
 
   return (
     <div className="container py-8 max-w-4xl mx-auto">
@@ -573,93 +559,96 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
             <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
                 
-                {test.questions.slice(0, visibleQuestions).map((question, index) => {
-                        const isLastQuestion = index === visibleQuestions - 1;
-                        return (
-                            <Card key={question.id || index} ref={el => {
-                                questionRefs.current[index] = el;
-                                if (isLastQuestion) {
-                                    (lastQuestionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-                                }
-                            }} className="p-6 shadow-none border scroll-m-24">
-                            <CardHeader className="p-0 mb-4">
-                                <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
-                                     <span className="self-start">{index + 1}.</span>
-                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.text}</ReactMarkdown>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0">
-                                {question.type === 'Multiple Choice' && question.options && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {question.options.map((option, optIndex) => (
-                                    <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
-                                        <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                                        <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
-                                        </Label>
+                {currentQuestion && (
+                    <Card key={currentQuestion.id || currentQuestionIndex} className="p-6 shadow-none border scroll-m-24">
+                        <CardHeader className="p-0 mb-4">
+                            <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
+                                    <span className="self-start">{currentQuestionIndex + 1}.</span>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{currentQuestion.text}</ReactMarkdown>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
+                            <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {currentQuestion.options.map((option, optIndex) => (
+                                <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+                                    <RadioGroupItem value={option.text} id={`q${currentQuestion.id}-opt${optIndex}`} />
+                                    <Label htmlFor={`q${currentQuestion.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                    </Label>
+                                </div>
+                                ))}
+                            </RadioGroup>
+                            )}
+                            {currentQuestion.type === 'True/False' && (
+                            <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="flex space-x-4 true-false-group">
+                                <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="True" id={`q${currentQuestion.id}-true`} />
+                                <Label htmlFor={`q${currentQuestion.id}-true`} className="text-lg">True</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="False" id={`q${currentQuestion.id}-false`} />
+                                <Label htmlFor={`q${currentQuestion.id}-false`} className="text-lg">False</Label>
+                                </div>
+                            </RadioGroup>
+                            )}
+                            {(currentQuestion.type === 'Short Answer' || currentQuestion.type === 'Fill in the Blank') && (
+                            <Input 
+                                placeholder="Your answer..." 
+                                onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                                value={answers[currentQuestion.id] || ''}
+                            />
+                            )}
+                            {currentQuestion.type === 'Matching' && currentQuestion.matchingOptions && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                        <div className="font-bold text-center">Column A</div>
+                                        <div></div>
+                                        <div className="font-bold text-center">Column B</div>
                                     </div>
-                                    ))}
-                                </RadioGroup>
-                                )}
-                                {question.type === 'True/False' && (
-                                <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="flex space-x-4 true-false-group">
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="True" id={`q${question.id}-true`} />
-                                    <Label htmlFor={`q${question.id}-true`} className="text-lg">True</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="False" id={`q${question.id}-false`} />
-                                    <Label htmlFor={`q${question.id}-false`} className="text-lg">False</Label>
-                                    </div>
-                                </RadioGroup>
-                                )}
-                                {(question.type === 'Short Answer' || question.type === 'Fill in the Blank') && (
-                                <Input 
-                                    placeholder="Your answer..." 
-                                    onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                                    value={answers[question.id] || ''}
-                                />
-                                )}
-                                {question.type === 'Matching' && question.matchingOptions && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                            <div className="font-bold text-center">Column A</div>
-                                            <div></div>
-                                            <div className="font-bold text-center">Column B</div>
-                                        </div>
-                                        {question.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                <div className="p-3 border rounded-md text-center bg-secondary">
-                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                    {itemA.text}
-                                                </div>
-                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                <Select 
-                                                    onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                                    value={answers[question.id]?.[itemA.text] || ''}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a match" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {question.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
-                                                            <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
-                                                                <div className="flex items-center gap-2">
-                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                                    <span>{itemB.text}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                    {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                        <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                            <div className="p-3 border rounded-md text-center bg-secondary">
+                                                {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                {itemA.text}
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )})}
+                                            <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                            <Select 
+                                                onValueChange={(value) => handleMatchingAnswerChange(currentQuestion.id, itemA.text, value)} 
+                                                value={answers[currentQuestion.id]?.[itemA.text] || ''}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a match" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
+                                                        <SelectItem key={`${currentQuestion.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
+                                                            <div className="flex items-center gap-2">
+                                                                {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                <span>{itemB.text}</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
                 </fieldset>
+
+                <div className="mt-8 flex justify-between items-center">
+                    <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0}>
+                        <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                    </Button>
+                    <span>Question {currentQuestionIndex + 1} of {test.questions.length}</span>
+                    <Button type="button" onClick={handleNext} disabled={currentQuestionIndex === test.questions.length - 1}>
+                        Next <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </div>
 
                 <div className="mt-8 flex justify-center">
                      <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
