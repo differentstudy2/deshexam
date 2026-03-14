@@ -121,8 +121,8 @@ export default function TextbookSolutionsListPage() {
     <div>
         <section className="relative w-full py-20 md:py-28 lg:py-36 text-white bg-textbook-hero-gradient">
             <div className="container mx-auto px-4 relative z-10 text-center">
-                <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg">
-                    Unlock Every Answer
+                <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg wave-text">
+                    <span>Unlock</span> <span>Every</span> <span>Answer</span>
                 </h1>
                 <p className="text-lg md:text-xl mt-4 max-w-3xl mx-auto drop-shadow-md">
                     Navigate your studies with ease. Access comprehensive, step-by-step solutions for all your textbook questions, from NCERT to top competitive exam books. Your path to academic excellence starts here.
