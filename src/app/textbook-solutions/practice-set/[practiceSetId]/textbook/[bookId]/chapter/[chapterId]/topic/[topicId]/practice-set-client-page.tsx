@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -214,13 +215,14 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         const submissionData: any = {
             practiceSetId: test?.id,
             practiceSetTitle: test?.title,
-            chapterId: chapterId,
             textbookId: textbookId,
+            chapterId: chapterId,
             answers: answers,
             score,
             totalQuestions: totalMarks,
             timeTaken: timeTakenInSeconds,
             duration: test?.duration || totalMarks,
+            testType: 'Practice Set'
         };
 
         if (topicId !== 'null') {
@@ -247,8 +249,6 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, timeLeft, chapterId, textbookId, topicId, toast, router, mockTestId]);
   
     useEffect(() => {
-        if (viewMode !== 'all') return;
-
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting && test && visibleQuestions < test.questions.length) {
@@ -268,7 +268,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 observer.unobserve(currentRef);
             }
         };
-    }, [lastQuestionRef, test, visibleQuestions, viewMode]);
+    }, [lastQuestionRef, test, visibleQuestions]);
 
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) {
@@ -607,36 +607,23 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
                 
                 {viewMode === 'single' && currentQuestion && (
-                     <Card key={currentQuestion.id || currentQuestionIndex} className="shadow-xl bg-transparent border-0">
-                        <div className="bg-[#0e8107] text-white p-6 rounded-t-lg">
-                            <CardTitle className="flex items-start gap-3 text-2xl font-semibold text-primary-foreground">
-                                    <span className="mt-1">{currentQuestionIndex + 1}.</span>
-                                    <div className="prose-lg prose-invert max-w-none">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{currentQuestion.text}</ReactMarkdown>
-                                    </div>
+                     <Card key={currentQuestion.id || currentQuestionIndex} className="p-6 shadow-none border scroll-m-24">
+                        <CardHeader className="p-0 mb-4">
+                            <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
+                                 <span className="self-start">{currentQuestionIndex + 1}.</span>
+                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{currentQuestion.text}</ReactMarkdown>
                             </CardTitle>
-                        </div>
-                        <CardContent className="p-6 bg-card rounded-b-lg border border-t-0">
+                        </CardHeader>
+                        <CardContent className="p-0">
                             {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
                             <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {currentQuestion.options.map((option, optIndex) => (
-                                <Label
-                                    key={optIndex}
-                                    htmlFor={`q${currentQuestion.id}-opt${optIndex}`}
-                                    className={cn(
-                                        "flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all",
-                                        optionBgColors[optIndex % optionBgColors.length],
-                                        "has-[:checked]:ring-2 has-[:checked]:ring-primary has-[:checked]:border-primary"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <span className="font-bold text-lg">{String.fromCharCode(65 + optIndex)}.</span>
-                                        <div className="prose-sm dark:prose-invert max-w-none">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
-                                        </div>
-                                    </div>
+                                <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
                                     <RadioGroupItem value={option.text} id={`q${currentQuestion.id}-opt${optIndex}`} />
-                                </Label>
+                                    <Label htmlFor={`q${currentQuestion.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                    </Label>
+                                </div>
                                 ))}
                             </RadioGroup>
                             )}

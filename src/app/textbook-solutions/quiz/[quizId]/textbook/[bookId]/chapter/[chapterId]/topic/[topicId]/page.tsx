@@ -1,4 +1,5 @@
 
+
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Metadata, ResolvingMetadata } from 'next';
@@ -6,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { PracticeSet, Textbook, Chapter, Topic, Question, Exam as Quiz } from '@/lib/types';
 import { getPracticeSetById, getQuestionsByPracticeSet, getContentById } from '@/lib/firebase/firestore';
-import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
+import QuizClientPage from './quiz-client-page';
 import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
 
@@ -143,7 +144,7 @@ export default async function QuizPage({ params }: PageProps) {
                     <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
             }>
-                <PracticeSetClientPage 
+                <QuizClientPage 
                     initialTest={initialTest as any} 
                     initialTextbook={textbook as any} 
                     initialChapter={chapter as any}

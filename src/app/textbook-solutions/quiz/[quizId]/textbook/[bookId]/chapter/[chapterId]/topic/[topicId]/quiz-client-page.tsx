@@ -1,371 +1,536 @@
 
+
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
+import { getContentById, addPracticeSetSubmission, getPracticeSetById, getQuestionsByPracticeSet, getUserProfile } from '@/lib/firebase/firestore';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, ArrowLeft, PlusCircle, Edit, Trash2, GripVertical, FileJson, Sparkles, Upload, FileText } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem, AlertTriangle, BookOpen, FileDown, Rows, LayoutGrid, Sparkles, ImageDown, Video, Play, Pause, Volume2, FileQuestion, X, Check, RefreshCw, Trophy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { 
-    addQuestionToContent,
-    updateContent,
-    deleteQuestionFromContent,
-    getContentById
-} from '@/lib/firebase/firestore';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useRouter, usePathname, useParams } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
-import { generateQuestions, AIQuestionGeneratorInput, AIQuestionGeneratorOutput } from '@/ai/flows/ai-question-generator';
-import type { Question, Topic, Textbook, Chapter, Exam as Quiz } from '@/lib/types';
-import QuestionForm from './question-form';
-
-const questionSchema = z.object({
-  id: z.string().optional(),
-  text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
-  marks: z.coerce.number().int().positive('Marks must be a positive number.'),
-  options: z.array(z.object({ text: z.string().min(1, 'Option text cannot be empty.'), explanation: z.string().optional() })).optional(),
-  matchingOptions: z.object({
-    columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
-    columnB: z.array(z.object({ text: z.string(), image: z.string().optional() })),
-  }).optional(),
-  correctAnswer: z.any().optional(),
-  explanation: z.string().optional(),
-});
-type QuestionFormValues = z.infer<typeof questionSchema>;
-
-const jsonExample = `
-{
-  "questions": [
-    {
-      "text": "What is the capital of France?",
-      "type": "Multiple Choice",
-      "marks": 1,
-      "options": [
-        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
-        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
-        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
-        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
-      ],
-      "correctAnswer": "Paris",
-      "explanation": "Paris is the capital and most populous city of France."
-    }
-  ]
-}
-`;
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
+import { useAuthDialog } from '@/hooks/use-auth-dialog';
+import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import type { PracticeSet, Question, Topic, Textbook, Chapter, Exam as Quiz } from '@/lib/types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import type { Metadata, ResolvingMetadata } from 'next';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Skeleton } from '@/components/ui/skeleton';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { PracticeSetPDF } from '@/components/feature/practice-set-pdf';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import Confetti from 'react-dom-confetti';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Switch } from '@/components/ui/switch';
 
 
-const aiGeneratorFormSchema = z.object({
-    sourceType: z.enum(['chapterContent', 'topic', 'text', 'file']),
-    sourceTopic: z.string().optional(),
-    sourceText: z.string().optional(),
-    sourceFile: z.string().optional(),
-    numQuestions: z.coerce.number().int().min(1).max(20),
-    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
-    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
-}).refine(data => {
-    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
-    if (data.sourceType === 'text' || data.sourceType === 'chapterContent') return !!data.sourceText && data.sourceText.length >= 3;
-    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
-    return false;
-}, {
-    message: 'Source content must be at least 3 characters.',
-    path: ['sourceTopic'], 
-});
-type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
-
+const optionBgColors = [
+    'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
+    'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
+    'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
+    'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+];
 
 export default function QuizClientPage({ initialTest, initialTextbook, initialChapter, initialTopic }: { initialTest: Quiz, initialTextbook: Textbook, initialChapter: Chapter, initialTopic: Topic | null }) {
-    const params = useParams();
+    const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState('');
+    const [isCorrect, setIsCorrect] = useState(false);
+    const [score, setScore] = useState(0);
+    const [quizFinished, setQuizFinished] = useState(false);
+    const [timerDuration, setTimerDuration] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const quizCardRef = useRef<HTMLDivElement>(null);
+    const [autoplayEnabled, setAutoplayEnabled] = useState(false);
+    
+    const [playingUrl, setPlayingUrl] = useState<string | null>(null);
+    const activeAudioRef = useRef<HTMLAudioElement | null>(null);
     const { toast } = useToast();
-    const { user } = useAuth();
-    
-    const quizId = params.quizId as string;
-    const [test, setTest] = useState(initialTest);
+    const router = useRouter();
 
-    const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
-    const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-    const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const aiFormFileInputRef = useRef<HTMLInputElement>(null);
-
-    const importFileRef = useRef<HTMLInputElement>(null);
-    const [isImporting, setIsImporting] = useState(false);
-    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-    const [jsonText, setJsonText] = useState('');
-
-    const form = useForm<QuestionFormValues>({
-        resolver: zodResolver(questionSchema),
-        defaultValues: { text: '', type: 'Multiple Choice', marks: 1, options: Array(4).fill({ text: '', explanation: '' }), correctAnswer: '', explanation: '' },
-    });
-    
-    const aiForm = useForm<AIGeneratorFormValues>({
-        resolver: zodResolver(aiGeneratorFormSchema),
-        defaultValues: { sourceType: 'chapterContent', sourceTopic: '', sourceText: initialChapter?.content || '', sourceFile: '', numQuestions: 5, difficulty: 'Medium', questionType: 'Any' },
-    });
-
-    const openQuestionDialog = (question: Question | null) => {
-        setEditingQuestion(question);
-        if (question) {
-            form.reset({ ...question, options: question.options || (question.type === 'Multiple Choice' ? Array(4).fill({ text: '', explanation: '' }) : []) });
-        } else {
-            form.reset({ text: '', type: 'Multiple Choice', marks: 1, options: Array(4).fill({ text: '', explanation: '' }), correctAnswer: '', explanation: '' });
+    const stopSound = useCallback(() => {
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause();
+            activeAudioRef.current.currentTime = 0;
+            activeAudioRef.current = null;
         }
-        setIsQuestionDialogOpen(true);
-    }
-    
-    const handleQuestionSubmit = async (data: QuestionFormValues) => {
-        setIsSubmitting(true);
-        try {
-            if (editingQuestion) {
-                const updatedQuestions = test.questions.map((q: any) => q.id === editingQuestion.id ? {...q, ...data} : q);
-                await updateContent(quizId, { questions: updatedQuestions });
-                setTest({ ...test, questions: updatedQuestions });
-                toast({ title: 'Question Updated' });
-            } else {
-                const newQuestionId = await addQuestionToContent(quizId, data);
-                const newQuestion = { ...data, id: newQuestionId };
-                setTest((prevTest: any) => ({ ...prevTest, questions: [...prevTest.questions, newQuestion] }));
-                toast({ title: 'Question Added' });
+        setPlayingUrl(null);
+    }, []);
+
+    const playSound = useCallback((url: string) => {
+        if (typeof window === 'undefined') return;
+        
+        stopSound(); // Stop anything else first
+
+        const audio = new Audio(url);
+        activeAudioRef.current = audio;
+        setPlayingUrl(url);
+
+        audio.play().catch(error => {
+            console.error(`Error playing sound:`, error);
+            setPlayingUrl(null); // Reset state on error
+        });
+
+        audio.onended = () => {
+            if (activeAudioRef.current === audio) {
+                setPlayingUrl(null);
+                activeAudioRef.current = null;
             }
-            setIsQuestionDialogOpen(false);
-        } catch (error) {
-            toast({ variant: "destructive", title: 'Error', description: (error as Error).message });
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
-    const handleDeleteQuestion = async (questionId: string) => {
-        try {
-            await deleteQuestionFromContent(quizId, questionId);
-            const updatedTest = await getContentById(quizId);
-            setTest(updatedTest as Quiz);
-            toast({ title: 'Question Deleted' });
-        } catch (error) {
-            toast({ variant: 'destructive', title: 'Error', description: (error as Error).message });
-        }
-    }
-
-    const handleSelectQuestion = (questionId: string) => {
-        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, id]);
-    };
-    
-    const handleSelectAllQuestions = (checked: boolean) => {
-        if (checked) {
-            setSelectedQuestions(test.questions.map((q: any) => q.id));
-        } else {
-            setSelectedQuestions([]);
-        }
-    };
-    
-    const handleDeleteSelected = async () => {
-        try {
-            const deletePromises = selectedQuestions.map(id => deleteQuestionFromContent(quizId, id));
-            await Promise.all(deletePromises);
-            const updatedTest = await getContentById(quizId);
-            setTest(updatedTest as Quiz);
-            toast({ title: `${selectedQuestions.length} question(s) deleted.` });
-            setSelectedQuestions([]);
-        } catch (error) {
-            toast({ variant: 'destructive', title: 'Error deleting questions', description: (error as Error).message });
-        }
-    }
-    
-    const processJsonImport = async (jsonText: string) => {
-        try {
-            const parsedJson = JSON.parse(jsonText);
-            const questionsToImport = parsedJson.questions.map((q: any) => ({...q, authorId: user?.uid, authorName: user?.displayName, createdAt: new Date()}));
-            
-            for(const q of questionsToImport) {
-                await addQuestionToContent(quizId, q);
-            }
-            
-            const updatedTest = await getContentById(quizId);
-            setTest(updatedTest as Quiz);
-            toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions have been added.`});
-            setIsImportDialogOpen(false);
-            setJsonText('');
-          } catch (error) {
-            toast({ variant: 'destructive', title: 'Import Failed', description: (error as Error).message });
-          } finally {
-            setIsImporting(false);
-          }
-    }
-
-    const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        setIsImporting(true);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = e.target?.result as string;
-          processJsonImport(text);
-           if(importFileRef.current) importFileRef.current.value = '';
         };
-        reader.readAsText(file);
+    }, [stopSound]);
+
+    const togglePlayUrl = useCallback((url: string) => {
+        if (playingUrl === url && activeAudioRef.current) {
+            stopSound();
+        } else {
+            playSound(url);
+        }
+    }, [playingUrl, playSound, stopSound]);
+
+    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
+        if (typeof window === 'undefined') return;
+
+        if (type !== 'win') {
+           stopSound();
+        }
+        
+        let soundUrl = '';
+        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+        
+        if(soundUrl) {
+            const audio = new Audio(soundUrl);
+            audio.play().catch(error => console.error(`Error playing sound:`, error));
+        }
+    }, [stopSound]);
+
+    const nextQuestion = useCallback(() => {
+        stopSound();
+        if (currentQuestionIndex < shuffledQuestions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+            setSelectedAnswer(null);
+            setFeedback('');
+            setIsCorrect(false);
+            if (timerDuration > 0) {
+                setTimeLeft(timerDuration);
+            }
+        } else {
+            setQuizFinished(true);
+            playSystemSound('win');
+        }
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
+    
+    useEffect(() => {
+        if(initialTest && initialTest.questions) {
+             setShuffledQuestions([...initialTest.questions].sort(() => Math.random() - 0.5));
+        }
+    }, [initialTest]);
+
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+     useEffect(() => {
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
+            const autoplayTimeout = setTimeout(() => {
+                playSound(currentQuestion.audio!);
+            }, 500); 
+            return () => clearTimeout(autoplayTimeout);
+        }
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
+
+
+    useEffect(() => {
+        if (quizFinished || selectedAnswer || timerDuration === 0) {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+            return;
+        }
+
+        timerIntervalRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+                    stopSound();
+                    playSystemSound('incorrect');
+                    setFeedback("Time's up!");
+                    setTimeout(nextQuestion, 1500); 
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+        };
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopSound]);
+    
+    useEffect(() => {
+        return () => {
+            stopSound();
+        }
+    }, [stopSound]);
+
+    const handleAnswer = (answer: string) => {
+        if (selectedAnswer) return;
+
+        stopSound();
+
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+
+        setSelectedAnswer(answer);
+        if (answer === currentQuestion.correctAnswer) {
+            setFeedback('Correct!');
+            setIsCorrect(true);
+            setScore(prev => prev + 1);
+            playSystemSound('correct');
+        } else {
+            setFeedback('Not quite!');
+            playSystemSound('incorrect');
+        }
+
+        setTimeout(nextQuestion, 1500);
     };
-      
-    const handleBulkImportFromText = () => {
-        if (!jsonText.trim()) { toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."}); return; }
-        setIsImporting(true);
-        processJsonImport(jsonText);
+
+    const restartQuiz = () => {
+        stopSound();
+        setShuffledQuestions([...initialTest.questions].sort(() => Math.random() - 0.5));
+        setCurrentQuestionIndex(0);
+        setSelectedAnswer(null);
+        setFeedback('');
+        setIsCorrect(false);
+        setScore(0);
+        setQuizFinished(false);
+        setTimeLeft(timerDuration);
+    };
+    
+    const handleTimerChange = (value: string) => {
+        const newDuration = parseInt(value, 10);
+        setTimerDuration(newDuration);
+        setTimeLeft(newDuration);
+    };
+
+    const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+        ctx.font = "bold 32px 'Lexend', sans-serif";
+        ctx.textAlign = "center";
+        ctx.save();
+        ctx.translate(width / 2, height / 2);
+        ctx.rotate(-Math.PI / 4);
+        
+        const text = "DeshExam";
+        const textWidth = ctx.measureText(text).width;
+        const patternWidth = textWidth + 150;
+        const patternHeight = 150;
+
+        for (let x = -width; x < width * 1.5; x += patternWidth) {
+            for (let y = -height * 1.5; y < height * 1.5; y += patternHeight) {
+                ctx.fillText(text, x, y);
+            }
+        }
+        ctx.restore();
+    };
+
+    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
+        if (quizCardRef.current) {
+            html2canvas(quizCardRef.current, {
+                useCORS: true,
+                backgroundColor: null,
+            }).then(sourceCanvas => {
+                let targetCanvas: HTMLCanvasElement;
+                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : initialTest.title;
+                const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}.png`;
+
+                const target = document.createElement('canvas');
+                const targetCtx = target.getContext('2d');
+                if (!targetCtx) return;
+                
+                if (aspectRatio === 'default') {
+                    target.width = sourceCanvas.width;
+                    target.height = sourceCanvas.height;
+                    targetCtx.drawImage(sourceCanvas, 0, 0);
+                    drawWatermark(targetCtx, target.width, target.height);
+                    targetCanvas = target;
+                } else {
+                    let targetWidth, targetHeight;
+                    if (aspectRatio === '9:16') {
+                        targetHeight = 1920;
+                        targetWidth = 1080;
+                    } else if (aspectRatio === '16:9') {
+                        targetWidth = 1920;
+                        targetHeight = 1080;
+                    } else if (aspectRatio === '4:5') {
+                        targetWidth = 1080;
+                        targetHeight = 1350;
+                    } else { // 1:1 for Instagram
+                        targetWidth = 1080;
+                        targetHeight = 1080;
+                    }
+                    
+                    target.width = targetWidth;
+                    target.height = targetHeight;
+
+                    // Create a pleasant gradient background
+                    const gradients = [
+                        { from: '#DA22FF', to: '#9733EE' },
+                        { from: '#09203F', to: '#537895' },
+                        { from: '#868F96', to: '#596164' },
+                        { from: '#93A5CF', to: '#E4EfE9' },
+                        { from: '#11998E', to: '#38EF7D' }
+                    ];
+                    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+                    const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
+                    gradient.addColorStop(0, randomGradient.from);
+                    gradient.addColorStop(1, randomGradient.to);
+                    targetCtx.fillStyle = gradient;
+                    targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+                    
+                    // Add repeating watermark
+                    drawWatermark(targetCtx, targetWidth, targetHeight);
+
+                    const padding = 100;
+                    const scale = Math.min(
+                        (targetWidth - padding * 2) / sourceCanvas.width, 
+                        (targetHeight - padding * 2) / sourceCanvas.height
+                    );
+                    const scaledWidth = sourceCanvas.width * scale;
+                    const scaledHeight = sourceCanvas.height * scale;
+                    const dx = (targetWidth - scaledWidth) / 2;
+                    const dy = (targetHeight - scaledHeight) / 2;
+                    
+                    targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
+                    targetCanvas = target;
+                }
+
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = targetCanvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    };
+
+
+    if (!initialTest || !shuffledQuestions || shuffledQuestions.length === 0) {
+        return (
+             <div className="container mx-auto px-4 py-12 text-center">
+                 <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
+                 <Button asChild className="mt-4">
+                     <Link href="/kids-zone/fun-quizzes">Back to Fun Quizzes</Link>
+                 </Button>
+             </div>
+        );
     }
     
-    const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
-        setIsGenerating(true);
-        try {
-            const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
-                         : aiData.sourceType === 'chapterContent' ? initialChapter?.content
-                         : aiData.sourceType === 'text' ? aiData.sourceText
-                         : aiData.sourceType === 'file' ? aiData.sourceFile
-                         : null;
+    const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
-            if (!source || source.length < 3) {
-                toast({ variant: "destructive", title: 'AI Generation Failed', description: 'Source content must be at least 3 characters.' });
-                setIsGenerating(false);
-                return;
-            }
-    
-            const input: AIQuestionGeneratorInput = { numQuestions: aiData.numQuestions, difficulty: aiData.difficulty, questionType: aiData.questionType, sourceType: (aiData.sourceType === 'file' || aiData.sourceType === 'chapterContent') ? 'text' : aiData.sourceType, source: source };
-
-            const result: AIQuestionGeneratorOutput = await generateQuestions(input);
-            
-            for(const q of result.questions) {
-                await addQuestionToContent(quizId, q);
-            }
-            
-            const updatedTest = await getContentById(quizId);
-            setTest(updatedTest as Quiz);
-            toast({ title: 'Questions Generated!', description: `${result.questions.length} new questions have been added.` });
-            setIsAIGeneratorOpen(false);
-        } catch (error) {
-            toast({ variant: "destructive", title: 'AI Generation Failed', description: (error as Error).message });
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
-    const handleAiFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file && file.type === 'text/plain') {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const text = e.target?.result as string;
-                aiForm.setValue('sourceFile', text, { shouldValidate: true });
-                aiForm.setValue('sourceType', 'file');
-            };
-            reader.readAsText(file);
-        } else {
-            toast({ variant: 'destructive', title: 'Invalid File Type', description: 'Please upload a .txt file.' });
-        }
-    };
-
-    const backUrl = initialTopic ? `/admin/textbooks/${initialTextbook.id}/chapter/${initialChapter.id}/topic/${initialTopic.id}` : `/admin/textbooks/${initialTextbook.id}/chapter/${initialChapter.id}`;
-
     return (
-        <div className="space-y-6">
-            <div>
-                <Button variant="ghost" asChild>
-                    <Link href={backUrl}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to {initialTopic ? 'Topic' : 'Chapter'}
-                    </Link>
-                </Button>
-            </div>
-            <header>
-                <h1 className="font-headline text-3xl font-bold">Quiz: <span className="text-primary">{test?.title}</span></h1>
-                <p className="text-muted-foreground mt-1">Topic: {initialTopic?.title || 'Chapter Level'}</p>
-            </header>
-
-            <Card>
-                <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                        <CardTitle>Questions ({test.questions.length})</CardTitle>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                        <Button size="sm" onClick={() => openQuestionDialog(null)} className="w-full">
-                            <PlusCircle className="mr-2"/> Add Question
-                        </Button>
-                        <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
-                            <DialogTrigger asChild><Button size="sm" variant="outline" className="w-full"><Sparkles className="mr-2"/> Generate with AI</Button></DialogTrigger>
-                            <DialogContent className="sm:max-w-2xl"><DialogHeader><DialogTitle>Generate Questions with AI</DialogTitle><DialogDescription>Describe the questions you want to create, and Gemini will generate them for this quiz.</DialogDescription></DialogHeader>
-                                <Form {...aiForm}>
-                                    <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
-                                        <Tabs defaultValue="chapterContent" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as any)}>
-                                            <TabsList className="grid w-full grid-cols-4"><TabsTrigger value="chapterContent">Chapter's Content</TabsTrigger><TabsTrigger value="topic">Topic</TabsTrigger><TabsTrigger value="text">Paste Text</TabsTrigger><TabsTrigger value="file">From File</TabsTrigger></TabsList>
-                                            <TabsContent value="chapterContent" className="pt-4"><FormItem><FormLabel>Chapter Content</FormLabel><FormControl><Textarea readOnly value={initialChapter?.content || "No content available for this chapter."} className="min-h-[150px] bg-secondary"/></FormControl></FormItem></TabsContent>
-                                            <TabsContent value="topic" className="pt-4"><FormField control={aiForm.control} name="sourceTopic" render={({ field }) => (<FormItem><FormLabel>Topic</FormLabel><FormControl><Input placeholder="e.g., 'Newton's Laws of Motion'" {...field} /></FormControl><FormMessage /></FormItem>)}/></TabsContent>
-                                            <TabsContent value="text" className="pt-4"><FormField control={aiForm.control} name="sourceText" render={({ field }) => (<FormItem><FormLabel>Paste Text</FormLabel><FormControl><Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /></FormControl><FormMessage /></FormItem>)}/></TabsContent>
-                                            <TabsContent value="file" className="pt-4"><FormItem><FormLabel>Upload File</FormLabel><FormControl><div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => aiFormFileInputRef.current?.click()}><div className="space-y-1 text-center"><Upload className="mx-auto h-12 w-12 text-muted-foreground" /><p className="pl-1">{aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}</p><p className="text-xs text-muted-foreground">{aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}</p></div></div></FormControl><Input type="file" ref={aiFormFileInputRef} onChange={handleAiFileChange} className="hidden" accept=".txt"/><FormMessage /></FormItem></TabsContent>
-                                        </Tabs>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <FormField control={aiForm.control} name="numQuestions" render={({ field }) => (<FormItem><FormLabel>Number of Questions</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
-                                            <FormField control={aiForm.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulty</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>
-                                        </div>
-                                        <FormField control={aiForm.control} name="questionType" render={({ field }) => (<FormItem><FormLabel>Question Type</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Any">Any</SelectItem><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem><SelectItem value="Short Answer">Short Answer</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>
-                                        <DialogFooter className="pt-4"><Button type="submit" disabled={isGenerating}>{isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate"}</Button></DialogFooter>
-                                    </form>
-                                </Form>
-                            </DialogContent>
-                        </Dialog>
-                        <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-                            <DialogTrigger asChild><Button size="sm" variant="outline" className="w-full"><FileJson className="mr-2"/> Bulk Import</Button></DialogTrigger>
-                            <DialogContent className="sm:max-w-2xl"><DialogHeader><DialogTitle>Bulk Import Questions</DialogTitle><DialogDescription>Upload a JSON file or paste JSON text containing an array of questions.</DialogDescription></DialogHeader>
-                                <Tabs defaultValue="upload" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="upload">Upload File</TabsTrigger><TabsTrigger value="paste">Paste JSON</TabsTrigger></TabsList>
-                                    <TabsContent value="upload"><div className="py-4"><div className="grid w-full max-w-sm items-center gap-1.5"><Label htmlFor="json-import">JSON/TXT File</Label><Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />{isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}</div></div></TabsContent>
-                                    <TabsContent value="paste"><div className="py-4 space-y-4"><Textarea placeholder='Paste your JSON content here...' value={jsonText} onChange={(e) => setJsonText(e.target.value)} className="min-h-[200px] font-mono text-xs" disabled={isImporting}/><Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>{isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}</Button></div></TabsContent>
-                                </Tabs>
-                                <Accordion type="single" collapsible className="w-full"><AccordionItem value="item-1"><AccordionTrigger>View JSON Format Example</AccordionTrigger><AccordionContent><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre></AccordionContent></AccordionItem></Accordion>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    {selectedQuestions.length > 0 && (
-                        <div className="mb-4"><AlertDialog><AlertDialogTrigger asChild><Button variant="destructive" size="sm"><Trash2 className="mr-2 h-4 w-4"/>Delete Selected ({selectedQuestions.length})</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will permanently delete {selectedQuestions.length} question(s). This action cannot be undone.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDeleteSelected}>Delete</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></div>
-                    )}
-                    {test.questions.length > 0 ? (
-                        <ul className="space-y-2"><li className="flex items-center p-3 border-b"><Checkbox id="select-all" checked={selectedQuestions.length === test.questions.length && test.questions.length > 0} onCheckedChange={handleSelectAllQuestions} className="mr-4" /><label htmlFor="select-all" className="flex-1 font-semibold text-sm">Select All</label></li>
-                            {test.questions.map((q: any) => (
-                                <li key={q.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-md gap-4">
-                                    <div className="flex items-start flex-1 min-w-0"><Checkbox id={`select-${q.id}`} checked={selectedQuestions.includes(q.id)} onCheckedChange={() => handleSelectQuestion(q.id)} className="mr-4 mt-1" /><label htmlFor={`select-${q.id}`} className="flex-1">{q.text}</label></div>
-                                    <div className="flex gap-2 flex-shrink-0 self-end sm:self-center">
-                                        <Button variant="ghost" size="icon" onClick={() => openQuestionDialog(q)}><Edit className="h-4 w-4"/></Button>
-                                        <AlertDialog><AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="text-destructive"><Trash2 className="h-4 w-4"/></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone and will permanently delete this question.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDeleteQuestion(q.id)}>Delete</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+        <div className="relative min-h-screen">
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: "url('/image/logo.png')",
+                backgroundSize: '150px',
+                backgroundRepeat: 'repeat',
+                opacity: 0.05,
+              }}
+            />
+             <div className="absolute inset-0 bg-secondary/30" />
+            <div className="relative z-10 container mx-auto px-4 py-12">
+                
+                {quizFinished ? (
+                    <Card ref={quizCardRef} className="w-full max-w-xl mx-auto text-center shadow-2xl p-8 bg-card/80 backdrop-blur-sm">
+                        <Confetti active={quizFinished} />
+                        <CardHeader>
+                            <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
+                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
+                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
+                            <p className="text-xl mt-2 font-semibold">Your Score</p>
+                            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button onClick={restartQuiz} size="lg">
+                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                    Play Again
+                                </Button>
+                                <Button asChild variant="outline" size="lg">
+                                    <Link href="/kids-zone/fun-quizzes">
+                                        <ArrowLeft className="mr-2 h-4 w-4" />
+                                        Back to Fun Quizzes
+                                    </Link>
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="w-full max-w-2xl mx-auto">
+                        <Card className="bg-card/60 backdrop-blur-sm">
+                             <CardContent className="p-3">
+                                <div className="flex flex-wrap justify-between items-center gap-4">
+                                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                        <FileQuestion className="w-5 h-5" />
+                                        <span className="font-bold text-foreground">{currentQuestionIndex + 1}</span>
+                                        <span>/</span>
+                                        <span>{shuffledQuestions.length}</span>
                                     </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : ( <p className="text-muted-foreground text-center py-8">No questions added to this quiz yet.</p>)}
-                </CardContent>
-            </Card>
-            
-             <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
-                <DialogContent className="sm:max-w-3xl">
-                    <DialogHeader><DialogTitle>{editingQuestion ? 'Edit Question' : 'Add New Question'}</DialogTitle><DialogDescription>Fill in the details for your question below.</DialogDescription></DialogHeader>
-                    <QuestionForm form={form} onSubmit={handleQuestionSubmit} isSubmitting={isSubmitting} />
-                </DialogContent>
-            </Dialog>
+                                    <div className="flex items-center gap-4 flex-wrap justify-end">
+                                        <div className="flex items-center gap-2">
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Label htmlFor="autoplay-switch" className="cursor-pointer">
+                                                            <Volume2 className="w-5 h-5 text-slate-600" />
+                                                        </Label>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>Autoplay Audio</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                            <Switch
+                                                id="autoplay-switch"
+                                                checked={autoplayEnabled}
+                                                onCheckedChange={(checked) => {
+                                                    setAutoplayEnabled(checked);
+                                                    if (!checked) {
+                                                        stopSound();
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
+                                            <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
+                                                <SelectTrigger id="timer-select" className="w-[100px] h-9">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="15">15s</SelectItem>
+                                                    <SelectItem value="30">30s</SelectItem>
+                                                    <SelectItem value="60">60s</SelectItem>
+                                                    <SelectItem value="0">Off</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {timerDuration > 0 && (
+                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                                <Clock className="w-5 h-5" />
+                                                <span>{timeLeft}s</span>
+                                            </div>
+                                        )}
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="icon">
+                                                    <ImageDown className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
+                                                    Save as Default
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
+                                                    <Video className="mr-2 h-4 w-4" />
+                                                    Save for Landscape Video (16:9)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
+                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
+                                                    Save for Short Video (9:16)
+                                                </DropdownMenuItem>
+                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                                                    Save for Instagram (1:1)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
+                                                    Save for Facebook Post (4:5)
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <div ref={quizCardRef}>
+                             <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
+                                <CardHeader className="relative bg-[#0e8107] text-white p-6">
+                                    {currentQuestion && currentQuestion.image && (
+                                        <div className="relative h-48 w-full mt-4">
+                                            <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
+                                        </div>
+                                    )}
+                                    
+                                    <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-start gap-2">
+                                        <span>{currentQuestion?.text}</span>
+                                        {currentQuestion?.audio && (
+                                            <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
+                                            </Button>
+                                        )}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-6">
+                                    <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                            {currentQuestion?.options.map((option, index) => {
+                                                const isSelected = selectedAnswer === option.text;
+                                                const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+                                                const isShown = selectedAnswer !== null;
+
+                                                return (
+                                                    <Label
+                                                        key={index}
+                                                        htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                        className={cn(
+                                                            "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
+                                                            !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
+                                                            isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
+                                                            isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
+                                                            !isShown && optionBgColors[index % optionBgColors.length],
+                                                        )}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                            <span className="text-left font-bold text-lg">{option.text}</span>
+                                                        </div>
+                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
+                                                    </Label>
+                                                );
+                                            })}
+                                        </div>
+                                    </RadioGroup>
+                                    {feedback && <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
- 
+
