@@ -173,8 +173,8 @@ export default function TextbookSolutionsListPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {visibleTextbooks.map((book) => (
-                <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
-                  <CardHeader className="p-0 relative bg-gray-100 dark:bg-gray-800 flex items-center justify-center aspect-[2/3]">
+                <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-textbook-card-gradient text-white">
+                  <CardHeader className="p-0 relative bg-black/20 flex items-center justify-center h-48">
                     <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
                         <Image
                           src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
@@ -191,16 +191,16 @@ export default function TextbookSolutionsListPage() {
                   </CardHeader>
                   <CardContent className="flex-grow p-3 space-y-2">
                       <div className="flex flex-wrap gap-1">
-                          {book.subject && <Badge variant="outline" className="text-xs">{book.subject}</Badge>}
-                          {book.class && <Badge variant="outline" className="text-xs">{book.class}</Badge>}
-                          {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
+                          {book.subject && <Badge variant="outline" className="border-primary-foreground/20 text-primary-foreground/80">{book.subject}</Badge>}
+                          {book.class && <Badge variant="outline" className="border-primary-foreground/20 text-primary-foreground/80">{book.class}</Badge>}
+                          {book.board && <Badge variant="outline" className="border-primary-foreground/20 text-primary-foreground/80">{book.board}</Badge>}
                       </div>
                       <Link href={`/textbook-solutions/${book.id}`}>
-                          <CardTitle className="font-headline text-base mt-1 leading-snug hover:text-primary transition-colors">
+                          <CardTitle className="font-headline text-base mt-1 leading-snug text-white hover:text-primary-foreground/80 transition-colors">
                               {book.title.length > 52 ? book.title.substring(0, 52) + '...' : book.title}
                           </CardTitle>
                       </Link>
-                       <p className="text-xs text-muted-foreground">by {(book as any).authorName || 'DeshExam'}</p>
+                       <p className="text-xs text-primary-foreground/70">by {(book as any).authorName || 'DeshExam'}</p>
                       <TextbookStats textbookId={book.id} />
                   </CardContent>
                   <CardFooter className="p-3 pt-0">

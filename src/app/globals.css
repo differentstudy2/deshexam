@@ -270,6 +270,12 @@
     background: -webkit-linear-gradient(to right, #0f9b0f, #000000);
     background: linear-gradient(to right, #0f9b0f, #000000);
   }
+
+  .bg-textbook-card-gradient {
+    background: #141E30;
+    background: -webkit-linear-gradient(to right, #243B55, #141E30);
+    background: linear-gradient(to right, #243B55, #141E30);
+  }
 }
 
 .ql-editor {
