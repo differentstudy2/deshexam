@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem, AlertTriangle, BookOpen, FileDown } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, ChevronLeft, ChevronRight, BarChart, GraduationCap, Target, School, BadgeCheck, Crown, Gem, AlertTriangle, BookOpen, FileDown, Rows, LayoutGrid } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -94,11 +94,17 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
   
+  const lastQuestionRef = useRef<HTMLDivElement>(null);
+
   const [pdfContent, setPdfContent] = useState<{ practiceSet: PracticeSet; questions: Question[] } | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<string | null>(null);
   const [clientDate, setClientDate] = useState('');
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<'single' | 'all'>('single');
+  const [visibleQuestions, setVisibleQuestions] = useState(5);
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const highestVisitedIndex = useRef(0);
 
   useEffect(() => {
@@ -127,6 +133,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
         }
         
         if (initialTest) {
+            questionRefs.current = Array(initialTest.questions.length).fill(null);
             const questionsWithMatchingOptions = initialTest.questions.map((q: any) => {
                 if (q.type === 'Matching' && q.correctAnswer) {
                     const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
@@ -232,6 +239,30 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     }
   }, [isSubmitting, user, openAuthDialog, test, answers, totalMarks, timeLeft, chapterId, textbookId, topicId, toast, router, mockTestId]);
   
+    useEffect(() => {
+        if (viewMode !== 'all') return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && test && visibleQuestions < test.questions.length) {
+                    setVisibleQuestions(prev => prev + 5);
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        const currentRef = lastQuestionRef.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
+
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
+    }, [lastQuestionRef, test, visibleQuestions, viewMode]);
+
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) {
       if (timeLeft === 0) {
@@ -278,7 +309,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
     const handleNavigateToQuestion = (qIndex: number) => {
         setIsConfirming(false);
-        setCurrentQuestionIndex(qIndex);
+        questionRefs.current[qIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
     const getConfirmDialogContent = () => {
@@ -552,107 +583,151 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 </div>
                             )}
                         </div>
+                        <Separator orientation="vertical" className="h-6" />
+                        <div className="flex items-center gap-1">
+                            <Button variant={viewMode === 'all' ? 'secondary' : 'ghost'} size="sm" className="h-8 w-8 p-0" onClick={() => setViewMode('all')}>
+                                <Rows className="h-4 w-4" />
+                            </Button>
+                            <Button variant={viewMode === 'single' ? 'secondary' : 'ghost'} size="sm" className="h-8 w-8 p-0" onClick={() => setViewMode('single')}>
+                                <LayoutGrid className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
 
             <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
                 <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
-                
-                {currentQuestion && (
-                    <Card key={currentQuestion.id || currentQuestionIndex} className="p-6 shadow-none border scroll-m-24">
-                        <CardHeader className="p-0 mb-4">
-                            <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
-                                    <span className="self-start">{currentQuestionIndex + 1}.</span>
-                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{currentQuestion.text}</ReactMarkdown>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
-                            <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {currentQuestion.options.map((option, optIndex) => (
-                                <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
-                                    <RadioGroupItem value={option.text} id={`q${currentQuestion.id}-opt${optIndex}`} />
-                                    <Label htmlFor={`q${currentQuestion.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
-                                    </Label>
-                                </div>
-                                ))}
-                            </RadioGroup>
-                            )}
-                            {currentQuestion.type === 'True/False' && (
-                            <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="flex space-x-4 true-false-group">
-                                <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="True" id={`q${currentQuestion.id}-true`} />
-                                <Label htmlFor={`q${currentQuestion.id}-true`} className="text-lg">True</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="False" id={`q${currentQuestion.id}-false`} />
-                                <Label htmlFor={`q${currentQuestion.id}-false`} className="text-lg">False</Label>
-                                </div>
-                            </RadioGroup>
-                            )}
-                            {(currentQuestion.type === 'Short Answer' || currentQuestion.type === 'Fill in the Blank') && (
-                            <Input 
-                                placeholder="Your answer..." 
-                                onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-                                value={answers[currentQuestion.id] || ''}
-                            />
-                            )}
-                            {currentQuestion.type === 'Matching' && currentQuestion.matchingOptions && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                        <div className="font-bold text-center">Column A</div>
-                                        <div></div>
-                                        <div className="font-bold text-center">Column B</div>
+                    {viewMode === 'single' && currentQuestion && (
+                         <Card key={currentQuestion.id || currentQuestionIndex} className="p-6 shadow-none border scroll-m-24">
+                            <CardHeader className="p-0 mb-4">
+                                <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
+                                        <span className="self-start">{currentQuestionIndex + 1}.</span>
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{currentQuestion.text}</ReactMarkdown>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {currentQuestion.options.map((option, optIndex) => (
+                                    <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+                                        <RadioGroupItem value={option.text} id={`q${currentQuestion.id}-opt${optIndex}`} />
+                                        <Label htmlFor={`q${currentQuestion.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                        </Label>
                                     </div>
-                                    {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                        <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                            <div className="p-3 border rounded-md text-center bg-secondary">
-                                                {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
-                                                {itemA.text}
-                                            </div>
-                                            <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                            <Select 
-                                                onValueChange={(value) => handleMatchingAnswerChange(currentQuestion.id, itemA.text, value)} 
-                                                value={answers[currentQuestion.id]?.[itemA.text] || ''}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a match" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
-                                                        <SelectItem key={`${currentQuestion.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
-                                                            <div className="flex items-center gap-2">
-                                                                {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
-                                                                <span>{itemB.text}</span>
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
                                     ))}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
+                                </RadioGroup>
+                                )}
+                                {currentQuestion.type === 'True/False' && (
+                                <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="flex space-x-4 true-false-group">
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="True" id={`q${currentQuestion.id}-true`} />
+                                    <Label htmlFor={`q${currentQuestion.id}-true`} className="text-lg">True</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="False" id={`q${currentQuestion.id}-false`} />
+                                    <Label htmlFor={`q${currentQuestion.id}-false`} className="text-lg">False</Label>
+                                    </div>
+                                </RadioGroup>
+                                )}
+                                {(currentQuestion.type === 'Short Answer' || currentQuestion.type === 'Fill in the Blank') && (
+                                <Input 
+                                    placeholder="Your answer..." 
+                                    onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                                    value={answers[currentQuestion.id] || ''}
+                                />
+                                )}
+                                {currentQuestion.type === 'Matching' && currentQuestion.matchingOptions && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                            <div className="font-bold text-center">Column A</div>
+                                            <div></div>
+                                            <div className="font-bold text-center">Column B</div>
+                                        </div>
+                                        {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                            <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                <div className="p-3 border rounded-md text-center bg-secondary">
+                                                    {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                    {itemA.text}
+                                                </div>
+                                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                <Select 
+                                                    onValueChange={(value) => handleMatchingAnswerChange(currentQuestion.id, itemA.text, value)} 
+                                                    value={answers[currentQuestion.id]?.[itemA.text] || ''}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a match" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
+                                                            <SelectItem key={`${currentQuestion.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
+                                                                <div className="flex items-center gap-2">
+                                                                    {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                    <span>{itemB.text}</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {viewMode === 'all' && test.questions.slice(0, visibleQuestions).map((question, index) => {
+                        const isLastQuestion = index === visibleQuestions - 1;
+                        return (
+                            <Card key={question.id || index} ref={el => {
+                                questionRefs.current[index] = el;
+                                if (isLastQuestion) {
+                                    (lastQuestionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+                                }
+                            }} className="p-6 shadow-none border scroll-m-24">
+                                <CardHeader className="p-0 mb-4">
+                                    <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
+                                        <span className="self-start">{index + 1}.</span>
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.text}</ReactMarkdown>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                    {question.type === 'Multiple Choice' && question.options && (
+                                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {question.options.map((option, optIndex) => (
+                                            <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+                                                <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
+                                                <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                </Label>
+                                            </div>
+                                            ))}
+                                        </RadioGroup>
+                                    )}
+                                    {/* Other question types for 'all' mode */}
+                                </CardContent>
+                            </Card>
+                        )
+                    })}
                 </fieldset>
 
-                <div className="mt-8 flex justify-between items-center">
-                    <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0}>
-                        <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-                    </Button>
-                    <span>Question {currentQuestionIndex + 1} of {test.questions.length}</span>
-                    <Button type="button" onClick={handleNext} disabled={currentQuestionIndex === test.questions.length - 1}>
-                        Next <ChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                </div>
+                {viewMode === 'single' && (
+                    <div className="mt-8 flex justify-between items-center">
+                        <Button type="button" onClick={handlePrev} disabled={currentQuestionIndex === 0}>
+                            <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                        </Button>
+                        <span>Question {currentQuestionIndex + 1} of {test.questions.length}</span>
+                        <Button type="button" onClick={handleNext} disabled={currentQuestionIndex === test.questions.length - 1}>
+                            Next <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
 
                 <div className="mt-8 flex justify-center">
                      <Button size="lg" type="submit" disabled={isSubmitting || timeUp}>
-                        {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Practice Set"}
+                        {isSubmitting ? <><Loader2 className="animate-spin mr-2" />Submitting...</> : "Submit Test"}
                     </Button>
                 </div>
             </form>
@@ -663,7 +738,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 <AlertDialogHeader>
                     <AlertDialogTitle>Time's Up!</AlertDialogTitle>
                     <AlertDialogDescription>
-                        The time limit for this practice set has been reached. Your answers will now be submitted.
+                        The time limit for this mock test has been reached. Your answers will now be submitted.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogAction onClick={() => handleSubmit()}>
