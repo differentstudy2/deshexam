@@ -118,17 +118,19 @@ export default function TextbookSolutionsListPage() {
   }, [searchQuery, selectedSubject, selectedGrade, selectedClassCategory, selectedBoard, selectedSchool]);
 
   return (
-    <div className="bg-secondary/30 min-h-screen">
-      <div className="container py-12 md:py-16">
-        <header className="text-center mb-12">
-          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter">
-            Textbook Solutions
-          </h1>
-          <p className="text-lg text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Find solutions and practice sets for your school textbooks. Covers all subjects and boards.
-          </p>
-        </header>
+    <div>
+        <section className="relative w-full py-20 md:py-28 lg:py-36 text-white bg-textbook-hero-gradient">
+            <div className="container mx-auto px-4 relative z-10 text-center">
+                <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg">
+                    Unlock Every Answer
+                </h1>
+                <p className="text-lg md:text-xl mt-4 max-w-3xl mx-auto drop-shadow-md">
+                    Navigate your studies with ease. Access comprehensive, step-by-step solutions for all your textbook questions, from NCERT to top competitive exam books. Your path to academic excellence starts here.
+                </p>
+            </div>
+        </section>
 
+      <div className="container py-12 md:py-16">
         <TextbookFilters
             searchQuery={searchQuery}
             onSearchQueryChange={setSearchQuery}
@@ -173,7 +175,7 @@ export default function TextbookSolutionsListPage() {
               {visibleTextbooks.map((book) => (
                 <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                   <CardHeader className="p-0 relative bg-gray-100 dark:bg-gray-800 flex items-center justify-center aspect-[2/3]">
-                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full th-full">
+                    <Link href={`/textbook-solutions/${book.id}`} className="block w-full h-full">
                         <Image
                           src={book.featureImage || `https://picsum.photos/seed/${book.id}/200/280`}
                           alt={book.title}
@@ -193,7 +195,7 @@ export default function TextbookSolutionsListPage() {
                           {book.class && <Badge variant="outline" className="text-xs">{book.class}</Badge>}
                           {book.board && <Badge variant="outline" className="text-xs">{book.board}</Badge>}
                       </div>
-                      <Link href={`/textbook-solutions/${book.id}`} className="block">
+                      <Link href={`/textbook-solutions/${book.id}`}>
                           <CardTitle className="font-headline text-base mt-1 leading-snug hover:text-primary transition-colors">
                               {book.title.length > 52 ? book.title.substring(0, 52) + '...' : book.title}
                           </CardTitle>
