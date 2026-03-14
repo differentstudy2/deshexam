@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -45,7 +44,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Switch } from '@/components/ui/switch';
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const optionBgColors = [
     'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
@@ -533,4 +537,3 @@ export default function QuizClientPage({ initialTest, initialTextbook, initialCh
         </div>
     );
 }
-
