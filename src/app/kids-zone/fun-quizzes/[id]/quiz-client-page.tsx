@@ -253,7 +253,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
         ctx.restore();
     };
-
+    
     const captureAndDownload = async (
         mode: 'question' | 'answer',
         aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5'
@@ -456,34 +456,36 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 <span>{timeLeft}s</span>
                                             </div>
                                         )}
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" size="icon" disabled={isCapturing}>
-                                                    {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
-                                                    Save as Default
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
-                                                    <Video className="mr-2 h-4 w-4" />
-                                                    Save for Landscape Video (16:9)
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
-                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
-                                                    Save for Short Video (9:16)
-                                                </DropdownMenuItem>
-                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
-                                                    Save for Instagram (1:1)
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
-                                                    Save for Facebook Post (4:5)
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <div className="fixed top-4 right-4 z-50">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="icon" disabled={isCapturing}>
+                                                        {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
+                                                        Save as Default
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
+                                                        <Video className="mr-2 h-4 w-4" />
+                                                        Save for Landscape Video (16:9)
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
+                                                        <Video className="mr-2 h-4 w-4 rotate-90" />
+                                                        Save for Short Video (9:16)
+                                                    </DropdownMenuItem>
+                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                                                        Save for Instagram (1:1)
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
+                                                        Save for Facebook Post (4:5)
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
@@ -518,16 +520,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
                                                     !isShown && captureMode === 'idle' && "cursor-pointer hover:scale-105 hover:border-primary"
                                                 );
-                                
+
+                                                const optionStyle: React.CSSProperties = {};
+
                                                 if (captureMode === 'question') {
                                                     optionClass = cn(optionClass, optionBgColors[index % optionBgColors.length]);
                                                 } else if (captureMode === 'answer') {
                                                     if (isCorrectAnswer) {
-                                                        optionClass = cn(optionClass, "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30");
+                                                        optionStyle.backgroundColor = 'rgb(32, 128, 0)';
+                                                        optionStyle.color = 'white';
+                                                        optionClass = cn(optionClass, "border-green-700 ring-2 ring-green-600/50");
                                                     } else {
-                                                        optionClass = cn(optionClass, "border-destructive/50 bg-red-100/50 dark:bg-red-900/20 text-muted-foreground opacity-70");
+                                                        optionStyle.backgroundColor = 'rgb(128, 128, 0)';
+                                                        optionStyle.color = 'white';
+                                                        optionClass = cn(optionClass, "border-yellow-800/50");
                                                     }
-                                                } else { // 'idle' mode
+                                                } else { // 'idle' mode for interactive quiz
                                                     if (isShown) {
                                                         if (isCorrectAnswer) {
                                                             optionClass = cn(optionClass, "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30");
@@ -546,6 +554,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         key={index}
                                                         htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                         className={optionClass}
+                                                        style={optionStyle}
                                                     >
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
