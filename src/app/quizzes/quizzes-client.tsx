@@ -30,19 +30,45 @@ function getUrlForTest(testType: string, testId: string) {
   return `/${typeSlug}/${testId}`;
 }
 
+const ITEMS_PER_PAGE = 8;
+
 export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: Quiz[] }) {
   const [quizzes, setQuizzes] = useState<Quiz[]>(initialQuizzes);
-  const [loading, setLoading] = useState(false); // Data is pre-fetched
-  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [subjects, setSubjects] = useState<{ id: string; name: string }[]>([]);
   const { toast } = useToast();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (initialQuizzes) {
         const uniqueSubjects = Array.from(new Set(initialQuizzes.map((quiz) => quiz.subject))).filter(Boolean) as string[];
-        setSubjects(uniqueSubjects);
+        setSubjects(uniqueSubjects.map(s => ({ id: s, name: s })));
     }
   }, [initialQuizzes]);
 
+  const filteredQuizzes = useMemo(() => {
+    return quizzes.filter(quiz => {
+        if (!quiz.title) return false;
+        const matchesSearch = quiz.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSubject = selectedSubject === 'all' || quiz.subject === selectedSubject;
+        return matchesSearch && matchesSubject;
+    });
+  }, [quizzes, searchQuery, selectedSubject]);
+
+  const totalPages = Math.ceil(filteredQuizzes.length / ITEMS_PER_PAGE);
+
+  const paginatedQuizzes = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredQuizzes.slice(startIndex, endIndex);
+  }, [filteredQuizzes, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedSubject]);
 
   return (
     <>
@@ -59,9 +85,16 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
 
       <div className="bg-background">
         <div className="container py-12 md:py-16">
+          <MockTestFilters
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
+            subjects={subjects}
+            selectedSubject={selectedSubject}
+            onSubjectChange={setSelectedSubject}
+          />
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
                  <Card key={i} className="flex flex-col overflow-hidden">
                   <CardHeader className="p-0 relative h-48">
                     <Skeleton className="w-full h-full rounded-t-lg" />
@@ -78,37 +111,52 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
               ))}
             </div>
           ) : quizzes.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {quizzes.map((quiz) => (
-                <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
-                  <CardHeader className="p-0 relative h-48">
-                    <Image
-                      src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`}
-                      alt={quiz.title}
-                      width={400}
-                      height={225}
-                      className="w-full h-full object-cover"
-                      data-ai-hint={`${quiz.subject} abstract`}
-                    />
-                    <div className="absolute top-2 right-2">
-                      <ContentBadge type={quiz.access} />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow p-4">
-                    <p className="text-sm font-medium text-primary-foreground/80">{quiz.subject}</p>
-                    <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
-                    <p className="text-sm text-primary-foreground/70 line-clamp-3">
-                      {quiz.description || `A fun quiz about ${quiz.subject}.`}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Button asChild className="w-full bg-quiz-button-gradient text-white">
-                      <Link href={getUrlForTest(quiz.testType, quiz.id)}>Start Quiz</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {paginatedQuizzes.map((quiz) => (
+                  <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card text-card-foreground">
+                    <CardHeader className="p-0 relative">
+                      <Image
+                        src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`}
+                        alt={quiz.title}
+                        width={400}
+                        height={225}
+                        className="w-full h-auto object-cover"
+                        data-ai-hint={`${quiz.subject} abstract`}
+                      />
+                      <div className="absolute top-2 right-2">
+                        <ContentBadge type={quiz.access} />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow p-4">
+                      <p className="text-sm font-medium text-primary">{quiz.subject}</p>
+                      <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {quiz.description || `A fun quiz about ${quiz.subject}.`}
+                      </p>
+                    </CardContent>
+                    <CardFooter className="p-4 pt-0">
+                      <Button asChild className="w-full">
+                        <Link href={getUrlForTest(quiz.testType, quiz.id)}>Start Quiz</Link>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+              {totalPages > 1 && (
+                  <div className="mt-12 text-center flex items-center justify-center gap-4">
+                      <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                          Previous
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                          Page {currentPage} of {totalPages}
+                      </span>
+                      <Button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                          Next
+                      </Button>
+                  </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16 text-muted-foreground">
               <p>No quizzes found.</p>
