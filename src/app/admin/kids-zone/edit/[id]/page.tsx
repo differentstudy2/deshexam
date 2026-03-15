@@ -486,78 +486,80 @@ export default function EditKidsContentPage() {
                                                         Upload a JSON file or paste JSON text. The content will be appended to the current question list.
                                                     </DialogDescription>
                                                 </DialogHeader>
-                                                <Tabs defaultValue="paste">
-                                                    <TabsList className="grid w-full grid-cols-2">
-                                                        <TabsTrigger value="paste">Paste JSON</TabsTrigger>
-                                                        <TabsTrigger value="upload">Upload File</TabsTrigger>
-                                                    </TabsList>
-                                                    <TabsContent value="paste" className="pt-4 space-y-4">
-                                                        <Textarea
-                                                            placeholder='Paste your JSON content here...'
-                                                            value={jsonText}
-                                                            onChange={(e) => setJsonText(e.target.value)}
-                                                            className="min-h-[200px] font-mono text-xs"
-                                                            disabled={isImporting}
-                                                        />
-                                                        <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
-                                                            {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
-                                                        </Button>
-                                                    </TabsContent>
-                                                    <TabsContent value="upload" className="pt-4">
-                                                        <div className="grid w-full max-w-sm items-center gap-1.5">
-                                                            <Label htmlFor="json-import">JSON/TXT File</Label>
-                                                            <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
-                                                            {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
-                                                        </div>
-                                                    </TabsContent>
-                                                </Tabs>
-                                                <Accordion type="single" collapsible className="w-full mt-4">
-                                                    <AccordionItem value="item-1">
-                                                        <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
-                                                        <AccordionContent>
-                                                            <Tabs defaultValue="full" className="w-full">
-                                                                <TabsList className="grid w-full grid-cols-2">
-                                                                    <TabsTrigger value="full">Full Example</TabsTrigger>
-                                                                    <TabsTrigger value="text-only">Text-Only</TabsTrigger>
-                                                                </TabsList>
-                                                                <TabsContent value="full">
-                                                                    <div className="relative mt-2">
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            className="absolute top-2 right-2 h-7 w-7"
-                                                                            onClick={() => handleCopy(jsonExampleFull)}
-                                                                        >
-                                                                            <Copy className="h-4 w-4" />
-                                                                            <span className="sr-only">Copy</span>
-                                                                        </Button>
-                                                                        <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
-                                                                            <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre>
-                                                                        </ScrollArea>
-                                                                    </div>
-                                                                </TabsContent>
-                                                                <TabsContent value="text-only">
-                                                                    <div className="relative mt-2">
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            className="absolute top-2 right-2 h-7 w-7"
-                                                                            onClick={() => handleCopy(jsonExampleTextOnly)}
-                                                                        >
-                                                                            <Copy className="h-4 w-4" />
-                                                                            <span className="sr-only">Copy</span>
-                                                                        </Button>
-                                                                        <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
-                                                                            <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre>
-                                                                        </ScrollArea>
-                                                                    </div>
-                                                                </TabsContent>
-                                                            </Tabs>
-                                                        </AccordionContent>
-                                                    </AccordionItem>
-                                                </Accordion>
+                                                <ScrollArea className="max-h-[60vh] pr-6">
+                                                    <Tabs defaultValue="paste">
+                                                        <TabsList className="grid w-full grid-cols-2">
+                                                            <TabsTrigger value="paste">Paste JSON</TabsTrigger>
+                                                            <TabsTrigger value="upload">Upload File</TabsTrigger>
+                                                        </TabsList>
+                                                        <TabsContent value="paste" className="pt-4 space-y-4">
+                                                            <Textarea
+                                                                placeholder='Paste your JSON content here...'
+                                                                value={jsonText}
+                                                                onChange={(e) => setJsonText(e.target.value)}
+                                                                className="min-h-[200px] font-mono text-xs"
+                                                                disabled={isImporting}
+                                                            />
+                                                            <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                                                {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                                            </Button>
+                                                        </TabsContent>
+                                                        <TabsContent value="upload" className="pt-4">
+                                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                <Label htmlFor="json-import">JSON/TXT File</Label>
+                                                                <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                                                {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                                            </div>
+                                                        </TabsContent>
+                                                    </Tabs>
+                                                    <Accordion type="single" collapsible className="w-full mt-4">
+                                                        <AccordionItem value="item-1">
+                                                            <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
+                                                            <AccordionContent>
+                                                                <Tabs defaultValue="full" className="w-full">
+                                                                    <TabsList className="grid w-full grid-cols-2">
+                                                                        <TabsTrigger value="full">Full Example</TabsTrigger>
+                                                                        <TabsTrigger value="text-only">Text-Only</TabsTrigger>
+                                                                    </TabsList>
+                                                                    <TabsContent value="full">
+                                                                        <div className="relative mt-2">
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                className="absolute top-2 right-2 h-7 w-7"
+                                                                                onClick={() => handleCopy(jsonExampleFull)}
+                                                                            >
+                                                                                <Copy className="h-4 w-4" />
+                                                                                <span className="sr-only">Copy</span>
+                                                                            </Button>
+                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
+                                                                                <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre>
+                                                                            </ScrollArea>
+                                                                        </div>
+                                                                    </TabsContent>
+                                                                    <TabsContent value="text-only">
+                                                                        <div className="relative mt-2">
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                className="absolute top-2 right-2 h-7 w-7"
+                                                                                onClick={() => handleCopy(jsonExampleTextOnly)}
+                                                                            >
+                                                                                <Copy className="h-4 w-4" />
+                                                                                <span className="sr-only">Copy</span>
+                                                                            </Button>
+                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
+                                                                                <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre>
+                                                                            </ScrollArea>
+                                                                        </div>
+                                                                    </TabsContent>
+                                                                </Tabs>
+                                                            </AccordionContent>
+                                                        </AccordionItem>
+                                                    </Accordion>
+                                                </ScrollArea>
                                             </DialogContent>
                                         </Dialog>
                                     </div>
