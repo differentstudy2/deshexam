@@ -429,15 +429,13 @@ export default function EditKidsContentPage() {
                                         const questionType = form.watch(`questions.${index}.type`);
                                         return (
                                         <Card key={question.id} className="p-4 bg-secondary/50">
-                                            <div className="flex justify-between items-center mb-4"><h4 className="font-semibold">Question {index + 1}</h4><Button type="button" variant="ghost" size="sm" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></div>
-                                            <div className="space-y-4">
-                                                <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                            <div className="flex justify-between items-center mb-4 gap-4">
+                                                <h4 className="font-semibold whitespace-nowrap">Question {index + 1}</h4>
                                                 <FormField
                                                     control={form.control}
                                                     name={`questions.${index}.type`}
                                                     render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>Question Type</FormLabel>
+                                                        <FormItem className="w-full">
                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                 <FormControl><SelectTrigger><SelectValue placeholder="Select type..."/></SelectTrigger></FormControl>
                                                                 <SelectContent>
@@ -450,8 +448,12 @@ export default function EditKidsContentPage() {
                                                         </FormItem>
                                                     )}
                                                 />
+                                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value} /></FormControl><FormMessage /></FormItem>)} />
+                                                    <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)} />
                                                     <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Question Audio</FormLabel>
@@ -462,7 +464,7 @@ export default function EditKidsContentPage() {
                                                                 </Button>
                                                                 {!!field.value && (
                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
-                                                                        <Trash2 className="h-4 w-4" />
+                                                                        <Trash2 className="w-4 h-4" />
                                                                     </Button>
                                                                 )}
                                                             </div>
@@ -549,7 +551,7 @@ export default function EditKidsContentPage() {
                                                 )}
                                                  {questionType === 'Short Answer' && (
                                                     <div className="space-y-4 pt-2 border-t">
-                                                        <FormField
+                                                         <FormField
                                                             control={form.control}
                                                             name={`questions.${index}.correctAnswer`}
                                                             render={({ field }) => (
@@ -675,4 +677,3 @@ export default function EditKidsContentPage() {
         </div>
     );
 }
-
