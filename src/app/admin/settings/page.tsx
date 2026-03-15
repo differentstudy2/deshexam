@@ -381,6 +381,50 @@ const DependentMetafieldManager = ({
     )
 }
 
+const flashTtsVoices = [
+    { name: 'Algenib', description: 'Standard Female 1' },
+    { name: 'Achernar', description: 'Standard Male 1' },
+    { name: 'Canopus', description: 'Standard Female 2' },
+    { name: 'Capella', description: 'Standard Male 2' },
+    { name: 'Deneb', description: 'WaveNet Female 1' },
+    { name: 'Fomalhaut', description: 'WaveNet Male 1' },
+    { name: 'Hadar', description: 'WaveNet Male 2' },
+    { name: 'Pollux', description: 'WaveNet Female 2' },
+    { name: 'Procyon', description: 'WaveNet Male 3' },
+    { name: 'Rigel', description: 'WaveNet Female 3' },
+];
+
+const proTtsVoices = [
+  { name: 'achird', description: 'Pro Voice 1' },
+  { name: 'algenib', description: 'Pro Voice 2' },
+  { name: 'algieba', description: 'Pro Voice 3' },
+  { name: 'alnilam', description: 'Pro Voice 4' },
+  { name: 'aoede', description: 'Pro Voice 5' },
+  { name: 'autonoe', description: 'Pro Voice 6' },
+  { name: 'callirrhoe', description: 'Pro Voice 7' },
+  { name: 'despina', description: 'Pro Voice 8' },
+  { name: 'enceladus', description: 'Pro Voice 9' },
+  { name: 'erinome', description: 'Pro Voice 10' },
+  { name: 'fenrir', description: 'Pro Voice 11' },
+  { name: 'gacrux', description: 'Pro Voice 12' },
+  { name: 'iapetus', description: 'Pro Voice 13' },
+  { name: 'kore', description: 'Pro Voice 14' },
+  { name: 'laomedeia', description: 'Pro Voice 15' },
+  { name: 'leda', description: 'Pro Voice 16' },
+  { name: 'orus', description: 'Pro Voice 17' },
+  { name: 'puck', description: 'Pro Voice 18' },
+  { name: 'pulcherrima', description: 'Pro Voice 19' },
+  { name: 'rasalgethi', description: 'Pro Voice 20' },
+  { name: 'sadach', description: 'Pro Voice 21' },
+  { name: 'sadaltager', description: 'Pro Voice 22' },
+  { name: 'schedar', description: 'Pro Voice 23' },
+  { name: 'sulafat', description: 'Pro Voice 24' },
+  { name: 'umbriel', description: 'Pro Voice 25' },
+  { name: 'vindemiatrix', description: 'Pro Voice 26' },
+  { name: 'zephyr', description: 'Pro Voice 27' },
+  { name: 'zubenelgenubi', description: 'Pro Voice 28' },
+];
+
 
 export default function AdminSettingsPage() {
   const { toast } = useToast();
@@ -398,19 +442,6 @@ export default function AdminSettingsPage() {
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedItems, setGeneratedItems] = useState<string[]>([]);
-
-  const ttsVoices = [
-    { name: 'Algenib', description: 'Standard Female 1' },
-    { name: 'Achernar', description: 'Standard Male 1' },
-    { name: 'Canopus', description: 'Standard Female 2' },
-    { name: 'Capella', description: 'Standard Male 2' },
-    { name: 'Deneb', description: 'WaveNet Female 1' },
-    { name: 'Fomalhaut', description: 'WaveNet Male 1' },
-    { name: 'Hadar', description: 'WaveNet Male 2' },
-    { name: 'Pollux', description: 'WaveNet Female 2' },
-    { name: 'Procyon', description: 'WaveNet Male 3' },
-    { name: 'Rigel', description: 'WaveNet Female 3' },
-  ];
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -461,6 +492,7 @@ export default function AdminSettingsPage() {
     }
   });
   const aiMetafieldType = aiForm.watch('metafieldType');
+  const selectedTtsModel = form.watch('ttsModel');
 
 
   const fetchInitialData = useCallback(async () => {
@@ -510,6 +542,20 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     fetchInitialData();
   }, [fetchInitialData]);
+
+  useEffect(() => {
+    const availableVoices = selectedTtsModel === 'gemini-2.5-pro-preview-tts' ? proTtsVoices.map(v => v.name) : flashTtsVoices.map(v => v.name);
+    const currentVoice = form.getValues('ttsVoice');
+    
+    if (currentVoice && !availableVoices.some(v => v.toLowerCase() === currentVoice.toLowerCase())) {
+        const newDefault = availableVoices.includes('Algenib') ? 'Algenib' : availableVoices[0];
+        form.setValue('ttsVoice', newDefault);
+        toast({
+            title: "Voice Reset",
+            description: `The previously selected voice is not available for this model. It has been reset to a default.`
+        });
+    }
+  }, [selectedTtsModel, form, toast]);
 
 
   const handleSave: SubmitHandler<SettingsFormValues> = async (data) => {
@@ -673,6 +719,8 @@ export default function AdminSettingsPage() {
         { id: 'questionTypes', label: 'Question Types', icon: Type },
         { id: 'content', label: 'Content Details', icon: Library },
     ];
+    
+    const availableTtsVoices = selectedTtsModel === 'gemini-2.5-pro-preview-tts' ? proTtsVoices : flashTtsVoices;
   
   if (loading) {
     return (
@@ -872,7 +920,7 @@ export default function AdminSettingsPage() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {ttsVoices.map((voice) => (
+                                                {availableTtsVoices.map((voice) => (
                                                     <SelectItem key={voice.name} value={voice.name}>
                                                         {voice.name} <span className="text-muted-foreground ml-2">({voice.description})</span>
                                                     </SelectItem>
