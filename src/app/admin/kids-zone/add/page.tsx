@@ -87,6 +87,8 @@ export default function AddKidsContentPage() {
 
   const jsonExampleFull = `
 {
+  "title": "Fun Animal Sounds Quiz (SEO Title ~60 chars)",
+  "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (SEO Description ~160 chars)",
   "questions": [
     {
       "text": "Which animal says 'Moo'?",
@@ -108,6 +110,8 @@ export default function AddKidsContentPage() {
 
 const jsonExampleTextOnly = `
 {
+  "title": "Simple Planet Quiz (SEO Title)",
+  "description": "A quick and easy quiz about the planets in our solar system. Test your basic astronomy knowledge now! (SEO Description)",
   "questions": [
     {
       "text": "Which planet is known as the Red Planet?",
@@ -153,21 +157,31 @@ const jsonExampleTextOnly = `
   const processJsonImport = (jsonString: string) => {
     try {
         const parsed = JSON.parse(jsonString);
+        
+        if (parsed.title) {
+            form.setValue('title', parsed.title);
+        }
+        if(parsed.description) {
+            form.setValue('description', parsed.description);
+        }
+
         const questionsToImport = parsed.questions || [];
-        if(!Array.isArray(questionsToImport) || questionsToImport.length === 0){
-            throw new Error("No valid 'questions' array found in the JSON.");
+        if(!Array.isArray(questionsToImport)){
+            throw new Error("The 'questions' key must be an array if it exists.");
         }
         
-        questionsToImport.forEach((q: any) => {
-            const { success } = funQuizQuestionSchema.safeParse(q);
-            if (!success) {
-                console.error("Invalid question structure:", q, funQuizQuestionSchema.safeParse(q));
-                throw new Error(`One or more questions have an invalid structure. Please check the format.`);
-            }
-        });
+        if (questionsToImport.length > 0) {
+            questionsToImport.forEach((q: any) => {
+                const { success } = funQuizQuestionSchema.safeParse(q);
+                if (!success) {
+                    console.error("Invalid question structure:", q, funQuizQuestionSchema.safeParse(q));
+                    throw new Error(`One or more questions have an invalid structure. Please check the format.`);
+                }
+            });
+            append(questionsToImport);
+        }
 
-        append(questionsToImport);
-        toast({ title: 'Import Successful', description: `${questionsToImport.length} questions added.` });
+        toast({ title: 'Import Successful!', description: `${parsed.title ? 'Title and description updated. ' : ''}${questionsToImport.length} questions added.` });
         setIsImportDialogOpen(false);
         setJsonText('');
     } catch (error) {
