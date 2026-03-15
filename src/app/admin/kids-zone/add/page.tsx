@@ -79,6 +79,8 @@ const jsonExampleFull = `
 {
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
+  "tags": "Animals, Sounds, Fun",
+  "keywords": "animal sounds quiz, kids learning, fun quiz for children",
   "questions": [
     {
       "text": "Which animal says 'Moo'?",
@@ -93,6 +95,24 @@ const jsonExampleFull = `
       ],
       "correctAnswer": "Cow",
       "explanation": "Cows are known for their 'moo' sound."
+    }
+  ]
+}
+`;
+
+const jsonExampleTextOnly = `
+{
+  "questions": [
+    {
+      "text": "What is 2 + 2?",
+      "type": "Multiple Choice",
+      "options": [
+        { "text": "3" },
+        { "text": "4" },
+        { "text": "5" }
+      ],
+      "correctAnswer": "4",
+      "explanation": "Two plus two equals four."
     }
   ]
 }
@@ -179,6 +199,12 @@ export default function AddKidsContentPage() {
         }
         if(parsed.description) {
             form.setValue('description', parsed.description);
+        }
+        if (parsed.tags) {
+            form.setValue('tags', parsed.tags);
+        }
+        if (parsed.keywords) {
+            form.setValue('keywords', parsed.keywords);
         }
 
         const questionsToImport = parsed.questions || [];
@@ -591,7 +617,7 @@ export default function AddKidsContentPage() {
                                     <DialogTrigger asChild>
                                         <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
                                     </DialogTrigger>
-                                    <DialogContent className="sm:max-w-xl">
+                                     <DialogContent className="sm:max-w-xl">
                                         <DialogHeader>
                                             <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
                                             <DialogDescription>
@@ -629,12 +655,25 @@ export default function AddKidsContentPage() {
                                                     <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
                                                     <AccordionContent>
                                                         <p className="text-sm text-muted-foreground mb-4">Your JSON file can contain a `title` and `description` to update the form, or just a `questions` array to append questions.</p>
-                                                        <Tabs defaultValue="mcq" className="w-full">
+                                                        <Tabs defaultValue="full" className="w-full">
                                                             <TabsList className="h-auto flex-wrap justify-start">
+                                                                <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
+                                                                <TabsTrigger value="text-only">Text-Only</TabsTrigger>
                                                                 <TabsTrigger value="mcq">MCQ</TabsTrigger>
                                                                 <TabsTrigger value="tf">True/False</TabsTrigger>
-                                                                <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
                                                             </TabsList>
+                                                            <TabsContent value="full">
+                                                                <div className="relative mt-2">
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
+                                                                </div>
+                                                            </TabsContent>
+                                                            <TabsContent value="text-only">
+                                                                <div className="relative mt-2">
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
+                                                                </div>
+                                                            </TabsContent>
                                                             <TabsContent value="mcq">
                                                                 <div className="relative mt-2">
                                                                     <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMCQ)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
@@ -645,12 +684,6 @@ export default function AddKidsContentPage() {
                                                                 <div className="relative mt-2">
                                                                     <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTF)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
                                                                     <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></ScrollArea>
-                                                                </div>
-                                                            </TabsContent>
-                                                            <TabsContent value="full">
-                                                                 <div className="relative mt-2">
-                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
                                                                 </div>
                                                             </TabsContent>
                                                         </Tabs>
@@ -674,3 +707,4 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
+
