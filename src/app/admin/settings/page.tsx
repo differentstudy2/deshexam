@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -16,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book, School as SchoolIcon } from 'lucide-react';
+import { Loader2, Save, Library, Trash2, Edit, PlusCircle, Settings, KeyRound, Users, Type, LayoutTemplate, Sparkles, BrainCircuit, Star, GraduationCap, DollarSign, Book, School as SchoolIcon, Mic } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useCallback } from 'react';
 import { 
@@ -128,6 +127,7 @@ const settingsSchema = z.object({
         pass: z.coerce.number().int().min(1).default(50),
         pro: z.coerce.number().int().min(1).default(200),
     }).default({ free: 5, pass: 50, pro: 200 }),
+    ttsVoice: z.string().optional(),
 });
 
 
@@ -398,6 +398,17 @@ export default function AdminSettingsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedItems, setGeneratedItems] = useState<string[]>([]);
 
+  const ttsVoices = [
+    { name: 'Algenib', description: 'Male, Standard' },
+    { name: 'Achernar', description: 'Male, Standard' },
+    { name: 'Enif', description: 'Female, Standard' },
+    { name: 'Hadar', description: 'Female, Standard' },
+    { name: 'Spica', description: 'Female, Standard' },
+    { name: 'Menkent', description: 'Male, Standard' },
+    { name: 'Canopus', description: 'Male, Standard' },
+    { name: 'Deneb', description: 'Female, Standard' },
+  ];
+
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
@@ -433,6 +444,7 @@ export default function AdminSettingsPage() {
         practiceSetPassMark: 60,
         gateChaptersOnPass: false,
         practiceSetSubmissionLimit: { free: 5, pass: 50, pro: 200 },
+        ttsVoice: 'Algenib',
     },
   });
 
@@ -650,6 +662,7 @@ export default function AdminSettingsPage() {
         { id: 'general', label: 'General', icon: Settings },
         { id: 'api', label: 'API Keys', icon: KeyRound },
         { id: 'users', label: 'User Management', icon: Users },
+        { id: 'tts', label: 'Text-to-Speech', icon: Mic },
         { id: 'plans', label: 'Plans & Pricing', icon: DollarSign },
         { id: 'textbooks', label: 'Textbooks', icon: Book },
         { id: 'metafields', label: 'Content Metafields', icon: LayoutTemplate },
@@ -808,6 +821,42 @@ export default function AdminSettingsPage() {
                                 </FormControl>
                                 </FormItem>
                             )}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {activeTab === 'tts' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Text-to-Speech Settings</CardTitle>
+                            <CardDescription>Configure the voice used for AI-generated audio across the site.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             <FormField
+                                control={form.control}
+                                name="ttsVoice"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Default TTS Voice</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a voice" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {ttsVoices.map((voice) => (
+                                                    <SelectItem key={voice.name} value={voice.name}>
+                                                        {voice.name} <span className="text-muted-foreground ml-2">({voice.description})</span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>This voice will be used for generating audio from text.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                             />
                         </CardContent>
                     </Card>
