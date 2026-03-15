@@ -259,7 +259,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5'
     ) => {
         if (!quizCardRef.current) return;
-        const sourceCanvas = await html2canvas(quizCardRef.current, { useCORS: true, backgroundColor: null });
+        const sourceCanvas = await html2canvas(quizCardRef.current, { 
+            useCORS: true, 
+            backgroundColor: null,
+            scale: 4 // Increased scale for higher quality
+        });
         
         const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
         const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}_${mode}.png`;
@@ -299,7 +303,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 { from: '#09203F', to: '#537895' },
                 { from: '#868F96', to: '#596164' },
                 { from: '#93A5CF', to: '#E4EfE9' },
-                { from: '#11998E', to: '#38EF7D' }
+                { from: '#a43931', to: '#1d4350' },
+                { from: '#434343', to: '#000000' },
+                { from: '#283e51', to: '#4b79a1' },
+                { from: '#2c3e50', to: '#2980b9' },
+                { from: '#3498db', to: '#2c3e50' }
             ];
             const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
             const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
@@ -334,19 +342,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (isCapturing) return;
         setIsCapturing(true);
 
+        // Capture Question
         setCaptureMode('question');
         await new Promise(r => setTimeout(r, 100)); // wait for rerender
         await captureAndDownload('question', aspectRatio);
 
+        // Capture Answer
         setCaptureMode('answer');
         await new Promise(r => setTimeout(r, 100));
         await captureAndDownload('answer', aspectRatio);
 
+        // Reset
         setCaptureMode('idle');
         setIsCapturing(false);
         toast({ title: 'Images saved!', description: 'Both question and answer images have been downloaded.' });
     };
-
 
     if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
         return (
