@@ -75,22 +75,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function EditKidsContentPage() {
-    const { toast } = useToast();
-    const router = useRouter();
-    const params = useParams();
-    const contentId = params.id as string;
-    const [loading, setLoading] = useState(true);
-    const [isUploadingAudio, setIsUploadingAudio] = useState(false);
-    const audioInputRef = useRef<HTMLInputElement>(null);
-    const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
 
-    const [isImporting, setIsImporting] = useState(false);
-    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-    const [jsonText, setJsonText] = useState('');
-    const importFileRef = useRef<HTMLInputElement>(null);
-
-    const jsonExampleFull = `
+const jsonExampleFull = `
 {
   "title": "Fun Animal Sounds Quiz (SEO Title ~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (SEO Description ~160 chars)",
@@ -133,6 +119,21 @@ const jsonExampleTextOnly = `
   ]
 }
 `;
+
+export default function EditKidsContentPage() {
+    const { toast } = useToast();
+    const router = useRouter();
+    const params = useParams();
+    const contentId = params.id as string;
+    const [loading, setLoading] = useState(true);
+    const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+    const audioInputRef = useRef<HTMLInputElement>(null);
+    const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
+
+    const [isImporting, setIsImporting] = useState(false);
+    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    const [jsonText, setJsonText] = useState('');
+    const importFileRef = useRef<HTMLInputElement>(null);
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
@@ -482,7 +483,7 @@ const jsonExampleTextOnly = `
                                                 <DialogHeader>
                                                     <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
                                                     <DialogDescription>
-                                                        Upload a JSON file or paste JSON text containing an array of questions.
+                                                        Upload a JSON file or paste JSON text. The content will be appended to the current question list.
                                                     </DialogDescription>
                                                 </DialogHeader>
                                                 <Tabs defaultValue="paste">
