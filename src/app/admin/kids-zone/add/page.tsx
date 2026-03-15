@@ -55,6 +55,7 @@ const funQuizQuestionSchema = z.object({
     audio: z.string().optional(),
   })).optional(),
   correctAnswer: z.string().min(1, "Please provide a correct answer."),
+  explanation: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -473,12 +474,25 @@ export default function AddKidsContentPage() {
                                                 />
                                             </div>
                                         )}
+                                        <FormField
+                                            control={form.control}
+                                            name={`questions.${index}.explanation`}
+                                            render={({ field }) => (
+                                                <FormItem className="mt-4">
+                                                    <FormLabel>Explanation</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea placeholder="Explain why the answer is correct (optional)..." {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
                                 </Card>
                                )
                             })}
                             <div className="flex flex-wrap gap-4">
-                                <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '' })}>
+                                <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}>
                                     <PlusCircle className="mr-2 h-4 w-4" /> Add Question
                                 </Button>
                                 <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
