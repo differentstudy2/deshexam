@@ -509,7 +509,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     )}
                                     
-                                    <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-start gap-2">
+                                    <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-start gap-2">
                                         <span>{currentQuestion?.text}</span>
                                         {currentQuestion?.audio && (
                                             <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
