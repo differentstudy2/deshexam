@@ -10,48 +10,39 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import type { Quiz } from '@/lib/types';
-import { collection, query, where, getDocs, limit, orderBy, startAfter, DocumentSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
-const ITEMS_PER_PAGE = 8;
 
 export default function FunQuizzesClientPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
-  const fetchQuizzes = useCallback(async (loadMore = false) => {
-    if (!loadMore) {
-        setLoading(true);
-    } else {
-        setLoadingMore(true);
-    }
-
+  const fetchQuizzes = useCallback(async () => {
+    setLoading(true);
     try {
-        const baseQuery = query(
+        const q = query(
             collection(db, "content"),
             where("testType", "==", "Quiz"),
-            where("category", "==", "Fun Quizzes"),
-            orderBy("createdAt", "desc"),
-            limit(ITEMS_PER_PAGE)
+            where("category", "==", "Fun Quizzes")
         );
 
-        const q = loadMore && lastVisible ? query(baseQuery, startAfter(lastVisible)) : baseQuery;
-
         const querySnapshot = await getDocs(q);
-        const fetchedQuizzes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Quiz);
+        const fetchedQuizzes = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return { 
+                id: doc.id, 
+                ...data,
+                // Add a comparable timestamp for sorting
+                createdAtTimestamp: data.createdAt?.toDate ? data.createdAt.toDate().getTime() : 0,
+            }
+        }) as (Quiz & { createdAtTimestamp: number })[];
         
-        setHasMore(fetchedQuizzes.length === ITEMS_PER_PAGE);
+        // Sort on the client-side
+        fetchedQuizzes.sort((a, b) => b.createdAtTimestamp - a.createdAtTimestamp);
 
-        if(querySnapshot.docs.length > 0) {
-             setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        }
-
-        setQuizzes(prev => loadMore ? [...prev, ...fetchedQuizzes] : fetchedQuizzes);
+        setQuizzes(fetchedQuizzes);
 
     } catch (error) {
         console.error("Error fetching quizzes:", error);
@@ -62,20 +53,12 @@ export default function FunQuizzesClientPage() {
         });
     } finally {
         setLoading(false);
-        setLoadingMore(false);
     }
   }, [toast]);
 
   useEffect(() => {
       fetchQuizzes();
   }, [fetchQuizzes]);
-
-
-  const handleLoadMore = () => {
-    if (hasMore && !loadingMore) {
-        fetchQuizzes(true);
-    }
-  };
 
   return (
     <div>
@@ -118,7 +101,6 @@ export default function FunQuizzesClientPage() {
                 ))}
             </div>
             ) : quizzes.length > 0 ? (
-            <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {quizzes.map((quiz) => (
                     <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group bg-card-gradient text-white">
@@ -133,7 +115,7 @@ export default function FunQuizzesClientPage() {
                             />
                         </CardHeader>
                         <CardContent className="p-4 flex-grow">
-                            <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug group-hover:text-primary transition-colors">
+                            <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug transition-colors text-white">
                                 {quiz.title}
                             </CardTitle>
                             <p className="text-sm text-slate-300 line-clamp-2">
@@ -148,14 +130,6 @@ export default function FunQuizzesClientPage() {
                     </Card>
                 ))}
                 </div>
-                {hasMore && (
-                <div className="mt-12 text-center">
-                    <Button onClick={handleLoadMore} size="lg" disabled={loadingMore}>
-                        {loadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : 'Load More Quizzes'}
-                    </Button>
-                </div>
-                )}
-            </>
             ) : (
             <div className="text-center py-16 text-muted-foreground">
                 <p>No quizzes found. Create one in the admin panel to get started!</p>
