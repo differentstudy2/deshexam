@@ -81,8 +81,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 const jsonExampleFull = `
 {
-  "title": "Fun Animal Sounds Quiz (SEO Title ~60 chars)",
-  "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (SEO Description ~160 chars)",
+  "title": "Fun Animal Sounds Quiz (~60 chars)",
+  "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "questions": [
     {
       "text": "Which animal says 'Moo'?",
@@ -102,46 +102,33 @@ const jsonExampleFull = `
 }
 `;
 
-const jsonExampleTextOnly = `
+const jsonExampleMCQ = `
 {
-  "title": "Simple Planet Quiz (SEO Title)",
-  "description": "A quick and easy quiz about the planets in our solar system. Test your basic astronomy knowledge now! (SEO Description)",
   "questions": [
     {
-      "text": "Which planet is known as the Red Planet?",
+      "text": "What color is the sky on a clear day?",
       "type": "Multiple Choice",
       "options": [
-        { "text": "Earth" },
-        { "text": "Mars" },
-        { "text": "Jupiter" },
-        { "text": "Venus" }
+        { "text": "Green" },
+        { "text": "Blue" },
+        { "text": "Red" },
+        { "text": "Yellow" }
       ],
-      "correctAnswer": "Mars",
-      "explanation": "Mars is often called the Red Planet because of its reddish appearance."
+      "correctAnswer": "Blue",
+      "explanation": "The sky appears blue because of how the Earth's atmosphere scatters sunlight."
     }
   ]
 }
 `;
 
-const jsonExampleQuestionsOnly = `
+const jsonExampleTF = `
 {
   "questions": [
     {
-      "text": "What is 2 + 2?",
-      "type": "Multiple Choice",
-      "options": [
-        { "text": "3" },
-        { "text": "4" },
-        { "text": "5" }
-      ],
-      "correctAnswer": "4",
-      "explanation": "Two plus two equals four."
-    },
-    {
-      "text": "Is the sun hot?",
+      "text": "The Earth is flat.",
       "type": "True/False",
-      "correctAnswer": "True",
-      "explanation": "The sun is a star and is very hot."
+      "correctAnswer": "False",
+      "explanation": "The Earth is roughly a sphere."
     }
   ]
 }
@@ -589,28 +576,29 @@ export default function EditKidsContentPage() {
                                                         <AccordionItem value="item-1">
                                                             <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
                                                             <AccordionContent>
-                                                                <Tabs defaultValue="full" className="w-full">
-                                                                    <TabsList className="grid w-full grid-cols-3">
-                                                                        <TabsTrigger value="full">Full Example</TabsTrigger>
-                                                                        <TabsTrigger value="text-only">Text-Only</TabsTrigger>
-                                                                        <TabsTrigger value="questions-only">Questions Only</TabsTrigger>
+                                                                <p className="text-sm text-muted-foreground mb-4">Your JSON file can contain a `title` and `description` to update the form, or just a `questions` array to append questions.</p>
+                                                                <Tabs defaultValue="mcq" className="w-full">
+                                                                    <TabsList className="h-auto flex-wrap justify-start">
+                                                                        <TabsTrigger value="mcq">MCQ</TabsTrigger>
+                                                                        <TabsTrigger value="tf">True/False</TabsTrigger>
+                                                                        <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
                                                                     </TabsList>
-                                                                    <TabsContent value="full">
+                                                                    <TabsContent value="mcq">
                                                                         <div className="relative mt-2">
+                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMCQ)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMCQ}</pre></ScrollArea>
+                                                                        </div>
+                                                                    </TabsContent>
+                                                                    <TabsContent value="tf">
+                                                                        <div className="relative mt-2">
+                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTF)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></ScrollArea>
+                                                                        </div>
+                                                                    </TabsContent>
+                                                                    <TabsContent value="full">
+                                                                         <div className="relative mt-2">
                                                                             <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
                                                                             <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
-                                                                        </div>
-                                                                    </TabsContent>
-                                                                    <TabsContent value="text-only">
-                                                                        <div className="relative mt-2">
-                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
-                                                                        </div>
-                                                                    </TabsContent>
-                                                                    <TabsContent value="questions-only">
-                                                                        <div className="relative mt-2">
-                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleQuestionsOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleQuestionsOnly}</pre></ScrollArea>
                                                                         </div>
                                                                     </TabsContent>
                                                                 </Tabs>
