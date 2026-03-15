@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -121,6 +121,25 @@ const jsonExampleTextOnly = `
       ],
       "correctAnswer": "4",
       "explanation": "Two plus two equals four."
+    }
+  ]
+}
+`;
+
+const jsonExampleQuestionsOnly = `
+{
+  "questions": [
+    {
+      "text": "What is the capital of France?",
+      "type": "Multiple Choice",
+      "options": [
+        { "text": "Berlin" },
+        { "text": "Madrid" },
+        { "text": "Paris" },
+        { "text": "Rome" }
+      ],
+      "correctAnswer": "Paris",
+      "explanation": "Paris is the capital and most populous city of France."
     }
   ]
 }
@@ -298,7 +317,6 @@ export default function EditKidsContentPage() {
         processJsonImport(jsonText);
       }
 
-
     const handleUpdate = async (data: FormValues) => {
         try {
             const contentToSave: any = {
@@ -345,6 +363,15 @@ export default function EditKidsContentPage() {
                 if(audioInputRef.current) audioInputRef.current.value = '';
             }
         }
+    };
+    
+    const handleCopyQuestion = (index: number) => {
+        const questionToCopy = form.getValues(`questions.${index}`);
+        append(questionToCopy);
+        toast({
+          title: "Question Copied",
+          description: `Question ${index + 1} has been duplicated at the end of the list.`,
+        });
     };
 
     if (loading) {
@@ -431,7 +458,7 @@ export default function EditKidsContentPage() {
                                         <Card key={question.id} className="p-4 bg-secondary/50">
                                             <div className="flex justify-between items-center mb-4 gap-4">
                                                 <h4 className="font-semibold whitespace-nowrap">Question {index + 1}</h4>
-                                                <FormField
+                                                 <FormField
                                                     control={form.control}
                                                     name={`questions.${index}.type`}
                                                     render={({ field }) => (
@@ -448,7 +475,12 @@ export default function EditKidsContentPage() {
                                                         </FormItem>
                                                     )}
                                                 />
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                                 <div className="flex gap-1">
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => handleCopyQuestion(index)}>
+                                                        <Copy className="h-4 w-4"/>
+                                                    </Button>
+                                                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                                 </div>
                                             </div>
                                             <div className="space-y-4">
                                                 <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
@@ -464,7 +496,7 @@ export default function EditKidsContentPage() {
                                                                 </Button>
                                                                 {!!field.value && (
                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
-                                                                        <Trash2 className="w-4 h-4" />
+                                                                        <Trash2 className="h-4 w-4" />
                                                                     </Button>
                                                                 )}
                                                             </div>
@@ -587,14 +619,14 @@ export default function EditKidsContentPage() {
                                             <DialogTrigger asChild>
                                                 <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
                                             </DialogTrigger>
-                                             <DialogContent className="sm:max-w-2xl">
+                                            <DialogContent className="sm:max-w-2xl">
                                                 <DialogHeader>
                                                     <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
                                                     <DialogDescription>
                                                         Upload a JSON file or paste JSON text. The content will be appended to the current question list.
                                                     </DialogDescription>
                                                 </DialogHeader>
-                                                <ScrollArea className="max-h-[60vh] pr-6">
+                                                 <ScrollArea className="max-h-[60vh] pr-6">
                                                     <Tabs defaultValue="paste">
                                                         <TabsList className="grid w-full grid-cols-2">
                                                             <TabsTrigger value="paste">Paste JSON</TabsTrigger>
@@ -629,10 +661,11 @@ export default function EditKidsContentPage() {
                                                                     <TabsList className="h-auto flex-wrap justify-start">
                                                                         <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
                                                                         <TabsTrigger value="text-only">Text-Only</TabsTrigger>
+                                                                         <TabsTrigger value="questions-only">Questions Only</TabsTrigger>
                                                                         <TabsTrigger value="mcq">MCQ</TabsTrigger>
                                                                         <TabsTrigger value="tf">True/False</TabsTrigger>
                                                                     </TabsList>
-                                                                    <TabsContent value="full">
+                                                                     <TabsContent value="full">
                                                                         <div className="relative mt-2">
                                                                             <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
                                                                             <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
@@ -642,6 +675,12 @@ export default function EditKidsContentPage() {
                                                                         <div className="relative mt-2">
                                                                             <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
                                                                             <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
+                                                                        </div>
+                                                                    </TabsContent>
+                                                                    <TabsContent value="questions-only">
+                                                                        <div className="relative mt-2">
+                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleQuestionsOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleQuestionsOnly}</pre></ScrollArea>
                                                                         </div>
                                                                     </TabsContent>
                                                                     <TabsContent value="mcq">
