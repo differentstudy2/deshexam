@@ -46,6 +46,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 const funQuizQuestionSchema = z.object({
@@ -89,7 +90,7 @@ export default function EditKidsContentPage() {
     const [jsonText, setJsonText] = useState('');
     const importFileRef = useRef<HTMLInputElement>(null);
 
-    const jsonExample = `
+    const jsonExampleFull = `
 {
   "questions": [
     {
@@ -98,13 +99,32 @@ export default function EditKidsContentPage() {
       "audio": "https://example.com/sounds/cow_question.mp3",
       "type": "Multiple Choice",
       "options": [
-        { "text": "Cow", "image": "https://picsum.photos/seed/cow-option/100/100" },
-        { "text": "Dog", "image": "https://picsum.photos/seed/dog-option/100/100" },
-        { "text": "Cat", "image": "https://picsum.photos/seed/cat-option/100/100" },
-        { "text": "Duck", "image": "https://picsum.photos/seed/duck-option/100/100" }
+        { "text": "Cow", "image": "https://picsum.photos/seed/cow-option/100/100", "audio": "https://example.com/sounds/cow_sound.mp3" },
+        { "text": "Dog", "image": "https://picsum.photos/seed/dog-option/100/100", "audio": "https://example.com/sounds/dog_sound.mp3" },
+        { "text": "Cat", "image": "https://picsum.photos/seed/cat-option/100/100", "audio": "https://example.com/sounds/cat_sound.mp3" },
+        { "text": "Duck", "image": "https://picsum.photos/seed/duck-option/100/100", "audio": "https://example.com/sounds/duck_sound.mp3" }
       ],
       "correctAnswer": "Cow",
       "explanation": "Cows are known for their 'moo' sound."
+    }
+  ]
+}
+`;
+
+const jsonExampleTextOnly = `
+{
+  "questions": [
+    {
+      "text": "Which planet is known as the Red Planet?",
+      "type": "Multiple Choice",
+      "options": [
+        { "text": "Earth" },
+        { "text": "Mars" },
+        { "text": "Jupiter" },
+        { "text": "Venus" }
+      ],
+      "correctAnswer": "Mars",
+      "explanation": "Mars is often called the Red Planet because of its reddish appearance."
     }
   ]
 }
@@ -477,24 +497,51 @@ export default function EditKidsContentPage() {
                                                     </TabsContent>
                                                 </Tabs>
                                                 <Accordion type="single" collapsible className="w-full mt-4">
-                                                <AccordionItem value="item-1">
-                                                    <AccordionTrigger>View Example JSON Format</AccordionTrigger>
-                                                    <AccordionContent>
-                                                    <div className="relative">
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="absolute top-2 right-2 h-7 w-7"
-                                                            onClick={() => handleCopy(jsonExample)}
-                                                        >
-                                                            <Copy className="h-4 w-4" />
-                                                            <span className="sr-only">Copy</span>
-                                                        </Button>
-                                                        <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre>
-                                                    </div>
-                                                    </AccordionContent>
-                                                </AccordionItem>
+                                                    <AccordionItem value="item-1">
+                                                        <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
+                                                        <AccordionContent>
+                                                            <Tabs defaultValue="full" className="w-full">
+                                                                <TabsList className="grid w-full grid-cols-2">
+                                                                    <TabsTrigger value="full">Full Example</TabsTrigger>
+                                                                    <TabsTrigger value="text-only">Text-Only</TabsTrigger>
+                                                                </TabsList>
+                                                                <TabsContent value="full">
+                                                                    <div className="relative mt-2">
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            className="absolute top-2 right-2 h-7 w-7"
+                                                                            onClick={() => handleCopy(jsonExampleFull)}
+                                                                        >
+                                                                            <Copy className="h-4 w-4" />
+                                                                            <span className="sr-only">Copy</span>
+                                                                        </Button>
+                                                                        <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
+                                                                            <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre>
+                                                                        </ScrollArea>
+                                                                    </div>
+                                                                </TabsContent>
+                                                                <TabsContent value="text-only">
+                                                                    <div className="relative mt-2">
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            className="absolute top-2 right-2 h-7 w-7"
+                                                                            onClick={() => handleCopy(jsonExampleTextOnly)}
+                                                                        >
+                                                                            <Copy className="h-4 w-4" />
+                                                                            <span className="sr-only">Copy</span>
+                                                                        </Button>
+                                                                        <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
+                                                                            <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre>
+                                                                        </ScrollArea>
+                                                                    </div>
+                                                                </TabsContent>
+                                                            </Tabs>
+                                                        </AccordionContent>
+                                                    </AccordionItem>
                                                 </Accordion>
                                             </DialogContent>
                                         </Dialog>
