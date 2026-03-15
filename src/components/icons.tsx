@@ -1,3 +1,4 @@
+'use client';
 
 export const DeshExamLogo = () => (
   <div className="flex items-center gap-2">
