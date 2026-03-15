@@ -418,7 +418,7 @@ export default function EditKidsContentPage() {
                                                                                                 </Button>
                                                                                                 {!!audioField.value && (
                                                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
-                                                                                                        <Trash2 className="w-4 h-4" />
+                                                                                                        <Trash2 className="h-4 w-4" />
                                                                                                     </Button>
                                                                                                 )}
                                                                                             </div>
