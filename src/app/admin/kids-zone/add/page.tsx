@@ -24,7 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, uploadFile } from '@/lib/firebase/firestore';
-import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson } from 'lucide-react';
+import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Copy } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
@@ -97,11 +97,20 @@ export default function AddKidsContentPage() {
         { "text": "Cat", "image": "https://picsum.photos/seed/cat-option/100/100" },
         { "text": "Duck", "image": "https://picsum.photos/seed/duck-option/100/100" }
       ],
-      "correctAnswer": "Cow"
+      "correctAnswer": "Cow",
+      "explanation": "Cows are known for their 'moo' sound."
     }
   ]
 }
 `;
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+        toast({ title: 'Copied to clipboard!' });
+    }).catch(err => {
+        toast({ variant: 'destructive', title: 'Failed to copy', description: 'Could not copy text to clipboard.' });
+    });
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -535,7 +544,19 @@ export default function AddKidsContentPage() {
                                         <AccordionItem value="item-1">
                                             <AccordionTrigger>View Example JSON Format</AccordionTrigger>
                                             <AccordionContent>
-                                            <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre>
+                                            <div className="relative">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute top-2 right-2 h-7 w-7"
+                                                    onClick={() => handleCopy(jsonExample)}
+                                                >
+                                                    <Copy className="h-4 w-4" />
+                                                    <span className="sr-only">Copy</span>
+                                                </Button>
+                                                <pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap break-words text-sm">{jsonExample}</pre>
+                                            </div>
                                             </AccordionContent>
                                         </AccordionItem>
                                         </Accordion>
