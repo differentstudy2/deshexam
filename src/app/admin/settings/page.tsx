@@ -898,40 +898,43 @@ export default function AdminSettingsPage() {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
+                                                <SelectItem value="Browser">Browser (Client-side)</SelectItem>
                                                 <SelectItem value="gemini-2.5-flash-preview-tts">Gemini 2.5 Flash TTS</SelectItem>
                                                 <SelectItem value="gemini-2.5-pro-preview-tts">Gemini 2.5 Pro TTS</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        <FormDescription>Select the AI model for generating audio from text. Pro may offer higher quality.</FormDescription>
+                                        <FormDescription>Select the engine for generating audio. "Browser" is free but not saved.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                             <FormField
-                                control={form.control}
-                                name="ttsVoice"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Default TTS Voice</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a voice" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {availableTtsVoices.map((voice) => (
-                                                    <SelectItem key={voice.name} value={voice.name}>
-                                                        {voice.name} <span className="text-muted-foreground ml-2">({voice.description})</span>
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormDescription>This voice will be used for generating audio from text.</FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                             {selectedTtsModel !== 'Browser' && (
+                                <FormField
+                                    control={form.control}
+                                    name="ttsVoice"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Default TTS Voice</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a voice" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {availableTtsVoices.map((voice) => (
+                                                        <SelectItem key={voice.name} value={voice.name}>
+                                                            {voice.name} <span className="text-muted-foreground ml-2">({voice.description})</span>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormDescription>This voice will be used for generating audio from text.</FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                             )}
                         </CardContent>
                     </Card>
                 )}

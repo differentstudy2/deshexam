@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, uploadFile } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, uploadFile, getSettings } from '@/lib/firebase/firestore';
 import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson, Copy, Sparkles } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
@@ -353,18 +353,36 @@ export default function EditKidsContentPage() {
         }
         setIsGeneratingAudio(fieldName);
         try {
-            const result = await textToSpeech({ text: text, lang: 'en-US' });
-            const dataUri = result.audioUrl;
+            const settings = await getSettings();
+            if (settings?.ttsModel === 'Browser') {
+                if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US'; // This could be made dynamic
+                    window.speechSynthesis.speak(utterance);
+                    toast({
+                        title: 'Playing Audio',
+                        description: "Using browser's built-in voice. This audio is not saved.",
+                    });
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Browser TTS Not Supported',
+                    });
+                }
+            } else {
+                const result = await textToSpeech({ text: text, lang: 'en-US' });
+                const dataUri = result.audioUrl;
 
-            const response = await fetch(dataUri);
-            const blob = await response.blob();
-            const audioFile = new File([blob], `generated_${Date.now()}.wav`, { type: 'audio/wav' });
+                const response = await fetch(dataUri);
+                const blob = await response.blob();
+                const audioFile = new File([blob], `generated_${Date.now()}.wav`, { type: 'audio/wav' });
 
-            const downloadURL = await uploadFile(audioFile);
+                const downloadURL = await uploadFile(audioFile);
 
-            form.setValue(fieldName, downloadURL, { shouldDirty: true });
-            
-            toast({ title: 'Audio Generated!', description: 'The audio has been generated and linked.' });
+                form.setValue(fieldName, downloadURL, { shouldDirty: true });
+                
+                toast({ title: 'Audio Generated!', description: 'The audio has been generated and linked.' });
+            }
 
         } catch (error) {
             toast({
