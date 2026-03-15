@@ -367,11 +367,34 @@ export default function EditKidsContentPage() {
     
     const handleCopyQuestion = (index: number) => {
         const questionToCopy = form.getValues(`questions.${index}`);
-        const { id, ...questionData } = questionToCopy;
-        navigator.clipboard.writeText(JSON.stringify(questionData, null, 2)).then(() => {
+        
+        let plainText = `${questionToCopy.text}\n`;
+
+        if (questionToCopy.type === 'Multiple Choice' && questionToCopy.options) {
+            questionToCopy.options.forEach((opt, i) => {
+                plainText += `Option "${String.fromCharCode(65 + i)}": "${opt.text}"\n`;
+            });
+            const correctOptionIndex = questionToCopy.options.findIndex(opt => opt.text === questionToCopy.correctAnswer);
+            if (correctOptionIndex > -1) {
+                const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+                plainText += `সঠিক উত্তর Option "${correctOptionLetter}": "${questionToCopy.correctAnswer}"\n`;
+            }
+        } else if (questionToCopy.type === 'True/False') {
+            plainText += `Option "A": "True"\n`;
+            plainText += `Option "B": "False"\n`;
+            const correctOptionLetter = questionToCopy.correctAnswer === 'True' ? 'A' : 'B';
+            plainText += `সঠিক উত্তর Option "${correctOptionLetter}": "${questionToCopy.correctAnswer}"\n`;
+        } else if (questionToCopy.type === 'Short Answer') {
+            plainText += `সঠিক উত্তর: "${questionToCopy.correctAnswer}"\n`;
+        } else {
+            // Fallback for other types
+            plainText += `Answer: ${questionToCopy.correctAnswer}\n`;
+        }
+
+        navigator.clipboard.writeText(plainText).then(() => {
             toast({
                 title: "Question Copied",
-                description: "The question's JSON data has been copied to the clipboard.",
+                description: "The question has been copied as plain text.",
             });
         }).catch(err => {
             toast({
@@ -627,7 +650,7 @@ export default function EditKidsContentPage() {
                                             <DialogTrigger asChild>
                                                 <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
                                             </DialogTrigger>
-                                            <DialogContent className="sm:max-w-2xl">
+                                             <DialogContent className="sm:max-w-2xl">
                                                 <DialogHeader>
                                                     <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
                                                     <DialogDescription>
