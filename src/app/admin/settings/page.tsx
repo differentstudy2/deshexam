@@ -399,14 +399,14 @@ export default function AdminSettingsPage() {
   const [generatedItems, setGeneratedItems] = useState<string[]>([]);
 
   const ttsVoices = [
-    { name: 'Algenib', description: 'Male, Standard' },
-    { name: 'Achernar', description: 'Male, Standard' },
-    { name: 'Enif', description: 'Female, Standard' },
-    { name: 'Hadar', description: 'Female, Standard' },
-    { name: 'Spica', description: 'Female, Standard' },
-    { name: 'Menkent', description: 'Male, Standard' },
-    { name: 'Canopus', description: 'Male, Standard' },
-    { name: 'Deneb', description: 'Female, Standard' },
+    { name: 'algenib', description: 'Standard Voice 1' },
+    { name: 'achird', description: 'Standard Voice 2' },
+    { name: 'gacrux', description: 'Standard Voice 3' },
+    { name: 'schedar', description: 'Standard Voice 4' },
+    { name: 'zephyr', description: 'Standard Voice 5' },
+    { name: 'puck', description: 'Standard Voice 6' },
+    { name: 'kore', description: 'Standard Voice 7' },
+    { name: 'despina', description: 'Standard Voice 8' },
   ];
 
   const form = useForm<SettingsFormValues>({
@@ -444,7 +444,7 @@ export default function AdminSettingsPage() {
         practiceSetPassMark: 60,
         gateChaptersOnPass: false,
         practiceSetSubmissionLimit: { free: 5, pass: 50, pro: 200 },
-        ttsVoice: 'Algenib',
+        ttsVoice: 'algenib',
     },
   });
 
@@ -1571,4 +1571,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-
