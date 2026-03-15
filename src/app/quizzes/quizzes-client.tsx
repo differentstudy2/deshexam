@@ -40,8 +40,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isPageChanging, setIsPageChanging] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     if (initialQuizzes) {
@@ -59,29 +58,16 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
     });
   }, [quizzes, searchQuery, selectedSubject]);
 
-  const totalPages = Math.ceil(filteredQuizzes.length / ITEMS_PER_PAGE);
+  const visibleQuizzes = useMemo(() => {
+    return filteredQuizzes.slice(0, visibleCount);
+  }, [filteredQuizzes, visibleCount]);
 
-  const paginatedQuizzes = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredQuizzes.slice(startIndex, endIndex);
-  }, [filteredQuizzes, currentPage]);
-  
-  const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > totalPages) return;
-    setIsPageChanging(true);
-    setCurrentPage(newPage);
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + ITEMS_PER_PAGE);
   };
   
   useEffect(() => {
-    if (isPageChanging) {
-      const timer = setTimeout(() => setIsPageChanging(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isPageChanging]);
-
-  useEffect(() => {
-    setCurrentPage(1);
+    setVisibleCount(ITEMS_PER_PAGE);
   }, [searchQuery, selectedSubject]);
 
   return (
@@ -106,7 +92,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
             selectedSubject={selectedSubject}
             onSubjectChange={setSelectedSubject}
           />
-          {(loading || isPageChanging) ? (
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                  <Card key={i} className="flex flex-col overflow-hidden">
@@ -124,18 +110,18 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
               </Card>
               ))}
             </div>
-          ) : paginatedQuizzes.length > 0 ? (
+          ) : filteredQuizzes.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {paginatedQuizzes.map((quiz) => (
-                  <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card text-card-foreground">
-                    <CardHeader className="p-0 relative">
+                {visibleQuizzes.map((quiz) => (
+                  <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
+                    <CardHeader className="p-0 relative h-48">
                       <Image
                         src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`}
                         alt={quiz.title}
                         width={400}
                         height={225}
-                        className="w-full h-auto object-cover"
+                        className="w-full h-full object-cover"
                         data-ai-hint={`${quiz.subject} abstract`}
                       />
                       <div className="absolute top-2 right-2">
@@ -143,9 +129,9 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
                       </div>
                     </CardHeader>
                     <CardContent className="flex-grow p-4">
-                      <p className="text-sm font-medium text-primary">{quiz.subject}</p>
+                      <p className="text-sm font-medium text-primary-foreground/80">{quiz.subject}</p>
                       <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
-                      <p className="text-sm text-muted-foreground line-clamp-3">
+                      <p className="text-sm text-primary-foreground/70 line-clamp-3">
                         {quiz.description || `A fun quiz about ${quiz.subject}.`}
                       </p>
                     </CardContent>
@@ -157,18 +143,12 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
                   </Card>
                 ))}
               </div>
-              {totalPages > 1 && (
-                  <div className="mt-12 text-center flex items-center justify-center gap-4">
-                      <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
-                          Previous
-                      </Button>
-                      <span className="text-sm text-muted-foreground">
-                          Page {currentPage} of {totalPages}
-                      </span>
-                      <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-                          Next
-                      </Button>
-                  </div>
+              {visibleCount < filteredQuizzes.length && (
+                <div className="mt-12 text-center">
+                  <Button onClick={handleLoadMore} size="lg">
+                    Load More Quizzes
+                  </Button>
+                </div>
               )}
             </>
           ) : (
