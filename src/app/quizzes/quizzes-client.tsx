@@ -41,6 +41,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isPageChanging, setIsPageChanging] = useState(false);
 
   useEffect(() => {
     if (initialQuizzes) {
@@ -65,6 +66,19 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
     const endIndex = startIndex + ITEMS_PER_PAGE;
     return filteredQuizzes.slice(startIndex, endIndex);
   }, [filteredQuizzes, currentPage]);
+  
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setIsPageChanging(true);
+    setCurrentPage(newPage);
+  };
+  
+  useEffect(() => {
+    if (isPageChanging) {
+      const timer = setTimeout(() => setIsPageChanging(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isPageChanging]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -72,7 +86,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
 
   return (
     <>
-      <section className="relative w-full py-20 md:py-28 lg:py-36 text-white" style={{ background: 'linear-gradient(to right, #71B280, #134E5E)' }}>
+      <section className="relative w-full py-20 md:py-28 lg:py-36 text-white bg-hero-gradient">
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg wave-text">
             <span>Fun</span> <span>&</span> <span>Engaging</span> <span>Quizzes</span>
@@ -92,7 +106,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
             selectedSubject={selectedSubject}
             onSubjectChange={setSelectedSubject}
           />
-          {loading ? (
+          {(loading || isPageChanging) ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                  <Card key={i} className="flex flex-col overflow-hidden">
@@ -110,7 +124,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
               </Card>
               ))}
             </div>
-          ) : quizzes.length > 0 ? (
+          ) : paginatedQuizzes.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {paginatedQuizzes.map((quiz) => (
@@ -145,13 +159,13 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
               </div>
               {totalPages > 1 && (
                   <div className="mt-12 text-center flex items-center justify-center gap-4">
-                      <Button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                      <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                           Previous
                       </Button>
                       <span className="text-sm text-muted-foreground">
                           Page {currentPage} of {totalPages}
                       </span>
-                      <Button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                      <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
                           Next
                       </Button>
                   </div>
@@ -159,7 +173,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
             </>
           ) : (
             <div className="text-center py-16 text-muted-foreground">
-              <p>No quizzes found.</p>
+              <p>No quizzes found matching your criteria.</p>
             </div>
           )}
         </div>
