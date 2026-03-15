@@ -50,7 +50,7 @@ const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
   options: z.array(z.object({ 
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
@@ -102,6 +102,10 @@ const jsonExampleFull = `
 
 const jsonExampleTextOnly = `
 {
+  "title": "Fun Animal Sounds Quiz (~60 chars)",
+  "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
+  "tags": "Animals, Sounds, Fun",
+  "keywords": "animal sounds quiz, kids learning, fun quiz for children",
   "questions": [
     {
       "text": "What is 2 + 2?",
@@ -482,6 +486,7 @@ export default function AddKidsContentPage() {
                                                         <SelectContent>
                                                             <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                                             <SelectItem value="True/False">True/False</SelectItem>
+                                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -592,6 +597,21 @@ export default function AddKidsContentPage() {
                                                 />
                                             </div>
                                         )}
+                                        {questionType === 'Short Answer' && (
+                                            <div className="space-y-4 pt-2 border-t">
+                                                 <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.correctAnswer`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Correct Answer</FormLabel>
+                                                            <FormControl><Input {...field} /></FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                        )}
                                         <FormField
                                             control={form.control}
                                             name={`questions.${index}.explanation`}
@@ -617,7 +637,7 @@ export default function AddKidsContentPage() {
                                     <DialogTrigger asChild>
                                         <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
                                     </DialogTrigger>
-                                     <DialogContent className="sm:max-w-xl">
+                                     <DialogContent className="sm:max-w-2xl">
                                         <DialogHeader>
                                             <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
                                             <DialogDescription>

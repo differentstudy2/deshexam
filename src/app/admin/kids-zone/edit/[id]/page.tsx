@@ -55,7 +55,7 @@ const funQuizQuestionSchema = z.object({
     text: z.string().min(1, 'Question text cannot be empty.'),
     image: z.string().optional(),
     audio: z.string().optional(),
-    type: z.enum(['Multiple Choice', 'True/False']),
+    type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
     options: z.array(z.object({
         text: z.string().min(1, "Option text cannot be empty."),
         image: z.string().optional(),
@@ -99,6 +99,28 @@ const jsonExampleFull = `
       ],
       "correctAnswer": "Cow",
       "explanation": "Cows are known for their 'moo' sound."
+    }
+  ]
+}
+`;
+
+const jsonExampleTextOnly = `
+{
+  "title": "Fun Animal Sounds Quiz (~60 chars)",
+  "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
+  "tags": "Animals, Sounds, Fun",
+  "keywords": "animal sounds quiz, kids learning, fun quiz for children",
+  "questions": [
+    {
+      "text": "What is 2 + 2?",
+      "type": "Multiple Choice",
+      "options": [
+        { "text": "3" },
+        { "text": "4" },
+        { "text": "5" }
+      ],
+      "correctAnswer": "4",
+      "explanation": "Two plus two equals four."
     }
   ]
 }
@@ -421,6 +443,7 @@ export default function EditKidsContentPage() {
                                                                 <SelectContent>
                                                                     <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                                                     <SelectItem value="True/False">True/False</SelectItem>
+                                                                    <SelectItem value="Short Answer">Short Answer</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                             <FormMessage />
@@ -524,6 +547,21 @@ export default function EditKidsContentPage() {
                                                         />
                                                     </div>
                                                 )}
+                                                 {questionType === 'Short Answer' && (
+                                                    <div className="space-y-4 pt-2 border-t">
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`questions.${index}.correctAnswer`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel>Correct Answer</FormLabel>
+                                                                    <FormControl><Input {...field} /></FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                )}
                                                  <FormField
                                                     control={form.control}
                                                     name={`questions.${index}.explanation`}
@@ -547,7 +585,7 @@ export default function EditKidsContentPage() {
                                             <DialogTrigger asChild>
                                                 <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
                                             </DialogTrigger>
-                                             <DialogContent className="sm:max-w-xl">
+                                             <DialogContent className="sm:max-w-2xl">
                                                 <DialogHeader>
                                                     <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
                                                     <DialogDescription>
@@ -600,8 +638,8 @@ export default function EditKidsContentPage() {
                                                                     </TabsContent>
                                                                     <TabsContent value="text-only">
                                                                         <div className="relative mt-2">
-                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMCQ)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMCQ}</pre></ScrollArea>
+                                                                            <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                            <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
                                                                         </div>
                                                                     </TabsContent>
                                                                     <TabsContent value="mcq">
@@ -637,3 +675,4 @@ export default function EditKidsContentPage() {
         </div>
     );
 }
+
