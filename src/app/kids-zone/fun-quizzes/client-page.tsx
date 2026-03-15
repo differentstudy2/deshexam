@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import type { Quiz } from '@/lib/types';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
 const ITEMS_PER_PAGE = 8;
@@ -25,16 +25,23 @@ export default function FunQuizzesClientPage() {
     const q = query(
       collection(db, "content"),
       where("testType", "==", "Quiz"),
-      where("category", "==", "Fun Quizzes"),
-      orderBy("createdAt", "desc")
+      where("category", "==", "Fun Quizzes")
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedQuizzes: Quiz[] = [];
+      const fetchedQuizzes: any[] = [];
       querySnapshot.forEach((doc) => {
-        fetchedQuizzes.push({ id: doc.id, ...doc.data() } as Quiz);
+        fetchedQuizzes.push({ id: doc.id, ...doc.data() });
       });
-      setQuizzes(fetchedQuizzes);
+
+      // Sort on the client-side to avoid needing a composite index
+      fetchedQuizzes.sort((a, b) => {
+          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+          return dateB.getTime() - dateA.getTime();
+      });
+
+      setQuizzes(fetchedQuizzes as Quiz[]);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching quizzes:", error);
@@ -107,6 +114,7 @@ export default function FunQuizzesClientPage() {
                                 src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/300`}
                                 alt={quiz.title}
                                 fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 className="object-cover group-hover:scale-110 transition-transform duration-300"
                                 data-ai-hint="quiz fun kids"
                             />
