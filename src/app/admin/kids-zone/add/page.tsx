@@ -62,7 +62,9 @@ const funQuizQuestionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
-  description: z.string().min(1, "Description is required."),
+  description: z.string().optional(),
+  tags: z.string().optional(),
+  keywords: z.string().optional(),
   featureImage: z.string().optional(),
   category: z.string().min(1, "Category is required."),
   body: z.string().optional(),
@@ -117,6 +119,30 @@ const jsonExampleTextOnly = `
 }
 `;
 
+const jsonExampleQuestionsOnly = `
+{
+  "questions": [
+    {
+      "text": "What is 2 + 2?",
+      "type": "Multiple Choice",
+      "options": [
+        { "text": "3" },
+        { "text": "4" },
+        { "text": "5" }
+      ],
+      "correctAnswer": "4",
+      "explanation": "Two plus two equals four."
+    },
+    {
+      "text": "Is the sun hot?",
+      "type": "True/False",
+      "correctAnswer": "True",
+      "explanation": "The sun is a star and is very hot."
+    }
+  ]
+}
+`;
+
 
 export default function AddKidsContentPage() {
   const { toast } = useToast();
@@ -143,6 +169,8 @@ export default function AddKidsContentPage() {
     defaultValues: {
       title: '',
       description: '',
+      tags: '',
+      keywords: '',
       featureImage: '',
       category: 'Fun Quizzes',
       body: '',
@@ -217,6 +245,8 @@ export default function AddKidsContentPage() {
       const contentToSave: any = {
         title: data.title,
         description: data.description,
+        tags: data.tags,
+        keywords: data.keywords,
         featureImage: data.featureImage,
         testType: data.category === 'Fun Quizzes' ? 'Quiz' : 'Kids Zone',
         category: data.category,
@@ -311,12 +341,42 @@ export default function AddKidsContentPage() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                         <Input placeholder="A fun quiz about all kinds of animals!" {...field} />
+                         <Textarea placeholder="A fun quiz about all kinds of animals!" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Tags</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., Animals, Sounds, Fun" {...field} />
+                          </FormControl>
+                          <FormDescription>Comma-separated tags for categorization.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="keywords"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Keywords</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., animal sounds quiz, kids learning" {...field} />
+                          </FormControl>
+                          <FormDescription>Comma-separated keywords for SEO.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </div>
                  <FormField
                   control={form.control}
                   name="category"
@@ -475,7 +535,7 @@ export default function AddKidsContentPage() {
                                                                                         </Button>
                                                                                         {!!audioField.value && (
                                                                                             <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
-                                                                                                <Trash2 className="w-4 h-4" />
+                                                                                                <Trash2 className="h-4 w-4" />
                                                                                             </Button>
                                                                                         )}
                                                                                     </div>
@@ -582,42 +642,27 @@ export default function AddKidsContentPage() {
                                                     <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
                                                     <AccordionContent>
                                                         <Tabs defaultValue="full" className="w-full">
-                                                            <TabsList className="grid w-full grid-cols-2">
+                                                            <TabsList className="grid w-full grid-cols-3">
                                                                 <TabsTrigger value="full">Full Example</TabsTrigger>
                                                                 <TabsTrigger value="text-only">Text-Only</TabsTrigger>
+                                                                <TabsTrigger value="questions-only">Questions Only</TabsTrigger>
                                                             </TabsList>
                                                             <TabsContent value="full">
                                                                 <div className="relative mt-2">
-                                                                     <Button
-                                                                        type="button"
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        className="absolute top-2 right-2 h-7 w-7"
-                                                                        onClick={() => handleCopy(jsonExampleFull)}
-                                                                    >
-                                                                        <Copy className="h-4 w-4" />
-                                                                        <span className="sr-only">Copy</span>
-                                                                    </Button>
-                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
-                                                                        <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre>
-                                                                    </ScrollArea>
+                                                                     <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
                                                                 </div>
                                                             </TabsContent>
                                                             <TabsContent value="text-only">
                                                                  <div className="relative mt-2">
-                                                                    <Button
-                                                                        type="button"
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        className="absolute top-2 right-2 h-7 w-7"
-                                                                        onClick={() => handleCopy(jsonExampleTextOnly)}
-                                                                    >
-                                                                        <Copy className="h-4 w-4" />
-                                                                        <span className="sr-only">Copy</span>
-                                                                    </Button>
-                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4">
-                                                                        <pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre>
-                                                                    </ScrollArea>
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
+                                                                </div>
+                                                            </TabsContent>
+                                                            <TabsContent value="questions-only">
+                                                                 <div className="relative mt-2">
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleQuestionsOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleQuestionsOnly}</pre></ScrollArea>
                                                                 </div>
                                                             </TabsContent>
                                                         </Tabs>
