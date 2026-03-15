@@ -71,6 +71,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     // New states for image capture
     const [isCapturing, setIsCapturing] = useState(false);
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
+    const [isLoading, setIsLoading] = useState(true);
     
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
@@ -149,6 +150,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if(quiz && quiz.questions) {
              setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         }
+        setIsLoading(false);
     }, [quiz]);
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -342,29 +344,44 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (isCapturing) return;
         setIsCapturing(true);
 
-        // Capture Question
         setCaptureMode('question');
         await new Promise(r => setTimeout(r, 100)); // wait for rerender
         await captureAndDownload('question', aspectRatio);
 
-        // Capture Answer
         setCaptureMode('answer');
         await new Promise(r => setTimeout(r, 100));
         await captureAndDownload('answer', aspectRatio);
 
-        // Reset
         setCaptureMode('idle');
         setIsCapturing(false);
         toast({ title: 'Images saved!', description: 'Both question and answer images have been downloaded.' });
     };
 
-    if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
+    if (isLoading) {
+        return (
+             <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                <p className="ml-4 text-lg">Loading Quiz...</p>
+             </div>
+        );
+    }
+
+    if (!quiz || !quiz.questions || quiz.questions.length === 0) {
         return (
              <div className="container mx-auto px-4 py-12 text-center">
                  <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
                  <Button asChild className="mt-4">
                      <Link href="/kids-zone/fun-quizzes">Back to Fun Quizzes</Link>
                  </Button>
+             </div>
+        );
+    }
+
+    if (!currentQuestion) {
+        return (
+             <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                <p className="ml-4 text-lg">Starting Quiz...</p>
              </div>
         );
     }
@@ -586,3 +603,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
