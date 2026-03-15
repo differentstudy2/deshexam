@@ -8,7 +8,6 @@ import { getUserProfile } from '@/lib/firebase/firestore';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 
 export default function AdminLayout({
   children,
