@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Loader2, PawPrint } from "lucide-react";
@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import type { Quiz } from '@/lib/types';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, orderBy, startAfter, DocumentSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
 const ITEMS_PER_PAGE = 8;
@@ -18,50 +18,63 @@ const ITEMS_PER_PAGE = 8;
 export default function FunQuizzesClientPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const q = query(
-      collection(db, "content"),
-      where("testType", "==", "Quiz"),
-      where("category", "==", "Fun Quizzes")
-    );
+  const [lastVisible, setLastVisible] = useState<DocumentSnapshot | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedQuizzes: any[] = [];
-      querySnapshot.forEach((doc) => {
-        fetchedQuizzes.push({ id: doc.id, ...doc.data() });
-      });
+  const fetchQuizzes = useCallback(async (loadMore = false) => {
+    if (!loadMore) {
+        setLoading(true);
+    } else {
+        setLoadingMore(true);
+    }
 
-      // Sort on the client-side to avoid needing a composite index
-      fetchedQuizzes.sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
-          return dateB.getTime() - dateA.getTime();
-      });
+    try {
+        const baseQuery = query(
+            collection(db, "content"),
+            where("testType", "==", "Quiz"),
+            where("category", "==", "Fun Quizzes"),
+            orderBy("createdAt", "desc"),
+            limit(ITEMS_PER_PAGE)
+        );
 
-      setQuizzes(fetchedQuizzes as Quiz[]);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching quizzes:", error);
-      toast({
-        variant: "destructive",
-        title: "Failed to load quizzes",
-        description: "Could not fetch quizzes in real-time. Please try refreshing the page.",
-      });
-      setLoading(false);
-    });
+        const q = loadMore && lastVisible ? query(baseQuery, startAfter(lastVisible)) : baseQuery;
 
-    return () => unsubscribe();
+        const querySnapshot = await getDocs(q);
+        const fetchedQuizzes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Quiz);
+        
+        setHasMore(fetchedQuizzes.length === ITEMS_PER_PAGE);
+
+        if(querySnapshot.docs.length > 0) {
+             setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        }
+
+        setQuizzes(prev => loadMore ? [...prev, ...fetchedQuizzes] : fetchedQuizzes);
+
+    } catch (error) {
+        console.error("Error fetching quizzes:", error);
+        toast({
+            variant: "destructive",
+            title: "Failed to load quizzes",
+            description: "Could not fetch quizzes. Please try refreshing the page.",
+        });
+    } finally {
+        setLoading(false);
+        setLoadingMore(false);
+    }
   }, [toast]);
 
-  const visibleQuizzes = useMemo(() => {
-    return quizzes.slice(0, visibleCount);
-  }, [quizzes, visibleCount]);
+  useEffect(() => {
+      fetchQuizzes();
+  }, [fetchQuizzes]);
+
 
   const handleLoadMore = () => {
-    setVisibleCount(prevCount => prevCount + ITEMS_PER_PAGE);
+    if (hasMore && !loadingMore) {
+        fetchQuizzes(true);
+    }
   };
 
   return (
@@ -107,7 +120,7 @@ export default function FunQuizzesClientPage() {
             ) : quizzes.length > 0 ? (
             <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {visibleQuizzes.map((quiz) => (
+                {quizzes.map((quiz) => (
                     <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group bg-card-gradient text-white">
                         <CardHeader className="p-0 relative h-48">
                             <Image
@@ -135,10 +148,10 @@ export default function FunQuizzesClientPage() {
                     </Card>
                 ))}
                 </div>
-                {visibleCount < quizzes.length && (
+                {hasMore && (
                 <div className="mt-12 text-center">
-                    <Button onClick={handleLoadMore} size="lg">
-                    Load More Quizzes
+                    <Button onClick={handleLoadMore} size="lg" disabled={loadingMore}>
+                        {loadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : 'Load More Quizzes'}
                     </Button>
                 </div>
                 )}
