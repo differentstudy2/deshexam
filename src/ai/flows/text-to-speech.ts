@@ -65,10 +65,11 @@ const textToSpeechFlow = ai.defineFlow(
   },
   async ({ text, lang }) => {
     const settings = await getSettings();
-    const voiceName = settings?.ttsVoice || 'Algenib'; // Fallback to 'Algenib' if not set
+    const voiceName = settings?.ttsVoice || 'Algenib';
+    const modelName = settings?.ttsModel || 'gemini-2.5-flash-preview-tts';
 
     const { media } = await ai.generate({
-      model: googleAI.model('gemini-2.5-flash-preview-tts'),
+      model: googleAI.model(modelName),
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {

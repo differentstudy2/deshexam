@@ -128,6 +128,7 @@ const settingsSchema = z.object({
         pro: z.coerce.number().int().min(1).default(200),
     }).default({ free: 5, pass: 50, pro: 200 }),
     ttsVoice: z.string().optional(),
+    ttsModel: z.string().optional(),
 });
 
 
@@ -399,14 +400,16 @@ export default function AdminSettingsPage() {
   const [generatedItems, setGeneratedItems] = useState<string[]>([]);
 
   const ttsVoices = [
-    { name: 'algenib', description: 'Standard Voice 1' },
-    { name: 'achird', description: 'Standard Voice 2' },
-    { name: 'gacrux', description: 'Standard Voice 3' },
-    { name: 'schedar', description: 'Standard Voice 4' },
-    { name: 'zephyr', description: 'Standard Voice 5' },
-    { name: 'puck', description: 'Standard Voice 6' },
-    { name: 'kore', description: 'Standard Voice 7' },
-    { name: 'despina', description: 'Standard Voice 8' },
+    { name: 'Algenib', description: 'Standard Female 1' },
+    { name: 'Achernar', description: 'Standard Male 1' },
+    { name: 'Canopus', description: 'Standard Female 2' },
+    { name: 'Capella', description: 'Standard Male 2' },
+    { name: 'Deneb', description: 'WaveNet Female 1' },
+    { name: 'Fomalhaut', description: 'WaveNet Male 1' },
+    { name: 'Hadar', description: 'WaveNet Male 2' },
+    { name: 'Pollux', description: 'WaveNet Female 2' },
+    { name: 'Procyon', description: 'WaveNet Male 3' },
+    { name: 'Rigel', description: 'WaveNet Female 3' },
   ];
 
   const form = useForm<SettingsFormValues>({
@@ -444,7 +447,8 @@ export default function AdminSettingsPage() {
         practiceSetPassMark: 60,
         gateChaptersOnPass: false,
         practiceSetSubmissionLimit: { free: 5, pass: 50, pro: 200 },
-        ttsVoice: 'algenib',
+        ttsVoice: 'Algenib',
+        ttsModel: 'gemini-2.5-flash-preview-tts',
     },
   });
 
@@ -832,7 +836,29 @@ export default function AdminSettingsPage() {
                             <CardTitle>Text-to-Speech Settings</CardTitle>
                             <CardDescription>Configure the voice used for AI-generated audio across the site.</CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="space-y-6">
+                             <FormField
+                                control={form.control}
+                                name="ttsModel"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>TTS Model</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a TTS model" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="gemini-2.5-flash-preview-tts">Gemini 2.5 Flash TTS</SelectItem>
+                                                <SelectItem value="gemini-2.5-pro-preview-tts">Gemini 2.5 Pro TTS</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>Select the AI model for generating audio from text. Pro may offer higher quality.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                              <FormField
                                 control={form.control}
                                 name="ttsVoice"
