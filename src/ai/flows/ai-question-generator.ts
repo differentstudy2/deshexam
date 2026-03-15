@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Generates educational questions using an AI model.
@@ -51,6 +50,22 @@ const prompt = ai.definePrompt({
 1.  **Markdown First**: Primarily use GitHub-flavored Markdown for all text formatting (headings, lists, bold, italics). Use simple, clear Markdown. For example, to bold a word, use **word**, not complex cases like **'word'**. Avoid putting emphasis markers like \`**\` or \`*\` right next to punctuation.
 2.  **LaTeX for Math**: For any mathematical expressions, formulas, or chemical equations, you MUST enclose them in LaTeX delimiters. Use a single dollar sign for inline math (e.g., $E=mc^2$) and double dollar signs for block-level math (e.g., $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$). For mathematical grouping, use parentheses () or square brackets [] inside the math delimiters, not curly braces {}, unless it is part of a specific LaTeX command like \\frac{a}{b}. Pay close attention to chemical formulas and reactions, using correct LaTeX syntax for subscripts (e.g., $H_2O$), reaction arrows (e.g., $\\rightarrow$), and symbols (e.g., \`\\therefore\` for ∴).
 3.  **Language**: You MUST generate all content (questions, options, explanations) in the same language as the provided source material.
+
+For example, if the source text is in Bengali and is about the human body, a good "Multiple Choice" question would be structured in the JSON output like this:
+{
+  "text": "আমাদের শরীরের বর্ম কাকে বলা হয়?",
+  "type": "Multiple Choice",
+  "marks": 1,
+  "options": [
+    { "text": "হাড়" },
+    { "text": "চামড়া বা ত্বক" },
+    { "text": "মাংসপেশি" },
+    { "text": "নখ" }
+  ],
+  "correctAnswer": "চামড়া বা ত্বক",
+  "explanation": "ত্বক আমাদের শরীরকে বাইরের আঘাত এবং জীবাণু থেকে রক্ষা করে, তাই একে বর্ম বলা হয়।"
+}
+Notice how the question, options, and answer are all in Bengali, matching the source language.
 
 The questions should have the following properties:
 - Number of questions: {{numQuestions}}
@@ -121,5 +136,3 @@ const generateQuestionsFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
