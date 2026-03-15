@@ -10,13 +10,44 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import type { Quiz } from '@/lib/types';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 const ITEMS_PER_PAGE = 8;
 
-export default function FunQuizzesClientPage({ initialQuizzes }: { initialQuizzes: Quiz[] }) {
-  const [quizzes, setQuizzes] = useState<Quiz[]>(initialQuizzes);
-  const [loading, setLoading] = useState(false);
+export default function FunQuizzesClientPage() {
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "content"),
+      where("testType", "==", "Quiz"),
+      where("category", "==", "Fun Quizzes"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedQuizzes: Quiz[] = [];
+      querySnapshot.forEach((doc) => {
+        fetchedQuizzes.push({ id: doc.id, ...doc.data() } as Quiz);
+      });
+      setQuizzes(fetchedQuizzes);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching quizzes:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to load quizzes",
+        description: "Could not fetch quizzes in real-time. Please try refreshing the page.",
+      });
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [toast]);
 
   const visibleQuizzes = useMemo(() => {
     return quizzes.slice(0, visibleCount);
