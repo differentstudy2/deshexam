@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -28,6 +27,7 @@ import {
 } from "@/components/ui/tooltip"
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Question = {
     text: string;
@@ -359,14 +359,42 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     if (isLoading) {
         return (
-             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                <p className="ml-4 text-lg">Loading Quiz...</p>
-             </div>
+             <div className="w-full max-w-2xl mx-auto">
+                <Card className="bg-card/60 backdrop-blur-sm">
+                    <CardContent className="p-3">
+                        <div className="flex flex-wrap justify-between items-center gap-4">
+                            <Skeleton className="h-6 w-20" />
+                            <div className="flex-grow max-w-lg">
+                                <Skeleton className="h-2 w-full" />
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <Skeleton className="h-9 w-24" />
+                                <Skeleton className="h-9 w-9 rounded-full" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
+                    <CardHeader className="relative bg-muted/30 p-6 min-h-[150px]">
+                        <div className="space-y-3">
+                            <Skeleton className="h-8 w-3/4" />
+                            <Skeleton className="h-5 w-1/2" />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                            <Skeleton className="h-20 w-full rounded-xl" />
+                            <Skeleton className="h-20 w-full rounded-xl" />
+                            <Skeleton className="h-20 w-full rounded-xl" />
+                            <Skeleton className="h-20 w-full rounded-xl" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         );
     }
 
-    if (!quiz || !quiz.questions || quiz.questions.length === 0) {
+    if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
         return (
              <div className="container mx-auto px-4 py-12 text-center">
                  <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
@@ -483,36 +511,34 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 <span>{timeLeft}s</span>
                                             </div>
                                         )}
-                                        <div className="fixed top-4 right-4 z-50">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="outline" size="icon" disabled={isCapturing}>
-                                                        {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
-                                                        Save as Default
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
-                                                        <Video className="mr-2 h-4 w-4" />
-                                                        Save for Landscape Video (16:9)
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
-                                                        <Video className="mr-2 h-4 w-4 rotate-90" />
-                                                        Save for Short Video (9:16)
-                                                    </DropdownMenuItem>
-                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
-                                                        Save for Instagram (1:1)
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
-                                                        Save for Facebook Post (4:5)
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                 <Button variant="outline" size="icon" disabled={isCapturing}>
+                                                     {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
+                                                 </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
+                                                    Save as Default
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
+                                                    <Video className="mr-2 h-4 w-4" />
+                                                    Save for Landscape Video (16:9)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
+                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
+                                                    Save for Short Video (9:16)
+                                                </DropdownMenuItem>
+                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                                                    Save for Instagram (1:1)
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
+                                                    Save for Facebook Post (4:5)
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
                             </CardContent>
@@ -603,4 +629,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
