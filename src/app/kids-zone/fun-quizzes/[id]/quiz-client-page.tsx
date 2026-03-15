@@ -499,6 +499,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     
                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-start gap-2">
                                         <span>{currentQuestion?.text}</span>
+                                        {currentQuestion?.audio && (
+                                            <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
+                                            </Button>
+                                        )}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
@@ -507,23 +512,40 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             {currentQuestion?.options.map((option, index) => {
                                                 const isSelected = selectedAnswer === option.text;
                                                 const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
-                                                
-                                                const isIdle = captureMode === 'idle';
-                                                const showAsCorrect = (captureMode === 'answer' && isCorrectAnswer) || (isIdle && selectedAnswer !== null && isCorrectAnswer);
-                                                const showAsIncorrect = (isIdle && selectedAnswer !== null && isSelected && !isCorrectAnswer);
-                                                const showAsNeutral = captureMode === 'question' || (isIdle && selectedAnswer === null);
+                                                const isShown = selectedAnswer !== null;
+
+                                                let optionClass = cn(
+                                                    "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
+                                                    !isShown && captureMode === 'idle' && "cursor-pointer hover:scale-105 hover:border-primary"
+                                                );
+                                
+                                                if (captureMode === 'question') {
+                                                    optionClass = cn(optionClass, optionBgColors[index % optionBgColors.length]);
+                                                } else if (captureMode === 'answer') {
+                                                    if (isCorrectAnswer) {
+                                                        optionClass = cn(optionClass, "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30");
+                                                    } else {
+                                                        optionClass = cn(optionClass, "border-destructive/50 bg-red-100/50 dark:bg-red-900/20 text-muted-foreground opacity-70");
+                                                    }
+                                                } else { // 'idle' mode
+                                                    if (isShown) {
+                                                        if (isCorrectAnswer) {
+                                                            optionClass = cn(optionClass, "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30");
+                                                        } else if (isSelected) {
+                                                            optionClass = cn(optionClass, "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30");
+                                                        } else {
+                                                            optionClass = cn(optionClass, optionBgColors[index % optionBgColors.length], "opacity-50");
+                                                        }
+                                                    } else {
+                                                        optionClass = cn(optionClass, optionBgColors[index % optionBgColors.length]);
+                                                    }
+                                                }
 
                                                 return (
                                                     <Label
                                                         key={index}
                                                         htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
-                                                        className={cn(
-                                                            "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
-                                                            !selectedAnswer && captureMode === 'idle' && "cursor-pointer hover:scale-105 hover:border-primary",
-                                                            showAsCorrect && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
-                                                            showAsIncorrect && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
-                                                            showAsNeutral && optionBgColors[index % optionBgColors.length],
-                                                        )}
+                                                        className={optionClass}
                                                     >
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
@@ -542,19 +564,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </div>
                 )}
             </div>
-             {!quizFinished && currentQuestion?.audio && (
-                <div className="fixed top-24 right-4 z-50">
-                    <Button
-                        variant="default"
-                        size="icon"
-                        className="w-16 h-16 rounded-full shadow-lg"
-                        onClick={() => togglePlayUrl(currentQuestion.audio!)}
-                    >
-                        {playingUrl === currentQuestion.audio ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
-                    </Button>
-                </div>
-            )}
         </div>
     );
 }
-
