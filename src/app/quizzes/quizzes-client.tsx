@@ -114,7 +114,7 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {visibleQuizzes.map((quiz) => (
-                  <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow bg-card-gradient text-white">
+                  <Card key={quiz.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
                     <CardHeader className="p-0 relative h-48">
                       <Image
                         src={quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`}
@@ -129,9 +129,9 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
                       </div>
                     </CardHeader>
                     <CardContent className="flex-grow p-4">
-                      <p className="text-sm font-medium text-primary-foreground/80">{quiz.subject}</p>
+                      <p className="text-sm font-medium text-primary">{quiz.subject}</p>
                       <CardTitle className="font-headline text-xl mt-1 mb-2 leading-snug">{quiz.title}</CardTitle>
-                      <p className="text-sm text-primary-foreground/70 line-clamp-3">
+                      <p className="text-sm text-muted-foreground line-clamp-3">
                         {quiz.description || `A fun quiz about ${quiz.subject}.`}
                       </p>
                     </CardContent>
