@@ -26,7 +26,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, uploadFile } from '@/lib/firebase/firestore';
-import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson, Copy } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson, Copy, Sparkles } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
@@ -48,6 +48,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 
 const funQuizQuestionSchema = z.object({
@@ -191,6 +192,9 @@ export default function EditKidsContentPage() {
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
     const [jsonText, setJsonText] = useState('');
     const importFileRef = useRef<HTMLInputElement>(null);
+
+    const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
+
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
@@ -339,6 +343,37 @@ export default function EditKidsContentPage() {
                 title: 'Error Updating Content',
                 description: (error as Error).message,
             });
+        }
+    };
+    
+    const handleGenerateAudio = async (text: string, fieldName: any) => {
+        if (!text || !text.trim()) {
+            toast({ variant: 'destructive', title: 'No text to generate audio from.' });
+            return;
+        }
+        setIsGeneratingAudio(fieldName);
+        try {
+            const result = await textToSpeech({ text: text, lang: 'en-US' });
+            const dataUri = result.audioUrl;
+
+            const response = await fetch(dataUri);
+            const blob = await response.blob();
+            const audioFile = new File([blob], `generated_${Date.now()}.wav`, { type: 'audio/wav' });
+
+            const downloadURL = await uploadFile(audioFile);
+
+            form.setValue(fieldName, downloadURL, { shouldDirty: true });
+            
+            toast({ title: 'Audio Generated!', description: 'The audio has been generated and linked.' });
+
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Audio Generation Failed',
+                description: (error as Error).message,
+            });
+        } finally {
+            setIsGeneratingAudio(null);
         }
     };
     
@@ -525,6 +560,9 @@ export default function EditKidsContentPage() {
                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
                                                                     {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                 </Button>
+                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.watch(`questions.${index}.text`), `questions.${index}.audio`)} disabled={isGeneratingAudio === `questions.${index}.audio` || !form.watch(`questions.${index}.text`)}>
+                                                                    {isGeneratingAudio === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
+                                                                </Button>
                                                                 {!!field.value && (
                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
                                                                         <Trash2 className="w-4 h-4" />
@@ -571,6 +609,9 @@ export default function EditKidsContentPage() {
                                                                                                 <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
                                                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
                                                                                                     {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                                                </Button>
+                                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.watch(`questions.${index}.options.${optionIndex}.text`), `questions.${index}.options.${optionIndex}.audio`)} disabled={isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` || !form.watch(`questions.${index}.options.${optionIndex}.text`)}>
+                                                                                                    {isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
                                                                                                 </Button>
                                                                                                 {!!audioField.value && (
                                                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
@@ -645,7 +686,7 @@ export default function EditKidsContentPage() {
                                        )
                                     })}
                                     <div className="flex flex-wrap gap-4">
-                                        <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }], correctAnswer: '', explanation: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Question</Button>
+                                        <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Question</Button>
                                         <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
                                             <DialogTrigger asChild>
                                                 <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
@@ -657,7 +698,7 @@ export default function EditKidsContentPage() {
                                                         Upload a JSON file or paste JSON text. The content will be appended to the current question list.
                                                     </DialogDescription>
                                                 </DialogHeader>
-                                                 <ScrollArea className="max-h-[60vh] pr-6">
+                                                <ScrollArea className="max-h-[60vh] pr-6">
                                                     <Tabs defaultValue="paste">
                                                         <TabsList className="grid w-full grid-cols-2">
                                                             <TabsTrigger value="paste">Paste JSON</TabsTrigger>
@@ -692,7 +733,7 @@ export default function EditKidsContentPage() {
                                                                     <TabsList className="h-auto flex-wrap justify-start">
                                                                         <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
                                                                         <TabsTrigger value="text-only">Text-Only</TabsTrigger>
-                                                                         <TabsTrigger value="questions-only">Questions Only</TabsTrigger>
+                                                                        <TabsTrigger value="questions-only">Questions Only</TabsTrigger>
                                                                         <TabsTrigger value="mcq">MCQ</TabsTrigger>
                                                                         <TabsTrigger value="tf">True/False</TabsTrigger>
                                                                     </TabsList>
