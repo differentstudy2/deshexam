@@ -367,10 +367,18 @@ export default function EditKidsContentPage() {
     
     const handleCopyQuestion = (index: number) => {
         const questionToCopy = form.getValues(`questions.${index}`);
-        append(questionToCopy);
-        toast({
-          title: "Question Copied",
-          description: `Question ${index + 1} has been duplicated at the end of the list.`,
+        const { id, ...questionData } = questionToCopy;
+        navigator.clipboard.writeText(JSON.stringify(questionData, null, 2)).then(() => {
+            toast({
+                title: "Question Copied",
+                description: "The question's JSON data has been copied to the clipboard.",
+            });
+        }).catch(err => {
+            toast({
+                variant: 'destructive',
+                title: "Copy Failed",
+                description: "Could not copy question to clipboard.",
+            });
         });
     };
 
@@ -496,7 +504,7 @@ export default function EditKidsContentPage() {
                                                                 </Button>
                                                                 {!!field.value && (
                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
-                                                                        <Trash2 className="h-4 w-4" />
+                                                                        <Trash2 className="w-4 h-4" />
                                                                     </Button>
                                                                 )}
                                                             </div>
@@ -543,7 +551,7 @@ export default function EditKidsContentPage() {
                                                                                                 </Button>
                                                                                                 {!!audioField.value && (
                                                                                                     <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
-                                                                                                        <Trash2 className="h-4 w-4" />
+                                                                                                        <Trash2 className="w-4 h-4" />
                                                                                                     </Button>
                                                                                                 )}
                                                                                             </div>
