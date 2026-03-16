@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Copy } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -72,6 +73,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isCapturing, setIsCapturing] = useState(false);
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     const [isLoading, setIsLoading] = useState(true);
+
+    const handleCopy = (text: string) => {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+            toast({ title: 'Copied to clipboard!' });
+        }).catch(err => {
+            toast({ variant: 'destructive', title: 'Failed to copy' });
+        });
+    };
     
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
@@ -552,13 +562,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     )}
                                     
-                                    <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-start gap-2">
+                                    <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
                                         <span>{currentQuestion?.text}</span>
-                                        {currentQuestion?.audio && (
-                                            <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
-                                                {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
+                                        <div className="flex-shrink-0 flex items-center">
+                                            {currentQuestion?.audio && (
+                                                <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                    {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
+                                                </Button>
+                                            )}
+                                             <Button variant="ghost" size="icon" onClick={() => handleCopy(currentQuestion.text)}>
+                                                <Copy className="w-5 h-5" />
                                             </Button>
-                                        )}
+                                        </div>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
@@ -576,9 +591,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
                                                 const optionStyle: React.CSSProperties = {};
 
-                                                if (captureMode === 'question') {
-                                                    optionClass = cn(optionClass, optionBgColors[index % optionBgColors.length]);
-                                                } else if (captureMode === 'answer') {
+                                                if (captureMode === 'answer') {
                                                     if (isCorrectAnswer) {
                                                         optionStyle.backgroundColor = 'rgb(32, 128, 0)';
                                                         optionStyle.color = 'white';
@@ -609,17 +622,43 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         className={optionClass}
                                                         style={optionStyle}
                                                     >
-                                                        <div className="flex items-center gap-2">
+                                                         <div className="flex items-center gap-2 flex-grow">
                                                             <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                             <span className="text-left font-bold text-lg">{option.text}</span>
                                                         </div>
-                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
+                                                        <div className="flex items-center flex-shrink-0">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 mr-1"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleCopy(option.text);
+                                                                }}
+                                                            >
+                                                                <Copy className="w-4 h-4" />
+                                                            </Button>
+                                                            <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
+                                                        </div>
                                                     </Label>
                                                 );
                                             })}
                                         </div>
                                     </RadioGroup>
-                                    {feedback && captureMode === 'idle' && <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>{feedback}</div>}
+                                    {feedback && captureMode === 'idle' && (
+                                        <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
+                                            {feedback}
+                                            {!isCorrect && selectedAnswer && (
+                                                <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
+                                                    <span>Correct answer: {currentQuestion.correctAnswer}</span>
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6 ml-1" onClick={() => handleCopy(currentQuestion.correctAnswer)}>
+                                                        <Copy className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
@@ -629,3 +668,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
