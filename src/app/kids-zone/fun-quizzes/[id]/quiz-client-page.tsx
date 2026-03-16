@@ -105,7 +105,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
           window.speechSynthesis.cancel(); // Stop any previous speech
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'en-US'; // This can be made dynamic later
+          utterance.lang = 'bn-BD'; // This can be made dynamic later
           window.speechSynthesis.speak(utterance);
         } else {
             toast({
@@ -450,14 +450,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
              </div>
         );
     }
-
-    if (!currentQuestion) {
-        return (
-             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-12 h-12 animate-spin text-primary" />
-             </div>
-        );
-    }
     
     const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
     
@@ -598,8 +590,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     )}
                                     
                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
-                                        <span onClick={() => speakText(currentQuestion.text)} className="cursor-pointer">{currentQuestion?.text}</span>
+                                        <span>{currentQuestion?.text}</span>
                                         <div className="flex-shrink-0 flex items-center">
+                                            <Button variant="ghost" size="icon" onClick={() => speakText(currentQuestion.text)}>
+                                                <Volume2 />
+                                            </Button>
                                             {currentQuestion?.audio && (
                                                 <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
                                                     {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
@@ -686,4 +681,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
