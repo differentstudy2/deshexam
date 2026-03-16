@@ -65,6 +65,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     
     const [playingUrl, setPlayingUrl] = useState<string | null>(null);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    const [isCapturing, setIsCapturing] = useState(false);
+    const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
@@ -248,83 +251,107 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         ctx.restore();
     };
 
-    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
-        if (quizCardRef.current) {
-            html2canvas(quizCardRef.current, {
-                useCORS: true,
-                backgroundColor: null,
-            }).then(sourceCanvas => {
-                let targetCanvas: HTMLCanvasElement;
-                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
-                const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}.png`;
+    const captureAndDownload = async (
+        mode: 'question' | 'answer',
+        aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5'
+    ) => {
+        if (!quizCardRef.current) return;
+        const sourceCanvas = await html2canvas(quizCardRef.current, { 
+            useCORS: true, 
+            backgroundColor: null,
+            scale: 4
+        });
+        
+        const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
+        const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}_${mode}.png`;
 
-                const target = document.createElement('canvas');
-                const targetCtx = target.getContext('2d');
-                if (!targetCtx) return;
-                
-                if (aspectRatio === 'default') {
-                    target.width = sourceCanvas.width;
-                    target.height = sourceCanvas.height;
-                    targetCtx.drawImage(sourceCanvas, 0, 0);
-                    drawWatermark(targetCtx, target.width, target.height);
-                    targetCanvas = target;
-                } else {
-                    let targetWidth, targetHeight;
-                    if (aspectRatio === '9:16') {
-                        targetHeight = 1920;
-                        targetWidth = 1080;
-                    } else if (aspectRatio === '16:9') {
-                        targetWidth = 1920;
-                        targetHeight = 1080;
-                    } else if (aspectRatio === '4:5') {
-                        targetWidth = 1080;
-                        targetHeight = 1350;
-                    } else { // 1:1 for Instagram
-                        targetWidth = 1080;
-                        targetHeight = 1080;
-                    }
-                    
-                    target.width = targetWidth;
-                    target.height = targetHeight;
+        const target = document.createElement('canvas');
+        const targetCtx = target.getContext('2d');
+        if (!targetCtx) return;
 
-                    // Create a pleasant gradient background
-                    const gradients = [
-                        { from: '#DA22FF', to: '#9733EE' },
-                        { from: '#09203F', to: '#537895' },
-                        { from: '#868F96', to: '#596164' },
-                        { from: '#93A5CF', to: '#E4EfE9' },
-                        { from: '#11998E', to: '#38EF7D' }
-                    ];
-                    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-                    const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
-                    gradient.addColorStop(0, randomGradient.from);
-                    gradient.addColorStop(1, randomGradient.to);
-                    targetCtx.fillStyle = gradient;
-                    targetCtx.fillRect(0, 0, targetWidth, targetHeight);
-                    
-                    // Add repeating watermark
-                    drawWatermark(targetCtx, targetWidth, targetHeight);
+        let targetCanvas: HTMLCanvasElement;
+        if (aspectRatio === 'default') {
+            target.width = sourceCanvas.width;
+            target.height = sourceCanvas.height;
+            targetCtx.drawImage(sourceCanvas, 0, 0);
+            drawWatermark(targetCtx, target.width, target.height);
+            targetCanvas = target;
+        } else {
+             let targetWidth, targetHeight;
+            if (aspectRatio === '9:16') {
+                targetHeight = 1920;
+                targetWidth = 1080;
+            } else if (aspectRatio === '16:9') {
+                targetWidth = 1920;
+                targetHeight = 1080;
+            } else if (aspectRatio === '4:5') {
+                targetWidth = 1080;
+                targetHeight = 1350;
+            } else { // 1:1 for Instagram
+                targetWidth = 1080;
+                targetHeight = 1080;
+            }
+            
+            target.width = targetWidth;
+            target.height = targetHeight;
 
-                    const padding = 100;
-                    const scale = Math.min(
-                        (targetWidth - padding * 2) / sourceCanvas.width, 
-                        (targetHeight - padding * 2) / sourceCanvas.height
-                    );
-                    const scaledWidth = sourceCanvas.width * scale;
-                    const scaledHeight = sourceCanvas.height * scale;
-                    const dx = (targetWidth - scaledWidth) / 2;
-                    const dy = (targetHeight - scaledHeight) / 2;
-                    
-                    targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
-                    targetCanvas = target;
-                }
+            // Create a pleasant gradient background
+            const gradients = [
+                { from: '#DA22FF', to: '#9733EE' },
+                { from: '#09203F', to: '#537895' },
+                { from: '#868F96', to: '#596164' },
+                { from: '#93A5CF', to: '#E4EfE9' },
+                { from: 'rgb(137, 137, 0)', to: '#1d4350' },
+                { from: '#434343', to: '#000000' },
+                { from: '#283e51', to: '#4b79a1' },
+                { from: '#2c3e50', to: '#2980b9' },
+                { from: '#3498db', to: '#2c3e50' }
+            ];
+            const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+            const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
+            gradient.addColorStop(0, randomGradient.from);
+            gradient.addColorStop(1, randomGradient.to);
+            targetCtx.fillStyle = gradient;
+            targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+            
+            // Add repeating watermark
+            drawWatermark(targetCtx, targetWidth, targetHeight);
 
-                const link = document.createElement('a');
-                link.download = fileName;
-                link.href = targetCanvas.toDataURL('image/png');
-                link.click();
-            });
+            const padding = 100;
+            const scale = Math.min(
+                (targetWidth - padding * 2) / sourceCanvas.width, 
+                (targetHeight - padding * 2) / sourceCanvas.height
+            );
+            const scaledWidth = sourceCanvas.width * scale;
+            const scaledHeight = sourceCanvas.height * scale;
+            const dx = (targetWidth - scaledWidth) / 2;
+            const dy = (targetHeight - scaledHeight) / 2;
+            
+            targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
+            targetCanvas = target;
         }
+        
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = targetCanvas.toDataURL('image/png');
+        link.click();
+    };
+
+    const handleSaveAsImage = async (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
+        if (isCapturing) return;
+        setIsCapturing(true);
+
+        setCaptureMode('question');
+        await new Promise(r => setTimeout(r, 100)); // wait for rerender
+        await captureAndDownload('question', aspectRatio);
+
+        setCaptureMode('answer');
+        await new Promise(r => setTimeout(r, 100));
+        await captureAndDownload('answer', aspectRatio);
+
+        setCaptureMode('idle');
+        setIsCapturing(false);
+        // toast({ title: 'Images saved!', description: 'Both question and answer images have been downloaded.' });
     };
 
 
@@ -333,7 +360,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
              <div className="container mx-auto px-4 py-12 text-center">
                  <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
                  <Button asChild className="mt-4">
-                     <Link href="/kids-zone/fun-quizzes">Back to Fun Quizzes</Link>
+                     <Link href="/quizzes">Back to Quizzes</Link>
                  </Button>
              </div>
         );
@@ -382,7 +409,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
-                        <Card className="bg-card/80 backdrop-blur-sm">
+                        <Card className="bg-card/60 backdrop-blur-sm">
                              <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
                                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -438,8 +465,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         )}
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" size="icon">
-                                                    <ImageDown className="h-4 w-4" />
+                                                <Button variant="outline" size="icon" disabled={isCapturing}>
+                                                    {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
@@ -493,20 +520,30 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 const isSelected = selectedAnswer === option.text;
                                                 const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                 const isShown = selectedAnswer !== null;
+                                                const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
 
                                                 return (
                                                     <Label
                                                         key={index}
                                                         htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                         className={cn(
-                                                            "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
+                                                            "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
                                                             !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
                                                             isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
                                                             isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
                                                             !isShown && optionBgColors[index % optionBgColors.length],
+                                                            isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30"
                                                         )}
                                                     >
                                                         <div className="flex items-center gap-2">
+                                                            {(isCorrectForCapture || (isShown && isCorrectAnswer)) && (
+                                                                <div className={cn(
+                                                                    "absolute -top-3 -right-3 bg-green-500 rounded-full p-0.5 text-white z-10",
+                                                                    captureMode !== 'answer' && !isShown && "hidden"
+                                                                )}>
+                                                                    <Check className="w-3 h-3" />
+                                                                </div>
+                                                            )}
                                                             <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                             <span className="text-left font-bold text-lg">{option.text}</span>
                                                         </div>
@@ -531,3 +568,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     
 
 
+
+
+    
