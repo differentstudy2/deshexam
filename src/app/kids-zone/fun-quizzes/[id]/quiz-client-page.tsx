@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Copy } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -74,33 +74,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     const [isLoading, setIsLoading] = useState(true);
 
-    const handleCopy = (question?: Question) => {
-        if (!question) return;
-    
-        let textToCopy = `${question.text}\n`;
-        const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
-        
-        if (correctOptionIndex === -1) {
-            toast({ variant: 'destructive', title: 'Cannot copy', description: 'Correct answer not found in options.' });
-            return;
-        }
-    
-        const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
-    
-        question.options.forEach((opt, index) => {
-            const optionLetter = String.fromCharCode(65 + index);
-            textToCopy += `Option"${optionLetter}": "${opt.text}"\n`;
-        });
-    
-        textToCopy += `সঠিক উত্তর Option "${correctOptionLetter}": "${question.correctAnswer}"`;
-    
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            toast({ title: 'Quiz content copied to clipboard!' });
-        }).catch(err => {
-            toast({ variant: 'destructive', title: 'Failed to copy content.' });
-        });
-    };
-    
     const speakText = (text: string) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
           window.speechSynthesis.cancel(); // Stop any previous speech
@@ -116,6 +89,29 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     };
     
+    const speakFullQuestion = (question?: Question) => {
+        if (!question) return;
+
+        let textToSpeak = `${question.text}. `;
+        const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
+
+        if (correctOptionIndex === -1) {
+            speakText(question.text); // Fallback to just the question
+            return;
+        }
+
+        const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+
+        question.options.forEach((opt, index) => {
+            const optionLetter = String.fromCharCode(65 + index);
+            textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
+        });
+
+        textToSpeak += `Correct Answer Option ${correctOptionLetter}: ${question.correctAnswer}.`;
+        
+        speakText(textToSpeak);
+    };
+
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
             activeAudioRef.current.pause();
@@ -589,10 +585,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     )}
                                     
-                                    <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
+                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-between gap-2">
                                         <span>{currentQuestion?.text}</span>
                                         <div className="flex-shrink-0 flex items-center">
-                                            <Button variant="ghost" size="icon" onClick={() => speakText(currentQuestion.text)}>
+                                            <Button variant="ghost" size="icon" onClick={() => speakFullQuestion(currentQuestion)}>
                                                 <Volume2 />
                                             </Button>
                                             {currentQuestion?.audio && (
@@ -600,9 +596,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
                                                 </Button>
                                             )}
-                                            <Button variant="ghost" size="icon" onClick={() => handleCopy(currentQuestion)}>
-                                                <Copy className="w-5 h-5" />
-                                            </Button>
                                         </div>
                                     </CardTitle>
                                 </CardHeader>
