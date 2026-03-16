@@ -237,6 +237,24 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setIsSpeaking(false);
         }
     }, []);
+    
+    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
+        if (typeof window === 'undefined') return;
+
+        if (type !== 'win') {
+           stopSound();
+        }
+        
+        let soundUrl = '';
+        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+        
+        if(soundUrl) {
+            const audio = new Audio(soundUrl);
+            audio.play().catch(error => console.error(`Error playing sound:`, error));
+        }
+    }, [stopSound]);
 
     const nextQuestion = useCallback(() => {
         stopSound();
@@ -250,10 +268,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             }
         } else {
             setQuizFinished(true);
-            // playSystemSound('win');
+            playSystemSound('win');
         }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, stopSound]);
-
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
+    
     const handleAnswer = useCallback((answer: string) => {
         if (selectedAnswer) return;
 
@@ -266,15 +284,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setFeedback(t.correct);
             setIsCorrect(true);
             setScore(prev => prev + 1);
-            // playSystemSound('correct');
+            playSystemSound('correct');
         } else {
             setFeedback(t.incorrect);
-            // playSystemSound('incorrect');
+            playSystemSound('incorrect');
         }
 
         setTimeout(() => nextQuestion(), 1500);
-    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, stopSound, nextQuestion]);
-    
+    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, nextQuestion, stopSound]);
+
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
             handleAnswer(currentQuestion.correctAnswer);
@@ -284,7 +302,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
-        stopSound();
+        stopSound(); // Stop anything else first
 
         const audio = new Audio(url);
         activeAudioRef.current = audio;
@@ -342,8 +360,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         
         speakText(textToSpeak);
     }, [stopSound, speakText, t.correctAnswer]);
-
-     useEffect(() => {
+    
+    useEffect(() => {
         if (!autoplayEnabled || !currentQuestion || quizFinished || selectedAnswer) {
             return;
         }
@@ -418,7 +436,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 if (prev <= 1) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
                     stopSound();
-                    // playSystemSound('incorrect');
+                    playSystemSound('incorrect');
                     setFeedback(t.timesUp);
                     setTimeout(nextQuestion, 1500); 
                     return 0;
@@ -430,13 +448,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, stopSound, t.timesUp]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopSound, t.timesUp]);
     
     useEffect(() => {
         return () => {
             stopSound();
         }
     }, [stopSound]);
+
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
@@ -679,8 +698,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         {t.backToQuizzes}
                                     </Link>
                                 </Button>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </CardContent>
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
@@ -840,9 +859,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-    
-
-    
-
-
 
