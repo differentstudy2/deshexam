@@ -51,9 +51,6 @@ const serializeTimestamps = (data: any): any => {
 export default async function QuizzesPage() {
     const fetchedQuizzes = await getAllContent("Quiz");
     const initialQuizzes = serializeTimestamps(fetchedQuizzes);
-    
-    // Filter out the "Fun Quizzes" from the main quizzes page
-    const filteredQuizzes = (initialQuizzes as any[]).filter(quiz => quiz.category !== 'Fun Quizzes');
 
-    return <QuizzesClientPage initialQuizzes={filteredQuizzes as any[]} />;
+    return <QuizzesClientPage initialQuizzes={initialQuizzes as any[]} />;
 }
