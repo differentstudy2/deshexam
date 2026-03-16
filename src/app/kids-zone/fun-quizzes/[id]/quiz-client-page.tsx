@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Languages, Settings } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Languages, Settings, Copy } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -506,7 +506,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const correctOptionIndex = currentQuestion.options.findIndex(opt => opt.text === currentQuestion.correctAnswer);
         if (correctOptionIndex > -1) {
             const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
-            textToCopy += `${t.correctAnswer} Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"\n`;
+            textToCopy += `Correct Answer Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"\n`;
         }
 
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -696,6 +696,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
+                                        <Button variant="outline" size="icon" onClick={handleCopy}>
+                                            <Copy className="h-4 w-4" />
+                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>
@@ -713,11 +716,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <CardTitle className="text-left text-2xl md:text-3xl font-bold">
                                             <span>{currentQuestion?.text}</span>
                                         </CardTitle>
-                                        <div className="flex items-center gap-1 flex-shrink-0">
-                                            <Button variant="ghost" size="icon" onClick={handleCopy}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white/80 hover:text-white"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                                            </Button>
-                                        </div>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="p-6">
@@ -769,3 +767,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+    
+
+    
+
+
