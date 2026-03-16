@@ -80,19 +80,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         let textToCopy = `${question.text}\n`;
         const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
         
-        if (correctOptionIndex === -1 && question.type !== 'True/False' && question.type !== 'Short Answer' && question.type !== 'Fill in the Blank') {
+        if (correctOptionIndex === -1) {
             toast({ variant: 'destructive', title: 'Cannot copy', description: 'Correct answer not found in options.' });
             return;
         }
     
         const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
     
-        if(question.options) {
-            question.options.forEach((opt, index) => {
-                const optionLetter = String.fromCharCode(65 + index);
-                textToCopy += `Option"${optionLetter}": "${opt.text}"\n`;
-            });
-        }
+        question.options.forEach((opt, index) => {
+            const optionLetter = String.fromCharCode(65 + index);
+            textToCopy += `Option"${optionLetter}": "${opt.text}"\n`;
+        });
     
         textToCopy += `সঠিক উত্তর Option "${correctOptionLetter}": "${question.correctAnswer}"`;
     
@@ -103,6 +101,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         });
     };
     
+    const speakText = (text: string) => {
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          window.speechSynthesis.cancel(); // Stop any previous speech
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'en-US'; // This can be made dynamic later
+          window.speechSynthesis.speak(utterance);
+        } else {
+            toast({
+                variant: "destructive",
+                title: "TTS Not Supported",
+                description: "Your browser does not support text-to-speech.",
+            });
+        }
+    };
+    
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
             activeAudioRef.current.pause();
@@ -110,6 +123,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             activeAudioRef.current = null;
         }
         setPlayingUrl(null);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
     }, []);
 
     const playSound = useCallback((url: string) => {
@@ -582,14 +598,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     )}
                                     
                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
-                                        <span>{currentQuestion?.text}</span>
+                                        <span onClick={() => speakText(currentQuestion.text)} className="cursor-pointer">{currentQuestion?.text}</span>
                                         <div className="flex-shrink-0 flex items-center">
                                             {currentQuestion?.audio && (
                                                 <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
                                                     {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
                                                 </Button>
                                             )}
-                                             <Button variant="ghost" size="icon" onClick={() => handleCopy(currentQuestion)}>
+                                            <Button variant="ghost" size="icon" onClick={() => handleCopy(currentQuestion)}>
                                                 <Copy className="w-5 h-5" />
                                             </Button>
                                         </div>
@@ -641,13 +657,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         className={optionClass}
                                                         style={optionStyle}
                                                     >
-                                                         <div className="flex items-center gap-2 flex-grow">
+                                                         <div className="flex items-center gap-2">
                                                             <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                             <span className="text-left font-bold text-lg">{option.text}</span>
                                                         </div>
-                                                        <div className="flex items-center flex-shrink-0">
-                                                            <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
-                                                        </div>
+                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
                                                     </Label>
                                                 );
                                             })}
@@ -672,3 +686,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
