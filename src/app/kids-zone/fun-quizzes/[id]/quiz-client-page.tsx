@@ -224,6 +224,53 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+     const stopSound = useCallback(() => {
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause();
+            activeAudioRef.current.currentTime = 0;
+            activeAudioRef.current = null;
+        }
+        setPlayingUrl(null);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+        }
+    }, []);
+    
+    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
+        if (typeof window === 'undefined') return;
+
+        if (type !== 'win') {
+           stopSound();
+        }
+        
+        let soundUrl = '';
+        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+        
+        if(soundUrl) {
+            const audio = new Audio(soundUrl);
+            audio.play().catch(error => console.error(`Error playing sound:`, error));
+        }
+    }, [stopSound]);
+
+     const nextQuestion = useCallback(() => {
+        stopSound();
+        if (currentQuestionIndex < shuffledQuestions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+            setSelectedAnswer(null);
+            setFeedback('');
+            setIsCorrect(false);
+            if (timerDuration > 0) {
+                setTimeLeft(timerDuration);
+            }
+        } else {
+            setQuizFinished(true);
+            playSystemSound('win');
+        }
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
     
     const handleAnswer = useCallback((answer: string) => {
         if (selectedAnswer) return;
@@ -244,7 +291,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
 
         setTimeout(() => nextQuestion(), 1500);
-    }, [selectedAnswer, currentQuestion]);
+    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, stopSound, nextQuestion]);
 
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
@@ -252,53 +299,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
 
-    const stopSound = useCallback(() => {
-        if (activeAudioRef.current) {
-            activeAudioRef.current.pause();
-            activeAudioRef.current.currentTime = 0;
-            activeAudioRef.current = null;
-        }
-        setPlayingUrl(null);
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            setIsSpeaking(false);
-        }
-    }, []);
-
-    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
-        if (typeof window === 'undefined') return;
-
-        if (type !== 'win') {
-           stopSound();
-        }
-        
-        let soundUrl = '';
-        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
-        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
-        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
-        
-        if(soundUrl) {
-            const audio = new Audio(soundUrl);
-            audio.play().catch(error => console.error(`Error playing sound:`, error));
-        }
-    }, [stopSound]);
-
-    const nextQuestion = useCallback(() => {
-        stopSound();
-        if (currentQuestionIndex < shuffledQuestions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-            setSelectedAnswer(null);
-            setFeedback('');
-            setIsCorrect(false);
-            if (timerDuration > 0) {
-                setTimeLeft(timerDuration);
-            }
-        } else {
-            setQuizFinished(true);
-            playSystemSound('win');
-        }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
-    
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
@@ -343,14 +343,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [language, t.ttsNotSupported, toast, onAudioEnd, stopSound]);
 
-    const togglePlayUrl = useCallback((url: string) => {
-        if (playingUrl === url && activeAudioRef.current) {
-            stopSound();
-        } else {
-            playSound(url);
-        }
-    }, [playingUrl, playSound, stopSound]);
-
     const speakFullQuestion = useCallback((question?: Question) => {
         if (!question) return;
         stopSound();
@@ -368,6 +360,36 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         
         speakText(textToSpeak);
     }, [stopSound, speakText, t.correctAnswer]);
+    
+    useEffect(() => {
+        if (!autoplayEnabled || !currentQuestion || quizFinished || selectedAnswer) {
+            return;
+        }
+
+        const autoplayTimeout = setTimeout(() => {
+            if (currentQuestion.audio) {
+                playSound(currentQuestion.audio);
+            } 
+            else if (currentQuestion.text) {
+                speakFullQuestion(currentQuestion);
+            } else {
+                if (autoAnswerEnabled) {
+                   handleAnswer(currentQuestion.correctAnswer);
+                }
+            }
+        }, 500); 
+
+        return () => clearTimeout(autoplayTimeout);
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakFullQuestion, autoAnswerEnabled, handleAnswer]);
+
+
+    const togglePlayUrl = useCallback((url: string) => {
+        if (playingUrl === url && activeAudioRef.current) {
+            stopSound();
+        } else {
+            playSound(url);
+        }
+    }, [playingUrl, playSound, stopSound]);
     
     const toggleSpeak = useCallback(() => {
         if (isSpeaking) {
@@ -388,7 +410,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setQuizFinished(false);
         setTimeLeft(timerDuration);
     };
-
+    
     const handleTimerChange = (value: string) => {
         const newDuration = parseInt(value, 10);
         setTimerDuration(newDuration);
@@ -401,27 +423,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
         setIsLoading(false);
     }, [quiz]);
-
-    useEffect(() => {
-        if (!autoplayEnabled || !currentQuestion || quizFinished || selectedAnswer) {
-            return;
-        }
-
-        const autoplayTimeout = setTimeout(() => {
-            if (currentQuestion.audio) {
-                playSound(currentQuestion.audio);
-            } 
-            else if (currentQuestion.text) {
-                speakText(currentQuestion.text);
-            } else {
-                if (autoAnswerEnabled) {
-                   handleAnswer(currentQuestion.correctAnswer);
-                }
-            }
-        }, 500); 
-
-        return () => clearTimeout(autoplayTimeout);
-    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakText, autoAnswerEnabled, handleAnswer]);
 
 
     useEffect(() => {
@@ -710,6 +711,33 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
                                     </div>
                                     <div className="flex items-center gap-4 flex-wrap justify-end">
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                            <Button variant="outline" size="icon" onClick={toggleSpeak}>
+                                                {isSpeaking ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                                            </Button>
+                                            {currentQuestion?.audio && (
+                                                <Button variant="outline" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                    {playingUrl === currentQuestion.audio ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                                                </Button>
+                                            )}
+                                            <Button variant="outline" size="icon" onClick={handleCopy}>
+                                                <Copy className="h-4 w-4" />
+                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="outline" size="icon" disabled={isCapturing}>
+                                                        {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
+                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
@@ -757,34 +785,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </DialogContent>
                                         </Dialog>
 
-                                        <div className="flex items-center gap-1 flex-shrink-0">
-                                            <Button variant="outline" size="icon" onClick={toggleSpeak}>
-                                                {isSpeaking ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                                            </Button>
-                                            {currentQuestion?.audio && (
-                                                <Button variant="outline" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
-                                                    {playingUrl === currentQuestion.audio ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                                                </Button>
-                                            )}
-                                            <Button variant="outline" size="icon" onClick={handleCopy}>
-                                                <Copy className="h-4 w-4" />
-                                            </Button>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="outline" size="icon" disabled={isCapturing}>
-                                                        {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
-                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-
                                         {timerDuration > 0 && (
                                             <div className="flex items-center gap-2 text-muted-foreground font-semibold">
                                                 <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
@@ -798,7 +798,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                              <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
                                 <CardHeader className="relative bg-[#0e8107] text-white p-6">
                                     {currentQuestion && currentQuestion.image && (
-                                        <div className="relative h-48 w-full my-4">
+                                        <div className="relative h-48 w-full mt-4">
                                             <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
                                         </div>
                                     )}
@@ -858,4 +858,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
