@@ -131,6 +131,51 @@ const optionBgColors = [
     'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
 ];
 
+const TimerCircle = ({ timeLeft, totalDuration, className, size = 36, strokeWidth = 3 }: { timeLeft: number; totalDuration: number, className?: string; size?: number; strokeWidth?: number; }) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = 2 * Math.PI * radius;
+    
+    const progress = totalDuration > 0 ? (timeLeft / totalDuration) * 100 : 0;
+    const offset = circumference - (progress / 100) * circumference;
+
+    const colorClass = progress <= 25 ? 'text-destructive' : progress <= 50 ? 'text-yellow-500' : 'text-primary';
+
+    return (
+        <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>
+            <svg className="absolute top-0 left-0" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                <circle
+                    className="text-gray-200 dark:text-gray-700"
+                    stroke="currentColor"
+                    strokeWidth={strokeWidth}
+                    fill="transparent"
+                    r={radius}
+                    cx={size / 2}
+                    cy={size / 2}
+                />
+                <circle
+                    className={cn("transition-all duration-1000 linear -rotate-90 origin-center", colorClass)}
+                    stroke="currentColor"
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={circumference}
+                    strokeDashoffset={offset}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    r={radius}
+                    cx={size / 2}
+                    cy={size / 2}
+                />
+            </svg>
+            <span className={cn("font-mono font-semibold", colorClass, {
+                'text-sm': size >= 36,
+                'text-xs': size < 36,
+            })}>
+                {timeLeft}
+            </span>
+        </div>
+    );
+};
+
+
 export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -291,17 +336,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
-             const autoplayTimeout = setTimeout(() => {
-                if (currentQuestion.audio) {
-                    playSound(currentQuestion.audio);
-                } else {
-                    speakFullQuestion(currentQuestion);
-                }
+        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
+            const autoplayTimeout = setTimeout(() => {
+                playSound(currentQuestion.audio!);
             }, 500); 
             return () => clearTimeout(autoplayTimeout);
         }
-    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakFullQuestion]);
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
 
 
     useEffect(() => {
@@ -566,8 +607,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         );
     }
     
-    const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
-    
     return (
         <div className="relative min-h-screen">
             <div
@@ -618,8 +657,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <span>/</span>
                                         <span>{shuffledQuestions.length}</span>
                                     </div>
-                                    <Progress value={progress} className="w-full max-w-xs h-2 flex-grow mx-4" />
+                                    <div className="flex-grow" />
                                     <div className="flex items-center gap-2">
+                                        {timerDuration > 0 && timeLeft !== null && (
+                                            <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
+                                        )}
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
@@ -631,9 +673,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </DialogHeader>
                                                 <div className="grid gap-4 py-4">
                                                     <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="language" className="flex items-center gap-2"><Languages className="w-5 h-5"/> Language</Label>
+                                                        <Label htmlFor="language" className="flex items-center gap-2 col-span-2"><Languages className="w-5 h-5"/> Language</Label>
                                                         <Select value={language} onValueChange={handleLanguageChange}>
-                                                            <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                                                            <SelectTrigger className="col-span-2 h-9"><SelectValue /></SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectItem value="en">English</SelectItem>
                                                                 <SelectItem value="hi">हिन्दी</SelectItem>
@@ -642,13 +684,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </Select>
                                                     </div>
                                                     <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="autoplay" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> Autoplay</Label>
+                                                        <Label htmlFor="autoplay" className="flex items-center gap-2 col-span-2"><Volume2 className="w-5 h-5"/> Autoplay</Label>
                                                         <Switch id="autoplay" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopAllAudio(); } }} />
                                                     </div>
                                                     <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="timer" className="flex items-center gap-2"><Clock className="w-5 h-5"/> Timer</Label>
+                                                        <Label htmlFor="timer" className="flex items-center gap-2 col-span-2"><Clock className="w-5 h-5"/> Timer</Label>
                                                         <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                            <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                                                            <SelectTrigger id="timer" className="col-span-2 h-9"><SelectValue /></SelectTrigger>
                                                             <SelectContent>
                                                                 <SelectItem value="15">15 seconds</SelectItem>
                                                                 <SelectItem value="30">30 seconds</SelectItem>
@@ -668,6 +710,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 {playingUrl === currentQuestion.audio ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                                             </Button>
                                         )}
+                                        <Button variant="outline" size="icon" onClick={handleCopy}>
+                                            <Copy className="h-4 w-4" />
+                                        </Button>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                  <Button variant="outline" size="icon" disabled={isCapturing}>
@@ -696,9 +741,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
-                                        <Button variant="outline" size="icon" onClick={handleCopy}>
-                                            <Copy className="h-4 w-4" />
-                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>
@@ -732,7 +774,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                         className={cn(
                                                             "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
-                                                            !isShown && captureMode === 'idle' && "cursor-pointer hover:scale-105 hover:border-primary",
+                                                            !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
                                                             isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
                                                             isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
                                                             !isShown && optionBgColors[index % optionBgColors.length],
@@ -767,8 +809,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-    
-
-    
-
 
