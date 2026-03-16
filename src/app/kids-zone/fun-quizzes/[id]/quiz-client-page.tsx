@@ -64,6 +64,7 @@ const translations = {
         seconds: "seconds",
         off: "Off",
         autoplayAudio: "Autoplay Audio",
+        autoAnswer: "Auto Answer",
         saveAsDefault: "Save as Default",
         saveForLandscape: "Save for Landscape Video (16:9)",
         saveForShorts: "Save for Short Video (9:16)",
@@ -89,6 +90,7 @@ const translations = {
         seconds: "सेकंड",
         off: "बंद",
         autoplayAudio: "ऑडियो ऑटोप्ले करें",
+        autoAnswer: "ऑटो उत्तर",
         saveAsDefault: "डिफ़ॉल्ट के रूप में सहेजें",
         saveForLandscape: "लैंडस्केप वीडियो (16:9) के लिए सहेजें",
         saveForShorts: "शॉर्ट वीडियो (9:16) के लिए सहेजें",
@@ -114,6 +116,7 @@ const translations = {
         seconds: "সেকেন্ড",
         off: "বন্ধ",
         autoplayAudio: "প্রশ্ন অডিও অটো-প্লে করুন",
+        autoAnswer: "স্বয়ংক্রিয় উত্তর",
         saveAsDefault: "ডিফল্ট হিসেবে সেভ করুন",
         saveForLandscape: "ল্যান্ডস্কেপ ভিডিও (১৬:৯) এর জন্য সেভ করুন",
         saveForShorts: "শর্ট ভিডিও (৯:১৬) এর জন্য সেভ করুন",
@@ -206,6 +209,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
+    const [autoAnswerEnabled, setAutoAnswerEnabled] = useState(false);
     
     const [playingUrl, setPlayingUrl] = useState<string | null>(null);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -219,7 +223,35 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const t = translations[language];
 
-    const stopAllAudio = useCallback(() => {
+    const handleAnswer = useCallback((answer: string) => {
+        if (selectedAnswer) return;
+
+        stopSound();
+
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+
+        setSelectedAnswer(answer);
+        if (answer === currentQuestion.correctAnswer) {
+            setFeedback(t.correct);
+            setIsCorrect(true);
+            setScore(prev => prev + 1);
+            playSystemSound('correct');
+        } else {
+            setFeedback(t.incorrect);
+            playSystemSound('incorrect');
+        }
+
+        setTimeout(() => nextQuestion(), 1500);
+    }, [selectedAnswer]);
+    
+    const onAudioEnd = useCallback(() => {
+        if (autoAnswerEnabled && currentQuestion) {
+            handleAnswer(currentQuestion.correctAnswer);
+        }
+    }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
+
+
+    const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
             activeAudioRef.current.pause();
             activeAudioRef.current.currentTime = 0;
@@ -234,11 +266,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     
     const speakText = useCallback((text: string) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
+            stopSound();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-BD';
             utterance.onstart = () => setIsSpeaking(true);
-            utterance.onend = () => setIsSpeaking(false);
+            utterance.onend = () => {
+                setIsSpeaking(false);
+                onAudioEnd();
+            };
             utterance.onerror = () => setIsSpeaking(false);
             window.speechSynthesis.speak(utterance);
         } else {
@@ -248,30 +283,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 description: t.ttsNotSupported,
             });
         }
-    }, [language, t.ttsNotSupported, toast]);
-
-    const speakFullQuestion = useCallback((question?: Question) => {
-        if (!question) return;
-        stopAllAudio();
-        
-        let textToSpeak = `${question.text}. `;
-        const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
-        const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
-
-        question.options.forEach((opt, index) => {
-            const optionLetter = String.fromCharCode(65 + index);
-            textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
-        });
-
-        textToSpeak += `${t.correctAnswer} Option ${correctOptionLetter}: ${question.correctAnswer}.`;
-        
-        speakText(textToSpeak);
-    }, [stopAllAudio, speakText, t.correctAnswer]);
-
+    }, [language, t.ttsNotSupported, toast, onAudioEnd, stopSound]);
+    
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
-        stopAllAudio(); // Stop anything else first
+        stopSound(); // Stop anything else first
 
         const audio = new Audio(url);
         activeAudioRef.current = audio;
@@ -287,22 +304,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 setPlayingUrl(null);
                 activeAudioRef.current = null;
             }
+            onAudioEnd();
         };
-    }, [stopAllAudio]);
+    }, [stopSound, onAudioEnd]);
 
     const togglePlayUrl = useCallback((url: string) => {
         if (playingUrl === url && activeAudioRef.current) {
-            stopAllAudio();
+            stopSound();
         } else {
             playSound(url);
         }
-    }, [playingUrl, playSound, stopAllAudio]);
+    }, [playingUrl, playSound, stopSound]);
 
     const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
         if (typeof window === 'undefined') return;
 
         if (type !== 'win') {
-           stopAllAudio();
+           stopSound();
         }
         
         let soundUrl = '';
@@ -314,21 +332,37 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             const audio = new Audio(soundUrl);
             audio.play().catch(error => console.error(`Error playing sound:`, error));
         }
-    }, [stopAllAudio]);
+    }, [stopSound]);
+
+    const speakFullQuestion = useCallback((question?: Question) => {
+        if (!question) return;
+        stopSound();
+        
+        let textToSpeak = `${question.text}. `;
+        const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
+        const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+
+        question.options.forEach((opt, index) => {
+            const optionLetter = String.fromCharCode(65 + index);
+            textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
+        });
+
+        textToSpeak += `${t.correctAnswer} Option ${correctOptionLetter}: ${question.correctAnswer}.`;
+        
+        speakText(textToSpeak);
+    }, [stopSound, speakText, t.correctAnswer]);
     
     const toggleSpeak = useCallback(() => {
         if (isSpeaking) {
-            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
+            stopSound();
         } else {
             speakFullQuestion(shuffledQuestions[currentQuestionIndex]);
         }
-    }, [isSpeaking, speakFullQuestion, currentQuestionIndex, shuffledQuestions]);
+    }, [isSpeaking, speakFullQuestion, currentQuestionIndex, shuffledQuestions, stopSound]);
 
 
     const nextQuestion = useCallback(() => {
-        stopAllAudio();
+        stopSound();
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedAnswer(null);
@@ -341,7 +375,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setQuizFinished(true);
             playSystemSound('win');
         }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopAllAudio]);
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
     
     useEffect(() => {
         if(quiz && quiz.questions) {
@@ -365,11 +399,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             // Fallback to text-to-speech
             else if (currentQuestion.text) {
                 speakText(currentQuestion.text);
+            } else {
+                // If there's no audio or text to play, but auto-answer is on, we should trigger it.
+                if (autoAnswerEnabled) {
+                   handleAnswer(currentQuestion.correctAnswer);
+                }
             }
         }, 500); // 500ms delay for smoother transition
 
         return () => clearTimeout(autoplayTimeout);
-    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakText]);
+    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakText, autoAnswerEnabled, handleAnswer]);
 
 
     useEffect(() => {
@@ -382,7 +421,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setTimeLeft(prev => {
                 if (prev <= 1) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-                    stopAllAudio();
+                    stopSound();
                     playSystemSound('incorrect');
                     setFeedback(t.timesUp);
                     setTimeout(nextQuestion, 1500); 
@@ -395,37 +434,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopAllAudio, t.timesUp]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopSound, t.timesUp]);
     
     useEffect(() => {
         return () => {
-            stopAllAudio();
+            stopSound();
         }
-    }, [stopAllAudio]);
-
-    const handleAnswer = (answer: string) => {
-        if (selectedAnswer) return;
-
-        stopAllAudio();
-
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-
-        setSelectedAnswer(answer);
-        if (answer === currentQuestion.correctAnswer) {
-            setFeedback(t.correct);
-            setIsCorrect(true);
-            setScore(prev => prev + 1);
-            playSystemSound('correct');
-        } else {
-            setFeedback(t.incorrect);
-            playSystemSound('incorrect');
-        }
-
-        setTimeout(nextQuestion, 1500);
-    };
+    }, [stopSound]);
 
     const restartQuiz = () => {
-        stopAllAudio();
+        stopSound();
         setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         setCurrentQuestionIndex(0);
         setSelectedAnswer(null);
@@ -567,14 +585,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const handleCopy = () => {
         if (!currentQuestion) return;
 
-        let textToCopy = `${currentQuestion.text}\n`;
+        let textToCopy = `${t.question}: ${currentQuestion.text}\n`;
         currentQuestion.options.forEach((opt, i) => {
             textToCopy += `Option "${String.fromCharCode(65 + i)}": "${opt.text}"\n`;
         });
         const correctOptionIndex = currentQuestion.options.findIndex(opt => opt.text === currentQuestion.correctAnswer);
         if (correctOptionIndex > -1) {
             const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
-            textToCopy += `Correct Answer Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"\n`;
+            textToCopy += `${t.correctAnswer} Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"`;
         }
 
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -668,7 +686,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             <CardDescription className="text-lg">{t.amazingJob}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
+                            <p className="text-5xl font-bold">{displayNum(score)} <span className="text-3xl text-muted-foreground">/ {displayNum(shuffledQuestions.length)}</span></p>
                             <p className="text-xl mt-2 font-semibold">{t.yourScore}</p>
                             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button onClick={restartQuiz} size="lg">
@@ -695,7 +713,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
                                     </div>
                                     <div className="flex items-center gap-4 flex-wrap justify-end">
-                                        
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
@@ -731,9 +748,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
-                                                    <div className="flex items-center justify-between">
+                                                     <div className="flex items-center justify-between">
                                                         <Label htmlFor="autoplay-switch" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> {t.autoplayAudio}</Label>
-                                                        <Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopAllAudio(); } }} />
+                                                        <Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopSound(); } }} />
+                                                    </div>
+                                                    <div className="flex items-center justify-between">
+                                                        <Label htmlFor="auto-answer-switch" className="flex items-center gap-2"><Sparkles className="w-5 h-5"/> {t.autoAnswer}</Label>
+                                                        <Switch id="auto-answer-switch" checked={autoAnswerEnabled} onCheckedChange={setAutoAnswerEnabled} />
                                                     </div>
                                                 </div>
                                             </DialogContent>
@@ -840,4 +861,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-    
+
