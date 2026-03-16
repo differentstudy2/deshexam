@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Languages } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -44,6 +44,78 @@ type Quiz = {
     questions: Question[];
 };
 
+const translations = {
+    en: {
+        backToQuizzes: "Back to Fun Quizzes",
+        quizComplete: "Quiz Complete!",
+        amazingJob: "You did an amazing job!",
+        yourScore: "Your Score",
+        playAgain: "Play Again",
+        question: "Question",
+        timer: "Timer",
+        autoplayAudio: "Autoplay Question Audio",
+        saveAsDefault: "Save as Default",
+        saveForLandscape: "Save for Landscape Video (16:9)",
+        saveForShorts: "Save for Short Video (9:16)",
+        saveForInstagram: "Save for Instagram (1:1)",
+        saveForFacebook: "Save for Facebook Post (4:5)",
+        correct: "Correct!",
+        incorrect: "Not quite!",
+        correctAnswer: "Correct answer:",
+        timesUp: "Time's up!",
+        ttsNotSupported: "Your browser does not support text-to-speech.",
+        copied: "Copied to clipboard!",
+        copyFailed: "Failed to copy text.",
+        copyQuestion: "Copy Question"
+    },
+    hi: {
+        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएँ",
+        quizComplete: "क्विज़ पूरा हुआ!",
+        amazingJob: "आपने अद्भुत काम किया!",
+        yourScore: "आपका स्कोर",
+        playAgain: "फिर से खेलें",
+        question: "प्रश्न",
+        timer: "टाइमर",
+        autoplayAudio: "प्रश्न ऑडियो ऑटोप्ले करें",
+        saveAsDefault: "डिफ़ॉल्ट के रूप में सहेजें",
+        saveForLandscape: "लैंडस्केप वीडियो (16:9) के लिए सहेजें",
+        saveForShorts: "शॉर्ट वीडियो (9:16) के लिए सहेजें",
+        saveForInstagram: "इंस्टाग्राम (1:1) के लिए सहेजें",
+        saveForFacebook: "फेसबुक पोस्ट (4:5) के लिए सहेजें",
+        correct: "सही!",
+        incorrect: "सही नहीं!",
+        correctAnswer: "सही जवाब:",
+        timesUp: "समय समाप्त!",
+        ttsNotSupported: "आपका ब्राउज़र टेक्स्ट-टू-स्पीच का समर्थन नहीं करता है।",
+        copied: "क्लिपबोर्ड पर कॉपी किया गया!",
+        copyFailed: "टेक्स्ट कॉपी करने में विफल।",
+        copyQuestion: "प्रश्न कॉपी करें"
+    },
+    bn: {
+        backToQuizzes: "মজার কুইজে ফিরে যান",
+        quizComplete: "কুইজ সম্পন্ন!",
+        amazingJob: "আপনি একটি আশ্চর্যজনক কাজ করেছেন!",
+        yourScore: "আপনার স্কোর",
+        playAgain: "আবার খেলুন",
+        question: "প্রশ্ন",
+        timer: "টাইমার",
+        autoplayAudio: "প্রশ্ন অডিও অটো-প্লে করুন",
+        saveAsDefault: "ডিফল্ট হিসেবে সেভ করুন",
+        saveForLandscape: "ল্যান্ডস্কেপ ভিডিও (১৬:৯) এর জন্য সেভ করুন",
+        saveForShorts: "শর্ট ভিডিও (৯:১৬) এর জন্য সেভ করুন",
+        saveForInstagram: "ইন্সটাগ্রাম (১:১) এর জন্য সেভ করুন",
+        saveForFacebook: "ফেসবুক পোস্ট (৪:৫) এর জন্য সেভ করুন",
+        correct: "সঠিক!",
+        incorrect: "সঠিক নয়!",
+        correctAnswer: "সঠিক উত্তর:",
+        timesUp: "সময় শেষ!",
+        ttsNotSupported: "আপনার ব্রাউজার টেক্সট-টু-স্পিচ সমর্থন করে না।",
+        copied: "ক্লিপবোর্ডে কপি করা হয়েছে!",
+        copyFailed: "টেক্সট কপি করতে ব্যর্থ।",
+        copyQuestion: "প্রশ্ন কপি করুন"
+    }
+};
+
 const optionBgColors = [
     'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
     'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
@@ -73,24 +145,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     const [isLoading, setIsLoading] = useState(true);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('bn');
 
-    const speakText = (text: string) => {
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'bn-BD';
-            utterance.onstart = () => setIsSpeaking(true);
-            utterance.onend = () => setIsSpeaking(false);
-            utterance.onerror = () => setIsSpeaking(false);
-            window.speechSynthesis.speak(utterance);
-        } else {
-            toast({
-                variant: "destructive",
-                title: "TTS Not Supported",
-                description: "Your browser does not support text-to-speech.",
-            });
-        }
-    };
+    const t = translations[language];
 
     const stopAllAudio = useCallback(() => {
         if (activeAudioRef.current) {
@@ -104,6 +161,24 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setIsSpeaking(false);
         }
     }, []);
+    
+    const speakText = useCallback((text: string) => {
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = language === 'en' ? 'en-US' : language === 'hi' ? 'hi-IN' : 'bn-BD';
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = () => setIsSpeaking(false);
+            window.speechSynthesis.speak(utterance);
+        } else {
+            toast({
+                variant: "destructive",
+                title: "TTS Not Supported",
+                description: t.ttsNotSupported,
+            });
+        }
+    }, [language, t.ttsNotSupported, toast]);
 
     const speakFullQuestion = useCallback((question?: Question) => {
         if (!question) return;
@@ -118,10 +193,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
         });
 
-        textToSpeak += `Correct Answer Option ${correctOptionLetter}: ${question.correctAnswer}.`;
+        textToSpeak += `${t.correctAnswer} Option ${correctOptionLetter}: ${question.correctAnswer}.`;
         
         speakText(textToSpeak);
-    }, [stopAllAudio]);
+    }, [stopAllAudio, speakText, t.correctAnswer]);
 
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
@@ -134,7 +209,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         audio.play().catch(error => {
             console.error(`Error playing sound:`, error);
-            setPlayingUrl(null);
+            setPlayingUrl(null); // Reset state on error
         });
 
         audio.onended = () => {
@@ -208,7 +283,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion && !quizFinished && !selectedAnswer) {
+        if (autoplayEnabled && currentQuestion && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
              const autoplayTimeout = setTimeout(() => {
                 if (currentQuestion.audio) {
                     playSound(currentQuestion.audio);
@@ -233,7 +308,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
                     stopAllAudio();
                     playSystemSound('incorrect');
-                    setFeedback("Time's up!");
+                    setFeedback(t.timesUp);
                     setTimeout(nextQuestion, 1500); 
                     return 0;
                 }
@@ -244,7 +319,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopAllAudio]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopAllAudio, t.timesUp]);
     
     useEffect(() => {
         return () => {
@@ -261,12 +336,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         setSelectedAnswer(answer);
         if (answer === currentQuestion.correctAnswer) {
-            setFeedback('Correct!');
+            setFeedback(t.correct);
             setIsCorrect(true);
             setScore(prev => prev + 1);
             playSystemSound('correct');
         } else {
-            setFeedback('Not quite!');
+            setFeedback(t.incorrect);
             playSystemSound('incorrect');
         }
 
@@ -427,10 +502,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
 
         navigator.clipboard.writeText(textToCopy).then(() => {
-            toast({ title: 'Copied to clipboard!' });
+            toast({ title: t.copied });
         }).catch(err => {
-            toast({ variant: 'destructive', title: 'Failed to copy', description: 'Could not copy text to clipboard.' });
+            toast({ variant: 'destructive', title: t.copyFailed, description: 'Could not copy text to clipboard.' });
         });
+    };
+    
+    const handleLanguageChange = (lang: 'en' | 'hi' | 'bn') => {
+        setLanguage(lang);
     };
 
     if (isLoading) {
@@ -500,21 +579,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         <Confetti active={quizFinished} />
                         <CardHeader>
                             <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
-                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
-                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
+                            <CardTitle className="text-4xl font-bold font-headline mt-4">{t.quizComplete}</CardTitle>
+                            <CardDescription className="text-lg">{t.amazingJob}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <p className="text-5xl font-bold">{score} <span className="text-3xl text-muted-foreground">/ {shuffledQuestions.length}</span></p>
-                            <p className="text-xl mt-2 font-semibold">Your Score</p>
+                            <p className="text-xl mt-2 font-semibold">{t.yourScore}</p>
                             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button onClick={restartQuiz} size="lg">
                                     <RefreshCw className="mr-2 h-4 w-4" />
-                                    Play Again
+                                    {t.playAgain}
                                 </Button>
                                 <Button asChild variant="outline" size="lg">
                                     <Link href="/kids-zone/fun-quizzes">
                                         <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Back to Fun Quizzes
+                                        {t.backToQuizzes}
                                     </Link>
                                 </Button>
                             </div>
@@ -533,6 +612,19 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </div>
                                     <div className="flex items-center gap-4 flex-wrap justify-end">
                                         <div className="flex items-center gap-2">
+                                            <Languages className="w-5 h-5 text-slate-600"/>
+                                            <Select value={language} onValueChange={handleLanguageChange}>
+                                                <SelectTrigger className="w-[120px] h-9">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="en">English</SelectItem>
+                                                    <SelectItem value="hi">हिन्दी</SelectItem>
+                                                    <SelectItem value="bn">বাংলা</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="flex items-center gap-2">
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
@@ -541,7 +633,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </Label>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        <p>Autoplay Question Audio</p>
+                                                        <p>{t.autoplayAudio}</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -557,7 +649,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             />
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <Label htmlFor="timer-select" className="text-sm font-medium">Timer</Label>
+                                            <Label htmlFor="timer-select" className="text-sm font-medium">{t.timer}</Label>
                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
                                                 <SelectTrigger id="timer-select" className="w-[100px] h-9">
                                                     <SelectValue />
@@ -566,7 +658,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     <SelectItem value="15">15s</SelectItem>
                                                     <SelectItem value="30">30s</SelectItem>
                                                     <SelectItem value="60">60s</SelectItem>
-                                                    <SelectItem value="0">Off</SelectItem>
+                                                    <SelectItem value="0">{t.off}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -583,25 +675,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                  </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>
-                                                    Save as Default
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}>
-                                                    <Video className="mr-2 h-4 w-4" />
-                                                    Save for Landscape Video (16:9)
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}>
-                                                    <Video className="mr-2 h-4 w-4 rotate-90" />
-                                                    Save for Short Video (9:16)
-                                                </DropdownMenuItem>
-                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
-                                                    Save for Instagram (1:1)
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>
-                                                    Save for Facebook Post (4:5)
-                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
+                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
@@ -619,6 +697,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     
                                      <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
                                         <span>{currentQuestion?.text}</span>
+                                        <Button variant="ghost" size="icon" onClick={handleCopy}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white/80 hover:text-white"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                        </Button>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
@@ -691,7 +772,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             {feedback}
                                             {!isCorrect && selectedAnswer && (
                                                 <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                    <span>Correct answer: {currentQuestion.correctAnswer}</span>
+                                                    <span>{t.correctAnswer} {currentQuestion.correctAnswer}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -705,4 +786,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
