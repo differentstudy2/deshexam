@@ -74,12 +74,32 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     const [isLoading, setIsLoading] = useState(true);
 
-    const handleCopy = (text: string) => {
-        if (!text) return;
-        navigator.clipboard.writeText(text).then(() => {
-            toast({ title: 'Copied to clipboard!' });
+    const handleCopy = (question?: Question) => {
+        if (!question) return;
+    
+        let textToCopy = `${question.text}\n`;
+        const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
+        
+        if (correctOptionIndex === -1 && question.type !== 'True/False' && question.type !== 'Short Answer' && question.type !== 'Fill in the Blank') {
+            toast({ variant: 'destructive', title: 'Cannot copy', description: 'Correct answer not found in options.' });
+            return;
+        }
+    
+        const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+    
+        if(question.options) {
+            question.options.forEach((opt, index) => {
+                const optionLetter = String.fromCharCode(65 + index);
+                textToCopy += `Option"${optionLetter}": "${opt.text}"\n`;
+            });
+        }
+    
+        textToCopy += `সঠিক উত্তর Option "${correctOptionLetter}": "${question.correctAnswer}"`;
+    
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            toast({ title: 'Quiz content copied to clipboard!' });
         }).catch(err => {
-            toast({ variant: 'destructive', title: 'Failed to copy' });
+            toast({ variant: 'destructive', title: 'Failed to copy content.' });
         });
     };
     
@@ -419,7 +439,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return (
              <div className="flex items-center justify-center min-h-[400px]">
                 <Loader2 className="w-12 h-12 animate-spin text-primary" />
-                <p className="ml-4 text-lg">Starting Quiz...</p>
              </div>
         );
     }
@@ -570,7 +589,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
                                                 </Button>
                                             )}
-                                             <Button variant="ghost" size="icon" onClick={() => handleCopy(currentQuestion.text)}>
+                                             <Button variant="ghost" size="icon" onClick={() => handleCopy(currentQuestion)}>
                                                 <Copy className="w-5 h-5" />
                                             </Button>
                                         </div>
@@ -627,18 +646,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             <span className="text-left font-bold text-lg">{option.text}</span>
                                                         </div>
                                                         <div className="flex items-center flex-shrink-0">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="h-8 w-8 mr-1"
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                    handleCopy(option.text);
-                                                                }}
-                                                            >
-                                                                <Copy className="w-4 h-4" />
-                                                            </Button>
                                                             <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
                                                         </div>
                                                     </Label>
@@ -652,9 +659,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             {!isCorrect && selectedAnswer && (
                                                 <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
                                                     <span>Correct answer: {currentQuestion.correctAnswer}</span>
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6 ml-1" onClick={() => handleCopy(currentQuestion.correctAnswer)}>
-                                                        <Copy className="w-4 h-4" />
-                                                    </Button>
                                                 </div>
                                             )}
                                         </div>
@@ -668,4 +672,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
