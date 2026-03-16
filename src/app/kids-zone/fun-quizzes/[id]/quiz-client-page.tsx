@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -224,6 +224,33 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
+    
+    const handleAnswer = useCallback((answer: string) => {
+        if (selectedAnswer) return;
+
+        stopSound();
+
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+
+        setSelectedAnswer(answer);
+        if (answer === currentQuestion.correctAnswer) {
+            setFeedback(t.correct);
+            setIsCorrect(true);
+            setScore(prev => prev + 1);
+            playSystemSound('correct');
+        } else {
+            setFeedback(t.incorrect);
+            playSystemSound('incorrect');
+        }
+
+        setTimeout(() => nextQuestion(), 1500);
+    }, [selectedAnswer, currentQuestion]);
+
+    const onAudioEnd = useCallback(() => {
+        if (autoAnswerEnabled && currentQuestion) {
+            handleAnswer(currentQuestion.correctAnswer);
+        }
+    }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
 
     const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
@@ -271,34 +298,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             playSystemSound('win');
         }
     }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
-
-    const handleAnswer = useCallback((answer: string) => {
-        if (selectedAnswer) return;
-
-        stopSound();
-
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-
-        setSelectedAnswer(answer);
-        if (answer === currentQuestion.correctAnswer) {
-            setFeedback(t.correct);
-            setIsCorrect(true);
-            setScore(prev => prev + 1);
-            playSystemSound('correct');
-        } else {
-            setFeedback(t.incorrect);
-            playSystemSound('incorrect');
-        }
-
-        setTimeout(() => nextQuestion(), 1500);
-    }, [selectedAnswer, stopSound, currentQuestion, nextQuestion, playSystemSound, t]);
-
-    const onAudioEnd = useCallback(() => {
-        if (autoAnswerEnabled && currentQuestion) {
-            handleAnswer(currentQuestion.correctAnswer);
-        }
-    }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
-
+    
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
@@ -310,7 +310,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         audio.play().catch(error => {
             console.error(`Error playing sound:`, error);
-            setPlayingUrl(null);
+            setPlayingUrl(null); // Reset state on error
         });
 
         audio.onended = () => {
@@ -454,31 +454,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             stopSound();
         }
     }, [stopSound]);
-    
-    useEffect(() => {
-        if(feedback.type === 'correct') {
-            setIsCorrect(true);
-            const timer = setTimeout(() => {
-                nextQuestion();
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-        if (feedback.type === 'incorrect') {
-            const timer = setTimeout(() => {
-                if (gameMode !== 'multipleChoice' && gameMode !== 'voice') {
-                    setUserAnswer('');
-                }
-                if (gameMode === 'multipleChoice' || gameMode === 'voice') {
-                    handleNewProblem(true);
-                } else {
-                    resetTranscript();
-                    setFeedback({message: '', type: 'none'});
-                    setIsSubmitting(false); 
-                }
-            }, 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [feedback.type]);
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
@@ -883,3 +858,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
