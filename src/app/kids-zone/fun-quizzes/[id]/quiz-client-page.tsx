@@ -353,13 +353,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
-            const autoplayTimeout = setTimeout(() => {
-                playSound(currentQuestion.audio!);
-            }, 500); 
-            return () => clearTimeout(autoplayTimeout);
+        if (!autoplayEnabled || !currentQuestion || quizFinished || selectedAnswer) {
+            return;
         }
-    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
+
+        const autoplayTimeout = setTimeout(() => {
+            // Priority to pre-recorded audio
+            if (currentQuestion.audio) {
+                playSound(currentQuestion.audio);
+            } 
+            // Fallback to text-to-speech
+            else if (currentQuestion.text) {
+                speakText(currentQuestion.text);
+            }
+        }, 500); // 500ms delay for smoother transition
+
+        return () => clearTimeout(autoplayTimeout);
+    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakText]);
 
 
     useEffect(() => {
@@ -684,15 +694,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <span>/</span>
                                         <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
                                     </div>
-                                    <div className="flex-grow max-w-lg">
-                                        <Progress value={progress} className="w-full h-2"/>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        {timerDuration > 0 && (
-                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                                <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
-                                            </div>
-                                        )}
+                                    <div className="flex items-center gap-4 flex-wrap justify-end">
+                                        
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
@@ -735,6 +738,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
+
                                         <div className="flex items-center gap-1 flex-shrink-0">
                                             <Button variant="outline" size="icon" onClick={toggleSpeak}>
                                                 {isSpeaking ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
@@ -762,6 +766,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
+
+                                        {timerDuration > 0 && (
+                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                                <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </CardContent>
@@ -830,6 +840,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-    
-
     
