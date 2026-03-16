@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Languages, Settings, Copy } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -61,6 +61,8 @@ const translations = {
         playAgain: "Play Again",
         question: "Question",
         timer: "Timer:",
+        seconds: "seconds",
+        off: "Off",
         autoplayAudio: "Autoplay Audio",
         saveAsDefault: "Save as Default",
         saveForLandscape: "Save for Landscape Video (16:9)",
@@ -84,6 +86,8 @@ const translations = {
         playAgain: "फिर से खेलें",
         question: "प्रश्न",
         timer: "टाइमर:",
+        seconds: "सेकंड",
+        off: "बंद",
         autoplayAudio: "ऑडियो ऑटोप्ले करें",
         saveAsDefault: "डिफ़ॉल्ट के रूप में सहेजें",
         saveForLandscape: "लैंडस्केप वीडियो (16:9) के लिए सहेजें",
@@ -107,6 +111,8 @@ const translations = {
         playAgain: "আবার খেলুন",
         question: "প্রশ্ন",
         timer: "টাইমার:",
+        seconds: "সেকেন্ড",
+        off: "বন্ধ",
         autoplayAudio: "প্রশ্ন অডিও অটো-প্লে করুন",
         saveAsDefault: "ডিফল্ট হিসেবে সেভ করুন",
         saveForLandscape: "ল্যান্ডস্কেপ ভিডিও (১৬:৯) এর জন্য সেভ করুন",
@@ -627,6 +633,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         );
     }
     
+    const progress = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+    
     return (
         <div className="relative min-h-screen">
             <div
@@ -669,19 +677,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
                         <Card className="bg-card/60 backdrop-blur-sm">
-                             <CardContent className="p-3">
+                            <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
                                      <div className="flex items-baseline gap-1 text-sm font-semibold text-muted-foreground">
                                         <span className="text-2xl font-bold text-foreground bg-secondary px-2 rounded-md">{displayNum(currentQuestionIndex + 1)}</span>
                                         <span>/</span>
                                         <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
                                     </div>
-                                    {timerDuration > 0 && (
-                                        <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                            <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
-                                        </div>
-                                    )}
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex-grow max-w-lg">
+                                        <Progress value={progress} className="w-full h-2"/>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        {timerDuration > 0 && (
+                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                                <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
+                                            </div>
+                                        )}
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
@@ -717,6 +728,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
+                                                    <div className="flex items-center justify-between">
+                                                        <Label htmlFor="autoplay-switch" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> {t.autoplayAudio}</Label>
+                                                        <Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopAllAudio(); } }} />
+                                                    </div>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
@@ -742,7 +757,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
+                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -764,9 +779,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <CardTitle className="text-left text-2xl md:text-3xl font-bold">
                                             <span>{currentQuestion?.text}</span>
                                         </CardTitle>
-                                        <div className="flex items-center gap-1">
-                                            <TooltipProvider><Tooltip><TooltipTrigger asChild><Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopAllAudio(); } }} /></TooltipTrigger><TooltipContent><p>{t.autoplayAudio}</p></TooltipContent></Tooltip></TooltipProvider>
-                                        </div>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="p-6">
@@ -818,4 +830,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+    
 
+    
