@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -65,11 +65,11 @@ const translations = {
         off: "Off",
         autoplayAudio: "Autoplay Audio",
         autoAnswer: "Auto Answer",
-        saveAsDefault: "Save as Default",
-        saveForLandscape: "Save for Landscape Video (16:9)",
-        saveForShorts: "Save for Short Video (9:16)",
-        saveForInstagram: "Save for Instagram (1:1)",
-        saveForFacebook: "Save for Facebook Post (4:5)",
+        saveAsDefault: "Save Default",
+        saveForLandscape: "(16:9)",
+        saveForShorts: "(9:16)",
+        saveForInstagram: "(1:1)",
+        saveForFacebook: "(4:5)",
         correct: "Correct!",
         incorrect: "Not quite!",
         correctAnswer: "Correct Answer",
@@ -91,11 +91,11 @@ const translations = {
         off: "बंद",
         autoplayAudio: "ऑडियो ऑटोप्ले करें",
         autoAnswer: "ऑटो उत्तर",
-        saveAsDefault: "डिफ़ॉल्ट के रूप में सहेजें",
-        saveForLandscape: "लैंडस्केप वीडियो (16:9) के लिए सहेजें",
-        saveForShorts: "शॉर्ट वीडियो (9:16) के लिए सहेजें",
-        saveForInstagram: "इंस्टाग्राम (1:1) के लिए सहेजें",
-        saveForFacebook: "फेसबुक पोस्ट (4:5) के लिए सहेजें",
+        saveAsDefault: "डिफ़ॉल्ट",
+        saveForLandscape: "(16:9)",
+        saveForShorts: "(9:16)",
+        saveForInstagram: "(1:1)",
+        saveForFacebook: "(4:5)",
         correct: "सही!",
         incorrect: "सही नहीं!",
         correctAnswer: "सही जवाब",
@@ -117,11 +117,11 @@ const translations = {
         off: "বন্ধ",
         autoplayAudio: "প্রশ্ন অডিও অটো-প্লে করুন",
         autoAnswer: "স্বয়ংক্রিয় উত্তর",
-        saveAsDefault: "ডিফল্ট হিসেবে সেভ করুন",
-        saveForLandscape: "ল্যান্ডস্কেপ ভিডিও (১৬:৯) এর জন্য সেভ করুন",
-        saveForShorts: "শর্ট ভিডিও (৯:১৬) এর জন্য সেভ করুন",
-        saveForInstagram: "ইন্সটাগ্রাম (১:১) এর জন্য সেভ করুন",
-        saveForFacebook: "ফেসবুক পোস্ট (৪:৫) এর জন্য সেভ করুন",
+        saveAsDefault: "ডিফল্ট",
+        saveForLandscape: "(১৬:৯)",
+        saveForShorts: "(৯:১৬)",
+        saveForInstagram: "(১:১)",
+        saveForFacebook: "(৪:৫)",
         correct: "সঠিক!",
         incorrect: "সঠিক নয়!",
         correctAnswer: "সঠিক উত্তর",
@@ -224,7 +224,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
-
+    
      const stopSound = useCallback(() => {
         if (activeAudioRef.current) {
             activeAudioRef.current.pause();
@@ -237,26 +237,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setIsSpeaking(false);
         }
     }, []);
-    
-    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
-        if (typeof window === 'undefined') return;
 
-        if (type !== 'win') {
-           stopSound();
-        }
-        
-        let soundUrl = '';
-        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
-        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
-        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
-        
-        if(soundUrl) {
-            const audio = new Audio(soundUrl);
-            audio.play().catch(error => console.error(`Error playing sound:`, error));
-        }
-    }, [stopSound]);
-
-     const nextQuestion = useCallback(() => {
+    const nextQuestion = useCallback(() => {
         stopSound();
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
@@ -268,10 +250,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             }
         } else {
             setQuizFinished(true);
-            playSystemSound('win');
+            // playSystemSound('win');
         }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
-    
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, stopSound]);
+
     const handleAnswer = useCallback((answer: string) => {
         if (selectedAnswer) return;
 
@@ -284,21 +266,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setFeedback(t.correct);
             setIsCorrect(true);
             setScore(prev => prev + 1);
-            playSystemSound('correct');
+            // playSystemSound('correct');
         } else {
             setFeedback(t.incorrect);
-            playSystemSound('incorrect');
+            // playSystemSound('incorrect');
         }
 
         setTimeout(() => nextQuestion(), 1500);
-    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, stopSound, nextQuestion]);
-
+    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, stopSound, nextQuestion]);
+    
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
             handleAnswer(currentQuestion.correctAnswer);
         }
     }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
-
+    
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
@@ -322,7 +304,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         };
     }, [stopSound, onAudioEnd]);
 
-    const speakText = useCallback((text: string) => {
+     const speakText = useCallback((text: string) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
             stopSound();
             const utterance = new SpeechSynthesisUtterance(text);
@@ -343,7 +325,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [language, t.ttsNotSupported, toast, onAudioEnd, stopSound]);
 
-    const speakFullQuestion = useCallback((question?: Question) => {
+     const speakFullQuestion = useCallback((question?: Question) => {
         if (!question) return;
         stopSound();
         
@@ -360,8 +342,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         
         speakText(textToSpeak);
     }, [stopSound, speakText, t.correctAnswer]);
-    
-    useEffect(() => {
+
+     useEffect(() => {
         if (!autoplayEnabled || !currentQuestion || quizFinished || selectedAnswer) {
             return;
         }
@@ -436,7 +418,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 if (prev <= 1) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
                     stopSound();
-                    playSystemSound('incorrect');
+                    // playSystemSound('incorrect');
                     setFeedback(t.timesUp);
                     setTimeout(nextQuestion, 1500); 
                     return 0;
@@ -448,7 +430,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopSound, t.timesUp]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, stopSound, t.timesUp]);
     
     useEffect(() => {
         return () => {
@@ -527,7 +509,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 { from: '#09203F', to: '#537895' },
                 { from: '#868F96', to: '#596164' },
                 { from: '#93A5CF', to: '#E4EfE9' },
-                { from: 'rgb(128, 128, 0)', to: '#1d4350' },
+                { from: 'rgb(137, 137, 0)', to: '#1d4350' },
                 { from: '#434343', to: '#000000' },
                 { from: '#283e51', to: '#4b79a1' },
                 { from: '#2c3e50', to: '#2980b9' },
@@ -697,8 +679,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         {t.backToQuizzes}
                                     </Link>
                                 </Button>
-                            </div>
-                        </CardContent>
+                            </CardContent>
+                        </Card>
                     </Card>
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
@@ -858,3 +840,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+    
+
+    
+
+
+

@@ -573,3 +573,6 @@ strong {
     transform: translateY(-20px);
   }
 }
+.rounded-xl {
+  border-radius: 0.3rem;
+}
