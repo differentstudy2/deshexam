@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Languages } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Loader2, Languages, Settings } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -29,6 +29,14 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type Question = {
     text: string;
@@ -53,7 +61,7 @@ const translations = {
         playAgain: "Play Again",
         question: "Question",
         timer: "Timer",
-        autoplayAudio: "Autoplay Question Audio",
+        autoplayAudio: "Autoplay Audio",
         saveAsDefault: "Save as Default",
         saveForLandscape: "Save for Landscape Video (16:9)",
         saveForShorts: "Save for Short Video (9:16)",
@@ -61,7 +69,7 @@ const translations = {
         saveForFacebook: "Save for Facebook Post (4:5)",
         correct: "Correct!",
         incorrect: "Not quite!",
-        correctAnswer: "Correct answer:",
+        correctAnswer: "Correct Answer",
         timesUp: "Time's up!",
         ttsNotSupported: "Your browser does not support text-to-speech.",
         copied: "Copied to clipboard!",
@@ -76,7 +84,7 @@ const translations = {
         playAgain: "फिर से खेलें",
         question: "प्रश्न",
         timer: "टाइमर",
-        autoplayAudio: "प्रश्न ऑडियो ऑटोप्ले करें",
+        autoplayAudio: "ऑडियो ऑटोप्ले करें",
         saveAsDefault: "डिफ़ॉल्ट के रूप में सहेजें",
         saveForLandscape: "लैंडस्केप वीडियो (16:9) के लिए सहेजें",
         saveForShorts: "शॉर्ट वीडियो (9:16) के लिए सहेजें",
@@ -84,7 +92,7 @@ const translations = {
         saveForFacebook: "फेसबुक पोस्ट (4:5) के लिए सहेजें",
         correct: "सही!",
         incorrect: "सही नहीं!",
-        correctAnswer: "सही जवाब:",
+        correctAnswer: "सही जवाब",
         timesUp: "समय समाप्त!",
         ttsNotSupported: "आपका ब्राउज़र टेक्स्ट-टू-स्पीच का समर्थन नहीं करता है।",
         copied: "क्लिपबोर्ड पर कॉपी किया गया!",
@@ -107,7 +115,7 @@ const translations = {
         saveForFacebook: "ফেসবুক পোস্ট (৪:৫) এর জন্য সেভ করুন",
         correct: "সঠিক!",
         incorrect: "সঠিক নয়!",
-        correctAnswer: "সঠিক উত্তর:",
+        correctAnswer: "সঠিক উত্তর",
         timesUp: "সময় শেষ!",
         ttsNotSupported: "আপনার ব্রাউজার টেক্সট-টু-স্পিচ সমর্থন করে না।",
         copied: "ক্লিপবোর্ডে কপি করা হয়েছে!",
@@ -436,7 +444,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 { from: '#09203F', to: '#537895' },
                 { from: '#868F96', to: '#596164' },
                 { from: '#93A5CF', to: '#E4EfE9' },
-                { from: '#a43931', to: '#1d4350' },
+                { from: 'rgb(128, 128, 0)', to: '#1d4350' },
                 { from: '#434343', to: '#000000' },
                 { from: '#283e51', to: '#4b79a1' },
                 { from: '#2c3e50', to: '#2980b9' },
@@ -498,7 +506,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const correctOptionIndex = currentQuestion.options.findIndex(opt => opt.text === currentQuestion.correctAnswer);
         if (correctOptionIndex > -1) {
             const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
-            textToCopy += `Correct Answer Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"\n`;
+            textToCopy += `${t.correctAnswer} Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"\n`;
         }
 
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -519,9 +527,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     <CardContent className="p-3">
                         <div className="flex flex-wrap justify-between items-center gap-4">
                             <Skeleton className="h-6 w-20" />
+                            <Skeleton className="h-4 w-1/2 flex-grow" />
                             <div className="flex items-center gap-4 flex-wrap justify-end">
-                               <Skeleton className="h-9 w-32" />
-                               <Skeleton className="h-9 w-24" />
+                               <Skeleton className="h-9 w-9 rounded-full" />
                                <Skeleton className="h-9 w-9 rounded-full" />
                             </div>
                         </div>
@@ -610,64 +618,49 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <span>/</span>
                                         <span>{shuffledQuestions.length}</span>
                                     </div>
-                                    <div className="flex items-center gap-4 flex-wrap justify-end">
-                                        <div className="flex items-center gap-2">
-                                            <Languages className="w-5 h-5 text-slate-600"/>
-                                            <Select value={language} onValueChange={handleLanguageChange}>
-                                                <SelectTrigger className="w-[120px] h-9">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="en">English</SelectItem>
-                                                    <SelectItem value="hi">हिन्दी</SelectItem>
-                                                    <SelectItem value="bn">বাংলা</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Label htmlFor="autoplay-switch" className="cursor-pointer">
-                                                            <Volume2 className="w-5 h-5 text-slate-600" />
-                                                        </Label>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>{t.autoplayAudio}</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                            <Switch
-                                                id="autoplay-switch"
-                                                checked={autoplayEnabled}
-                                                onCheckedChange={(checked) => {
-                                                    setAutoplayEnabled(checked);
-                                                    if (!checked) {
-                                                        stopAllAudio();
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="timer-select" className="text-sm font-medium">{t.timer}</Label>
-                                            <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                <SelectTrigger id="timer-select" className="w-[100px] h-9">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="15">15s</SelectItem>
-                                                    <SelectItem value="30">30s</SelectItem>
-                                                    <SelectItem value="60">60s</SelectItem>
-                                                    <SelectItem value="0">{t.off}</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        {timerDuration > 0 && (
-                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                                <Clock className="w-5 h-5" />
-                                                <span>{timeLeft}s</span>
-                                            </div>
-                                        )}
+                                    <Progress value={progress} className="w-full max-w-xs h-2 flex-grow mx-4" />
+                                    <div className="flex items-center gap-2">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Quiz Settings</DialogTitle>
+                                                    <DialogDescription>Adjust your quiz preferences.</DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="language" className="flex items-center gap-2"><Languages className="w-5 h-5"/> Language</Label>
+                                                        <Select value={language} onValueChange={handleLanguageChange}>
+                                                            <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="en">English</SelectItem>
+                                                                <SelectItem value="hi">हिन्दी</SelectItem>
+                                                                <SelectItem value="bn">বাংলা</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="autoplay" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> Autoplay</Label>
+                                                        <Switch id="autoplay" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopAllAudio(); } }} />
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="timer" className="flex items-center gap-2"><Clock className="w-5 h-5"/> Timer</Label>
+                                                        <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
+                                                            <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="15">15 seconds</SelectItem>
+                                                                <SelectItem value="30">30 seconds</SelectItem>
+                                                                <SelectItem value="60">60 seconds</SelectItem>
+                                                                <SelectItem value="0">Off</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                        
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                  <Button variant="outline" size="icon" disabled={isCapturing}>
@@ -690,29 +683,31 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                              <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
                                 <CardHeader className="relative bg-[#0e8107] text-white p-6">
                                     {currentQuestion && currentQuestion.image && (
-                                        <div className="relative h-48 w-full mt-4">
+                                        <div className="relative h-48 w-full my-4">
                                             <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
                                         </div>
                                     )}
                                     
-                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
-                                        <span>{currentQuestion?.text}</span>
-                                        <Button variant="ghost" size="icon" onClick={handleCopy}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white/80 hover:text-white"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                                        </Button>
-                                    </CardTitle>
+                                     <div className="flex items-start justify-between gap-2">
+                                        <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                            <span>{currentQuestion?.text}</span>
+                                        </CardTitle>
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                            <Button variant="ghost" size="icon" onClick={toggleSpeak}>
+                                                {isSpeaking ? <Pause className="text-white"/> : <Play className="text-white"/>}
+                                            </Button>
+                                            {currentQuestion?.audio && (
+                                                <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                    {playingUrl === currentQuestion.audio ? <Pause className="text-white"/> : <Volume2 className="text-white"/>}
+                                                </Button>
+                                            )}
+                                            <Button variant="ghost" size="icon" onClick={handleCopy}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white/80 hover:text-white"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </CardHeader>
                                 <CardContent className="p-6">
-                                    <div className="flex justify-center mb-4 gap-2">
-                                        <Button variant="outline" size="icon" onClick={toggleSpeak}>
-                                            {isSpeaking ? <Pause /> : <Play />}
-                                        </Button>
-                                        {currentQuestion?.audio && (
-                                            <Button variant="outline" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
-                                                {playingUrl === currentQuestion.audio ? <Pause /> : <Volume2 />}
-                                            </Button>
-                                        )}
-                                    </div>
                                     <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                                             {currentQuestion?.options.map((option, index) => {
