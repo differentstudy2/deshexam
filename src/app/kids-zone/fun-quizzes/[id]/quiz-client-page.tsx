@@ -69,17 +69,20 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
     const { toast } = useToast();
 
-    // New states for image capture
     const [isCapturing, setIsCapturing] = useState(false);
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     const [isLoading, setIsLoading] = useState(true);
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     const speakText = (text: string) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          window.speechSynthesis.cancel(); // Stop any previous speech
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'bn-BD'; // This can be made dynamic later
-          window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'bn-BD';
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = () => setIsSpeaking(false);
+            window.speechSynthesis.speak(utterance);
         } else {
             toast({
                 variant: "destructive",
@@ -88,18 +91,26 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             });
         }
     };
-    
-    const speakFullQuestion = (question?: Question) => {
-        if (!question) return;
 
+    const stopAllAudio = useCallback(() => {
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause();
+            activeAudioRef.current.currentTime = 0;
+            activeAudioRef.current = null;
+        }
+        setPlayingUrl(null);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+        }
+    }, []);
+
+    const speakFullQuestion = useCallback((question?: Question) => {
+        if (!question) return;
+        stopAllAudio();
+        
         let textToSpeak = `${question.text}. `;
         const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
-
-        if (correctOptionIndex === -1) {
-            speakText(question.text); // Fallback to just the question
-            return;
-        }
-
         const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
 
         question.options.forEach((opt, index) => {
@@ -110,24 +121,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         textToSpeak += `Correct Answer Option ${correctOptionLetter}: ${question.correctAnswer}.`;
         
         speakText(textToSpeak);
-    };
-
-    const stopSound = useCallback(() => {
-        if (activeAudioRef.current) {
-            activeAudioRef.current.pause();
-            activeAudioRef.current.currentTime = 0;
-            activeAudioRef.current = null;
-        }
-        setPlayingUrl(null);
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-        }
-    }, []);
+    }, [stopAllAudio]);
 
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
-        stopSound(); // Stop anything else first
+        stopAllAudio();
 
         const audio = new Audio(url);
         activeAudioRef.current = audio;
@@ -135,7 +134,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         audio.play().catch(error => {
             console.error(`Error playing sound:`, error);
-            setPlayingUrl(null); // Reset state on error
+            setPlayingUrl(null);
         });
 
         audio.onended = () => {
@@ -144,21 +143,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 activeAudioRef.current = null;
             }
         };
-    }, [stopSound]);
+    }, [stopAllAudio]);
 
     const togglePlayUrl = useCallback((url: string) => {
         if (playingUrl === url && activeAudioRef.current) {
-            stopSound();
+            stopAllAudio();
         } else {
             playSound(url);
         }
-    }, [playingUrl, playSound, stopSound]);
+    }, [playingUrl, playSound, stopAllAudio]);
 
     const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
         if (typeof window === 'undefined') return;
 
         if (type !== 'win') {
-           stopSound();
+           stopAllAudio();
         }
         
         let soundUrl = '';
@@ -170,10 +169,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             const audio = new Audio(soundUrl);
             audio.play().catch(error => console.error(`Error playing sound:`, error));
         }
-    }, [stopSound]);
+    }, [stopAllAudio]);
+    
+    const toggleSpeak = useCallback(() => {
+        if (isSpeaking) {
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        } else {
+            speakFullQuestion(shuffledQuestions[currentQuestionIndex]);
+        }
+    }, [isSpeaking, speakFullQuestion, currentQuestionIndex, shuffledQuestions]);
+
 
     const nextQuestion = useCallback(() => {
-        stopSound();
+        stopAllAudio();
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedAnswer(null);
@@ -186,7 +196,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setQuizFinished(true);
             playSystemSound('win');
         }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopAllAudio]);
     
     useEffect(() => {
         if(quiz && quiz.questions) {
@@ -198,13 +208,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
      useEffect(() => {
-        if (autoplayEnabled && currentQuestion?.audio && !quizFinished && !selectedAnswer && (!activeAudioRef.current || activeAudioRef.current.paused)) {
-            const autoplayTimeout = setTimeout(() => {
-                playSound(currentQuestion.audio!);
+        if (autoplayEnabled && currentQuestion && !quizFinished && !selectedAnswer) {
+             const autoplayTimeout = setTimeout(() => {
+                if (currentQuestion.audio) {
+                    playSound(currentQuestion.audio);
+                } else {
+                    speakFullQuestion(currentQuestion);
+                }
             }, 500); 
             return () => clearTimeout(autoplayTimeout);
         }
-    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound]);
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakFullQuestion]);
 
 
     useEffect(() => {
@@ -217,7 +231,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setTimeLeft(prev => {
                 if (prev <= 1) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-                    stopSound();
+                    stopAllAudio();
                     playSystemSound('incorrect');
                     setFeedback("Time's up!");
                     setTimeout(nextQuestion, 1500); 
@@ -230,18 +244,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return () => {
             if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
         };
-    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopSound]);
+    }, [quizFinished, selectedAnswer, nextQuestion, timerDuration, currentQuestionIndex, playSystemSound, stopAllAudio]);
     
     useEffect(() => {
         return () => {
-            stopSound();
+            stopAllAudio();
         }
-    }, [stopSound]);
+    }, [stopAllAudio]);
 
     const handleAnswer = (answer: string) => {
         if (selectedAnswer) return;
 
-        stopSound();
+        stopAllAudio();
 
         if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
@@ -260,7 +274,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     };
 
     const restartQuiz = () => {
-        stopSound();
+        stopAllAudio();
         setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         setCurrentQuestionIndex(0);
         setSelectedAnswer(null);
@@ -306,7 +320,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const sourceCanvas = await html2canvas(quizCardRef.current, { 
             useCORS: true, 
             backgroundColor: null,
-            scale: 4 // Increased scale for higher quality
+            scale: 4
         });
         
         const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : quiz.title;
@@ -399,19 +413,37 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         toast({ title: 'Images saved!', description: 'Both question and answer images have been downloaded.' });
     };
 
+    const handleCopy = () => {
+        if (!currentQuestion) return;
+
+        let textToCopy = `${currentQuestion.text}\n`;
+        currentQuestion.options.forEach((opt, i) => {
+            textToCopy += `Option "${String.fromCharCode(65 + i)}": "${opt.text}"\n`;
+        });
+        const correctOptionIndex = currentQuestion.options.findIndex(opt => opt.text === currentQuestion.correctAnswer);
+        if (correctOptionIndex > -1) {
+            const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+            textToCopy += `Correct Answer Option "${correctOptionLetter}": "${currentQuestion.correctAnswer}"\n`;
+        }
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            toast({ title: 'Copied to clipboard!' });
+        }).catch(err => {
+            toast({ variant: 'destructive', title: 'Failed to copy', description: 'Could not copy text to clipboard.' });
+        });
+    };
+
     if (isLoading) {
         return (
-             <div className="w-full max-w-2xl mx-auto">
+             <div className="w-full max-w-2xl mx-auto py-12 px-4">
                 <Card className="bg-card/60 backdrop-blur-sm">
                     <CardContent className="p-3">
                         <div className="flex flex-wrap justify-between items-center gap-4">
                             <Skeleton className="h-6 w-20" />
-                            <div className="flex-grow max-w-lg">
-                                <Skeleton className="h-2 w-full" />
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Skeleton className="h-9 w-24" />
-                                <Skeleton className="h-9 w-9 rounded-full" />
+                            <div className="flex items-center gap-4 flex-wrap justify-end">
+                               <Skeleton className="h-9 w-32" />
+                               <Skeleton className="h-9 w-24" />
+                               <Skeleton className="h-9 w-9 rounded-full" />
                             </div>
                         </div>
                     </CardContent>
@@ -509,7 +541,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </Label>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        <p>Autoplay Audio</p>
+                                                        <p>Autoplay Question Audio</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
@@ -519,7 +551,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 onCheckedChange={(checked) => {
                                                     setAutoplayEnabled(checked);
                                                     if (!checked) {
-                                                        stopSound();
+                                                        stopAllAudio();
                                                     }
                                                 }}
                                             />
@@ -585,21 +617,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     )}
                                     
-                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-center justify-between gap-2">
+                                     <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start justify-between gap-2">
                                         <span>{currentQuestion?.text}</span>
-                                        <div className="flex-shrink-0 flex items-center">
-                                            <Button variant="ghost" size="icon" onClick={() => speakFullQuestion(currentQuestion)}>
-                                                <Volume2 />
-                                            </Button>
-                                            {currentQuestion?.audio && (
-                                                <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
-                                                    {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
-                                                </Button>
-                                            )}
-                                        </div>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
+                                    <div className="flex justify-center mb-4 gap-2">
+                                        <Button variant="outline" size="icon" onClick={toggleSpeak}>
+                                            {isSpeaking ? <Pause /> : <Play />}
+                                        </Button>
+                                        {currentQuestion?.audio && (
+                                            <Button variant="outline" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                {playingUrl === currentQuestion.audio ? <Pause /> : <Volume2 />}
+                                            </Button>
+                                        )}
+                                    </div>
                                     <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                                             {currentQuestion?.options.map((option, index) => {
@@ -607,12 +639,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                 const isShown = selectedAnswer !== null;
 
+                                                let optionStyle: React.CSSProperties = {};
                                                 let optionClass = cn(
                                                     "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300",
                                                     !isShown && captureMode === 'idle' && "cursor-pointer hover:scale-105 hover:border-primary"
                                                 );
-
-                                                const optionStyle: React.CSSProperties = {};
 
                                                 if (captureMode === 'answer') {
                                                     if (isCorrectAnswer) {
@@ -674,3 +705,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
