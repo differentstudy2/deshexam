@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Check, X, Sparkles, Trophy, Clock, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -223,6 +223,55 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const t = translations[language];
 
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+    const stopSound = useCallback(() => {
+        if (activeAudioRef.current) {
+            activeAudioRef.current.pause();
+            activeAudioRef.current.currentTime = 0;
+            activeAudioRef.current = null;
+        }
+        setPlayingUrl(null);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+        }
+    }, []);
+
+    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
+        if (typeof window === 'undefined') return;
+
+        if (type !== 'win') {
+           stopSound();
+        }
+        
+        let soundUrl = '';
+        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+        
+        if(soundUrl) {
+            const audio = new Audio(soundUrl);
+            audio.play().catch(error => console.error(`Error playing sound:`, error));
+        }
+    }, [stopSound]);
+
+    const nextQuestion = useCallback(() => {
+        stopSound();
+        if (currentQuestionIndex < shuffledQuestions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+            setSelectedAnswer(null);
+            setFeedback('');
+            setIsCorrect(false);
+            if (timerDuration > 0) {
+                setTimeLeft(timerDuration);
+            }
+        } else {
+            setQuizFinished(true);
+            playSystemSound('win');
+        }
+    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
+
     const handleAnswer = useCallback((answer: string) => {
         if (selectedAnswer) return;
 
@@ -242,28 +291,37 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
 
         setTimeout(() => nextQuestion(), 1500);
-    }, [selectedAnswer]);
-    
+    }, [selectedAnswer, stopSound, currentQuestion, nextQuestion, playSystemSound, t]);
+
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
             handleAnswer(currentQuestion.correctAnswer);
         }
     }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
 
+    const playSound = useCallback((url: string) => {
+        if (typeof window === 'undefined') return;
+        
+        stopSound();
 
-    const stopSound = useCallback(() => {
-        if (activeAudioRef.current) {
-            activeAudioRef.current.pause();
-            activeAudioRef.current.currentTime = 0;
-            activeAudioRef.current = null;
-        }
-        setPlayingUrl(null);
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            setIsSpeaking(false);
-        }
-    }, []);
-    
+        const audio = new Audio(url);
+        activeAudioRef.current = audio;
+        setPlayingUrl(url);
+
+        audio.play().catch(error => {
+            console.error(`Error playing sound:`, error);
+            setPlayingUrl(null);
+        });
+
+        audio.onended = () => {
+            if (activeAudioRef.current === audio) {
+                setPlayingUrl(null);
+                activeAudioRef.current = null;
+            }
+            onAudioEnd();
+        };
+    }, [stopSound, onAudioEnd]);
+
     const speakText = useCallback((text: string) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
             stopSound();
@@ -284,29 +342,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             });
         }
     }, [language, t.ttsNotSupported, toast, onAudioEnd, stopSound]);
-    
-    const playSound = useCallback((url: string) => {
-        if (typeof window === 'undefined') return;
-        
-        stopSound(); // Stop anything else first
-
-        const audio = new Audio(url);
-        activeAudioRef.current = audio;
-        setPlayingUrl(url);
-
-        audio.play().catch(error => {
-            console.error(`Error playing sound:`, error);
-            setPlayingUrl(null); // Reset state on error
-        });
-
-        audio.onended = () => {
-            if (activeAudioRef.current === audio) {
-                setPlayingUrl(null);
-                activeAudioRef.current = null;
-            }
-            onAudioEnd();
-        };
-    }, [stopSound, onAudioEnd]);
 
     const togglePlayUrl = useCallback((url: string) => {
         if (playingUrl === url && activeAudioRef.current) {
@@ -315,24 +350,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             playSound(url);
         }
     }, [playingUrl, playSound, stopSound]);
-
-    const playSystemSound = useCallback((type: 'correct' | 'incorrect' | 'win') => {
-        if (typeof window === 'undefined') return;
-
-        if (type !== 'win') {
-           stopSound();
-        }
-        
-        let soundUrl = '';
-        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
-        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
-        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
-        
-        if(soundUrl) {
-            const audio = new Audio(soundUrl);
-            audio.play().catch(error => console.error(`Error playing sound:`, error));
-        }
-    }, [stopSound]);
 
     const speakFullQuestion = useCallback((question?: Question) => {
         if (!question) return;
@@ -360,22 +377,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [isSpeaking, speakFullQuestion, currentQuestionIndex, shuffledQuestions, stopSound]);
 
-
-    const nextQuestion = useCallback(() => {
+    const restartQuiz = () => {
         stopSound();
-        if (currentQuestionIndex < shuffledQuestions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-            setSelectedAnswer(null);
-            setFeedback('');
-            setIsCorrect(false);
-            if (timerDuration > 0) {
-                setTimeLeft(timerDuration);
-            }
-        } else {
-            setQuizFinished(true);
-            playSystemSound('win');
-        }
-    }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
+        setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
+        setCurrentQuestionIndex(0);
+        setSelectedAnswer(null);
+        setFeedback('');
+        setIsCorrect(false);
+        setScore(0);
+        setQuizFinished(false);
+        setTimeLeft(timerDuration);
+    };
+
+    const handleTimerChange = (value: string) => {
+        const newDuration = parseInt(value, 10);
+        setTimerDuration(newDuration);
+        setTimeLeft(newDuration);
+    };
     
     useEffect(() => {
         if(quiz && quiz.questions) {
@@ -384,31 +402,26 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setIsLoading(false);
     }, [quiz]);
 
-    const currentQuestion = shuffledQuestions[currentQuestionIndex];
-
-     useEffect(() => {
+    useEffect(() => {
         if (!autoplayEnabled || !currentQuestion || quizFinished || selectedAnswer) {
             return;
         }
 
         const autoplayTimeout = setTimeout(() => {
-            // Priority to pre-recorded audio
             if (currentQuestion.audio) {
                 playSound(currentQuestion.audio);
             } 
-            // Fallback to text-to-speech
             else if (currentQuestion.text) {
                 speakText(currentQuestion.text);
             } else {
-                // If there's no audio or text to play, but auto-answer is on, we should trigger it.
                 if (autoAnswerEnabled) {
                    handleAnswer(currentQuestion.correctAnswer);
                 }
             }
-        }, 500); // 500ms delay for smoother transition
+        }, 500); 
 
         return () => clearTimeout(autoplayTimeout);
-    }, [currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakText, autoAnswerEnabled, handleAnswer]);
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakText, autoAnswerEnabled, handleAnswer]);
 
 
     useEffect(() => {
@@ -441,24 +454,31 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             stopSound();
         }
     }, [stopSound]);
-
-    const restartQuiz = () => {
-        stopSound();
-        setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
-        setCurrentQuestionIndex(0);
-        setSelectedAnswer(null);
-        setFeedback('');
-        setIsCorrect(false);
-        setScore(0);
-        setQuizFinished(false);
-        setTimeLeft(timerDuration);
-    };
     
-    const handleTimerChange = (value: string) => {
-        const newDuration = parseInt(value, 10);
-        setTimerDuration(newDuration);
-        setTimeLeft(newDuration);
-    };
+    useEffect(() => {
+        if(feedback.type === 'correct') {
+            setIsCorrect(true);
+            const timer = setTimeout(() => {
+                nextQuestion();
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+        if (feedback.type === 'incorrect') {
+            const timer = setTimeout(() => {
+                if (gameMode !== 'multipleChoice' && gameMode !== 'voice') {
+                    setUserAnswer('');
+                }
+                if (gameMode === 'multipleChoice' || gameMode === 'voice') {
+                    handleNewProblem(true);
+                } else {
+                    resetTranscript();
+                    setFeedback({message: '', type: 'none'});
+                    setIsSubmitting(false); 
+                }
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [feedback.type]);
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
@@ -480,7 +500,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
         ctx.restore();
     };
-    
+
     const captureAndDownload = async (
         mode: 'question' | 'answer',
         aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5'
@@ -525,6 +545,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             target.width = targetWidth;
             target.height = targetHeight;
 
+            // Create a pleasant gradient background
             const gradients = [
                 { from: '#DA22FF', to: '#9733EE' },
                 { from: '#09203F', to: '#537895' },
@@ -543,6 +564,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             targetCtx.fillStyle = gradient;
             targetCtx.fillRect(0, 0, targetWidth, targetHeight);
             
+            // Add repeating watermark
             drawWatermark(targetCtx, targetWidth, targetHeight);
 
             const padding = 100;
@@ -705,7 +727,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 ) : (
                     <div className="w-full max-w-2xl mx-auto">
                         <Card className="bg-card/60 backdrop-blur-sm">
-                            <CardContent className="p-3">
+                             <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
                                      <div className="flex items-baseline gap-1 text-sm font-semibold text-muted-foreground">
                                         <span className="text-2xl font-bold text-foreground bg-secondary px-2 rounded-md">{displayNum(currentQuestionIndex + 1)}</span>
@@ -861,4 +883,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
