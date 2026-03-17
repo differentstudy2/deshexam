@@ -652,7 +652,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     if (!quiz || !shuffledQuestions || shuffledQuestions.length === 0) {
         return (
              <div className="container mx-auto px-4 py-12 text-center">
-                 <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
+                 <h1 className="text-2xl font-bold">This quiz has no questions yet.</h1>
+                 <p className="text-muted-foreground">Please check back later.</p>
                  <Button asChild className="mt-4">
                      <Link href="/quizzes">Back to Quizzes</Link>
                  </Button>
