@@ -20,13 +20,15 @@ type Quiz = {
   duration: number;
   difficulty: string;
   access: "free" | "premium" | "pro";
-  testType: string;
+  testType: string | string[];
   featureImage?: string;
   description?: string;
 };
 
-function getUrlForTest(testType: string, testId: string) {
-  const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+function getUrlForTest(testType: string | string[], testId: string) {
+  const primaryType = Array.isArray(testType) ? testType[0] : testType;
+  if (!primaryType) return `/content/${testId}`; // Fallback in case of empty array
+  const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
   return `/${typeSlug}/${testId}`;
 }
 
