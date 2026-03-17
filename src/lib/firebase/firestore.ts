@@ -641,7 +641,7 @@ export const getAllContent = async (type?: string) => {
     try {
         let contentQuery;
         if (type) {
-            contentQuery = query(collection(db, "content"), where("testType", "==", type));
+            contentQuery = query(collection(db, "content"), where("testType", "array-contains", type));
         } else {
             contentQuery = query(collection(db, "content"));
         }
@@ -2339,3 +2339,4 @@ export const getRelatedQuestions = async (currentQuestion: Partial<Question>): P
         throw new Error("Failed to fetch related questions.");
     }
 };
+

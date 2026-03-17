@@ -34,9 +34,9 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass, addContent } from '@/lib/firebase/firestore';
+import { getSubjects, addSubject, getBoards, addBoard, getExamTypes, addExamType, getChaptersBySubjectId, addChapter, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass, addContent, getContentTypes } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, FileText, Upload, GripVertical, Image as ImageIcon, CalendarIcon, Book } from 'lucide-react';
-import { useEffect, useState, useRef, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -59,6 +59,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 const optionSchema = z.object({
@@ -109,7 +110,7 @@ const formSchema = z.object({
   newExamCategory: z.string().optional(),
   newExam: z.string().optional(),
   newChapterName: z.string().optional(),
-  testType: z.string().optional(),
+  testType: z.array(z.string()).min(1, { message: 'Please select at least one content type.'}),
   description: z.string().optional(),
   featureImage: z.string().optional(),
   duration: z.coerce
@@ -134,6 +135,7 @@ type State = { id: string, name: string };
 type ExamType = { id: string, name: string };
 type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
+type ContentType = { id: string, name: string };
 
 const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: string, onUrlChange: (url: string) => void, value?: string }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -328,6 +330,7 @@ function AddContentForm() {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
+  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -390,7 +393,7 @@ function AddContentForm() {
       newExamCategory: '',
       newExam: '',
       newChapterName: '',
-      testType: contentType,
+      testType: [contentType],
       description: '',
       featureImage: '',
       duration: 0,
@@ -409,35 +412,18 @@ function AddContentForm() {
   });
   
   const selectedClassCategory = form.watch('classCategory');
-  useEffect(() => {
-    const fetchGrades = async () => {
-      if (selectedClassCategory) {
-        const fetchedGrades = await getGradesByClass(selectedClassCategory);
-        setGrades(fetchedGrades);
-      } else {
-        setGrades([]);
-      }
-    };
-    fetchGrades();
-  }, [selectedClassCategory]);
-
-
-  useEffect(() => {
-    form.setValue('testType', contentType);
-  }, [contentType, form]);
-
-
-  useEffect(() => {
-    const fetchFormData = async () => {
+  
+  const fetchFormData = useCallback(async () => {
       try {
         setLoadingData(true);
-        const [subjectData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
+        const [subjectData, boardData, classData, stateData, examTypeData, siteSettings, contentTypesData] = await Promise.all([
             getSubjects(),
             getBoards(),
             getClasses(),
             getStates(),
             getExamTypes(),
-            getSettings()
+            getSettings(),
+            getContentTypes()
         ]);
         
         setSubjects(subjectData);
@@ -445,6 +431,7 @@ function AddContentForm() {
         setClassCategories(classData);
         setStates(stateData);
         setExamCategories(examTypeData);
+        setContentTypes(contentTypesData);
 
         if (siteSettings) {
           setSettings({
@@ -452,7 +439,7 @@ function AddContentForm() {
               enableMultipleChoice: siteSettings.enableMultipleChoice ?? true,
               enableTrueFalse: siteSettings.enableTrueFalse ?? true,
               enableShortAnswer: siteSettings.enableShortAnswer ?? true,
-              enableFillInTheBlank: siteSettings.enableFillInTheBlank ?? true,
+              enableFillInTheBlank: true,
               enableSubjectMetafield: siteSettings.enableSubjectMetafield ?? true,
               enableBoardMetafield: siteSettings.enableBoardMetafield ?? true,
               enableClassMetafield: siteSettings.enableClassMetafield ?? true,
@@ -479,7 +466,7 @@ function AddContentForm() {
               subject: currentValues.subject || siteSettings.defaultSubject || '',
               examCategory: currentValues.examCategory || siteSettings.defaultExamCategory || '',
               state: currentValues.state || siteSettings.defaultState || '',
-              testType: contentType,
+              testType: [contentType],
           });
           
           const defaultClassCat = siteSettings.defaultClassCategory || form.getValues('classCategory');
@@ -518,8 +505,21 @@ function AddContentForm() {
       } finally {
         setLoadingData(false);
       }
+    }, [form, toast, contentType]);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+      if (selectedClassCategory) {
+        const fetchedGrades = await getGradesByClass(selectedClassCategory);
+        setGrades(fetchedGrades);
+      } else {
+        setGrades([]);
+      }
     };
-    
+    fetchGrades();
+  }, [selectedClassCategory]);
+
+  useEffect(() => {
     fetchFormData();
 
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
@@ -554,7 +554,7 @@ function AddContentForm() {
             form.setValue('title', aiContent.title);
             form.setValue('description', aiContent.description);
             form.setValue('difficulty', aiContent.difficulty);
-            form.setValue('testType', aiContent.contentType);
+            form.setValue('testType', aiContent.testType);
             replace(aiContent.questions.map((q: any) => ({
                 ...q,
                 options: q.options || (q.type === 'Multiple Choice' ? [{text:''}, {text:''}, {text:''}, {text:''}] : undefined),
@@ -575,7 +575,7 @@ function AddContentForm() {
           }
         }
     }
-  }, [form, replace, toast]);
+  }, [form, replace, toast, fetchFormData]);
   
   const questions = form.watch('questions');
   useEffect(() => {
@@ -672,7 +672,7 @@ function AddContentForm() {
       await addContent(contentToSave);
       toast({
         title: 'Content Created!',
-        description: `The ${data.testType?.toLowerCase()} "${data.title}" has been successfully saved.`,
+        description: `The content "${data.title}" has been successfully saved.`,
       });
       
       if (resetType === 'full') {
@@ -936,6 +936,55 @@ function AddContentForm() {
                 )}
               />
                 
+                <FormField
+                    control={form.control}
+                    name="testType"
+                    render={() => (
+                        <FormItem>
+                        <FormLabel>Content Type(s)</FormLabel>
+                        <FormDescription>
+                            Select all categories this content should appear under.
+                        </FormDescription>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                            {contentTypes.map((item) => (
+                            <FormField
+                                key={item.id}
+                                control={form.control}
+                                name="testType"
+                                render={({ field }) => {
+                                return (
+                                    <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-center space-x-3 space-y-0"
+                                    >
+                                    <FormControl>
+                                        <Checkbox
+                                        checked={field.value?.includes(item.name)}
+                                        onCheckedChange={(checked) => {
+                                            return checked
+                                            ? field.onChange([...(field.value || []), item.name])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                (value) => value !== item.name
+                                                )
+                                            )
+                                        }}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        {item.name}
+                                    </FormLabel>
+                                    </FormItem>
+                                )
+                                }}
+                            />
+                            ))}
+                        </div>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {settings.enableBoardMetafield && <FormField
                     control={form.control}
@@ -1742,3 +1791,4 @@ export default function CreateQuizPage() {
 }
 
     
+

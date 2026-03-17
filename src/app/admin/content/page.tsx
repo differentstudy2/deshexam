@@ -72,7 +72,7 @@ type Content = {
     id: string;
     title: string;
     subject: string;
-    testType: string;
+    testType: string | string[];
     access: 'free' | 'premium' | 'pro';
     publishedAt: string;
     authorId: string;
@@ -100,8 +100,9 @@ type BulkAction =
     | { type: 'exam', value: string }
     | null;
 
-function getUrlForTest(testType: string, testId: string) {
-    const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+function getUrlForTest(testType: string | string[], testId: string) {
+    const primaryType = Array.isArray(testType) ? testType[0] : testType;
+    const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}`;
 }
 
@@ -150,7 +151,7 @@ const ContentTable = ({
     isAllSelected: boolean
 }) => {
     const getEditUrl = (item: Content) => {
-        if (item.testType === 'Learn') {
+        if (Array.isArray(item.testType) ? item.testType.includes('Learn') : item.testType === 'Learn') {
             return `/admin/edit-article/${item.id}`;
         }
         return `/admin/edit-content/${item.id}`;
@@ -212,7 +213,13 @@ const ContentTable = ({
                             </div>
                         </TableCell>
                         <TableCell className="hidden md:table-cell">
-                            <Badge variant="secondary">{item.testType}</Badge>
+                            {Array.isArray(item.testType) ? (
+                                <div className="flex flex-wrap gap-1">
+                                    {item.testType.map(t => <Badge key={t} variant="secondary">{t}</Badge>)}
+                                </div>
+                            ) : (
+                                <Badge variant="secondary">{item.testType}</Badge>
+                            )}
                         </TableCell>
                          <TableCell className="hidden md:table-cell">
                             <ContentBadge type={item.access} />
@@ -355,7 +362,7 @@ export default function ManageContentPage() {
 
   const filteredContent = useMemo(() => {
     return allContent.filter(item => {
-        const matchesTab = activeTab === 'All' || item.testType === activeTab;
+        const matchesTab = activeTab === 'All' || (Array.isArray(item.testType) ? item.testType.includes(activeTab) : item.testType === activeTab);
         const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesSubject = subjectFilter === 'all' || item.subject === subjectFilter;
         const matchesAccess = accessFilter === 'all' || item.access === accessFilter;
@@ -620,7 +627,7 @@ export default function ManageContentPage() {
                 {allTabs.map(type => (
                     <TabsContent key={type.id} value={type.name}>
                        <ContentTable 
-                            content={paginatedContent.filter(c => activeTab === 'All' || c.testType === type.name)}
+                            content={paginatedContent.filter(c => activeTab === 'All' || (Array.isArray(c.testType) ? c.testType.includes(activeTab) : c.testType === type.name))}
                             loading={loading}
                             openDeleteDialog={openDeleteDialog}
                             selectedContent={selectedContent}
@@ -657,3 +664,4 @@ export default function ManageContentPage() {
     </div>
   );
 }
+
