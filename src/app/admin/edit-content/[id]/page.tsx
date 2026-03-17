@@ -54,6 +54,7 @@ import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 const optionSchema = z.object({
@@ -94,7 +95,7 @@ const formSchema = z.object({
   newExam: z.string().optional(),
   newChapterNo: z.string().optional(),
   newChapterName: z.string().optional(),
-  testType: z.string().min(1, 'Please select a content type.'),
+  testType: z.array(z.string()).min(1, { message: 'Please select at least one content type.'}),
   description: z.string().optional(),
   duration: z.coerce
     .number()
@@ -413,7 +414,7 @@ export default function EditContentPage() {
       newExam: '',
       newChapterNo: '',
       newChapterName: '',
-      testType: 'Mock Test',
+      testType: [],
       description: '',
       duration: 0,
       difficulty: 'Medium',
@@ -482,7 +483,12 @@ export default function EditContentPage() {
         }
 
         if (contentData) {
-            form.reset(contentData as FormValues);
+            const testTypeArray = Array.isArray(contentData.testType) 
+                ? contentData.testType 
+                : (typeof contentData.testType === 'string' ? [contentData.testType] : []);
+
+            form.reset({ ...contentData, testType: testTypeArray });
+
              if (contentData.subject) {
               const selectedSubject = subjectData.find(s => s.name === contentData.subject);
               if (selectedSubject) {
@@ -623,7 +629,7 @@ export default function EditContentPage() {
       await updateContent(contentId, contentToSave);
       toast({
         title: 'Content Updated!',
-        description: `The ${data.testType?.toLowerCase()} "${data.title}" has been successfully updated.`,
+        description: `The content "${data.title}" has been successfully updated.`,
       });
       router.push('/admin/content');
     } catch (error) {
@@ -872,6 +878,55 @@ export default function EditContentPage() {
                   </FormItem>
                 )}
               />
+
+                <FormField
+                    control={form.control}
+                    name="testType"
+                    render={() => (
+                        <FormItem>
+                        <FormLabel>Content Type(s)</FormLabel>
+                        <FormDescription>
+                            Select all categories this content should appear under.
+                        </FormDescription>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                            {contentTypes.map((item) => (
+                            <FormField
+                                key={item.id}
+                                control={form.control}
+                                name="testType"
+                                render={({ field }) => {
+                                return (
+                                    <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-center space-x-3 space-y-0"
+                                    >
+                                    <FormControl>
+                                        <Checkbox
+                                        checked={field.value?.includes(item.name)}
+                                        onCheckedChange={(checked) => {
+                                            return checked
+                                            ? field.onChange([...(field.value || []), item.name])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                (value) => value !== item.name
+                                                )
+                                            )
+                                        }}
+                                        />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        {item.name}
+                                    </FormLabel>
+                                    </FormItem>
+                                )
+                                }}
+                            />
+                            ))}
+                        </div>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {settings.enableBoardMetafield && <FormField
@@ -1300,29 +1355,6 @@ export default function EditContentPage() {
                     )}
                 </div>
               </div>
-
-               <FormField
-                  control={form.control}
-                  name="testType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Content Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a content type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                           {contentTypes.map((type) => (
-                                <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>
-                           ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
             </CardContent>
           </Card>
           
@@ -1560,33 +1592,29 @@ export default function EditContentPage() {
                                 Upload a JSON file or paste JSON text containing an array of questions.
                             </DialogDescription>
                         </DialogHeader>
-                        <Tabs defaultValue="upload" className="w-full">
-                             <TabsList className="grid w-full grid-cols-2">
+                        <Tabs defaultValue="upload">
+                            <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="upload">Upload File</TabsTrigger>
                                 <TabsTrigger value="paste">Paste JSON</TabsTrigger>
                             </TabsList>
-                            <TabsContent value="upload">
-                                <div className="py-4">
-                                    <div className="grid w-full max-w-sm items-center gap-1.5">
-                                        <Label htmlFor="json-import">JSON/TXT File</Label>
-                                        <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
-                                        {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
-                                    </div>
+                            <TabsContent value="upload" className="pt-4">
+                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                    <Label htmlFor="json-import">JSON/TXT File</Label>
+                                    <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                    {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
                                 </div>
                             </TabsContent>
-                            <TabsContent value="paste">
-                                <div className="py-4 space-y-4">
-                                     <Textarea
-                                        placeholder='Paste your JSON content here...'
-                                        value={jsonText}
-                                        onChange={(e) => setJsonText(e.target.value)}
-                                        className="min-h-[200px] font-mono text-xs"
-                                        disabled={isImporting}
-                                    />
-                                    <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
-                                        {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
-                                    </Button>
-                                </div>
+                            <TabsContent value="paste" className="pt-4 space-y-2">
+                                 <Textarea
+                                    placeholder='Paste your JSON content here...'
+                                    value={jsonText}
+                                    onChange={(e) => setJsonText(e.target.value)}
+                                    className="min-h-[200px] font-mono text-xs"
+                                    disabled={isImporting}
+                                />
+                                <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                    {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                </Button>
                             </TabsContent>
                         </Tabs>
 
@@ -1635,5 +1663,6 @@ export default function EditContentPage() {
     
 
     
+
 
 
