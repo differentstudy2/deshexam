@@ -74,16 +74,16 @@ const nextConfig: NextConfig = {
         destination: '/content/:id*',
       },
       {
-        source: '/quiz/:id*',
-        destination: '/content/:id*',
-      },
-      {
         source: '/exam/:id*',
         destination: '/content/:id*',
       },
       {
         source: '/textbook-solutions/:bookId/exam/:examId',
         destination: '/textbook-solutions/exam/:examId/textbook/:bookId',
+      },
+      {
+        source: '/:bookId/text-practice-sets/:practiceSetId',
+        destination: '/content/:practiceSetId',
       },
       {
         source: '/textbook-solutions/:bookId/quiz/:quizId',
@@ -93,12 +93,15 @@ const nextConfig: NextConfig = {
         source: '/practice-questions/:id*',
         destination: '/content/:id*',
       },
+      {
+        source: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
+        destination: '/textbook-solutions/mock-test/:mockTestId/textbook/:bookId/chapter/:chapterId/topic/:topicId',
+      },
     ];
   }
 };
 
 export default nextConfig;
-
 
 
 
