@@ -214,6 +214,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [playingUrl, setPlayingUrl] = useState<string | null>(null);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
     const { toast } = useToast();
+    const router = useRouter();
 
     const [isCapturing, setIsCapturing] = useState(false);
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
@@ -798,7 +799,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </Card>
                         <div ref={quizCardRef}>
                              <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
-                                <CardHeader className="relative bg-[#0e8107] text-white p-6">
+                                <CardHeader className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6">
                                     {currentQuestion && currentQuestion.image && (
                                         <div className="relative h-48 w-full mt-4">
                                             <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
