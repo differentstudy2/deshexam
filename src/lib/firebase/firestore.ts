@@ -639,16 +639,32 @@ export const deleteQuestionFromContent = async (contentId: string, questionId: s
 
 export const getAllContent = async (type?: string) => {
     try {
-        let contentQuery;
+        let allContents: any[] = [];
+        const contentRef = collection(db, "content");
+
         if (type) {
-            contentQuery = query(collection(db, "content"), where("testType", "array-contains", type));
+            const arrayQuery = query(contentRef, where("testType", "array-contains", type));
+            const stringQuery = query(contentRef, where("testType", "==", type));
+
+            const [arraySnapshot, stringSnapshot] = await Promise.all([
+                getDocs(arrayQuery),
+                getDocs(stringQuery),
+            ]);
+
+            const arrayContents = arraySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const stringContents = stringSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            const combined = [...arrayContents, ...stringContents];
+            const uniqueContents = Array.from(new Map(combined.map(item => [item.id, item])).values());
+            allContents = uniqueContents;
+
         } else {
-            contentQuery = query(collection(db, "content"));
+            const allContentQuery = query(contentRef);
+            const allContentSnapshot = await getDocs(allContentQuery);
+            allContents = allContentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
-        
-        const contentSnapshot = await getDocs(contentQuery);
-        const contents = contentSnapshot.docs.map(doc => {
-            const data = doc.data();
+
+        const formattedContents = allContents.map(data => {
             const createdAt = data.createdAt;
             let formattedDate = 'N/A';
             if (createdAt && typeof createdAt.toDate === 'function') {
@@ -660,19 +676,19 @@ export const getAllContent = async (type?: string) => {
                 }
             }
             return {
-                id: doc.id,
                 ...data,
                 questions: data.questions || [],
                 createdAt: formattedDate,
             };
         });
 
-        return contents;
+        return formattedContents;
     } catch (e) {
         console.error("Error getting documents: ", e);
         throw new Error("Failed to fetch content.");
     }
 }
+
 
 export const addTestSubmission = async (submissionData: any) => {
     const auth = getAuth();
@@ -2339,4 +2355,3 @@ export const getRelatedQuestions = async (currentQuestion: Partial<Question>): P
         throw new Error("Failed to fetch related questions.");
     }
 };
-
