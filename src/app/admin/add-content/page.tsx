@@ -81,7 +81,6 @@ const questionSchema = z.object({
   image: z.string().optional(),
   audio: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
-  marks: z.coerce.number().int().min(1, 'Marks must be a positive number.').describe('The marks allocated for the question.'),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
       columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
@@ -116,7 +115,7 @@ const formSchema = z.object({
   duration: z.coerce
     .number()
     .int()
-    .positive('Duration must be a positive number of minutes.').optional(),
+    .min(0, 'Duration must be a positive number.').optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
   access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
@@ -287,40 +286,6 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
     );
 };
 
-const ContentTypeNavigation = () => {
-    const pathname = usePathname();
-  
-    const navItems = [
-      { name: 'Mock Test', href: '/admin/add-content' },
-      { name: 'Quiz', href: '/admin/add-quiz' },
-      { name: 'Practice Questions', href: '/admin/add-practice-questions' },
-      { name: 'Exam', href: '/admin/add-exam' },
-      { name: 'Learn Article', href: '/admin/add-article' },
-      { name: 'Textbook', href: '/admin/textbooks/add' },
-    ];
-
-    return (
-        <div className="mb-6 flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  isActive
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-                )}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-      );
-}
 
 function AddContentForm() {
   const { toast } = useToast();
@@ -583,7 +548,7 @@ function AddContentForm() {
         if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
             return total + (q.correctAnswer.length || 0);
         }
-        return total + (q.marks || 1);
+        return total + 1; // Each question is worth 1 mark/minute
     }, 0) || 0;
     form.setValue('duration', totalMarks, { shouldValidate: true });
   }, [questions, form]);
@@ -909,9 +874,6 @@ function AddContentForm() {
             </Button>
         </div>
         
-        <ContentTypeNavigation />
-
-
       <Form {...form}>
         <form className="space-y-8">
           <Card>
@@ -1330,7 +1292,7 @@ function AddContentForm() {
                     name="duration"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Duration / Total Marks</FormLabel>
+                        <FormLabel>Duration / Total Questions</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} readOnly disabled />
                         </FormControl>
@@ -1503,18 +1465,6 @@ function AddContentForm() {
                                                       {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
                                                   </SelectContent>
                                               </Select>
-                                              <FormMessage />
-                                          </FormItem>
-                                      )}
-                                  />
-                                  <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.marks`}
-                                      render={({ field }) => (
-                                          <FormItem>
-                                              <FormControl>
-                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} disabled={questionType === 'Matching'} />
-                                              </FormControl>
                                               <FormMessage />
                                           </FormItem>
                                       )}
@@ -1734,7 +1684,6 @@ function AddContentForm() {
                         const newQuestion: any = { 
                             text: '', 
                             type: 'Multiple Choice', 
-                            marks: 1, 
                             options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], 
                             correctAnswer: '', 
                             explanation: '' 
@@ -1791,4 +1740,5 @@ export default function CreateQuizPage() {
 }
 
     
+
 
