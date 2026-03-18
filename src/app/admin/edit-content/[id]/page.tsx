@@ -57,24 +57,25 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const optionSchema = z.object({
-  text: z.string().min(1, 'Option text cannot be empty.'),
+  text: z.string().optional(),
   image: z.string().optional(),
   audio: z.string().optional(),
 });
 
 const matchingOptionSchema = z.object({
-    a: z.string().min(1, 'Column A item cannot be empty.'),
+    a: z.string().optional(),
     aImage: z.string().optional(),
-    b: z.string().min(1, 'Column B item cannot be empty.'),
+    b: z.string().optional(),
     bImage: z.string().optional(),
 });
 
 const questionSchema = z.object({
   id: z.string().optional(),
-  text: z.string().min(1, 'Question text cannot be empty.'),
+  text: z.string().optional(),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']).optional(),
+  marks: z.coerce.number().int().min(0, "Marks must be a positive number.").optional(),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
       columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
@@ -85,7 +86,7 @@ const questionSchema = z.object({
 });
 
 const formSchema = z.object({
-  title: z.string().min(1, 'Title cannot be empty.'),
+  title: z.string().optional(),
   board: z.string().optional(),
   classCategory: z.string().optional(),
   class: z.string().optional(),
@@ -96,15 +97,16 @@ const formSchema = z.object({
   chapter: z.string().optional(),
   school: z.string().optional(),
   semester: z.string().optional(),
-  testType: z.array(z.string()).min(1, { message: 'Please select at least one content type.'}),
+  testType: z.array(z.string()).optional(),
   description: z.string().optional(),
   duration: z.coerce.number().int().min(0, 'Duration must be a positive number of minutes.').optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
-  access: z.enum(['free', 'premium', 'pro']),
+  access: z.enum(['free', 'premium', 'pro']).optional(),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).optional(),
 });
+
 
 type FormValues = z.infer<typeof formSchema>;
 type Subject = { id: string, name: string };
@@ -268,6 +270,7 @@ const jsonExampleMCQ = `
     {
       "text": "What is the capital of France?",
       "type": "Multiple Choice",
+      "marks": 1,
       "options": [
         { "text": "Berlin" },
         { "text": "Madrid" },
@@ -287,6 +290,7 @@ const jsonExampleTF = `
     {
       "text": "The Earth is flat.",
       "type": "True/False",
+      "marks": 1,
       "correctAnswer": "False",
       "explanation": "The Earth is roughly a sphere."
     }
@@ -299,6 +303,7 @@ const jsonExampleSA = `
     {
       "text": "What is the chemical symbol for water?",
       "type": "Short Answer",
+      "marks": 1,
       "correctAnswer": "H2O",
       "explanation": "Water is a chemical compound consisting of two hydrogen atoms and one oxygen atom."
     }
@@ -311,6 +316,7 @@ const jsonExampleFIB = `
     {
       "text": "The powerhouse of the cell is the ____.",
       "type": "Fill in the Blank",
+      "marks": 1,
       "correctAnswer": "mitochondrion",
       "explanation": "Mitochondria are membrane-bound cell organelles that generate most of the chemical energy needed to power the cell's biochemical reactions."
     }
@@ -323,6 +329,7 @@ const jsonExampleMatching = `
     {
       "text": "Match the countries to their capitals.",
       "type": "Matching",
+      "marks": 3,
       "correctAnswer": [
         { "a": "Japan", "b": "Tokyo" },
         { "a": "Canada", "b": "Ottawa" },
@@ -348,7 +355,6 @@ export default function EditContentPage() {
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
@@ -396,80 +402,72 @@ export default function EditContentPage() {
         if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
             return total + (q.correctAnswer.length || 0);
         }
-        return total + 1;
+        return total + (q.marks || 1);
     }, 0) || 0;
     form.setValue('duration', totalMarks, { shouldValidate: true });
   }, [questions, form]);
 
 
-  useEffect(() => {
-    const fetchContentAndMetadata = async () => {
-      if (!contentId) return;
-      try {
-        setLoading(true);
-        const [contentData, subjectData, contentTypeData, boardData, classData, stateData, examTypeData] = await Promise.all([
-            getContentById(contentId),
-            getSubjects(),
-            getContentTypes(),
-            getBoards(),
-            getClasses(),
-            getStates(),
-            getExamTypes(),
-        ]);
-        
-        setSubjects(subjectData);
-        setContentTypes(contentTypeData);
-        setBoards(boardData);
-        setClasses(classData);
-        setStates(stateData);
-        setExamCategories(examTypeData);
+  const fetchContentAndMetadata = useCallback(async () => {
+    if (!contentId) return;
+    try {
+      setLoading(true);
+      const [contentData, subjectData, contentTypeData, boardData, classData, stateData, examTypeData] = await Promise.all([
+          getContentById(contentId),
+          getSubjects(),
+          getContentTypes(),
+          getBoards(),
+          getClasses(),
+          getStates(),
+          getExamTypes(),
+      ]);
+      
+      setSubjects(subjectData);
+      setContentTypes(contentTypeData);
+      setBoards(boardData);
+      setClasses(classData);
+      setStates(stateData);
+      setExamCategories(examTypeData);
 
-        if (contentData) {
-            const testTypeArray = Array.isArray(contentData.testType) 
-                ? contentData.testType 
-                : (typeof contentData.testType === 'string' ? [contentData.testType] : []);
+      if (contentData) {
+          const testTypeArray = Array.isArray(contentData.testType) 
+              ? contentData.testType 
+              : (typeof contentData.testType === 'string' ? [contentData.testType] : []);
 
-            const questionsWithDefaults = (contentData.questions || []).map((q: any) => ({
-                ...q,
-                options: q.options || (q.type === 'Multiple Choice' ? Array.from({length: 4}, () => ({ text: '', explanation: ''})) : q.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
-            }));
-            
-            form.reset({ ...contentData, testType: testTypeArray, questions: questionsWithDefaults });
-            
-            if (contentData.classCategory) {
-                const fetchedGrades = await getGradesByClass(contentData.classCategory);
-                setGrades(fetchedGrades);
-            }
-             if (contentData.subject) {
-                const selectedSubject = subjectData.find(s => s.name === contentData.subject);
-                if (selectedSubject) {
-                    const fetchedChapters = await getChaptersBySubjectId(selectedSubject.id);
-                    setChapters(fetchedChapters);
-                }
-            }
-            if (contentData.examCategory) {
-                const selectedExamCategory = examTypeData.find(e => e.name === contentData.examCategory);
-                if (selectedExamCategory) {
-                    const fetchedExams = await getExamsByCategory(selectedExamCategory.id);
-                    setExams(fetchedExams);
-                }
-            }
-        } else {
-            throw new Error("Content not found");
-        }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: 'Error fetching content data',
-          description: (error as Error).message,
-        });
-        router.push('/admin/content');
-      } finally {
-        setLoading(false);
+          const questionsWithDefaults = (contentData.questions || []).map((q: any) => ({
+              ...q,
+              marks: q.marks || 1,
+              options: q.options || (q.type === 'Multiple Choice' ? Array.from({length: 4}, () => ({ text: '', explanation: ''})) : q.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
+          }));
+          
+          form.reset({ ...contentData, testType: testTypeArray, questions: questionsWithDefaults });
+          
+          if (contentData.classCategory) {
+              const fetchedGrades = await getGradesByClass(contentData.classCategory);
+              setGrades(fetchedGrades);
+          }
+           if (contentData.examCategory) {
+              const fetchedExams = await getExamsByCategory(contentData.examCategory);
+              setExams(fetchedExams);
+          }
+      } else {
+          throw new Error("Content not found");
       }
-    };
-    fetchContentAndMetadata();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: 'Error fetching content data',
+        description: (error as Error).message,
+      });
+      router.push('/admin/content');
+    } finally {
+      setLoading(false);
+    }
   }, [contentId, form, toast, router]);
+
+  useEffect(() => {
+    fetchContentAndMetadata();
+  }, [fetchContentAndMetadata]);
 
    useEffect(() => {
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
@@ -479,6 +477,7 @@ export default function EditContentPage() {
         const existingQuestions = form.getValues('questions') || [];
         const combinedQuestions = [...existingQuestions, ...newQuestions.map((q: any) => ({
             ...q,
+            marks: q.marks || 1,
             options: q.options || (q.type === 'Multiple Choice' ? Array.from({length: 4}, () => ({ text: '', explanation: ''})) : q.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
             explanation: q.explanation || ''
         }))];
@@ -502,24 +501,19 @@ export default function EditContentPage() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-        let finalData = {...data};
-        const processedQuestions = data.questions?.map(q => {
-            if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
-                const correctAnswer = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
-                const columnA = correctAnswer.map(pair => ({ text: pair.a, image: pair.aImage }));
-                let columnB = correctAnswer.map(pair => ({ text: pair.b, image: pair.bImage }));
-                for (let i = columnB.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [columnB[i], columnB[j]] = [columnB[j], columnB[i]];
+        const processedData = { ...data };
+        
+        // Ensure marks are calculated for new/edited matching questions
+        if (processedData.questions) {
+            processedData.questions = processedData.questions.map(q => {
+                if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
+                    return { ...q, marks: q.correctAnswer.length };
                 }
-                return { ...q, matchingOptions: { columnA, columnB } };
-            }
-            return q;
-        });
-
-        finalData = {...finalData, questions: processedQuestions};
-
-      await updateContent(contentId, finalData);
+                return { ...q, marks: q.marks || 1 }; // Ensure marks default to 1
+            });
+        }
+        
+      await updateContent(contentId, processedData);
       toast({
         title: 'Content Updated!',
         description: `The content "${data.title}" has been successfully updated.`,
@@ -552,14 +546,15 @@ export default function EditContentPage() {
             }
             
             if (questionsToImport.length > 0) {
-                questionsToImport.forEach((q: any) => {
-                    const { success, error } = questionSchema.safeParse(q);
-                    if (!success) {
+                const validatedQuestions = questionsToImport.map(q => {
+                     const { success, error, data } = questionSchema.safeParse(q);
+                     if (!success) {
                         console.error("Invalid question structure:", q, error.flatten().fieldErrors);
                         throw new Error(`One or more questions have an invalid structure. Please check the format.`);
-                    }
+                     }
+                     return data;
                 });
-                append(questionsToImport);
+                append(validatedQuestions);
             }
 
             toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions added.` });
@@ -778,7 +773,7 @@ export default function EditContentPage() {
                   })}
               </CardContent>
               <CardFooter className="flex flex-wrap gap-4">
-                  <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: Array.from({length: 4}, () => ({text: ''})), correctAnswer: '', explanation: '' })}>
+                  <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', marks: 1, options: Array.from({length: 4}, () => ({text: ''})), correctAnswer: '', explanation: '' })}>
                       <PlusCircle className="mr-2" />Add Question Manually
                   </Button>
                    <Button asChild variant="outline">
@@ -858,3 +853,5 @@ export default function EditContentPage() {
     </div>
   );
 }
+
+    
