@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -34,7 +35,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, getExamsByCategory, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, getExamsByCategory, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass, addSubject, addBoard, addState, addExamType, addExam, addChapter } from '@/lib/firebase/firestore';
 import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon, FileJson, Copy, CalendarIcon } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -272,6 +273,14 @@ export default function EditContentPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   
+  const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
+  const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
+  const [isAddingNewClass, setIsAddingNewClass] = useState(false);
+  const [isAddingNewState, setIsAddingNewState] = useState(false);
+  const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
+  const [isAddingNewExam, setIsAddingNewExam] = useState(false);
+  const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
+
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const importFileRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -314,8 +323,8 @@ export default function EditContentPage() {
     name: 'questions',
   });
   
-  const selectedClassCategory = form.watch('classCategory');
   const selectedSubject = form.watch('subject');
+  const selectedClassCategory = form.watch('classCategory');
   const selectedExamCategory = form.watch('examCategory');
 
   const fetchContentAndMetadata = useCallback(async () => {
@@ -350,23 +359,37 @@ export default function EditContentPage() {
               options: q.options || (q.type === 'Multiple Choice' ? Array.from({length: 4}, () => ({ text: '', explanation: ''})) : q.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
           }));
           
-          form.reset({ ...contentData, testType: testTypeArray, questions: questionsWithDefaults, publishedAt: contentData.publishedAt ? new Date(contentData.publishedAt) : new Date() });
+          let chaptersForSubject: Chapter[] = [];
+          if (contentData.subject) {
+            const subjectDoc = subjectData.find(s => s.name === contentData.subject);
+            if(subjectDoc) chaptersForSubject = await getChaptersBySubjectId(subjectDoc.id);
+          }
+          setChapters(chaptersForSubject);
           
-          if (contentData.classCategory) {
-              const fetchedGrades = await getGradesByClass(contentData.classCategory);
-              setGrades(fetchedGrades);
+          let examsForCategory: Exam[] = [];
+          if (contentData.examCategory) {
+              const examCatDoc = examTypeData.find(e => e.name === contentData.examCategory);
+              if (examCatDoc) examsForCategory = await getExamsByCategory(examCatDoc.id);
           }
-           if (contentData.examCategory) {
-              const fetchedExams = await getExamsByCategory(contentData.examCategory);
-              setExams(fetchedExams);
+          setExams(examsForCategory);
+
+          let gradesForClass: Grade[] = [];
+          if(contentData.classCategory) {
+              gradesForClass = await getGradesByClass(contentData.classCategory);
           }
-          if(contentData.subject) {
-              const subjectDoc = subjectData.find(s => s.name === contentData.subject);
-              if (subjectDoc) {
-                  const fetchedChapters = await getChaptersBySubjectId(subjectDoc.id);
-                  setChapters(fetchedChapters);
-              }
-          }
+          setGrades(gradesForClass);
+
+          const initialChapter = chaptersForSubject.find(c => c.chapterName === contentData.chapter);
+          const initialExam = examsForCategory.find(e => e.name === contentData.exam);
+
+          form.reset({ 
+              ...contentData, 
+              testType: testTypeArray, 
+              questions: questionsWithDefaults, 
+              publishedAt: contentData.publishedAt ? new Date(contentData.publishedAt.seconds * 1000) : new Date(),
+              chapter: initialChapter?.id || '',
+              exam: initialExam?.id || '',
+          });
       } else {
           throw new Error("Content not found");
       }
@@ -414,14 +437,17 @@ export default function EditContentPage() {
   useEffect(() => {
     const fetchExams = async () => {
       if (selectedExamCategory) {
-        const fetchedExams = await getExamsByCategory(selectedExamCategory);
-        setExams(fetchedExams);
+        const examCat = examCategories.find(e => e.name === selectedExamCategory);
+        if (examCat) {
+          const fetchedExams = await getExamsByCategory(examCat.id);
+          setExams(fetchedExams);
+        }
       } else {
         setExams([]);
       }
     };
     fetchExams();
-  }, [selectedExamCategory]);
+  }, [selectedExamCategory, examCategories]);
 
    useEffect(() => {
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
@@ -466,6 +492,33 @@ export default function EditContentPage() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
+        const subjectDoc = subjects.find(s => s.name === data.subject);
+        
+        let chapterName = '';
+        if (data.chapter === 'add_new_chapter') {
+            const newChapterName = form.getValues('newChapterName');
+            if (newChapterName && subjectDoc) {
+                await addChapter(subjectDoc.id, { chapterName: newChapterName, chapterNo: (chapters.length + 1).toString() });
+                chapterName = newChapterName;
+            }
+        } else if (data.chapter) {
+            const foundChapter = chapters.find(c => c.id === data.chapter);
+            chapterName = foundChapter ? foundChapter.chapterName : '';
+        }
+
+        let examName = '';
+        if (data.exam === 'add_new_exam') {
+            const newExamName = form.getValues('newExam');
+            const examCatDoc = examCategories.find(ec => ec.name === data.examCategory);
+            if (newExamName && examCatDoc) {
+                await addExam(examCatDoc.id, { name: newExamName });
+                examName = newExamName;
+            }
+        } else if(data.exam) {
+            const foundExam = exams.find(e => e.id === data.exam);
+            examName = foundExam ? foundExam.name : '';
+        }
+        
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
                 return { ...q, marks: q.correctAnswer.length || 1 };
@@ -473,9 +526,14 @@ export default function EditContentPage() {
             return { ...q, marks: q.marks || 1 };
         });
 
-        const processedData = { ...data, questions: processedQuestions };
+        const dataToSave = {
+            ...data,
+            questions: processedQuestions,
+            chapter: chapterName,
+            exam: examName,
+        };
         
-        await updateContent(contentId, processedData);
+        await updateContent(contentId, dataToSave);
         toast({
             title: 'Content Updated!',
             description: `The content "${data.title}" has been successfully updated.`,
@@ -538,13 +596,13 @@ export default function EditContentPage() {
             }
             
             if (questionsToImport.length > 0) {
-                const validatedQuestions = questionsToImport.map(q => {
-                     const { success, error, data } = questionSchema.safeParse(q);
-                     if (!success) {
-                        console.error("Invalid question structure:", q, error.flatten().fieldErrors);
+                const validatedQuestions = questionsToImport.map((q: any) => {
+                     const parsedQuestion = questionSchema.safeParse(q);
+                     if (!parsedQuestion.success) {
+                        console.error("Invalid question structure:", q, parsedQuestion.error.flatten().fieldErrors);
                         throw new Error(`One or more questions have an invalid structure. Please check the format.`);
                      }
-                     return data;
+                     return { ...parsedQuestion.data, marks: parsedQuestion.data.marks || 1 };
                 });
                 append(validatedQuestions);
             }
@@ -708,7 +766,7 @@ export default function EditContentPage() {
                         <FormItem><FormLabel>Subject</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('chapter', ''); }} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl><SelectContent>{subjects.map((subject) => (<SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                     )}/>
                     <FormField control={form.control} name="chapter" render={({ field }) => (
-                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.chapterName}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.id}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
                     )}/>
                 </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -716,7 +774,7 @@ export default function EditContentPage() {
                     <FormItem><FormLabel>Exam Category</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('exam', ''); }} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam category" /></SelectTrigger></FormControl><SelectContent>{examCategories.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="exam" render={({ field }) => (
-                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                 )}/>
               </div>
 
@@ -917,3 +975,4 @@ export default function EditContentPage() {
     </div>
   );
 }
+
