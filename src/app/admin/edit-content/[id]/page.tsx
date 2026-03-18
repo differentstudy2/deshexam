@@ -56,8 +56,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-
-// Schemas from add-content/page.tsx
 const optionSchema = z.object({
   text: z.string().min(1, 'Option text cannot be empty.'),
   image: z.string().optional(),
@@ -86,7 +84,6 @@ const questionSchema = z.object({
   explanation: z.string().optional(),
 });
 
-// Main form schema adapted for edit page
 const formSchema = z.object({
   title: z.string().min(1, 'Title cannot be empty.'),
   board: z.string().optional(),
@@ -99,27 +96,15 @@ const formSchema = z.object({
   chapter: z.string().optional(),
   school: z.string().optional(),
   semester: z.string().optional(),
-  newSubject: z.string().optional(),
-  newBoard: z.string().optional(),
-  newClass: z.string().optional(),
-  newState: z.string().optional(),
-  newExamCategory: z.string().optional(),
-  newExam: z.string().optional(),
-  newChapterNo: z.string().optional(),
-  newChapterName: z.string().optional(),
   testType: z.array(z.string()).min(1, { message: 'Please select at least one content type.'}),
   description: z.string().optional(),
-  duration: z.coerce
-    .number()
-    .int()
-    .min(0, 'Duration must be a positive number of minutes.').optional(),
+  duration: z.coerce.number().int().min(0, 'Duration must be a positive number of minutes.').optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
   access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
   questions: z.array(questionSchema).optional(),
 });
-
 
 type FormValues = z.infer<typeof formSchema>;
 type Subject = { id: string, name: string };
@@ -132,7 +117,6 @@ type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
 type ContentType = { id: string, name: string };
 
-// Copied from add-content
 const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: string, onUrlChange: (url: string) => void, value?: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [url, setUrl] = useState('');
@@ -228,7 +212,6 @@ const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: string, o
     );
 };
 
-// Copied from add-content
 const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
     const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
         control: control,
@@ -257,9 +240,7 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
                         <div className="space-y-2">
                             <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} value={field.value ?? ''} />} />
                             <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
-                                <>
-                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'aImage', url)} value={field.value} />
-                                </>
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'aImage', url)} value={field.value} />
                             )} />
                         </div>
                         <div className="pt-2">
@@ -268,9 +249,7 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
                         <div className="space-y-2">
                              <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} value={field.value ?? ''} />} />
                              <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
-                                <>
-                                  <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'bImage', url)} value={field.value} />
-                                </>
+                                <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'bImage', url)} value={field.value} />
                             )} />
                         </div>
                     </div>
@@ -355,13 +334,12 @@ const jsonExampleMatching = `
 }
 `;
 
-
-
 export default function EditContentPage() {
   const { toast } = useToast();
   const router = useRouter();
   const params = useParams();
   const contentId = params.id as string;
+  
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
@@ -372,14 +350,7 @@ export default function EditContentPage() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-  const [isAddingNewSubject, setIsAddingNewSubject] = useState(false);
-  const [isAddingNewBoard, setIsAddingNewBoard] = useState(false);
-  const [isAddingNewClass, setIsAddingNewClass] = useState(false);
-  const [isAddingNewState, setIsAddingNewState] = useState(false);
-  const [isAddingNewExamCategory, setIsAddingNewExamCategory] = useState(false);
-  const [isAddingNewExam, setIsAddingNewExam] = useState(false);
-  const [isAddingNewChapter, setIsAddingNewChapter] = useState(false);
-
+  
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const importFileRef = useRef<HTMLInputElement>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -389,7 +360,6 @@ export default function EditContentPage() {
   const [isUploadingAudio, setIsUploadingAudio] = useState(false);
   const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
-
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -426,7 +396,7 @@ export default function EditContentPage() {
         if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
             return total + (q.correctAnswer.length || 0);
         }
-        return total + 1; // Each question is worth 1 mark/minute by default
+        return total + 1;
     }, 0) || 0;
     form.setValue('duration', totalMarks, { shouldValidate: true });
   }, [questions, form]);
@@ -437,7 +407,7 @@ export default function EditContentPage() {
       if (!contentId) return;
       try {
         setLoading(true);
-        const [contentData, subjectData, contentTypeData, boardData, classData, stateData, examTypeData, siteSettings] = await Promise.all([
+        const [contentData, subjectData, contentTypeData, boardData, classData, stateData, examTypeData] = await Promise.all([
             getContentById(contentId),
             getSubjects(),
             getContentTypes(),
@@ -445,7 +415,6 @@ export default function EditContentPage() {
             getClasses(),
             getStates(),
             getExamTypes(),
-            getSettings()
         ]);
         
         setSubjects(subjectData);
@@ -534,8 +503,6 @@ export default function EditContentPage() {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
         let finalData = {...data};
-
-        // Process matching questions
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
                 const correctAnswer = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
@@ -657,6 +624,8 @@ export default function EditContentPage() {
         }
     };
 
+    const selectedClassCategory = form.watch('classCategory');
+    const accessLevel = form.watch('access');
 
   if (loading) {
     return (
