@@ -5,6 +5,17 @@ import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses,
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
 
+  // Helper to safely get a slug from a potentially array-like testType
+  const getUrlSlug = (testType: string | string[] | undefined): string => {
+    let type = 'content';
+    if (Array.isArray(testType) && testType.length > 0) {
+        type = testType[0];
+    } else if (typeof testType === 'string') {
+        type = testType;
+    }
+    return type.toLowerCase().replace(/\s+/g, '-');
+  };
+
   // 1. Statically defined routes
   const staticRoutes = [
     '', 
@@ -68,7 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 3. Fetch all individual content items for dynamic routes
   const allContent = await getAllContent();
   const contentItemRoutes = allContent.map((item: any) => {
-    const typeSlug = (item.testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    const typeSlug = getUrlSlug(item.testType);
     const path = `/${typeSlug}/${item.id}`;
     let lastMod;
     if (item.updatedAt && typeof item.updatedAt.toDate === 'function') {
