@@ -378,6 +378,26 @@ export default function EditContentPage() {
           const testTypeArray = Array.isArray(contentData.testType) 
               ? contentData.testType 
               : (typeof contentData.testType === 'string' ? [contentData.testType] : []);
+          
+          let parsedPublishedDate = new Date(); // Default to now
+          const dateValue = contentData.publishedAt;
+          
+          if (dateValue) {
+              let tempDate;
+              // Handle Firestore Timestamp object, which has a toDate() method
+              if (typeof dateValue.toDate === 'function') {
+                  tempDate = dateValue.toDate();
+              } 
+              // Handle ISO string or other date formats that `new Date()` can parse
+              else {
+                  tempDate = new Date(dateValue);
+              }
+              
+              // Check if the created date is valid before using it
+              if (!isNaN(tempDate.getTime())) {
+                  parsedPublishedDate = tempDate;
+              }
+          }
 
           const questionsWithDefaults = (contentData.questions || []).map((q: any) => ({
               ...q,
@@ -409,7 +429,8 @@ export default function EditContentPage() {
               ...contentData, 
               testType: testTypeArray, 
               questions: questionsWithDefaults, 
-              publishedAt: contentData.publishedAt ? new Date(contentData.publishedAt.seconds * 1000) : new Date(),
+              publishedAt: parsedPublishedDate,
+              difficulty: Array.isArray(contentData.difficulty) ? contentData.difficulty[0] : contentData.difficulty,
           });
       } else {
           throw new Error("Content not found");
@@ -758,7 +779,7 @@ export default function EditContentPage() {
                         <FormItem><FormLabel>Subject</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('chapter', ''); }} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl><SelectContent>{subjects.map((subject) => (<SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                     )}/>
                     <FormField control={form.control} name="chapter" render={({ field }) => (
-                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.id}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.id}>{chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
                     )}/>
                 </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1000,3 +1021,4 @@ export default function EditContentPage() {
     </div>
   );
 }
+
