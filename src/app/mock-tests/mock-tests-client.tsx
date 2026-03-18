@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import type { Textbook } from '@/lib/types';
+import { MockTestFilters } from "@/components/mock-test-filters";
 
 type Test = {
   id: string;
@@ -23,7 +24,7 @@ type Test = {
   difficulty: string | string[];
   questionSource?: string | string[];
   access: "free" | "premium" | "pro";
-  testType: string;
+  testType: string | string[];
   textbookId?: string;
   textbookTitle?: string;
   chapterId?: string;
@@ -45,7 +46,10 @@ function getUrlForTest(test: Test) {
     if (test.textbookId) {
         return `/textbook-solutions/mock-test/${test.id}/textbook/${test.textbookId}`;
     }
-    const typeSlug = test.testType.toLowerCase().replace(/\s+/g, '-');
+    const primaryType = Array.isArray(test.testType) ? test.testType[0] : test.testType;
+    if (!primaryType) return `/content/${test.id}`; // Fallback
+    
+    const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${test.id}`;
 }
 
@@ -58,8 +62,8 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
 
   useEffect(() => {
     if (initialTests) {
-      const uniqueSubjects = Array.from(new Set(initialTests.map((exam) => exam.subject))).filter(Boolean) as string[];
-      setSubjects(uniqueSubjects);
+        const uniqueSubjects = Array.from(new Set(initialTests.map((exam) => exam.subject))).filter(Boolean) as string[];
+        setSubjects(uniqueSubjects);
     }
   }, [initialTests]);
   
@@ -161,5 +165,3 @@ export default function MockTestsClientPage({ initialTests }: { initialTests: Te
     </>
   );
 }
-
-    
