@@ -235,12 +235,31 @@ export default function EditKidsContentPage() {
             try {
                 const contentData = await getContentById(contentId);
                 if (contentData) {
-                    const questionsWithDefaults = (contentData.questions || []).map((q: any) => ({
-                        ...q,
-                        type: q.type || 'Multiple Choice',
-                        explanation: q.explanation || ''
-                    }));
-                    form.reset({ ...contentData, questions: questionsWithDefaults } as any);
+                    const sanitizedData = {
+                        ...contentData,
+                        title: contentData.title ?? '',
+                        description: contentData.description ?? '',
+                        tags: contentData.tags ?? '',
+                        keywords: contentData.keywords ?? '',
+                        featureImage: contentData.featureImage ?? '',
+                        category: contentData.category ?? 'Fun Quizzes',
+                        body: contentData.body ?? '',
+                        questions: (contentData.questions || []).map((q: any) => ({
+                            ...q,
+                            text: q.text ?? '',
+                            image: q.image ?? '',
+                            audio: q.audio ?? '',
+                            type: q.type || 'Multiple Choice',
+                            options: (q.options || Array(4).fill(null)).map((opt: any) => ({
+                                text: opt?.text ?? '',
+                                image: opt?.image ?? '',
+                                audio: opt?.audio ?? '',
+                            })),
+                            correctAnswer: q.correctAnswer ?? '',
+                            explanation: q.explanation ?? '',
+                        })),
+                    };
+                    form.reset(sanitizedData as any);
                 } else {
                     toast({ variant: 'destructive', title: 'Content not found' });
                     router.push('/admin/kids-zone/manage');
@@ -486,7 +505,7 @@ export default function EditKidsContentPage() {
                             <CardDescription>Update the details of the game, quiz, or activity.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            <FormField control={form.control} name="title" render={({ field }) => (<FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder="e.g., Amazing Animals Quiz" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="title" render={({ field }) => (<FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder="e.g., Amazing Animals Quiz" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                             <FormField
                               control={form.control}
                               name="description"
@@ -494,7 +513,7 @@ export default function EditKidsContentPage() {
                                 <FormItem>
                                   <FormLabel>Description</FormLabel>
                                   <FormControl>
-                                    <Textarea placeholder="A fun quiz about all kinds of animals!" {...field} />
+                                    <Textarea placeholder="A fun quiz about all kinds of animals!" {...field} value={field.value ?? ''} />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -508,7 +527,7 @@ export default function EditKidsContentPage() {
                                     <FormItem>
                                       <FormLabel>Tags</FormLabel>
                                       <FormControl>
-                                        <Input placeholder="e.g., Animals, Sounds, Fun" {...field} />
+                                        <Input placeholder="e.g., Animals, Sounds, Fun" {...field} value={field.value ?? ''} />
                                       </FormControl>
                                       <FormDescription>Comma-separated tags for categorization.</FormDescription>
                                       <FormMessage />
@@ -522,7 +541,7 @@ export default function EditKidsContentPage() {
                                     <FormItem>
                                       <FormLabel>Keywords</FormLabel>
                                       <FormControl>
-                                        <Input placeholder="e.g., animal sounds quiz, kids learning" {...field} />
+                                        <Input placeholder="e.g., animal sounds quiz, kids learning" {...field} value={field.value ?? ''} />
                                       </FormControl>
                                       <FormDescription>Comma-separated keywords for SEO.</FormDescription>
                                       <FormMessage />
@@ -532,7 +551,7 @@ export default function EditKidsContentPage() {
                             </div>
                             <FormField control={form.control} name="category" render={({ field }) => (<FormItem><FormLabel>Category</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Fun Quizzes">Fun Quizzes</SelectItem><SelectItem value="Learning Games">Learning Games</SelectItem><SelectItem value="Learning English">Learning English</SelectItem><SelectItem value="Learning Bengali">Learning Bengali</SelectItem><SelectItem value="Learning Hindi">Learning Hindi</SelectItem><SelectItem value="Learning Arabic">Learning Arabic</SelectItem><SelectItem value="Learning Urdu">Learning Urdu</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
                             <FormField control={form.control} name="featureImage" render={({ field }) => (<FormItem><FormLabel>Feature Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })} value={field.value} /></FormControl><FormMessage /></FormItem>)} />
-                            {form.watch('category') !== 'Fun Quizzes' && (<FormField control={form.control} name="body" render={({ field }) => (<FormItem><FormLabel>Content Body (for non-quiz content)</FormLabel><FormControl><Textarea {...field} placeholder="Write your article or game description here." className="min-h-[200px] font-mono" /></FormControl><FormMessage /></FormItem>)} />)}
+                            {form.watch('category') !== 'Fun Quizzes' && (<FormField control={form.control} name="body" render={({ field }) => (<FormItem><FormLabel>Content Body (for non-quiz content)</FormLabel><FormControl><Textarea {...field} placeholder="Write your article or game description here." className="min-h-[200px] font-mono" value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />)}
                             {form.watch('category') === 'Fun Quizzes' && (
                                 <div className="space-y-6 pt-4 border-t">
                                     <h3 className="text-lg font-medium">Quiz Questions</h3>
@@ -567,7 +586,7 @@ export default function EditKidsContentPage() {
                                                  </div>
                                             </div>
                                             <div className="space-y-4">
-                                                <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                                <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)} />
                                                     <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
@@ -611,7 +630,7 @@ export default function EditKidsContentPage() {
                                                                                     <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
                                                                                         <FormItem className="flex-1">
                                                                                             <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
-                                                                                            <FormControl><Input {...field} /></FormControl>
+                                                                                            <FormControl><Input {...field} value={field.value ?? ''} /></FormControl>
                                                                                             <FormMessage />
                                                                                         </FormItem>
                                                                                     )}/>
@@ -679,7 +698,7 @@ export default function EditKidsContentPage() {
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormLabel>Correct Answer</FormLabel>
-                                                                    <FormControl><Input {...field} /></FormControl>
+                                                                    <FormControl><Input {...field} value={field.value ?? ''} /></FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>
                                                             )}
@@ -693,7 +712,7 @@ export default function EditKidsContentPage() {
                                                         <FormItem className="mt-4">
                                                             <FormLabel>Explanation</FormLabel>
                                                             <FormControl>
-                                                                <Textarea placeholder="Explain why the answer is correct (optional)..." {...field} />
+                                                                <Textarea placeholder="Explain why the answer is correct (optional)..." {...field} value={field.value ?? ''} />
                                                             </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
