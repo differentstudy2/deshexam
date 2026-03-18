@@ -47,13 +47,16 @@ type Quiz = {
     id: string;
     title: string;
     subject: string;
-    testType: string;
+    testType: string | string[];
     access: 'free' | 'premium' | 'pro';
     createdAt: string;
 }
 
-function getUrlForTest(testType: string, testId: string) {
-    const typeSlug = testType.toLowerCase().replace(/\s+/g, '-');
+function getUrlForTest(testType: string | string[], testId: string) {
+    const primaryType = Array.isArray(testType) ? testType[0] : testType;
+    // Fallback for safety, though every item should have a type.
+    if (!primaryType) return `/content/${testId}`;
+    const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}`;
 }
 
