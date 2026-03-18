@@ -34,8 +34,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon, FileJson, Copy } from 'lucide-react';
+import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, getExamsByCategory, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
+import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon, FileJson, Copy, CalendarIcon } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Dialog,
@@ -46,6 +46,10 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 import { generateDescription } from '@/ai/flows/ai-description-generator';
 import { generateImage } from '@/ai/flows/ai-image-generator';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -55,6 +59,8 @@ import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ImageUploader } from '@/components/feature/image-uploader';
+
 
 const optionSchema = z.object({
   text: z.string().optional(),
@@ -90,20 +96,22 @@ const formSchema = z.object({
   board: z.string().optional(),
   classCategory: z.string().optional(),
   class: z.string().optional(),
-  state: z.string().optional(),
-  examCategory: z.string().optional(),
-  exam: z.string().optional(),
   subject: z.string().optional(),
   chapter: z.string().optional(),
+  examCategory: z.string().optional(),
+  state: z.string().optional(),
+  exam: z.string().optional(),
   school: z.string().optional(),
   semester: z.string().optional(),
   testType: z.array(z.string()).optional(),
   description: z.string().optional(),
+  featureImage: z.string().optional(),
   duration: z.coerce.number().int().min(0, 'Duration must be a positive number of minutes.').optional(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional(),
-  access: z.enum(['free', 'premium', 'pro']).optional(),
+  access: z.enum(['free', 'premium', 'pro']),
   price: z.coerce.number().optional(),
   subscriptionPlan: z.enum(['pass', 'pro']).optional(),
+  publishedAt: z.date().optional(),
   questions: z.array(questionSchema).optional(),
 });
 
@@ -119,100 +127,6 @@ type Exam = { id: string, name: string };
 type Chapter = { id: string; chapterNo: string; chapterName: string };
 type ContentType = { id: string, name: string };
 
-const ImageUploader = ({ fieldName, onUrlChange, value }: { fieldName: string, onUrlChange: (url: string) => void, value?: string }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [url, setUrl] = useState('');
-    const [isUploading, setIsUploading] = useState(false);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [prompt, setPrompt] = useState('');
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setIsUploading(true);
-            try {
-                const downloadURL = await uploadFile(file);
-                onUrlChange(downloadURL);
-                setIsOpen(false);
-            } catch (error) {
-                console.error("Upload error:", error);
-            } finally {
-                setIsUploading(false);
-            }
-        }
-    };
-    
-    const handleGenerate = async () => {
-        if (!prompt) return;
-        setIsGenerating(true);
-        try {
-            const result = await generateImage({ prompt });
-            onUrlChange(result.imageUrl);
-            setIsOpen(false);
-        } catch (error) {
-            console.error("AI Generation error:", error);
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
-    return (
-        <div className="space-y-2">
-            <div className="flex items-center gap-2">
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" type="button"><ImageIcon className="mr-2 h-4 w-4" />Set Image</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Set Image</DialogTitle>
-                        </DialogHeader>
-                        <Tabs defaultValue="upload">
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="upload">Upload</TabsTrigger>
-                                <TabsTrigger value="url">From URL</TabsTrigger>
-                                <TabsTrigger value="ai">Generate with AI</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="upload" className="pt-4">
-                                <div 
-                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
-                                    onClick={() => fileInputRef.current?.click()}
-                                >
-                                    <div className="space-y-1 text-center">
-                                        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                        <p>Click to upload a file</p>
-                                        <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
-                                    </div>
-                                </div>
-                                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/png, image/jpeg, image/gif" />
-                                {isUploading && <div className="mt-2 flex items-center justify-center"><Loader2 className="animate-spin" /> Uploading...</div>}
-                            </TabsContent>
-                            <TabsContent value="url" className="pt-4 space-y-2">
-                                <Label htmlFor="imageUrl">Image URL</Label>
-                                <Input id="imageUrl" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com/image.png" />
-                                <Button type="button" onClick={() => { onUrlChange(url); setIsOpen(false); }}>Set URL</Button>
-                            </TabsContent>
-                            <TabsContent value="ai" className="pt-4 space-y-2">
-                                 <Label htmlFor="aiPrompt">Image Prompt</Label>
-                                <Input id="aiPrompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., A majestic dragon soaring" />
-                                <Button type="button" onClick={handleGenerate} disabled={isGenerating}>
-                                    {isGenerating ? <><Loader2 className="animate-spin" /> Generating...</> : <><Sparkles /> Generate</>}
-                                </Button>
-                            </TabsContent>
-                        </Tabs>
-                    </DialogContent>
-                </Dialog>
-                {value && (
-                    <Button variant="destructive" size="sm" type="button" onClick={() => onUrlChange('')}>
-                        <Trash2 className="mr-2 h-4 w-4" /> Remove
-                    </Button>
-                )}
-            </div>
-            {value && <Image src={value} alt="Preview" width={80} height={80} className="w-20 h-20 object-cover mt-2 rounded-md" />}
-        </div>
-    );
-};
 
 const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
     const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
@@ -350,11 +264,12 @@ export default function EditContentPage() {
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
-  const [classes, setClasses] = useState<ClassCategory[]>([]);
+  const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [examCategories, setExamCategories] = useState<ExamType[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
+  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
@@ -372,21 +287,24 @@ export default function EditContentPage() {
     defaultValues: {
       title: '',
       board: '',
+      classCategory: '',
       class: '',
-      state: '',
-      examCategory: '',
-      exam: '',
       subject: '',
       chapter: '',
+      examCategory: '',
+      state: '',
+      exam: '',
       school: '',
       semester: '',
       testType: [],
       description: '',
+      featureImage: '',
       duration: 0,
       difficulty: 'Medium',
       access: 'free',
       price: undefined,
       subscriptionPlan: 'pass',
+      publishedAt: new Date(),
       questions: [],
     },
   });
@@ -395,18 +313,10 @@ export default function EditContentPage() {
     control: form.control,
     name: 'questions',
   });
-
-  const questions = form.watch('questions');
-  useEffect(() => {
-    const totalMarks = questions?.reduce((total, q) => {
-        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
-            return total + (q.correctAnswer.length || 0);
-        }
-        return total + (q.marks || 1);
-    }, 0) || 0;
-    form.setValue('duration', totalMarks, { shouldValidate: true });
-  }, [questions, form]);
-
+  
+  const selectedClassCategory = form.watch('classCategory');
+  const selectedSubject = form.watch('subject');
+  const selectedExamCategory = form.watch('examCategory');
 
   const fetchContentAndMetadata = useCallback(async () => {
     if (!contentId) return;
@@ -425,7 +335,7 @@ export default function EditContentPage() {
       setSubjects(subjectData);
       setContentTypes(contentTypeData);
       setBoards(boardData);
-      setClasses(classData);
+      setClassCategories(classData);
       setStates(stateData);
       setExamCategories(examTypeData);
 
@@ -440,7 +350,7 @@ export default function EditContentPage() {
               options: q.options || (q.type === 'Multiple Choice' ? Array.from({length: 4}, () => ({ text: '', explanation: ''})) : q.type === 'True/False' ? [{text: 'True', explanation: ''}, {text: 'False', explanation: ''}] : []),
           }));
           
-          form.reset({ ...contentData, testType: testTypeArray, questions: questionsWithDefaults });
+          form.reset({ ...contentData, testType: testTypeArray, questions: questionsWithDefaults, publishedAt: contentData.publishedAt ? new Date(contentData.publishedAt) : new Date() });
           
           if (contentData.classCategory) {
               const fetchedGrades = await getGradesByClass(contentData.classCategory);
@@ -449,6 +359,13 @@ export default function EditContentPage() {
            if (contentData.examCategory) {
               const fetchedExams = await getExamsByCategory(contentData.examCategory);
               setExams(fetchedExams);
+          }
+          if(contentData.subject) {
+              const subjectDoc = subjectData.find(s => s.name === contentData.subject);
+              if (subjectDoc) {
+                  const fetchedChapters = await getChaptersBySubjectId(subjectDoc.id);
+                  setChapters(fetchedChapters);
+              }
           }
       } else {
           throw new Error("Content not found");
@@ -468,6 +385,43 @@ export default function EditContentPage() {
   useEffect(() => {
     fetchContentAndMetadata();
   }, [fetchContentAndMetadata]);
+
+  useEffect(() => {
+    const fetchChapters = async () => {
+      const subjectDoc = subjects.find(s => s.name === selectedSubject);
+      if (subjectDoc) {
+        const fetchedChapters = await getChaptersBySubjectId(subjectDoc.id);
+        setChapters(fetchedChapters);
+      } else {
+        setChapters([]);
+      }
+    };
+    if (selectedSubject) fetchChapters();
+  }, [selectedSubject, subjects]);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+      if (selectedClassCategory) {
+        const fetchedGrades = await getGradesByClass(selectedClassCategory);
+        setGrades(fetchedGrades);
+      } else {
+        setGrades([]);
+      }
+    };
+    fetchGrades();
+  }, [selectedClassCategory]);
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      if (selectedExamCategory) {
+        const fetchedExams = await getExamsByCategory(selectedExamCategory);
+        setExams(fetchedExams);
+      } else {
+        setExams([]);
+      }
+    };
+    fetchExams();
+  }, [selectedExamCategory]);
 
    useEffect(() => {
     const aiQuestionsRaw = sessionStorage.getItem('aiGeneratedQuestions');
@@ -498,33 +452,71 @@ export default function EditContentPage() {
     }
   }, [replace, toast, form]);
 
+  const questions = form.watch('questions');
+  useEffect(() => {
+    const totalMarks = questions?.reduce((total, q) => {
+        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+            return total + (q.correctAnswer.length || 0);
+        }
+        return total + (q.marks || 1);
+    }, 0) || 0;
+    form.setValue('duration', totalMarks, { shouldValidate: true });
+  }, [questions, form]);
+
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-        const processedData = { ...data };
+        const processedQuestions = data.questions?.map(q => {
+            if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
+                return { ...q, marks: q.correctAnswer.length || 1 };
+            }
+            return { ...q, marks: q.marks || 1 };
+        });
+
+        const processedData = { ...data, questions: processedQuestions };
         
-        // Ensure marks are calculated for new/edited matching questions
-        if (processedData.questions) {
-            processedData.questions = processedData.questions.map(q => {
-                if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
-                    return { ...q, marks: q.correctAnswer.length };
-                }
-                return { ...q, marks: q.marks || 1 }; // Ensure marks default to 1
-            });
-        }
-        
-      await updateContent(contentId, processedData);
-      toast({
-        title: 'Content Updated!',
-        description: `The content "${data.title}" has been successfully updated.`,
-      });
-      router.push('/admin/content');
+        await updateContent(contentId, processedData);
+        toast({
+            title: 'Content Updated!',
+            description: `The content "${data.title}" has been successfully updated.`,
+        });
+        router.push('/admin/content');
     } catch (error) {
        toast({
         variant: "destructive",
         title: 'Error Updating Content',
         description: (error as Error).message,
       });
+    }
+  };
+
+  const handleAIDescriptionGenerate = async () => {
+    const title = form.getValues('title');
+    if (!title) {
+        toast({
+            variant: "destructive",
+            title: 'Title is required',
+            description: 'Please enter a title before generating a description.',
+        });
+        return;
+    }
+
+    setIsGeneratingDesc(true);
+    try {
+        const result = await generateDescription({ source: title });
+        form.setValue('description', result.description);
+        toast({
+            title: 'Description Generated!',
+            description: 'AI has created a description for you.',
+        });
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+        });
+    } finally {
+      setIsGeneratingDesc(false);
     }
   };
 
@@ -618,8 +610,7 @@ export default function EditContentPage() {
             }
         }
     };
-
-    const selectedClassCategory = form.watch('classCategory');
+    
     const accessLevel = form.watch('access');
 
   if (loading) {
@@ -682,6 +673,79 @@ export default function EditContentPage() {
                         </FormItem>
                     )}
                 />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="board" render={({ field }) => (
+                        <FormItem><FormLabel>Board</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl><SelectContent>{boards.map((board) => (<SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name="state" render={({ field }) => (
+                        <FormItem><FormLabel>State</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a state" /></SelectTrigger></FormControl><SelectContent>{states.map((s) => (<SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    )} />
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="classCategory" render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Class Category</FormLabel>
+                        <Select onValueChange={(value) => { field.onChange(value); form.setValue('class', ''); }} value={field.value || ''}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl>
+                            <SelectContent>{classCategories.map(c => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}</SelectContent>
+                        </Select><FormMessage /></FormItem>
+                    )} />
+                    <FormField control={form.control} name="class" render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Grade</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedClassCategory}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select a grade" /></SelectTrigger></FormControl>
+                            <SelectContent>{grades.map(g => (<SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>))}</SelectContent>
+                        </Select><FormMessage /></FormItem>
+                    )} />
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="school" render={({ field }) => (<FormItem><FormLabel>School/College (Optional)</FormLabel><FormControl><Input placeholder="e.g., St. Stephen's College" {...field} value={field.value ?? ''}/></FormControl><FormMessage /></FormItem>)}/>
+                    <FormField control={form.control} name="semester" render={({ field }) => (<FormItem><FormLabel>Semester (Optional)</FormLabel><FormControl><Input placeholder="e.g., 3rd Semester" {...field} value={field.value ?? ''}/></FormControl><FormMessage /></FormItem>)}/>
+                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField control={form.control} name="subject" render={({ field }) => (
+                        <FormItem><FormLabel>Subject</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('chapter', ''); }} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl><SelectContent>{subjects.map((subject) => (<SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="chapter" render={({ field }) => (
+                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.chapterName}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
+                    )}/>
+                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField control={form.control} name="examCategory" render={({ field }) => (
+                    <FormItem><FormLabel>Exam Category</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('exam', ''); }} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam category" /></SelectTrigger></FormControl><SelectContent>{examCategories.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="exam" render={({ field }) => (
+                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                )}/>
+              </div>
+
+              <FormField control={form.control} name="description" render={({ field }) => (
+                  <FormItem>
+                    <div className="flex justify-between items-center"><FormLabel>Description</FormLabel>
+                        <Button type="button" variant="outline" size="sm" onClick={handleAIDescriptionGenerate} disabled={isGeneratingDesc || !form.getValues('title')}>
+                            {isGeneratingDesc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />} Generate with AI
+                        </Button>
+                    </div><FormControl><Textarea placeholder="Provide a brief description." {...field} /></FormControl><FormMessage />
+                  </FormItem>
+              )}/>
+               <FormField control={form.control} name="featureImage" render={({ field }) => (
+                  <FormItem><FormLabel>Feature Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })} value={field.value} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+                  <FormField control={form.control} name="duration" render={({ field }) => (<FormItem><FormLabel>Duration / Total Marks</FormLabel><FormControl><Input type="number" {...field} readOnly disabled /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={form.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulty Level</FormLabel><Select onValueChange={field.onChange} value={field.value ?? 'Medium'}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>
+                  <FormField control={form.control} name="publishedAt" render={({ field }) => (
+                        <FormItem className="flex flex-col"><FormLabel>Publish Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus/></PopoverContent></Popover><FormMessage /></FormItem>
+                  )}/>
+                  <div className='space-y-2 lg:col-span-3'>
+                      <FormField control={form.control} name="access" render={({ field }) => (
+                          <FormItem><FormLabel>Access Level</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="free">Free</SelectItem><SelectItem value="premium">Paid (Premium)</SelectItem><SelectItem value="pro">Subscription (Pro)</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                      )}/>
+                      {accessLevel === 'premium' && (<FormField control={form.control} name="price" render={({ field }) => (<FormItem><FormLabel>Price (INR)</FormLabel><FormControl><Input type="number" placeholder="e.g., 199" {...field} value={field.value ?? ''}/></FormControl><FormMessage /></FormItem>)}/>)}
+                      {accessLevel === 'pro' && (<FormField control={form.control} name="subscriptionPlan" render={({ field }) => (<FormItem><FormLabel>Subscription Plan</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="pass">Pass</SelectItem><SelectItem value="pro">Pass Pro</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>)}
+                  </div>
+                </div>
             </CardContent>
           </Card>
 
@@ -853,5 +917,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
-    
