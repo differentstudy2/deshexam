@@ -35,7 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, getSubjects, getContentTypes, getBoards, getExamTypes, getChaptersBySubjectId, addChapter, addBoard, addExamType, addSubject, getExamsByCategory, addExam, uploadFile, getSettings, getClasses, addClass, getStates, addState, getGradesByClass } from '@/lib/firebase/firestore';
-import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon, FileJson } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Sparkles, FileText, Upload, GripVertical, Save, Image as ImageIcon, FileJson, Copy } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Dialog,
@@ -54,6 +54,7 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 // Schemas from add-content/page.tsx
@@ -282,19 +283,17 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
     );
 };
 
-
-const jsonExample = `
+const jsonExampleMCQ = `
 {
   "questions": [
     {
       "text": "What is the capital of France?",
       "type": "Multiple Choice",
-      "marks": 1,
       "options": [
-        { "text": "Berlin", "explanation": "Incorrect. Berlin is the capital of Germany." },
-        { "text": "Madrid", "explanation": "Incorrect. Madrid is the capital of Spain." },
-        { "text": "Paris", "explanation": "Correct. Paris is the capital of France." },
-        { "text": "Rome", "explanation": "Incorrect. Rome is the capital of Italy." }
+        { "text": "Berlin" },
+        { "text": "Madrid" },
+        { "text": "Paris" },
+        { "text": "Rome" }
       ],
       "correctAnswer": "Paris",
       "explanation": "Paris is the capital and most populous city of France."
@@ -309,13 +308,8 @@ const jsonExampleTF = `
     {
       "text": "The Earth is flat.",
       "type": "True/False",
-      "marks": 1,
-      "options": [
-        {"text": "True", "explanation": "This is incorrect. The Earth is an oblate spheroid."},
-        {"text": "False", "explanation": "This is correct. Scientific evidence overwhelmingly shows the Earth is round."}
-      ],
       "correctAnswer": "False",
-      "explanation": "The Earth is roughly a sphere. Evidence includes satellite photos, the way ships disappear over the horizon, and the existence of different time zones."
+      "explanation": "The Earth is roughly a sphere."
     }
   ]
 }
@@ -326,7 +320,6 @@ const jsonExampleSA = `
     {
       "text": "What is the chemical symbol for water?",
       "type": "Short Answer",
-      "marks": 1,
       "correctAnswer": "H2O",
       "explanation": "Water is a chemical compound consisting of two hydrogen atoms and one oxygen atom."
     }
@@ -339,7 +332,6 @@ const jsonExampleFIB = `
     {
       "text": "The powerhouse of the cell is the ____.",
       "type": "Fill in the Blank",
-      "marks": 1,
       "correctAnswer": "mitochondrion",
       "explanation": "Mitochondria are membrane-bound cell organelles that generate most of the chemical energy needed to power the cell's biochemical reactions."
     }
@@ -352,7 +344,6 @@ const jsonExampleMatching = `
     {
       "text": "Match the countries to their capitals.",
       "type": "Matching",
-      "marks": 3,
       "correctAnswer": [
         { "a": "Japan", "b": "Tokyo" },
         { "a": "Canada", "b": "Ottawa" },
@@ -363,6 +354,7 @@ const jsonExampleMatching = `
   ]
 }
 `;
+
 
 
 export default function EditContentPage() {
@@ -575,30 +567,43 @@ export default function EditContentPage() {
     }
   };
 
-    const processJsonImport = (jsonText: string) => {
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+        toast({ title: 'Copied to clipboard!' });
+    }).catch(err => {
+        toast({ variant: 'destructive', title: 'Failed to copy', description: 'Could not copy text to clipboard.' });
+    });
+  };
+
+    const processJsonImport = (jsonString: string) => {
         try {
-            const parsedJson = JSON.parse(jsonText);
-            if (!parsedJson.questions || !Array.isArray(parsedJson.questions)) {
-                throw new Error("JSON must contain a 'questions' array.");
+            const parsed = JSON.parse(jsonString);
+            const questionsToImport = parsed.questions || [];
+            
+            if(!Array.isArray(questionsToImport)){
+                throw new Error("The 'questions' key must be an array if it exists.");
             }
             
-            append(parsedJson.questions);
-            toast({
-            title: 'Import Successful!',
-            description: `${parsedJson.questions.length} questions have been added.`,
-            });
+            if (questionsToImport.length > 0) {
+                questionsToImport.forEach((q: any) => {
+                    const { success, error } = questionSchema.safeParse(q);
+                    if (!success) {
+                        console.error("Invalid question structure:", q, error.flatten().fieldErrors);
+                        throw new Error(`One or more questions have an invalid structure. Please check the format.`);
+                    }
+                });
+                append(questionsToImport);
+            }
+
+            toast({ title: 'Import Successful!', description: `${questionsToImport.length} questions added.` });
             setIsImportDialogOpen(false);
             setJsonText('');
         } catch (error) {
-            toast({
-            variant: 'destructive',
-            title: 'Import Failed',
-            description: (error as Error).message,
-            });
+            toast({ variant: 'destructive', title: 'Import Failed', description: (error as Error).message });
         } finally {
             setIsImporting(false);
         }
-    }
+    };
     
     const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -816,13 +821,59 @@ export default function EditContentPage() {
                         <DialogTrigger asChild>
                             <Button type="button" variant="outline"><FileJson className="mr-2" />Bulk Import from JSON</Button>
                         </DialogTrigger>
-                        <DialogContent><DialogHeader><DialogTitle>Bulk Import Questions</DialogTitle><DialogDescription>Upload a JSON file or paste JSON text.</DialogDescription></DialogHeader>
-                            <Tabs defaultValue="upload">
-                                <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="upload">Upload File</TabsTrigger><TabsTrigger value="paste">Paste JSON</TabsTrigger></TabsList>
-                                <TabsContent value="upload" className="pt-4"><Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} /></TabsContent>
-                                <TabsContent value="paste" className="pt-4 space-y-2"><Textarea placeholder='Paste your JSON here' value={jsonText} onChange={(e) => setJsonText(e.target.value)} className="min-h-[200px]" /><Button onClick={handleBulkImportFromText} disabled={isImporting}>Import from Text</Button></TabsContent>
-                            </Tabs>
-                            <Accordion type="single" collapsible><AccordionItem value="item-1"><AccordionTrigger>View Example</AccordionTrigger><AccordionContent><pre className="mt-2 w-full rounded-md bg-secondary p-4 whitespace-pre-wrap text-sm">{jsonExample}</pre></AccordionContent></AccordionItem></Accordion>
+                        <DialogContent className="sm:max-w-2xl">
+                            <DialogHeader>
+                                <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
+                                <DialogDescription>
+                                    Upload a JSON file or paste JSON text. The content will be appended to the current question list.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <ScrollArea className="max-h-[60vh] pr-6">
+                                <Tabs defaultValue="paste">
+                                    <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="paste">Paste JSON</TabsTrigger><TabsTrigger value="upload">Upload File</TabsTrigger></TabsList>
+                                    <TabsContent value="paste" className="pt-4 space-y-4">
+                                        <Textarea
+                                            placeholder='Paste your JSON content here...'
+                                            value={jsonText}
+                                            onChange={(e) => setJsonText(e.target.value)}
+                                            className="min-h-[200px] font-mono text-xs"
+                                            disabled={isImporting}
+                                        />
+                                        <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                            {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                        </Button>
+                                    </TabsContent>
+                                    <TabsContent value="upload" className="pt-4">
+                                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                                            <Label htmlFor="json-import">JSON/TXT File</Label>
+                                            <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                            {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
+                                <Accordion type="single" collapsible className="w-full mt-4">
+                                    <AccordionItem value="item-1">
+                                        <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
+                                        <AccordionContent>
+                                            <p className="text-sm text-muted-foreground mb-4">Your JSON file must contain a `questions` array. Each question should follow the specified format for its type.</p>
+                                            <Tabs defaultValue="mcq" className="w-full">
+                                                <TabsList className="h-auto flex-wrap justify-start">
+                                                    <TabsTrigger value="mcq">MCQ</TabsTrigger>
+                                                    <TabsTrigger value="tf">T/F</TabsTrigger>
+                                                    <TabsTrigger value="sa">Short Answer</TabsTrigger>
+                                                    <TabsTrigger value="fib">Fill Blank</TabsTrigger>
+                                                    <TabsTrigger value="matching">Matching</TabsTrigger>
+                                                </TabsList>
+                                                <TabsContent value="mcq"><div className="relative mt-2"><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMCQ)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button><ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMCQ}</pre></ScrollArea></div></TabsContent>
+                                                <TabsContent value="tf"><div className="relative mt-2"><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTF)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button><ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></ScrollArea></div></TabsContent>
+                                                <TabsContent value="sa"><div className="relative mt-2"><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleSA)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button><ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleSA}</pre></ScrollArea></div></TabsContent>
+                                                <TabsContent value="fib"><div className="relative mt-2"><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFIB)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button><ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFIB}</pre></ScrollArea></div></TabsContent>
+                                                <TabsContent value="matching"><div className="relative mt-2"><Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMatching)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button><ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMatching}</pre></ScrollArea></div></TabsContent>
+                                            </Tabs>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </ScrollArea>
                         </DialogContent>
                     </Dialog>
               </CardFooter>
