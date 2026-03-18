@@ -563,12 +563,16 @@ export const updateContent = async (contentId: string, contentData: any) => {
     if (!contentId) {
         throw new Error("Content ID is required to update content.");
     }
-    
-    const collectionName = contentData.testType === 'Textbook' ? 'textbooks' : 'content';
+
+    const isTextbook = Array.isArray(contentData.testType) 
+        ? contentData.testType.includes('Textbook') 
+        : contentData.testType === 'Textbook';
+
+    const collectionName = isTextbook ? 'textbooks' : 'content';
     const contentRef = doc(db, collectionName, contentId);
-    
+
     const cleanedData = cleanDataForFirebase(contentData);
-    
+
     const finalContentData = {
         ...cleanedData,
         updatedAt: serverTimestamp(),
@@ -2355,3 +2359,4 @@ export const getRelatedQuestions = async (currentQuestion: Partial<Question>): P
         throw new Error("Failed to fetch related questions.");
     }
 };
+
