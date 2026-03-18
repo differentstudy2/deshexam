@@ -379,16 +379,11 @@ export default function EditContentPage() {
           }
           setGrades(gradesForClass);
 
-          const initialChapter = chaptersForSubject.find(c => c.chapterName === contentData.chapter);
-          const initialExam = examsForCategory.find(e => e.name === contentData.exam);
-
           form.reset({ 
               ...contentData, 
               testType: testTypeArray, 
               questions: questionsWithDefaults, 
               publishedAt: contentData.publishedAt ? new Date(contentData.publishedAt.seconds * 1000) : new Date(),
-              chapter: initialChapter?.id || '',
-              exam: initialExam?.id || '',
           });
       } else {
           throw new Error("Content not found");
@@ -481,10 +476,10 @@ export default function EditContentPage() {
   const questions = form.watch('questions');
   useEffect(() => {
     const totalMarks = questions?.reduce((total, q) => {
-        if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
+        if (q?.type === 'Matching' && Array.isArray(q.correctAnswer)) {
             return total + (q.correctAnswer.length || 0);
         }
-        return total + (q.marks || 1);
+        return total + (q?.marks || 1);
     }, 0) || 0;
     form.setValue('duration', totalMarks, { shouldValidate: true });
   }, [questions, form]);
@@ -492,33 +487,6 @@ export default function EditContentPage() {
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-        const subjectDoc = subjects.find(s => s.name === data.subject);
-        
-        let chapterName = '';
-        if (data.chapter === 'add_new_chapter') {
-            const newChapterName = form.getValues('newChapterName');
-            if (newChapterName && subjectDoc) {
-                await addChapter(subjectDoc.id, { chapterName: newChapterName, chapterNo: (chapters.length + 1).toString() });
-                chapterName = newChapterName;
-            }
-        } else if (data.chapter) {
-            const foundChapter = chapters.find(c => c.id === data.chapter);
-            chapterName = foundChapter ? foundChapter.chapterName : '';
-        }
-
-        let examName = '';
-        if (data.exam === 'add_new_exam') {
-            const newExamName = form.getValues('newExam');
-            const examCatDoc = examCategories.find(ec => ec.name === data.examCategory);
-            if (newExamName && examCatDoc) {
-                await addExam(examCatDoc.id, { name: newExamName });
-                examName = newExamName;
-            }
-        } else if(data.exam) {
-            const foundExam = exams.find(e => e.id === data.exam);
-            examName = foundExam ? foundExam.name : '';
-        }
-        
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
                 return { ...q, marks: q.correctAnswer.length || 1 };
@@ -529,8 +497,6 @@ export default function EditContentPage() {
         const dataToSave = {
             ...data,
             questions: processedQuestions,
-            chapter: chapterName,
-            exam: examName,
         };
         
         await updateContent(contentId, dataToSave);
@@ -698,7 +664,7 @@ export default function EditContentPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <FormField control={form.control} name="title" render={({ field }) => ( <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )}/>
+              <FormField control={form.control} name="title" render={({ field }) => ( <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem> )}/>
                <FormField
                     control={form.control}
                     name="testType"
@@ -774,7 +740,7 @@ export default function EditContentPage() {
                     <FormItem><FormLabel>Exam Category</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('exam', ''); }} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam category" /></SelectTrigger></FormControl><SelectContent>{examCategories.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="exam" render={({ field }) => (
-                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                 )}/>
               </div>
 
@@ -784,14 +750,14 @@ export default function EditContentPage() {
                         <Button type="button" variant="outline" size="sm" onClick={handleAIDescriptionGenerate} disabled={isGeneratingDesc || !form.getValues('title')}>
                             {isGeneratingDesc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />} Generate with AI
                         </Button>
-                    </div><FormControl><Textarea placeholder="Provide a brief description." {...field} /></FormControl><FormMessage />
+                    </div><FormControl><Textarea placeholder="Provide a brief description." {...field} value={field.value ?? ''} /></FormControl><FormMessage />
                   </FormItem>
               )}/>
                <FormField control={form.control} name="featureImage" render={({ field }) => (
                   <FormItem><FormLabel>Feature Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue('featureImage', url, { shouldValidate: true })} value={field.value} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-                  <FormField control={form.control} name="duration" render={({ field }) => (<FormItem><FormLabel>Duration / Total Marks</FormLabel><FormControl><Input type="number" {...field} readOnly disabled /></FormControl><FormMessage /></FormItem>)}/>
+                  <FormField control={form.control} name="duration" render={({ field }) => (<FormItem><FormLabel>Duration / Total Marks</FormLabel><FormControl><Input type="number" {...field} readOnly disabled value={field.value ?? 0} /></FormControl><FormMessage /></FormItem>)}/>
                   <FormField control={form.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulty Level</FormLabel><Select onValueChange={field.onChange} value={field.value ?? 'Medium'}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>
                   <FormField control={form.control} name="publishedAt" render={({ field }) => (
                         <FormItem className="flex flex-col"><FormLabel>Publish Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus/></PopoverContent></Popover><FormMessage /></FormItem>
@@ -823,12 +789,24 @@ export default function EditContentPage() {
                                   <FormField control={form.control} name={`questions.${index}.type`} render={({ field }) => (
                                       <FormItem className="w-full"><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem><SelectItem value="Short Answer">Short Answer</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                                   )}/>
+                                  <FormField
+                                      control={form.control}
+                                      name={`questions.${index}.marks`}
+                                      render={({ field }) => (
+                                          <FormItem>
+                                              <FormControl>
+                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} disabled={questionType === 'Matching'} value={field.value ?? 1} />
+                                              </FormControl>
+                                              <FormMessage />
+                                          </FormItem>
+                                      )}
+                                  />
                                   <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
                                       <Trash2 className="mr-2 h-4 w-4" />Remove
                                   </Button>
                               </div>
                               <div className="space-y-4">
-                                  <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => ( <FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem> )}/>
+                                  <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => ( <FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem> )}/>
                                   
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url, { shouldValidate: true })} value={field.value} /></FormControl><FormMessage /></FormItem>)}/>
@@ -855,7 +833,7 @@ export default function EditContentPage() {
                                                       <div key={optionIndex} className="flex items-start gap-4">
                                                           <FormControl><RadioGroupItem value={form.getValues(`questions.${index}.options.${optionIndex}.text`)} className="mt-2.5" /></FormControl>
                                                            <div className="space-y-2 flex-1">
-                                                              <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (<Input {...optionField} placeholder={`Option ${optionIndex + 1}`} /> )}/>
+                                                              <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (<Input {...optionField} placeholder={`Option ${optionIndex + 1}`} value={optionField.value ?? ''} /> )}/>
                                                               <div className="grid grid-cols-2 gap-2">
                                                                     <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl></FormItem>)}/>
                                                                     <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
@@ -885,10 +863,10 @@ export default function EditContentPage() {
                                   )}
                                   {questionType === 'Matching' && ( <MatchingPairsField control={form.control} questionIndex={index} setValue={form.setValue} /> )}
                                   {(questionType === 'Short Answer' || questionType === 'Fill in the Blank') && (
-                                      <FormField control={form.control} name={`questions.${index}.correctAnswer`} render={({ field }) => (<FormItem><FormLabel>Answer</FormLabel><FormControl><Input {...field} placeholder="Enter the correct answer" /></FormControl><FormMessage /></FormItem>)}/>
+                                      <FormField control={form.control} name={`questions.${index}.correctAnswer`} render={({ field }) => (<FormItem><FormLabel>Answer</FormLabel><FormControl><Input {...field} placeholder="Enter the correct answer" value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)}/>
                                   )}
 
-                                  <FormField control={form.control} name={`questions.${index}.explanation`} render={({ field }) => (<FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea {...field} placeholder="Explain why the correct answer is right." /></FormControl><FormMessage /></FormItem>)}/>
+                                  <FormField control={form.control} name={`questions.${index}.explanation`} render={({ field }) => (<FormItem><FormLabel>General Explanation</FormLabel><FormControl><Textarea {...field} placeholder="Explain why the correct answer is right." value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)}/>
                               </div>
                           </Card>
                       );
@@ -975,4 +953,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
