@@ -564,9 +564,8 @@ export const updateContent = async (contentId: string, contentData: any) => {
         throw new Error("Content ID is required to update content.");
     }
 
-    const isTextbook = Array.isArray(contentData.testType) 
-        ? contentData.testType.includes('Textbook') 
-        : contentData.testType === 'Textbook';
+    const testType = Array.isArray(contentData.testType) ? contentData.testType[0] : contentData.testType;
+    const isTextbook = testType === 'Textbook';
 
     const collectionName = isTextbook ? 'textbooks' : 'content';
     const contentRef = doc(db, collectionName, contentId);
@@ -2068,7 +2067,7 @@ export const deletePracticeSet = async (textbookId: string, chapterId: string, t
         const questionsRef = collection(practiceSetRef, 'questions');
         const questionsSnap = await getDocs(questionsRef);
         for (const qDoc of questionsSnap.docs) {
-            await deleteDoc(qDoc.ref);
+             await deleteDoc(qDoc.ref);
         }
         await deleteDoc(practiceSetRef);
     } catch (e) {

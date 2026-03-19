@@ -1686,7 +1686,7 @@ function AddQuizForm() {
                             text: '', 
                             type: 'Multiple Choice', 
                             marks: 1, 
-                            options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], 
+                            options: [{text:''}, {text:''}, {text:''}, {text:''}], 
                             correctAnswer: '', 
                             explanation: '' 
                         };
@@ -1700,7 +1700,7 @@ function AddQuizForm() {
                       Add Question Manually
                   </Button>
                    <Button asChild variant="outline">
-                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-quiz">
+                        <Link href="/admin/add-content/add-ai-question?redirect=/admin/add-practice-questions">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Add Questions with AI
                         </Link>
@@ -1733,10 +1733,10 @@ function AddQuizForm() {
   );
 }
 
-export default function AddQuizPage() {
+export default function CreateTestPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <AddQuizForm />
+            <AddContentForm />
         </Suspense>
     )
 }
