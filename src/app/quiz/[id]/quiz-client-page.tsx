@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -222,6 +223,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isLoading, setIsLoading] = useState(true);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('bn');
+    const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
     const t = translations[language];
 
@@ -656,7 +658,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
              <div className="container mx-auto px-4 py-12 text-center">
                  <h1 className="text-2xl font-bold">Quiz not found or has no questions.</h1>
                  <Button asChild className="mt-4">
-                     <Link href="/kids-zone/fun-quizzes">Back to Fun Quizzes</Link>
+                     <Link href="/quizzes">Back to Quizzes</Link>
                  </Button>
              </div>
         );
@@ -695,7 +697,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     {t.playAgain}
                                 </Button>
                                 <Button asChild variant="outline" size="lg">
-                                    <Link href="/kids-zone/fun-quizzes">
+                                    <Link href="/quizzes">
                                         <ArrowLeft className="mr-2 h-4 w-4" />
                                         {t.backToQuizzes}
                                     </Link>
@@ -704,7 +706,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="w-full max-w-2xl mx-auto">
+                    <div className={cn(
+                        "w-full mx-auto transition-all duration-300",
+                        viewMode === 'desktop' ? 'max-w-2xl' : 'max-w-sm'
+                    )}>
                         <Card className="bg-card/60 backdrop-blur-sm">
                              <CardContent className="p-3">
                                 <div className="flex flex-wrap justify-between items-center gap-4">
@@ -751,6 +756,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     <DialogDescription>Adjust your quiz preferences.</DialogDescription>
                                                 </DialogHeader>
                                                 <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="view-mode" className="col-span-2">View Mode</Label>
+                                                        <Select value={viewMode} onValueChange={(v) => setViewMode(v as 'desktop' | 'mobile')}>
+                                                            <SelectTrigger className="col-span-2 h-9">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="desktop">Desktop</SelectItem>
+                                                                <SelectItem value="mobile">Mobile (Shorts)</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
                                                     <div className="grid grid-cols-4 items-center gap-4">
                                                         <Label htmlFor="language" className="flex items-center gap-2 col-span-2"><Languages className="w-5 h-5"/> Language</Label>
                                                         <Select value={language} onValueChange={handleLanguageChange}>
@@ -871,3 +888,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
