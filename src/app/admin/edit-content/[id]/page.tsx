@@ -379,23 +379,17 @@ export default function EditContentPage() {
               ? contentData.testType 
               : (typeof contentData.testType === 'string' ? [contentData.testType] : []);
           
-          let parsedPublishedDate = new Date(); // Default to now
+          let parsedPublishedDate = new Date();
           const dateValue = contentData.publishedAt;
           
           if (dateValue) {
-              let tempDate;
-              // Handle Firestore Timestamp object, which has a toDate() method
               if (typeof dateValue.toDate === 'function') {
-                  tempDate = dateValue.toDate();
-              } 
-              // Handle ISO string or other date formats that `new Date()` can parse
-              else {
-                  tempDate = new Date(dateValue);
-              }
-              
-              // Check if the created date is valid before using it
-              if (!isNaN(tempDate.getTime())) {
-                  parsedPublishedDate = tempDate;
+                  parsedPublishedDate = dateValue.toDate();
+              } else {
+                  const d = new Date(dateValue);
+                  if (!isNaN(d.getTime())) {
+                      parsedPublishedDate = d;
+                  }
               }
           }
 
@@ -425,12 +419,14 @@ export default function EditContentPage() {
           }
           setGrades(gradesForClass);
 
+          const difficulty = Array.isArray(contentData.difficulty) ? contentData.difficulty[0] : contentData.difficulty;
+
           form.reset({ 
               ...contentData, 
               testType: testTypeArray, 
               questions: questionsWithDefaults, 
               publishedAt: parsedPublishedDate,
-              difficulty: Array.isArray(contentData.difficulty) ? contentData.difficulty[0] : contentData.difficulty,
+              difficulty: difficulty || 'Medium',
           });
       } else {
           throw new Error("Content not found");
@@ -727,9 +723,10 @@ export default function EditContentPage() {
                                             <Checkbox
                                             checked={field.value?.includes(item.name)}
                                             onCheckedChange={(checked) => {
+                                                const currentValue = field.value || [];
                                                 return checked
-                                                ? field.onChange([...(field.value || []), item.name])
-                                                : field.onChange(field.value?.filter((value) => value !== item.name))
+                                                ? field.onChange([...currentValue, item.name])
+                                                : field.onChange(currentValue?.filter((value) => value !== item.name))
                                             }}
                                             />
                                         </FormControl>
@@ -1021,4 +1018,3 @@ export default function EditContentPage() {
     </div>
   );
 }
-
