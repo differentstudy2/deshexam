@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
@@ -93,27 +93,54 @@ const AlphabetLearn = ({ letters, type }: { letters: { char: string; name: strin
         };
     }, [emblaApi, letters, playLetterSound]);
     
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
 
     return (
-        <div className="overflow-hidden w-full max-w-sm mx-auto p-2 bg-black rounded-3xl shadow-2xl" ref={emblaRef}>
-            <div className="flex flex-col h-[70vh] rounded-2xl overflow-hidden">
-                {letters.map((letter, index) => (
-                    <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${type}-${index}`}>
-                        <div 
-                            onClick={() => playLetterSound(letter)}
-                            className={cn(
-                                "w-full h-full transform transition-all duration-300 flex flex-col text-center items-center justify-center cursor-pointer bg-gradient-to-br from-slate-800 to-slate-900",
-                                activeLetter === letter.char && "scale-105"
-                            )}
-                        >
-                            <div className="p-4 w-full flex flex-col items-center justify-center">
-                                <p className="text-[14rem] leading-none font-bold text-white/90" style={{fontFamily: "'Hind Siliguri', sans-serif"}}>{letter.char}</p>
-                                <p className="text-3xl font-semibold text-white/70 mt-4">{letter.name}</p>
+        <div className="relative w-full max-w-sm mx-auto">
+            <Button
+                variant="outline"
+                size="icon"
+                className="absolute top-4 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                onClick={scrollPrev}
+            >
+                <ChevronUp className="h-6 w-6" />
+            </Button>
+
+            <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl" ref={emblaRef}>
+                <div className="flex flex-col h-[70vh] rounded-2xl overflow-hidden">
+                    {letters.map((letter, index) => (
+                        <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${type}-${index}`}>
+                            <div 
+                                onClick={() => playLetterSound(letter)}
+                                className={cn(
+                                    "w-full h-full transform transition-all duration-300 flex flex-col text-center items-center justify-center cursor-pointer bg-gradient-to-br from-slate-800 to-slate-900",
+                                    activeLetter === letter.char && "scale-105"
+                                )}
+                            >
+                                <div className="p-4 w-full flex flex-col items-center justify-center">
+                                    <p className="text-[14rem] leading-none font-bold text-white/90" style={{fontFamily: "'Hind Siliguri', sans-serif"}}>{letter.char}</p>
+                                    <p className="text-3xl font-semibold text-white/70 mt-4">{letter.name}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
+
+            <Button
+                variant="outline"
+                size="icon"
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                onClick={scrollNext}
+            >
+                <ChevronDown className="h-6 w-6" />
+            </Button>
         </div>
     );
 };
