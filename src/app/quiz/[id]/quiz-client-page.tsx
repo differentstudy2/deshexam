@@ -831,7 +831,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                        <div className={cn(
+                                            "grid gap-4 w-full",
+                                            viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                                        )}>
                                             {currentQuestion?.options.map((option, index) => {
                                                 const isSelected = selectedAnswer === option.text;
                                                 const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
@@ -888,4 +891,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
