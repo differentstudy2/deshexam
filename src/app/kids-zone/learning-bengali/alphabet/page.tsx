@@ -9,12 +9,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Confetti from 'react-dom-confetti';
+import { useToast } from "@/hooks/use-toast";
 
 
 const vowels = [
   { char: 'অ', name: 'Aw' }, { char: 'আ', name: 'A' }, { char: 'ই', name: 'E' },
   { char: 'ঈ', name: 'Ee' }, { char: 'উ', name: 'U' }, { char: 'ঊ', name: 'Oo' },
-  { char: 'ঋ', name: 'Ri' }, { char: 'এ', name: 'E' }, { char: 'ঐ', name: 'Oi' },
+  { char: 'ঋ', name: 'Ri' }, 
+  { char: 'এ', name: 'E', dialogue: "আমি হলাম এ! খুব সহজ আর ছটফটে। আমাকে লিখে ফেলো চটপট!" }, 
+  { char: 'ঐ', name: 'Oi', dialogue: "আর আমি ঐ! এ-এর মাথায় একটা ঝুঁটি দিলেই আমি তৈরি!" },
   { char: 'ও', name: 'O' }, { char: 'ঔ', name: 'Ou' }
 ];
 
@@ -56,7 +59,11 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
     }, [shuffleLetters]);
 
     const playLetterSound = (letter: string) => {
-        console.log(`Playing sound for ${letter}`);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(letter);
+            utterance.lang = 'bn-IN';
+            window.speechSynthesis.speak(utterance);
+        }
         setActiveLetter(letter);
         setTimeout(() => setActiveLetter(null), 1000);
     }
@@ -344,11 +351,26 @@ const MatchingGame = () => {
 
 export default function BengaliAlphabetPage() {
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
+    const { toast } = useToast();
 
-    const playLetterSound = (letter: string) => {
-        console.log(`Playing sound for ${letter}`);
-        setActiveLetter(letter);
-        setTimeout(() => setActiveLetter(null), 1000);
+    const playLetterSound = (letter: {char: string, name: string, dialogue?: string}) => {
+        const textToSpeak = letter.dialogue || letter.char;
+        
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(textToSpeak);
+          utterance.lang = 'bn-IN';
+          window.speechSynthesis.speak(utterance);
+        }
+
+        if (letter.dialogue) {
+            toast({
+                description: letter.dialogue,
+                duration: 4000,
+            });
+        }
+
+        setActiveLetter(letter.char);
+        setTimeout(() => setActiveLetter(null), 1500);
     }
 
   return (
@@ -385,7 +407,7 @@ export default function BengaliAlphabetPage() {
                         {vowels.map((letter, index) => (
                             <Card 
                                 key={`${letter.char}-${index}`} 
-                                onClick={() => playLetterSound(letter.char)}
+                                onClick={() => playLetterSound(letter)}
                                 className={cn(
                                     "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
                                     activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
@@ -406,7 +428,7 @@ export default function BengaliAlphabetPage() {
                         {consonants.map((letter, index) => (
                             <Card 
                                 key={`${letter.char}-${index}`}
-                                onClick={() => playLetterSound(letter.char)}
+                                onClick={() => playLetterSound(letter)}
                                 className={cn(
                                     "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
                                     activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
