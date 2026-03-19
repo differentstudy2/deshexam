@@ -96,6 +96,7 @@ export default function TestClientPage({ test }: { test: Test }) {
     const { openAuthDialog } = useAuthDialog();
     const quizCardRef = useRef<HTMLDivElement>(null);
     const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [isCapturing, setIsCapturing] = useState(false);
 
     const startQuiz = useCallback(() => {
         setShuffledQuestions(shuffleArray(test.questions));
@@ -128,9 +129,8 @@ export default function TestClientPage({ test }: { test: Test }) {
             // Auto-submit when the last question is answered
             if(user) {
                 // We need to do this in a timeout to get the final state of answers
-                setTimeout(() => {
-                    // This is a bit of a hack, but we need to ensure the final answer is in the state
-                    // before we submit. A better solution would use a state callback.
+                // before we submit. A better solution would use a state callback.
+                 setTimeout(() => {
                      addTestSubmission({
                         testId: test?.id,
                         testTitle: test?.title,
@@ -214,7 +214,6 @@ export default function TestClientPage({ test }: { test: Test }) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
         ctx.font = "bold 32px 'Lexend', sans-serif";
         ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
         ctx.save();
         ctx.translate(width / 2, height / 2);
         ctx.rotate(-Math.PI / 4);
@@ -224,7 +223,7 @@ export default function TestClientPage({ test }: { test: Test }) {
         const patternWidth = textWidth + 150;
         const patternHeight = 150;
 
-        for (let x = -width * 1.5; x < width * 1.5; x += patternWidth) {
+        for (let x = -width; x < width * 1.5; x += patternWidth) {
             for (let y = -height * 1.5; y < height * 1.5; y += patternHeight) {
                 ctx.fillText(text, x, y);
             }
@@ -232,80 +231,92 @@ export default function TestClientPage({ test }: { test: Test }) {
         ctx.restore();
     };
 
-    const handleSaveAsImage = (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
-        if (quizCardRef.current) {
-            html2canvas(quizCardRef.current, {
-                useCORS: true,
+    const handleSaveAsImage = async (aspectRatio: 'default' | '9:16' | '16:9' | '1:1' | '4:5' = 'default') => {
+        if (isCapturing || !quizCardRef.current) return;
+        setIsCapturing(true);
+
+        try {
+            const sourceCanvas = await html2canvas(quizCardRef.current, { 
+                useCORS: true, 
                 backgroundColor: null,
-            }).then(sourceCanvas => {
-                let targetCanvas: HTMLCanvasElement;
-                const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '').replace(/\s+/g, '_').slice(0, 50) : quiz.title.replace(/\s+/g, '_').slice(0, 50);
-                const fileName = `${questionText}.png`;
-
-                const target = document.createElement('canvas');
-                const targetCtx = target.getContext('2d');
-                if (!targetCtx) return;
-                
-                if (aspectRatio === 'default') {
-                    target.width = sourceCanvas.width;
-                    target.height = sourceCanvas.height;
-                    targetCtx.drawImage(sourceCanvas, 0, 0);
-                    drawWatermark(targetCtx, target.width, target.height);
-                    targetCanvas = target;
-                } else {
-                    let targetWidth, targetHeight;
-                    if (aspectRatio === '9:16') {
-                        targetHeight = 1920;
-                        targetWidth = 1080;
-                    } else if (aspectRatio === '16:9') {
-                        targetWidth = 1920;
-                        targetHeight = 1080;
-                    } else if (aspectRatio === '4:5') {
-                        targetWidth = 1080;
-                        targetHeight = 1350;
-                    } else { // 1:1 for Instagram
-                        targetWidth = 1080;
-                        targetHeight = 1080;
-                    }
-                    
-                    target.width = targetWidth;
-                    target.height = targetHeight;
-
-                    const gradients = [
-                        { from: '#DA22FF', to: '#9733EE' },
-                        { from: '#09203F', to: '#537895' },
-                        { from: '#868F96', to: '#596164' },
-                        { from: '#93A5CF', to: '#E4EfE9' },
-                        { from: '#11998E', to: '#38EF7D' }
-                    ];
-                    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-                    const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
-                    gradient.addColorStop(0, randomGradient.from);
-                    gradient.addColorStop(1, randomGradient.to);
-                    targetCtx.fillStyle = gradient;
-                    targetCtx.fillRect(0, 0, targetWidth, targetHeight);
-                    
-                    drawWatermark(targetCtx, targetWidth, targetHeight);
-
-                    const padding = 100;
-                    const scale = Math.min(
-                        (targetWidth - padding * 2) / sourceCanvas.width, 
-                        (targetHeight - padding * 2) / sourceCanvas.height
-                    );
-                    const scaledWidth = sourceCanvas.width * scale;
-                    const scaledHeight = sourceCanvas.height * scale;
-                    const dx = (targetWidth - scaledWidth) / 2;
-                    const dy = (targetHeight - scaledHeight) / 2;
-                    
-                    targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
-                    targetCanvas = target;
-                }
-
-                const link = document.createElement('a');
-                link.download = fileName;
-                link.href = targetCanvas.toDataURL('image/png');
-                link.click();
+                scale: 2 // Increase scale for better resolution
             });
+            
+            const questionText = currentQuestion?.text ? currentQuestion.text.replace(/[?]/g, '') : test.title;
+            const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}.png`;
+
+            const target = document.createElement('canvas');
+            const targetCtx = target.getContext('2d');
+            if (!targetCtx) {
+                setIsCapturing(false);
+                return;
+            };
+
+            let targetCanvas: HTMLCanvasElement;
+            if (aspectRatio === 'default') {
+                target.width = sourceCanvas.width;
+                target.height = sourceCanvas.height;
+                targetCtx.drawImage(sourceCanvas, 0, 0);
+                drawWatermark(targetCtx, target.width, target.height);
+                targetCanvas = target;
+            } else {
+                let targetWidth, targetHeight;
+                if (aspectRatio === '9:16') {
+                    targetHeight = 1920;
+                    targetWidth = 1080;
+                } else if (aspectRatio === '16:9') {
+                    targetWidth = 1920;
+                    targetHeight = 1080;
+                } else if (aspectRatio === '4:5') {
+                    targetWidth = 1080;
+                    targetHeight = 1350;
+                } else { // 1:1 for Instagram
+                    targetWidth = 1080;
+                    targetHeight = 1080;
+                }
+                
+                target.width = targetWidth;
+                target.height = targetHeight;
+
+                const gradients = [
+                    { from: '#DA22FF', to: '#9733EE' },
+                    { from: '#09203F', to: '#537895' },
+                    { from: '#868F96', to: '#596164' },
+                    { from: '#93A5CF', to: '#E4EfE9' },
+                    { from: '#11998E', to: '#38EF7D' }
+                ];
+                const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+                const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
+                gradient.addColorStop(0, randomGradient.from);
+                gradient.addColorStop(1, randomGradient.to);
+                targetCtx.fillStyle = gradient;
+                targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+                
+                drawWatermark(targetCtx, targetWidth, targetHeight);
+
+                const padding = 100;
+                const scale = Math.min(
+                    (targetWidth - padding * 2) / sourceCanvas.width, 
+                    (targetHeight - padding * 2) / sourceCanvas.height
+                );
+                const scaledWidth = sourceCanvas.width * scale;
+                const scaledHeight = sourceCanvas.height * scale;
+                const dx = (targetWidth - scaledWidth) / 2;
+                const dy = (targetHeight - scaledHeight) / 2;
+                
+                targetCtx.drawImage(sourceCanvas, dx, dy, scaledWidth, scaledHeight);
+                targetCanvas = target;
+            }
+            
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = targetCanvas.toDataURL('image/png');
+            link.click();
+            toast({ title: 'Image saved!', description: 'The question has been downloaded.' });
+        } catch(e) {
+            toast({ variant: 'destructive', title: 'Error saving image', description: (e as Error).message });
+        } finally {
+            setIsCapturing(false);
         }
     };
     
@@ -385,8 +396,8 @@ export default function TestClientPage({ test }: { test: Test }) {
                                         )}
                                          <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" size="icon">
-                                                    <ImageDown className="h-4 w-4" />
+                                                <Button variant="outline" size="icon" disabled={isCapturing}>
+                                                    {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
@@ -394,7 +405,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />Save for Landscape Video (16:9)</DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />Save for Short Video (9:16)</DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>Save for Instagram (1:1)</DropdownMenuItem>
-                                                 <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>Save for Facebook Post (4:5)</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>Save for Facebook Post (4:5)</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <Dialog>
@@ -460,7 +471,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                                             <Input 
                                                 placeholder="Type your answer here..."
                                                 value={userAnswers[currentQuestion.id] || ''}
-                                                onChange={(e) => setUserAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
+                                                onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                                                 disabled={showFeedback === currentQuestion.id}
                                                 className="h-12 text-lg"
                                             />
@@ -481,3 +492,5 @@ export default function TestClientPage({ test }: { test: Test }) {
         </div>
     );
 }
+
+```
