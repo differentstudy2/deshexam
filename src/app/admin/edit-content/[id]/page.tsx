@@ -402,16 +402,20 @@ export default function EditContentPage() {
           let chaptersForSubject: Chapter[] = [];
           if (contentData.subject) {
             const subjectDoc = subjectData.find(s => s.name === contentData.subject);
-            if(subjectDoc) chaptersForSubject = await getChaptersBySubjectId(subjectDoc.id);
+            if(subjectDoc) {
+                const fetchedChapters = await getChaptersBySubjectId(subjectDoc.id);
+                setChapters(fetchedChapters);
+            }
           }
-          setChapters(chaptersForSubject);
           
           let examsForCategory: Exam[] = [];
           if (contentData.examCategory) {
-              const examCatDoc = examTypeData.find(e => e.name === contentData.examCategory);
-              if (examCatDoc) examsForCategory = await getExamsByCategory(examCatDoc.id);
+              const examCatDoc = examTypeData.find(e => e.id === contentData.examCategory);
+              if (examCatDoc) {
+                  const fetchedExams = await getExamsByCategory(examCatDoc.id);
+                  setExams(fetchedExams);
+              }
           }
-          setExams(examsForCategory);
 
           let gradesForClass: Grade[] = [];
           if(contentData.classCategory) {
@@ -449,7 +453,7 @@ export default function EditContentPage() {
 
   useEffect(() => {
     const fetchChapters = async () => {
-      const subjectDoc = subjects.find(s => s.name === selectedSubject);
+      const subjectDoc = subjects.find(s => s.id === selectedSubject);
       if (subjectDoc) {
         const fetchedChapters = await getChaptersBySubjectId(subjectDoc.id);
         setChapters(fetchedChapters);
@@ -475,7 +479,7 @@ export default function EditContentPage() {
   useEffect(() => {
     const fetchExams = async () => {
       if (selectedExamCategory) {
-        const examCat = examCategories.find(e => e.name === selectedExamCategory);
+        const examCat = examCategories.find(e => e.id === selectedExamCategory);
         if (examCat) {
           const fetchedExams = await getExamsByCategory(examCat.id);
           setExams(fetchedExams);
@@ -531,7 +535,7 @@ export default function EditContentPage() {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
         const processedQuestions = data.questions?.map(q => {
-            if (q.type === 'Matching' && q.correctAnswer && Array.isArray(q.correctAnswer)) {
+            if (q.type === 'Matching' && Array.isArray(q.correctAnswer)) {
                 return { ...q, marks: q.correctAnswer.length || 1 };
             }
             return { ...q, marks: q.marks || 1 };
@@ -702,9 +706,6 @@ export default function EditContentPage() {
           <Card>
             <CardHeader>
               <CardTitle>Content Details</CardTitle>
-              <CardDescription>
-                Provide the essential information for your content.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <FormField control={form.control} name="title" render={({ field }) => ( <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem> )}/>
@@ -743,10 +744,10 @@ export default function EditContentPage() {
                 />
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="board" render={({ field }) => (
-                        <FormItem><FormLabel>Board</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl><SelectContent>{boards.map((board) => (<SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Board</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a board" /></SelectTrigger></FormControl><SelectContent>{boards.map((board) => (<SelectItem key={board.id} value={board.id}>{board.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="state" render={({ field }) => (
-                        <FormItem><FormLabel>State</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a state" /></SelectTrigger></FormControl><SelectContent>{states.map((s) => (<SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                        <FormItem><FormLabel>State</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a state" /></SelectTrigger></FormControl><SelectContent>{states.map((s) => (<SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                     )} />
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -763,7 +764,7 @@ export default function EditContentPage() {
                         <FormLabel>Grade</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedClassCategory}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select a grade" /></SelectTrigger></FormControl>
-                            <SelectContent>{grades.map(g => (<SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>))}</SelectContent>
+                            <SelectContent>{grades.map(g => (<SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>))}</SelectContent>
                         </Select><FormMessage /></FormItem>
                     )} />
                 </div>
@@ -773,18 +774,18 @@ export default function EditContentPage() {
                  </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField control={form.control} name="subject" render={({ field }) => (
-                        <FormItem><FormLabel>Subject</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('chapter', ''); }} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl><SelectContent>{subjects.map((subject) => (<SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Subject</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('chapter', ''); }} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger></FormControl><SelectContent>{subjects.map((subject) => (<SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                     )}/>
                     <FormField control={form.control} name="chapter" render={({ field }) => (
-                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.id}>{chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Chapter</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedSubject}><FormControl><SelectTrigger><SelectValue placeholder="Select a chapter" /></SelectTrigger></FormControl><SelectContent>{chapters.map(chap => <SelectItem key={chap.id} value={chap.id}>{chap.chapterNo}. {chap.chapterName}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
                     )}/>
                 </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField control={form.control} name="examCategory" render={({ field }) => (
-                    <FormItem><FormLabel>Exam Category</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('exam', ''); }} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam category" /></SelectTrigger></FormControl><SelectContent>{examCategories.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Exam Category</FormLabel><Select onValueChange={(value) => { field.onChange(value); form.setValue('exam', ''); }} value={field.value ?? ''}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam category" /></SelectTrigger></FormControl><SelectContent>{examCategories.map((exam) => (<SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="exam" render={({ field }) => (
-                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.name}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Exam</FormLabel><Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedExamCategory}><FormControl><SelectTrigger><SelectValue placeholder="Select an exam" /></SelectTrigger></FormControl><SelectContent>{exams.map((exam) => (<SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
                 )}/>
               </div>
 
@@ -852,20 +853,9 @@ export default function EditContentPage() {
                               <div className="flex justify-between items-center mb-4 gap-4">
                                   <h4 className="font-semibold text-lg whitespace-nowrap">Question {index + 1}</h4>
                                   <FormField control={form.control} name={`questions.${index}.type`} render={({ field }) => (
-                                      <FormItem className="w-full"><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem><SelectItem value="Short Answer">Short Answer</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                                      <FormItem className="w-full"><Select onValueChange={field.onChange} value={field.value ?? undefined}><FormControl><SelectTrigger><SelectValue placeholder="Select a question type" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem><SelectItem value="Short Answer">Short Answer</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                                   )}/>
-                                  <FormField
-                                      control={form.control}
-                                      name={`questions.${index}.marks`}
-                                      render={({ field }) => (
-                                          <FormItem>
-                                              <FormControl>
-                                                  <Input type="number" placeholder="Marks" className="w-24" {...field} disabled={questionType === 'Matching'} value={field.value ?? 1} />
-                                              </FormControl>
-                                              <FormMessage />
-                                          </FormItem>
-                                      )}
-                                  />
+                                  
                                   <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
                                       <Trash2 className="mr-2 h-4 w-4" />Remove
                                   </Button>
