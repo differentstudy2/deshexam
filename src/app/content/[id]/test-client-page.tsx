@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
@@ -492,5 +491,3 @@ export default function TestClientPage({ test }: { test: Test }) {
         </div>
     );
 }
-
-```
