@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2, ChevronUp, ChevronDown, Settings } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
@@ -11,6 +11,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Confetti from 'react-dom-confetti';
 import { useToast } from "@/hooks/use-toast";
 import useEmblaCarousel from 'embla-carousel-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+
 
 const vowels = [
   { char: 'অ', name: 'Aw' }, { char: 'আ', name: 'A' }, { char: 'ই', name: 'E' },
@@ -46,7 +57,7 @@ const playSound = (type: 'correct' | 'incorrect') => {
   }
 };
 
-const AlphabetLearn = ({ letters, type }: { letters: { char: string; name: string, dialogue?: string }[], type: 'vowels' | 'consonants' | 'all' }) => {
+const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: string; name: string, dialogue?: string }[], type: 'vowels' | 'consonants' | 'all', autoplayEnabled: boolean }) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         axis: 'y',
         loop: true,
@@ -57,6 +68,7 @@ const AlphabetLearn = ({ letters, type }: { letters: { char: string; name: strin
     const playLetterSound = useCallback((letter: { char: string; name: string; dialogue?: string }) => {
         const textToSpeak = letter.dialogue || letter.char;
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(textToSpeak);
             utterance.lang = 'bn-IN';
             window.speechSynthesis.speak(utterance);
@@ -77,21 +89,22 @@ const AlphabetLearn = ({ letters, type }: { letters: { char: string; name: strin
         if (!emblaApi) return;
         
         const onSelect = () => {
-            const selectedIndex = emblaApi.selectedScrollSnap();
-            const letter = letters[selectedIndex];
-            playLetterSound(letter);
+            if (autoplayEnabled) {
+                const selectedIndex = emblaApi.selectedScrollSnap();
+                const letter = letters[selectedIndex];
+                playLetterSound(letter);
+            }
         };
 
         emblaApi.on('select', onSelect);
-        // Play sound for the first letter on load
-        if (letters.length > 0) {
+        if (autoplayEnabled && letters.length > 0) {
             playLetterSound(letters[0]);
         }
 
         return () => {
             emblaApi.off('select', onSelect);
         };
-    }, [emblaApi, letters, playLetterSound]);
+    }, [emblaApi, letters, playLetterSound, autoplayEnabled]);
     
     const scrollPrev = useCallback(() => {
         if (emblaApi) emblaApi.scrollPrev();
@@ -160,6 +173,7 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
 
     const playLetterSound = (letter: string) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(letter);
             utterance.lang = 'bn-IN';
             window.speechSynthesis.speak(utterance);
@@ -450,16 +464,44 @@ const MatchingGame = () => {
 
 
 export default function BengaliAlphabetPage() {
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+
   return (
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-4">
+        <div className="mb-4 flex justify-between items-center">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone/learning-bengali">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back to Learning Bengali
                 </Link>
             </Button>
+             <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outline" size="icon">
+                        <Settings className="h-5 w-5" />
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Settings</DialogTitle>
+                        <DialogDescription>Control your learning experience.</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="autoplay-audio" className="flex items-center gap-2">
+                                <Volume2 className="h-5 w-5"/>
+                                Autoplay Audio on Scroll
+                            </Label>
+                            <Switch
+                                id="autoplay-audio"
+                                checked={autoplayEnabled}
+                                onCheckedChange={setAutoplayEnabled}
+                            />
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
         <header className="text-center mb-8">
           <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-orange-600">
@@ -485,13 +527,13 @@ export default function BengaliAlphabetPage() {
                     <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
                   </TabsList>
                   <TabsContent value="all" className="mt-8">
-                    <AlphabetLearn letters={allLetters} type="all" />
+                    <AlphabetLearn letters={allLetters} type="all" autoplayEnabled={autoplayEnabled} />
                   </TabsContent>
                   <TabsContent value="vowels" className="mt-8">
-                    <AlphabetLearn letters={vowels} type="vowels" />
+                    <AlphabetLearn letters={vowels} type="vowels" autoplayEnabled={autoplayEnabled} />
                   </TabsContent>
                   <TabsContent value="consonants" className="mt-8">
-                    <AlphabetLearn letters={consonants} type="consonants" />
+                    <AlphabetLearn letters={consonants} type="consonants" autoplayEnabled={autoplayEnabled} />
                   </TabsContent>
               </Tabs>
             </TabsContent>
