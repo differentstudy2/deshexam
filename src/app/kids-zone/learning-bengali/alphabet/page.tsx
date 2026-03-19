@@ -3,14 +3,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Confetti from 'react-dom-confetti';
 import { useToast } from "@/hooks/use-toast";
-
+import useEmblaCarousel from 'embla-carousel-react'
 
 const vowels = [
   { char: 'অ', name: 'Aw' }, { char: 'আ', name: 'A' }, { char: 'ই', name: 'E' },
@@ -27,8 +27,9 @@ const consonants = [
   { char: 'ট', name: 'Taw' }, { char: 'ঠ', name: 'Thaw' }, { char: 'ড', name: 'Daw' }, { char: 'ঢ', name: 'Dhaw' }, { char: 'ণ', name: 'Naw' },
   { char: 'ত', name: 'Taw' }, { char: 'থ', name: 'Thaw' }, { char: 'দ', name: 'Daw' }, { char: 'ধ', name: 'Dhaw' }, { char: 'ন', name: 'Naw' },
   { char: 'প', name: 'Paw' }, { char: 'ফ', name: 'Faw' }, { char: 'ব', name: 'Baw' }, { char: 'ভ', name: 'Bhaw' }, { char: 'ম', name: 'Maw' },
-  { char: 'য', name: 'Jaw' }, { char: 'র', name: 'Raw' }, { char: 'ল', name: 'Law' }, { char: 'ব', name: 'Baw' }, { char: 'শ', name: 'Shaw' }, { char: 'ষ', name: 'Shaw' },
-  { char: 'স', name: 'Saw' }, { char: 'হ', name: 'Haw' }, { char: 'ক্ষ', name: 'Kkhaw' }, { char: 'ড়', name: 'Raw' }, { char: 'ঢ়', name: 'Rhaw' }, { char: 'য়', name: 'Yaw' },
+  { char: 'য', name: 'Jaw' }, { char: 'র', name: 'Raw' }, { char: 'ল', name: 'Law' },
+  { char: 'শ', name: 'Shaw' }, { char: 'ষ', name: 'Shaw' },
+  { char: 'স', name: 'Saw' }, { char: 'হ', name: 'Haw' }, { char: 'ড়', name: 'Raw' }, { char: 'ঢ়', name: 'Rhaw' }, { char: 'য়', name: 'Yaw' },
   { char: 'ৎ', name: 'T ' }, { char: 'ং', name: 'Ong' }, { char: 'ঃ', name: 'Oh' }, { char: 'ঁ', name: 'Chandrabindu' }
 ];
 
@@ -43,6 +44,78 @@ const playSound = (type: 'correct' | 'incorrect') => {
     const audio = new Audio(soundUrl);
     audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
   }
+};
+
+const AlphabetLearn = ({ letters, type }: { letters: { char: string; name: string, dialogue?: string }[], type: 'vowels' | 'consonants' | 'all' }) => {
+    const [emblaRef, emblaApi] = useEmblaCarousel({
+        axis: 'y',
+        loop: true,
+    });
+    const [activeLetter, setActiveLetter] = useState<string | null>(null);
+    const { toast } = useToast();
+
+    const playLetterSound = useCallback((letter: { char: string; name: string; dialogue?: string }) => {
+        const textToSpeak = letter.dialogue || letter.char;
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'bn-IN';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        if (letter.dialogue) {
+            toast({
+                description: letter.dialogue,
+                duration: 4000,
+            });
+        }
+
+        setActiveLetter(letter.char);
+        setTimeout(() => setActiveLetter(null), 1000);
+    }, [toast]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        
+        const onSelect = () => {
+            const selectedIndex = emblaApi.selectedScrollSnap();
+            const letter = letters[selectedIndex];
+            playLetterSound(letter);
+        };
+
+        emblaApi.on('select', onSelect);
+        // Play sound for the first letter on load
+        if (letters.length > 0) {
+            playLetterSound(letters[0]);
+        }
+
+        return () => {
+            emblaApi.off('select', onSelect);
+        };
+    }, [emblaApi, letters, playLetterSound]);
+    
+
+    return (
+        <div className="overflow-hidden w-full max-w-sm mx-auto p-2 bg-black rounded-3xl shadow-2xl" ref={emblaRef}>
+            <div className="flex flex-col h-[70vh] rounded-2xl overflow-hidden">
+                {letters.map((letter, index) => (
+                    <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${type}-${index}`}>
+                        <div 
+                            onClick={() => playLetterSound(letter)}
+                            className={cn(
+                                "w-full h-full transform transition-all duration-300 flex flex-col text-center items-center justify-center cursor-pointer bg-gradient-to-br from-slate-800 to-slate-900",
+                                activeLetter === letter.char && "scale-105"
+                            )}
+                        >
+                            <div className="p-4 w-full flex flex-col items-center justify-center">
+                                <p className="text-[14rem] leading-none font-bold text-white/90" style={{fontFamily: "'Hind Siliguri', sans-serif"}}>{letter.char}</p>
+                                <p className="text-3xl font-semibold text-white/70 mt-4">{letter.name}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
 
 const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8" }: { letters: { char: string; name: string; }[], gridClass?: string }) => {
@@ -350,33 +423,10 @@ const MatchingGame = () => {
 
 
 export default function BengaliAlphabetPage() {
-    const [activeLetter, setActiveLetter] = useState<string | null>(null);
-    const { toast } = useToast();
-
-    const playLetterSound = (letter: {char: string, name: string, dialogue?: string}) => {
-        const textToSpeak = letter.dialogue || letter.char;
-        
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(textToSpeak);
-          utterance.lang = 'bn-IN';
-          window.speechSynthesis.speak(utterance);
-        }
-
-        if (letter.dialogue) {
-            toast({
-                description: letter.dialogue,
-                duration: 4000,
-            });
-        }
-
-        setActiveLetter(letter.char);
-        setTimeout(() => setActiveLetter(null), 1500);
-    }
-
   return (
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
-      <div className="container mx-auto px-4 py-12">
-        <div className="mb-8">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-4">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone/learning-bengali">
                     <ArrowLeft className="mr-2 h-4 w-4" />
@@ -384,12 +434,12 @@ export default function BengaliAlphabetPage() {
                 </Link>
             </Button>
         </div>
-        <header className="text-center mb-12">
-          <h1 className="font-headline text-5xl md:text-6xl font-bold tracking-tighter text-orange-600">
+        <header className="text-center mb-8">
+          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-orange-600">
             Bengali Alphabet (বাংলা বর্ণমালা)
           </h1>
-          <p className="text-lg text-orange-700/80 mt-4 max-w-2xl mx-auto">
-            Click on a letter to learn its sound or test your pronunciation.
+          <p className="text-lg text-orange-700/80 mt-2 max-w-2xl mx-auto">
+            Learn your ABCs with fun games and activities!
           </p>
         </header>
 
@@ -401,47 +451,22 @@ export default function BengaliAlphabetPage() {
                 <TabsTrigger value="voice">Voice (কণ্ঠস্বর)</TabsTrigger>
             </TabsList>
             <TabsContent value="alphabet" className="mt-8">
-                <section className="mb-12">
-                    <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Vowels (স্বরবর্ণ)</h2>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
-                        {vowels.map((letter, index) => (
-                            <Card 
-                                key={`${letter.char}-${index}`} 
-                                onClick={() => playLetterSound(letter)}
-                                className={cn(
-                                    "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
-                                    activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
-                                )}
-                            >
-                                <CardContent className="p-2 w-full flex flex-col items-center justify-center">
-                                    <p className="text-6xl md:text-8xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
-                                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 mt-2">{letter.name}</p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </section>
-
-                <section>
-                    <h2 className="text-3xl font-bold font-headline mb-6 text-center text-orange-700">Consonants (ব্যঞ্জনবর্ণ)</h2>
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-8 gap-4 max-w-7xl mx-auto">
-                        {consonants.map((letter, index) => (
-                            <Card 
-                                key={`${letter.char}-${index}`}
-                                onClick={() => playLetterSound(letter)}
-                                className={cn(
-                                    "transform transition-all duration-300 hover:scale-110 hover:shadow-2xl flex flex-col text-center items-center justify-center aspect-square cursor-pointer",
-                                    activeLetter === letter.char ? "scale-110 shadow-2xl ring-4 ring-orange-400" : "shadow-lg bg-white/70 backdrop-blur-sm"
-                                )}
-                            >
-                                <CardContent className="p-2 w-full flex flex-col items-center justify-center">
-                                    <p className="text-5xl md:text-7xl font-bold text-slate-800 dark:text-slate-100">{letter.char}</p>
-                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">{letter.name}</p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </section>
+              <Tabs defaultValue="all" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto sm:h-10">
+                    <TabsTrigger value="all">All (সব)</TabsTrigger>
+                    <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
+                    <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all" className="mt-8">
+                    <AlphabetLearn letters={allLetters} type="all" />
+                  </TabsContent>
+                  <TabsContent value="vowels" className="mt-8">
+                    <AlphabetLearn letters={vowels} type="vowels" />
+                  </TabsContent>
+                  <TabsContent value="consonants" className="mt-8">
+                    <AlphabetLearn letters={consonants} type="consonants" />
+                  </TabsContent>
+              </Tabs>
             </TabsContent>
             <TabsContent value="recognize">
               <Tabs defaultValue="all" className="w-full">
