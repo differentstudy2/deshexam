@@ -629,6 +629,8 @@ export default function AddKidsContentPage() {
                                 </Card>
                                )
                             })}
+                        </CardContent>
+                        <CardFooter>
                             <div className="flex flex-wrap gap-4">
                                 <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}>
                                     <PlusCircle className="mr-2 h-4 w-4" /> Add Question
@@ -714,7 +716,7 @@ export default function AddKidsContentPage() {
                                     </DialogContent>
                                 </Dialog>
                             </div>
-                        </CardContent>
+                        </CardFooter>
                     </Card>
                 )}
               </CardContent>
@@ -727,4 +729,3 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
-
