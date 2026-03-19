@@ -137,7 +137,7 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
                                 )}
                             >
                                 <div className="p-4 w-full flex flex-col items-center justify-center">
-                                    <p className="text-[14rem] leading-none font-bold text-white/90" style={{fontFamily: "'Hind Siliguri', sans-serif"}}>{letter.char}</p>
+                                    <p className="text-[12rem] leading-none font-bold text-white/90">{letter.char}</p>
                                     <p className="text-3xl font-semibold text-white/70 mt-4">{letter.name}</p>
                                 </div>
                             </div>
@@ -496,7 +496,9 @@ export default function BengaliAlphabetPage() {
                             <Switch
                                 id="autoplay-audio"
                                 checked={autoplayEnabled}
-                                onCheckedChange={setAutoplayEnabled}
+                                onCheckedChange={(checked) => {
+                                    setAutoplayEnabled(checked);
+                                }}
                             />
                         </div>
                     </div>
