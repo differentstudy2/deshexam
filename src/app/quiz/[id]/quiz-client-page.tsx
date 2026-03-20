@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -140,6 +139,14 @@ const optionBgColors = [
     'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
     'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
     'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+];
+
+const bgGradients = [
+    'from-rose-400 via-fuchsia-500 to-indigo-500',
+    'from-amber-400 via-orange-500 to-red-500',
+    'from-lime-400 via-green-500 to-emerald-500',
+    'from-sky-400 via-cyan-500 to-blue-500',
+    'from-violet-400 via-purple-500 to-pink-500',
 ];
 
 const TimerCircle = ({ timeLeft, totalDuration, className, size = 36, strokeWidth = 3 }: { timeLeft: number; totalDuration: number, className?: string; size?: number; strokeWidth?: number; }) => {
@@ -861,7 +868,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </Card>
                             <div ref={quizCardRef}>
                                 <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
-                                    <CardHeader className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6">
+                                    <CardHeader className={cn(
+                                        "relative text-white p-6 bg-gradient-to-br",
+                                        bgGradients[currentQuestionIndex % bgGradients.length]
+                                    )}>
                                         {currentQuestion && currentQuestion.image && (
                                             <div className="relative h-48 w-full mt-4">
                                                 <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
@@ -930,8 +940,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </CardContent>
                                 </Card>
                             </div>
-                            <div className="md:hidden mt-4 flex justify-between">
-                               <Button variant="secondary" onClick={handleManualPrev} disabled={currentQuestionIndex === 0 || isSubmitting} className="shadow-lg">
+                            <div className="mt-4 flex md:hidden justify-between">
+                                <Button variant="secondary" onClick={handleManualPrev} disabled={currentQuestionIndex === 0 || isSubmitting} className="shadow-lg">
                                     <ChevronLeft className="mr-2 h-4 w-4" /> Previous
                                 </Button>
                                 <Button variant="secondary" onClick={handleManualNext} disabled={quizFinished || isSubmitting || currentQuestionIndex === shuffledQuestions.length - 1} className="shadow-lg">
@@ -940,10 +950,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </div>
                         </div>
 
-                        <Button
+                         <Button
                             variant="outline"
                             size="icon"
-                            className="absolute -right-4 md:-right-16 top-1/2 -translate-y-1/2 rounded-full h-12 w-12 z-20 bg-white/50 dark:bg-black/50 backdrop-blur-sm hidden md:flex"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full h-12 w-12 z-20 bg-white/50 dark:bg-black/50 backdrop-blur-sm hidden md:flex"
                             onClick={handleManualNext}
                             disabled={quizFinished || isSubmitting || currentQuestionIndex === shuffledQuestions.length - 1}
                         >
