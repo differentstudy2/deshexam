@@ -134,11 +134,11 @@ const translations = {
     }
 };
 
-const optionGradients = [
-  'from-blue-400 to-indigo-500',
-  'from-green-400 to-teal-500',
-  'from-yellow-400 to-orange-500',
-  'from-pink-400 to-rose-500',
+const optionBgColors = [
+    'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
+    'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
+    'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
+    'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
 ];
 
 const bgGradients = [
@@ -147,6 +147,10 @@ const bgGradients = [
     'from-lime-400 via-green-500 to-emerald-500',
     'from-sky-400 via-cyan-500 to-blue-500',
     'from-violet-400 via-purple-500 to-pink-500',
+    'from-ec4899', 'to-f43f5e',
+    'from-06b6d4', 'to-3b82f6',
+    'from-a3e635', 'to-22c55e',
+    'from-facc15', 'to-eab308'
 ];
 
 const TimerCircle = ({ timeLeft, totalDuration, className, size = 36, strokeWidth = 3 }: { timeLeft: number; totalDuration: number, className?: string; size?: number; strokeWidth?: number; }) => {
@@ -501,7 +505,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         ctx.font = "bold 42px 'Lexend', sans-serif";
         ctx.textAlign = "center";
         ctx.save();
@@ -566,7 +570,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             target.height = targetHeight;
 
             // Create a pleasant gradient background
-             const gradients = [
+            const gradients = [
                 { from: '#DA22FF', to: '#9733EE' }, // Purple-ish
                 { from: '#09203F', to: '#537895' }, // Dark blue
                 { from: '#11998E', to: '#38EF7D' }, // Teal to Green
@@ -578,8 +582,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 { from: '#facc15', to: '#eab308' }, // Amber to Yellow
             ];
             const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-            const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
+            const gradient = targetCtx.createLinearGradient(0, 0, 0, targetHeight);
             gradient.addColorStop(0, randomGradient.from);
+            gradient.addColorStop(0.5, randomGradient.to);
             gradient.addColorStop(1, randomGradient.to);
             targetCtx.fillStyle = gradient;
             targetCtx.fillRect(0, 0, targetWidth, targetHeight);
@@ -877,9 +882,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </div>
                                         )}
                                         
-                                        <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                            <span>{currentQuestion?.text}</span>
-                                        </CardTitle>
+                                         <div className="flex items-start justify-between gap-2">
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                                <span>{currentQuestion?.text}</span>
+                                            </CardTitle>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
                                         <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
@@ -900,11 +907,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                             className={cn(
                                                                 "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
-                                                                !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
-                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30 text-slate-900 dark:text-slate-50",
-                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30 text-slate-900 dark:text-slate-50",
+                                                                !isShown && "cursor-pointer hover:scale-105",
+                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 dark:text-slate-900 bg-green-500",
+                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 dark:text-slate-900 bg-red-500",
                                                                 !isShown && gradientClass,
-                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30 text-slate-900 dark:text-slate-50"
+                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900 dark:text-slate-900"
                                                             )}
                                                         >
                                                             <div className="flex items-center gap-2">
