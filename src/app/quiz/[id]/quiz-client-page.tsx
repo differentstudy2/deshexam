@@ -462,6 +462,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     useEffect(() => {
         return () => {
             stopSound();
+            if (nextQuestionTimeoutRef.current) {
+              clearTimeout(nextQuestionTimeoutRef.current);
+            }
         }
     }, [stopSound]);
 
@@ -736,7 +739,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="relative flex items-center justify-center">
+                    <div className="relative">
                         <Button
                             variant="outline"
                             size="icon"
@@ -874,7 +877,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                             <div className={cn(
                                                 "grid gap-4 w-full",
-                                                viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                                                 viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
                                             )}>
                                                 {currentQuestion?.options.map((option, index) => {
                                                     const isSelected = selectedAnswer === option.text;
@@ -935,6 +938,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </Button>
                             </div>
                         </div>
+
                         <Button
                             variant="outline"
                             size="icon"
@@ -950,3 +954,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
