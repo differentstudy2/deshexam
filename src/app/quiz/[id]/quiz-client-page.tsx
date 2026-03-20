@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -502,7 +501,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
         ctx.font = "bold 42px 'Lexend', sans-serif";
         ctx.textAlign = "center";
         ctx.save();
@@ -567,16 +566,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             target.height = targetHeight;
 
             // Create a pleasant gradient background
-            const gradients = [
-                { from: '#DA22FF', to: '#9733EE' },
-                { from: '#09203F', to: '#537895' },
-                { from: '#868F96', to: '#596164' },
-                { from: '#93A5CF', to: '#E4EfE9' },
-                { from: 'rgb(137, 137, 0)', to: '#1d4350' },
-                { from: '#434343', to: '#000000' },
-                { from: '#283e51', to: '#4b79a1' },
-                { from: '#2c3e50', to: '#2980b9' },
-                { from: '#3498db', to: '#2c3e50' }
+             const gradients = [
+                { from: '#DA22FF', to: '#9733EE' }, // Purple-ish
+                { from: '#09203F', to: '#537895' }, // Dark blue
+                { from: '#11998E', to: '#38EF7D' }, // Teal to Green
+                { from: '#f97316', to: '#ef4444' }, // Orange to Red
+                { from: '#8b5cf6', to: '#7c3aed' }, // Purple to Violet
+                { from: '#ec4899', to: '#f43f5e' }, // Pink to Rose
+                { from: '#06b6d4', to: '#3b82f6' }, // Cyan to Blue
+                { from: '#a3e635', to: '#22c55e' }, // Lime to Green
+                { from: '#facc15', to: '#eab308' }, // Amber to Yellow
             ];
             const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
             const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
@@ -737,7 +736,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     {t.playAgain}
                                 </Button>
                                 <Button asChild variant="outline" size="lg">
-                                    <Link href="/quizzes">
+                                    <Link href="/kids-zone/fun-quizzes">
                                         <ArrowLeft className="mr-2 h-4 w-4" />
                                         {t.backToQuizzes}
                                     </Link>
