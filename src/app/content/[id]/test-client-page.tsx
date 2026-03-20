@@ -469,7 +469,6 @@ export default function TestClientPage({ test }: { test: Test }) {
                                         <div className="w-full space-y-4">
                                             <Input 
                                                 placeholder="Type your answer here..."
-                                                value={userAnswers[currentQuestion.id] || ''}
                                                 onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                                                 disabled={showFeedback === currentQuestion.id}
                                                 className="h-12 text-lg"
