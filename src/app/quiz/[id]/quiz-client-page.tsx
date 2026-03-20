@@ -141,6 +141,13 @@ const optionBgColors = [
     'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
 ];
 
+const optionGradients = [
+    'from-sky-400 to-blue-500',
+    'from-amber-400 to-orange-500',
+    'from-lime-400 to-green-500',
+    'from-rose-400 to-red-500',
+];
+
 const bgGradients = [
     'from-rose-400 via-fuchsia-500 to-indigo-500',
     'from-amber-400 via-orange-500 to-red-500',
@@ -505,8 +512,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-        ctx.font = "bold 42px 'Lexend', sans-serif";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+        ctx.font = "bold 32px 'Lexend', sans-serif";
         ctx.textAlign = "center";
         ctx.save();
         ctx.translate(width / 2, height / 2);
@@ -571,15 +578,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
             // Create a pleasant gradient background
             const gradients = [
-                { from: '#DA22FF', to: '#9733EE' }, // Purple-ish
-                { from: '#09203F', to: '#537895' }, // Dark blue
-                { from: '#11998E', to: '#38EF7D' }, // Teal to Green
-                { from: '#f97316', to: '#ef4444' }, // Orange to Red
-                { from: '#8b5cf6', to: '#7c3aed' }, // Purple to Violet
-                { from: '#ec4899', to: '#f43f5e' }, // Pink to Rose
-                { from: '#06b6d4', to: '#3b82f6' }, // Cyan to Blue
-                { from: '#a3e635', to: '#22c55e' }, // Lime to Green
-                { from: '#facc15', to: '#eab308' }, // Amber to Yellow
+                { from: '#DA22FF', to: '#9733EE' },
+                { from: '#09203F', to: '#537895' },
+                { from: '#868F96', to: '#596164' },
+                { from: '#93A5CF', to: '#E4EfE9' },
+                { from: 'rgb(137, 137, 0)', to: '#1d4350' },
+                { from: '#434343', to: '#000000' },
+                { from: '#283e51', to: '#4b79a1' },
+                { from: '#2c3e50', to: '#2980b9' },
+                { from: '#3498db', to: '#2c3e50' }
             ];
             const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
             const gradient = targetCtx.createLinearGradient(0, 0, 0, targetHeight);
