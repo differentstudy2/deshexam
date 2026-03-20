@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -212,6 +212,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const quizCardRef = useRef<HTMLDivElement>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(false);
     const [autoAnswerEnabled, setAutoAnswerEnabled] = useState(false);
+    const nextQuestionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     
     const [playingUrl, setPlayingUrl] = useState<string | null>(null);
     const activeAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -294,7 +295,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             playSystemSound('incorrect');
         }
 
-        setTimeout(() => nextQuestion(), 1500);
+        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 1500);
     }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, nextQuestion, stopSound]);
 
     const onAudioEnd = useCallback(() => {
@@ -459,6 +460,31 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             stopSound();
         }
     }, [stopSound]);
+
+    const handleManualNext = () => {
+        if (nextQuestionTimeoutRef.current) {
+            clearTimeout(nextQuestionTimeoutRef.current);
+            nextQuestionTimeoutRef.current = null;
+        }
+        nextQuestion();
+    };
+    
+    const handleManualPrev = () => {
+        if (nextQuestionTimeoutRef.current) {
+            clearTimeout(nextQuestionTimeoutRef.current);
+            nextQuestionTimeoutRef.current = null;
+        }
+        stopSound();
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1);
+            setSelectedAnswer(null);
+            setFeedback('');
+            setIsCorrect(false);
+            if (timerDuration > 0) {
+                setTimeLeft(timerDuration);
+            }
+        }
+    };
 
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
@@ -706,185 +732,214 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className={cn(
-                        "w-full mx-auto transition-all duration-300",
-                        viewMode === 'desktop' ? 'max-w-2xl' : 'max-w-sm'
-                    )}>
-                        <Card className="bg-card/60 backdrop-blur-sm">
-                             <CardContent className="p-3">
-                                <div className="flex flex-wrap justify-between items-center gap-4">
-                                     <div className="flex items-baseline gap-1 text-sm font-semibold text-muted-foreground">
-                                        <span className="text-2xl font-bold text-foreground bg-secondary px-2 rounded-md">{displayNum(currentQuestionIndex + 1)}</span>
-                                        <span>/</span>
-                                        <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
-                                    </div>
-                                    <div className="flex items-center gap-4 flex-wrap justify-end">
-                                        <div className="flex items-center gap-1 flex-shrink-0">
-                                            <Button variant="outline" size="icon" onClick={toggleSpeak}>
-                                                {isSpeaking ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                                            </Button>
-                                            {currentQuestion?.audio && (
-                                                <Button variant="outline" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
-                                                    {playingUrl === currentQuestion.audio ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                    <div className="relative flex items-center justify-center">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="absolute -left-4 md:-left-16 top-1/2 -translate-y-1/2 rounded-full h-12 w-12 z-20 bg-white/50 dark:bg-black/50 backdrop-blur-sm hidden md:flex"
+                            onClick={handleManualPrev}
+                            disabled={currentQuestionIndex === 0 || isSubmitting}
+                        >
+                            <ChevronLeft className="h-6 w-6" />
+                        </Button>
+
+                        <div className={cn(
+                            "w-full mx-auto transition-all duration-300",
+                            viewMode === 'desktop' ? 'max-w-2xl' : 'max-w-sm'
+                        )}>
+                            <Card className="bg-card/60 backdrop-blur-sm">
+                                <CardContent className="p-3">
+                                    <div className="flex flex-wrap justify-between items-center gap-4">
+                                        <div className="flex items-baseline gap-1 text-sm font-semibold text-muted-foreground">
+                                            <span className="text-2xl font-bold text-foreground bg-secondary px-2 rounded-md">{displayNum(currentQuestionIndex + 1)}</span>
+                                            <span>/</span>
+                                            <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
+                                        </div>
+                                        <div className="flex items-center gap-4 flex-wrap justify-end">
+                                            <div className="flex items-center gap-1 flex-shrink-0">
+                                                <Button variant="outline" size="icon" onClick={toggleSpeak}>
+                                                    {isSpeaking ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                                                 </Button>
-                                            )}
-                                            <Button variant="outline" size="icon" onClick={handleCopy}>
-                                                <Copy className="h-4 w-4" />
-                                            </Button>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="outline" size="icon" disabled={isCapturing}>
-                                                        {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
+                                                {currentQuestion?.audio && (
+                                                    <Button variant="outline" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                        {playingUrl === currentQuestion.audio ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                                                     </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
-                                                     <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Quiz Settings</DialogTitle>
-                                                    <DialogDescription>Adjust your quiz preferences.</DialogDescription>
-                                                </DialogHeader>
-                                                <div className="grid gap-4 py-4">
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="view-mode" className="col-span-2">View Mode</Label>
-                                                        <Select value={viewMode} onValueChange={(v) => setViewMode(v as 'desktop' | 'mobile')}>
-                                                            <SelectTrigger className="col-span-2 h-9">
-                                                                <SelectValue />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value="desktop">Desktop</SelectItem>
-                                                                <SelectItem value="mobile">Mobile (Shorts)</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="language" className="flex items-center gap-2 col-span-2"><Languages className="w-5 h-5"/> Language</Label>
-                                                        <Select value={language} onValueChange={handleLanguageChange}>
-                                                            <SelectTrigger className="col-span-2 h-9"><SelectValue /></SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value="en">English</SelectItem>
-                                                                <SelectItem value="hi">हिन्दी</SelectItem>
-                                                                <SelectItem value="bn">বাংলা</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="timer-select" className="col-span-2">{t.timer}</Label>
-                                                        <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
-                                                            <SelectTrigger id="timer-select" className="col-span-2 h-9">
-                                                                <SelectValue />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value="15">15 {t.seconds}</SelectItem>
-                                                                <SelectItem value="30">30 {t.seconds}</SelectItem>
-                                                                <SelectItem value="60">60 {t.seconds}</SelectItem>
-                                                                <SelectItem value="0">{t.off}</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                     <div className="flex items-center justify-between">
-                                                        <Label htmlFor="autoplay-switch" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> {t.autoplayAudio}</Label>
-                                                        <Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopSound(); } }} />
-                                                    </div>
-                                                    <div className="flex items-center justify-between">
-                                                        <Label htmlFor="auto-answer-switch" className="flex items-center gap-2"><Sparkles className="w-5 h-5"/> {t.autoAnswer}</Label>
-                                                        <Switch id="auto-answer-switch" checked={autoAnswerEnabled} onCheckedChange={setAutoAnswerEnabled} />
-                                                    </div>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-
-                                        {timerDuration > 0 && (
-                                            <div className="flex items-center gap-2 text-muted-foreground font-semibold">
-                                                <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
+                                                )}
+                                                <Button variant="outline" size="icon" onClick={handleCopy}>
+                                                    <Copy className="h-4 w-4" />
+                                                </Button>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="outline" size="icon" disabled={isCapturing}>
+                                                            {isCapturing ? <Loader2 className="h-4 w-4 animate-spin"/> : <ImageDown className="h-4 w-4" />}
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <div ref={quizCardRef}>
-                             <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
-                                <CardHeader className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6">
-                                    {currentQuestion && currentQuestion.image && (
-                                        <div className="relative h-48 w-full mt-4">
-                                            <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
-                                        </div>
-                                    )}
-                                    
-                                     <div className="flex items-start justify-between gap-2">
-                                        <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                            <span>{currentQuestion?.text}</span>
-                                        </CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-6">
-                                    <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
-                                        <div className={cn(
-                                            "grid gap-4 w-full",
-                                            viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
-                                        )}>
-                                            {currentQuestion?.options.map((option, index) => {
-                                                const isSelected = selectedAnswer === option.text;
-                                                const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
-                                                const isShown = selectedAnswer !== null;
-                                                const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
-
-                                                return (
-                                                    <Label
-                                                        key={index}
-                                                        htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
-                                                        className={cn(
-                                                            "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
-                                                            !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
-                                                            isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
-                                                            isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
-                                                            !isShown && optionBgColors[index % optionBgColors.length],
-                                                            isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30"
-                                                        )}
-                                                    >
-                                                        <div className="flex items-center gap-2">
-                                                            {(isCorrectForCapture || (isShown && isCorrectAnswer)) && (
-                                                                <div className={cn(
-                                                                    "absolute -top-3 -right-3 bg-green-500 rounded-full p-0.5 text-white z-10",
-                                                                    captureMode !== 'answer' && !isShown && "hidden"
-                                                                )}>
-                                                                    <Check className="w-3 h-3" />
-                                                                </div>
-                                                            )}
-                                                            <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                            <span className="text-left font-bold text-lg">{option.text}</span>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline" size="icon"><Settings className="h-4 w-4" /></Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-[425px]">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Quiz Settings</DialogTitle>
+                                                        <DialogDescription>Adjust your quiz preferences.</DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className="grid gap-4 py-4">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label htmlFor="view-mode" className="col-span-2">View Mode</Label>
+                                                            <Select value={viewMode} onValueChange={(v) => setViewMode(v as 'desktop' | 'mobile')}>
+                                                                <SelectTrigger className="col-span-2 h-9">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="desktop">Desktop</SelectItem>
+                                                                    <SelectItem value="mobile">Mobile (Shorts)</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
                                                         </div>
-                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
-                                                    </Label>
-                                                );
-                                            })}
-                                        </div>
-                                    </RadioGroup>
-                                    {feedback && captureMode === 'idle' && (
-                                        <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
-                                            {feedback}
-                                            {!isCorrect && selectedAnswer && (
-                                                <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                    <span>{t.correctAnswer}: {currentQuestion.correctAnswer}</span>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label htmlFor="language" className="flex items-center gap-2 col-span-2"><Languages className="w-5 h-5"/> Language</Label>
+                                                            <Select value={language} onValueChange={handleLanguageChange}>
+                                                                <SelectTrigger className="col-span-2 h-9"><SelectValue /></SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="en">English</SelectItem>
+                                                                    <SelectItem value="hi">हिन्दी</SelectItem>
+                                                                    <SelectItem value="bn">বাংলা</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label htmlFor="timer-select" className="col-span-2">{t.timer}</Label>
+                                                            <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
+                                                                <SelectTrigger id="timer-select" className="col-span-2 h-9">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="15">15 {t.seconds}</SelectItem>
+                                                                    <SelectItem value="30">30 {t.seconds}</SelectItem>
+                                                                    <SelectItem value="60">60 {t.seconds}</SelectItem>
+                                                                    <SelectItem value="0">{t.off}</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <Label htmlFor="autoplay-switch" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> {t.autoplayAudio}</Label>
+                                                            <Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopSound(); } }} />
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <Label htmlFor="auto-answer-switch" className="flex items-center gap-2"><Sparkles className="w-5 h-5"/> {t.autoAnswer}</Label>
+                                                            <Switch id="auto-answer-switch" checked={autoAnswerEnabled} onCheckedChange={setAutoAnswerEnabled} />
+                                                        </div>
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
+
+                                            {timerDuration > 0 && (
+                                                <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+                                                    <TimerCircle timeLeft={timeLeft} totalDuration={timerDuration} />
                                                 </div>
                                             )}
                                         </div>
-                                    )}
+                                    </div>
                                 </CardContent>
                             </Card>
+                            <div ref={quizCardRef}>
+                                <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
+                                    <CardHeader className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6">
+                                        {currentQuestion && currentQuestion.image && (
+                                            <div className="relative h-48 w-full mt-4">
+                                                <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
+                                            </div>
+                                        )}
+                                        
+                                        <div className="flex items-start justify-between gap-2">
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                                <span>{currentQuestion?.text}</span>
+                                            </CardTitle>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="p-6">
+                                        <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
+                                            <div className={cn(
+                                                "grid gap-4 w-full",
+                                                viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                                            )}>
+                                                {currentQuestion?.options.map((option, index) => {
+                                                    const isSelected = selectedAnswer === option.text;
+                                                    const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+                                                    const isShown = selectedAnswer !== null;
+                                                    const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
+
+                                                    return (
+                                                        <Label
+                                                            key={index}
+                                                            htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                            className={cn(
+                                                                "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
+                                                                !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
+                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
+                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
+                                                                !isShown && optionBgColors[index % optionBgColors.length],
+                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30"
+                                                            )}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                {(isCorrectForCapture || (isShown && isCorrectAnswer)) && (
+                                                                    <div className={cn(
+                                                                        "absolute -top-3 -right-3 bg-green-500 rounded-full p-0.5 text-white z-10",
+                                                                        captureMode !== 'answer' && !isShown && "hidden"
+                                                                    )}>
+                                                                        <Check className="w-3 h-3" />
+                                                                    </div>
+                                                                )}
+                                                                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                                <span className="text-left font-bold text-lg">{option.text}</span>
+                                                            </div>
+                                                            <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
+                                                        </Label>
+                                                    );
+                                                })}
+                                            </div>
+                                        </RadioGroup>
+                                        {feedback && captureMode === 'idle' && (
+                                            <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
+                                                {feedback}
+                                                {!isCorrect && selectedAnswer && (
+                                                    <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
+                                                        <span>{t.correctAnswer}: {currentQuestion.correctAnswer}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </div>
+                            <div className="md:hidden mt-4 flex justify-between">
+                               <Button variant="secondary" onClick={handleManualPrev} disabled={currentQuestionIndex === 0 || isSubmitting} className="shadow-lg">
+                                    <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+                                </Button>
+                                <Button variant="secondary" onClick={handleManualNext} disabled={quizFinished || isSubmitting || currentQuestionIndex === shuffledQuestions.length - 1}>
+                                    Next <ChevronRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="absolute -right-4 md:-right-16 top-1/2 -translate-y-1/2 rounded-full h-12 w-12 z-20 bg-white/50 dark:bg-black/50 backdrop-blur-sm hidden md:flex"
+                            onClick={handleManualNext}
+                            disabled={quizFinished || isSubmitting || currentQuestionIndex === shuffledQuestions.length - 1}
+                        >
+                            <ChevronRight className="h-6 w-6" />
+                        </Button>
                     </div>
                 )}
             </div>
