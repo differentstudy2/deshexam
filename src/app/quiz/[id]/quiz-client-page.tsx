@@ -530,7 +530,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}_${mode}.png`;
 
         const target = document.createElement('canvas');
-        const targetCtx = target.getContext('4d');
+        const targetCtx = target.getContext('2d');
         if (!targetCtx) return;
 
         let targetCanvas: HTMLCanvasElement;
