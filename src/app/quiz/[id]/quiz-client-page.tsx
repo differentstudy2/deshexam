@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -55,7 +56,7 @@ type Quiz = {
 
 const translations = {
     en: {
-        backToQuizzes: "Back to Quizzes",
+        backToQuizzes: "Back to Fun Quizzes",
         quizComplete: "Quiz Complete!",
         amazingJob: "You did an amazing job!",
         yourScore: "Your Score",
@@ -81,7 +82,7 @@ const translations = {
         copyQuestion: "Copy Question"
     },
     hi: {
-        backToQuizzes: "क्विज़ पर वापस जाएं",
+        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएँ",
         quizComplete: "क्विज़ पूरा हुआ!",
         amazingJob: "आपने अद्भुत काम किया!",
         yourScore: "आपका स्कोर",
@@ -107,7 +108,7 @@ const translations = {
         copyQuestion: "प्रश्न कॉपी करें"
     },
     bn: {
-        backToQuizzes: "কুইজে ফিরে যান",
+        backToQuizzes: "মজার কুইজে ফিরে যান",
         quizComplete: "কুইজ সম্পন্ন!",
         amazingJob: "আপনি একটি আশ্চর্যজনক কাজ করেছেন!",
         yourScore: "আপনার স্কোর",
@@ -134,11 +135,11 @@ const translations = {
     }
 };
 
-const optionBgColors = [
-    'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
-    'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
-    'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
-    'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
+const optionGradients = [
+  'from-blue-400 to-indigo-500',
+  'from-green-400 to-teal-500',
+  'from-yellow-400 to-orange-500',
+  'from-pink-400 to-rose-500',
 ];
 
 const bgGradients = [
@@ -878,23 +879,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </div>
                                         )}
                                         
-                                        <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                <span>{currentQuestion?.text}</span>
-                                            </CardTitle>
-                                        </div>
+                                        <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                            <span>{currentQuestion?.text}</span>
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-6">
                                         <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                             <div className={cn(
                                                 "grid gap-4 w-full",
-                                                 viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                                                    viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
                                             )}>
                                                 {currentQuestion?.options.map((option, index) => {
                                                     const isSelected = selectedAnswer === option.text;
                                                     const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                     const isShown = selectedAnswer !== null;
                                                     const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
+                                                    const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                     return (
                                                         <Label
@@ -902,10 +902,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                             className={cn(
                                                                 "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
-                                                                !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
-                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
-                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
-                                                                !isShown && optionBgColors[index % optionBgColors.length],
+                                                                !isShown && "cursor-pointer hover:scale-105",
+                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30 text-slate-900 dark:text-slate-50",
+                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30 text-slate-900 dark:text-slate-50",
+                                                                !isShown && gradientClass,
                                                                 isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30"
                                                             )}
                                                         >
@@ -965,4 +965,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
