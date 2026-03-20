@@ -287,11 +287,33 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
     
+    const handleAnswer = useCallback((answer: string) => {
+        if (selectedAnswer || isSubmitting) return;
+
+        stopSound();
+        setIsSubmitting(true);
+
+        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+
+        setSelectedAnswer(answer);
+        if (answer === currentQuestion.correctAnswer) {
+            setFeedback(t.correct);
+            setIsCorrect(true);
+            setScore(prev => prev + 1);
+            playSystemSound('correct');
+        } else {
+            setFeedback(t.incorrect);
+            playSystemSound('incorrect');
+        }
+
+        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 1500);
+    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, nextQuestion, stopSound, isSubmitting]);
+
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
             handleAnswer(currentQuestion.correctAnswer);
         }
-    }, [autoAnswerEnabled, currentQuestion]);
+    }, [autoAnswerEnabled, currentQuestion, handleAnswer]);
     
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
@@ -374,30 +396,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }, 500); 
 
         return () => clearTimeout(autoplayTimeout);
-    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakFullQuestion, autoAnswerEnabled]);
-
-    const handleAnswer = useCallback((answer: string) => {
-        if (selectedAnswer || isSubmitting) return;
-
-        stopSound();
-        setIsSubmitting(true);
-
-        if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-
-        setSelectedAnswer(answer);
-        if (answer === currentQuestion.correctAnswer) {
-            setFeedback(t.correct);
-            setIsCorrect(true);
-            setScore(prev => prev + 1);
-            playSystemSound('correct');
-        } else {
-            setFeedback(t.incorrect);
-            playSystemSound('incorrect');
-        }
-
-        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 1500);
-    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, nextQuestion, stopSound, isSubmitting]);
-
+    }, [currentQuestionIndex, currentQuestion, autoplayEnabled, quizFinished, selectedAnswer, playSound, speakFullQuestion, autoAnswerEnabled, handleAnswer]);
 
     const togglePlayUrl = useCallback((url: string) => {
         if (playingUrl === url && activeAudioRef.current) {
@@ -765,7 +764,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             <Card className="bg-card/60 backdrop-blur-sm">
                                 <CardContent className="p-3">
                                     <div className="flex flex-wrap justify-between items-center gap-4">
-                                        <div className="flex items-baseline gap-1 text-sm font-semibold text-muted-foreground">
+                                         <div className="flex items-baseline gap-1 text-sm font-semibold text-muted-foreground">
                                             <span className="text-2xl font-bold text-foreground bg-secondary px-2 rounded-md">{displayNum(currentQuestionIndex + 1)}</span>
                                             <span>/</span>
                                             <span className="text-lg">{displayNum(shuffledQuestions.length)}</span>
@@ -868,11 +867,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </CardContent>
                             </Card>
                             <div ref={quizCardRef}>
-                                <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
-                                    <CardHeader className={cn(
-                                        "relative text-white p-6 bg-gradient-to-br",
-                                        bgGradients[currentQuestionIndex % bgGradients.length]
-                                    )}>
+                                <Card className={cn(
+                                    "shadow-2xl overflow-hidden mt-2 bg-gradient-to-br",
+                                    bgGradients[currentQuestionIndex % bgGradients.length]
+                                )}>
+                                    <CardHeader className="relative text-white p-6">
                                         {currentQuestion && currentQuestion.image && (
                                             <div className="relative h-48 w-full mt-4">
                                                 <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
@@ -883,7 +882,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             <span>{currentQuestion?.text}</span>
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="p-6">
+                                    <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
                                         <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                             <div className={cn(
                                                 "grid gap-4 w-full",
@@ -902,11 +901,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                             className={cn(
                                                                 "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
-                                                                !isShown && "cursor-pointer hover:scale-105",
+                                                                !isShown && "cursor-pointer hover:scale-105 hover:border-primary",
                                                                 isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30 text-slate-900 dark:text-slate-50",
                                                                 isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30 text-slate-900 dark:text-slate-50",
                                                                 !isShown && gradientClass,
-                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30"
+                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30 text-slate-900 dark:text-slate-50"
                                                             )}
                                                         >
                                                             <div className="flex items-center gap-2">
