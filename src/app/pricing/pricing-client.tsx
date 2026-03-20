@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Separator } from '@/components/ui/separator';
 import { getCouponByCode } from '@/lib/firebase/firestore';
+import Script from 'next/script';
 
 
 declare global {
@@ -243,6 +244,7 @@ export default function PricingClientPage() {
 
   return (
     <div className="bg-secondary/30">
+        <Script id="razorpay-checkout-js" src="https://checkout.razorpay.com/v1/checkout.js" />
         <div className="container py-12 md:py-16">
             <Tabs value={planType} onValueChange={(value) => setPlanType(value as 'pro' | 'pass')} className="w-full max-w-sm mx-auto mb-4">
                  <TabsList className="grid w-full grid-cols-2">

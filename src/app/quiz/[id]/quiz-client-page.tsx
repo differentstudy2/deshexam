@@ -496,7 +496,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const drawWatermark = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
         ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-        ctx.font = "bold 32px 'Lexend', sans-serif";
+        ctx.font = "bold 42px 'Lexend', sans-serif";
         ctx.textAlign = "center";
         ctx.save();
         ctx.translate(width / 2, height / 2);
@@ -530,7 +530,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const fileName = `${questionText.replace(/\s+/g, '_').slice(0, 50)}_${mode}.png`;
 
         const target = document.createElement('canvas');
-        const targetCtx = target.getContext('2d');
+        const targetCtx = target.getContext('4d');
         if (!targetCtx) return;
 
         let targetCanvas: HTMLCanvasElement;
@@ -666,7 +666,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="shadow-2xl bg-card/60 backdrop-blur-sm overflow-hidden mt-2">
+                <Card className="shadow-2xl bg-card/100 backdrop-blur-sm overflow-hidden mt-2">
                     <CardHeader className="relative bg-muted/30 p-6 min-h-[150px]">
                         <div className="space-y-3">
                             <Skeleton className="h-8 w-3/4" />
@@ -707,7 +707,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 backgroundImage: "url('/image/logo.png')",
                 backgroundSize: '150px',
                 backgroundRepeat: 'repeat',
-                opacity: 0.05,
+                opacity: 0.08,
               }}
             />
              <div className="absolute inset-0 bg-secondary/30" />
@@ -830,10 +830,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                     <SelectValue />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
+                                                                <SelectItem value="0">{t.off}</SelectItem>
                                                                     <SelectItem value="15">15 {t.seconds}</SelectItem>
                                                                     <SelectItem value="30">30 {t.seconds}</SelectItem>
                                                                     <SelectItem value="60">60 {t.seconds}</SelectItem>
-                                                                    <SelectItem value="0">{t.off}</SelectItem>
+                                                                    
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>

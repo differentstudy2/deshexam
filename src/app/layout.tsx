@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { AuthProvider } from "@/hooks/use-auth";
-import Script from "next/script";
 import { AppProviders } from "./providers"; // Import the new provider
 import { AuthDialogProvider } from "@/hooks/use-auth-dialog";
 import { AuthDialog } from "@/components/feature/auth-dialog";
@@ -54,7 +53,6 @@ export default function RootLayout({
             </AuthDialogProvider>
           </AuthProvider>
           <Toaster />
-          <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         </AppProviders>
       </body>
     </html>
