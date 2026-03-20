@@ -13,7 +13,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = params;
   const article = await getContentById(id) as any;
 
   if (!article || article.testType !== 'Learn') {
@@ -53,7 +53,8 @@ export async function generateMetadata(
 
 
 export default async function LearnArticlePage({ params }: Props) {
-    const articleData = await getContentById(params.id);
+    const { id } = params;
+    const articleData = await getContentById(id);
 
     if (!articleData || articleData.testType !== 'Learn') {
         notFound();

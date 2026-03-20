@@ -12,7 +12,7 @@ export async function generateMetadata(
   { params }: PageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const bookId = params.bookId;
+  const { bookId } = params;
   const textbook = (await getContentById(bookId)) as any;
 
   if (!textbook) {
@@ -50,7 +50,8 @@ export async function generateMetadata(
 
 
 export default async function TextbookSolutionsPage({ params }: PageProps) {
-    const textbookData = await getContentById(params.bookId);
+    const { bookId } = params;
+    const textbookData = await getContentById(bookId);
 
     if (!textbookData) {
         notFound();

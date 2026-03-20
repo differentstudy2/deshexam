@@ -1,6 +1,6 @@
 
 import { getContentById } from '@/lib/firebase/firestore';
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import QuizClientPage from './quiz-client-page';
 import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
@@ -29,8 +29,9 @@ const serializeTimestamps = (data: any): any => {
 };
 
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const quiz = await getContentById(params.id) as any;
+export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const { id } = params;
+  const quiz = await getContentById(id) as any;
   if (!quiz) {
     return { title: 'Quiz Not Found' };
   }
@@ -41,7 +42,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function QuizPage({ params }: Props) {
-  const quizData = await getContentById(params.id);
+  const { id } = params;
+  const quizData = await getContentById(id);
   if (!quizData || quizData.testType !== 'Quiz') {
     notFound();
   }

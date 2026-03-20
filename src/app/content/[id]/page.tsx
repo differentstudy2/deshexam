@@ -15,7 +15,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = params;
   const test = await getContentById(id);
 
   if (!test) {
@@ -38,7 +38,8 @@ export async function generateMetadata(
 }
 
 export default async function TestPage({ params }: Props) {
-  const testData = await getContentById(params.id);
+  const { id } = params;
+  const testData = await getContentById(id);
 
   if (!testData) {
     notFound();

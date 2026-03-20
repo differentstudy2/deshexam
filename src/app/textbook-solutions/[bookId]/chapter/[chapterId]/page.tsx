@@ -43,8 +43,9 @@ async function getPageData(bookId: string, chapterId: string, topicId?: string) 
 }
 
 export async function generateMetadata({ params, searchParams }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
+    const { bookId, chapterId } = params;
     const topicId = searchParams.topic as string | undefined;
-    const { textbook, chapter, topic } = await getPageData(params.bookId, params.chapterId, topicId);
+    const { textbook, chapter, topic } = await getPageData(bookId, chapterId, topicId);
 
     if (!textbook || !chapter) {
         return {
@@ -78,7 +79,8 @@ export async function generateMetadata({ params, searchParams }: PageProps, pare
 }
 
 export default async function TextbookChapterPage({ params }: PageProps) {
-    const { textbook, chapter, topic } = await getPageData(params.bookId, params.chapterId);
+    const { bookId, chapterId } = params;
+    const { textbook, chapter, topic } = await getPageData(bookId, chapterId);
      if (!textbook || !chapter) {
         notFound();
     }
