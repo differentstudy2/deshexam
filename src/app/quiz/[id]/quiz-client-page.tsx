@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -142,9 +143,9 @@ const optionBgColors = [
 ];
 
 const optionGradients = [
-    'from-sky-400 to-blue-500',
+    'from-purple-500 to-indigo-600',
     'from-amber-400 to-orange-500',
-    'from-lime-400 to-green-500',
+    'from-teal-400 to-cyan-500',
     'from-rose-400 to-red-500',
 ];
 
@@ -906,7 +907,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                     const isShown = selectedAnswer !== null;
                                                     const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
-                                                    const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
+                                                     const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                     return (
                                                         <Label
@@ -915,10 +916,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             className={cn(
                                                                 "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
                                                                 !isShown && "cursor-pointer hover:scale-105",
-                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 dark:text-slate-900 bg-green-500",
+                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
                                                                 isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 dark:text-slate-900 bg-red-500",
                                                                 !isShown && gradientClass,
-                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900 dark:text-slate-900"
+                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
                                                             )}
                                                         >
                                                             <div className="flex items-center gap-2">
@@ -977,3 +978,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
