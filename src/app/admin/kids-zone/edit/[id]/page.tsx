@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { getContentById, updateContent, uploadFile, getSettings } from '@/lib/firebase/firestore';
+import { getContentById, updateContent, uploadFile, getSettings, getSubjects, getBoards, getClasses, getStates, getGradesByClass } from '@/lib/firebase/firestore';
 import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson, Copy, Sparkles } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
@@ -49,7 +49,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
-
+import Image from 'next/image';
 
 const funQuizQuestionSchema = z.object({
     id: z.string().optional(),
@@ -69,6 +69,11 @@ const funQuizQuestionSchema = z.object({
 const formSchema = z.object({
     title: z.string().min(1, "Title is required."),
     description: z.string().optional(),
+    board: z.string().optional(),
+    classCategory: z.string().optional(),
+    grade: z.string().optional(),
+    state: z.string().optional(),
+    subject: z.string().optional(),
     tags: z.string().optional(),
     keywords: z.string().optional(),
     featureImage: z.string().optional(),
@@ -78,6 +83,12 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+type Subject = { id: string, name: string };
+type Board = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
+type State = { id: string, name: string };
 
 
 const jsonExampleFull = `
@@ -194,6 +205,12 @@ export default function EditKidsContentPage() {
     const importFileRef = useRef<HTMLInputElement>(null);
 
     const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [boards, setBoards] = useState<Board[]>([]);
+    const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
+    const [grades, setGrades] = useState<Grade[]>([]);
+    const [states, setStates] = useState<State[]>([]);
+    const [loadingMetadata, setLoadingMetadata] = useState(true);
 
 
     const handleCopy = (text: string) => {
@@ -209,6 +226,11 @@ export default function EditKidsContentPage() {
         defaultValues: {
             title: '',
             description: '',
+            board: '',
+            classCategory: '',
+            grade: '',
+            state: '',
+            subject: '',
             tags: '',
             keywords: '',
             featureImage: '',
@@ -217,6 +239,8 @@ export default function EditKidsContentPage() {
             questions: [],
         },
     });
+    
+    const selectedClassCategory = form.watch('classCategory');
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -230,15 +254,33 @@ export default function EditKidsContentPage() {
             return;
         }
 
-        const fetchContent = async () => {
+        const fetchContentAndMetadata = async () => {
             setLoading(true);
+            setLoadingMetadata(true);
             try {
-                const contentData = await getContentById(contentId);
+                 const [contentData, subjectData, boardData, classData, stateData] = await Promise.all([
+                    getContentById(contentId),
+                    getSubjects(),
+                    getBoards(),
+                    getClasses(),
+                    getStates(),
+                ]);
+                
+                setSubjects(subjectData);
+                setBoards(boardData);
+                setClassCategories(classData);
+                setStates(stateData);
+
                 if (contentData) {
                     const sanitizedData = {
                         ...contentData,
                         title: contentData.title ?? '',
                         description: contentData.description ?? '',
+                        board: contentData.board ?? '',
+                        classCategory: contentData.classCategory ?? '',
+                        grade: contentData.grade ?? '',
+                        state: contentData.state ?? '',
+                        subject: contentData.subject ?? '',
                         tags: contentData.tags ?? '',
                         keywords: contentData.keywords ?? '',
                         featureImage: contentData.featureImage ?? '',
@@ -260,6 +302,11 @@ export default function EditKidsContentPage() {
                         })),
                     };
                     form.reset(sanitizedData as any);
+
+                    if (contentData.classCategory) {
+                        const fetchedGrades = await getGradesByClass(contentData.classCategory);
+                        setGrades(fetchedGrades);
+                    }
                 } else {
                     toast({ variant: 'destructive', title: 'Content not found' });
                     router.push('/admin/kids-zone/manage');
@@ -272,11 +319,24 @@ export default function EditKidsContentPage() {
                 });
             } finally {
                 setLoading(false);
+                setLoadingMetadata(false);
             }
         };
 
-        fetchContent();
+        fetchContentAndMetadata();
     }, [contentId, router, toast, form]);
+
+     useEffect(() => {
+        const fetchGrades = async () => {
+            if(selectedClassCategory) {
+                const fetchedGrades = await getGradesByClass(selectedClassCategory);
+                setGrades(fetchedGrades);
+            } else {
+                setGrades([]);
+            }
+        };
+        if (selectedClassCategory) fetchGrades();
+    }, [selectedClassCategory]);
 
       const processJsonImport = (jsonString: string) => {
         try {
@@ -345,6 +405,11 @@ export default function EditKidsContentPage() {
             const contentToSave: any = {
                 title: data.title,
                 description: data.description,
+                board: data.board,
+                classCategory: data.classCategory,
+                grade: data.grade,
+                state: data.state,
+                subject: data.subject,
                 tags: data.tags,
                 keywords: data.keywords,
                 featureImage: data.featureImage,
@@ -519,34 +584,150 @@ export default function EditKidsContentPage() {
                                 </FormItem>
                               )}
                             />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <FormField
-                                  control={form.control}
-                                  name="tags"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Tags</FormLabel>
-                                      <FormControl>
-                                        <Input placeholder="e.g., Animals, Sounds, Fun" {...field} value={field.value ?? ''} />
-                                      </FormControl>
-                                      <FormDescription>Comma-separated tags for categorization.</FormDescription>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
+                                    control={form.control}
+                                    name="subject"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Subject</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a subject" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {subjects.map((subject) => (
+                                                        <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
                                 <FormField
-                                  control={form.control}
-                                  name="keywords"
-                                  render={({ field }) => (
+                                    control={form.control}
+                                    name="board"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Board</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a board" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {boards.map((board) => (
+                                                        <SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <FormField
+                                    control={form.control}
+                                    name="classCategory"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Class Category</FormLabel>
+                                        <Select onValueChange={(value) => { field.onChange(value); form.setValue('grade', ''); }} value={field.value}>
+                                            <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a category" />
+                                            </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                            {classCategories.map(c => (
+                                                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                            ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="grade"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Grade</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategory}>
+                                            <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a grade" />
+                                            </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                            {grades.map(g => (
+                                                <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
+                                            ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="state"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>State</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a state" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {states.map((state) => (
+                                                        <SelectItem key={state.id} value={state.name}>{state.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                control={form.control}
+                                name="tags"
+                                render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>Keywords</FormLabel>
-                                      <FormControl>
-                                        <Input placeholder="e.g., animal sounds quiz, kids learning" {...field} value={field.value ?? ''} />
-                                      </FormControl>
-                                      <FormDescription>Comma-separated keywords for SEO.</FormDescription>
-                                      <FormMessage />
+                                    <FormLabel>Tags</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g., Animals, Sounds, Fun" {...field} value={field.value ?? ''} />
+                                    </FormControl>
+                                    <FormDescription>Comma-separated tags for categorization.</FormDescription>
+                                    <FormMessage />
                                     </FormItem>
-                                  )}
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="keywords"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Keywords</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g., animal sounds quiz, kids learning" {...field} value={field.value ?? ''} />
+                                    </FormControl>
+                                    <FormDescription>Comma-separated keywords for SEO.</FormDescription>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
                                 />
                             </div>
                             <FormField control={form.control} name="category" render={({ field }) => (<FormItem><FormLabel>Category</FormLabel><Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger></FormControl><SelectContent><SelectItem value="Fun Quizzes">Fun Quizzes</SelectItem><SelectItem value="Learning Games">Learning Games</SelectItem><SelectItem value="Learning English">Learning English</SelectItem><SelectItem value="Learning Bengali">Learning Bengali</SelectItem><SelectItem value="Learning Hindi">Learning Hindi</SelectItem><SelectItem value="Learning Arabic">Learning Arabic</SelectItem><SelectItem value="Learning Urdu">Learning Urdu</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
@@ -588,15 +769,13 @@ export default function EditKidsContentPage() {
                                             <div className="space-y-4">
                                                 <FormField control={form.control} name={`questions.${index}.text`} render={({ field }) => (<FormItem><FormLabel>Question Text</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)} />
+                                                    <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)}/>
                                                     <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Question Audio</FormLabel>
                                                              <div className="flex items-center gap-2">
                                                                 <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
-                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
-                                                                    {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
-                                                                </Button>
+                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>
                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.watch(`questions.${index}.text`), `questions.${index}.audio`)} disabled={isGeneratingAudio === `questions.${index}.audio` || !form.watch(`questions.${index}.text`)}>
                                                                     {isGeneratingAudio === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
                                                                 </Button>
@@ -644,9 +823,7 @@ export default function EditKidsContentPage() {
                                                                                             <FormLabel className="text-xs">Audio</FormLabel>
                                                                                              <div className="flex items-center gap-2">
                                                                                                 <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
-                                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
-                                                                                                    {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
-                                                                                                </Button>
+                                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>
                                                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.watch(`questions.${index}.options.${optionIndex}.text`), `questions.${index}.options.${optionIndex}.audio`)} disabled={isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` || !form.watch(`questions.${index}.options.${optionIndex}.text`)}>
                                                                                                     {isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
                                                                                                 </Button>
