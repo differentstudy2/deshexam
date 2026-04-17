@@ -11,6 +11,8 @@ import { ContentBadge } from "@/components/content-badge";
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MockTestFilters } from "@/components/mock-test-filters";
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 type Quiz = {
   id: string;
@@ -23,6 +25,7 @@ type Quiz = {
   testType: string | string[];
   featureImage?: string;
   description?: string;
+  createdAt?: any;
 };
 
 function getUrlForTest(testType: string | string[], testId: string) {
@@ -34,9 +37,9 @@ function getUrlForTest(testType: string | string[], testId: string) {
 
 const ITEMS_PER_PAGE = 8;
 
-export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: Quiz[] }) {
-  const [quizzes, setQuizzes] = useState<Quiz[]>(initialQuizzes);
-  const [loading, setLoading] = useState(false);
+export default function QuizzesClientPage() {
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<{ id: string; name: string }[]>([]);
   const { toast } = useToast();
 
@@ -45,11 +48,44 @@ export default function QuizzesClientPage({ initialQuizzes }: { initialQuizzes: 
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
-    if (initialQuizzes) {
-        const uniqueSubjects = Array.from(new Set(initialQuizzes.map((quiz) => quiz.subject))).filter(Boolean) as string[];
+    setLoading(true);
+    
+    const quizzesMap = new Map<string, Quiz>();
+
+    const updateState = () => {
+        const allQuizzes = Array.from(quizzesMap.values());
+        allQuizzes.sort((a: any, b: any) => (b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0) - (a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0));
+        setQuizzes(allQuizzes);
+
+        const uniqueSubjects = Array.from(new Set(allQuizzes.map((quiz) => quiz.subject))).filter(Boolean) as string[];
         setSubjects(uniqueSubjects.map(s => ({ id: s, name: s })));
-    }
-  }, [initialQuizzes]);
+        setLoading(false);
+    };
+
+    const arrayQuery = query(collection(db, "content"), where("testType", "array-contains", "Quiz"));
+    const unsubscribeArray = onSnapshot(arrayQuery, (snapshot) => {
+      snapshot.docs.forEach(doc => quizzesMap.set(doc.id, { id: doc.id, ...doc.data() } as Quiz));
+      updateState();
+    }, (error) => {
+      console.error("Error on array-contains snapshot:", error);
+      toast({ variant: "destructive", title: "Error loading quizzes." });
+    });
+
+    const stringQuery = query(collection(db, "content"), where("testType", "==", "Quiz"));
+    const unsubscribeString = onSnapshot(stringQuery, (snapshot) => {
+      snapshot.docs.forEach(doc => quizzesMap.set(doc.id, { id: doc.id, ...doc.data() } as Quiz));
+      updateState();
+    }, (error) => {
+      console.error("Error on string-equals snapshot:", error);
+      toast({ variant: "destructive", title: "Error loading quizzes." });
+    });
+
+    return () => {
+      unsubscribeArray();
+      unsubscribeString();
+    };
+  }, [toast]);
+
 
   const filteredQuizzes = useMemo(() => {
     return quizzes.filter(quiz => {

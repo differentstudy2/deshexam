@@ -1,7 +1,6 @@
 
 import type { Metadata, ResolvingMetadata } from 'next';
 import QuizzesClientPage from './quizzes-client';
-import { getAllContent } from '@/lib/firebase/firestore';
 
 export async function generateMetadata(
   {},
@@ -29,28 +28,6 @@ export async function generateMetadata(
   };
 }
 
-// Helper to make Timestamps serializable
-const serializeTimestamps = (data: any): any => {
-    if (!data) return data;
-    if (Array.isArray(data)) {
-        return data.map(item => serializeTimestamps(item));
-    }
-    if (typeof data === 'object' && data !== null) {
-        if (data.hasOwnProperty('seconds') && data.hasOwnProperty('nanoseconds') && typeof (data as any).toDate === 'function') {
-            return (data as any).toDate().toISOString();
-        }
-        const newObj: { [key: string]: any } = {};
-        for (const key in data) {
-            newObj[key] = serializeTimestamps(data[key]);
-        }
-        return newObj;
-    }
-    return data;
-};
-
-export default async function QuizzesPage() {
-    const fetchedQuizzes = await getAllContent("Quiz");
-    const initialQuizzes = serializeTimestamps(fetchedQuizzes);
-
-    return <QuizzesClientPage initialQuizzes={initialQuizzes as any[]} />;
+export default function QuizzesPage() {
+  return <QuizzesClientPage />;
 }
