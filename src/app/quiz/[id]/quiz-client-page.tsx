@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -148,7 +147,7 @@ const toBengaliNumerals = (num: number | string) => {
 };
 
 const optionGradients = [
-    'from-purple-500 to-indigo-600',
+    'from-sky-500 to-indigo-600',
     'from-amber-400 to-orange-500',
     'from-teal-400 to-cyan-500',
     'from-rose-400 to-red-500',
@@ -157,13 +156,11 @@ const optionGradients = [
 const bgGradients = [
     'from-rose-400 via-fuchsia-500 to-indigo-500',
     'from-amber-400 via-orange-500 to-red-500',
-    'from-lime-400 via-green-500 to-emerald-500',
     'from-sky-400 via-cyan-500 to-blue-500',
     'from-violet-400 via-purple-500 to-pink-500',
-    'from-ec4899', 'to-f43f5e',
-    'from-06b6d4', 'to-3b82f6',
-    'from-a3e635', 'to-22c55e',
-    'from-facc15', 'to-eab308'
+    'from-[#ec4899] to-[#f43f5e]',
+    'from-[#06b6d4] to-[#3b82f6]',
+    'from-[#facc15] to-[#eab308]'
 ];
 
 const TimerCircle = ({ timeLeft, totalDuration, className, size = 36, strokeWidth = 3 }: { timeLeft: number; totalDuration: number, className?: string; size?: number; strokeWidth?: number; }) => {
@@ -575,12 +572,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 { from: '#DA22FF', to: '#9733EE' },
                 { from: '#09203F', to: '#537895' },
                 { from: '#868F96', to: '#596164' },
-                { from: '#93A5CF', to: '#E4EfE9' },
-                { from: 'rgb(137, 137, 0)', to: '#1d4350' },
+                { from: '#c0392b', to: '#8e44ad' },
                 { from: '#434343', to: '#000000' },
                 { from: '#283e51', to: '#4b79a1' },
                 { from: '#2c3e50', to: '#2980b9' },
-                { from: '#3498db', to: '#2c3e50' }
+                { from: '#3498db', to: '#2c3e50' },
+                { from: '#6a3093', to: '#a044ff' }
             ];
             const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
             const gradient = targetCtx.createLinearGradient(0, 0, 0, targetHeight);
@@ -910,7 +907,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
                                                                 !isShown && "cursor-pointer hover:scale-105",
                                                                 isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
-                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 dark:text-slate-900 bg-red-500",
+                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 dark:text-slate-900",
                                                                 !isShown && gradientClass,
                                                                 isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
                                                             )}
