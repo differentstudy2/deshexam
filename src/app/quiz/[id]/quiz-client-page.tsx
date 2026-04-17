@@ -135,12 +135,17 @@ const translations = {
     }
 };
 
-const optionBgColors = [
-    'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200/80',
-    'bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200/80',
-    'bg-lime-100 dark:bg-lime-900/30 hover:bg-lime-200/80',
-    'bg-rose-100 dark:bg-rose-900/30 hover:bg-rose-200/80',
-];
+const toDevanagari = (num: number | string) => {
+    const n = num.toString();
+    const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+    return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
+};
+
+const toBengaliNumerals = (num: number | string) => {
+    const n = num.toString();
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return n.split('').map(digit => bengaliDigits[parseInt(digit, 10)]).join('');
+};
 
 const optionGradients = [
     'from-purple-500 to-indigo-600',
@@ -203,18 +208,6 @@ const TimerCircle = ({ timeLeft, totalDuration, className, size = 36, strokeWidt
             </span>
         </div>
     );
-};
-
-const toDevanagari = (num: number | string) => {
-    const n = num.toString();
-    const devanagariDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
-    return n.split('').map(digit => devanagariDigits[parseInt(digit, 10)]).join('');
-};
-
-const toBengaliNumerals = (num: number | string) => {
-    const n = num.toString();
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return n.split('').map(digit => bengaliDigits[parseInt(digit, 10)]).join('');
 };
 
 export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
@@ -883,18 +876,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     "shadow-2xl overflow-hidden mt-2 bg-gradient-to-br",
                                     bgGradients[currentQuestionIndex % bgGradients.length]
                                 )}>
-                                    <CardHeader className="relative text-white p-6">
+                                    <CardHeader className="relative p-6 text-white">
                                         {currentQuestion && currentQuestion.image && (
                                             <div className="relative h-48 w-full mt-4">
                                                 <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
                                             </div>
                                         )}
                                         
-                                         <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                <span>{currentQuestion?.text}</span>
-                                            </CardTitle>
-                                        </div>
+                                        <div className="flex items-start justify-between gap-2">
+                                        <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                            <span>{currentQuestion?.text}</span>
+                                        </CardTitle>
+                                    </div>
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
                                         <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
@@ -978,4 +971,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
