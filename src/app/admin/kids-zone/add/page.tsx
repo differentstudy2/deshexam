@@ -24,9 +24,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, uploadFile } from '@/lib/firebase/firestore';
+import { addContent, uploadFile, getSubjects, getBoards, getClasses, getStates, getGradesByClass } from '@/lib/firebase/firestore';
 import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Copy } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -63,6 +63,11 @@ const funQuizQuestionSchema = z.object({
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
   description: z.string().optional(),
+  board: z.string().optional(),
+  classCategory: z.string().optional(),
+  grade: z.string().optional(),
+  state: z.string().optional(),
+  subject: z.string().optional(),
   tags: z.string().optional(),
   keywords: z.string().optional(),
   featureImage: z.string().optional(),
@@ -154,6 +159,12 @@ const jsonExampleTF = `
 }
 `;
 
+type Subject = { id: string, name: string };
+type Board = { id: string, name: string };
+type ClassCategory = { id: string, name: string };
+type Grade = { id: string, name: string };
+type State = { id: string, name: string };
+
 
 export default function AddKidsContentPage() {
   const { toast } = useToast();
@@ -166,6 +177,13 @@ export default function AddKidsContentPage() {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [jsonText, setJsonText] = useState('');
   const importFileRef = useRef<HTMLInputElement>(null);
+  
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
+  const [states, setStates] = useState<State[]>([]);
+  const [loadingMetadata, setLoadingMetadata] = useState(true);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -180,6 +198,11 @@ export default function AddKidsContentPage() {
     defaultValues: {
       title: '',
       description: '',
+      board: '',
+      classCategory: '',
+      grade: '',
+      state: '',
+      subject: '',
       tags: '',
       keywords: '',
       featureImage: '',
@@ -193,6 +216,47 @@ export default function AddKidsContentPage() {
     control: form.control,
     name: 'questions',
   });
+  
+  const selectedClassCategory = form.watch('classCategory');
+
+   useEffect(() => {
+    const fetchMetadata = async () => {
+        try {
+            setLoadingMetadata(true);
+            const [subjectData, boardData, classData, stateData] = await Promise.all([
+                getSubjects(),
+                getBoards(),
+                getClasses(),
+                getStates(),
+            ]);
+            setSubjects(subjectData);
+            setBoards(boardData);
+            setClassCategories(classData);
+            setStates(stateData);
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Error loading metadata',
+                description: (error as Error).message
+            });
+        } finally {
+            setLoadingMetadata(false);
+        }
+    }
+    fetchMetadata();
+  }, [toast]);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+        if (selectedClassCategory) {
+            const fetchedGrades = await getGradesByClass(selectedClassCategory);
+            setGrades(fetchedGrades);
+        } else {
+            setGrades([]);
+        }
+    };
+    if (selectedClassCategory) fetchGrades();
+  }, [selectedClassCategory]);
 
   const processJsonImport = (jsonString: string) => {
     try {
@@ -262,6 +326,11 @@ export default function AddKidsContentPage() {
       const contentToSave: any = {
         title: data.title,
         description: data.description,
+        board: data.board,
+        classCategory: data.classCategory,
+        grade: data.grade,
+        state: data.state,
+        subject: data.subject,
         tags: data.tags,
         keywords: data.keywords,
         featureImage: data.featureImage,
@@ -364,6 +433,120 @@ export default function AddKidsContentPage() {
                     </FormItem>
                   )}
                 />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="subject"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Subject</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a subject" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {subjects.map((subject) => (
+                                            <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="board"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Board</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a board" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {boards.map((board) => (
+                                            <SelectItem key={board.id} value={board.name}>{board.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="classCategory"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Class Category</FormLabel>
+                            <Select onValueChange={(value) => { field.onChange(value); form.setValue('grade', ''); }} value={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {classCategories.map(c => (
+                                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="grade"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Grade</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClassCategory}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a grade" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {grades.map(g => (
+                                    <SelectItem key={g.id} value={g.name}>{g.name}</SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a state" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {states.map((state) => (
+                                            <SelectItem key={state.id} value={state.name}>{state.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
