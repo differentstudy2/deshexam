@@ -1,11 +1,23 @@
-
 'use client';
 
 import Link from "next/link";
 import { DeshExamLogo } from "@/components/icons";
 import { Github, Twitter, Linkedin } from "lucide-react";
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+
+  const hideFooterOnPaths = [
+    '/quiz/'
+  ];
+
+  const shouldHideFooter = hideFooterOnPaths.some(path => pathname.startsWith(path));
+
+  if (shouldHideFooter) {
+    return null;
+  }
+
   return (
     <footer className="bg-secondary text-secondary-foreground font-body">
       <div className="container py-12">
