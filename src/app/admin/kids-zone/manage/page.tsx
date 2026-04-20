@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { getAllContent, deleteContent } from '@/lib/firebase/firestore';
 import {
@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Trash2, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, PlusCircle, Search } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +42,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 
 type KidsContent = {
     id: string;
@@ -53,17 +55,31 @@ type KidsContent = {
     questions?: any[];
 }
 
+const categories = [
+  "All",
+  "Fun Quizzes",
+  "Learning Games",
+  "Learning English",
+  "Learning Bengali",
+  "Learning Hindi",
+  "Learning Arabic",
+  "Learning Urdu",
+];
+
 export default function ManageKidsContentPage() {
   const { toast } = useToast();
-  const [content, setContent] = useState<KidsContent[]>([]);
+  const [allContent, setAllContent] = useState<KidsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState<KidsContent | null>(null);
+  
+  const [activeTab, setActiveTab] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchContent = async () => {
     try {
       setLoading(true);
-      const allContent = await getAllContent();
-      const kidsContent = (allContent as any[]).filter(item => item.testType === 'Kids Zone' || (item.testType === 'Quiz' && item.category === 'Fun Quizzes'));
+      const allContentData = await getAllContent();
+      const kidsContent = (allContentData as any[]).filter(item => item.testType === 'Kids Zone' || (item.testType === 'Quiz' && item.category === 'Fun Quizzes'));
       
       const formattedContent = kidsContent.map((c: any) => {
             let pubDate = 'N/A';
@@ -84,7 +100,7 @@ export default function ManageKidsContentPage() {
             } as KidsContent;
         });
 
-      setContent(formattedContent);
+      setAllContent(formattedContent);
     } catch (error) {
       toast({
         variant: "destructive",
@@ -99,6 +115,14 @@ export default function ManageKidsContentPage() {
   useEffect(() => {
     fetchContent();
   }, [toast]);
+
+  const filteredContent = useMemo(() => {
+    return allContent.filter(item => {
+        const matchesCategory = activeTab === 'All' || item.category === activeTab;
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+  }, [allContent, activeTab, searchQuery]);
 
   const handleDelete = async () => {
     if (!itemToDelete) return;
@@ -120,6 +144,60 @@ export default function ManageKidsContentPage() {
     }
   };
 
+  const ContentTable = ({ contentItems }: { contentItems: KidsContent[] }) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Title</TableHead>
+          <TableHead>Category</TableHead>
+          <TableHead className="hidden md:table-cell">Created At</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <TableRow key={i}>
+              <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+              <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+              <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+              <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-full ml-auto" /></TableCell>
+            </TableRow>
+          ))
+        ) : contentItems.length > 0 ? (
+          contentItems.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell className="font-medium">{item.title}</TableCell>
+              <TableCell><Badge variant="outline">{item.category}</Badge></TableCell>
+              <TableCell className="hidden md:table-cell">{item.createdAt}</TableCell>
+              <TableCell className="text-right">
+                 <DropdownMenu>
+                      <DropdownMenuTrigger asChild><Button aria-haspopup="true" size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem asChild>
+                              <Link href={`/admin/kids-zone/edit/${item.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete(item)}>
+                          <Trash2 className="mr-2 h-4 w-4"/>Delete
+                          </DropdownMenuItem>
+                      </DropdownMenuContent>
+                  </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={4} className="text-center h-24">
+              No content found for this category.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
+
   return (
     <div className="space-y-6">
        <div className="flex justify-between items-center">
@@ -137,62 +215,22 @@ export default function ManageKidsContentPage() {
       <Card>
         <CardHeader>
           <CardTitle>All Kids Zone Content</CardTitle>
-          <CardDescription>
-            A list of all games, quizzes, and activities.
-          </CardDescription>
+           <div className="relative mt-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search by title..." className="pl-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="hidden md:table-cell">Created At</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: 3 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-8 rounded-full ml-auto" /></TableCell>
-                  </TableRow>
-                ))
-              ) : content.length > 0 ? (
-                content.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.title}</TableCell>
-                    <TableCell><Badge variant="outline">{item.category}</Badge></TableCell>
-                    <TableCell className="hidden md:table-cell">{item.createdAt}</TableCell>
-                    <TableCell className="text-right">
-                       <DropdownMenu>
-                            <DropdownMenuTrigger asChild><Button aria-haspopup="true" size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem asChild>
-                                    <Link href={`/admin/kids-zone/edit/${item.id}`}><Pencil className="mr-2 h-4 w-4"/>Edit</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete(item)}>
-                                <Trash2 className="mr-2 h-4 w-4"/>Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center h-24">
-                    No Kids Zone content found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="flex-wrap h-auto justify-start">
+              {categories.map(category => (
+                <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+              ))}
+            </TabsList>
+            <TabsContent value={activeTab} className="mt-4">
+                <ContentTable contentItems={filteredContent} />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
       
