@@ -211,159 +211,6 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
     );
 };
 
-const useSpeechRecognition = (lang: string) => {
-    const [isListening, setIsListening] = useState(false);
-    const [transcript, setTranscript] = useState('');
-    const recognitionRef = useRef<any>(null);
-
-    useEffect(() => {
-        if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window)) {
-            console.warn('Speech recognition not supported in this browser.');
-            return;
-        }
-
-        const recognition = new (window as any).webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = lang;
-
-        recognition.onstart = () => {
-            setIsListening(true);
-        };
-
-        recognition.onend = () => {
-            setIsListening(false);
-        };
-
-        recognition.onresult = (event: any) => {
-            const last = event.results.length - 1;
-            const text = event.results[last][0].transcript;
-            setTranscript(text);
-        };
-        
-        recognitionRef.current = recognition;
-
-    }, [lang]);
-
-    const startListening = () => {
-        if (recognitionRef.current && !isListening) {
-            setTranscript('');
-            recognitionRef.current.start();
-        }
-    };
-    
-    const resetTranscript = useCallback(() => {
-        setTranscript('');
-    }, []);
-
-    return { isListening, transcript, startListening, resetTranscript, hasSupport: !!recognitionRef.current };
-};
-
-const VoiceRecognitionGame = () => {
-    const [currentLetter, setCurrentLetter] = useState<{ char: string; name: string; } | null>(null);
-    const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
-    const [isCorrect, setIsCorrect] = useState(false);
-    
-    const { isListening, transcript, startListening, resetTranscript, hasSupport } = useSpeechRecognition('bn-IN');
-
-    const startNewRound = useCallback(() => {
-        const randomIndex = Math.floor(Math.random() * allLetters.length);
-        setCurrentLetter(allLetters[randomIndex]);
-        setFeedback({message: '', type: 'none'});
-        setIsCorrect(false);
-        resetTranscript();
-    }, [resetTranscript]);
-    
-    useEffect(() => {
-        startNewRound();
-    }, [startNewRound]);
-
-    useEffect(() => {
-        if (!transcript || !currentLetter || isCorrect) return;
-
-        const spokenAnswer = transcript.toLowerCase().trim().replace(/[.]$/, '');
-        const correctAnswer = currentLetter.name.toLowerCase();
-        
-        if (spokenAnswer === correctAnswer) {
-            setFeedback({ message: 'Great job!', type: 'correct' });
-            setIsCorrect(true);
-            playSound('correct');
-        } else {
-            setFeedback({ message: 'Try again!', type: 'incorrect' });
-            playSound('incorrect');
-            setTimeout(() => {
-                setFeedback({ message: '', type: 'none' });
-                resetTranscript();
-            }, 1500);
-        }
-    }, [transcript, currentLetter, isCorrect, resetTranscript]);
-
-    if (!hasSupport) {
-        return <p className="text-center text-red-500 mt-8">Voice recognition is not supported by your browser. Please try Google Chrome.</p>
-    }
-
-    return (
-        <div className="relative flex flex-col items-center justify-center mt-8">
-            <Card className="w-full max-w-md shadow-2xl bg-white/70 backdrop-blur-sm">
-                <CardHeader className="text-center">
-                    <CardTitle className="text-9xl font-bold text-slate-800" style={{fontFamily: "'Lexend', sans-serif"}}>
-                        {currentLetter?.char}
-                    </CardTitle>
-                    <CardDescription className="text-2xl font-semibold text-slate-500 pt-2">
-                        {currentLetter?.name}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="h-44 text-center relative flex flex-col justify-center items-center">
-                    <Confetti active={isCorrect} config={{
-                        angle: 90,
-                        spread: 360,
-                        startVelocity: 40,
-                        elementCount: 100,
-                        decay: 0.9,
-                    }}/>
-
-                    <div className="absolute top-0 w-full px-4">
-                        {feedback.message && (
-                             <div className={`flex items-center justify-center gap-2 font-bold text-2xl ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
-                                {isCorrect ? <Check className="w-8 h-8" /> : <X className="w-8 h-8" />}
-                                {feedback.message}
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="h-16 w-full mt-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                        <p className="text-2xl font-mono text-gray-500 dark:text-gray-400">
-                            {transcript || (isListening ? '...' : 'Speak here')}
-                        </p>
-                    </div>
-
-                </CardContent>
-            </Card>
-
-            <div className="mt-8 flex flex-col items-center gap-4">
-                 <Button 
-                    onClick={startListening}
-                    variant={isListening ? 'destructive' : 'outline'}
-                    className="w-32 h-32 rounded-full shadow-lg text-6xl font-bold transition-all duration-300 ease-in-out"
-                    disabled={isListening || isCorrect}
-                >
-                    <Mic className="w-16 h-16" />
-                </Button>
-                <p className="mt-2 text-lg font-semibold text-slate-700 dark:text-slate-200">
-                    {isListening ? 'Listening...' : 'Tap to Speak'}
-                </p>
-            </div>
-
-             <div className="mt-8">
-                <Button variant="outline" onClick={startNewRound} size="lg">
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    New Letter
-                </Button>
-            </div>
-        </div>
-    );
-};
-
 const MatchingGame = () => {
     const [targetLetter, setTargetLetter] = useState<{ char: string; name: string } | null>(null);
     const [options, setOptions] = useState<{ char: string; name: string }[]>([]);
@@ -515,11 +362,10 @@ export default function BengaliAlphabetPage() {
         </header>
 
         <Tabs defaultValue="alphabet" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 max-w-3xl mx-auto h-auto">
+            <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto h-auto">
                 <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
                 <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
                 <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
-                <TabsTrigger value="voice">Voice (কণ্ঠস্বর)</TabsTrigger>
             </TabsList>
             <TabsContent value="alphabet" className="mt-8">
               <Tabs defaultValue="all" className="w-full">
@@ -559,9 +405,6 @@ export default function BengaliAlphabetPage() {
             </TabsContent>
             <TabsContent value="match">
                 <MatchingGame />
-            </TabsContent>
-            <TabsContent value="voice">
-                <VoiceRecognitionGame />
             </TabsContent>
         </Tabs>
       </div>
