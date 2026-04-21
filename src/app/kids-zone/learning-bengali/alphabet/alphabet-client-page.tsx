@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -316,7 +315,7 @@ export default function BengaliAlphabetClientPage() {
   return (
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-4 flex justify-between items-center">
+        <div className="mb-8 flex justify-between items-center">
             <Button asChild variant="ghost">
                 <Link href="/kids-zone/learning-bengali">
                     <ArrowLeft className="mr-2 h-4 w-4" />
@@ -337,7 +336,7 @@ export default function BengaliAlphabetClientPage() {
                     <div className="py-4">
                         <div className="flex items-center justify-between">
                             <Label htmlFor="autoplay-audio" className="flex items-center gap-2">
-                                <Volume2 className="h-5 w-5"/>
+                                <Volume2 className="w-5 h-5"/>
                                 Autoplay Audio on Scroll
                             </Label>
                             <Switch
@@ -352,15 +351,7 @@ export default function BengaliAlphabetClientPage() {
                 </DialogContent>
             </Dialog>
         </div>
-        <header className="text-center mb-8">
-          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter text-orange-600">
-            Bengali Alphabet (বাংলা বর্ণমালা)
-          </h1>
-          <p className="text-lg text-orange-700/80 mt-2 max-w-2xl mx-auto">
-            Learn your ABCs with fun games and activities!
-          </p>
-        </header>
-
+        
         <Tabs defaultValue="alphabet" className="w-full">
             <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto h-auto">
                 <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
