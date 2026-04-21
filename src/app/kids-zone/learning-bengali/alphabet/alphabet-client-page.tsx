@@ -315,50 +315,52 @@ export default function BengaliAlphabetClientPage() {
 
   return (
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex justify-between items-center">
-            <Button asChild variant="ghost" size="icon">
-                <Link href="/kids-zone/learning-bengali">
-                    <ArrowLeft className="h-4 w-4" />
-                    <span className="sr-only">Back to Learning Bengali</span>
-                </Link>
-            </Button>
-             <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="outline" size="icon">
-                        <Settings className="h-5 w-5" />
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Settings</DialogTitle>
-                        <DialogDescription>Control your learning experience.</DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                        <div className="flex items-center justify-between">
-                            <Label htmlFor="autoplay-audio" className="flex items-center gap-2">
-                                <Volume2 className="w-5 h-5"/>
-                                Autoplay Audio on Scroll
-                            </Label>
-                            <Switch
-                                id="autoplay-audio"
-                                checked={autoplayEnabled}
-                                onCheckedChange={(checked) => {
-                                    setAutoplayEnabled(checked);
-                                }}
-                            />
+      <Tabs defaultValue="alphabet" className="w-full">
+        <div className="container mx-auto px-4 py-8">
+            <div className="mb-12 flex justify-between items-center">
+                <Button asChild variant="ghost" size="icon">
+                    <Link href="/kids-zone/learning-bengali">
+                        <ArrowLeft className="h-4 w-4" />
+                        <span className="sr-only">Back to Learning Bengali</span>
+                    </Link>
+                </Button>
+                
+                <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto">
+                    <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
+                    <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
+                    <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
+                </TabsList>
+                
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="icon">
+                            <Settings className="h-5 w-5" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Settings</DialogTitle>
+                            <DialogDescription>Control your learning experience.</DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="autoplay-audio" className="flex items-center gap-2">
+                                    <Volume2 className="w-5 h-5"/>
+                                    Autoplay Audio on Scroll
+                                </Label>
+                                <Switch
+                                    id="autoplay-audio"
+                                    checked={autoplayEnabled}
+                                    onCheckedChange={(checked) => {
+                                        setAutoplayEnabled(checked);
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </div>
-        
-        <Tabs defaultValue="alphabet" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 max-w-lg mx-auto h-auto">
-                <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
-                <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
-                <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
-            </TabsList>
+                    </DialogContent>
+                </Dialog>
+            </div>
+            
             <TabsContent value="alphabet" className="mt-8">
               <Tabs defaultValue="all" className="w-full">
                   <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto sm:h-10">
@@ -398,8 +400,8 @@ export default function BengaliAlphabetClientPage() {
             <TabsContent value="match">
                 <MatchingGame />
             </TabsContent>
-        </Tabs>
-      </div>
+        </div>
+      </Tabs>
     </div>
   );
 }
