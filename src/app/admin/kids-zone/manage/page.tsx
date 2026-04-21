@@ -328,11 +328,11 @@ export default function ManageKidsContentPage() {
         </CardContent>
       </Card>
       
-       <AlertDialog open={!!contentToDelete} onOpenChange={() => setItemToDelete(null)}>
+       <AlertDialog open={!!itemToDelete} onOpenChange={() => setItemToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone. This will permanently delete "{contentToDelete?.title}".</AlertDialogDescription>
+            <AlertDialogDescription>This action cannot be undone. This will permanently delete "{itemToDelete?.title}".</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
