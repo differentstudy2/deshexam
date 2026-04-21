@@ -2122,7 +2122,7 @@ export const getPracticeSetById = async (textbookId: string, chapterId: string |
 };
 
 
-export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string, topicId: string | null, practiceSetId: string, questionData: any) => {
+export const addQuestionToPracticeSet = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string, questionData: any) => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) throw new Error("Authentication required.");
@@ -2135,9 +2135,14 @@ export const addQuestionToPracticeSet = async (textbookId: string, chapterId: st
     });
 
     try {
-        const path = (topicId && topicId !== 'null')
-            ? `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`
-            : `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+        let path = '';
+        if (textbookId && chapterId && chapterId !== 'null' && topicId && topicId !== 'null') {
+             path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
+        } else if (textbookId && chapterId && chapterId !== 'null' && (!topicId || topicId === 'null')) {
+            path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
+        } else {
+             throw new Error("Invalid path to add question.");
+        }
         const questionsRef = collection(db, path);
         const docRef = await addDoc(questionsRef, dataToSave);
         return docRef.id;
@@ -2359,3 +2364,40 @@ export const getRelatedQuestions = async (currentQuestion: Partial<Question>): P
     }
 };
 
+export const getKidsZoneCategories = async () => {
+    try {
+        const q = query(collection(db, "kidsZoneCategories"), orderBy("title"));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+        console.error("Error getting Kids Zone categories: ", e);
+        throw new Error("Failed to fetch Kids Zone categories.");
+    }
+};
+
+export const addKidsZoneCategory = async (categoryData: { title: string, description: string, icon: string }) => {
+    if (!categoryData.title) {
+        throw new Error("Category title cannot be empty.");
+    }
+    try {
+        const link = `/kids-zone/${categoryData.title.toLowerCase().replace(/\s+/g, '-')}`;
+        const existingQuery = query(collection(db, "kidsZoneCategories"), where("link", "==", link));
+        const existingSnap = await getDocs(existingQuery);
+        if (!existingSnap.empty) {
+            throw new Error("A category with this name already exists.");
+        }
+
+        const docRef = await addDoc(collection(db, "kidsZoneCategories"), {
+            ...categoryData,
+            link,
+            image: `https://picsum.photos/seed/${categoryData.title.toLowerCase().replace(/\s+/g, '-')}/400/300`,
+            imageHint: `${categoryData.title.toLowerCase().split(' ')[0]} learning`
+        });
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding Kids Zone category: ", e);
+        throw e;
+    }
+};
+
+    

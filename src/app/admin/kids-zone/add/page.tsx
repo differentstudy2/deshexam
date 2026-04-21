@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
@@ -24,7 +25,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { addContent, uploadFile, getSubjects, getBoards, getClasses, getStates, getGradesByClass } from '@/lib/firebase/firestore';
+import { addContent, uploadFile, getSubjects, getBoards, getClasses, getStates, getGradesByClass, getKidsZoneCategories, addKidsZoneCategory } from '@/lib/firebase/firestore';
 import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Copy } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +42,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -164,6 +165,7 @@ type Board = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
 type Grade = { id: string, name: string };
 type State = { id: string, name: string };
+type KidsZoneCategory = { id: string; title: string; };
 
 
 export default function AddKidsContentPage() {
@@ -184,6 +186,12 @@ export default function AddKidsContentPage() {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [states, setStates] = useState<State[]>([]);
   const [loadingMetadata, setLoadingMetadata] = useState(true);
+
+  const [categories, setCategories] = useState<KidsZoneCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [newCategoryData, setNewCategoryData] = useState({ title: '', description: '', icon: 'ToyBrick' });
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -219,20 +227,35 @@ export default function AddKidsContentPage() {
   
   const selectedClassCategory = form.watch('classCategory');
 
+  const fetchKidsCategories = async () => {
+    setLoadingCategories(true);
+    try {
+        const fetched = await getKidsZoneCategories();
+        setCategories(fetched.map((c: any) => ({id: c.id, title: c.title})));
+    } catch (error) {
+        toast({ variant: 'destructive', title: 'Could not load categories' });
+    } finally {
+        setLoadingCategories(false);
+    }
+  };
+
+
    useEffect(() => {
     const fetchMetadata = async () => {
         try {
             setLoadingMetadata(true);
-            const [subjectData, boardData, classData, stateData] = await Promise.all([
+            const [subjectData, boardData, classData, stateData, kidsCategories] = await Promise.all([
                 getSubjects(),
                 getBoards(),
                 getClasses(),
                 getStates(),
+                getKidsZoneCategories()
             ]);
             setSubjects(subjectData);
             setBoards(boardData);
             setClassCategories(classData);
             setStates(stateData);
+            setCategories(kidsCategories.map((c: any) => ({id: c.id, title: c.title})));
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -382,6 +405,25 @@ export default function AddKidsContentPage() {
         }
     }
   };
+
+    const handleAddNewCategory = async () => {
+        if (!newCategoryData.title.trim() || !newCategoryData.description.trim()) {
+            toast({ variant: 'destructive', title: 'Title and description are required.' });
+            return;
+        }
+        setIsAddingCategory(true);
+        try {
+            await addKidsZoneCategory(newCategoryData);
+            toast({ title: 'Category added!' });
+            setIsCategoryDialogOpen(false);
+            setNewCategoryData({ title: '', description: '', icon: 'ToyBrick' });
+            await fetchKidsCategories(); // Re-fetch
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Failed to add category', description: (error as Error).message });
+        } finally {
+            setIsAddingCategory(false);
+        }
+    };
   
   return (
     <div>
@@ -583,22 +625,59 @@ export default function AddKidsContentPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Fun Quizzes">Fun Quizzes</SelectItem>
-                          <SelectItem value="Learning Games">Learning Games</SelectItem>
-                          <SelectItem value="Learning English">Learning English</SelectItem>
-                           <SelectItem value="Learning Bengali">Learning Bengali</SelectItem>
-                          <SelectItem value="Learning Hindi">Learning Hindi</SelectItem>
-                          <SelectItem value="Learning Arabic">Learning Arabic</SelectItem>
-                          <SelectItem value="Learning Urdu">Learning Urdu</SelectItem>
-                        </SelectContent>
-                      </Select>
+                       <div className="flex items-center gap-2">
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {categories.map(cat => <SelectItem key={cat.id} value={cat.title}>{cat.title}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+                              <DialogTrigger asChild>
+                                <Button type="button" variant="outline" size="icon"><PlusCircle className="w-4 h-4"/></Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                  <DialogHeader>
+                                      <DialogTitle>Add New Kids Zone Category</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="space-y-4 py-4">
+                                      <div className="space-y-2">
+                                          <Label htmlFor="new-cat-title">Title</Label>
+                                          <Input id="new-cat-title" value={newCategoryData.title} onChange={(e) => setNewCategoryData(prev => ({...prev, title: e.target.value}))} />
+                                      </div>
+                                       <div className="space-y-2">
+                                          <Label htmlFor="new-cat-desc">Description</Label>
+                                          <Textarea id="new-cat-desc" value={newCategoryData.description} onChange={(e) => setNewCategoryData(prev => ({...prev, description: e.target.value}))} />
+                                      </div>
+                                       <div className="space-y-2">
+                                          <Label htmlFor="new-cat-icon">Icon</Label>
+                                          <Select value={newCategoryData.icon} onValueChange={(val) => setNewCategoryData(prev => ({...prev, icon: val}))}>
+                                            <SelectTrigger><SelectValue/></SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Puzzle">Puzzle</SelectItem>
+                                                <SelectItem value="Gamepad2">Gamepad</SelectItem>
+                                                <SelectItem value="BookHeart">BookHeart</SelectItem>
+                                                <SelectItem value="BookOpen">BookOpen</SelectItem>
+                                                <SelectItem value="Languages">Languages</SelectItem>
+                                                <SelectItem value="Book">Book</SelectItem>
+                                                <SelectItem value="ToyBrick">ToyBrick (Default)</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                      </div>
+                                  </div>
+                                  <DialogFooter>
+                                      <Button variant="ghost" onClick={() => setIsCategoryDialogOpen(false)}>Cancel</Button>
+                                      <Button onClick={handleAddNewCategory} disabled={isAddingCategory}>
+                                        {isAddingCategory ? <Loader2 className="animate-spin" /> : 'Add Category'}
+                                      </Button>
+                                  </DialogFooter>
+                              </DialogContent>
+                          </Dialog>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
