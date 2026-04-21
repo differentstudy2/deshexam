@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 
 const vowels = [
@@ -312,10 +313,16 @@ const MatchingGame = () => {
 
 export default function BengaliAlphabetClientPage() {
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+  const [activeTab, setActiveTab] = useState('alphabet');
+
+  const tabLabels: { [key: string]: string } = {
+    alphabet: 'Alphabet (বর্ণমালা)',
+    recognize: 'Recognize (চিনুন)',
+    match: 'Match (মেলান)',
+  };
 
   return (
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
-      <Tabs defaultValue="alphabet" className="w-full">
         <div className="container mx-auto px-4 py-8">
             <div className="mb-12 flex justify-between items-center">
                 <Button asChild variant="ghost" size="icon">
@@ -325,11 +332,25 @@ export default function BengaliAlphabetClientPage() {
                     </Link>
                 </Button>
                 
-                <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto">
-                    <TabsTrigger value="alphabet">Alphabet (বর্ণমালা)</TabsTrigger>
-                    <TabsTrigger value="recognize">Recognize (চিনুন)</TabsTrigger>
-                    <TabsTrigger value="match">Match (মেলান)</TabsTrigger>
-                </TabsList>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="w-48 justify-between">
+                            {tabLabels[activeTab]}
+                            <ChevronDown className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48">
+                        <DropdownMenuItem onSelect={() => setActiveTab('alphabet')}>
+                            Alphabet (বর্ণমালা)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setActiveTab('recognize')}>
+                            Recognize (চিনুন)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setActiveTab('match')}>
+                            Match (মেলান)
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 
                 <Dialog>
                     <DialogTrigger asChild>
@@ -351,9 +372,7 @@ export default function BengaliAlphabetClientPage() {
                                 <Switch
                                     id="autoplay-audio"
                                     checked={autoplayEnabled}
-                                    onCheckedChange={(checked) => {
-                                        setAutoplayEnabled(checked);
-                                    }}
+                                    onCheckedChange={setAutoplayEnabled}
                                 />
                             </div>
                         </div>
@@ -361,47 +380,46 @@ export default function BengaliAlphabetClientPage() {
                 </Dialog>
             </div>
             
-            <TabsContent value="alphabet" className="mt-8">
-              <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto sm:h-10">
-                    <TabsTrigger value="all">All (সব)</TabsTrigger>
-                    <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
-                    <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="all" className="mt-8">
-                    <AlphabetLearn letters={allLetters} type="all" autoplayEnabled={autoplayEnabled} />
-                  </TabsContent>
-                  <TabsContent value="vowels" className="mt-8">
-                    <AlphabetLearn letters={vowels} type="vowels" autoplayEnabled={autoplayEnabled} />
-                  </TabsContent>
-                  <TabsContent value="consonants" className="mt-8">
-                    <AlphabetLearn letters={consonants} type="consonants" autoplayEnabled={autoplayEnabled} />
-                  </TabsContent>
-              </Tabs>
-            </TabsContent>
-            <TabsContent value="recognize">
-              <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 max-w-lg mx-auto h-auto sm:h-10">
-                    <TabsTrigger value="all">All (সব বর্ণ)</TabsTrigger>
-                    <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
-                    <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
-                </TabsList>
-                <TabsContent value="all">
-                    <AlphabetRecognitionGame letters={allLetters} />
-                </TabsContent>
-                 <TabsContent value="vowels">
-                    <AlphabetRecognitionGame letters={vowels} gridClass="grid-cols-2 sm:grid-cols-4 md:grid-cols-6" />
-                </TabsContent>
-                 <TabsContent value="consonants">
-                    <AlphabetRecognitionGame letters={consonants} />
-                </TabsContent>
-              </Tabs>
-            </TabsContent>
-            <TabsContent value="match">
-                <MatchingGame />
-            </TabsContent>
+            <div className="mt-8">
+                {activeTab === 'alphabet' && (
+                    <Tabs defaultValue="all" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto sm:h-10">
+                            <TabsTrigger value="all">All (সব)</TabsTrigger>
+                            <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
+                            <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="all" className="mt-8">
+                            <AlphabetLearn letters={allLetters} type="all" autoplayEnabled={autoplayEnabled} />
+                        </TabsContent>
+                        <TabsContent value="vowels" className="mt-8">
+                            <AlphabetLearn letters={vowels} type="vowels" autoplayEnabled={autoplayEnabled} />
+                        </TabsContent>
+                        <TabsContent value="consonants" className="mt-8">
+                            <AlphabetLearn letters={consonants} type="consonants" autoplayEnabled={autoplayEnabled} />
+                        </TabsContent>
+                    </Tabs>
+                )}
+                {activeTab === 'recognize' && (
+                    <Tabs defaultValue="all" className="w-full">
+                        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 max-w-lg mx-auto h-auto sm:h-10">
+                            <TabsTrigger value="all">All (সব বর্ণ)</TabsTrigger>
+                            <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
+                            <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="all">
+                            <AlphabetRecognitionGame letters={allLetters} />
+                        </TabsContent>
+                        <TabsContent value="vowels">
+                            <AlphabetRecognitionGame letters={vowels} gridClass="grid-cols-2 sm:grid-cols-4 md:grid-cols-6" />
+                        </TabsContent>
+                        <TabsContent value="consonants">
+                            <AlphabetRecognitionGame letters={consonants} />
+                        </TabsContent>
+                    </Tabs>
+                )}
+                {activeTab === 'match' && <MatchingGame />}
+            </div>
         </div>
-      </Tabs>
     </div>
   );
 }
