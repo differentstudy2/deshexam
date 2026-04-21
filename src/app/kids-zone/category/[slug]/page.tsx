@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -20,7 +19,7 @@ type ContentItem = {
   title: string;
   description?: string;
   subject: string;
-  testType: string;
+  testType: string | string[];
   access: "free" | "premium" | "pro";
   featureImage?: string;
   category: string;
@@ -78,10 +77,18 @@ export default function KidsZoneCategoryPage() {
 
 
   const getLinkForItem = (item: ContentItem) => {
-    if (item.testType === 'Kids Zone') {
+    const primaryType = Array.isArray(item.testType) ? item.testType[0] : item.testType;
+    
+    if (primaryType === 'Kids Zone') {
       return `/content/${item.id}`;
     }
-    const typeSlug = (item.testType || 'content').toLowerCase().replace(/\s+/g, '-');
+    if (primaryType === 'Quiz') {
+      return `/kids-zone/fun-quizzes/${item.id}`;
+    }
+    if (!primaryType) {
+        return `/content/${item.id}`; // A sensible fallback
+    }
+    const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${item.id}`;
   };
 
