@@ -54,6 +54,9 @@ export default function KidsZoneCategoryPage({ params }: { params: { slug: strin
   }, [categoryName, toast]);
 
   const getLinkForItem = (item: ContentItem) => {
+    if (item.testType === 'Kids Zone') {
+      return `/content/${item.id}`;
+    }
     const typeSlug = (item.testType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${item.id}`;
   };
