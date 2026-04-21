@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -68,27 +69,44 @@ export default function KidsZoneCategoryPage() {
 
         setCategoryName(finalCategoryName);
 
-        // Fetch content based on the resolved category name
-        const q = query(
-          collection(db, "content"),
-          where("category", "==", finalCategoryName)
-        );
-        const querySnapshot = await getDocs(q);
-        const fetchedContent = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ContentItem));
+        const queries = [];
+        const contentCollection = collection(db, "content");
+
+        // Base query by category name
+        queries.push(query(contentCollection, where("category", "==", finalCategoryName)));
+
+        // Add special logic for hardcoded categories to also fetch by testType
+        if (finalCategoryName === "Fun Quizzes") {
+            queries.push(query(contentCollection, where("testType", "==", "Quiz")));
+            queries.push(query(contentCollection, where("testType", "array-contains", "Quiz")));
+        }
         
-        // Filter demo content for the current category
+        if (finalCategoryName === "Learning Games") {
+            // Add any special logic for learning games if needed in future
+        }
+
+        const querySnapshots = await Promise.all(queries.map(q => getDocs(q)));
+        
+        const contentMap = new Map<string, ContentItem>();
+        querySnapshots.forEach(snapshot => {
+            snapshot.docs.forEach(doc => {
+                if (!contentMap.has(doc.id)) {
+                    contentMap.set(doc.id, { id: doc.id, ...doc.data() } as ContentItem);
+                }
+            });
+        });
+
+        const fetchedContent = Array.from(contentMap.values());
+        
+        // Filter demo content for the current category and add if not already present
         const demoItemsForCategory = demoContent.filter(item => item.category === finalCategoryName);
-        
-        // Combine and remove duplicates, preferring DB content over demo content
-        const combinedContent = [...fetchedContent];
         demoItemsForCategory.forEach(demoItem => {
-            // Add demo item only if no DB item with the same title exists
             if (!fetchedContent.some(dbItem => dbItem.title === demoItem.title)) {
-                combinedContent.push(demoItem);
+                fetchedContent.push(demoItem);
             }
         });
         
-        setContent(combinedContent);
+        setContent(fetchedContent);
 
       } catch (error) {
         toast({
