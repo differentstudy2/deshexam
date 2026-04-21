@@ -7,6 +7,7 @@ import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, ChevronUp, ChevronDown, 
 import Link from "next/link";
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Confetti from 'react-dom-confetti';
 import { useToast } from "@/hooks/use-toast";
 import useEmblaCarousel from 'embla-carousel-react'
@@ -50,14 +51,21 @@ const consonants = [
 
 const allLetters = [...vowels, ...consonants];
 
-const playSound = (type: 'correct' | 'incorrect') => {
+const playSound = (type: 'correct' | 'incorrect' | 'letter', letter?: string) => {
   if (typeof window !== 'undefined') {
-    const soundUrl = type === 'correct'
-      ? '/audio/correct-83487.mp3'
-      : '/audio/incorrect-293358.mp3';
-      
-    const audio = new Audio(soundUrl);
-    audio.play().catch(error => console.error(`Error playing ${type} sound:`, error));
+    let soundUrl = '';
+    if(type === 'letter' && letter) {
+      soundUrl = `/audio/alphabet/${letter.toLowerCase()}.mp3`
+    } else if (type === 'correct') {
+      soundUrl = '/audio/correct-83487.mp3';
+    } else if (type === 'incorrect') {
+      soundUrl = '/audio/incorrect-293358.mp3';
+    }
+    
+    if(soundUrl) {
+      const audio = new Audio(soundUrl);
+      audio.play().catch(error => console.error(`Error playing sound:`, error));
+    }
   }
 };
 
@@ -128,7 +136,7 @@ const AlphabetLearn = ({ autoplayEnabled, filter }: { autoplayEnabled: boolean, 
     return (
         <div className="relative w-full max-w-sm mx-auto">
             {/* The carousel container itself */}
-            <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl h-[70vh]" ref={emblaRef}>
+            <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl h-[60vh] md:h-[70vh]" ref={emblaRef}>
                 <div className="flex flex-col h-full rounded-2xl">
                     {letters.map((letter, index) => (
                         <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${filter}-${index}`}>
@@ -140,7 +148,7 @@ const AlphabetLearn = ({ autoplayEnabled, filter }: { autoplayEnabled: boolean, 
                                 )}
                             >
                                 <div className="p-4 w-full flex flex-col items-center justify-center">
-                                    <p className="text-[12rem] leading-none font-bold text-white/90">{letter.char}</p>
+                                    <p className="text-9xl md:text-[12rem] leading-none font-bold text-white/90">{letter.char}</p>
                                     <p className="text-3xl font-semibold text-white/70 mt-4">{letter.name}</p>
                                 </div>
                             </div>
@@ -312,7 +320,7 @@ const MatchingGame = () => {
         <div className="relative flex flex-col items-center justify-center mt-8">
             <Card className="w-full max-w-md shadow-2xl bg-white/70 backdrop-blur-sm">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-9xl font-bold text-slate-800" style={{ fontFamily: "'Lexend', sans-serif" }}>
+                    <CardTitle className="text-7xl sm:text-9xl font-bold text-slate-800" style={{ fontFamily: "'Lexend', sans-serif" }}>
                         {targetLetter?.char}
                     </CardTitle>
                     <CardDescription className="text-xl font-semibold text-slate-500 pt-2">
@@ -379,7 +387,7 @@ export default function BengaliAlphabetClientPage() {
             <div className="mb-12 flex justify-between items-center">
                 <Button asChild variant="ghost" size="icon">
                     <Link href="/kids-zone/learning-bengali">
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-5 w-5" />
                          <span className="sr-only">Back to Learning Bengali</span>
                     </Link>
                 </Button>
@@ -387,7 +395,7 @@ export default function BengaliAlphabetClientPage() {
                 <div className="flex items-center gap-2">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-48 justify-between">
+                            <Button variant="outline" className="w-40 sm:w-48 justify-between">
                                 {tabLabels[activeTab]}
                                 <ChevronDown className="h-4 w-4" />
                             </Button>
@@ -402,7 +410,7 @@ export default function BengaliAlphabetClientPage() {
                     {(activeTab === 'alphabet' || activeTab === 'recognize') && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-48 justify-between">
+                                <Button variant="outline" className="w-40 sm:w-48 justify-between">
                                     {filterLabels[filter]}
                                     <ChevronDown className="h-4 w-4" />
                                 </Button>
@@ -453,4 +461,3 @@ export default function BengaliAlphabetClientPage() {
     </div>
   );
 }
-
