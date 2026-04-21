@@ -125,8 +125,8 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
                 <ChevronUp className="h-6 w-6" />
             </Button>
 
-            <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl" ref={emblaRef}>
-                <div className="flex flex-col h-[70vh] rounded-2xl overflow-hidden">
+            <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl h-[70vh]" ref={emblaRef}>
+                <div className="flex flex-col h-full rounded-2xl">
                     {letters.map((letter, index) => (
                         <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${type}-${index}`}>
                             <div 
