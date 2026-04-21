@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { ContentBadge } from '@/components/content-badge';
+import { useParams } from 'next/navigation';
 
 type ContentItem = {
   id: string;
@@ -23,11 +24,13 @@ type ContentItem = {
   category: string;
 };
 
-export default function KidsZoneCategoryPage({ params }: { params: { slug: string } }) {
+export default function KidsZoneCategoryPage() {
+  const params = useParams();
+  const slug = params.slug as string;
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const categoryName = params.slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const categoryName = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   useEffect(() => {
     const fetchContent = async () => {
