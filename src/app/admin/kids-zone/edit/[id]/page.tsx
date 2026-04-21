@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -838,53 +837,58 @@ export default function EditKidsContentPage() {
                                                 </div>
                                                 
                                                 {questionType === 'Multiple Choice' && (
-                                                    <div className="space-y-4 pt-2 border-t">
-                                                        <Label>Options</Label>
-                                                         <Controller
-                                                            control={form.control}
-                                                            name={`questions.${index}.correctAnswer`}
-                                                            render={({ field: controllerField }) => (
-                                                                <RadioGroup onValueChange={controllerField.onChange} value={controllerField.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                    {[0, 1, 2, 3].map(optionIndex => (
-                                                                        <Card key={optionIndex} className="p-4 bg-background">
-                                                                            <div className="space-y-4">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <FormControl>
-                                                                                        <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
-                                                                                    </FormControl>
-                                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
-                                                                                        <FormItem className="flex-1">
-                                                                                            <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
-                                                                                            <FormControl><Input {...field} value={field.value ?? ''} /></FormControl>
-                                                                                            <FormMessage />
-                                                                                        </FormItem>
-                                                                                    )}/>
-                                                                                </div>
-                                                                                <div className="grid grid-cols-2 gap-2">
-                                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
-                                                                                    <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                                                        <FormItem>
-                                                                                            <FormLabel className="text-xs">Audio</FormLabel>
-                                                                                            <FormControl>
-                                                                                                <div className="flex items-center gap-2">
-                                                                                                    <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
-                                                                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>
-                                                                                                    {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}
-                                                                                                </div>
-                                                                                            </FormControl>
-                                                                                            {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}
-                                                                                            <FormMessage />
-                                                                                        </FormItem>
-                                                                                    )}/>
-                                                                                </div>
-                                                                            </div>
-                                                                        </Card>
-                                                                    ))}
-                                                                </RadioGroup>
-                                                            )}
-                                                        />
-                                                         <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
-                                                    </div>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`questions.${index}.correctAnswer`}
+                                                        render={({ field }) => (
+                                                          <FormItem className="space-y-3">
+                                                            <FormLabel>Options</FormLabel>
+                                                            <FormControl>
+                                                              <RadioGroup
+                                                                onValueChange={field.onChange}
+                                                                value={field.value}
+                                                                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                                              >
+                                                                {[0, 1, 2, 3].map(optionIndex => (
+                                                                  <Card key={optionIndex} className="p-4 bg-background">
+                                                                    <div className="space-y-4">
+                                                                      <FormItem className="flex items-center gap-3">
+                                                                        <FormControl>
+                                                                          <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
+                                                                        </FormControl>
+                                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (
+                                                                            <FormItem className="flex-1">
+                                                                                <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
+                                                                                <FormControl><Input {...optionField} value={optionField.value ?? ''} /></FormControl>
+                                                                                <FormMessage />
+                                                                            </FormItem>
+                                                                        )}/>
+                                                                      </FormItem>
+                                                                      <div className="grid grid-cols-2 gap-2">
+                                                                          <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
+                                                                          <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
+                                                                              <FormItem><FormLabel className="text-xs">Audio</FormLabel>
+                                                                                  <FormControl>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
+                                                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>
+                                                                                        {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}
+                                                                                    </div>
+                                                                                  </FormControl>
+                                                                                  {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}
+                                                                                  <FormMessage />
+                                                                              </FormItem>
+                                                                          )}/>
+                                                                      </div>
+                                                                    </div>
+                                                                  </Card>
+                                                                ))}
+                                                              </RadioGroup>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                          </FormItem>
+                                                        )}
+                                                      />
                                                 )}
                                                 {questionType === 'True/False' && (
                                                     <div className="space-y-4 pt-2 border-t">
@@ -918,11 +922,23 @@ export default function EditKidsContentPage() {
                                                     <Tabs defaultValue="paste">
                                                         <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="paste">Paste JSON</TabsTrigger><TabsTrigger value="upload">Upload File</TabsTrigger></TabsList>
                                                         <TabsContent value="paste" className="pt-4 space-y-4">
-                                                            <Textarea placeholder='Paste your JSON content here...' value={jsonText} onChange={(e) => setJsonText(e.target.value)} className="min-h-[200px] font-mono text-xs" disabled={isImporting} />
-                                                            <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>{isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}</Button>
+                                                            <Textarea
+                                                                placeholder='Paste your JSON content here...'
+                                                                value={jsonText}
+                                                                onChange={(e) => setJsonText(e.target.value)}
+                                                                className="min-h-[200px] font-mono text-xs"
+                                                                disabled={isImporting}
+                                                            />
+                                                            <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                                                {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                                            </Button>
                                                         </TabsContent>
                                                         <TabsContent value="upload" className="pt-4">
-                                                            <div className="grid w-full max-w-sm items-center gap-1.5"><Label htmlFor="json-import">JSON/TXT File</Label><Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />{isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}</div>
+                                                            <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                <Label htmlFor="json-import">JSON/TXT File</Label>
+                                                                <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                                                {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                                            </div>
                                                         </TabsContent>
                                                     </Tabs>
                                                     <Accordion type="single" collapsible className="w-full mt-4">
@@ -962,5 +978,3 @@ export default function EditKidsContentPage() {
         </div>
     );
 }
-
-
