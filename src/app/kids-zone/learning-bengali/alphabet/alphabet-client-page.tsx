@@ -3,13 +3,19 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2, ChevronUp, ChevronDown, Settings } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, ChevronUp, ChevronDown, Settings, Volume2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import Confetti from 'react-dom-confetti';
 import { useToast } from "@/hooks/use-toast";
 import useEmblaCarousel from 'embla-carousel-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Dialog,
   DialogContent,
@@ -20,13 +26,6 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
 
 const vowels = [
   { char: 'অ', name: 'Aw' }, { char: 'আ', name: 'A' }, { char: 'ই', name: 'E' },
@@ -128,15 +127,7 @@ const AlphabetLearn = ({ autoplayEnabled, filter }: { autoplayEnabled: boolean, 
 
     return (
         <div className="relative w-full max-w-sm mx-auto">
-            <Button
-                variant="outline"
-                size="icon"
-                className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
-                onClick={scrollPrev}
-            >
-                <ChevronUp className="h-6 w-6" />
-            </Button>
-
+            {/* The carousel container itself */}
             <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl h-[70vh]" ref={emblaRef}>
                 <div className="flex flex-col h-full rounded-2xl">
                     {letters.map((letter, index) => (
@@ -158,14 +149,45 @@ const AlphabetLearn = ({ autoplayEnabled, filter }: { autoplayEnabled: boolean, 
                 </div>
             </div>
 
-            <Button
-                variant="outline"
-                size="icon"
-                className="absolute bottom-[-1rem] left-1/2 -translate-x-1/2 translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
-                onClick={scrollNext}
-            >
-                <ChevronDown className="h-6 w-6" />
-            </Button>
+            {/* Side Controls for Desktop */}
+            <div className="absolute top-1/2 -translate-y-1/2 -right-20 flex-col gap-4 hidden md:flex">
+                 <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                    onClick={scrollPrev}
+                >
+                    <ChevronUp className="h-6 w-6" />
+                </Button>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                    onClick={scrollNext}
+                >
+                    <ChevronDown className="h-6 w-6" />
+                </Button>
+            </div>
+
+             {/* Top/Bottom Controls for Mobile */}
+            <div className="md:hidden">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                    onClick={scrollPrev}
+                >
+                    <ChevronUp className="h-6 w-6" />
+                </Button>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute bottom-[-1rem] left-1/2 -translate-x-1/2 translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                    onClick={scrollNext}
+                >
+                    <ChevronDown className="h-6 w-6" />
+                </Button>
+            </div>
         </div>
     );
 };
@@ -358,7 +380,7 @@ export default function BengaliAlphabetClientPage() {
                 <Button asChild variant="ghost" size="icon">
                     <Link href="/kids-zone/learning-bengali">
                         <ArrowLeft className="h-4 w-4" />
-                        <span className="sr-only">Back to Learning Bengali</span>
+                         <span className="sr-only">Back to Learning Bengali</span>
                     </Link>
                 </Button>
                 
