@@ -23,7 +23,23 @@ type ContentItem = {
   access: "free" | "premium" | "pro";
   featureImage?: string;
   category: string;
+  questions?: any[]; // To match demo object
 };
+
+const demoContent: ContentItem[] = [
+  {
+    id: 'demo-game-1',
+    title: 'Addition Adventure (Demo)',
+    description: 'Practice your addition skills in this exciting adventure game!',
+    category: 'Learning Games',
+    testType: 'Kids Zone',
+    subject: 'Math',
+    featureImage: 'https://picsum.photos/seed/demo-game-math/400/300',
+    access: 'free',
+    questions: [],
+  },
+];
+
 
 export default function KidsZoneCategoryPage() {
   const params = useParams();
@@ -59,7 +75,20 @@ export default function KidsZoneCategoryPage() {
         );
         const querySnapshot = await getDocs(q);
         const fetchedContent = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ContentItem));
-        setContent(fetchedContent);
+        
+        // Filter demo content for the current category
+        const demoItemsForCategory = demoContent.filter(item => item.category === finalCategoryName);
+        
+        // Combine and remove duplicates, preferring DB content over demo content
+        const combinedContent = [...fetchedContent];
+        demoItemsForCategory.forEach(demoItem => {
+            // Add demo item only if no DB item with the same title exists
+            if (!fetchedContent.some(dbItem => dbItem.title === demoItem.title)) {
+                combinedContent.push(demoItem);
+            }
+        });
+        
+        setContent(combinedContent);
 
       } catch (error) {
         toast({
@@ -77,13 +106,17 @@ export default function KidsZoneCategoryPage() {
 
 
   const getLinkForItem = (item: ContentItem) => {
+    if (item.id === 'demo-game-1') {
+      return '/kids-zone/learning-games/math-puzzles/addition-adventure';
+    }
+
     const primaryType = Array.isArray(item.testType) ? item.testType[0] : item.testType;
     
     if (primaryType === 'Kids Zone') {
       return `/content/${item.id}`;
     }
     if (primaryType === 'Quiz') {
-      return `/kids-zone/fun-quizzes/${item.id}`;
+      return `/quiz/${item.id}`;
     }
     if (!primaryType) {
         return `/content/${item.id}`; // A sensible fallback
