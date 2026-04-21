@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Volume2, ChevronUp, ChevronDown, Settings } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { cn } from "@/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Confetti from 'react-dom-confetti';
 import { useToast } from "@/hooks/use-toast";
 import useEmblaCarousel from 'embla-carousel-react'
@@ -21,7 +20,12 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 const vowels = [
@@ -58,7 +62,8 @@ const playSound = (type: 'correct' | 'incorrect') => {
   }
 };
 
-const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: string; name: string, dialogue?: string }[], type: 'vowels' | 'consonants' | 'all', autoplayEnabled: boolean }) => {
+const AlphabetLearn = ({ autoplayEnabled }: { autoplayEnabled: boolean }) => {
+    const [filter, setFilter] = useState<'all' | 'vowels' | 'consonants'>('all');
     const [emblaRef, emblaApi] = useEmblaCarousel({
         axis: 'y',
         loop: true,
@@ -66,10 +71,22 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
     const { toast } = useToast();
 
+    const letters = useMemo(() => {
+        if (filter === 'vowels') return vowels;
+        if (filter === 'consonants') return consonants;
+        return allLetters;
+    }, [filter]);
+
+    const filterLabels = {
+        all: 'All (সব)',
+        vowels: 'Vowels (স্বরবর্ণ)',
+        consonants: 'Consonants (ব্যঞ্জনবর্ণ)'
+    };
+
     const playLetterSound = useCallback((letter: { char: string; name: string; dialogue?: string }) => {
-        const textToSpeak = letter.dialogue || letter.char;
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
             window.speechSynthesis.cancel();
+            const textToSpeak = letter.dialogue || letter.char;
             const utterance = new SpeechSynthesisUtterance(textToSpeak);
             utterance.lang = 'bn-IN';
             window.speechSynthesis.speak(utterance);
@@ -87,13 +104,14 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
     }, [toast]);
 
     useEffect(() => {
-        if (!emblaApi) return;
+        if (!emblaApi || !letters.length) return;
+        emblaApi.reInit(); // Re-initialize when letters change
         
         const onSelect = () => {
             if (autoplayEnabled) {
                 const selectedIndex = emblaApi.selectedScrollSnap();
                 const letter = letters[selectedIndex];
-                playLetterSound(letter);
+                if(letter) playLetterSound(letter);
             }
         };
 
@@ -117,10 +135,26 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
 
     return (
         <div className="relative w-full max-w-sm mx-auto">
+             <div className="flex justify-center mb-4">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="w-56 justify-between">
+                            {filterLabels[filter]}
+                            <ChevronDown className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                        <DropdownMenuItem onSelect={() => setFilter('all')}>All (সব)</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setFilter('vowels')}>Vowels (স্বরবর্ণ)</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setFilter('consonants')}>Consonants (ব্যঞ্জনবর্ণ)</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+            
             <Button
                 variant="outline"
                 size="icon"
-                className="absolute top-4 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                className="absolute top-16 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
                 onClick={scrollPrev}
             >
                 <ChevronUp className="h-6 w-6" />
@@ -129,7 +163,7 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
             <div className="overflow-hidden p-2 bg-black rounded-3xl shadow-2xl h-[70vh]" ref={emblaRef}>
                 <div className="flex flex-col h-full rounded-2xl">
                     {letters.map((letter, index) => (
-                        <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${type}-${index}`}>
+                        <div className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-0" key={`${filter}-${index}`}>
                             <div 
                                 onClick={() => playLetterSound(letter)}
                                 className={cn(
@@ -159,9 +193,27 @@ const AlphabetLearn = ({ letters, type, autoplayEnabled }: { letters: { char: st
     );
 };
 
-const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8" }: { letters: { char: string; name: string; }[], gridClass?: string }) => {
+const AlphabetRecognitionGame = () => {
+    const [filter, setFilter] = useState<'all' | 'vowels' | 'consonants'>('all');
     const [shuffledAlphabet, setShuffledAlphabet] = useState<{ char: string; name: string; }[]>([]);
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
+
+    const letters = useMemo(() => {
+        if (filter === 'vowels') return vowels;
+        if (filter === 'consonants') return consonants;
+        return allLetters;
+    }, [filter]);
+
+    const gridClass = useMemo(() => {
+        if (filter === 'vowels') return "grid-cols-3 sm:grid-cols-4 md:grid-cols-6";
+        return "grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9";
+    }, [filter]);
+
+    const filterLabels = {
+        all: 'All (সব বর্ণ)',
+        vowels: 'Vowels (স্বরবর্ণ)',
+        consonants: 'Consonants (ব্যঞ্জনবর্ণ)'
+    };
 
     const shuffleLetters = useCallback(() => {
         const shuffled = [...letters].sort(() => Math.random() - 0.5);
@@ -185,7 +237,20 @@ const AlphabetRecognitionGame = ({ letters, gridClass = "grid-cols-3 sm:grid-col
     
     return (
         <div className="mt-8">
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6 gap-4">
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="w-56 justify-between">
+                            {filterLabels[filter]}
+                            <ChevronDown className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                        <DropdownMenuItem onSelect={() => setFilter('all')}>All (সব বর্ণ)</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setFilter('vowels')}>Vowels (স্বরবর্ণ)</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setFilter('consonants')}>Consonants (ব্যঞ্জনবর্ণ)</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 <Button onClick={shuffleLetters}>
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Reset (পুনরায় সাজান)
@@ -312,8 +377,8 @@ const MatchingGame = () => {
 
 
 export default function BengaliAlphabetClientPage() {
-  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
   const [activeTab, setActiveTab] = useState('alphabet');
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
 
   const tabLabels: { [key: string]: string } = {
     alphabet: 'Alphabet (বর্ণমালা)',
@@ -351,6 +416,7 @@ export default function BengaliAlphabetClientPage() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
                 
                 <Dialog>
                     <DialogTrigger asChild>
@@ -381,42 +447,8 @@ export default function BengaliAlphabetClientPage() {
             </div>
             
             <div className="mt-8">
-                {activeTab === 'alphabet' && (
-                    <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 max-w-sm mx-auto h-auto sm:h-10">
-                            <TabsTrigger value="all">All (সব)</TabsTrigger>
-                            <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
-                            <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="all" className="mt-8">
-                            <AlphabetLearn letters={allLetters} type="all" autoplayEnabled={autoplayEnabled} />
-                        </TabsContent>
-                        <TabsContent value="vowels" className="mt-8">
-                            <AlphabetLearn letters={vowels} type="vowels" autoplayEnabled={autoplayEnabled} />
-                        </TabsContent>
-                        <TabsContent value="consonants" className="mt-8">
-                            <AlphabetLearn letters={consonants} type="consonants" autoplayEnabled={autoplayEnabled} />
-                        </TabsContent>
-                    </Tabs>
-                )}
-                {activeTab === 'recognize' && (
-                    <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 max-w-lg mx-auto h-auto sm:h-10">
-                            <TabsTrigger value="all">All (সব বর্ণ)</TabsTrigger>
-                            <TabsTrigger value="vowels">Vowels (স্বরবর্ণ)</TabsTrigger>
-                            <TabsTrigger value="consonants">Consonants (ব্যঞ্জনবর্ণ)</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="all">
-                            <AlphabetRecognitionGame letters={allLetters} />
-                        </TabsContent>
-                        <TabsContent value="vowels">
-                            <AlphabetRecognitionGame letters={vowels} gridClass="grid-cols-2 sm:grid-cols-4 md:grid-cols-6" />
-                        </TabsContent>
-                        <TabsContent value="consonants">
-                            <AlphabetRecognitionGame letters={consonants} />
-                        </TabsContent>
-                    </Tabs>
-                )}
+                {activeTab === 'alphabet' && <AlphabetLearn autoplayEnabled={autoplayEnabled} />}
+                {activeTab === 'recognize' && <AlphabetRecognitionGame />}
                 {activeTab === 'match' && <MatchingGame />}
             </div>
         </div>
