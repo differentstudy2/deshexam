@@ -62,8 +62,7 @@ const playSound = (type: 'correct' | 'incorrect') => {
   }
 };
 
-const AlphabetLearn = ({ autoplayEnabled }: { autoplayEnabled: boolean }) => {
-    const [filter, setFilter] = useState<'all' | 'vowels' | 'consonants'>('all');
+const AlphabetLearn = ({ autoplayEnabled, filter }: { autoplayEnabled: boolean, filter: 'all' | 'vowels' | 'consonants' }) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         axis: 'y',
         loop: true,
@@ -76,12 +75,6 @@ const AlphabetLearn = ({ autoplayEnabled }: { autoplayEnabled: boolean }) => {
         if (filter === 'consonants') return consonants;
         return allLetters;
     }, [filter]);
-
-    const filterLabels = {
-        all: 'All (সব)',
-        vowels: 'Vowels (স্বরবর্ণ)',
-        consonants: 'Consonants (ব্যঞ্জনবর্ণ)'
-    };
 
     const playLetterSound = useCallback((letter: { char: string; name: string; dialogue?: string }) => {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -135,26 +128,10 @@ const AlphabetLearn = ({ autoplayEnabled }: { autoplayEnabled: boolean }) => {
 
     return (
         <div className="relative w-full max-w-sm mx-auto">
-             <div className="flex justify-center mb-4">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-56 justify-between">
-                            {filterLabels[filter]}
-                            <ChevronDown className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                        <DropdownMenuItem onSelect={() => setFilter('all')}>All (সব)</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setFilter('vowels')}>Vowels (স্বরবর্ণ)</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setFilter('consonants')}>Consonants (ব্যঞ্জনবর্ণ)</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-            
             <Button
                 variant="outline"
                 size="icon"
-                className="absolute top-16 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
                 onClick={scrollPrev}
             >
                 <ChevronUp className="h-6 w-6" />
@@ -184,7 +161,7 @@ const AlphabetLearn = ({ autoplayEnabled }: { autoplayEnabled: boolean }) => {
             <Button
                 variant="outline"
                 size="icon"
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
+                className="absolute bottom-[-1rem] left-1/2 -translate-x-1/2 translate-y-full rounded-full h-12 w-12 z-10 bg-white/80 backdrop-blur-sm"
                 onClick={scrollNext}
             >
                 <ChevronDown className="h-6 w-6" />
@@ -193,8 +170,7 @@ const AlphabetLearn = ({ autoplayEnabled }: { autoplayEnabled: boolean }) => {
     );
 };
 
-const AlphabetRecognitionGame = () => {
-    const [filter, setFilter] = useState<'all' | 'vowels' | 'consonants'>('all');
+const AlphabetRecognitionGame = ({ filter }: { filter: 'all' | 'vowels' | 'consonants' }) => {
     const [shuffledAlphabet, setShuffledAlphabet] = useState<{ char: string; name: string; }[]>([]);
     const [activeLetter, setActiveLetter] = useState<string | null>(null);
 
@@ -208,12 +184,6 @@ const AlphabetRecognitionGame = () => {
         if (filter === 'vowels') return "grid-cols-3 sm:grid-cols-4 md:grid-cols-6";
         return "grid-cols-4 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9";
     }, [filter]);
-
-    const filterLabels = {
-        all: 'All (সব বর্ণ)',
-        vowels: 'Vowels (স্বরবর্ণ)',
-        consonants: 'Consonants (ব্যঞ্জনবর্ণ)'
-    };
 
     const shuffleLetters = useCallback(() => {
         const shuffled = [...letters].sort(() => Math.random() - 0.5);
@@ -237,20 +207,7 @@ const AlphabetRecognitionGame = () => {
     
     return (
         <div className="mt-8">
-            <div className="flex justify-center mb-6 gap-4">
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-56 justify-between">
-                            {filterLabels[filter]}
-                            <ChevronDown className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                        <DropdownMenuItem onSelect={() => setFilter('all')}>All (সব বর্ণ)</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setFilter('vowels')}>Vowels (স্বরবর্ণ)</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setFilter('consonants')}>Consonants (ব্যঞ্জনবর্ণ)</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+            <div className="flex justify-center mb-6">
                 <Button onClick={shuffleLetters}>
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Reset (পুনরায় সাজান)
@@ -378,6 +335,7 @@ const MatchingGame = () => {
 
 export default function BengaliAlphabetClientPage() {
   const [activeTab, setActiveTab] = useState('alphabet');
+  const [filter, setFilter] = useState<'all' | 'vowels' | 'consonants'>('all');
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);
 
   const tabLabels: { [key: string]: string } = {
@@ -385,6 +343,13 @@ export default function BengaliAlphabetClientPage() {
     recognize: 'Recognize (চিনুন)',
     match: 'Match (মেলান)',
   };
+
+  const filterLabels = {
+    all: 'All (সব)',
+    vowels: 'Vowels (স্বরবর্ণ)',
+    consonants: 'Consonants (ব্যঞ্জনবর্ণ)'
+  };
+
 
   return (
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
@@ -397,61 +362,73 @@ export default function BengaliAlphabetClientPage() {
                     </Link>
                 </Button>
                 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-48 justify-between">
-                            {tabLabels[activeTab]}
-                            <ChevronDown className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-48">
-                        <DropdownMenuItem onSelect={() => setActiveTab('alphabet')}>
-                            Alphabet (বর্ণমালা)
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setActiveTab('recognize')}>
-                            Recognize (চিনুন)
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setActiveTab('match')}>
-                            Match (মেলান)
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="w-48 justify-between">
+                                {tabLabels[activeTab]}
+                                <ChevronDown className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-48">
+                            <DropdownMenuItem onSelect={() => setActiveTab('alphabet')}>Alphabet (বর্ণমালা)</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setActiveTab('recognize')}>Recognize (চিনুন)</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => setActiveTab('match')}>Match (মেলান)</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="icon">
-                            <Settings className="h-5 w-5" />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Settings</DialogTitle>
-                            <DialogDescription>Control your learning experience.</DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="autoplay-audio" className="flex items-center gap-2">
-                                    <Volume2 className="w-5 h-5"/>
-                                    Autoplay Audio on Scroll
-                                </Label>
-                                <Switch
-                                    id="autoplay-audio"
-                                    checked={autoplayEnabled}
-                                    onCheckedChange={setAutoplayEnabled}
-                                />
+                    {(activeTab === 'alphabet' || activeTab === 'recognize') && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-48 justify-between">
+                                    {filterLabels[filter]}
+                                    <ChevronDown className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-48">
+                                <DropdownMenuItem onSelect={() => setFilter('all')}>All (সব)</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setFilter('vowels')}>Vowels (স্বরবর্ণ)</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setFilter('consonants')}>Consonants (ব্যঞ্জনবর্ণ)</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
+                    
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Settings className="h-5 w-5" />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Settings</DialogTitle>
+                                <DialogDescription>Control your learning experience.</DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="autoplay-audio" className="flex items-center gap-2">
+                                        <Volume2 className="w-5 h-5"/>
+                                        Autoplay Audio on Scroll
+                                    </Label>
+                                    <Switch
+                                        id="autoplay-audio"
+                                        checked={autoplayEnabled}
+                                        onCheckedChange={setAutoplayEnabled}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
             
             <div className="mt-8">
-                {activeTab === 'alphabet' && <AlphabetLearn autoplayEnabled={autoplayEnabled} />}
-                {activeTab === 'recognize' && <AlphabetRecognitionGame />}
+                {activeTab === 'alphabet' && <AlphabetLearn autoplayEnabled={autoplayEnabled} filter={filter} />}
+                {activeTab === 'recognize' && <AlphabetRecognitionGame filter={filter} />}
                 {activeTab === 'match' && <MatchingGame />}
             </div>
         </div>
     </div>
   );
 }
+
