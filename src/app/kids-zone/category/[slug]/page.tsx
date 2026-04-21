@@ -24,10 +24,105 @@ type ContentItem = {
   access: "free" | "premium" | "pro";
   featureImage?: string;
   category: string;
-  questions?: any[]; // To match demo object
+  questions?: any[];
+  link?: string;
 };
 
-const demoContent: ContentItem[] = [
+// Merged pre-existing and demo content
+const preExistingContent: ContentItem[] = [
+  // Learning Bengali
+  {
+    id: "bengali-alphabet",
+    title: "বর্ণমালা পরিচিতি (Alphabet)",
+    description: "Learn the Bengali alphabet with sounds and examples.",
+    category: "Learning Bengali",
+    testType: "Kids Zone",
+    subject: "Bengali",
+    featureImage: "https://picsum.photos/seed/bengali-alphabet/400/300",
+    access: 'free',
+    link: "/kids-zone/learning-bengali/alphabet",
+  },
+  {
+    id: "bengali-matra",
+    title: "মাত্রা (Matra)",
+    description: "Learn how vowels combine with consonants.",
+    category: "Learning Bengali",
+    testType: "Kids Zone",
+    subject: "Bengali",
+    featureImage: "https://picsum.photos/seed/bengali-matra/400/300",
+    access: 'free',
+    link: "/kids-zone/learning-bengali/matra",
+  },
+  {
+    id: "bengali-spelling",
+    title: "বানান কৌশল (Spelling)",
+    description: "Master Bengali spelling with interactive exercises.",
+    category: "Learning Bengali",
+    testType: "Kids Zone",
+    subject: "Bengali",
+    featureImage: "https://picsum.photos/seed/bengali-spelling/400/300",
+    access: 'free',
+    link: "/kids-zone/learning-bengali/spelling",
+  },
+  {
+    id: "bengali-reading",
+    title: "পড়ার অভ্যাস (Reading)",
+    description: "Practice reading Bengali with short stories and passages.",
+    category: "Learning Bengali",
+    testType: "Kids Zone",
+    subject: "Bengali",
+    featureImage: "https://picsum.photos/seed/bengali-reading/400/300",
+    access: 'free',
+    link: "/kids-zone/learning-bengali/reading",
+  },
+  // Learning English
+  {
+    id: "english-alphabet",
+    title: "Alphabet Fun",
+    description: "Learn the ABCs with sounds and pictures.",
+    category: "Learning English",
+    testType: "Kids Zone",
+    subject: "English",
+    featureImage: "https://picsum.photos/seed/english-abc/400/300",
+    access: 'free',
+    link: "/kids-zone/learning-english/alphabet",
+  },
+  // Learning Urdu
+  {
+    id: "urdu-alphabet",
+    title: "حروف تہجی (Alphabet)",
+    description: "Learn the Urdu alphabet with sounds and examples.",
+    category: "Learning Urdu",
+    testType: "Kids Zone",
+    subject: "Urdu",
+    featureImage: "https://picsum.photos/seed/urdu-alphabet/400/300",
+    access: 'free',
+    link: "/kids-zone/learning-urdu/alphabet",
+  },
+  // Learning Games
+  {
+      id: "number-recognition",
+      title: "Number Recognition",
+      description: "Learn to identify numbers with this fun recognition game.",
+      category: "Learning Games",
+      testType: "Kids Zone",
+      subject: "Math",
+      featureImage: "https://picsum.photos/seed/number-recog/400/300",
+      access: 'free',
+      link: "/kids-zone/learning-games/number-recognition",
+  },
+  {
+      id: "math-puzzles",
+      title: "Math Puzzles",
+      description: "Solve fun math problems and become a numbers wizard!",
+      category: "Learning Games",
+      testType: "Kids Zone",
+      subject: "Math",
+      featureImage: "https://picsum.photos/seed/math-puzzles/400/300",
+      access: 'free',
+      link: "/kids-zone/learning-games/math-puzzles",
+  },
+  // Demo content from before
   {
     id: 'demo-game-1',
     title: 'Addition Adventure (Demo)',
@@ -38,6 +133,7 @@ const demoContent: ContentItem[] = [
     featureImage: 'https://picsum.photos/seed/demo-game-math/400/300',
     access: 'free',
     questions: [],
+    link: '/kids-zone/learning-games/math-puzzles/addition-adventure',
   },
 ];
 
@@ -98,15 +194,19 @@ export default function KidsZoneCategoryPage() {
 
         const fetchedContent = Array.from(contentMap.values());
         
-        // Filter demo content for the current category and add if not already present
-        const demoItemsForCategory = demoContent.filter(item => item.category === finalCategoryName);
-        demoItemsForCategory.forEach(demoItem => {
-            if (!fetchedContent.some(dbItem => dbItem.title === demoItem.title)) {
-                fetchedContent.push(demoItem);
+        // Filter pre-existing content for the current category
+        const itemsForCategory = preExistingContent.filter(item => item.category === finalCategoryName);
+        
+        const combinedContent = [...fetchedContent];
+
+        // Add pre-existing items if an item with the same title doesn't already exist from Firestore
+        itemsForCategory.forEach(preExistingItem => {
+            if (!combinedContent.some(dbItem => dbItem.title === preExistingItem.title)) {
+                combinedContent.push(preExistingItem);
             }
         });
         
-        setContent(fetchedContent);
+        setContent(combinedContent);
 
       } catch (error) {
         toast({
@@ -124,8 +224,8 @@ export default function KidsZoneCategoryPage() {
 
 
   const getLinkForItem = (item: ContentItem) => {
-    if (item.id === 'demo-game-1') {
-      return '/kids-zone/learning-games/math-puzzles/addition-adventure';
+    if (item.link) {
+      return item.link;
     }
 
     const primaryType = Array.isArray(item.testType) ? item.testType[0] : item.testType;
@@ -134,7 +234,7 @@ export default function KidsZoneCategoryPage() {
       return `/content/${item.id}`;
     }
     if (primaryType === 'Quiz') {
-      return `/quiz/${item.id}`;
+      return `/kids-zone/fun-quizzes/${item.id}`;
     }
     if (!primaryType) {
         return `/content/${item.id}`; // A sensible fallback
