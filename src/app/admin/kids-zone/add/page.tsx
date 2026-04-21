@@ -63,6 +63,7 @@ const funQuizQuestionSchema = z.object({
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required."),
+  contentType: z.enum(['Text', 'Quiz']).default('Text'),
   description: z.string().optional(),
   board: z.string().optional(),
   classCategory: z.string().optional(),
@@ -75,6 +76,21 @@ const formSchema = z.object({
   category: z.string().min(1, "Category is required."),
   body: z.string().optional(),
   questions: z.array(funQuizQuestionSchema).optional(),
+}).superRefine((data, ctx) => {
+    if (data.contentType === 'Text' && (!data.body || data.body.length < 1)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Content body cannot be empty for Text/Activity type.",
+            path: ['body'],
+        });
+    }
+    if (data.contentType === 'Quiz' && (!data.questions || data.questions.length === 0)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "At least one question is required for Quiz type.",
+            path: ['questions'],
+        });
+    }
 });
 
 
@@ -214,6 +230,7 @@ export default function AddKidsContentPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
+      contentType: 'Text',
       description: '',
       board: '',
       classCategory: '',
@@ -235,6 +252,7 @@ export default function AddKidsContentPage() {
   });
   
   const selectedClassCategory = form.watch('classCategory');
+  const contentType = form.watch('contentType');
 
   const fetchKidsCategories = async () => {
     setLoadingCategories(true);
@@ -384,11 +402,11 @@ export default function AddKidsContentPage() {
         tags: data.tags,
         keywords: data.keywords,
         featureImage: data.featureImage,
-        testType: data.category === 'Fun Quizzes' ? 'Quiz' : 'Kids Zone',
+        testType: data.contentType === 'Quiz' ? 'Quiz' : 'Kids Zone',
         category: data.category,
         access: 'free',
-        body: data.body,
-        questions: data.category === 'Fun Quizzes' ? data.questions : [],
+        body: data.contentType === 'Text' ? data.body : null,
+        questions: data.contentType === 'Quiz' ? data.questions : [],
       };
 
       await addContent(contentToSave);
@@ -727,8 +745,39 @@ export default function AddKidsContentPage() {
                     </FormItem>
                   )}
                 />
+
+                 <FormField
+                    control={form.control}
+                    name="contentType"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <FormLabel>Content Type</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex items-center space-x-4"
+                            >
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Text" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Text/Activity</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="Quiz" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Fun Quiz</FormLabel>
+                            </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                 />
                 
-                {form.watch('category') !== 'Fun Quizzes' && (
+                {contentType === 'Text' && (
                   <FormField
                     control={form.control}
                     name="body"
@@ -748,7 +797,7 @@ export default function AddKidsContentPage() {
                   />
                 )}
                 
-                {form.watch('category') === 'Fun Quizzes' && (
+                {contentType === 'Quiz' && (
                     <Card>
                         <CardHeader>
                             <h3 className="text-lg font-medium">Quiz Questions</h3>
@@ -1018,3 +1067,4 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
+
