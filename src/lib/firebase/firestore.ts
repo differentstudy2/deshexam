@@ -1874,8 +1874,8 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersQuery),
-            getDocs(monthOrdersQuery),
+            getDocs(todayOrdersSnapshot),
+            getDocs(monthOrdersSnapshot),
             getCountFromServer(usersCollection),
         ]);
 
@@ -2384,4 +2384,27 @@ export const addKidsZoneCategory = async (categoryData: { title: string, descrip
     }
 };
 
+export const updateKidsZoneCategory = async (id: string, data: any) => {
+    if (!id) throw new Error("Category ID is required.");
+    try {
+        const categoryRef = doc(db, "kidsZoneCategories", id);
+        const slug = data.title.toLowerCase().replace(/\s+/g, '-');
+        const link = `/kids-zone/category/${slug}`;
+        await updateDoc(categoryRef, {...data, link});
+    } catch (e) {
+        console.error("Error updating Kids Zone category: ", e);
+        throw new Error("Failed to update category.");
+    }
+};
+
+export const deleteKidsZoneCategory = async (id: string) => {
+    if (!id) throw new Error("Category ID is required.");
+    try {
+        await deleteDoc(doc(db, "kidsZoneCategories", id));
+    } catch (e) {
+        console.error("Error deleting Kids Zone category: ", e);
+        throw new Error("Failed to delete category.");
+    }
+};
     
+
