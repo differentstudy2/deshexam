@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from "next/image";
@@ -20,6 +19,72 @@ type KidsZoneCategory = {
     imageHint: string;
     icon: string;
 };
+
+const hardcodedCategories: KidsZoneCategory[] = [
+    {
+        id: "learning-games",
+        title: "Learning Games",
+        description: "Engage with interactive games that make learning numbers, letters, and logic fun.",
+        link: "/kids-zone/learning-games",
+        image: "https://picsum.photos/seed/learning-games/400/300",
+        imageHint: "kids playing games",
+        icon: "Gamepad2",
+    },
+    {
+        id: "fun-quizzes",
+        title: "Fun Quizzes",
+        description: "Test your knowledge with exciting quizzes on animals, science, and general knowledge.",
+        link: "/kids-zone/fun-quizzes",
+        image: "https://picsum.photos/seed/fun-quizzes/400/300",
+        imageHint: "quiz show kids",
+        icon: "Puzzle",
+    },
+    {
+        id: "learning-english",
+        title: "Learning English",
+        description: "Master the English alphabet, vocabulary, and basic reading.",
+        link: "/kids-zone/learning-english",
+        image: "https://picsum.photos/seed/learn-english/400/300",
+        imageHint: "english alphabet book",
+        icon: "BookHeart",
+    },
+    {
+        id: "learning-bengali",
+        title: "Learning Bengali",
+        description: "Explore the Bengali alphabet, words, and stories.",
+        link: "/kids-zone/learning-bengali",
+        image: "https://picsum.photos/seed/learn-bengali/400/300",
+        imageHint: "bengali language art",
+        icon: "Languages",
+    },
+    {
+        id: "learning-arabic",
+        title: "Learning Arabic",
+        description: "Discover the beauty of the Arabic alphabet and language.",
+        link: "/kids-zone/learning-arabic",
+        image: "https://picsum.photos/seed/learn-arabic/400/300",
+        imageHint: "arabic calligraphy",
+        icon: "BookOpen",
+    },
+    {
+        id: "learning-hindi",
+        title: "Learning Hindi",
+        description: "Learn Hindi alphabets, words and sentence making.",
+        link: "/kids-zone/learning-hindi",
+        image: "https://picsum.photos/seed/learn-hindi/400/300",
+        imageHint: "hindi calligraphy",
+        icon: "Book",
+    },
+    {
+        id: "learning-urdu",
+        title: "Learning Urdu",
+        description: "Learn Urdu alphabets, words and sentence making.",
+        link: "/kids-zone/learning-urdu",
+        image: "https://picsum.photos/seed/learn-urdu/400/300",
+        imageHint: "urdu calligraphy",
+        icon: "Book",
+    }
+];
 
 const iconMap: { [key: string]: React.ReactNode } = {
     Puzzle: <Puzzle className="w-12 h-12 text-primary" />,
@@ -46,7 +111,18 @@ export default function KidsZoneClientPage() {
             try {
                 setLoading(true);
                 const fetchedCategories = await getKidsZoneCategories();
-                setCategories(fetchedCategories as KidsZoneCategory[]);
+                
+                // Combine hardcoded and fetched categories
+                const combined = [
+                    ...hardcodedCategories,
+                    ...(fetchedCategories as KidsZoneCategory[])
+                ];
+
+                // Remove duplicates by title, preferring fetched categories
+                const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
+                
+                setCategories(uniqueCategories);
+
             } catch (error) {
                 toast({
                     variant: 'destructive',
