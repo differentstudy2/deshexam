@@ -1,3 +1,4 @@
+
 import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -132,6 +133,24 @@ type PageProps = {
   params: { slug: string };
 };
 
+const serializeFirestoreTimestamps = (data: any): any => {
+    if (!data) return data;
+    if (Array.isArray(data)) {
+        return data.map(item => serializeFirestoreTimestamps(item));
+    }
+    if (typeof data === 'object' && data !== null) {
+        if (data.hasOwnProperty('seconds') && data.hasOwnProperty('nanoseconds') && typeof (data as any).toDate === 'function') {
+            return (data as any).toDate().toISOString();
+        }
+        const newObj: { [key: string]: any } = {};
+        for (const key in data) {
+            newObj[key] = serializeFirestoreTimestamps(data[key]);
+        }
+        return newObj;
+    }
+    return data;
+};
+
 // This helper function fetches category data and can be used by both generateMetadata and the page component
 async function getCategoryData(slug: string) {
     let categoryName = '';
@@ -200,7 +219,8 @@ export default async function KidsZoneCategoryServerPage({ params }: PageProps) 
       querySnapshots.forEach(snapshot => {
           snapshot.docs.forEach(doc => {
               if (!contentMap.has(doc.id)) {
-                  contentMap.set(doc.id, { id: doc.id, ...doc.data() } as ContentItem);
+                  const serializedData = serializeFirestoreTimestamps(doc.data());
+                  contentMap.set(doc.id, { id: doc.id, ...serializedData } as ContentItem);
               }
           });
       });
