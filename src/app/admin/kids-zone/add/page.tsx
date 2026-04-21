@@ -167,6 +167,15 @@ type Grade = { id: string, name: string };
 type State = { id: string, name: string };
 type KidsZoneCategory = { id: string; title: string; };
 
+const hardcodedCategories = [
+    { id: 'fun-quizzes', title: 'Fun Quizzes' },
+    { id: 'learning-games', title: 'Learning Games' },
+    { id: 'learning-english', title: 'Learning English' },
+    { id: 'learning-bengali', title: 'Learning Bengali' },
+    { id: 'learning-hindi', title: 'Learning Hindi' },
+    { id: 'learning-urdu', title: 'Learning Urdu' },
+];
+
 
 export default function AddKidsContentPage() {
   const { toast } = useToast();
@@ -231,7 +240,18 @@ export default function AddKidsContentPage() {
     setLoadingCategories(true);
     try {
         const fetched = await getKidsZoneCategories();
-        setCategories(fetched.map((c: any) => ({id: c.id, title: c.title})));
+        const firestoreCategories = fetched.map((c: any) => ({id: c.id, title: c.title}));
+        
+        const combined = [
+            ...hardcodedCategories,
+            ...firestoreCategories
+        ];
+        
+        const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
+        
+        uniqueCategories.sort((a, b) => a.title.localeCompare(b.title));
+        
+        setCategories(uniqueCategories);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Could not load categories' });
     } finally {
@@ -255,7 +275,13 @@ export default function AddKidsContentPage() {
             setBoards(boardData);
             setClassCategories(classData);
             setStates(stateData);
-            setCategories(kidsCategories.map((c: any) => ({id: c.id, title: c.title})));
+            
+            const firestoreCategories = kidsCategories.map((c: any) => ({id: c.id, title: c.title}));
+            const combined = [...hardcodedCategories, ...firestoreCategories];
+            const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
+            uniqueCategories.sort((a, b) => a.title.localeCompare(b.title));
+            setCategories(uniqueCategories);
+
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -264,6 +290,7 @@ export default function AddKidsContentPage() {
             });
         } finally {
             setLoadingMetadata(false);
+            setLoadingCategories(false); // Also set this to false
         }
     }
     fetchMetadata();
