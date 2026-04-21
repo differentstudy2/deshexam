@@ -267,7 +267,7 @@ export const updateQuestion = async (questionId: string, data: any) => {
     }
 };
 
-export const handleQuestionVote = async (questionId: string, voteType: 'like' | 'dislike') => {
+export const handleQuestionVote = async (questionId: string, voteType: 'like') => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) {
@@ -285,39 +285,22 @@ export const handleQuestionVote = async (questionId: string, voteType: 'like' | 
 
             const data = questionDoc.data();
             const likedBy = data.likedBy || [];
-            const dislikedBy = data.dislikedBy || [];
-
+            
             const hasLiked = likedBy.includes(user.uid);
-            const hasDisliked = dislikedBy.includes(user.uid);
 
             let newLikedBy = [...likedBy];
-            let newDislikedBy = [...dislikedBy];
 
             if (voteType === 'like') {
                 if (hasLiked) { // User is un-liking
                     newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
                 } else { // User is liking
                     newLikedBy.push(user.uid);
-                    if (hasDisliked) { // If they previously disliked, remove dislike
-                        newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-                    }
-                }
-            } else if (voteType === 'dislike') {
-                if (hasDisliked) { // User is un-disliking
-                    newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
-                } else { // User is disliking
-                    newDislikedBy.push(user.uid);
-                    if (hasLiked) { // If they previously liked, remove like
-                        newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-                    }
                 }
             }
             
             transaction.update(questionRef, {
                 likedBy: newLikedBy,
-                dislikedBy: newDislikedBy,
                 likes: newLikedBy.length,
-                dislikes: newDislikedBy.length,
             });
         });
     } catch (e) {
@@ -2380,7 +2363,8 @@ export const addKidsZoneCategory = async (categoryData: { title: string, descrip
         throw new Error("Category title cannot be empty.");
     }
     try {
-        const link = `/kids-zone/${categoryData.title.toLowerCase().replace(/\s+/g, '-')}`;
+        const slug = categoryData.title.toLowerCase().replace(/\s+/g, '-');
+        const link = `/kids-zone/category/${slug}`;
         const existingQuery = query(collection(db, "kidsZoneCategories"), where("link", "==", link));
         const existingSnap = await getDocs(existingQuery);
         if (!existingSnap.empty) {
@@ -2390,7 +2374,7 @@ export const addKidsZoneCategory = async (categoryData: { title: string, descrip
         const docRef = await addDoc(collection(db, "kidsZoneCategories"), {
             ...categoryData,
             link,
-            image: `https://picsum.photos/seed/${categoryData.title.toLowerCase().replace(/\s+/g, '-')}/400/300`,
+            image: `https://picsum.photos/seed/${slug}/400/300`,
             imageHint: `${categoryData.title.toLowerCase().split(' ')[0]} learning`
         });
         return docRef.id;
