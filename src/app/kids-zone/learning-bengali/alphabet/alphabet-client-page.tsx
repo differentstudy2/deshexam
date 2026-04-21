@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -316,10 +317,10 @@ export default function BengaliAlphabetClientPage() {
     <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
-            <Button asChild variant="ghost">
+            <Button asChild variant="ghost" size="icon">
                 <Link href="/kids-zone/learning-bengali">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Learning Bengali
+                    <ArrowLeft className="h-4 w-4" />
+                    <span className="sr-only">Back to Learning Bengali</span>
                 </Link>
             </Button>
              <Dialog>
