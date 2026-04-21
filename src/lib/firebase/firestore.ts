@@ -1,5 +1,4 @@
 
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -23,7 +22,7 @@ export type EarningStats = {
 };
 
 const generateUsername = async (displayName: string): Promise<string> => {
-    const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 30);
+    const baseUsername = displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').slice(0, 30);
     let username = baseUsername;
     let attempts = 0;
     
@@ -2363,9 +2362,9 @@ export const addKidsZoneCategory = async (categoryData: { title: string, descrip
         throw new Error("Category title cannot be empty.");
     }
     try {
-        const slug = categoryData.title.toLowerCase().replace(/\s+/g, '-');
+        const slug = categoryData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
         const link = `/kids-zone/category/${slug}`;
-        const existingQuery = query(collection(db, "kidsZoneCategories"), where("link", "==", link));
+        const existingQuery = query(collection(db, "kidsZoneCategories"), where("slug", "==", slug));
         const existingSnap = await getDocs(existingQuery);
         if (!existingSnap.empty) {
             throw new Error("A category with this name already exists.");
@@ -2373,6 +2372,7 @@ export const addKidsZoneCategory = async (categoryData: { title: string, descrip
 
         const docRef = await addDoc(collection(db, "kidsZoneCategories"), {
             ...categoryData,
+            slug,
             link,
             image: `https://picsum.photos/seed/${slug}/400/300`,
             imageHint: `${categoryData.title.toLowerCase().split(' ')[0]} learning`
@@ -2388,9 +2388,9 @@ export const updateKidsZoneCategory = async (id: string, data: any) => {
     if (!id) throw new Error("Category ID is required.");
     try {
         const categoryRef = doc(db, "kidsZoneCategories", id);
-        const slug = data.title.toLowerCase().replace(/\s+/g, '-');
+        const slug = data.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
         const link = `/kids-zone/category/${slug}`;
-        await updateDoc(categoryRef, {...data, link});
+        await updateDoc(categoryRef, {...data, slug, link});
     } catch (e) {
         console.error("Error updating Kids Zone category: ", e);
         throw new Error("Failed to update category.");
@@ -2408,3 +2408,17 @@ export const deleteKidsZoneCategory = async (id: string) => {
 };
     
 
+export const getKidsCategoryBySlug = async (slug: string) => {
+    try {
+        const q = query(collection(db, "kidsZoneCategories"), where("slug", "==", slug), limit(1));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return null;
+        }
+        const docSnap = querySnapshot.docs[0];
+        return { id: docSnap.id, ...docSnap.data() };
+    } catch (e) {
+        console.error("Error getting category by slug: ", e);
+        throw new Error("Failed to fetch category.");
+    }
+}

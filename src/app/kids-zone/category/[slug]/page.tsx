@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,10 +9,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ArrowLeft } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { ContentBadge } from '@/components/content-badge';
 import { useParams } from 'next/navigation';
+import { getKidsCategoryBySlug } from '@/lib/firebase/firestore';
 
 type ContentItem = {
   id: string;
@@ -29,20 +31,37 @@ export default function KidsZoneCategoryPage() {
   const slug = params.slug as string;
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoryName, setCategoryName] = useState<string>('');
   const { toast } = useToast();
-  const categoryName = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   useEffect(() => {
-    const fetchContent = async () => {
+    const fetchCategoryAndContent = async () => {
+      if (!slug) return;
       setLoading(true);
+      
+      let finalCategoryName = '';
+      
       try {
+        const category = await getKidsCategoryBySlug(slug);
+
+        if (category) {
+          finalCategoryName = category.title;
+        } else {
+          // Fallback for hardcoded categories or categories created before slug field
+          finalCategoryName = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        setCategoryName(finalCategoryName);
+
+        // Fetch content based on the resolved category name
         const q = query(
           collection(db, "content"),
-          where("category", "==", categoryName)
+          where("category", "==", finalCategoryName)
         );
         const querySnapshot = await getDocs(q);
         const fetchedContent = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ContentItem));
         setContent(fetchedContent);
+
       } catch (error) {
         toast({
           variant: "destructive",
@@ -53,8 +72,10 @@ export default function KidsZoneCategoryPage() {
         setLoading(false);
       }
     };
-    fetchContent();
-  }, [categoryName, toast]);
+    
+    fetchCategoryAndContent();
+  }, [slug, toast]);
+
 
   const getLinkForItem = (item: ContentItem) => {
     if (item.testType === 'Kids Zone') {
@@ -69,7 +90,7 @@ export default function KidsZoneCategoryPage() {
       <section className="relative w-full py-20 md:py-28 lg:py-36 bg-gradient-to-br from-blue-500 to-purple-600 text-white">
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter drop-shadow-lg">
-            {categoryName}
+            {categoryName || <Skeleton className="h-16 w-3/4 mx-auto" />}
           </h1>
           <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto drop-shadow-md">
             Explore fun and educational activities in the {categoryName} category.
