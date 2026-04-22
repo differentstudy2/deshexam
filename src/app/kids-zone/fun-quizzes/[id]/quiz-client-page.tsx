@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -37,6 +38,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
 
 type Question = {
     id: string;
@@ -241,6 +243,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('bn');
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+    const [textAnswer, setTextAnswer] = useState('');
 
     const t = translations[language];
 
@@ -286,6 +289,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setFeedback('');
             setIsCorrect(false);
             setMatchingAnswers({});
+            setTextAnswer('');
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -324,7 +328,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 isPartial = true;
             }
         } else {
-            isCorrect = answer === currentQuestion.correctAnswer;
+             const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
+             const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
+                ? currentQuestion.correctAnswer.toLowerCase().trim() 
+                : currentQuestion.correctAnswer;
+            
+            isCorrect = processedUserAnswer === correctAnswer;
         }
 
         if (isCorrect) {
@@ -459,6 +468,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setScore(0);
         setQuizFinished(false);
         setIsSubmitting(false);
+        setTextAnswer('');
         setTimeLeft(timerDuration);
     };
     
@@ -958,6 +968,43 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     })}
                                                 </div>
                                             </RadioGroup>
+                                        ) : currentQuestion?.type === 'True/False' && currentQuestion.options ? (
+                                            <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null} className="flex justify-center space-x-4">
+                                                {currentQuestion.options.map((option, index) => (
+                                                    <Label
+                                                        key={index}
+                                                        htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                        className={cn(
+                                                            "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40",
+                                                            !selectedAnswer && "cursor-pointer hover:scale-105",
+                                                            !selectedAnswer && optionGradients[(currentQuestionIndex + index + 2) % optionGradients.length],
+                                                            selectedAnswer && option.text === currentQuestion.correctAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
+                                                            selectedAnswer === option.text && option.text !== currentQuestion.correctAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white"
+                                                        )}
+                                                    >
+                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="sr-only" />
+                                                        {option.text}
+                                                    </Label>
+                                                ))}
+                                            </RadioGroup>
+                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
+                                            <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
+                                                <Input 
+                                                    type="text" 
+                                                    placeholder="Your answer"
+                                                    value={textAnswer}
+                                                    onChange={(e) => setTextAnswer(e.target.value)}
+                                                    disabled={selectedAnswer !== null}
+                                                    className="text-lg h-12"
+                                                />
+                                                <Button 
+                                                    type="submit" 
+                                                    disabled={selectedAnswer !== null || !textAnswer.trim()}
+                                                    size="lg"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </form>
                                         ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
                                             <div className="w-full space-y-4">
                                                 <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
@@ -973,7 +1020,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </div>
                                                         <GripVertical className="h-5 w-5 text-muted-foreground" />
                                                         <Select
-                                                            onValueChange={(value) => handleMatchingAnswerChange(itemA.text, value)}
+                                                            onValueChange={(value) => {
+                                                                const currentAnswers = matchingAnswers || {};
+                                                                const newAnswers = { ...currentAnswers, [itemA.text]: value };
+                                                                setMatchingAnswers(newAnswers);
+                                                            }}
                                                             value={matchingAnswers[itemA.text] || ''}
                                                             disabled={selectedAnswer !== null}
                                                         >
@@ -981,7 +1032,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 <SelectValue placeholder="Select..." />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                {currentQuestion.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                                                {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
                                                                     <SelectItem key={`${currentQuestion.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
                                                                         <div className="flex items-center gap-2">
                                                                             {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}

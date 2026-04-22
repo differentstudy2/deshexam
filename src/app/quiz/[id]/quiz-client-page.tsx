@@ -1,11 +1,10 @@
 
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -39,6 +38,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
 
 type Question = {
     id: string;
@@ -46,7 +46,11 @@ type Question = {
     image?: string;
     audio?: string;
     options: { text: string; image?: string; audio?: string; }[];
-    correctAnswer: string;
+    matchingOptions?: {
+        columnA: { text: string; image?: string; }[];
+        columnB: { text: string; image?: string; }[];
+    };
+    correctAnswer: any;
     type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
 };
 
@@ -213,7 +217,8 @@ const TimerCircle = ({ timeLeft, totalDuration, className, size = 36, strokeWidt
 export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
+    const [matchingAnswers, setMatchingAnswers] = useState<{ [key: string]: string }>({});
     const [feedback, setFeedback] = useState('');
     const [isCorrect, setIsCorrect] = useState(false);
     const [score, setScore] = useState(0);
@@ -238,6 +243,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('bn');
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+    const [textAnswer, setTextAnswer] = useState('');
 
     const t = translations[language];
 
@@ -282,6 +288,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setSelectedAnswer(null);
             setFeedback('');
             setIsCorrect(false);
+            setMatchingAnswers({});
+            setTextAnswer('');
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -291,7 +299,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [currentQuestionIndex, shuffledQuestions.length, timerDuration, playSystemSound, stopSound]);
     
-    const handleAnswer = useCallback((answer: string) => {
+    const handleAnswer = useCallback((answer: any) => {
         if (selectedAnswer || isSubmitting) return;
 
         stopSound();
@@ -300,18 +308,46 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
         setSelectedAnswer(answer);
-        if (answer === currentQuestion.correctAnswer) {
+        
+        let isCorrect = false;
+        let isPartial = false;
+
+        if (currentQuestion.type === 'Matching') {
+            const correctAnswers = currentQuestion.correctAnswer;
+            let correctCount = 0;
+            if (answer && Array.isArray(correctAnswers)) {
+                for (const pair of correctAnswers) {
+                    if (answer[pair.a] === pair.b) {
+                        correctCount++;
+                    }
+                }
+            }
+            if (correctAnswers && correctAnswers.length > 0 && correctCount === correctAnswers.length) {
+                isCorrect = true;
+            } else if (correctCount > 0) {
+                isPartial = true;
+            }
+        } else {
+            const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
+            const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
+               ? currentQuestion.correctAnswer.toLowerCase().trim() 
+               : currentQuestion.correctAnswer;
+            isCorrect = processedUserAnswer === correctAnswer;
+        }
+
+        if (isCorrect) {
             setFeedback(t.correct);
             setIsCorrect(true);
             setScore(prev => prev + 1);
             playSystemSound('correct');
         } else {
-            setFeedback(t.incorrect);
-            playSystemSound('incorrect');
+            setFeedback(isPartial ? 'Partially Correct!' : t.incorrect);
+            playSystemSound(isPartial ? 'correct' : 'incorrect');
         }
 
         nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 1500);
-    }, [selectedAnswer, currentQuestion, t.correct, t.incorrect, playSystemSound, nextQuestion, stopSound, isSubmitting]);
+    }, [selectedAnswer, isSubmitting, stopSound, currentQuestion, t, playSystemSound, nextQuestion]);
+
 
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
@@ -322,7 +358,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
-        stopSound(); // Stop anything else first
+        stopSound(); 
 
         const audio = new Audio(url);
         activeAudioRef.current = audio;
@@ -330,7 +366,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         audio.play().catch(error => {
             console.error(`Error playing sound:`, error);
-            setPlayingUrl(null); // Reset state on error
+            setPlayingUrl(null); 
         });
 
         audio.onended = () => {
@@ -368,15 +404,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         stopSound();
         
         let textToSpeak = `${question.text}. `;
-        const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
-        const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
+        if ((question.type === 'Multiple Choice' || question.type === 'True/False') && question.options) {
+            const correctOptionIndex = question.options.findIndex(opt => opt.text === question.correctAnswer);
+            const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
 
-        question.options.forEach((opt, index) => {
-            const optionLetter = String.fromCharCode(65 + index);
-            textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
-        });
+            question.options.forEach((opt, index) => {
+                const optionLetter = String.fromCharCode(65 + index);
+                textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
+            });
 
-        textToSpeak += `${t.correctAnswer} Option ${correctOptionLetter}: ${question.correctAnswer}.`;
+            textToSpeak += `${t.correctAnswer} Option ${correctOptionLetter}: ${question.correctAnswer}.`;
+        }
         
         speakText(textToSpeak);
     }, [stopSound, speakText, t.correctAnswer]);
@@ -423,11 +461,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
         setCurrentQuestionIndex(0);
         setSelectedAnswer(null);
+        setMatchingAnswers({});
         setFeedback('');
         setIsCorrect(false);
         setScore(0);
         setQuizFinished(false);
         setIsSubmitting(false);
+        setTextAnswer('');
         setTimeLeft(timerDuration);
     };
     
@@ -498,6 +538,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setSelectedAnswer(null);
             setFeedback('');
             setIsCorrect(false);
+            setMatchingAnswers({});
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -891,41 +932,119 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion?.options ? (
-                                        <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
-                                            <div className={cn(
-                                                "grid gap-4 w-full",
-                                                    viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
-                                            )}>
-                                                {currentQuestion.options.map((option, index) => {
-                                                    const isSelected = selectedAnswer === option.text;
-                                                    const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
-                                                    const isShown = selectedAnswer !== null;
-                                                    const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
-                                                     const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
+                                            <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
+                                                <div className={cn(
+                                                    "grid gap-4 w-full",
+                                                        viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                                                )}>
+                                                    {currentQuestion.options.map((option, index) => {
+                                                        const isSelected = selectedAnswer === option.text;
+                                                        const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
+                                                        const isShown = selectedAnswer !== null;
+                                                        const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
+                                                         const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
-                                                    return (
-                                                        <Label
-                                                            key={index}
-                                                            htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
-                                                            className={cn(
-                                                                "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
-                                                                !isShown && "cursor-pointer hover:scale-105",
-                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
-                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 dark:text-slate-900",
-                                                                !isShown && gradientClass,
-                                                                isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
-                                                            )}
+                                                        return (
+                                                            <Label
+                                                                key={index}
+                                                                htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                                className={cn(
+                                                                    "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
+                                                                    !isShown && "cursor-pointer hover:scale-105",
+                                                                    isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
+                                                                    isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 dark:text-slate-900",
+                                                                    !isShown && gradientClass,
+                                                                    isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
+                                                                )}
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
+                                                                    <span className="text-left font-bold text-lg">{option.text}</span>
+                                                                </div>
+                                                                <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
+                                                            </Label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </RadioGroup>
+                                        ) : currentQuestion?.type === 'True/False' && currentQuestion.options ? (
+                                            <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null} className="flex justify-center space-x-4">
+                                                {currentQuestion.options.map((option, index) => (
+                                                    <Label
+                                                        key={index}
+                                                        htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                        className={cn(
+                                                            "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40",
+                                                            !selectedAnswer && "cursor-pointer hover:scale-105",
+                                                            !selectedAnswer && optionGradients[(currentQuestionIndex + index + 2) % optionGradients.length],
+                                                            selectedAnswer && option.text === currentQuestion.correctAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
+                                                            selectedAnswer === option.text && option.text !== currentQuestion.correctAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white"
+                                                        )}
+                                                    >
+                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="sr-only" />
+                                                        {option.text}
+                                                    </Label>
+                                                ))}
+                                            </RadioGroup>
+                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
+                                            <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
+                                                <Input 
+                                                    type="text" 
+                                                    placeholder="Your answer"
+                                                    value={textAnswer}
+                                                    onChange={(e) => setTextAnswer(e.target.value)}
+                                                    disabled={selectedAnswer !== null}
+                                                    className="text-lg h-12"
+                                                />
+                                                <Button 
+                                                    type="submit" 
+                                                    disabled={selectedAnswer !== null || !textAnswer.trim()}
+                                                    size="lg"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </form>
+                                        ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
+                                            <div className="w-full space-y-4">
+                                                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                    <div className="font-bold text-center">Column A</div>
+                                                    <div></div>
+                                                    <div className="font-bold text-center">Column B</div>
+                                                </div>
+                                                {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                                    <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                        <div className="p-3 border rounded-md text-center bg-secondary">
+                                                            {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
+                                                            {itemA.text}
+                                                        </div>
+                                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                        <Select
+                                                            onValueChange={(value) => {
+                                                                const currentAnswers = matchingAnswers || {};
+                                                                const newAnswers = { ...currentAnswers, [itemA.text]: value };
+                                                                setMatchingAnswers(newAnswers);
+                                                            }}
+                                                            value={matchingAnswers[itemA.text] || ''}
+                                                            disabled={selectedAnswer !== null}
                                                         >
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                                <span className="text-left font-bold text-lg">{option.text}</span>
-                                                            </div>
-                                                            <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
-                                                        </Label>
-                                                    );
-                                                })}
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select..." />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
+                                                                    <SelectItem key={`${currentQuestion.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
+                                                                        <div className="flex items-center gap-2">
+                                                                            {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
+                                                                            <span>{itemB.text}</span>
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                ))}
+                                                <Button onClick={() => handleAnswer(matchingAnswers)} disabled={selectedAnswer !== null || Object.keys(matchingAnswers).length !== currentQuestion.matchingOptions.columnA.length}>Check Answer</Button>
                                             </div>
-                                        </RadioGroup>
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
                                         )}
