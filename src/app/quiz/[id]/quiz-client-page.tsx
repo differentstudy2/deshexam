@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -40,11 +41,13 @@ import {
 import { useRouter } from 'next/navigation';
 
 type Question = {
+    id: string;
     text: string;
     image?: string;
     audio?: string;
     options: { text: string; image?: string; audio?: string; }[];
     correctAnswer: string;
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
 };
 
 type Quiz = {
@@ -869,7 +872,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </CardContent>
                             </Card>
                             <div ref={quizCardRef}>
-                                <Card className={cn(
+                                 <Card className={cn(
                                     "shadow-2xl overflow-hidden mt-2 bg-gradient-to-br",
                                     bgGradients[currentQuestionIndex % bgGradients.length]
                                 )}>
@@ -880,19 +883,20 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </div>
                                         )}
                                         
-                                        <div className="flex items-start justify-between gap-2">
-                                        <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                            <span>{currentQuestion?.text}</span>
-                                        </CardTitle>
-                                    </div>
+                                         <div className="flex items-start justify-between gap-2">
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                                <span>{currentQuestion?.text}</span>
+                                            </CardTitle>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
+                                        {currentQuestion?.type === 'Multiple Choice' && currentQuestion?.options ? (
                                         <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                             <div className={cn(
                                                 "grid gap-4 w-full",
                                                     viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
                                             )}>
-                                                {currentQuestion?.options.map((option, index) => {
+                                                {currentQuestion.options.map((option, index) => {
                                                     const isSelected = selectedAnswer === option.text;
                                                     const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                     const isShown = selectedAnswer !== null;
@@ -913,14 +917,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             )}
                                                         >
                                                             <div className="flex items-center gap-2">
-                                                                {(isCorrectForCapture || (isShown && isCorrectAnswer)) && (
-                                                                    <div className={cn(
-                                                                        "absolute -top-3 -right-3 bg-green-500 rounded-full p-0.5 text-white z-10",
-                                                                        captureMode !== 'answer' && !isShown && "hidden"
-                                                                    )}>
-                                                                        <Check className="w-3 h-3" />
-                                                                    </div>
-                                                                )}
                                                                 <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
                                                                 <span className="text-left font-bold text-lg">{option.text}</span>
                                                             </div>
@@ -930,6 +926,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 })}
                                             </div>
                                         </RadioGroup>
+                                        ) : (
+                                          <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
+                                        )}
                                         {feedback && captureMode === 'idle' && (
                                             <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
                                                 {feedback}
