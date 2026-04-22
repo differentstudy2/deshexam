@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -9,7 +10,8 @@ export function Footer() {
   const pathname = usePathname();
 
   const hideFooterOnPaths = [
-    '/quiz/'
+    '/quiz/',
+    '/admin'
   ];
 
   const shouldHideFooter = hideFooterOnPaths.some(path => pathname.startsWith(path));
