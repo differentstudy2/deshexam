@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Upload, Loader2 } from 'lucide-react';
 import { MatchingPairsField } from './matching-pairs-field';
-import { ImageUploader } from './image-uploader';
+import { ImageUploader } from '@/components/feature/image-uploader';
 import { useRef, useState } from 'react';
 import { uploadFile } from '@/lib/firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
@@ -64,6 +64,7 @@ export const QuestionEditorCard = ({ index, onRemove, settings }: { index: numbe
                                     {settings.enableShortAnswer && <SelectItem value="Short Answer">Short Answer</SelectItem>}
                                     {settings.enableFillInTheBlank && <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>}
                                     {settings.enableMatching && <SelectItem value="Matching">Matching</SelectItem>}
+                                    <SelectItem value="Descriptive">Descriptive</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />
@@ -252,6 +253,65 @@ export const QuestionEditorCard = ({ index, onRemove, settings }: { index: numbe
                             </FormItem>
                         )}
                     />
+                )}
+
+                 {questionType === 'Descriptive' && (
+                    <div className="space-y-4">
+                        <FormField
+                            control={control}
+                            name={`questions.${index}.correctAnswer`}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Model Answer</FormLabel>
+                                    <FormControl>
+                                        <Textarea {...field} placeholder="Provide a detailed model answer or key points." className="min-h-[150px]" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                             <FormField
+                                control={control}
+                                name={`questions.${index}.answerImage`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Answer Image</FormLabel>
+                                        <FormControl>
+                                            <ImageUploader
+                                                fieldName={field.name}
+                                                onUrlChange={(url) => setValue(`questions.${index}.answerImage`, url)}
+                                                value={field.value}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={control}
+                                name={`questions.${index}.answerAudio`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Answer Audio</FormLabel>
+                                        <div className="flex items-center gap-2">
+                                            <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
+                                            <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.answerAudio`)} disabled={isUploadingAudio}>
+                                                {isUploadingAudio && uploadingAudioField === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                            </Button>
+                                            {!!field.value && (
+                                                <Button type="button" variant="destructive" size="icon" onClick={() => setValue(`questions.${index}.answerAudio`, '')}>
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                         {!!field.value && <audio controls src={field.value} className="w-full mt-2" />}
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
                 )}
 
                 <FormField

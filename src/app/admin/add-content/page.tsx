@@ -67,7 +67,9 @@ const questionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Descriptive']),
+  answerImage: z.string().optional(),
+  answerAudio: z.string().optional(),
   options: z.array(optionSchema).optional(),
   matchingOptions: z.object({
       columnA: z.array(z.object({ text: z.string(), image: z.string().optional() })),
@@ -76,6 +78,7 @@ const questionSchema = z.object({
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
 });
+
 
 const formSchema = z.object({
   title: z.string().optional(),
