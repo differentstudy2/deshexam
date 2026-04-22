@@ -51,7 +51,7 @@ const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank', 'Descriptive']),
   options: z.array(z.object({
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
@@ -59,9 +59,10 @@ const funQuizQuestionSchema = z.object({
   })).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
-  // Temporary fields for Fill in the Blank UI
   wordBank: z.string().optional(),
   correctAnswerString: z.string().optional(),
+  answerImage: z.string().optional(),
+  answerAudio: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -902,6 +903,7 @@ export default function AddKidsContentPage() {
                                                             <SelectItem value="True/False">True/False</SelectItem>
                                                             <SelectItem value="Matching">Matching</SelectItem>
                                                             <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                                            <SelectItem value="Descriptive">Descriptive</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -1034,6 +1036,64 @@ export default function AddKidsContentPage() {
                                                 />
                                             </div>
                                         )}
+                                         {questionType === 'Descriptive' && (
+                                            <div className="space-y-4 pt-2 border-t">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.correctAnswer`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Model Answer</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea placeholder="Provide a detailed model answer or key points." {...field} />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <div className="grid grid-cols-2 gap-4">
+                                                     <FormField
+                                                        control={form.control}
+                                                        name={`questions.${index}.answerImage`}
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>Answer Image</FormLabel>
+                                                                <FormControl>
+                                                                    <ImageUploader
+                                                                        fieldName={field.name}
+                                                                        onUrlChange={(url) => form.setValue(`questions.${index}.answerImage`, url)}
+                                                                        value={field.value}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`questions.${index}.answerAudio`}
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>Answer Audio</FormLabel>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
+                                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.answerAudio`)} disabled={isUploadingAudio}>
+                                                                        {isUploadingAudio && uploadingAudioField === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                    </Button>
+                                                                    {!!field.value && (
+                                                                        <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.answerAudio`, '')}>
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                                 {!!field.value && <audio controls src={field.value} className="w-full mt-2" />}
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                         <FormField
                                             control={form.control}
                                             name={`questions.${index}.explanation`}
@@ -1070,10 +1130,7 @@ export default function AddKidsContentPage() {
                                         </DialogHeader>
                                         <ScrollArea className="max-h-[60vh] pr-6">
                                             <Tabs defaultValue="paste">
-                                                <TabsList className="grid w-full grid-cols-2">
-                                                    <TabsTrigger value="paste">Paste JSON</TabsTrigger>
-                                                    <TabsTrigger value="upload">Upload File</TabsTrigger>
-                                                </TabsList>
+                                                <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="paste">Paste JSON</TabsTrigger><TabsTrigger value="upload">Upload File</TabsTrigger></TabsList>
                                                 <TabsContent value="paste" className="pt-4 space-y-4">
                                                     <Textarea
                                                         placeholder='Paste your JSON content here...'

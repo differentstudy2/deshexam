@@ -58,7 +58,7 @@ const funQuizQuestionSchema = z.object({
     text: z.string().min(1, 'Question text cannot be empty.'),
     image: z.string().optional(),
     audio: z.string().optional(),
-    type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank']),
+    type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank', 'Descriptive']),
     options: z.array(z.object({
         text: z.string().min(1, "Option text cannot be empty."),
         image: z.string().optional(),
@@ -68,6 +68,8 @@ const funQuizQuestionSchema = z.object({
     explanation: z.string().optional(),
     wordBank: z.string().optional(),
     correctAnswerString: z.string().optional(),
+    answerImage: z.string().optional(),
+    answerAudio: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -122,8 +124,7 @@ const hardcodedCategories = [
 ];
 
 
-const jsonExampleFull = `
-{
+const jsonExampleFull = `{
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "tags": "Animals, Sounds, Fun",
@@ -144,11 +145,9 @@ const jsonExampleFull = `
       "explanation": "Cows are known for their 'moo' sound."
     }
   ]
-}
-`;
+}`;
 
-const jsonExampleTextOnly = `
-{
+const jsonExampleTextOnly = `{
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "tags": "Animals, Sounds, Fun",
@@ -166,11 +165,9 @@ const jsonExampleTextOnly = `
       "explanation": "Two plus two equals four."
     }
   ]
-}
-`;
+}`;
 
-const jsonExampleMCQ = `
-{
+const jsonExampleMCQ = `{
   "questions": [
     {
       "text": "What color is the sky on a clear day?",
@@ -185,11 +182,9 @@ const jsonExampleMCQ = `
       "explanation": "The sky appears blue because of how the Earth's atmosphere scatters sunlight."
     }
   ]
-}
-`;
+}`;
 
-const jsonExampleTF = `
-{
+const jsonExampleTF = `{
   "questions": [
     {
       "text": "The Earth is flat.",
@@ -198,8 +193,7 @@ const jsonExampleTF = `
       "explanation": "The Earth is roughly a sphere."
     }
   ]
-}
-`;
+}`;
 
 const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
     const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
@@ -948,6 +942,7 @@ export default function EditKidsContentPage() {
                                                                         <SelectItem value="True/False">True/False</SelectItem>
                                                                         <SelectItem value="Matching">Matching</SelectItem>
                                                                         <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                                                        <SelectItem value="Descriptive">Descriptive</SelectItem>
                                                                     </SelectContent>
                                                                 </Select>
                                                                 <FormMessage />
@@ -993,7 +988,7 @@ export default function EditKidsContentPage() {
                                                                                         <FormControl>
                                                                                             <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
                                                                                         </FormControl>
-                                                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (
+                                                                                         <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (
                                                                                             <FormItem className="flex-1">
                                                                                                 <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
                                                                                                 <FormControl><Input {...optionField} /></FormControl>
@@ -1080,6 +1075,64 @@ export default function EditKidsContentPage() {
                                                             />
                                                         </div>
                                                     )}
+                                                     {questionType === 'Descriptive' && (
+                                                        <div className="space-y-4 pt-2 border-t">
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`questions.${index}.correctAnswer`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Model Answer</FormLabel>
+                                                                        <FormControl>
+                                                                            <Textarea placeholder="Provide a detailed model answer or key points." {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name={`questions.${index}.answerImage`}
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel>Answer Image</FormLabel>
+                                                                            <FormControl>
+                                                                                <ImageUploader
+                                                                                    fieldName={field.name}
+                                                                                    onUrlChange={(url) => form.setValue(`questions.${index}.answerImage`, url)}
+                                                                                    value={field.value}
+                                                                                />
+                                                                            </FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name={`questions.${index}.answerAudio`}
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel>Answer Audio</FormLabel>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
+                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.answerAudio`)} disabled={isUploadingAudio}>
+                                                                                    {isUploadingAudio && uploadingAudioField === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                                </Button>
+                                                                                {!!field.value && (
+                                                                                    <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.answerAudio`, '')}>
+                                                                                        <Trash2 className="w-4 h-4" />
+                                                                                    </Button>
+                                                                                )}
+                                                                            </div>
+                                                                            {!!field.value && <audio controls src={field.value} className="w-full mt-2" />}
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                     <FormField
                                                         control={form.control}
                                                         name={`questions.${index}.explanation`}
@@ -1103,18 +1156,95 @@ export default function EditKidsContentPage() {
                                             <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}>
                                                 <PlusCircle className="mr-2 h-4 w-4" /> Add Question
                                             </Button>
+                                            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                                                <DialogTrigger asChild>
+                                                    <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
+                                                </DialogTrigger>
+                                                 <DialogContent className="sm:max-w-2xl">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
+                                                        <DialogDescription>
+                                                            Upload a JSON file or paste JSON text. The content will be appended to the current question list.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <ScrollArea className="max-h-[60vh] pr-6">
+                                                        <Tabs defaultValue="paste">
+                                                            <TabsList className="grid w-full grid-cols-2"><TabsTrigger value="paste">Paste JSON</TabsTrigger><TabsTrigger value="upload">Upload File</TabsTrigger></TabsList>
+                                                            <TabsContent value="paste" className="pt-4 space-y-4">
+                                                                <Textarea
+                                                                    placeholder='Paste your JSON content here...'
+                                                                    value={jsonText}
+                                                                    onChange={(e) => setJsonText(e.target.value)}
+                                                                    className="min-h-[200px] font-mono text-xs"
+                                                                    disabled={isImporting}
+                                                                />
+                                                                <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
+                                                                    {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
+                                                                </Button>
+                                                            </TabsContent>
+                                                            <TabsContent value="upload" className="pt-4">
+                                                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                                                    <Label htmlFor="json-import">JSON/TXT File</Label>
+                                                                    <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
+                                                                    {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
+                                                                </div>
+                                                            </TabsContent>
+                                                        </Tabs>
+                                                        <Accordion type="single" collapsible className="w-full mt-4">
+                                                            <AccordionItem value="item-1">
+                                                                <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
+                                                                <AccordionContent>
+                                                                    <p className="text-sm text-muted-foreground mb-4">Your JSON file can contain a `title` and `description` to update the form, or just a `questions` array to append questions.</p>
+                                                                    <Tabs defaultValue="full" className="w-full">
+                                                                        <TabsList className="h-auto flex-wrap justify-start">
+                                                                            <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
+                                                                            <TabsTrigger value="text-only">Text-Only</TabsTrigger>
+                                                                            <TabsTrigger value="mcq">MCQ</TabsTrigger>
+                                                                            <TabsTrigger value="tf">True/False</TabsTrigger>
+                                                                        </TabsList>
+                                                                         <TabsContent value="full">
+                                                                            <div className="relative mt-2">
+                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
+                                                                            </div>
+                                                                        </TabsContent>
+                                                                        <TabsContent value="text-only">
+                                                                            <div className="relative mt-2">
+                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
+                                                                            </div>
+                                                                        </TabsContent>
+                                                                        <TabsContent value="mcq">
+                                                                            <div className="relative mt-2">
+                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMCQ)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMCQ}</pre></ScrollArea>
+                                                                            </div>
+                                                                        </TabsContent>
+                                                                        <TabsContent value="tf">
+                                                                            <div className="relative mt-2">
+                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTF)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></ScrollArea>
+                                                                            </div>
+                                                                        </TabsContent>
+                                                                    </Tabs>
+                                                                </AccordionContent>
+                                                            </AccordionItem>
+                                                        </Accordion>
+                                                    </ScrollArea>
+                                                </DialogContent>
+                                            </Dialog>
                                         </div>
                                     </CardFooter>
                                 </Card>
                             )}
-                        </CardContent>
-                    </Card>
-                  <Button type="submit" disabled={isSubmitting}>
-                      <Save className="mr-2 h-4 w-4"/>
-                      {isSubmitting ? "Saving..." : "Save Content"}
-                  </Button>
-                </form>
-              </Form>
-        </div>
-    );
+              </CardContent>
+            </Card>
+          <Button type="submit" disabled={isSubmitting}>
+              <Save className="mr-2 h-4 w-4"/>
+              {isSubmitting ? "Saving..." : "Save Content"}
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
 }
