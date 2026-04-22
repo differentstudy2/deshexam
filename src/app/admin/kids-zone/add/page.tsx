@@ -469,37 +469,54 @@ export default function AddKidsContentPage() {
         }
     };
 
-    const MatchingPairsField = ({ control, questionIndex }: { control: any, questionIndex: number }) => {
-        const { fields, append, remove } = useFieldArray({
-            control,
+    const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
+        const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
+            control: control,
             name: `questions.${questionIndex}.correctAnswer` as any,
         });
+    
+        const handleImageUrlChange = (pairIndex: number, field: 'aImage' | 'bImage', url: string) => {
+            setValue(`questions.${questionIndex}.correctAnswer.${pairIndex}.${field}`, url);
+        };
     
         return (
             <div className='space-y-4'>
                 <FormLabel>Matching Pairs</FormLabel>
-                <FormDescription>Define the correct pairs. The B column will be shuffled for the user.</FormDescription>
                 <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
                     <div>Column A</div>
                     <div></div>
                     <div>Column B</div>
                 </div>
-                {fields.map((pair, pairIndex) => (
+                {matchingPairFields.map((pair, pairIndex) => (
                      <div key={pair.id} className="p-4 border rounded-lg space-y-3">
                         <div className="flex justify-between items-center">
                             <FormLabel className="text-sm">Pair {pairIndex + 1}</FormLabel>
-                            <Button type="button" variant="ghost" size="sm" onClick={() => remove(pairIndex)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => removeMatchingPair(pairIndex)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                         </div>
                         <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
-                            <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />} />
+                            <div className="space-y-2">
+                                <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1} Text`} />} />
+                                <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.aImage`} render={({ field }) => (
+                                    <>
+                                      <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'aImage', url)} value={field.value} />
+                                    </>
+                                )} />
+                            </div>
                             <div className="pt-2">
                                 <GripVertical className="h-5 w-5 text-muted-foreground" />
                             </div>
-                             <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />} />
+                            <div className="space-y-2">
+                                 <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1} Text`} />} />
+                                 <Controller control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.bImage`} render={({ field }) => (
+                                    <>
+                                      <ImageUploader fieldName={field.name} onUrlChange={(url) => handleImageUrlChange(pairIndex, 'bImage', url)} value={field.value} />
+                                    </>
+                                )} />
+                            </div>
                         </div>
                      </div>
                 ))}
-                <Button type="button" variant="outline" size="sm" onClick={() => append({ a: '', b: '' })}>
+                <Button type="button" variant="outline" size="sm" onClick={() => appendMatchingPair({ a: '', aImage: '', b: '', bImage: '' })}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Pair
                 </Button>
             </div>
@@ -914,7 +931,7 @@ export default function AddKidsContentPage() {
                                                                             <FormControl>
                                                                                 <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
                                                                             </FormControl>
-                                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (
+                                                                             <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (
                                                                                 <FormItem className="flex-1">
                                                                                     <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
                                                                                     <FormControl><Input {...optionField} /></FormControl>
@@ -924,24 +941,9 @@ export default function AddKidsContentPage() {
                                                                         </div>
                                                                         
                                                                         <div className="grid grid-cols-2 gap-2">
-                                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (
-                                                                                <FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>
-                                                                            )}/>
+                                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
                                                                             <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                                                <FormItem>
-                                                                                    <FormLabel className="text-xs">Audio</FormLabel>
-                                                                                    <FormControl>
-                                                                                        <div className="flex items-center gap-2">
-                                                                                            <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
-                                                                                            <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
-                                                                                                {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
-                                                                                            </Button>
-                                                                                            {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}
-                                                                                        </div>
-                                                                                    </FormControl>
-                                                                                    {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}
-                                                                                    <FormMessage />
-                                                                                </FormItem>
+                                                                                <FormItem><FormLabel className="text-xs">Audio</FormLabel><FormControl><div className="flex items-center gap-2"><Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} /><Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>{!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}</div></FormControl>{form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}<FormMessage /></FormItem>
                                                                             )}/>
                                                                         </div>
                                                                     </div>
@@ -980,7 +982,7 @@ export default function AddKidsContentPage() {
                                             </div>
                                         )}
                                         {questionType === 'Matching' && (
-                                            <MatchingPairsField control={form.control} questionIndex={index} />
+                                            <MatchingPairsField control={form.control} questionIndex={index} setValue={form.setValue} />
                                         )}
                                         <FormField
                                             control={form.control}
