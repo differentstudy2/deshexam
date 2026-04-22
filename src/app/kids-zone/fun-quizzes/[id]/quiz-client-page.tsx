@@ -245,6 +245,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
     const [textAnswer, setTextAnswer] = useState('');
 
+    const [fillInTheBlankAnswers, setFillInTheBlankAnswers] = useState<(string | null)[]>([]);
+    const [wordBank, setWordBank] = useState<string[]>([]);
+    const [draggedWordInfo, setDraggedWordInfo] = useState<{ word: string, from: 'bank' | number } | null>(null);
+
+
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -290,6 +295,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setIsCorrect(false);
             setMatchingAnswers({});
             setTextAnswer('');
+            setFillInTheBlankAnswers([]);
+            setWordBank([]);
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -308,7 +315,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
         setSelectedAnswer(answer);
-        setTextAnswer(''); // Clear text input after any answer
         
         let isCorrect = false;
         let isPartial = false;
@@ -328,10 +334,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             } else if (correctCount > 0) {
                 isPartial = true;
             }
-        } else if (currentQuestion.type === 'Fill in the Blank') {
-            const correctAnswers = currentQuestion.correctAnswer as string[];
-            const userAnswers = Object.values(answer || {});
-            isCorrect = correctAnswers.length === userAnswers.length && correctAnswers.every(val => userAnswers.includes(val));
         } else {
              const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
              const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
@@ -474,6 +476,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setQuizFinished(false);
         setIsSubmitting(false);
         setTextAnswer('');
+        setFillInTheBlankAnswers([]);
+        setWordBank([]);
         setTimeLeft(timerDuration);
     };
     
@@ -513,6 +517,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
       }
       setIsLoading(false);
     }, [quiz]);
+
+    useEffect(() => {
+        if (currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options) {
+            const blankCount = (currentQuestion.text.match(/____/g) || []).length;
+            setFillInTheBlankAnswers(Array(blankCount).fill(null));
+            setWordBank(currentQuestion.options.map(o => o.text).filter(Boolean));
+        }
+    }, [currentQuestion]);
 
 
     useEffect(() => {
@@ -729,6 +741,51 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (language === 'hi') return toDevanagari(num);
         if (language === 'bn') return toBengaliNumerals(num);
         return num.toString();
+    }
+    
+    const handleDropOnBlank = (blankIndex: number) => {
+        if (!draggedWordInfo || isSubmitting) return;
+
+        const newAnswers = [...fillInTheBlankAnswers];
+        const oldWordInBlank = newAnswers[blankIndex];
+
+        // Place the new word
+        newAnswers[blankIndex] = draggedWordInfo.word;
+        setFillInTheBlankAnswers(newAnswers);
+
+        // Manage word bank
+        const newWordBank = [...wordBank];
+        const draggedWordIndexInBank = newWordBank.indexOf(draggedWordInfo.word);
+        if (draggedWordIndexInBank > -1) {
+            newWordBank.splice(draggedWordIndexInBank, 1);
+        }
+
+        if (oldWordInBlank) {
+            newWordBank.push(oldWordInBlank);
+        }
+
+        // Handle swapping from another blank
+        if (draggedWordInfo.from !== 'bank') {
+            newAnswers[draggedWordInfo.from] = oldWordInBlank;
+            setFillInTheBlankAnswers(newAnswers);
+            const indexToRemove = newWordBank.indexOf(draggedWordInfo.word);
+            if (indexToRemove > -1) newWordBank.splice(indexToRemove, 1);
+        }
+
+        setWordBank(newWordBank);
+        setDraggedWordInfo(null);
+    };
+
+    const checkFillInTheBlankAnswer = () => {
+        if (isSubmitting || !currentQuestion) return;
+        setIsSubmitting(true);
+        
+        const correctAnswers = (currentQuestion.correctAnswer as string[]).slice(0, fillInTheBlankAnswers.length);
+        const userAnswers = fillInTheBlankAnswers.filter(a => a !== null);
+
+        const isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every((ans, i) => ans === correctAnswers[i]);
+        
+        handleAnswer(isCorrect);
     }
 
 
@@ -955,33 +1012,44 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         )}
                                         
                                          <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-center text-2xl md:text-3xl font-bold flex flex-wrap items-center justify-center w-full">
-                                            {currentQuestion?.type === 'Fill in the Blank' ? (
-                                                currentQuestion.text.split('____').map((part, index, arr) => (
-                                                    <span key={index} className="mx-1">
-                                                        {part}
-                                                        {index < arr.length - 1 && (
-                                                            <div 
-                                                                onDragOver={(e) => { e.preventDefault(); if(!selectedAnswer) e.currentTarget.classList.add('border-primary', 'bg-primary/50'); }}
-                                                                onDragLeave={(e) => e.currentTarget.classList.remove('border-primary', 'bg-primary/50')}
-                                                                onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove('border-primary', 'bg-primary/50'); handleAnswer(e.dataTransfer.getData("text/plain")); }}
-                                                                className={cn(
-                                                                    "inline-block align-middle w-48 min-h-[50px] border-2 border-dashed rounded-lg mx-2 flex items-center justify-center transition-colors bg-black/10",
-                                                                    selectedAnswer ? (isCorrect ? "border-green-500 bg-green-500/30" : "border-destructive bg-red-500/30") : "border-white/50 hover:border-white"
-                                                                )}
-                                                            >
-                                                                {selectedAnswer ? (
-                                                                    <div className="font-bold p-2 text-white">{selectedAnswer}</div>
-                                                                ) : (
-                                                                    <span className="text-white/70 text-sm font-normal">Drag Answer Here</span>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </span>
-                                                ))
-                                            ) : (
-                                                <span>{currentQuestion?.text}</span>
-                                            )}
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold flex flex-wrap items-center justify-start gap-x-2">
+                                                {currentQuestion?.type === 'Fill in the Blank' ? (
+                                                    currentQuestion.text.split('____').map((part, index, arr) => (
+                                                        <span key={index}>
+                                                            {part}
+                                                            {index < arr.length - 1 && (
+                                                                <div 
+                                                                    onDragOver={(e) => { e.preventDefault(); if(!isSubmitting) e.currentTarget.classList.add('bg-white/30'); }}
+                                                                    onDragLeave={(e) => e.currentTarget.classList.remove('bg-white/30')}
+                                                                    onDrop={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.currentTarget.classList.remove('bg-white/30');
+                                                                        const word = e.dataTransfer.getData("text/plain");
+                                                                        handleDropOnBlank(index);
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        if (fillInTheBlankAnswers[index]) {
+                                                                            // Logic to return word to bank
+                                                                        }
+                                                                    }}
+                                                                    className={cn("inline-block align-middle w-36 h-12 border-2 border-dashed rounded-lg mx-2 flex items-center justify-center transition-colors cursor-pointer", fillInTheBlankAnswers[index] ? 'border-transparent' : 'border-white/50 hover:border-white')}
+                                                                >
+                                                                    {fillInTheBlankAnswers[index] && (
+                                                                        <span 
+                                                                            className="p-2 bg-white text-blue-800 rounded-md font-bold cursor-pointer"
+                                                                            draggable
+                                                                            onDragStart={() => setDraggedWordInfo({ word: fillInTheBlankAnswers[index]!, from: index })}
+                                                                        >
+                                                                            {fillInTheBlankAnswers[index]}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span>{currentQuestion?.text}</span>
+                                                )}
                                             </CardTitle>
                                         </div>
                                     </CardHeader>
@@ -1032,7 +1100,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
                                                     return (
                                                         <Label
-                                                            key={index}
+                                                                key={index}
                                                             htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                             className={cn(
                                                                 "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40",
@@ -1048,7 +1116,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer' || (currentQuestion?.type === 'Fill in the Blank' && !currentQuestion?.options?.some(o => o.text))) ? (
+                                        ) : currentQuestion?.type === 'Short Answer' ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
                                                 <Input 
                                                     type="text" 
@@ -1066,23 +1134,34 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     Submit
                                                 </Button>
                                             </form>
-                                        ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options ? (
-                                            <div className="flex flex-wrap justify-center gap-4 pt-4">
-                                                {currentQuestion.options
-                                                    .filter(opt => selectedAnswer !== opt.text && opt.text.trim() !== '')
-                                                    .map((option, index) => (
-                                                    <div
-                                                        key={index}
-                                                        draggable={selectedAnswer === null}
-                                                        onDragStart={(e) => { e.dataTransfer.setData("text/plain", option.text); }}
-                                                        className={cn(
-                                                            "h-auto p-4 text-2xl font-bold rounded-xl shadow-lg bg-white dark:bg-slate-800 transition-transform",
-                                                            selectedAnswer !== null ? "opacity-30 cursor-not-allowed" : "cursor-grab active:cursor-grabbing hover:scale-105"
-                                                        )}
-                                                    >
-                                                        {option.text}
-                                                    </div>
-                                                ))}
+                                        ) : currentQuestion?.type === 'Fill in the Blank' ? (
+                                            <div className="flex flex-col items-center gap-6">
+                                                <div 
+                                                    className="flex flex-wrap justify-center gap-4 p-4 rounded-lg bg-secondary min-h-[70px] w-full"
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={handleDropOnBank}
+                                                >
+                                                    {wordBank.map((word, index) => (
+                                                        <Button
+                                                            key={index}
+                                                            draggable
+                                                            onDragStart={() => handleDragStart(word, 'bank')}
+                                                            className="h-auto p-4 text-2xl font-bold rounded-xl shadow-lg cursor-grab active:cursor-grabbing bg-white text-slate-800"
+                                                            variant="outline"
+                                                        >
+                                                            {word}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                                <div className="flex gap-4">
+                                                    <Button onClick={checkFillInTheBlankAnswer} disabled={isSubmitting || fillInTheBlankAnswers.includes(null)}>
+                                                        Check Answer
+                                                    </Button>
+                                                    <Button onClick={() => {
+                                                         setFillInTheBlankAnswers(Array((currentQuestion?.text.match(/____/g) || []).length).fill(null));
+                                                         setWordBank(currentQuestion?.options.map(o => o.text).filter(Boolean) || []);
+                                                    }} variant="secondary">Reset</Button>
+                                                </div>
                                             </div>
                                         ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
                                             <div className="w-full space-y-4">
@@ -1166,3 +1245,5 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
+    
