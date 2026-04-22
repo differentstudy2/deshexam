@@ -1026,45 +1026,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
                                         <div className="flex items-start justify-between gap-2">
                                             <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                 <div className="inline-block"
-                                                 >
-                                                    {currentQuestion?.type === 'Fill in the Blank' ? (
-                                                        currentQuestion.text.split('____').map((part, index, arr) => (
-                                                            <React.Fragment key={index}>
-                                                                {part}
-                                                                {index < arr.length - 1 && (
-                                                                    <div 
-                                                                        onDragOver={(e) => { e.preventDefault(); if(!isSubmitting) e.currentTarget.classList.add('bg-white/30'); }}
-                                                                        onDragLeave={(e) => e.currentTarget.classList.remove('bg-white/30')}
-                                                                        onDrop={(e) => {
-                                                                            e.preventDefault();
-                                                                            e.currentTarget.classList.remove('bg-white/30');
-                                                                            handleDropOnBlank(index);
-                                                                        }}
-                                                                        onClick={() => {
-                                                                            if (fillInTheBlankAnswers[index]) {
-                                                                                // Logic to return word to bank
-                                                                            }
-                                                                        }}
-                                                                        className={cn("inline-block align-middle w-36 h-12 border-2 border-dashed rounded-lg mx-2 flex items-center justify-center transition-colors cursor-pointer", fillInTheBlankAnswers[index] ? 'border-transparent' : 'border-white/50 hover:border-white')}
-                                                                    >
-                                                                        {fillInTheBlankAnswers[index] && (
-                                                                            <span 
-                                                                                className="p-2 bg-white text-blue-800 rounded-md font-bold cursor-pointer"
-                                                                                draggable
-                                                                                onDragStart={() => handleDragStart(fillInTheBlankAnswers[index]!, index)}
-                                                                            >
-                                                                                {fillInTheBlankAnswers[index]}
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </React.Fragment>
-                                                        ))
-                                                    ) : (
-                                                        <span>{currentQuestion?.text}</span>
-                                                    )}
-                                                </div>
+                                                <span>{currentQuestion?.text}</span>
                                             </CardTitle>
                                         </div>
                                         {currentQuestion && currentQuestion.image && (

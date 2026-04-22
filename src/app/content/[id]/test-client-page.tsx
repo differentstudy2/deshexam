@@ -27,6 +27,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import rehypeRaw from 'rehype-raw';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +45,7 @@ import Image from 'next/image';
 
 type Option = {
   text: string;
+  image?: string;
 };
 
 type MatchingItem = {
@@ -103,11 +105,15 @@ export default function TestClientPage({ test }: { test: Test }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(test.duration > 0 ? test.duration * 60 : null);
   const [timeUp, setTimeUp] = useState(false);
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   
-  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const lastQuestionRef = useRef<HTMLDivElement | null>(null);
-  const [visibleQuestions, setVisibleQuestions] = useState(5);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<'submit' | 'back' | 'new' | null>(null);
+  
+  const lastQuestionRef = useRef<HTMLDivElement>(null);
+
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [visibleQuestions, setVisibleQuestions] = useState(5);
 
   const highestAttemptedIndex = useMemo(() => {
     if (!testWithShuffledOptions) return -1;
@@ -314,10 +320,18 @@ export default function TestClientPage({ test }: { test: Test }) {
     <>
       <div className="bg-secondary/30">
         <div className="container py-8 max-w-4xl mx-auto">
-          {/* ... Header and other components */}
+          <div className="mb-6">
+            <Button variant="ghost" onClick={() => {setConfirmAction('back'); setIsConfirming(true);}}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+            </Button>
+          </div>
+          <header className="mb-8 text-center">
+            <h1 className="font-headline text-4xl font-bold">{title}</h1>
+            <p className="text-muted-foreground">{description}</p>
+          </header>
           
           <form onSubmit={(e) => { e.preventDefault(); setConfirmAction('submit'); setIsConfirming(true); }} className="p-6 pt-0">
-             {/* Sticky Header with Timer & Stats */}
              <Card className={cn(
                 "sticky top-[64px] z-40 border-x-0 border-b",
                 timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
@@ -367,6 +381,7 @@ export default function TestClientPage({ test }: { test: Test }) {
             <fieldset disabled={timeUp || isSubmitting} className="space-y-8 mt-6">
               {questions.slice(0, visibleQuestions).map((question, index) => {
                  const isLastQuestion = index === visibleQuestions - 1;
+                 const userAnswer = answers[question.id];
                  return (
                   <Card key={question.id || index} ref={el => {
                       questionRefs.current[index] = el;
@@ -377,20 +392,41 @@ export default function TestClientPage({ test }: { test: Test }) {
                     <CardHeader className="p-0 mb-4">
                       <CardTitle className="flex items-baseline gap-2 text-xl font-semibold prose dark:prose-invert">
                            <span className="self-start">{index + 1}.</span>
-                           <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{question.text}</ReactMarkdown>
+                           <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{question.text}</ReactMarkdown>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                       {question.type === 'Multiple Choice' && question.options && (
-                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {question.options.map((option, optIndex) => (
-                            <div key={optIndex} className="flex items-center space-x-3 p-3 border rounded-md has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
-                              <RadioGroupItem value={option.text} id={`q${question.id}-opt${optIndex}`} />
-                              <Label htmlFor={`q${question.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer">
-                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{option.text}</ReactMarkdown>
-                              </Label>
-                            </div>
-                          ))}
+                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id] || ''} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {question.options.map((option, optIndex) => {
+                            const isCorrectAnswer = question.correctAnswer === option.text;
+                            return (
+                              <div key={optIndex}>
+                                <Label htmlFor={`q-${question.id}-opt${optIndex}`} className={cn(
+                                    "flex flex-col p-4 border rounded-lg cursor-pointer transition-all",
+                                    isAnswerRevealed && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
+                                    isAnswerRevealed && userAnswer === option.text && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
+                                    !isAnswerRevealed && "hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/10",
+                                )}>
+                                  {option.image && (
+                                      <div className="relative w-full aspect-video mb-4 rounded-md overflow-hidden">
+                                          <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
+                                      </div>
+                                  )}
+                                  <div className="flex items-center space-x-3 w-full">
+                                    <RadioGroupItem value={option.text} id={`q-${question.id}-opt${optIndex}`} />
+                                    <div className="text-base font-normal flex-1">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                    </div>
+                                    {isAnswerRevealed && (
+                                        isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
+                                        userAnswer === option.text ? <XCircle className="w-5 h-5 text-destructive" /> : null
+                                    )}
+                                  </div>
+                                </Label>
+                              </div>
+                            )
+                          })}
                         </RadioGroup>
                       )}
                       {question.type === 'True/False' && (
