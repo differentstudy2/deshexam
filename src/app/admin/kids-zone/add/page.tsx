@@ -50,7 +50,7 @@ const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Matching']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank']),
   options: z.array(z.object({ 
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
@@ -877,7 +877,7 @@ export default function AddKidsContentPage() {
                                                         if (value === 'Matching') {
                                                             form.setValue(`questions.${index}.correctAnswer`, []);
                                                             form.setValue(`questions.${index}.options`, undefined);
-                                                        } else if (value === 'Multiple Choice' && !form.getValues(`questions.${index}.options`)) {
+                                                        } else if (value === 'Multiple Choice' || value === 'Fill in the Blank') {
                                                             form.setValue(`questions.${index}.options`, [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]);
                                                         }
                                                     }} defaultValue={field.value}>
@@ -886,6 +886,7 @@ export default function AddKidsContentPage() {
                                                             <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                                             <SelectItem value="True/False">True/False</SelectItem>
                                                             <SelectItem value="Matching">Matching</SelectItem>
+                                                            <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -893,7 +894,7 @@ export default function AddKidsContentPage() {
                                             )}
                                         />
                                         <div className="grid grid-cols-2 gap-4">
-                                            <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value}/></FormControl><FormMessage /></FormItem>)}/>
+                                            <FormField control={form.control} name={`questions.${index}.image`} render={({ field }) => (<FormItem><FormLabel>Question Image</FormLabel><FormControl><ImageUploader fieldName={field.name} onUrlChange={(url) => form.setValue(`questions.${index}.image`, url)} value={field.value} /></FormControl><FormMessage /></FormItem>)}/>
                                             <FormField control={form.control} name={`questions.${index}.audio`} render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Question Audio</FormLabel>
@@ -952,7 +953,6 @@ export default function AddKidsContentPage() {
                                                         </RadioGroup>
                                                     )}
                                                 />
-                                                <FormMessage>{form.formState.errors.questions?.[index]?.correctAnswer?.message}</FormMessage>
                                             </div>
                                         )}
                                         {questionType === 'True/False' && (
@@ -983,6 +983,45 @@ export default function AddKidsContentPage() {
                                         )}
                                         {questionType === 'Matching' && (
                                             <MatchingPairsField control={form.control} questionIndex={index} setValue={form.setValue} />
+                                        )}
+                                        {questionType === 'Fill in the Blank' && (
+                                            <div className="space-y-4 pt-2 border-t">
+                                                <FormDescription>
+                                                    Use "____" in the question text for the blank. Provide options below, one of which must be the correct answer.
+                                                </FormDescription>
+                                                <FormLabel>Options (for Drag & Drop)</FormLabel>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {[0, 1, 2, 3].map(optionIndex => (
+                                                        <FormField
+                                                            key={optionIndex}
+                                                            control={form.control}
+                                                            name={`questions.${index}.options.${optionIndex}.text`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="text-xs">Option {optionIndex + 1}</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.correctAnswer`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Correct Answer</FormLabel>
+                                                            <FormControl>
+                                                                <Input {...field} placeholder="Type the correct word from the options above" />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
                                         )}
                                         <FormField
                                             control={form.control}
