@@ -745,10 +745,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return num.toString();
     }
     
-    const handleDragStart = (word: string, from: 'bank' | number) => {
-        setDraggedWordInfo({ word, from });
-    };
-
     const handleDropOnBank = (e: React.DragEvent) => {
         e.preventDefault();
         if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
@@ -1024,15 +1020,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     bgGradients[currentQuestionIndex % bgGradients.length]
                                 )}>
                                     <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
-                                        {currentQuestion && currentQuestion.image && (
-                                            <div className="relative h-48 w-full mt-4">
-                                                <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
-                                            </div>
-                                        )}
-                                        
-                                         <div className="flex items-start justify-between gap-2">
+                                        <div className="flex items-start justify-between gap-2">
                                             <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                <span className="inline">
+                                                 <span className="inline">
                                                     {currentQuestion?.type === 'Fill in the Blank' ? (
                                                         currentQuestion.text.split('____').map((part, index, arr) => (
                                                             <React.Fragment key={index}>
@@ -1072,6 +1062,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </span>
                                             </CardTitle>
                                         </div>
+                                        {currentQuestion && currentQuestion.image && (
+                                            <div className="relative h-48 w-full mt-4">
+                                                <Image src={currentQuestion.image} alt={currentQuestion.text || 'Question Image'} layout="fill" objectFit="contain" className="rounded-lg" />
+                                            </div>
+                                        )}
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
@@ -1136,7 +1131,25 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : currentQuestion?.type === 'Fill in the Blank' ? (
+                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank' && !currentQuestion.options?.length) ? (
+                                            <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
+                                                <Input 
+                                                    type="text" 
+                                                    placeholder="Your answer"
+                                                    value={textAnswer}
+                                                    onChange={(e) => setTextAnswer(e.target.value)}
+                                                    disabled={selectedAnswer !== null}
+                                                    className="text-lg h-12"
+                                                />
+                                                <Button 
+                                                    type="submit" 
+                                                    disabled={selectedAnswer !== null || !textAnswer.trim()}
+                                                    size="lg"
+                                                >
+                                                    Submit
+                                                </Button>
+                                            </form>
+                                        ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options ? (
                                              <div className="flex flex-col items-center gap-6">
                                                 <div 
                                                     className="flex flex-wrap justify-center gap-4 p-4 rounded-lg bg-secondary min-h-[70px] w-full"
