@@ -48,12 +48,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 
 const funQuizQuestionSchema = z.object({
-  text: z.string().min(1, 'Question text cannot be empty.'),
+  text: z.string().optional(),
   image: z.string().optional(),
   audio: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank', 'Direct Question']),
   options: z.array(z.object({
-    text: z.string().min(1, "Option text cannot be empty."),
+    text: z.string().optional(),
     image: z.string().optional(),
     audio: z.string().optional(),
   })).optional(),
@@ -1004,7 +1004,7 @@ export default function AddKidsContentPage() {
                                         {questionType === 'Fill in the Blank' && (
                                             <div className="space-y-4 pt-2 border-t">
                                                 <FormDescription>
-                                                    Use `____` for each blank in the question. Provide all possible words (correct and incorrect) in the Word Bank. Then list the correct words in order.
+                                                    Use `____` for each blank in the question. Provide all possible words (correct and incorrect) in the Word Bank. Then list the correct words in order, separated by commas.
                                                 </FormDescription>
                                                 <FormField
                                                     control={form.control}
