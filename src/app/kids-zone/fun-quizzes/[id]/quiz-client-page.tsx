@@ -51,7 +51,9 @@ type Question = {
         columnB: { text: string; image?: string; }[];
     };
     correctAnswer: any;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Direct Question';
+    answerImage?: string;
+    answerAudio?: string;
 };
 
 type Quiz = {
@@ -248,6 +250,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [fillInTheBlankAnswers, setFillInTheBlankAnswers] = useState<(string | null)[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
     const [draggedWordInfo, setDraggedWordInfo] = useState<{ word: string, from: 'bank' | number } | null>(null);
+    const [isAnswerShown, setIsAnswerShown] = useState(false);
 
 
     const t = translations[language];
@@ -297,6 +300,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setTextAnswer('');
             setFillInTheBlankAnswers([]);
             setWordBank([]);
+            setIsAnswerShown(false);
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -478,6 +482,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTextAnswer('');
         setFillInTheBlankAnswers([]);
         setWordBank([]);
+        setIsAnswerShown(false);
         setTimeLeft(timerDuration);
     };
     
@@ -775,7 +780,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setWordBank(newWordBank);
         setDraggedWordInfo(null);
     };
-
+    
     const handleDropOnBank = (e: React.DragEvent) => {
         e.preventDefault();
         if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
@@ -1031,7 +1036,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                          <div className="flex items-start justify-between gap-2">
                                             <CardTitle className="text-left text-2xl md:text-3xl font-bold">
                                                 {currentQuestion?.type === 'Fill in the Blank' ? (
-                                                     <span className='inline'>
+                                                     <span className="inline">
                                                         {currentQuestion.text.split('____').map((part, index, arr) => (
                                                             <React.Fragment key={index}>
                                                                 {part}
@@ -1163,46 +1168,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     }} variant="secondary">Reset</Button>
                                                 </div>
                                             </div>
-                                        ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
-                                            <div className="w-full space-y-4">
-                                                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                    <div className="font-bold text-center">Column A</div>
-                                                    <div></div>
-                                                    <div className="font-bold text-center">Column B</div>
-                                                </div>
-                                                {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                                    <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                        <div className="p-3 border rounded-md text-center bg-secondary">
-                                                            {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
-                                                            {itemA.text}
-                                                        </div>
-                                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                        <Select
-                                                            onValueChange={(value) => {
-                                                                const currentAnswers = matchingAnswers || {};
-                                                                const newAnswers = { ...currentAnswers, [itemA.text]: value };
-                                                                setMatchingAnswers(newAnswers);
-                                                            }}
-                                                            value={matchingAnswers[itemA.text] || ''}
-                                                            disabled={selectedAnswer !== null}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Select..." />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
-                                                                    <SelectItem key={`${currentQuestion.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
-                                                                        <div className="flex items-center gap-2">
-                                                                            {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
-                                                                            <span>{itemB.text}</span>
-                                                                        </div>
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
+                                        ) : currentQuestion?.type === 'Direct Question' ? (
+                                            <div className="flex flex-col items-center gap-4">
+                                                {isAnswerShown ? (
+                                                    <div className="space-y-4 w-full p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                                        <h3 className="font-bold text-lg text-center text-green-700 dark:text-green-300">Answer</h3>
+                                                        {currentQuestion.answerImage && (
+                                                            <div className="relative w-full max-w-sm mx-auto aspect-video">
+                                                                <Image src={currentQuestion.answerImage} alt="Answer" layout="fill" objectFit="contain" className="rounded-lg" />
+                                                            </div>
+                                                        )}
+                                                        {currentQuestion.correctAnswer && <p className="text-lg text-center">{currentQuestion.correctAnswer}</p>}
+                                                        {currentQuestion.answerAudio && <audio controls src={currentQuestion.answerAudio} className="w-full mt-2" />}
                                                     </div>
-                                                ))}
-                                                <Button onClick={() => handleAnswer(matchingAnswers)} disabled={selectedAnswer !== null || Object.keys(matchingAnswers).length !== currentQuestion.matchingOptions.columnA.length}>Check Answer</Button>
+                                                ) : (
+                                                    <Button onClick={() => setIsAnswerShown(true)} size="lg">Show Answer</Button>
+                                                )}
                                             </div>
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
@@ -1245,5 +1226,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
-    
