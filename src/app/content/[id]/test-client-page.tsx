@@ -191,6 +191,12 @@ export default function TestClientPage({ test }: { test: Test }) {
 
         setTimeout(nextQuestion, 2000);
     };
+
+    const handleMatchingAnswerChange = (questionId: string, columnAItem: string, columnBItem: string) => {
+        const currentAnswer = userAnswers[questionId] || {};
+        const newAnswer = { ...currentAnswer, [columnAItem]: columnBItem };
+        setUserAnswers(prev => ({ ...prev, [questionId]: newAnswer }));
+    };
     
     useEffect(() => {
         if (quizFinished || timeLeft === null) return;
@@ -474,6 +480,46 @@ export default function TestClientPage({ test }: { test: Test }) {
                                                 className="h-12 text-lg"
                                             />
                                             <Button onClick={() => handleAnswer(currentQuestion.id, userAnswers[currentQuestion.id])} disabled={showFeedback === currentQuestion.id || !userAnswers[currentQuestion.id]}>Check Answer</Button>
+                                        </div>
+                                    )}
+                                    {currentQuestion.type === 'Matching' && currentQuestion.matchingOptions && (
+                                        <div className="w-full space-y-4">
+                                            <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                <div className="font-bold text-center">Column A</div>
+                                                <div></div>
+                                                <div className="font-bold text-center">Column B</div>
+                                            </div>
+                                            {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                                <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                    <div className="p-3 border rounded-md text-center bg-secondary">
+                                                        {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                                        {itemA.text}
+                                                    </div>
+                                                    <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                    <Select
+                                                        onValueChange={(value) => handleMatchingAnswerChange(currentQuestion.id, itemA.text, value)}
+                                                        value={userAnswers[currentQuestion.id]?.[itemA.text] || ''}
+                                                        disabled={showFeedback === currentQuestion.id}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a match" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {currentQuestion.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                                                <SelectItem key={`${currentQuestion.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
+                                                                    <div className="flex items-center gap-2">
+                                                                        {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                                        <span>{itemB.text}</span>
+                                                                    </div>
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            ))}
+                                            <div className="text-center mt-4">
+                                                <Button onClick={() => handleAnswer(currentQuestion.id, userAnswers[currentQuestion.id])} disabled={showFeedback === currentQuestion.id || Object.keys(userAnswers[currentQuestion.id] || {}).length !== currentQuestion.matchingOptions.columnA.length}>Check Answer</Button>
+                                            </div>
                                         </div>
                                     )}
                                     {feedback[currentQuestion.id] && showFeedback === currentQuestion.id && (
