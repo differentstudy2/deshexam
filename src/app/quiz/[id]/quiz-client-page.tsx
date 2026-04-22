@@ -328,24 +328,25 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 isPartial = true;
             }
         } else {
-            const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
-            const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
-               ? currentQuestion.correctAnswer.toLowerCase().trim() 
-               : currentQuestion.correctAnswer;
+             const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
+             const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
+                ? currentQuestion.correctAnswer.toLowerCase().trim() 
+                : currentQuestion.correctAnswer;
+            
             isCorrect = processedUserAnswer === correctAnswer;
         }
 
         if (isCorrect) {
             setFeedback(t.correct);
             setIsCorrect(true);
-            setScore(prev => prev + 1);
+            setScore(prev => prev + 1); // For quizzes, assume 1 point per question
             playSystemSound('correct');
         } else {
             setFeedback(isPartial ? 'Partially Correct!' : t.incorrect);
             playSystemSound(isPartial ? 'correct' : 'incorrect');
         }
 
-        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 1500);
+        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 2000);
     }, [selectedAnswer, isSubmitting, stopSound, currentQuestion, t, playSystemSound, nextQuestion]);
 
 
@@ -358,7 +359,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
-        stopSound(); 
+        stopSound(); // Stop anything else first
 
         const audio = new Audio(url);
         activeAudioRef.current = audio;
@@ -366,7 +367,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         audio.play().catch(error => {
             console.error(`Error playing sound:`, error);
-            setPlayingUrl(null); 
+            setPlayingUrl(null); // Reset state on error
         });
 
         audio.onended = () => {
@@ -478,10 +479,34 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     };
     
     useEffect(() => {
-        if(quiz && quiz.questions) {
-             setShuffledQuestions([...quiz.questions].sort(() => Math.random() - 0.5));
+      const shuffleArray = (array: any[]) => {
+        const indexedArray = array.map((item, index) => ({ ...item, originalIndex: index }));
+        for (let i = indexedArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indexedArray[i], indexedArray[j]] = [indexedArray[j], indexedArray[i]];
         }
-        setIsLoading(false);
+        return indexedArray;
+      };
+
+      if (quiz && quiz.questions) {
+          const questionsWithMatchingOptions = quiz.questions.map(q => {
+              if (q.type === 'Matching' && q.correctAnswer) {
+                  const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                  const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                  let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
+                  return {
+                      ...q,
+                      matchingOptions: {
+                          columnA,
+                          columnB: shuffleArray(columnB)
+                      }
+                  }
+              }
+              return q;
+          });
+          setShuffledQuestions([...questionsWithMatchingOptions].sort(() => Math.random() - 0.5));
+      }
+      setIsLoading(false);
     }, [quiz]);
 
 
@@ -624,7 +649,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 { from: '#6a3093', to: '#a044ff' }
             ];
             const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-            const gradient = targetCtx.createLinearGradient(0, 0, 0, targetHeight);
+            const gradient = targetCtx.createLinearGradient(0, 0, targetWidth, targetHeight);
             gradient.addColorStop(0, randomGradient.from);
             gradient.addColorStop(0.5, randomGradient.to);
             gradient.addColorStop(1, randomGradient.to);
@@ -931,7 +956,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
-                                        {currentQuestion?.type === 'Multiple Choice' && currentQuestion?.options ? (
+                                        {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                                 <div className={cn(
                                                     "grid gap-4 w-full",
@@ -967,24 +992,31 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     })}
                                                 </div>
                                             </RadioGroup>
-                                        ) : currentQuestion?.type === 'True/False' && currentQuestion.options ? (
+                                        ) : currentQuestion?.type === 'True/False' ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null} className="flex justify-center space-x-4">
-                                                {currentQuestion.options.map((option, index) => (
-                                                    <Label
-                                                        key={index}
-                                                        htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
-                                                        className={cn(
-                                                            "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40",
-                                                            !selectedAnswer && "cursor-pointer hover:scale-105",
-                                                            !selectedAnswer && optionGradients[(currentQuestionIndex + index + 2) % optionGradients.length],
-                                                            selectedAnswer && option.text === currentQuestion.correctAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
-                                                            selectedAnswer === option.text && option.text !== currentQuestion.correctAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white"
-                                                        )}
-                                                    >
-                                                        <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="sr-only" />
-                                                        {option.text}
-                                                    </Label>
-                                                ))}
+                                                {['True', 'False'].map((option, index) => {
+                                                    const isSelected = selectedAnswer === option;
+                                                    const isCorrectAnswer = currentQuestion.correctAnswer === option;
+                                                    const isShown = selectedAnswer !== null;
+                                                    const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index + 2) % optionGradients.length]}`;
+
+                                                    return (
+                                                        <Label
+                                                            key={index}
+                                                            htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                            className={cn(
+                                                                "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40",
+                                                                !isShown && "cursor-pointer hover:scale-105",
+                                                                !isShown && gradientClass,
+                                                                isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
+                                                                isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white"
+                                                            )}
+                                                        >
+                                                            <RadioGroupItem value={option} id={`q-${currentQuestionIndex}-opt-${index}`} className="sr-only" />
+                                                            {option}
+                                                        </Label>
+                                                    );
+                                                })}
                                             </RadioGroup>
                                         ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
