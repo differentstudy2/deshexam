@@ -308,6 +308,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
         setSelectedAnswer(answer);
+        setTextAnswer(''); // Clear text input after any answer
         
         let isCorrect = false;
         let isPartial = false;
@@ -328,24 +329,25 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                 isPartial = true;
             }
         } else {
-            const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
-            const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
-               ? currentQuestion.correctAnswer.toLowerCase().trim() 
-               : currentQuestion.correctAnswer;
+             const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
+             const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
+                ? currentQuestion.correctAnswer.toLowerCase().trim() 
+                : currentQuestion.correctAnswer;
+            
             isCorrect = processedUserAnswer === correctAnswer;
         }
 
         if (isCorrect) {
             setFeedback(t.correct);
             setIsCorrect(true);
-            setScore(prev => prev + 1);
+            setScore(prev => prev + 1); // For quizzes, assume 1 point per question
             playSystemSound('correct');
         } else {
             setFeedback(isPartial ? 'Partially Correct!' : t.incorrect);
             playSystemSound(isPartial ? 'correct' : 'incorrect');
         }
 
-        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 1500);
+        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 2000);
     }, [selectedAnswer, isSubmitting, stopSound, currentQuestion, t, playSystemSound, nextQuestion]);
 
 
@@ -358,7 +360,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const playSound = useCallback((url: string) => {
         if (typeof window === 'undefined') return;
         
-        stopSound(); 
+        stopSound(); // Stop anything else first
 
         const audio = new Audio(url);
         activeAudioRef.current = audio;
@@ -366,7 +368,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         audio.play().catch(error => {
             console.error(`Error playing sound:`, error);
-            setPlayingUrl(null); 
+            setPlayingUrl(null); // Reset state on error
         });
 
         audio.onended = () => {
@@ -478,34 +480,34 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     };
     
     useEffect(() => {
-        const shuffleArray = (array: any[]) => {
-            const indexedArray = array.map((item, index) => ({ ...item, originalIndex: index }));
-            for (let i = indexedArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [indexedArray[i], indexedArray[j]] = [indexedArray[j], indexedArray[i]];
-            }
-            return indexedArray;
-        };
-
-        if (quiz && quiz.questions) {
-            const questionsWithMatchingOptions = quiz.questions.map(q => {
-                if (q.type === 'Matching' && q.correctAnswer) {
-                    const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
-                    const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
-                    let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
-                    return {
-                        ...q,
-                        matchingOptions: {
-                            columnA,
-                            columnB: shuffleArray(columnB)
-                        }
-                    }
-                }
-                return q;
-            });
-            setShuffledQuestions([...questionsWithMatchingOptions].sort(() => Math.random() - 0.5));
+      const shuffleArray = (array: any[]) => {
+        const indexedArray = array.map((item, index) => ({ ...item, originalIndex: index }));
+        for (let i = indexedArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indexedArray[i], indexedArray[j]] = [indexedArray[j], indexedArray[i]];
         }
-        setIsLoading(false);
+        return indexedArray;
+      };
+
+      if (quiz && quiz.questions) {
+          const questionsWithMatchingOptions = quiz.questions.map(q => {
+              if (q.type === 'Matching' && q.correctAnswer) {
+                  const pairs = q.correctAnswer as { a: string, aImage?: string, b: string, bImage?: string }[];
+                  const columnA = pairs.map(p => ({ text: p.a, image: p.aImage }));
+                  let columnB = pairs.map(p => ({ text: p.b, image: p.bImage }));
+                  return {
+                      ...q,
+                      matchingOptions: {
+                          columnA,
+                          columnB: shuffleArray(columnB)
+                      }
+                  }
+              }
+              return q;
+          });
+          setShuffledQuestions([...questionsWithMatchingOptions].sort(() => Math.random() - 0.5));
+      }
+      setIsLoading(false);
     }, [quiz]);
 
 
@@ -955,7 +957,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
-                                        {currentQuestion?.type === 'Multiple Choice' && currentQuestion?.options ? (
+                                        {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                                 <div className={cn(
                                                     "grid gap-4 w-full",
@@ -1017,7 +1019,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
+                                        ) : (currentQuestion?.type === 'Short Answer') ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
                                                 <Input 
                                                     type="text" 
@@ -1035,6 +1037,48 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     Submit
                                                 </Button>
                                             </form>
+                                        ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options ? (
+                                            <div className="space-y-8 text-center">
+                                                <div className="text-2xl font-semibold flex flex-wrap items-center justify-center">
+                                                    {currentQuestion.text.split('____').map((part, index, arr) => (
+                                                        <span key={index}>
+                                                            {part}
+                                                            {index < arr.length - 1 && (
+                                                                <div 
+                                                                    onDragOver={(e) => { e.preventDefault(); if(!selectedAnswer) e.currentTarget.classList.add('border-primary', 'bg-primary/10'); }}
+                                                                    onDragLeave={(e) => e.currentTarget.classList.remove('border-primary', 'bg-primary/10')}
+                                                                    onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove('border-primary', 'bg-primary/10'); handleAnswer(e.dataTransfer.getData("text/plain")); }}
+                                                                    className={cn(
+                                                                        "inline-block align-middle w-48 min-h-[50px] border-2 border-dashed rounded-lg mx-2 flex items-center justify-center transition-colors",
+                                                                        selectedAnswer ? (isCorrect ? "border-green-500 bg-green-100/50" : "border-destructive bg-red-100/50") : "border-muted-foreground/50 hover:border-primary"
+                                                                    )}
+                                                                >
+                                                                    {selectedAnswer ? (
+                                                                        <div className="font-bold p-2">{selectedAnswer}</div>
+                                                                    ) : (
+                                                                        <span className="text-muted-foreground text-sm">Drag Answer Here</span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <div className="flex flex-wrap justify-center gap-4 pt-4">
+                                                    {currentQuestion.options?.filter(opt => opt.text !== selectedAnswer).map((option, index) => (
+                                                        <div
+                                                            key={index}
+                                                            draggable={selectedAnswer === null}
+                                                            onDragStart={(e) => { e.dataTransfer.setData("text/plain", option.text); }}
+                                                            className={cn(
+                                                                "p-3 text-lg font-semibold bg-card border rounded-lg shadow-md transition-all",
+                                                                selectedAnswer !== null ? "opacity-30 cursor-not-allowed" : "cursor-grab active:cursor-grabbing hover:shadow-lg hover:-translate-y-1"
+                                                            )}
+                                                        >
+                                                            {option.text}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
                                             <div className="w-full space-y-4">
                                                 <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
