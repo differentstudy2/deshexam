@@ -250,7 +250,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [fillInTheBlankAnswers, setFillInTheBlankAnswers] = useState<(string | null)[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
     const [draggedWordInfo, setDraggedWordInfo] = useState<{ word: string, from: 'bank' | number } | null>(null);
-    const [isAnswerShown, setIsAnswerShown] = useState(false);
 
 
     const t = translations[language];
@@ -300,7 +299,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setTextAnswer('');
             setFillInTheBlankAnswers([]);
             setWordBank([]);
-            setIsAnswerShown(false);
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -482,7 +480,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setTextAnswer('');
         setFillInTheBlankAnswers([]);
         setWordBank([]);
-        setIsAnswerShown(false);
         setTimeLeft(timerDuration);
     };
     
@@ -752,6 +749,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setDraggedWordInfo({ word, from });
     };
 
+    const handleDropOnBank = (e: React.DragEvent) => {
+        e.preventDefault();
+        if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
+
+        const { word, from } = draggedWordInfo;
+
+        // Word is coming from a blank, so put it back in the bank
+        const newAnswers = [...fillInTheBlankAnswers];
+        newAnswers[from as number] = null; 
+        setFillInTheBlankAnswers(newAnswers);
+
+        const newWordBank = [...wordBank, word];
+        setWordBank(newWordBank);
+
+        setDraggedWordInfo(null);
+    };
+    
     const handleDropOnBlank = (blankIndex: number) => {
         if (!draggedWordInfo || isSubmitting) return;
 
@@ -778,23 +792,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         setFillInTheBlankAnswers(newAnswers);
         setWordBank(newWordBank);
-        setDraggedWordInfo(null);
-    };
-    
-    const handleDropOnBank = (e: React.DragEvent) => {
-        e.preventDefault();
-        if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
-
-        const { word, from } = draggedWordInfo;
-
-        // Word is coming from a blank, so put it back in the bank
-        const newAnswers = [...fillInTheBlankAnswers];
-        newAnswers[from as number] = null; 
-        setFillInTheBlankAnswers(newAnswers);
-
-        const newWordBank = [...wordBank, word];
-        setWordBank(newWordBank);
-
         setDraggedWordInfo(null);
     };
     
@@ -1028,16 +1025,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 )}>
                                     <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
                                         {currentQuestion && currentQuestion.image && (
-                                            <div className="relative h-48 w-full mb-4">
+                                            <div className="relative h-48 w-full mt-4">
                                                 <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
                                             </div>
                                         )}
                                         
                                          <div className="flex items-start justify-between gap-2">
                                             <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                {currentQuestion?.type === 'Fill in the Blank' ? (
-                                                     <span className="inline">
-                                                        {currentQuestion.text.split('____').map((part, index, arr) => (
+                                                <span className="inline">
+                                                    {currentQuestion?.type === 'Fill in the Blank' ? (
+                                                        currentQuestion.text.split('____').map((part, index, arr) => (
                                                             <React.Fragment key={index}>
                                                                 {part}
                                                                 {index < arr.length - 1 && (
@@ -1068,11 +1065,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                     </div>
                                                                 )}
                                                             </React.Fragment>
-                                                        ))}
-                                                    </span>
-                                                ) : (
-                                                    <span>{currentQuestion?.text}</span>
-                                                )}
+                                                        ))
+                                                    ) : (
+                                                        <span>{currentQuestion?.text}</span>
+                                                    )}
+                                                </span>
                                             </CardTitle>
                                         </div>
                                     </CardHeader>
@@ -1169,20 +1166,19 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </div>
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
-                                            <div className="flex flex-col items-center gap-4">
-                                                {isAnswerShown ? (
-                                                    <div className="space-y-4 w-full p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                                                        <h3 className="font-bold text-lg text-center text-green-700 dark:text-green-300">Answer</h3>
-                                                        {currentQuestion.answerImage && (
-                                                            <div className="relative w-full max-w-sm mx-auto aspect-video">
-                                                                <Image src={currentQuestion.answerImage} alt="Answer" layout="fill" objectFit="contain" className="rounded-lg" />
-                                                            </div>
-                                                        )}
-                                                        {currentQuestion.correctAnswer && <p className="text-lg text-center">{currentQuestion.correctAnswer}</p>}
-                                                        {currentQuestion.answerAudio && <audio controls src={currentQuestion.answerAudio} className="w-full mt-2" />}
+                                            <div className="mt-4 flex flex-col items-center gap-4">
+                                                {currentQuestion.correctAnswer && (
+                                                    <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
+                                                        {currentQuestion.correctAnswer}
                                                     </div>
-                                                ) : (
-                                                    <Button onClick={() => setIsAnswerShown(true)} size="lg">Show Answer</Button>
+                                                )}
+                                                {currentQuestion.answerImage && (
+                                                    <div className="relative w-full max-w-sm mx-auto aspect-video mt-4">
+                                                        <Image src={currentQuestion.answerImage} alt="Answer Image" layout="fill" objectFit="contain" className="rounded-lg" />
+                                                    </div>
+                                                )}
+                                                {currentQuestion.answerAudio && (
+                                                    <audio controls src={currentQuestion.answerAudio} className="w-full mt-4 max-w-sm" />
                                                 )}
                                             </div>
                                         ) : (
