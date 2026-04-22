@@ -59,13 +59,15 @@ const funQuizQuestionSchema = z.object({
     image: z.string().optional(),
     audio: z.string().optional(),
     type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank']),
-    options: z.array(z.object({ 
+    options: z.array(z.object({
         text: z.string().min(1, "Option text cannot be empty."),
         image: z.string().optional(),
         audio: z.string().optional(),
     })).optional(),
     correctAnswer: z.any().optional(),
     explanation: z.string().optional(),
+    wordBank: z.string().optional(),
+    correctAnswerString: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -273,7 +275,7 @@ export default function EditKidsContentPage() {
     const [grades, setGrades] = useState<Grade[]>([]);
     const [states, setStates] = useState<State[]>([]);
     const [loadingMetadata, setLoadingMetadata] = useState(true);
-    
+
     const [categories, setCategories] = useState<KidsZoneCategory[]>([]);
     const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
     const [newCategoryData, setNewCategoryData] = useState({ title: '', description: '', icon: 'ToyBrick' });
@@ -298,7 +300,7 @@ export default function EditKidsContentPage() {
             questions: [],
         },
     });
-    
+
     const selectedClassCategory = form.watch('classCategory');
     const contentType = form.watch('contentType');
 
@@ -326,7 +328,7 @@ export default function EditKidsContentPage() {
                     getStates(),
                     getKidsZoneCategories()
                 ]);
-                
+
                 setSubjects(subjectData);
                 setBoards(boardData);
                 setClassCategories(classData);
@@ -355,20 +357,30 @@ export default function EditKidsContentPage() {
                         featureImage: contentData.featureImage ?? '',
                         category: contentData.category ?? 'Fun Quizzes',
                         body: contentData.body ?? '',
-                        questions: (contentData.questions || []).map((q: any) => ({
-                            ...q,
-                            text: q.text ?? '',
-                            image: q.image ?? '',
-                            audio: q.audio ?? '',
-                            type: q.type || 'Multiple Choice',
-                            options: (q.options || Array(6).fill(null)).map((opt: any) => ({
-                                text: opt?.text ?? '',
-                                image: opt?.image ?? '',
-                                audio: opt?.audio ?? '',
-                            })),
-                            correctAnswer: q.correctAnswer ?? (q.type === 'Fill in the Blank' ? [] : ''),
-                            explanation: q.explanation ?? '',
-                        })),
+                        questions: (contentData.questions || []).map((q: any) => {
+                            let wordBank = '';
+                            let correctAnswerString = '';
+                            if (q.type === 'Fill in the Blank') {
+                                wordBank = q.options?.map((opt: any) => opt.text).join('\n') || '';
+                                correctAnswerString = Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : '';
+                            }
+                            return {
+                                ...q,
+                                text: q.text ?? '',
+                                image: q.image ?? '',
+                                audio: q.audio ?? '',
+                                type: q.type || 'Multiple Choice',
+                                options: (q.options || Array(6).fill(null)).map((opt: any) => ({
+                                    text: opt?.text ?? '',
+                                    image: opt?.image ?? '',
+                                    audio: opt?.audio ?? '',
+                                })),
+                                correctAnswer: q.correctAnswer ?? (q.type === 'Fill in the Blank' ? [] : ''),
+                                explanation: q.explanation ?? '',
+                                wordBank,
+                                correctAnswerString,
+                            }
+                        }),
                     };
                     form.reset(sanitizedData as any);
 
@@ -418,7 +430,7 @@ export default function EditKidsContentPage() {
     const processJsonImport = (jsonString: string) => {
         try {
             const parsed = JSON.parse(jsonString);
-            
+
             if (parsed.title) {
                 form.setValue('title', parsed.title);
             }
@@ -436,7 +448,7 @@ export default function EditKidsContentPage() {
             if(!Array.isArray(questionsToImport)){
                 throw new Error("The 'questions' key must be an array if it exists.");
             }
-            
+
             if (questionsToImport.length > 0) {
                 questionsToImport.forEach((q: any) => {
                     const { success } = funQuizQuestionSchema.safeParse(q);
@@ -457,7 +469,7 @@ export default function EditKidsContentPage() {
             setIsImporting(false);
         }
     };
-    
+
     const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -467,11 +479,11 @@ export default function EditKidsContentPage() {
         reader.readAsText(file);
         if (importFileRef.current) importFileRef.current.value = '';
     };
-      
+
     const handleBulkImportFromText = () => {
-        if (!jsonText.trim()) { 
-            toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."}); 
-            return; 
+        if (!jsonText.trim()) {
+            toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."});
+            return;
         }
         setIsImporting(true);
         processJsonImport(jsonText);
@@ -480,6 +492,21 @@ export default function EditKidsContentPage() {
     const handleUpdate = async (data: FormValues) => {
         setIsSubmitting(true);
         try {
+            const processedQuestions = data.questions?.map(q => {
+                if (q.type === 'Fill in the Blank') {
+                    const options = q.wordBank?.split('\n').filter(Boolean).map(text => ({ text })) || [];
+                    const correctAnswer = q.correctAnswerString?.split(',').map(s => s.trim()).filter(Boolean) || [];
+
+                    const newQ: any = { ...q };
+                    newQ.options = options as any[];
+                    newQ.correctAnswer = correctAnswer;
+                    delete newQ.wordBank;
+                    delete newQ.correctAnswerString;
+                    return newQ;
+                }
+                return q;
+            });
+
              const contentToSave: any = {
                 title: data.title,
                 description: data.description,
@@ -494,7 +521,7 @@ export default function EditKidsContentPage() {
                 testType: data.contentType === 'Quiz' ? 'Quiz' : 'Kids Zone',
                 category: data.category,
                 body: data.contentType === 'Text' ? data.body : null,
-                questions: data.contentType === 'Quiz' ? data.questions : null,
+                questions: data.contentType === 'Quiz' ? processedQuestions : null,
             };
             await updateContent(contentId, contentToSave);
             toast({ title: 'Content Updated!', description: `The item "${data.title}" has been successfully updated.` });
@@ -509,7 +536,7 @@ export default function EditKidsContentPage() {
             setIsSubmitting(false);
         }
     };
-    
+
     const handleGenerateAudio = async (text: string, fieldName: any) => {
         if (!text || !text.trim()) {
             toast({ variant: 'destructive', title: 'No text to generate audio from.' });
@@ -527,7 +554,7 @@ export default function EditKidsContentPage() {
             const downloadURL = await uploadFile(audioFile);
 
             form.setValue(fieldName, downloadURL, { shouldDirty: true });
-            
+
             toast({ title: 'Audio Generated!', description: 'The audio has been generated and linked.' });
         } catch (error) {
             toast({
@@ -539,7 +566,7 @@ export default function EditKidsContentPage() {
             setIsGeneratingAudio(null);
         }
     };
-    
+
     const handleAudioUploadClick = (fieldName: string) => {
         setUploadingAudioField(fieldName);
         audioInputRef.current?.click();
@@ -574,7 +601,7 @@ export default function EditKidsContentPage() {
             toast({ title: 'Category added!' });
             setIsCategoryDialogOpen(false);
             setNewCategoryData({ title: '', description: '', icon: 'ToyBrick' });
-            
+
             const fetched = await getKidsZoneCategories();
             const firestoreCategories = fetched.map((c: any) => ({id: c.id, title: c.title}));
             const combined = [...hardcodedCategories, ...firestoreCategories];
@@ -588,7 +615,7 @@ export default function EditKidsContentPage() {
             setIsAddingCategory(false);
         }
     };
-    
+
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center">
@@ -597,7 +624,7 @@ export default function EditKidsContentPage() {
             </div>
         );
     }
-    
+
     return (
         <div>
              <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
@@ -840,7 +867,7 @@ export default function EditKidsContentPage() {
                                     </FormItem>
                                 )}
                             />
-                            
+
                             <FormField
                                 control={form.control}
                                 name="featureImage"
@@ -887,9 +914,9 @@ export default function EditKidsContentPage() {
                             />
 
                             {contentType === 'Text' && (<FormField control={form.control} name="body" render={({ field }) => (<FormItem><FormLabel>Content Body (for non-quiz content)</FormLabel><FormControl><Textarea {...field} placeholder="Write your article or game description here." className="min-h-[200px] font-mono" value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>)} />)}
-                            
-                             {contentType === 'Quiz' && (
-                                <Card>
+
+                            {contentType === 'Quiz' && (
+                                 <Card>
                                     <CardHeader>
                                         <h3 className="text-lg font-medium">Quiz Questions</h3>
                                     </CardHeader>
@@ -950,7 +977,7 @@ export default function EditKidsContentPage() {
                                                             </FormItem>
                                                         )}/>
                                                     </div>
-                                                    
+
                                                     {questionType === 'Multiple Choice' && (
                                                         <div className="space-y-4 pt-2 border-t">
                                                             <Label>Options</Label>
@@ -974,7 +1001,7 @@ export default function EditKidsContentPage() {
                                                                                             </FormItem>
                                                                                         )}/>
                                                                                     </div>
-                                                                                    
+
                                                                                     <div className="grid grid-cols-2 gap-2">
                                                                                         <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
                                                                                         <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
@@ -1021,56 +1048,36 @@ export default function EditKidsContentPage() {
                                                     {questionType === 'Fill in the Blank' && (
                                                         <div className="space-y-4 pt-2 border-t">
                                                             <FormDescription>
-                                                                Use `____` for each blank in the question. Provide a word bank in the options below and check the box for each correct answer in order.
+                                                                Use `____` for each blank in the question. Provide all possible words (correct and incorrect) in the Word Bank. Then list the correct words in order.
                                                             </FormDescription>
-                                                            <FormItem>
-                                                                <FormLabel>Word Bank & Correct Answers</FormLabel>
-                                                                <div className="space-y-3">
-                                                                    {Array.from({ length: 6 }).map((_, optionIndex) => (
-                                                                        <div key={optionIndex} className="flex items-center gap-4 p-3 border rounded-md">
-                                                                            <FormField
-                                                                                control={form.control}
-                                                                                name={`questions.${index}.options.${optionIndex}.text`}
-                                                                                render={({ field }) => (
-                                                                                    <FormItem className="flex-grow">
-                                                                                        <FormControl>
-                                                                                            <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
-                                                                                        </FormControl>
-                                                                                        <FormMessage />
-                                                                                    </FormItem>
-                                                                                )}
-                                                                            />
-                                                                            <Controller
-                                                                                name={`questions.${index}.correctAnswer`}
-                                                                                control={form.control}
-                                                                                render={({ field: correctField }) => {
-                                                                                    const optionValue = form.getValues(`questions.${index}.options.${optionIndex}.text`);
-                                                                                    return (
-                                                                                        <FormItem className="flex items-center space-x-2">
-                                                                                            <FormControl>
-                                                                                                <Checkbox
-                                                                                                    checked={Array.isArray(correctField.value) && correctField.value.includes(optionValue)}
-                                                                                                    disabled={!optionValue}
-                                                                                                    onCheckedChange={(checked) => {
-                                                                                                        const currentAnswers = Array.isArray(correctField.value) ? correctField.value : [];
-                                                                                                        const newAnswers = checked
-                                                                                                            ? [...currentAnswers, optionValue]
-                                                                                                            : currentAnswers.filter((v: string) => v !== optionValue);
-                                                                                                        correctField.onChange(newAnswers);
-                                                                                                    }}
-                                                                                                />
-                                                                                            </FormControl>
-                                                                                            <FormLabel className="text-sm font-normal">
-                                                                                                Correct
-                                                                                            </FormLabel>
-                                                                                        </FormItem>
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </FormItem>
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`questions.${index}.wordBank`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Word Bank Options</FormLabel>
+                                                                        <FormControl>
+                                                                            <Textarea placeholder={"One word per line...\napple\nball\ncat"} {...field} />
+                                                                        </FormControl>
+                                                                        <FormDescription>These words will be the draggable options for the user.</FormDescription>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`questions.${index}.correctAnswerString`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Correct Answers (in order)</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="e.g., apple, cat" {...field} />
+                                                                        </FormControl>
+                                                                        <FormDescription>Comma-separated list of the correct words, in the order they should appear in the blanks.</FormDescription>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
                                                         </div>
                                                     )}
                                                     <FormField
@@ -1111,4 +1118,3 @@ export default function EditKidsContentPage() {
         </div>
     );
 }
-

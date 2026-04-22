@@ -52,13 +52,16 @@ const funQuizQuestionSchema = z.object({
   image: z.string().optional(),
   audio: z.string().optional(),
   type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank']),
-  options: z.array(z.object({ 
+  options: z.array(z.object({
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
     audio: z.string().optional(),
   })).optional(),
   correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
+  // Temporary fields for Fill in the Blank UI
+  wordBank: z.string().optional(),
+  correctAnswerString: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -204,7 +207,7 @@ export default function AddKidsContentPage() {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [jsonText, setJsonText] = useState('');
   const importFileRef = useRef<HTMLInputElement>(null);
-  
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [classCategories, setClassCategories] = useState<ClassCategory[]>([]);
@@ -250,7 +253,7 @@ export default function AddKidsContentPage() {
     control: form.control,
     name: 'questions',
   });
-  
+
   const selectedClassCategory = form.watch('classCategory');
   const contentType = form.watch('contentType');
 
@@ -259,16 +262,16 @@ export default function AddKidsContentPage() {
     try {
         const fetched = await getKidsZoneCategories();
         const firestoreCategories = fetched.map((c: any) => ({id: c.id, title: c.title}));
-        
+
         const combined = [
             ...hardcodedCategories,
             ...firestoreCategories
         ];
-        
+
         const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
-        
+
         uniqueCategories.sort((a, b) => a.title.localeCompare(b.title));
-        
+
         setCategories(uniqueCategories);
     } catch (error) {
         toast({ variant: 'destructive', title: 'Could not load categories' });
@@ -293,7 +296,7 @@ export default function AddKidsContentPage() {
             setBoards(boardData);
             setClassCategories(classData);
             setStates(stateData);
-            
+
             const firestoreCategories = kidsCategories.map((c: any) => ({id: c.id, title: c.title}));
             const combined = [...hardcodedCategories, ...firestoreCategories];
             const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
@@ -329,7 +332,7 @@ export default function AddKidsContentPage() {
   const processJsonImport = (jsonString: string) => {
     try {
         const parsed = JSON.parse(jsonString);
-        
+
         if (parsed.title) {
             form.setValue('title', parsed.title);
         }
@@ -347,7 +350,7 @@ export default function AddKidsContentPage() {
         if(!Array.isArray(questionsToImport)){
             throw new Error("The 'questions' key must be an array if it exists.");
         }
-        
+
         if (questionsToImport.length > 0) {
             questionsToImport.forEach((q: any) => {
                 const { success } = funQuizQuestionSchema.safeParse(q);
@@ -368,7 +371,7 @@ export default function AddKidsContentPage() {
         setIsImporting(false);
     }
   };
-    
+
   const handleBulkImportFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -378,11 +381,11 @@ export default function AddKidsContentPage() {
     reader.readAsText(file);
     if (importFileRef.current) importFileRef.current.value = '';
   };
-      
+
   const handleBulkImportFromText = () => {
-    if (!jsonText.trim()) { 
-        toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."}); 
-        return; 
+    if (!jsonText.trim()) {
+        toast({ variant: "destructive", title: 'Import Failed', description: "Textbox cannot be empty."});
+        return;
     }
     setIsImporting(true);
     processJsonImport(jsonText);
@@ -391,6 +394,21 @@ export default function AddKidsContentPage() {
   const handleFormSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+        const processedQuestions = data.questions?.map(q => {
+            if (q.type === 'Fill in the Blank') {
+                const options = q.wordBank?.split('\n').filter(Boolean).map(text => ({ text })) || [];
+                const correctAnswer = q.correctAnswerString?.split(',').map(s => s.trim()).filter(Boolean) || [];
+
+                const newQ: Partial<typeof q> = { ...q };
+                newQ.options = options as any[];
+                newQ.correctAnswer = correctAnswer;
+                delete newQ.wordBank;
+                delete newQ.correctAnswerString;
+                return newQ;
+            }
+            return q;
+        });
+
       const contentToSave: any = {
         title: data.title,
         description: data.description,
@@ -406,7 +424,7 @@ export default function AddKidsContentPage() {
         category: data.category,
         access: 'free',
         body: data.contentType === 'Text' ? data.body : null,
-        questions: data.contentType === 'Quiz' ? data.questions : [],
+        questions: data.contentType === 'Quiz' ? processedQuestions : [],
       };
 
       await addContent(contentToSave);
@@ -414,7 +432,7 @@ export default function AddKidsContentPage() {
         title: 'Content Created!',
         description: `The item "${data.title}" has been successfully saved.`,
       });
-      
+
       form.reset();
 
     } catch (error) {
@@ -475,11 +493,11 @@ export default function AddKidsContentPage() {
             control: control,
             name: `questions.${questionIndex}.correctAnswer` as any,
         });
-    
+
         const handleImageUrlChange = (pairIndex: number, field: 'aImage' | 'bImage', url: string) => {
             setValue(`questions.${questionIndex}.correctAnswer.${pairIndex}.${field}`, url);
         };
-    
+
         return (
             <div className='space-y-4'>
                 <FormLabel>Matching Pairs</FormLabel>
@@ -523,7 +541,7 @@ export default function AddKidsContentPage() {
             </div>
         );
     };
-  
+
   return (
     <div>
         <div className="flex justify-between items-center mb-6">
@@ -534,7 +552,7 @@ export default function AddKidsContentPage() {
                 </p>
             </div>
         </div>
-        
+
       <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
 
       <Form {...form}>
@@ -830,7 +848,7 @@ export default function AddKidsContentPage() {
                         </FormItem>
                     )}
                  />
-                
+
                 {contentType === 'Text' && (
                   <FormField
                     control={form.control}
@@ -850,7 +868,7 @@ export default function AddKidsContentPage() {
                     )}
                   />
                 )}
-                
+
                 {contentType === 'Quiz' && (
                     <Card>
                         <CardHeader>
@@ -913,7 +931,7 @@ export default function AddKidsContentPage() {
                                                 </FormItem>
                                             )}/>
                                         </div>
-                                        
+
                                         {questionType === 'Multiple Choice' && (
                                             <div className="space-y-4 pt-2 border-t">
                                                 <Label>Options</Label>
@@ -937,7 +955,7 @@ export default function AddKidsContentPage() {
                                                                                 </FormItem>
                                                                             )}/>
                                                                         </div>
-                                                                        
+
                                                                         <div className="grid grid-cols-2 gap-2">
                                                                             <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
                                                                             <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
@@ -984,56 +1002,36 @@ export default function AddKidsContentPage() {
                                         {questionType === 'Fill in the Blank' && (
                                             <div className="space-y-4 pt-2 border-t">
                                                 <FormDescription>
-                                                    Use `____` for each blank in the question. Provide a word bank in the options below and check the box for each correct answer in order.
+                                                    Use `____` for each blank in the question. Provide all possible words (correct and incorrect) in the Word Bank. Then list the correct words in order.
                                                 </FormDescription>
-                                                <FormItem>
-                                                    <FormLabel>Word Bank & Correct Answers</FormLabel>
-                                                    <div className="space-y-3">
-                                                        {Array.from({ length: 6 }).map((_, optionIndex) => (
-                                                            <div key={optionIndex} className="flex items-center gap-4 p-3 border rounded-md">
-                                                                <FormField
-                                                                    control={form.control}
-                                                                    name={`questions.${index}.options.${optionIndex}.text`}
-                                                                    render={({ field }) => (
-                                                                        <FormItem className="flex-grow">
-                                                                            <FormControl>
-                                                                                <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
-                                                                            </FormControl>
-                                                                            <FormMessage />
-                                                                        </FormItem>
-                                                                    )}
-                                                                />
-                                                                <Controller
-                                                                    name={`questions.${index}.correctAnswer`}
-                                                                    control={form.control}
-                                                                    render={({ field: correctField }) => {
-                                                                        const optionValue = form.getValues(`questions.${index}.options.${optionIndex}.text`);
-                                                                        return (
-                                                                            <FormItem className="flex items-center space-x-2">
-                                                                                <FormControl>
-                                                                                    <Checkbox
-                                                                                        checked={Array.isArray(correctField.value) && correctField.value.includes(optionValue)}
-                                                                                        disabled={!optionValue}
-                                                                                        onCheckedChange={(checked) => {
-                                                                                            const currentAnswers = Array.isArray(correctField.value) ? correctField.value : [];
-                                                                                            const newAnswers = checked
-                                                                                                ? [...currentAnswers, optionValue]
-                                                                                                : currentAnswers.filter((v: string) => v !== optionValue);
-                                                                                            correctField.onChange(newAnswers);
-                                                                                        }}
-                                                                                    />
-                                                                                </FormControl>
-                                                                                <FormLabel className="text-sm font-normal">
-                                                                                    Correct
-                                                                                </FormLabel>
-                                                                            </FormItem>
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </FormItem>
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.wordBank`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Word Bank Options</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea placeholder={"One word per line...\napple\nball\ncat"} {...field} />
+                                                            </FormControl>
+                                                            <FormDescription>These words will be the draggable options for the user.</FormDescription>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`questions.${index}.correctAnswerString`}
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Correct Answers (in order)</FormLabel>
+                                                            <FormControl>
+                                                                <Input placeholder="e.g., apple, cat" {...field} />
+                                                            </FormControl>
+                                                            <FormDescription>Comma-separated list of the correct words, in the order they should appear in the blanks.</FormDescription>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
                                             </div>
                                         )}
                                         <FormField
