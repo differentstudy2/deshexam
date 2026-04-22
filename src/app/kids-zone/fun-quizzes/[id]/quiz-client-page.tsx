@@ -951,8 +951,33 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         )}
                                         
                                          <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                <span>{currentQuestion?.text}</span>
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold flex flex-wrap items-center justify-center text-center w-full">
+                                                {currentQuestion?.type === 'Fill in the Blank' ? (
+                                                    currentQuestion.text.split('____').map((part, index, arr) => (
+                                                        <span key={index} className="mx-1">
+                                                            {part}
+                                                            {index < arr.length - 1 && (
+                                                                <div 
+                                                                    onDragOver={(e) => { e.preventDefault(); if(!selectedAnswer) e.currentTarget.classList.add('border-primary', 'bg-primary/50'); }}
+                                                                    onDragLeave={(e) => e.currentTarget.classList.remove('border-primary', 'bg-primary/50')}
+                                                                    onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove('border-primary', 'bg-primary/50'); handleAnswer(e.dataTransfer.getData("text/plain")); }}
+                                                                    className={cn(
+                                                                        "inline-block align-middle w-48 min-h-[50px] border-2 border-dashed rounded-lg mx-2 flex items-center justify-center transition-colors bg-black/10",
+                                                                        selectedAnswer ? (isCorrect ? "border-green-500 bg-green-500/30" : "border-destructive bg-red-500/30") : "border-white/50 hover:border-white"
+                                                                    )}
+                                                                >
+                                                                    {selectedAnswer ? (
+                                                                        <div className="font-bold p-2 text-white">{selectedAnswer}</div>
+                                                                    ) : (
+                                                                        <span className="text-white/70 text-sm font-normal">Drag Answer Here</span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span>{currentQuestion?.text}</span>
+                                                )}
                                             </CardTitle>
                                         </div>
                                     </CardHeader>
@@ -1019,7 +1044,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer') ? (
+                                        ) : currentQuestion?.type === 'Short Answer' ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
                                                 <Input 
                                                     type="text" 
@@ -1038,46 +1063,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 </Button>
                                             </form>
                                         ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options ? (
-                                            <div className="space-y-8 text-center">
-                                                <div className="text-2xl font-semibold flex flex-wrap items-center justify-center">
-                                                    {currentQuestion.text.split('____').map((part, index, arr) => (
-                                                        <span key={index}>
-                                                            {part}
-                                                            {index < arr.length - 1 && (
-                                                                <div 
-                                                                    onDragOver={(e) => { e.preventDefault(); if(!selectedAnswer) e.currentTarget.classList.add('border-primary', 'bg-primary/10'); }}
-                                                                    onDragLeave={(e) => e.currentTarget.classList.remove('border-primary', 'bg-primary/10')}
-                                                                    onDrop={(e) => { e.preventDefault(); e.currentTarget.classList.remove('border-primary', 'bg-primary/10'); handleAnswer(e.dataTransfer.getData("text/plain")); }}
-                                                                    className={cn(
-                                                                        "inline-block align-middle w-48 min-h-[50px] border-2 border-dashed rounded-lg mx-2 flex items-center justify-center transition-colors",
-                                                                        selectedAnswer ? (isCorrect ? "border-green-500 bg-green-100/50" : "border-destructive bg-red-100/50") : "border-muted-foreground/50 hover:border-primary"
-                                                                    )}
-                                                                >
-                                                                    {selectedAnswer ? (
-                                                                        <div className="font-bold p-2">{selectedAnswer}</div>
-                                                                    ) : (
-                                                                        <span className="text-muted-foreground text-sm">Drag Answer Here</span>
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <div className="flex flex-wrap justify-center gap-4 pt-4">
-                                                    {currentQuestion.options?.filter(opt => opt.text !== selectedAnswer).map((option, index) => (
-                                                        <div
-                                                            key={index}
-                                                            draggable={selectedAnswer === null}
-                                                            onDragStart={(e) => { e.dataTransfer.setData("text/plain", option.text); }}
-                                                            className={cn(
-                                                                "p-3 text-lg font-semibold bg-card border rounded-lg shadow-md transition-all",
-                                                                selectedAnswer !== null ? "opacity-30 cursor-not-allowed" : "cursor-grab active:cursor-grabbing hover:shadow-lg hover:-translate-y-1"
-                                                            )}
-                                                        >
-                                                            {option.text}
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                            <div className="flex flex-wrap justify-center gap-4 pt-4">
+                                                {currentQuestion.options
+                                                    .filter(opt => selectedAnswer !== opt.text)
+                                                    .map((option, index) => (
+                                                    <div
+                                                        key={index}
+                                                        draggable={selectedAnswer === null}
+                                                        onDragStart={(e) => { e.dataTransfer.setData("text/plain", option.text); }}
+                                                        className={cn(
+                                                            "h-auto p-4 text-2xl font-bold rounded-xl shadow-lg bg-white dark:bg-slate-800 transition-transform",
+                                                            selectedAnswer !== null ? "opacity-30 cursor-not-allowed" : "cursor-grab active:cursor-grabbing hover:scale-105"
+                                                        )}
+                                                    >
+                                                        {option.text}
+                                                    </div>
+                                                ))}
                                             </div>
                                         ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
                                             <div className="w-full space-y-4">
