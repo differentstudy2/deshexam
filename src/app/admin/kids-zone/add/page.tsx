@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
@@ -26,7 +25,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, uploadFile, getSubjects, getBoards, getClasses, getStates, getGradesByClass, getKidsZoneCategories, addKidsZoneCategory } from '@/lib/firebase/firestore';
-import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Copy } from 'lucide-react';
+import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Copy, GripVertical } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
@@ -51,13 +50,13 @@ const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Matching']),
   options: z.array(z.object({ 
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
     audio: z.string().optional(),
   })).optional(),
-  correctAnswer: z.string().min(1, "Please provide a correct answer."),
+  correctAnswer: z.any().optional(),
   explanation: z.string().optional(),
 });
 
@@ -469,6 +468,43 @@ export default function AddKidsContentPage() {
             setIsAddingCategory(false);
         }
     };
+
+    const MatchingPairsField = ({ control, questionIndex }: { control: any, questionIndex: number }) => {
+        const { fields, append, remove } = useFieldArray({
+            control,
+            name: `questions.${questionIndex}.correctAnswer` as any,
+        });
+    
+        return (
+            <div className='space-y-4'>
+                <FormLabel>Matching Pairs</FormLabel>
+                <FormDescription>Define the correct pairs. The B column will be shuffled for the user.</FormDescription>
+                <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
+                    <div>Column A</div>
+                    <div></div>
+                    <div>Column B</div>
+                </div>
+                {fields.map((pair, pairIndex) => (
+                     <div key={pair.id} className="p-4 border rounded-lg space-y-3">
+                        <div className="flex justify-between items-center">
+                            <FormLabel className="text-sm">Pair {pairIndex + 1}</FormLabel>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => remove(pairIndex)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                        </div>
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
+                            <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.a`} render={({ field }) => <Input {...field} placeholder={`Item A${pairIndex + 1}`} />} />
+                            <div className="pt-2">
+                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                             <FormField control={control} name={`questions.${questionIndex}.correctAnswer.${pairIndex}.b`} render={({ field }) => <Input {...field} placeholder={`Item B${pairIndex + 1}`} />} />
+                        </div>
+                     </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={() => append({ a: '', b: '' })}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add Pair
+                </Button>
+            </div>
+        );
+    };
   
   return (
     <div>
@@ -819,12 +855,20 @@ export default function AddKidsContentPage() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Question Type</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        if (value === 'Matching') {
+                                                            form.setValue(`questions.${index}.correctAnswer`, []);
+                                                            form.setValue(`questions.${index}.options`, undefined);
+                                                        } else if (value === 'Multiple Choice' && !form.getValues(`questions.${index}.options`)) {
+                                                            form.setValue(`questions.${index}.options`, [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]);
+                                                        }
+                                                    }} defaultValue={field.value}>
                                                         <FormControl><SelectTrigger><SelectValue placeholder="Select type..."/></SelectTrigger></FormControl>
                                                         <SelectContent>
                                                             <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
                                                             <SelectItem value="True/False">True/False</SelectItem>
-                                                            <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                            <SelectItem value="Matching">Matching</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -870,10 +914,10 @@ export default function AddKidsContentPage() {
                                                                             <FormControl>
                                                                                 <RadioGroupItem value={form.watch(`questions.${index}.options.${optionIndex}.text`)} disabled={!form.watch(`questions.${index}.options.${optionIndex}.text`)} />
                                                                             </FormControl>
-                                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field }) => (
+                                                                            <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.text`} render={({ field: optionField }) => (
                                                                                 <FormItem className="flex-1">
                                                                                     <FormLabel className="sr-only">Option {optionIndex + 1} Text</FormLabel>
-                                                                                    <FormControl><Input {...field} /></FormControl>
+                                                                                    <FormControl><Input {...optionField} /></FormControl>
                                                                                     <FormMessage />
                                                                                 </FormItem>
                                                                             )}/>
@@ -892,16 +936,10 @@ export default function AddKidsContentPage() {
                                                                                             <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
                                                                                                 {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                                             </Button>
-                                                                                            {!!audioField.value && (
-                                                                                                <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}>
-                                                                                                    <Trash2 className="w-4 h-4" />
-                                                                                                </Button>
-                                                                                            )}
+                                                                                            {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}
                                                                                         </div>
                                                                                     </FormControl>
-                                                                                    {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (
-                                                                                        <audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" />
-                                                                                    )}
+                                                                                    {form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}
                                                                                     <FormMessage />
                                                                                 </FormItem>
                                                                             )}/>
@@ -941,20 +979,8 @@ export default function AddKidsContentPage() {
                                                 />
                                             </div>
                                         )}
-                                        {questionType === 'Short Answer' && (
-                                            <div className="space-y-4 pt-2 border-t">
-                                                 <FormField
-                                                    control={form.control}
-                                                    name={`questions.${index}.correctAnswer`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>Correct Answer</FormLabel>
-                                                            <FormControl><Input {...field} /></FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
+                                        {questionType === 'Matching' && (
+                                            <MatchingPairsField control={form.control} questionIndex={index} />
                                         )}
                                         <FormField
                                             control={form.control}
@@ -1073,5 +1099,3 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
-
-
