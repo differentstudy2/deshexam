@@ -1029,10 +1029,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         )}
                                         
                                          <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold flex flex-wrap items-center justify-start gap-x-2">
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold leading-relaxed">
                                                 {currentQuestion?.type === 'Fill in the Blank' ? (
                                                     currentQuestion.text.split('____').map((part, index, arr) => (
-                                                        <span key={index}>
+                                                        <React.Fragment key={index}>
                                                             {part}
                                                             {index < arr.length - 1 && (
                                                                 <div 
@@ -1061,7 +1061,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                     )}
                                                                 </div>
                                                             )}
-                                                        </span>
+                                                        </React.Fragment>
                                                     ))
                                                 ) : (
                                                     <span>{currentQuestion?.text}</span>
@@ -1132,26 +1132,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : currentQuestion?.type === 'Short Answer' ? (
-                                            <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
-                                                <Input 
-                                                    type="text" 
-                                                    placeholder="Your answer"
-                                                    value={textAnswer}
-                                                    onChange={(e) => setTextAnswer(e.target.value)}
-                                                    disabled={selectedAnswer !== null}
-                                                    className="text-lg h-12"
-                                                />
-                                                <Button 
-                                                    type="submit" 
-                                                    disabled={selectedAnswer !== null || !textAnswer.trim()}
-                                                    size="lg"
-                                                >
-                                                    Submit
-                                                </Button>
-                                            </form>
-                                        ) : currentQuestion?.type === 'Fill in the Blank' ? (
-                                            <div className="flex flex-col items-center gap-6">
+                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
+                                             <div className="flex flex-col items-center gap-6">
                                                 <div 
                                                     className="flex flex-wrap justify-center gap-4 p-4 rounded-lg bg-secondary min-h-[70px] w-full"
                                                     onDragOver={(e) => e.preventDefault()}
