@@ -44,6 +44,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 const funQuizQuestionSchema = z.object({
@@ -874,12 +875,8 @@ export default function AddKidsContentPage() {
                                                     <FormLabel>Question Type</FormLabel>
                                                     <Select onValueChange={(value) => {
                                                         field.onChange(value);
-                                                        if (value === 'Matching') {
-                                                            form.setValue(`questions.${index}.correctAnswer`, []);
-                                                            form.setValue(`questions.${index}.options`, undefined);
-                                                        } else if (value === 'Multiple Choice' || value === 'Fill in the Blank') {
-                                                            form.setValue(`questions.${index}.options`, [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]);
-                                                        }
+                                                        form.setValue(`questions.${index}.options`, Array(6).fill({ text: '', image: '', audio: '' }));
+                                                        form.setValue(`questions.${index}.correctAnswer`, value === 'Matching' ? [] : '');
                                                     }} defaultValue={field.value}>
                                                         <FormControl><SelectTrigger><SelectValue placeholder="Select type..."/></SelectTrigger></FormControl>
                                                         <SelectContent>
@@ -965,13 +962,13 @@ export default function AddKidsContentPage() {
                                                             <FormLabel>Correct Answer</FormLabel>
                                                             <FormControl>
                                                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="flex space-x-4">
-                                                                    <FormItem className="flex items-center space-x-2">
+                                                                    <FormItem className="flex items-center space-x-2 space-y-0">
                                                                         <FormControl><RadioGroupItem value="True" /></FormControl>
-                                                                        <FormLabel>True</FormLabel>
+                                                                        <FormLabel className="font-normal">True</FormLabel>
                                                                     </FormItem>
-                                                                    <FormItem className="flex items-center space-x-2">
+                                                                    <FormItem className="flex items-center space-x-2 space-y-0">
                                                                         <FormControl><RadioGroupItem value="False" /></FormControl>
-                                                                        <FormLabel>False</FormLabel>
+                                                                        <FormLabel className="font-normal">False</FormLabel>
                                                                     </FormItem>
                                                                 </RadioGroup>
                                                             </FormControl>
@@ -987,40 +984,56 @@ export default function AddKidsContentPage() {
                                         {questionType === 'Fill in the Blank' && (
                                             <div className="space-y-4 pt-2 border-t">
                                                 <FormDescription>
-                                                    Use "____" in the question text for the blank. Provide options below, one of which must be the correct answer.
+                                                    Use `____` for each blank in the question. Provide a word bank in the options below and check the box for each correct answer in order.
                                                 </FormDescription>
-                                                <FormLabel>Options (for Drag & Drop)</FormLabel>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {[0, 1, 2, 3].map(optionIndex => (
-                                                        <FormField
-                                                            key={optionIndex}
-                                                            control={form.control}
-                                                            name={`questions.${index}.options.${optionIndex}.text`}
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel className="text-xs">Option {optionIndex + 1}</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`questions.${index}.correctAnswer`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>Correct Answer</FormLabel>
-                                                            <FormControl>
-                                                                <Input {...field} placeholder="Type the correct word from the options above" />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
+                                                <FormItem>
+                                                    <FormLabel>Word Bank & Correct Answers</FormLabel>
+                                                    <div className="space-y-3">
+                                                        {Array.from({ length: 6 }).map((_, optionIndex) => (
+                                                            <div key={optionIndex} className="flex items-center gap-4 p-3 border rounded-md">
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name={`questions.${index}.options.${optionIndex}.text`}
+                                                                    render={({ field }) => (
+                                                                        <FormItem className="flex-grow">
+                                                                            <FormControl>
+                                                                                <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
+                                                                            </FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                                <Controller
+                                                                    name={`questions.${index}.correctAnswer`}
+                                                                    control={form.control}
+                                                                    render={({ field: correctField }) => {
+                                                                        const optionValue = form.getValues(`questions.${index}.options.${optionIndex}.text`);
+                                                                        return (
+                                                                            <FormItem className="flex items-center space-x-2">
+                                                                                <FormControl>
+                                                                                    <Checkbox
+                                                                                        checked={Array.isArray(correctField.value) && correctField.value.includes(optionValue)}
+                                                                                        disabled={!optionValue}
+                                                                                        onCheckedChange={(checked) => {
+                                                                                            const currentAnswers = Array.isArray(correctField.value) ? correctField.value : [];
+                                                                                            const newAnswers = checked
+                                                                                                ? [...currentAnswers, optionValue]
+                                                                                                : currentAnswers.filter((v: string) => v !== optionValue);
+                                                                                            correctField.onChange(newAnswers);
+                                                                                        }}
+                                                                                    />
+                                                                                </FormControl>
+                                                                                <FormLabel className="text-sm font-normal">
+                                                                                    Correct
+                                                                                </FormLabel>
+                                                                            </FormItem>
+                                                                        );
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </FormItem>
                                             </div>
                                         )}
                                         <FormField

@@ -50,6 +50,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 import Image from 'next/image';
+import { Checkbox } from '@/components/ui/checkbox';
+
 
 const funQuizQuestionSchema = z.object({
     id: z.string().optional(),
@@ -118,8 +120,7 @@ const hardcodedCategories = [
 ];
 
 
-const jsonExampleFull = `
-{
+const jsonExampleFull = `{
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "tags": "Animals, Sounds, Fun",
@@ -140,11 +141,9 @@ const jsonExampleFull = `
       "explanation": "Cows are known for their 'moo' sound."
     }
   ]
-}
-`;
+}`;
 
-const jsonExampleTextOnly = `
-{
+const jsonExampleTextOnly = `{
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "tags": "Animals, Sounds, Fun",
@@ -162,11 +161,9 @@ const jsonExampleTextOnly = `
       "explanation": "Two plus two equals four."
     }
   ]
-}
-`;
+}`;
 
-const jsonExampleMCQ = `
-{
+const jsonExampleMCQ = `{
   "questions": [
     {
       "text": "What color is the sky on a clear day?",
@@ -181,11 +178,9 @@ const jsonExampleMCQ = `
       "explanation": "The sky appears blue because of how the Earth's atmosphere scatters sunlight."
     }
   ]
-}
-`;
+}`;
 
-const jsonExampleTF = `
-{
+const jsonExampleTF = `{
   "questions": [
     {
       "text": "The Earth is flat.",
@@ -194,8 +189,7 @@ const jsonExampleTF = `
       "explanation": "The Earth is roughly a sphere."
     }
   ]
-}
-`;
+}`;
 
 const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
     const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
@@ -210,7 +204,6 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
     return (
         <div className='space-y-4'>
             <FormLabel>Matching Pairs</FormLabel>
-            <FormDescription>Define the correct pairs. The B column will be shuffled for the user.</FormDescription>
             <div className='grid grid-cols-[1fr_auto_1fr] items-center gap-2 font-semibold text-center'>
                 <div>Column A</div>
                 <div></div>
@@ -247,6 +240,7 @@ const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any
         </div>
     );
 };
+
 
 export default function EditKidsContentPage() {
     const { toast } = useToast();
@@ -358,12 +352,12 @@ export default function EditKidsContentPage() {
                             image: q.image ?? '',
                             audio: q.audio ?? '',
                             type: q.type || 'Multiple Choice',
-                            options: (q.options || Array(4).fill(null)).map((opt: any) => ({
+                            options: (q.options || Array(6).fill(null)).map((opt: any) => ({
                                 text: opt?.text ?? '',
                                 image: opt?.image ?? '',
                                 audio: opt?.audio ?? '',
                             })),
-                            correctAnswer: q.correctAnswer ?? '',
+                            correctAnswer: q.correctAnswer ?? (q.type === 'Fill in the Blank' ? [] : ''),
                             explanation: q.explanation ?? '',
                         })),
                     };
@@ -582,44 +576,8 @@ export default function EditKidsContentPage() {
             setIsAddingCategory(false);
         }
     };
+
     
-    const handleCopyQuestion = (index: number) => {
-        const questionToCopy = form.getValues(`questions.${index}`);
-        
-        let plainText = `${questionToCopy.text}\n`;
-
-        if (questionToCopy.type === 'Multiple Choice' && questionToCopy.options) {
-            questionToCopy.options.forEach((opt, i) => {
-                plainText += `Option "${String.fromCharCode(65 + i)}": "${opt.text}"\n`;
-            });
-            const correctOptionIndex = questionToCopy.options.findIndex(opt => opt.text === questionToCopy.correctAnswer);
-            if (correctOptionIndex > -1) {
-                const correctOptionLetter = String.fromCharCode(65 + correctOptionIndex);
-                plainText += `Correct Answer Option "${correctOptionLetter}": "${questionToCopy.correctAnswer}"\n`;
-            }
-        } else if (questionToCopy.type === 'True/False') {
-            plainText += `Option "A": "True"\n`;
-            plainText += `Option "B": "False"\n`;
-            const correctOptionLetter = questionToCopy.correctAnswer === 'True' ? 'A' : 'B';
-            plainText += `Correct Answer Option "${correctOptionLetter}": "${questionToCopy.correctAnswer}"\n`;
-        } else {
-            plainText += `Answer: ${questionToCopy.correctAnswer}\n`;
-        }
-
-        navigator.clipboard.writeText(plainText).then(() => {
-            toast({
-                title: "Question Copied",
-                description: "The question has been copied as plain text.",
-            });
-        }).catch(err => {
-            toast({
-                variant: 'destructive',
-                title: "Copy Failed",
-                description: "Could not copy question to clipboard.",
-            });
-        });
-    };
-
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center">
@@ -628,10 +586,10 @@ export default function EditKidsContentPage() {
             </div>
         );
     }
-
+    
     return (
         <div>
-             <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
+            <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
             <div className="mb-6">
                 <Button asChild variant="outline">
                     <Link href="/admin/kids-zone/manage">
@@ -943,12 +901,8 @@ export default function EditKidsContentPage() {
                                                                 <FormLabel>Question Type</FormLabel>
                                                                 <Select onValueChange={(value) => {
                                                                     field.onChange(value);
-                                                                    if (value === 'Matching') {
-                                                                        form.setValue(`questions.${index}.correctAnswer`, []);
-                                                                        form.setValue(`questions.${index}.options`, undefined);
-                                                                    } else if (value === 'Multiple Choice' || value === 'Fill in the Blank') {
-                                                                        form.setValue(`questions.${index}.options`, [{ text: '' }, { text: '' }, { text: '' }, { text: '' }]);
-                                                                    }
+                                                                    form.setValue(`questions.${index}.options`, Array(6).fill({ text: '', image: '', audio: '' }));
+                                                                    form.setValue(`questions.${index}.correctAnswer`, value === 'Matching' ? [] : '');
                                                                 }} defaultValue={field.value}>
                                                                     <FormControl><SelectTrigger><SelectValue placeholder="Select type..."/></SelectTrigger></FormControl>
                                                                     <SelectContent>
@@ -1007,6 +961,7 @@ export default function EditKidsContentPage() {
                                                                                             </FormItem>
                                                                                         )}/>
                                                                                     </div>
+                                                                                    
                                                                                     <div className="grid grid-cols-2 gap-2">
                                                                                         <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
                                                                                         <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
@@ -1048,45 +1003,62 @@ export default function EditKidsContentPage() {
                                                         </div>
                                                     )}
                                                     {questionType === 'Matching' && (
-                                                        <MatchingPairsField control={control} questionIndex={index} setValue={setValue} />
+                                                        <MatchingPairsField control={form.control} questionIndex={index} setValue={form.setValue} />
                                                     )}
                                                     {questionType === 'Fill in the Blank' && (
                                                         <div className="space-y-4 pt-2 border-t">
                                                             <FormDescription>
-                                                                Use "____" in the question text for the blank. Provide options below, one of which must be the correct answer.
+                                                                Use `____` for each blank in the question. Provide a word bank in the options below and check the box for each correct answer in order.
                                                             </FormDescription>
-                                                            <FormLabel>Options (for Drag & Drop)</FormLabel>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                                {[0, 1, 2, 3].map(optionIndex => (
-                                                                    <FormField
-                                                                        key={optionIndex}
-                                                                        control={control}
-                                                                        name={`questions.${index}.options.${optionIndex}.text`}
-                                                                        render={({ field }) => (
-                                                                            <FormItem>
-                                                                                <FormLabel className="text-xs">Option {optionIndex + 1}</FormLabel>
-                                                                                <FormControl>
-                                                                                    <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
-                                                                                </FormControl>
-                                                                                <FormMessage />
-                                                                            </FormItem>
-                                                                        )}
-                                                                    />
-                                                                ))}
-                                                            </div>
-                                                            <FormField
-                                                                control={form.control}
-                                                                name={`questions.${index}.correctAnswer`}
-                                                                render={({ field }) => (
-                                                                    <FormItem>
-                                                                        <FormLabel>Correct Answer</FormLabel>
-                                                                        <FormControl>
-                                                                            <Input {...field} placeholder="Type the correct word from the options above" />
-                                                                        </FormControl>
-                                                                        <FormMessage />
-                                                                    </FormItem>
-                                                                )}
-                                                            />
+                                                            <FormItem>
+                                                                <FormLabel>Word Bank & Correct Answers</FormLabel>
+                                                                <div className="space-y-3">
+                                                                    {Array.from({ length: 6 }).map((_, optionIndex) => (
+                                                                        <div key={optionIndex} className="flex items-center gap-4 p-3 border rounded-md">
+                                                                            <FormField
+                                                                                control={form.control}
+                                                                                name={`questions.${index}.options.${optionIndex}.text`}
+                                                                                render={({ field }) => (
+                                                                                    <FormItem className="flex-grow">
+                                                                                        <FormControl>
+                                                                                            <Input {...field} placeholder={`Option ${optionIndex + 1}`} />
+                                                                                        </FormControl>
+                                                                                        <FormMessage />
+                                                                                    </FormItem>
+                                                                                )}
+                                                                            />
+                                                                            <Controller
+                                                                                name={`questions.${index}.correctAnswer`}
+                                                                                control={form.control}
+                                                                                render={({ field: correctField }) => {
+                                                                                    const optionValue = form.getValues(`questions.${index}.options.${optionIndex}.text`);
+                                                                                    return (
+                                                                                        <FormItem className="flex items-center space-x-2">
+                                                                                            <FormControl>
+                                                                                                <Checkbox
+                                                                                                    checked={Array.isArray(correctField.value) && correctField.value.includes(optionValue)}
+                                                                                                    disabled={!optionValue}
+                                                                                                    onCheckedChange={(checked) => {
+                                                                                                        const currentAnswers = Array.isArray(correctField.value) ? correctField.value : [];
+                                                                                                        const newAnswers = checked
+                                                                                                            ? [...currentAnswers, optionValue]
+                                                                                                            : currentAnswers.filter((v: string) => v !== optionValue);
+                                                                                                        correctField.onChange(newAnswers);
+                                                                                                    }}
+                                                                                                />
+                                                                                            </FormControl>
+                                                                                            <FormLabel className="text-sm font-normal">
+                                                                                                Correct
+                                                                                            </FormLabel>
+                                                                                        </FormItem>
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <FormMessage />
+                                                            </FormItem>
                                                         </div>
                                                     )}
                                                     <FormField
@@ -1198,8 +1170,9 @@ export default function EditKidsContentPage() {
                             )}
                         </CardContent>
                     </Card>
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
-                      {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
+                  <Button type="submit" disabled={isSubmitting}>
+                      <Save className="mr-2 h-4 w-4"/>
+                      {isSubmitting ? "Saving..." : "Save Content"}
                   </Button>
                 </form>
               </Form>
