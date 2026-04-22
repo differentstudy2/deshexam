@@ -51,7 +51,7 @@ const funQuizQuestionSchema = z.object({
   text: z.string().min(1, 'Question text cannot be empty.'),
   image: z.string().optional(),
   audio: z.string().optional(),
-  type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank', 'Descriptive']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank', 'Direct Question']),
   options: z.array(z.object({
     text: z.string().min(1, "Option text cannot be empty."),
     image: z.string().optional(),
@@ -903,7 +903,7 @@ export default function AddKidsContentPage() {
                                                             <SelectItem value="True/False">True/False</SelectItem>
                                                             <SelectItem value="Matching">Matching</SelectItem>
                                                             <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                                            <SelectItem value="Descriptive">Descriptive</SelectItem>
+                                                            <SelectItem value="Direct Question">Direct Question</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -1036,7 +1036,7 @@ export default function AddKidsContentPage() {
                                                 />
                                             </div>
                                         )}
-                                         {questionType === 'Descriptive' && (
+                                         {questionType === 'Direct Question' && (
                                             <div className="space-y-4 pt-2 border-t">
                                                 <FormField
                                                     control={form.control}
