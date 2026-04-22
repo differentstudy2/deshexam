@@ -26,7 +26,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { getContentById, updateContent, uploadFile, getSubjects, getBoards, getClasses, getStates, getGradesByClass, getKidsZoneCategories, addKidsZoneCategory } from '@/lib/firebase/firestore';
-import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson, Copy, Sparkles, GripVertical } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, PlusCircle, Trash2, Upload, FileJson, Copy, Sparkles, GripVertical, Image as ImageIcon } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
@@ -120,7 +120,8 @@ const hardcodedCategories = [
 ];
 
 
-const jsonExampleFull = `{
+const jsonExampleFull = `
+{
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "tags": "Animals, Sounds, Fun",
@@ -141,9 +142,11 @@ const jsonExampleFull = `{
       "explanation": "Cows are known for their 'moo' sound."
     }
   ]
-}`;
+}
+`;
 
-const jsonExampleTextOnly = `{
+const jsonExampleTextOnly = `
+{
   "title": "Fun Animal Sounds Quiz (~60 chars)",
   "description": "Can you guess which animal makes which sound? A fun and educational quiz for kids with real animal pictures and sounds. (~160 chars)",
   "tags": "Animals, Sounds, Fun",
@@ -161,9 +164,11 @@ const jsonExampleTextOnly = `{
       "explanation": "Two plus two equals four."
     }
   ]
-}`;
+}
+`;
 
-const jsonExampleMCQ = `{
+const jsonExampleMCQ = `
+{
   "questions": [
     {
       "text": "What color is the sky on a clear day?",
@@ -178,9 +183,11 @@ const jsonExampleMCQ = `{
       "explanation": "The sky appears blue because of how the Earth's atmosphere scatters sunlight."
     }
   ]
-}`;
+}
+`;
 
-const jsonExampleTF = `{
+const jsonExampleTF = `
+{
   "questions": [
     {
       "text": "The Earth is flat.",
@@ -189,7 +196,8 @@ const jsonExampleTF = `{
       "explanation": "The Earth is roughly a sphere."
     }
   ]
-}`;
+}
+`;
 
 const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
     const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
@@ -248,6 +256,7 @@ export default function EditKidsContentPage() {
     const params = useParams();
     const contentId = params.id as string;
     const [loading, setLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUploadingAudio, setIsUploadingAudio] = useState(false);
     const audioInputRef = useRef<HTMLInputElement>(null);
     const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
@@ -469,6 +478,7 @@ export default function EditKidsContentPage() {
     };
 
     const handleUpdate = async (data: FormValues) => {
+        setIsSubmitting(true);
         try {
              const contentToSave: any = {
                 title: data.title,
@@ -495,6 +505,8 @@ export default function EditKidsContentPage() {
                 title: 'Error Updating Content',
                 description: (error as Error).message,
             });
+        } finally {
+            setIsSubmitting(false);
         }
     };
     
@@ -576,7 +588,6 @@ export default function EditKidsContentPage() {
             setIsAddingCategory(false);
         }
     };
-
     
     if (loading) {
         return (
@@ -589,7 +600,7 @@ export default function EditKidsContentPage() {
     
     return (
         <div>
-            <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
+             <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
             <div className="mb-6">
                 <Button asChild variant="outline">
                     <Link href="/admin/kids-zone/manage">
@@ -924,7 +935,9 @@ export default function EditKidsContentPage() {
                                                                 <FormControl>
                                                                     <div className="flex items-center gap-2">
                                                                         <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
-                                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>
+                                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
+                                                                            {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                        </Button>
                                                                         {!!field.value && (
                                                                             <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
                                                                                 <Trash2 className="w-4 h-4" />
@@ -1057,7 +1070,6 @@ export default function EditKidsContentPage() {
                                                                         </div>
                                                                     ))}
                                                                 </div>
-                                                                <FormMessage />
                                                             </FormItem>
                                                         </div>
                                                     )}
@@ -1084,86 +1096,6 @@ export default function EditKidsContentPage() {
                                             <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}>
                                                 <PlusCircle className="mr-2 h-4 w-4" /> Add Question
                                             </Button>
-                                            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-                                                <DialogTrigger asChild>
-                                                    <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
-                                                </DialogTrigger>
-                                                 <DialogContent className="sm:max-w-2xl">
-                                                    <DialogHeader>
-                                                        <DialogTitle>Bulk Import Quiz Questions</DialogTitle>
-                                                        <DialogDescription>
-                                                            Upload a JSON file or paste JSON text. The content will be appended to the current question list.
-                                                        </DialogDescription>
-                                                    </DialogHeader>
-                                                    <ScrollArea className="max-h-[60vh] pr-6">
-                                                        <Tabs defaultValue="paste">
-                                                            <TabsList className="grid w-full grid-cols-2">
-                                                                <TabsTrigger value="paste">Paste JSON</TabsTrigger>
-                                                                <TabsTrigger value="upload">Upload File</TabsTrigger>
-                                                            </TabsList>
-                                                            <TabsContent value="paste" className="pt-4 space-y-4">
-                                                                <Textarea
-                                                                    placeholder='Paste your JSON content here...'
-                                                                    value={jsonText}
-                                                                    onChange={(e) => setJsonText(e.target.value)}
-                                                                    className="min-h-[200px] font-mono text-xs"
-                                                                    disabled={isImporting}
-                                                                />
-                                                                <Button onClick={handleBulkImportFromText} disabled={isImporting || !jsonText.trim()}>
-                                                                    {isImporting ? <><Loader2 className="animate-spin mr-2"/>Processing...</> : 'Import from Text'}
-                                                                </Button>
-                                                            </TabsContent>
-                                                            <TabsContent value="upload" className="pt-4">
-                                                                <div className="grid w-full max-w-sm items-center gap-1.5">
-                                                                    <Label htmlFor="json-import">JSON/TXT File</Label>
-                                                                    <Input id="json-import" type="file" accept=".json,.txt" onChange={handleBulkImportFromFile} ref={importFileRef} disabled={isImporting} />
-                                                                    {isImporting && <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin" /> Importing...</p>}
-                                                                </div>
-                                                            </TabsContent>
-                                                        </Tabs>
-                                                        <Accordion type="single" collapsible className="w-full mt-4">
-                                                            <AccordionItem value="item-1">
-                                                                <AccordionTrigger>View Example JSON Formats</AccordionTrigger>
-                                                                <AccordionContent>
-                                                                    <p className="text-sm text-muted-foreground mb-4">Your JSON file can contain a `title` and `description` to update the form, or just a `questions` array to append questions.</p>
-                                                                    <Tabs defaultValue="full" className="w-full">
-                                                                        <TabsList className="h-auto flex-wrap justify-start">
-                                                                            <TabsTrigger value="full">Full Example (Multimedia)</TabsTrigger>
-                                                                            <TabsTrigger value="text-only">Text-Only</TabsTrigger>
-                                                                            <TabsTrigger value="mcq">MCQ</TabsTrigger>
-                                                                            <TabsTrigger value="tf">True/False</TabsTrigger>
-                                                                        </TabsList>
-                                                                         <TabsContent value="full">
-                                                                            <div className="relative mt-2">
-                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFull)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFull}</pre></ScrollArea>
-                                                                            </div>
-                                                                        </TabsContent>
-                                                                        <TabsContent value="text-only">
-                                                                            <div className="relative mt-2">
-                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTextOnly)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTextOnly}</pre></ScrollArea>
-                                                                            </div>
-                                                                        </TabsContent>
-                                                                        <TabsContent value="mcq">
-                                                                            <div className="relative mt-2">
-                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMCQ)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMCQ}</pre></ScrollArea>
-                                                                            </div>
-                                                                        </TabsContent>
-                                                                        <TabsContent value="tf">
-                                                                            <div className="relative mt-2">
-                                                                                <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleTF)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
-                                                                                <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></ScrollArea>
-                                                                            </div>
-                                                                        </TabsContent>
-                                                                    </Tabs>
-                                                                </AccordionContent>
-                                                            </AccordionItem>
-                                                        </Accordion>
-                                                    </ScrollArea>
-                                                </DialogContent>
-                                            </Dialog>
                                         </div>
                                     </CardFooter>
                                 </Card>
@@ -1179,3 +1111,4 @@ export default function EditKidsContentPage() {
         </div>
     );
 }
+
