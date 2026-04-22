@@ -743,6 +743,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return num.toString();
     }
     
+    const handleDragStart = (word: string, from: 'bank' | number) => {
+        setDraggedWordInfo({ word, from });
+    };
+
     const handleDropOnBlank = (blankIndex: number) => {
         if (!draggedWordInfo || isSubmitting) return;
 
@@ -751,31 +755,44 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         // Place the new word
         newAnswers[blankIndex] = draggedWordInfo.word;
-        setFillInTheBlankAnswers(newAnswers);
 
         // Manage word bank
-        const newWordBank = [...wordBank];
-        const draggedWordIndexInBank = newWordBank.indexOf(draggedWordInfo.word);
-        if (draggedWordIndexInBank > -1) {
-            newWordBank.splice(draggedWordIndexInBank, 1);
+        let newWordBank = [...wordBank];
+        if (draggedWordInfo.from === 'bank') {
+            // Remove from word bank
+            newWordBank = newWordBank.filter(w => w !== draggedWordInfo.word);
+        } else {
+            // It was dragged from another blank, so clear the source blank
+            newAnswers[draggedWordInfo.from as number] = null;
         }
-
+        
+        // If we replaced a word, put it back in the bank
         if (oldWordInBlank) {
             newWordBank.push(oldWordInBlank);
         }
 
-        // Handle swapping from another blank
-        if (draggedWordInfo.from !== 'bank') {
-            newAnswers[draggedWordInfo.from] = oldWordInBlank;
-            setFillInTheBlankAnswers(newAnswers);
-            const indexToRemove = newWordBank.indexOf(draggedWordInfo.word);
-            if (indexToRemove > -1) newWordBank.splice(indexToRemove, 1);
-        }
-
+        setFillInTheBlankAnswers(newAnswers);
         setWordBank(newWordBank);
         setDraggedWordInfo(null);
     };
 
+    const handleDropOnBank = (e: React.DragEvent) => {
+        e.preventDefault();
+        if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
+
+        const { word, from } = draggedWordInfo;
+
+        // Word is coming from a blank, so put it back in the bank
+        const newAnswers = [...fillInTheBlankAnswers];
+        newAnswers[from as number] = null; 
+        setFillInTheBlankAnswers(newAnswers);
+
+        const newWordBank = [...wordBank, word];
+        setWordBank(newWordBank);
+
+        setDraggedWordInfo(null);
+    };
+    
     const checkFillInTheBlankAnswer = () => {
         if (isSubmitting || !currentQuestion) return;
         setIsSubmitting(true);
@@ -1024,7 +1041,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                     onDrop={(e) => {
                                                                         e.preventDefault();
                                                                         e.currentTarget.classList.remove('bg-white/30');
-                                                                        const word = e.dataTransfer.getData("text/plain");
                                                                         handleDropOnBlank(index);
                                                                     }}
                                                                     onClick={() => {
@@ -1038,7 +1054,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                         <span 
                                                                             className="p-2 bg-white text-blue-800 rounded-md font-bold cursor-pointer"
                                                                             draggable
-                                                                            onDragStart={() => setDraggedWordInfo({ word: fillInTheBlankAnswers[index]!, from: index })}
+                                                                            onDragStart={() => handleDragStart(fillInTheBlankAnswers[index]!, index)}
                                                                         >
                                                                             {fillInTheBlankAnswers[index]}
                                                                         </span>
@@ -1245,5 +1261,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
-    
