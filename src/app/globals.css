@@ -545,6 +545,11 @@ strong {
           transform: translateY(-20px);
       }
   }
+
+  .inline {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
 
 .wave-text span {
