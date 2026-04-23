@@ -524,7 +524,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options) {
             const blankCount = (currentQuestion.text.match(/____/g) || []).length;
             setFillInTheBlankAnswers(Array(blankCount).fill(null));
-            setWordBank(currentQuestion.options.map(o => o.text).filter(Boolean));
+            setWordBank(currentQuestion.options.map(o => o.text).filter(Boolean) as string[]);
         }
     }, [currentQuestion]);
 
@@ -1026,7 +1026,33 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
                                         <div className="flex items-start justify-between gap-2">
                                             <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                <span>{currentQuestion?.text}</span>
+                                                {currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 ? (
+                                                    currentQuestion.text.split('____').map((part, index, arr) => (
+                                                        <React.Fragment key={index}>
+                                                            {part}
+                                                            {index < arr.length - 1 && (
+                                                                <div 
+                                                                    className="inline-block w-24 h-12 bg-slate-200/20 dark:bg-slate-700/50 rounded-md align-middle mx-2 border-2 border-dashed border-white/50"
+                                                                    onDragOver={(e) => e.preventDefault()}
+                                                                    onDrop={() => handleDropOnBlank(index)}
+                                                                >
+                                                                    {fillInTheBlankAnswers[index] && (
+                                                                         <Button
+                                                                            draggable
+                                                                            onDragStart={() => handleDragStart(fillInTheBlankAnswers[index]!, index)}
+                                                                            className="h-full w-full text-xl font-bold bg-white/90 text-slate-800"
+                                                                            variant="outline"
+                                                                        >
+                                                                            {fillInTheBlankAnswers[index]}
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </React.Fragment>
+                                                    ))
+                                                ) : (
+                                                    <span>{currentQuestion?.text}</span>
+                                                )}
                                             </CardTitle>
                                         </div>
                                         {currentQuestion && currentQuestion.image && (
@@ -1109,7 +1135,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer' || (currentQuestion?.type === 'Fill in the Blank' && !currentQuestion.options?.length)) ? (
+                                        ) : (currentQuestion?.type === 'Short Answer' || (currentQuestion?.type === 'Fill in the Blank' && (!currentQuestion.options || currentQuestion.options.length === 0))) ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
                                                 <Input 
                                                     type="text" 
@@ -1127,8 +1153,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     Submit
                                                 </Button>
                                             </form>
-                                        ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options ? (
-                                             <div className="flex flex-col items-center gap-6">
+                                        ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 ? (
+                                            <div className="flex flex-col items-center gap-6">
                                                 <div 
                                                     className="flex flex-wrap justify-center gap-4 p-4 rounded-lg bg-secondary min-h-[70px] w-full"
                                                     onDragOver={(e) => e.preventDefault()}
@@ -1152,9 +1178,48 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     </Button>
                                                     <Button onClick={() => {
                                                          setFillInTheBlankAnswers(Array((currentQuestion?.text.match(/____/g) || []).length).fill(null));
-                                                         setWordBank(currentQuestion?.options?.map(o => o.text).filter(Boolean) || []);
+                                                         setWordBank(currentQuestion?.options?.map(o => o.text).filter(Boolean) as string[] || []);
                                                     }} variant="secondary">Reset</Button>
                                                 </div>
+                                            </div>
+                                        ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
+                                            <div className="w-full space-y-4">
+                                                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                    <div className="font-bold text-center">Column A</div>
+                                                    <div></div>
+                                                    <div className="font-bold text-center">Column B</div>
+                                                </div>
+                                                {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
+                                                    <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                                                        <div className="p-3 border rounded-md text-center bg-secondary">
+                                                            {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
+                                                            {itemA.text}
+                                                        </div>
+                                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                                        <Select
+                                                            onValueChange={(value) => {
+                                                                handleAnswerChange(currentQuestion.id, {...answers[currentQuestion.id], [itemA.text]: value});
+                                                            }}
+                                                            value={answers[currentQuestion.id]?.[itemA.text] || ''}
+                                                            disabled={selectedAnswer !== null}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select..." />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
+                                                                    <SelectItem key={`${currentQuestion.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
+                                                                        <div className="flex items-center gap-2">
+                                                                            {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
+                                                                            <span>{itemB.text}</span>
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                ))}
+                                                <Button onClick={() => handleAnswer(answers[currentQuestion.id])} disabled={selectedAnswer !== null || Object.keys(answers[currentQuestion.id] || {}).length !== currentQuestion.matchingOptions.columnA.length}>Check Answer</Button>
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
                                             <div className="mt-4 flex flex-col items-center gap-4">
@@ -1178,7 +1243,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 {feedback}
                                                 {!isCorrect && selectedAnswer && (
                                                     <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                        <span>{t.correctAnswer}: {currentQuestion.correctAnswer}</span>
+                                                      <span>
+                                                          {t.correctAnswer}:{' '}
+                                                          {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
+                                                            <div className="flex flex-col items-center mt-1">
+                                                                {currentQuestion.correctAnswer.map((pair: any, i: number) => (
+                                                                    <span key={i}>{pair.a} &rarr; {pair.b}</span>
+                                                                ))}
+                                                            </div>
+                                                          ) : (
+                                                            String(currentQuestion.correctAnswer)
+                                                          )}
+                                                      </span>
                                                     </div>
                                                 )}
                                             </div>
