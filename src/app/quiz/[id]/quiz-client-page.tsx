@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
@@ -248,6 +248,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
     const [textAnswer, setTextAnswer] = useState('');
 
+    const [fillInTheBlankAnswers, setFillInTheBlankAnswers] = useState<(string | null)[]>([]);
+    const [wordBank, setWordBank] = useState<string[]>([]);
+    const [draggedWordInfo, setDraggedWordInfo] = useState<{ word: string, from: 'bank' | number } | null>(null);
+
+
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -293,6 +298,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             setIsCorrect(false);
             setMatchingAnswers({});
             setTextAnswer('');
+            setFillInTheBlankAnswers([]);
+            setWordBank([]);
             if (timerDuration > 0) {
                 setTimeLeft(timerDuration);
             }
@@ -472,6 +479,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setQuizFinished(false);
         setIsSubmitting(false);
         setTextAnswer('');
+        setFillInTheBlankAnswers([]);
+        setWordBank([]);
         setTimeLeft(timerDuration);
     };
     
@@ -511,6 +520,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
       }
       setIsLoading(false);
     }, [quiz]);
+
+
+    useEffect(() => {
+        if (currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options) {
+            const blankCount = (currentQuestion.text.match(/____/g) || []).length;
+            setFillInTheBlankAnswers(Array(blankCount).fill(null));
+            setWordBank(currentQuestion.options.map(o => o.text).filter(Boolean));
+        }
+    }, [currentQuestion]);
 
 
     useEffect(() => {
@@ -727,6 +745,68 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (language === 'hi') return toDevanagari(num);
         if (language === 'bn') return toBengaliNumerals(num);
         return num.toString();
+    }
+    
+    const handleDropOnBank = (e: React.DragEvent) => {
+        e.preventDefault();
+        if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
+
+        const { word, from } = draggedWordInfo;
+
+        // Word is coming from a blank, so put it back in the bank
+        const newAnswers = [...fillInTheBlankAnswers];
+        newAnswers[from as number] = null; 
+        setFillInTheBlankAnswers(newAnswers);
+
+        const newWordBank = [...wordBank, word];
+        setWordBank(newWordBank);
+
+        setDraggedWordInfo(null);
+    };
+    
+    const handleDropOnBlank = (blankIndex: number) => {
+        if (!draggedWordInfo || isSubmitting) return;
+
+        const newAnswers = [...fillInTheBlankAnswers];
+        const oldWordInBlank = newAnswers[blankIndex];
+
+        // Place the new word
+        newAnswers[blankIndex] = draggedWordInfo.word;
+
+        // Manage word bank
+        let newWordBank = [...wordBank];
+        if (draggedWordInfo.from === 'bank') {
+            // Remove from word bank
+            newWordBank = newWordBank.filter(w => w !== draggedWordInfo.word);
+        } else {
+            // It was dragged from another blank, so clear the source blank
+            newAnswers[draggedWordInfo.from as number] = null;
+        }
+        
+        // If we replaced a word, put it back in the bank
+        if (oldWordInBlank) {
+            newWordBank.push(oldWordInBlank);
+        }
+
+        setFillInTheBlankAnswers(newAnswers);
+        setWordBank(newWordBank);
+        setDraggedWordInfo(null);
+    };
+
+    const handleDragStart = (word: string, from: 'bank' | number) => {
+        setDraggedWordInfo({ word, from });
+    };
+    
+    const checkFillInTheBlankAnswer = () => {
+        if (isSubmitting || !currentQuestion) return;
+        setIsSubmitting(true);
+        
+        const correctAnswers = (currentQuestion.correctAnswer as string[]).slice(0, fillInTheBlankAnswers.length);
+        const userAnswers = fillInTheBlankAnswers.filter(a => a !== null);
+
+        const isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every((ans, i) => ans === correctAnswers[i]);
+        
+        handleAnswer(isCorrect);
     }
 
 
@@ -1031,7 +1111,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
+                                        ) : (currentQuestion?.type === 'Short Answer' || (currentQuestion?.type === 'Fill in the Blank' && !currentQuestion.options?.length)) ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
                                                 <Input 
                                                     type="text" 
@@ -1065,11 +1145,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         <GripVertical className="h-5 w-5 text-muted-foreground" />
                                                         <Select
                                                             onValueChange={(value) => {
-                                                                const currentAnswers = matchingAnswers || {};
-                                                                const newAnswers = { ...currentAnswers, [itemA.text]: value };
-                                                                handleAnswer(newAnswers);
+                                                                setMatchingAnswers(prev => ({...prev, [itemA.text]: value}));
                                                             }}
-                                                            value={answers[currentQuestion.id]?.[itemA.text] || ''}
+                                                            value={matchingAnswers[itemA.text] || ''}
                                                             disabled={selectedAnswer !== null}
                                                         >
                                                             <SelectTrigger>
@@ -1089,6 +1167,20 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     </div>
                                                 ))}
                                                 <Button onClick={() => handleAnswer(matchingAnswers)} disabled={selectedAnswer !== null || Object.keys(matchingAnswers).length !== currentQuestion.matchingOptions.columnA.length}>Check Answer</Button>
+                                            </div>
+                                        ) : currentQuestion?.type === 'Direct Question' ? (
+                                            <div className="mt-4 flex flex-col items-center gap-4">
+                                                <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
+                                                    {currentQuestion.correctAnswer}
+                                                </div>
+                                                {currentQuestion.answerImage && (
+                                                    <div className="relative w-full max-w-sm mx-auto aspect-video mt-4">
+                                                        <Image src={currentQuestion.answerImage} alt="Answer Image" layout="fill" objectFit="contain" className="rounded-lg" />
+                                                    </div>
+                                                )}
+                                                {currentQuestion.answerAudio && (
+                                                    <audio controls src={currentQuestion.answerAudio} className="w-full mt-4 max-w-sm" />
+                                                )}
                                             </div>
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
