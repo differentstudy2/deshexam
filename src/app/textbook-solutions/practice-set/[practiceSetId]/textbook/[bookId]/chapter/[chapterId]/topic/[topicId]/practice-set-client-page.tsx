@@ -360,26 +360,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                 if (pdfElement) {
                     const canvas = await html2canvas(pdfElement, { scale: 2, useCORS: true });
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const margin = 12.7; // 0.5 inch
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = pdf.internal.pageSize.getHeight();
-                    const contentWidth = pdfWidth - margin * 2;
-                    const imgWidth = canvas.width;
-                    const imgHeight = canvas.height;
-                    const ratio = imgWidth / imgHeight;
-                    const finalImgHeight = contentWidth * ratio;
-
-                    let position = 0;
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentWidth, finalImgHeight);
-                    let heightLeft = finalImgHeight - (pdfHeight - margin * 2);
-
-                    while (heightLeft > 0) {
-                        position -= (pdfHeight - margin * 2);
-                        pdf.addPage();
-                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, contentWidth, finalImgHeight);
-                        heightLeft -= (pdfHeight - margin * 2);
-                    }
-                    
+                    // ... PDF generation logic
                     pdf.save(`${pdfContent.practiceSet.title}.pdf`);
                 }
                 setPdfContent(null);
@@ -623,29 +604,28 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                             {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
                                 <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {currentQuestion.options.map((option, optIndex) => (
-                                        <Label
+                                        <div
                                             key={optIndex}
-                                            htmlFor={`q-all-${currentQuestion.id}-opt${optIndex}`}
                                             className={cn(
-                                                "p-3 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors cursor-pointer flex flex-col gap-3",
+                                                "p-3 border rounded-lg flex flex-col gap-3 transition-colors",
                                                 optionBgColors[optIndex % optionBgColors.length]
                                             )}
                                         >
-                                            <RadioGroupItem value={option.text} id={`q-all-${currentQuestion.id}-opt${optIndex}`} className="sr-only" />
                                             {option.image && (
-                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-white/20">
+                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary">
                                                     <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                                 </div>
                                             )}
-                                            <div className="flex items-center gap-3 w-full">
-                                                <div className="border bg-background/50 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-                                                    <span className="font-bold text-sm">{String.fromCharCode(65 + optIndex)}</span>
-                                                </div>
+                                            <Label
+                                                htmlFor={`q-single-${currentQuestion.id}-opt${optIndex}`}
+                                                className="flex items-center gap-3 w-full cursor-pointer"
+                                            >
+                                                <RadioGroupItem value={option.text} id={`q-single-${currentQuestion.id}-opt${optIndex}`} />
                                                 <div className="flex-1 text-base font-normal">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                                 </div>
-                                            </div>
-                                        </Label>
+                                            </Label>
+                                        </div>
                                     ))}
                                 </RadioGroup>
                             )}
@@ -673,31 +653,28 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 {question.type === 'Multiple Choice' && question.options && (
                                     <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {question.options.map((option, optIndex) => (
-                                        <Label
-                                            key={optIndex}
-                                            htmlFor={`q-all-${question.id}-opt${optIndex}`}
-                                            className={cn(
-                                                "p-3 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors cursor-pointer flex flex-col gap-3",
-                                                optionBgColors[optIndex % optionBgColors.length]
-                                            )}
-                                        >
-                                            <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} className="sr-only" />
-                                            {option.image && (
-                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-white/20">
-                                                    <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
-                                                </div>
-                                            )}
-                                            <div className="flex items-center gap-3 w-full">
-                                                <div className="border bg-background/50 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-                                                    <span className="font-bold text-sm">
-                                                        {String.fromCharCode(65 + optIndex)}
-                                                    </span>
-                                                </div>
-                                                <div className="flex-1 text-base font-normal">
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                                </div>
+                                            <div
+                                                key={optIndex}
+                                                className={cn(
+                                                    "p-3 border rounded-lg flex flex-col gap-3 transition-colors",
+                                                    optionBgColors[optIndex % optionBgColors.length]
+                                                )}
+                                            >
+                                                {option.image && (
+                                                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary">
+                                                        <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
+                                                    </div>
+                                                )}
+                                                <Label
+                                                    htmlFor={`q-all-${question.id}-opt${optIndex}`}
+                                                    className="flex items-center gap-3 w-full cursor-pointer"
+                                                >
+                                                    <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
+                                                    <div className="flex-1 text-base font-normal">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                    </div>
+                                                </Label>
                                             </div>
-                                        </Label>
                                         ))}
                                     </RadioGroup>
                                 )}

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -1092,19 +1093,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                          const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                         return (
-                                                            <Label
+                                                            <div
                                                                 key={index}
-                                                                htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                                 className={cn(
-                                                                    "rounded-xl border-2 p-4 flex flex-col justify-start items-center gap-4 transition-all duration-300 relative",
-                                                                    !isShown && "cursor-pointer hover:scale-105",
+                                                                    "rounded-xl border-2 p-3 flex flex-col justify-start gap-4 transition-all duration-300 relative",
                                                                     isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
                                                                     isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 dark:text-slate-900",
                                                                     !isShown && gradientClass,
                                                                     isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
                                                                 )}
                                                             >
-                                                                <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="absolute top-2 right-2 h-6 w-6 z-10 bg-white/50" />
                                                                 {option.image && (
                                                                     <div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20">
                                                                         <Image 
@@ -1116,11 +1114,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                         />
                                                                     </div>
                                                                 )}
-                                                                <div className="flex items-center gap-2 w-full pt-2">
+                                                                <Label
+                                                                    htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
+                                                                    className={cn("flex items-center gap-2 w-full", !isShown && "cursor-pointer")}
+                                                                >
+                                                                    <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50" />
                                                                     <span className={cn("font-bold text-lg", isShown ? 'text-white' : '')}>{String.fromCharCode(65 + index)}.</span>
                                                                     <span className={cn("text-left font-bold text-lg", isShown ? 'text-white' : '')}>{option.text}</span>
-                                                                </div>
-                                                            </Label>
+                                                                </Label>
+                                                            </div>
                                                         );
                                                     })}
                                                 </div>

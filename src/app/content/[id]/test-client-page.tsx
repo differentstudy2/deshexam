@@ -398,37 +398,39 @@ export default function TestClientPage({ test }: { test: Test }) {
                     </CardHeader>
                     <CardContent className="p-0">
                       {question.type === 'Multiple Choice' && question.options && (
-                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id] || ''} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {question.options.map((option, optIndex) => {
                             const isCorrectAnswer = question.correctAnswer === option.text;
                             const isUserAnswer = userAnswer === option.text;
+                            const isShown = isAnswerRevealed;
                             return (
-                                <Label
+                                <div
                                     key={optIndex}
-                                    htmlFor={`q-${question.id}-opt${optIndex}`}
                                     className={cn(
-                                    "flex flex-col p-4 border rounded-lg cursor-pointer transition-all",
-                                    isAnswerRevealed && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
-                                    isAnswerRevealed && isUserAnswer && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
-                                    !isAnswerRevealed && "hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/10",
+                                        "p-3 border rounded-lg flex flex-col gap-3",
+                                        isShown && isCorrectAnswer && "bg-green-100 dark:bg-green-900/20 border-green-200",
+                                        isShown && isUserAnswer && !isCorrectAnswer && "bg-red-100 dark:bg-red-900/20 border-red-200"
                                     )}
                                 >
-                                     {option.image && (
-                                        <div className="relative w-full aspect-video mb-4 rounded-md overflow-hidden">
+                                    {option.image && (
+                                        <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary">
                                             <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                         </div>
                                     )}
-                                  <div className="flex items-center space-x-3 w-full">
-                                    <RadioGroupItem value={option.text} id={`q-${question.id}-opt${optIndex}`} />
-                                    <div className="text-base font-normal flex-1">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                    </div>
-                                    {isAnswerRevealed && (
-                                        isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
-                                        isUserAnswer ? <XCircle className="w-5 h-5 text-destructive" /> : null
-                                    )}
-                                  </div>
-                                </Label>
+                                    <Label
+                                        htmlFor={`q-all-${question.id}-opt${optIndex}`}
+                                        className="flex items-center gap-3 w-full cursor-pointer"
+                                    >
+                                        <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
+                                        <div className="flex-1 text-base font-normal">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                        </div>
+                                        {isShown && (
+                                            isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
+                                            isUserAnswer ? <XCircle className="w-5 h-5 text-destructive" /> : null
+                                        )}
+                                    </Label>
+                                </div>
                             )
                           })}
                         </RadioGroup>
@@ -475,7 +477,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                                           </SelectTrigger>
                                           <SelectContent>
                                               {question.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
-                                                  <SelectItem key={`${question.id}-${itemA.text}-${itemB.originalIndex}`} value={itemB.text}>
+                                                  <SelectItem key={`${question.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
                                                       <div className="flex items-center gap-2">
                                                           {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
                                                           <span>{itemB.text}</span>
