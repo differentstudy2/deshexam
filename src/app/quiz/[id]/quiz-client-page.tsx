@@ -744,54 +744,42 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return num.toString();
     }
     
-    const handleDropOnBank = (e: React.DragEvent) => {
+    const handleDragStart = (e: React.DragEvent, word: string, from: 'bank' | number) => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ word, from }));
+    };
+
+    const handleDrop = (e: React.DragEvent, to: 'bank' | number) => {
         e.preventDefault();
-        if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
+        const data = e.dataTransfer.getData("text/plain");
+        if (!data) return;
 
-        const { word, from } = draggedWordInfo;
-
-        // Word is coming from a blank, so put it back in the bank
-        const newAnswers = [...fillInTheBlankAnswers];
-        newAnswers[from as number] = null; 
-        setFillInTheBlankAnswers(newAnswers);
-
-        const newWordBank = [...wordBank, word];
-        setWordBank(newWordBank);
-
-        setDraggedWordInfo(null);
-    };
-    
-    const handleDropOnBlank = (blankIndex: number) => {
-        if (!draggedWordInfo || isSubmitting) return;
+        const { word, from } = JSON.parse(data);
 
         const newAnswers = [...fillInTheBlankAnswers];
-        const oldWordInBlank = newAnswers[blankIndex];
-
-        // Place the new word
-        newAnswers[blankIndex] = draggedWordInfo.word;
-
-        // Manage word bank
         let newWordBank = [...wordBank];
-        if (draggedWordInfo.from === 'bank') {
-            // Remove from word bank
-            newWordBank = newWordBank.filter(w => w !== draggedWordInfo.word);
-        } else {
-            // It was dragged from another blank, so clear the source blank
-            newAnswers[draggedWordInfo.from as number] = null;
-        }
-        
-        // If we replaced a word, put it back in the bank
-        if (oldWordInBlank) {
-            newWordBank.push(oldWordInBlank);
+
+        if (to === 'bank') {
+            if (from !== 'bank') { // Moving from blank to bank
+                newAnswers[from] = null;
+                newWordBank.push(word);
+            }
+        } else { // Dropping on a blank
+            const oldWordInBlank = newAnswers[to];
+            newAnswers[to] = word;
+
+            if (from === 'bank') {
+                newWordBank = newWordBank.filter(w => w !== word);
+            } else { // Moving from another blank
+                newAnswers[from] = null;
+            }
+            
+            if (oldWordInBlank) {
+                newWordBank.push(oldWordInBlank);
+            }
         }
 
         setFillInTheBlankAnswers(newAnswers);
         setWordBank(newWordBank);
-        setDraggedWordInfo(null);
-    };
-
-    const handleDragStart = (word: string, from: 'bank' | number) => {
-        setDraggedWordInfo({ word, from });
     };
     
     const checkFillInTheBlankAnswer = useCallback(() => {
@@ -1037,48 +1025,42 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </Card>
                             <div ref={quizCardRef}>
                                  <Card className={cn(
-                                    "shadow-2xl overflow-hidden mt-2 bg-gradient-to-br",
-                                    bgGradients[currentQuestionIndex % bgGradients.length]
+                                    "shadow-2xl overflow-hidden mt-2",
+                                    (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
+                                    captureMode === 'question' && 'bg-orange-500'
                                 )}>
-                                    <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
-                                                {currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 ? (
-                                                    currentQuestion.text.split('____').map((part, index, arr) => (
-                                                        <React.Fragment key={index}>
-                                                            {part}
-                                                            {index < arr.length - 1 && (
-                                                                <div 
-                                                                    className="inline-block w-24 h-12 bg-slate-200/20 dark:bg-slate-700/50 rounded-md align-middle mx-2 border-2 border-dashed border-white/50"
-                                                                    onDragOver={(e) => e.preventDefault()}
-                                                                    onDrop={() => handleDropOnBlank(index)}
-                                                                >
-                                                                    {fillInTheBlankAnswers[index] && (
-                                                                         <Button
-                                                                            draggable
-                                                                            onDragStart={() => handleDragStart(fillInTheBlankAnswers[index]!, index)}
-                                                                            className="h-full w-full text-xl font-bold bg-white/90 text-slate-800"
-                                                                            variant="outline"
-                                                                        >
-                                                                            {fillInTheBlankAnswers[index]}
-                                                                        </Button>
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </React.Fragment>
-                                                    ))
-                                                ) : (
-                                                    <span>{currentQuestion?.text}</span>
+                                     <CardHeader className={cn(
+                                        "relative p-6 text-white text-center",
+                                        captureMode === 'question' && 'bg-orange-500',
+                                        captureMode !== 'question' && bgGradients[currentQuestionIndex % bgGradients.length]
+                                    )}>
+                                        <div className="relative z-10">
+                                            <CardTitle className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-2">
+                                                <span>{currentQuestion?.text}</span>
+                                                {currentQuestion?.audio && (
+                                                    <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                        {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
+                                                    </Button>
                                                 )}
                                             </CardTitle>
                                         </div>
-                                        {currentQuestion && currentQuestion.image && (
-                                            <div className="relative h-48 w-full mt-4">
-                                                <Image src={currentQuestion.image} alt={currentQuestion.text || 'Question Image'} layout="fill" objectFit="contain" className="rounded-lg" />
-                                            </div>
-                                        )}
                                     </CardHeader>
-                                    <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
+                                    
+                                    {currentQuestion && currentQuestion.image && (
+                                        <div className="p-4 bg-orange-100 dark:bg-slate-800 border-y-4 border-red-500">
+                                            <div className="relative h-48 w-full">
+                                                <Image 
+                                                    src={currentQuestion.image} 
+                                                    alt={currentQuestion.text || 'Question Image'} 
+                                                    layout="fill" 
+                                                    objectFit="contain" 
+                                                    className="rounded-lg" 
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <CardContent className="p-6 bg-orange-50 dark:bg-slate-900 rounded-b-xl">
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                                 <div className={cn(
@@ -1109,22 +1091,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 <Label
                                                                     htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                                     className={cn(
-                                                                        "rounded-xl border-2 p-4 flex items-center gap-4 h-16 transition-all duration-300 relative",
+                                                                        "rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative",
                                                                         // Normal state
-                                                                        !isShown && !isCapturing && "cursor-pointer hover:scale-105 justify-between",
+                                                                        !isShown && !isCapturing && "cursor-pointer hover:scale-105 justify-between items-center",
                                                                         // Answer revealed state
-                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between",
-                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between",
+                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center",
+                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center",
                                                                         !isShown && !isCapturing && gradientClass,
                                                                         // Capture state
-                                                                        isCapturing && "justify-start",
+                                                                        isCapturing && "items-center",
                                                                         isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20",
                                                                         isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20",
                                                                     )}
                                                                 >
                                                                     {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
                                                                     {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
-                                                                    <span className={cn( "font-bold text-lg md:text-xl", !isCapturing && "flex-1" )}>
+                                                                    <span className={cn( "font-bold text-lg md:text-xl", !isCapturing && "flex-1 text-left", isCapturing && "text-black dark:text-white")}>
                                                                         {String.fromCharCode(65 + index)}. {option.text}
                                                                     </span>
                                                                     {!isCapturing && <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50 shrink-0" />}
@@ -1160,98 +1142,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer' || (currentQuestion?.type === 'Fill in the Blank' && (!currentQuestion.options || currentQuestion.options.length === 0))) ? (
-                                            <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
-                                                <Input 
-                                                    type="text" 
-                                                    placeholder="Your answer"
-                                                    value={textAnswer}
-                                                    onChange={(e) => setTextAnswer(e.target.value)}
-                                                    disabled={selectedAnswer !== null}
-                                                    className="text-lg h-12"
-                                                />
-                                                <Button 
-                                                    type="submit" 
-                                                    disabled={selectedAnswer !== null || !textAnswer.trim()}
-                                                    size="lg"
-                                                >
-                                                    Submit
-                                                </Button>
-                                            </form>
-                                        ) : currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 ? (
-                                            <div className="flex flex-col items-center gap-6">
-                                                <div 
-                                                    className="flex flex-wrap justify-center gap-4 p-4 rounded-lg bg-secondary min-h-[70px] w-full"
-                                                    onDragOver={(e) => e.preventDefault()}
-                                                    onDrop={handleDropOnBank}
-                                                >
-                                                    {wordBank.map((word, index) => (
-                                                        <Button
-                                                            key={index}
-                                                            draggable
-                                                            onDragStart={() => handleDragStart(word, 'bank')}
-                                                            className="h-auto p-4 text-2xl font-bold rounded-xl shadow-lg cursor-grab active:cursor-grabbing bg-white text-slate-800"
-                                                            variant="outline"
-                                                        >
-                                                            {word}
-                                                        </Button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
-                                            <div className="w-full space-y-4">
-                                                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                    <div className="font-bold text-center">Column A</div>
-                                                    <div></div>
-                                                    <div className="font-bold text-center">Column B</div>
-                                                </div>
-                                                {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
-                                                    <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                                        <div className="p-3 border rounded-md text-center bg-secondary">
-                                                            {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
-                                                            {itemA.text}
-                                                        </div>
-                                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                                        <Select
-                                                            onValueChange={(value) => handleMatchingAnswerChange(itemA.text, value)}
-                                                            value={matchingAnswers[itemA.text] || ''}
-                                                            disabled={selectedAnswer !== null}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Select..." />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {currentQuestion.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
-                                                                    <SelectItem key={`${currentQuestion.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
-                                                                        <div className="flex items-center gap-2">
-                                                                            {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
-                                                                            <span>{itemB.text}</span>
-                                                                        </div>
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : currentQuestion?.type === 'Direct Question' ? (
-                                            (!!currentQuestion.correctAnswer || currentQuestion.answerImage || currentQuestion.answerAudio) && (
-                                                <div className="mt-4 flex flex-col items-center gap-4">
-                                                    {currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim() && (
-                                                        <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
-                                                            {String(currentQuestion.correctAnswer)}
-                                                        </div>
-                                                    )}
-                                                    {currentQuestion.answerImage && (
-                                                        <div className="relative w-full max-w-sm mx-auto aspect-video mt-4">
-                                                            <Image src={currentQuestion.answerImage} alt="Answer Image" layout="fill" objectFit="contain" className="rounded-lg" />
-                                                        </div>
-                                                    )}
-                                                    {currentQuestion.answerAudio && (
-                                                        <audio controls src={currentQuestion.answerAudio} className="w-full mt-4 max-w-sm" />
-                                                    )}
-                                                </div>
-                                            )
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
                                         )}
@@ -1303,4 +1193,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     );
 }
 
-    
