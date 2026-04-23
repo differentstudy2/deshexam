@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -356,7 +355,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             playSystemSound(isPartial ? 'correct' : 'incorrect');
         }
 
-        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 2000);
+        nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 5000);
     }, [selectedAnswer, isSubmitting, stopSound, currentQuestion, t, playSystemSound, nextQuestion]);
 
 
@@ -796,9 +795,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setDraggedWordInfo({ word, from });
     };
     
-    const checkFillInTheBlankAnswer = () => {
+    const checkFillInTheBlankAnswer = useCallback(() => {
         if (isSubmitting || !currentQuestion) return;
-        setIsSubmitting(true);
         
         const correctAnswers = (currentQuestion.correctAnswer as string[]).slice(0, fillInTheBlankAnswers.length);
         const userAnswers = fillInTheBlankAnswers.filter(a => a !== null);
@@ -806,7 +804,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every((ans, i) => ans === correctAnswers[i]);
         
         handleAnswer(isCorrect);
-    }
+    }, [isSubmitting, currentQuestion, fillInTheBlankAnswers, handleAnswer]);
+
+    useEffect(() => {
+        if (currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 && fillInTheBlankAnswers.length > 0 && !isSubmitting) {
+            const allFilled = fillInTheBlankAnswers.every(a => a !== null);
+            const blankCount = (currentQuestion?.text.match(/____/g) || []).length;
+            if (allFilled && fillInTheBlankAnswers.length === blankCount) {
+                checkFillInTheBlankAnswer();
+            }
+        }
+    }, [fillInTheBlankAnswers, currentQuestion, isSubmitting, checkFillInTheBlankAnswer]);
+
+    useEffect(() => {
+        if (currentQuestion?.type === 'Matching' && matchingAnswers && currentQuestion.matchingOptions && Object.keys(matchingAnswers).length === currentQuestion.matchingOptions.columnA.length && !selectedAnswer) {
+            handleAnswer(matchingAnswers);
+        }
+    }, [matchingAnswers, currentQuestion, handleAnswer, selectedAnswer]);
 
 
     if (isLoading) {
@@ -1173,15 +1187,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </Button>
                                                     ))}
                                                 </div>
-                                                <div className="flex gap-4">
-                                                    <Button onClick={checkFillInTheBlankAnswer} disabled={isSubmitting || fillInTheBlankAnswers.includes(null)}>
-                                                        Check Answer
-                                                    </Button>
-                                                    <Button onClick={() => {
-                                                         setFillInTheBlankAnswers(Array((currentQuestion?.text.match(/____/g) || []).length).fill(null));
-                                                         setWordBank(currentQuestion?.options?.map(o => o.text).filter(Boolean) as string[] || []);
-                                                    }} variant="secondary">Reset</Button>
-                                                </div>
                                             </div>
                                         ) : currentQuestion?.type === 'Matching' ? (
                                             <div className="w-full space-y-4">
@@ -1218,7 +1223,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </Select>
                                                     </div>
                                                 ))}
-                                                <Button onClick={() => handleAnswer(matchingAnswers)} disabled={selectedAnswer !== null || Object.keys(matchingAnswers).length !== currentQuestion.matchingOptions?.columnA.length}>Check Answer</Button>
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
                                             <div className="mt-4 flex flex-col items-center gap-4">
@@ -1242,18 +1246,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 {feedback}
                                                 {!isCorrect && selectedAnswer && (
                                                     <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                      <span>
-                                                          {t.correctAnswer}:{' '}
-                                                          {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
+                                                        <span>{t.correctAnswer}: </span> 
+                                                        {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
                                                             <div className="flex flex-col items-center mt-1">
                                                                 {currentQuestion.correctAnswer.map((pair: any, i: number) => (
-                                                                    <span key={i}>{pair.a} &rarr; {pair.b}</span>
+                                                                    <span key={i} className="ml-1">{pair.a} &rarr; {pair.b}</span>
                                                                 ))}
                                                             </div>
-                                                          ) : (
-                                                            String(currentQuestion.correctAnswer)
-                                                          )}
-                                                      </span>
+                                                        ) : (
+                                                            <span className="ml-1">{String(currentQuestion.correctAnswer)}</span>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
