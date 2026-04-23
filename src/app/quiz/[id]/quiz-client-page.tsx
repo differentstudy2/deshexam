@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight, GripVertical, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -1090,7 +1090,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                         const isShown = selectedAnswer !== null;
                                                         const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
-                                                         const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
+                                                        const isIncorrectForCapture = captureMode === 'answer' && !isCorrectAnswer;
+                                                        const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                         return (
                                                             <div key={index}>
@@ -1108,16 +1109,25 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 <Label
                                                                     htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                                     className={cn(
-                                                                        "rounded-xl border-2 p-4 flex justify-between items-center gap-4 h-16 transition-all duration-300 relative",
-                                                                        !isShown && "cursor-pointer hover:scale-105",
-                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
-                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white",
-                                                                        !isShown && gradientClass,
-                                                                        isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white"
+                                                                        "rounded-xl border-2 p-4 flex items-center gap-4 h-16 transition-all duration-300 relative",
+                                                                        // Normal state
+                                                                        !isShown && !isCapturing && "cursor-pointer hover:scale-105 justify-between",
+                                                                        // Answer revealed state
+                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between",
+                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between",
+                                                                        !isShown && !isCapturing && gradientClass,
+                                                                        // Capture state
+                                                                        isCapturing && "justify-start",
+                                                                        isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20",
+                                                                        isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20",
                                                                     )}
                                                                 >
-                                                                    <span className={cn("font-bold text-lg md:text-xl")}>{String.fromCharCode(65 + index)}. {option.text}</span>
-                                                                    <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50" />
+                                                                    {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
+                                                                    {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
+                                                                    <span className={cn( "font-bold text-lg md:text-xl", !isCapturing && "flex-1" )}>
+                                                                        {String.fromCharCode(65 + index)}. {option.text}
+                                                                    </span>
+                                                                    {!isCapturing && <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50 shrink-0" />}
                                                                 </Label>
                                                             </div>
                                                         );
@@ -1225,7 +1235,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 ))}
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
-                                            ((currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim()) || currentQuestion.answerImage || currentQuestion.answerAudio) && (
+                                            (!!currentQuestion.correctAnswer || currentQuestion.answerImage || currentQuestion.answerAudio) && (
                                                 <div className="mt-4 flex flex-col items-center gap-4">
                                                     {currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim() && (
                                                         <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
@@ -1292,3 +1302,5 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
+    

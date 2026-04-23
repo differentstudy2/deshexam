@@ -180,6 +180,48 @@ const jsonExampleTF = `
 }
 `;
 
+const jsonExampleSA = `
+{
+  "questions": [
+    {
+      "text": "What is the chemical symbol for water?",
+      "type": "Short Answer",
+      "correctAnswer": "H2O",
+      "explanation": "Water is a chemical compound consisting of two hydrogen atoms and one oxygen atom."
+    }
+  ]
+}
+`;
+
+const jsonExampleFIB = `
+{
+  "questions": [
+    {
+      "text": "The powerhouse of the cell is the ____.",
+      "type": "Fill in the Blank",
+      "correctAnswer": "mitochondrion",
+      "explanation": "Mitochondria generate most of the cell's supply of adenosine triphosphate (ATP)."
+    }
+  ]
+}
+`;
+const jsonExampleMatching = `
+{
+  "questions": [
+    {
+      "text": "Match the countries to their capitals.",
+      "type": "Matching",
+      "correctAnswer": [
+        { "a": "Japan", "b": "Tokyo" },
+        { "a": "Canada", "b": "Ottawa" },
+        { "a": "Australia", "b": "Canberra" }
+      ],
+      "explanation": "This tests knowledge of world geography."
+    }
+  ]
+}
+`;
+
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
 type ClassCategory = { id: string, name: string };
@@ -397,7 +439,7 @@ export default function AddKidsContentPage() {
     try {
         const processedQuestions = data.questions?.map(q => {
             if (q.type === 'Fill in the Blank') {
-                const options = q.wordBank?.split('\n').filter(Boolean).map(text => ({ text })) || [];
+                const options = q.wordBank?.split('\\n').filter(Boolean).map(text => ({ text })) || [];
                 const correctAnswer = q.correctAnswerString?.split(',').map(s => s.trim()).filter(Boolean) || [];
 
                 const newQ: Partial<typeof q> = { ...q };
@@ -1162,6 +1204,9 @@ export default function AddKidsContentPage() {
                                                                 <TabsTrigger value="text-only">Text-Only</TabsTrigger>
                                                                 <TabsTrigger value="mcq">MCQ</TabsTrigger>
                                                                 <TabsTrigger value="tf">True/False</TabsTrigger>
+                                                                <TabsTrigger value="sa">Short Answer</TabsTrigger>
+                                                                <TabsTrigger value="fib">Fill Blank</TabsTrigger>
+                                                                <TabsTrigger value="matching">Matching</TabsTrigger>
                                                             </TabsList>
                                                              <TabsContent value="full">
                                                                 <div className="relative mt-2">
@@ -1187,6 +1232,24 @@ export default function AddKidsContentPage() {
                                                                     <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleTF}</pre></ScrollArea>
                                                                 </div>
                                                             </TabsContent>
+                                                            <TabsContent value="sa">
+                                                                <div className="relative mt-2">
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleSA)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleSA}</pre></ScrollArea>
+                                                                </div>
+                                                            </TabsContent>
+                                                            <TabsContent value="fib">
+                                                                <div className="relative mt-2">
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleFIB)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleFIB}</pre></ScrollArea>
+                                                                </div>
+                                                            </TabsContent>
+                                                            <TabsContent value="matching">
+                                                                <div className="relative mt-2">
+                                                                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => handleCopy(jsonExampleMatching)}><Copy className="h-4 w-4" /><span className="sr-only">Copy</span></Button>
+                                                                    <ScrollArea className="h-64 rounded-md border bg-secondary p-4"><pre className="whitespace-pre-wrap break-words text-sm">{jsonExampleMatching}</pre></ScrollArea>
+                                                                </div>
+                                                            </TabsContent>
                                                         </Tabs>
                                                     </AccordionContent>
                                                 </AccordionItem>
@@ -1208,3 +1271,5 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
+
+    
