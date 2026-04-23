@@ -400,35 +400,30 @@ export default function TestClientPage({ test }: { test: Test }) {
                       {question.type === 'Multiple Choice' && question.options && (
                         <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {question.options.map((option, optIndex) => {
-                            const isCorrectAnswer = question.correctAnswer === option.text;
                             const isUserAnswer = userAnswer === option.text;
+                            const isCorrectAnswer = question.correctAnswer === option.text;
                             const isShown = isAnswerRevealed;
                             return (
-                                <div
-                                    key={optIndex}
-                                    className={cn(
-                                        "p-3 border rounded-lg flex flex-col gap-3",
-                                        isShown && isCorrectAnswer && "bg-green-100 dark:bg-green-900/20 border-green-200",
-                                        isShown && isUserAnswer && !isCorrectAnswer && "bg-red-100 dark:bg-red-900/20 border-red-200"
-                                    )}
-                                >
+                                <div key={optIndex} className="p-3 border rounded-lg flex flex-col gap-3">
                                     {option.image && (
-                                        <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary">
+                                        <div className={cn("relative w-full aspect-video rounded-md overflow-hidden bg-white/20 mb-2", option.image ? 'block' : 'hidden')}>
                                             <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                         </div>
                                     )}
                                     <Label
                                         htmlFor={`q-all-${question.id}-opt${optIndex}`}
-                                        className="flex items-center gap-3 w-full cursor-pointer"
+                                        className="flex justify-between items-center gap-3 w-full cursor-pointer h-16"
                                     >
-                                        <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
                                         <div className="flex-1 text-base font-normal">
                                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                         </div>
-                                        {isShown && (
-                                            isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
-                                            isUserAnswer ? <XCircle className="w-5 h-5 text-destructive" /> : null
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            {isShown && (
+                                                isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
+                                                isUserAnswer ? <XCircle className="w-5 h-5 text-destructive" /> : null
+                                            )}
+                                            <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
+                                        </div>
                                     </Label>
                                 </div>
                             )
@@ -464,22 +459,19 @@ export default function TestClientPage({ test }: { test: Test }) {
                               {question.matchingOptions.columnA.map((itemA, itemIndex) => (
                                   <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
                                       <div className="p-3 border rounded-md text-center bg-secondary">
-                                          {itemA.image && <Image src={itemA.image} alt={itemA.text} width={100} height={100} className="mx-auto mb-2 rounded-md" />}
+                                          {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
                                           {itemA.text}
                                       </div>
                                       <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                      <Select 
-                                          onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} 
-                                          value={answers[question.id]?.[itemA.text] || ''}
-                                      >
+                                      <Select onValueChange={(value) => handleMatchingAnswerChange(question.id, itemA.text, value)} value={answers[question.id]?.[itemA.text] || ''}>
                                           <SelectTrigger>
                                               <SelectValue placeholder="Select a match" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                              {question.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
+                                              {question.matchingOptions?.columnB.map((itemB, bIndex) => (
                                                   <SelectItem key={`${question.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
                                                       <div className="flex items-center gap-2">
-                                                          {itemB.image && <Image src={itemB.image} alt={itemB.text} width={24} height={24} className="rounded-sm" />}
+                                                          {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
                                                           <span>{itemB.text}</span>
                                                       </div>
                                                   </SelectItem>
@@ -510,7 +502,7 @@ export default function TestClientPage({ test }: { test: Test }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Time's Up!</AlertDialogTitle>
             <AlertDialogDescription>
-              The time limit for this test has been reached. Your answers will now be submitted.
+              The time limit for this mock test has been reached. Your answers will now be submitted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogAction onClick={() => handleSubmit()}>

@@ -459,14 +459,10 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                         <CardHeader className="p-0">
                             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                                 <div className="flex items-center gap-4">
-                                    <Avatar className="h-16 w-16">
-                                        <AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} />
-                                        <AvatarFallback>{student?.displayName?.[0]}</AvatarFallback>
-                                    </Avatar>
+                                    <Avatar className="h-16 w-16"><AvatarImage src={student?.photoURL || `https://picsum.photos/seed/${student?.uid}/64/64`} /><AvatarFallback>{student?.displayName?.[0]}</AvatarFallback></Avatar>
                                     <div>
                                         <h3 className="name text-lg font-semibold">{student?.displayName}</h3>
                                         <div className="flex items-center gap-2">
-                                            
                                             <Badge variant="outline" className="border-blue-300 bg-blue-50 text-blue-600"><BadgeCheck className="w-3.5 h-3.5 mr-1"/>Verified</Badge>
                                             {student?.subscriptionPlan === 'pro' && (
                                                 <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-600">
@@ -517,7 +513,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                  <h1 className="font-headline text-2xl font-bold tracking-tighter">{test.title}</h1>
             </div>
 
-             <Card className={cn(
+            <Card className={cn(
                 "sticky top-[64px] z-40 border-x-0 border-b",
                 timeLeft !== null && timeLeft <= 60 && "bg-red-50 dark:bg-red-900/20 border-red-200"
             )}>
@@ -618,12 +614,12 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                             )}
                                             <Label
                                                 htmlFor={`q-single-${currentQuestion.id}-opt${optIndex}`}
-                                                className="flex items-center gap-3 w-full cursor-pointer"
+                                                className="flex justify-between items-center gap-3 w-full cursor-pointer h-16"
                                             >
-                                                <RadioGroupItem value={option.text} id={`q-single-${currentQuestion.id}-opt${optIndex}`} />
                                                 <div className="flex-1 text-base font-normal">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                                 </div>
+                                                <RadioGroupItem value={option.text} id={`q-single-${currentQuestion.id}-opt${optIndex}`} />
                                             </Label>
                                         </div>
                                     ))}
@@ -667,12 +663,12 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                                 )}
                                                 <Label
                                                     htmlFor={`q-all-${question.id}-opt${optIndex}`}
-                                                    className="flex items-center gap-3 w-full cursor-pointer"
+                                                    className="flex justify-between items-center gap-3 w-full cursor-pointer h-16"
                                                 >
-                                                    <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
                                                     <div className="flex-1 text-base font-normal">
                                                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                                     </div>
+                                                    <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
                                                 </Label>
                                             </div>
                                         ))}
