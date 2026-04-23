@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -542,7 +541,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     stopSound();
                     playSystemSound('incorrect');
                     setFeedback(t.timesUp);
-                    setTimeout(nextQuestion, 1500); 
+                    setTimeout(nextQuestion, 5000); 
                     return 0;
                 }
                 return prev - 1;
@@ -852,10 +851,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                            <Skeleton className="h-20 w-full rounded-xl" />
-                            <Skeleton className="h-20 w-full rounded-xl" />
-                            <Skeleton className="h-20 w-full rounded-xl" />
-                            <Skeleton className="h-20 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
                         </div>
                     </CardContent>
                 </Card>
@@ -1109,7 +1108,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 <Label
                                                                     htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                                     className={cn(
-                                                                        "rounded-xl border-2 p-4 flex justify-between items-center gap-4 h-20 md:h-24 transition-all duration-300 relative",
+                                                                        "rounded-xl border-2 p-4 flex justify-between items-center gap-4 h-16 transition-all duration-300 relative",
                                                                         !isShown && "cursor-pointer hover:scale-105",
                                                                         isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
                                                                         isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white",
@@ -1138,7 +1137,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             key={index}
                                                             htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                             className={cn(
-                                                                "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40",
+                                                                "rounded-xl border-2 p-4 text-xl font-bold flex justify-center items-center gap-4 transition-all duration-300 w-40 h-16",
                                                                 !isShown && "cursor-pointer hover:scale-105",
                                                                 !isShown && gradientClass,
                                                                 isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
@@ -1293,5 +1292,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
-    

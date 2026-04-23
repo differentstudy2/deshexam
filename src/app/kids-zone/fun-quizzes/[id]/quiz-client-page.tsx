@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -852,10 +851,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                            <Skeleton className="h-20 w-full rounded-xl" />
-                            <Skeleton className="h-20 w-full rounded-xl" />
-                            <Skeleton className="h-20 w-full rounded-xl" />
-                            <Skeleton className="h-20 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
+                            <Skeleton className="h-16 w-full rounded-xl" />
                         </div>
                     </CardContent>
                 </Card>

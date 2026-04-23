@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -600,21 +599,18 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                             {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
                                 <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {currentQuestion.options.map((option, optIndex) => (
-                                        <div
-                                            key={optIndex}
-                                            className={cn(
-                                                "p-3 border rounded-lg flex flex-col gap-3 transition-colors",
-                                                optionBgColors[optIndex % optionBgColors.length]
-                                            )}
-                                        >
+                                        <div key={optIndex}>
                                             {option.image && (
-                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary">
+                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary mb-2">
                                                     <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                                 </div>
                                             )}
                                             <Label
                                                 htmlFor={`q-single-${currentQuestion.id}-opt${optIndex}`}
-                                                className="flex justify-between items-center gap-3 w-full cursor-pointer h-16"
+                                                className={cn(
+                                                    "p-3 border rounded-lg flex items-center justify-between gap-3 w-full cursor-pointer h-16 transition-colors",
+                                                    optionBgColors[optIndex % optionBgColors.length]
+                                                )}
                                             >
                                                 <div className="flex-1 text-base font-normal">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
@@ -649,21 +645,18 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                 {question.type === 'Multiple Choice' && question.options && (
                                     <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {question.options.map((option, optIndex) => (
-                                            <div
-                                                key={optIndex}
-                                                className={cn(
-                                                    "p-3 border rounded-lg flex flex-col gap-3 transition-colors",
-                                                    optionBgColors[optIndex % optionBgColors.length]
-                                                )}
-                                            >
+                                            <div key={optIndex}>
                                                 {option.image && (
-                                                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary">
+                                                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary mb-2">
                                                         <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                                     </div>
                                                 )}
                                                 <Label
                                                     htmlFor={`q-all-${question.id}-opt${optIndex}`}
-                                                    className="flex justify-between items-center gap-3 w-full cursor-pointer h-16"
+                                                    className={cn(
+                                                        "p-3 border rounded-lg flex items-center justify-between gap-3 w-full cursor-pointer h-16 transition-colors",
+                                                        optionBgColors[optIndex % optionBgColors.length]
+                                                    )}
                                                 >
                                                     <div className="flex-1 text-base font-normal">
                                                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>

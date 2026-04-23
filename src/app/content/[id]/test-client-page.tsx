@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -372,7 +371,24 @@ export default function TestClientPage({ test }: { test: Test }) {
                                     ))}
                                 </div>
                             ) : (
-                                <div>({skippedQuestions.length})</div>
+                                <div className="w-48">
+                                    <Carousel opts={{ align: "start", loop: false }}>
+                                        <CarouselContent className="-ml-2">
+                                            {skippedQuestions.map((qIndex) => (
+                                                <CarouselItem key={`skipped-carousel-${qIndex}`} className="pl-2 basis-auto">
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="h-7 w-7 rounded-full p-0 text-xs"
+                                                        onClick={() => handleNavigateToQuestion(qIndex)}
+                                                    >
+                                                        {qIndex + 1}
+                                                    </Button>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                    </Carousel>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -383,6 +399,7 @@ export default function TestClientPage({ test }: { test: Test }) {
               {questions.slice(0, visibleQuestions).map((question, index) => {
                  const isLastQuestion = index === visibleQuestions - 1;
                  const userAnswer = answers[question.id];
+                 const isCorrectForCapture = false; // Not used on this page
                  return (
                   <Card key={question.id || index} ref={el => {
                       questionRefs.current[index] = el;
@@ -399,35 +416,27 @@ export default function TestClientPage({ test }: { test: Test }) {
                     <CardContent className="p-0">
                       {question.type === 'Multiple Choice' && question.options && (
                         <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {question.options.map((option, optIndex) => {
-                            const isUserAnswer = userAnswer === option.text;
-                            const isCorrectAnswer = question.correctAnswer === option.text;
-                            const isShown = isAnswerRevealed;
-                            return (
-                                <div key={optIndex} className="p-3 border rounded-lg flex flex-col gap-3">
-                                    {option.image && (
-                                        <div className={cn("relative w-full aspect-video rounded-md overflow-hidden bg-white/20 mb-2", option.image ? 'block' : 'hidden')}>
-                                            <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
-                                        </div>
+                          {question.options.map((option, optIndex) => (
+                            <div key={optIndex}>
+                                {option.image && (
+                                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-secondary mb-2">
+                                        <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
+                                    </div>
+                                )}
+                                <Label
+                                    htmlFor={`q-all-${question.id}-opt${optIndex}`}
+                                    className={cn(
+                                        "w-full flex items-center justify-between h-16 p-4 text-left border rounded-lg",
+                                        "cursor-pointer hover:bg-accent"
                                     )}
-                                    <Label
-                                        htmlFor={`q-all-${question.id}-opt${optIndex}`}
-                                        className="flex justify-between items-center gap-3 w-full cursor-pointer h-16"
-                                    >
-                                        <div className="flex-1 text-base font-normal">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            {isShown && (
-                                                isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
-                                                isUserAnswer ? <XCircle className="w-5 h-5 text-destructive" /> : null
-                                            )}
-                                            <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
-                                        </div>
-                                    </Label>
-                                </div>
-                            )
-                          })}
+                                >
+                                    <div className="flex-1 text-base font-normal">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                    </div>
+                                    <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} />
+                                </Label>
+                            </div>
+                          ))}
                         </RadioGroup>
                       )}
                       {question.type === 'True/False' && (
@@ -468,7 +477,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                                               <SelectValue placeholder="Select a match" />
                                           </SelectTrigger>
                                           <SelectContent>
-                                              {question.matchingOptions?.columnB.map((itemB, bIndex) => (
+                                              {question.matchingOptions?.columnB.map((itemB: any, bIndex: number) => (
                                                   <SelectItem key={`${question.id}-${itemA.text}-${bIndex}`} value={itemB.text}>
                                                       <div className="flex items-center gap-2">
                                                           {itemB.image && <Image src={itemB.image} alt={itemB.text} width={20} height={20} className="rounded-sm" />}
