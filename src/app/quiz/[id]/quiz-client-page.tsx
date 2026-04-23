@@ -817,6 +817,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     }, [fillInTheBlankAnswers, currentQuestion, isSubmitting, checkFillInTheBlankAnswer]);
 
     const handleMatchingAnswerChange = (columnAItem: string, columnBItem: string) => {
+        if (isSubmitting) return;
         const newAnswers = { ...matchingAnswers, [columnAItem]: columnBItem };
         setMatchingAnswers(newAnswers);
         if (currentQuestion.matchingOptions && Object.keys(newAnswers).length === currentQuestion.matchingOptions.columnA.length) {
@@ -1093,18 +1094,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                          const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                         return (
-                                                            <div
-                                                                key={index}
-                                                                className={cn(
-                                                                    "rounded-xl border-2 p-3 flex flex-col justify-start gap-4 transition-all duration-300 relative",
-                                                                    isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
-                                                                    isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 dark:text-slate-900",
-                                                                    !isShown && gradientClass,
-                                                                    isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
-                                                                )}
-                                                            >
+                                                            <div key={index}>
                                                                 {option.image && (
-                                                                    <div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20">
+                                                                    <div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2">
                                                                         <Image 
                                                                             src={option.image} 
                                                                             alt={option.text || `Option ${index + 1}`}
@@ -1116,11 +1108,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 )}
                                                                 <Label
                                                                     htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
-                                                                    className={cn("flex items-center gap-2 w-full", !isShown && "cursor-pointer")}
+                                                                    className={cn(
+                                                                        "rounded-xl border-2 p-4 flex justify-between items-center gap-4 h-20 md:h-24 transition-all duration-300 relative",
+                                                                        !isShown && "cursor-pointer hover:scale-105",
+                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
+                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white",
+                                                                        !isShown && gradientClass,
+                                                                        isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white"
+                                                                    )}
                                                                 >
-                                                                    <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50" />
-                                                                    <span className={cn("font-bold text-lg", isShown ? 'text-white' : '')}>{String.fromCharCode(65 + index)}.</span>
-                                                                    <span className={cn("text-left font-bold text-lg", isShown ? 'text-white' : '')}>{option.text}</span>
+                                                                    <span className={cn("font-bold text-lg md:text-xl")}>{String.fromCharCode(65 + index)}. {option.text}</span>
+                                                                    <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50" />
                                                                 </Label>
                                                             </div>
                                                         );
@@ -1228,7 +1226,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 ))}
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
-                                            ((currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim()) || currentQuestion.answerImage || currentQuestion.answerAudio) ? (
+                                            ((currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim()) || currentQuestion.answerImage || currentQuestion.answerAudio) && (
                                                 <div className="mt-4 flex flex-col items-center gap-4">
                                                     {currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim() && (
                                                         <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
@@ -1244,7 +1242,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         <audio controls src={currentQuestion.answerAudio} className="w-full mt-4 max-w-sm" />
                                                     )}
                                                 </div>
-                                            ) : null
+                                            )
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
                                         )}
@@ -1295,3 +1293,5 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
+    
