@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -51,7 +52,9 @@ type Question = {
         columnB: { text: string; image?: string; }[];
     };
     correctAnswer: any;
-    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching';
+    type: 'Multiple Choice' | 'True/False' | 'Short Answer' | 'Fill in the Blank' | 'Matching' | 'Direct Question';
+    answerImage?: string;
+    answerAudio?: string;
 };
 
 type Quiz = {
@@ -942,18 +945,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     "shadow-2xl overflow-hidden mt-2 bg-gradient-to-br",
                                     bgGradients[currentQuestionIndex % bgGradients.length]
                                 )}>
-                                    <CardHeader className="relative p-6 text-white">
-                                        {currentQuestion && currentQuestion.image && (
-                                            <div className="relative h-48 w-full mt-4">
-                                                <Image src={currentQuestion.image} alt={currentQuestion.text} layout="fill" objectFit="contain" className="rounded-lg" />
-                                            </div>
-                                        )}
-                                        
-                                         <div className="flex items-start justify-between gap-2">
+                                    <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
+                                        <div className="flex items-start justify-between gap-2">
                                             <CardTitle className="text-left text-2xl md:text-3xl font-bold">
                                                 <span>{currentQuestion?.text}</span>
                                             </CardTitle>
                                         </div>
+                                        {currentQuestion && currentQuestion.image && (
+                                            <div className="relative h-48 w-full mt-4">
+                                                <Image src={currentQuestion.image} alt={currentQuestion.text || 'Question Image'} layout="fill" objectFit="contain" className="rounded-lg" />
+                                            </div>
+                                        )}
                                     </CardHeader>
                                     <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
@@ -974,7 +976,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 key={index}
                                                                 htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                                 className={cn(
-                                                                    "rounded-xl border-2 p-4 flex justify-between items-center gap-4 transition-all duration-300 relative",
+                                                                    "rounded-xl border-2 p-4 flex flex-col justify-start items-center gap-4 transition-all duration-300 relative",
                                                                     !isShown && "cursor-pointer hover:scale-105",
                                                                     isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900",
                                                                     isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 dark:text-slate-900",
@@ -982,11 +984,22 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                     isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-slate-900"
                                                                 )}
                                                             >
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="font-bold">{String.fromCharCode(65 + index)}.</span>
-                                                                    <span className="text-left font-bold text-lg">{option.text}</span>
+                                                                <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="absolute top-2 right-2 h-6 w-6 z-10 bg-white/50" />
+                                                                {option.image && (
+                                                                    <div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20">
+                                                                        <Image 
+                                                                            src={option.image} 
+                                                                            alt={option.text || `Option ${index + 1}`}
+                                                                            layout="fill"
+                                                                            objectFit="contain"
+                                                                            className="rounded-md"
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex items-center gap-2 w-full pt-2">
+                                                                    <span className={cn("font-bold text-lg", isShown ? 'text-white' : '')}>{String.fromCharCode(65 + index)}.</span>
+                                                                    <span className={cn("text-left font-bold text-lg", isShown ? 'text-white' : '')}>{option.text}</span>
                                                                 </div>
-                                                                <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} />
                                                             </Label>
                                                         );
                                                     })}
@@ -1054,9 +1067,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             onValueChange={(value) => {
                                                                 const currentAnswers = matchingAnswers || {};
                                                                 const newAnswers = { ...currentAnswers, [itemA.text]: value };
-                                                                setMatchingAnswers(newAnswers);
+                                                                handleAnswer(newAnswers);
                                                             }}
-                                                            value={matchingAnswers[itemA.text] || ''}
+                                                            value={answers[currentQuestion.id]?.[itemA.text] || ''}
                                                             disabled={selectedAnswer !== null}
                                                         >
                                                             <SelectTrigger>
