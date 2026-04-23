@@ -185,7 +185,7 @@ const jsonExampleSA = `
   "questions": [
     {
       "text": "What is the chemical symbol for water?",
-      "type": "Short Answer",
+      "type": "Direct Question",
       "correctAnswer": "H2O",
       "explanation": "Water is a chemical compound consisting of two hydrogen atoms and one oxygen atom."
     }
@@ -197,14 +197,16 @@ const jsonExampleFIB = `
 {
   "questions": [
     {
-      "text": "The powerhouse of the cell is the ____.",
+      "text": "The cat sat on the ____.",
       "type": "Fill in the Blank",
-      "correctAnswer": "mitochondrion",
-      "explanation": "Mitochondria generate most of the cell's supply of adenosine triphosphate (ATP)."
+      "wordBank": "mat\\nball\\nhat",
+      "correctAnswerString": "mat",
+      "explanation": "A mat is a common place for a cat to sit."
     }
   ]
 }
 `;
+
 const jsonExampleMatching = `
 {
   "questions": [
@@ -1272,4 +1274,5 @@ export default function AddKidsContentPage() {
   );
 }
 
+    
     
