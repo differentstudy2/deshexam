@@ -90,7 +90,7 @@ const translations = {
         copyQuestion: "Copy Question"
     },
     hi: {
-        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएँ",
+        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएं",
         quizComplete: "क्विज़ पूरा हुआ!",
         amazingJob: "आपने अद्भुत काम किया!",
         yourScore: "आपका स्कोर",
@@ -357,7 +357,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 5000);
     }, [selectedAnswer, isSubmitting, stopSound, currentQuestion, t, playSystemSound, nextQuestion]);
-
 
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
@@ -817,14 +816,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     }, [fillInTheBlankAnswers, currentQuestion, isSubmitting, checkFillInTheBlankAnswer]);
 
     const handleMatchingAnswerChange = (columnAItem: string, columnBItem: string) => {
-        setMatchingAnswers(prev => ({ ...prev, [columnAItem]: columnBItem }));
-    };
-
-    useEffect(() => {
-        if (currentQuestion?.type === 'Matching' && currentQuestion.matchingOptions && Object.keys(matchingAnswers).length === currentQuestion.matchingOptions.columnA.length && !selectedAnswer) {
-            handleAnswer(matchingAnswers);
+        const newAnswers = { ...matchingAnswers, [columnAItem]: columnBItem };
+        setMatchingAnswers(newAnswers);
+        if (currentQuestion.matchingOptions && Object.keys(newAnswers).length === currentQuestion.matchingOptions.columnA.length) {
+            handleAnswer(newAnswers);
         }
-    }, [matchingAnswers, currentQuestion, handleAnswer, selectedAnswer]);
+    };
 
 
     if (isLoading) {
@@ -1229,19 +1226,23 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 ))}
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
-                                            <div className="mt-4 flex flex-col items-center gap-4">
-                                                <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
-                                                    {currentQuestion.correctAnswer}
+                                            ((currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim()) || currentQuestion.answerImage || currentQuestion.answerAudio) ? (
+                                                <div className="mt-4 flex flex-col items-center gap-4">
+                                                    {currentQuestion.correctAnswer && String(currentQuestion.correctAnswer).trim() && (
+                                                        <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
+                                                            {String(currentQuestion.correctAnswer)}
+                                                        </div>
+                                                    )}
+                                                    {currentQuestion.answerImage && (
+                                                        <div className="relative w-full max-w-sm mx-auto aspect-video mt-4">
+                                                            <Image src={currentQuestion.answerImage} alt="Answer Image" layout="fill" objectFit="contain" className="rounded-lg" />
+                                                        </div>
+                                                    )}
+                                                    {currentQuestion.answerAudio && (
+                                                        <audio controls src={currentQuestion.answerAudio} className="w-full mt-4 max-w-sm" />
+                                                    )}
                                                 </div>
-                                                {currentQuestion.answerImage && (
-                                                    <div className="relative w-full max-w-sm mx-auto aspect-video mt-4">
-                                                        <Image src={currentQuestion.answerImage} alt="Answer Image" layout="fill" objectFit="contain" className="rounded-lg" />
-                                                    </div>
-                                                )}
-                                                {currentQuestion.answerAudio && (
-                                                    <audio controls src={currentQuestion.answerAudio} className="w-full mt-4 max-w-sm" />
-                                                )}
-                                            </div>
+                                            ) : null
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
                                         )}
@@ -1250,16 +1251,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 {feedback}
                                                 {!isCorrect && selectedAnswer && (
                                                     <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                        <span>{t.correctAnswer}: </span> 
-                                                        {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
-                                                            <div className="flex flex-col items-center mt-1">
-                                                                {currentQuestion.correctAnswer.map((pair: any, i: number) => (
-                                                                    <span key={i} className="ml-1">{pair.a} &rarr; {pair.b}</span>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <span className="ml-1">{String(currentQuestion.correctAnswer)}</span>
-                                                        )}
+                                                      <span>{t.correctAnswer}: </span>
+                                                      {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
+                                                          <div className="flex flex-col items-center mt-1">
+                                                              {currentQuestion.correctAnswer.map((pair: any, i: number) => (
+                                                                  <span key={i} className="ml-1">{pair.a} &rarr; {pair.b}</span>
+                                                              ))}
+                                                          </div>
+                                                      ) : (
+                                                          <span className="ml-1">{String(currentQuestion.correctAnswer)}</span>
+                                                      )}
                                                     </div>
                                                 )}
                                             </div>
