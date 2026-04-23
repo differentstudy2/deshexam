@@ -816,8 +816,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [fillInTheBlankAnswers, currentQuestion, isSubmitting, checkFillInTheBlankAnswer]);
 
+    const handleMatchingAnswerChange = (columnAItem: string, columnBItem: string) => {
+        setMatchingAnswers(prev => ({ ...prev, [columnAItem]: columnBItem }));
+    };
+
     useEffect(() => {
-        if (currentQuestion?.type === 'Matching' && matchingAnswers && currentQuestion.matchingOptions && Object.keys(matchingAnswers).length === currentQuestion.matchingOptions.columnA.length && !selectedAnswer) {
+        if (currentQuestion?.type === 'Matching' && currentQuestion.matchingOptions && Object.keys(matchingAnswers).length === currentQuestion.matchingOptions.columnA.length && !selectedAnswer) {
             handleAnswer(matchingAnswers);
         }
     }, [matchingAnswers, currentQuestion, handleAnswer, selectedAnswer]);
@@ -1188,14 +1192,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     ))}
                                                 </div>
                                             </div>
-                                        ) : currentQuestion?.type === 'Matching' ? (
+                                        ) : currentQuestion?.type === 'Matching' && currentQuestion?.matchingOptions ? (
                                             <div className="w-full space-y-4">
                                                 <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
                                                     <div className="font-bold text-center">Column A</div>
                                                     <div></div>
                                                     <div className="font-bold text-center">Column B</div>
                                                 </div>
-                                                {currentQuestion.matchingOptions?.columnA.map((itemA, itemIndex) => (
+                                                {currentQuestion.matchingOptions.columnA.map((itemA, itemIndex) => (
                                                     <div key={itemIndex} className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
                                                         <div className="p-3 border rounded-md text-center bg-secondary">
                                                             {itemA.image && <Image src={itemA.image} alt={itemA.text} width={40} height={40} className="mx-auto mb-1 rounded-sm" />}
@@ -1203,7 +1207,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </div>
                                                         <GripVertical className="h-5 w-5 text-muted-foreground" />
                                                         <Select
-                                                            onValueChange={(value) => handleMatchingAnswerChange(currentQuestion.id, itemA.text, value)}
+                                                            onValueChange={(value) => handleMatchingAnswerChange(itemA.text, value)}
                                                             value={matchingAnswers[itemA.text] || ''}
                                                             disabled={selectedAnswer !== null}
                                                         >
