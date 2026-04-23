@@ -90,7 +90,7 @@ const translations = {
         copyQuestion: "Copy Question"
     },
     hi: {
-        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएँ",
+        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएं",
         quizComplete: "क्विज़ पूरा हुआ!",
         amazingJob: "आपने अद्भुत काम किया!",
         yourScore: "आपका स्कोर",
@@ -357,17 +357,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
         nextQuestionTimeoutRef.current = setTimeout(nextQuestion, 5000);
     }, [selectedAnswer, isSubmitting, stopSound, currentQuestion, t, playSystemSound, nextQuestion]);
-
-    const handleMatchingAnswerChange = (columnAItem: string, columnBItem: string) => {
-        setMatchingAnswers(prev => ({ ...prev, [columnAItem]: columnBItem }));
-    };
-
-    useEffect(() => {
-        if (currentQuestion?.type === 'Matching' && currentQuestion.matchingOptions && Object.keys(matchingAnswers).length === currentQuestion.matchingOptions.columnA.length && !selectedAnswer) {
-            handleAnswer(matchingAnswers);
-        }
-    }, [matchingAnswers, currentQuestion, handleAnswer, selectedAnswer]);
-
 
     const onAudioEnd = useCallback(() => {
         if (autoAnswerEnabled && currentQuestion) {
@@ -826,6 +815,14 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
     }, [fillInTheBlankAnswers, currentQuestion, isSubmitting, checkFillInTheBlankAnswer]);
 
+    const handleMatchingAnswerChange = (columnAItem: string, columnBItem: string) => {
+        const newAnswers = { ...matchingAnswers, [columnAItem]: columnBItem };
+        setMatchingAnswers(newAnswers);
+        if (currentQuestion.matchingOptions && Object.keys(newAnswers).length === currentQuestion.matchingOptions.columnA.length) {
+            handleAnswer(newAnswers);
+        }
+    };
+
 
     if (isLoading) {
         return (
@@ -1154,7 +1151,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                     );
                                                 })}
                                             </RadioGroup>
-                                        ) : (currentQuestion?.type === 'Short Answer' || (currentQuestion?.type === 'Fill in the Blank' && (!currentQuestion.options || currentQuestion.options.length === 0))) ? (
+                                        ) : (currentQuestion?.type === 'Short Answer' || currentQuestion?.type === 'Fill in the Blank') ? (
                                             <form onSubmit={(e) => { e.preventDefault(); handleAnswer(textAnswer); }} className="flex w-full max-w-sm items-center space-x-2 mx-auto">
                                                 <Input 
                                                     type="text" 
@@ -1230,9 +1227,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </div>
                                         ) : currentQuestion?.type === 'Direct Question' ? (
                                             <div className="mt-4 flex flex-col items-center gap-4">
-                                                <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
-                                                    {currentQuestion.correctAnswer}
-                                                </div>
+                                                {currentQuestion.correctAnswer && (
+                                                    <div className="w-full p-4 text-2xl font-bold text-white rounded-xl bg-gradient-to-r from-cyan-400 to-teal-500 shadow-lg text-center">
+                                                        {currentQuestion.correctAnswer}
+                                                    </div>
+                                                )}
                                                 {currentQuestion.answerImage && (
                                                     <div className="relative w-full max-w-sm mx-auto aspect-video mt-4">
                                                         <Image src={currentQuestion.answerImage} alt="Answer Image" layout="fill" objectFit="contain" className="rounded-lg" />
