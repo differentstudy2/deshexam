@@ -1190,7 +1190,18 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 {feedback}
                                                 {!isCorrect && selectedAnswer && (
                                                     <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                        <span>{t.correctAnswer}: {currentQuestion.correctAnswer}</span>
+                                                      <span>
+                                                          {t.correctAnswer}:{' '}
+                                                          {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
+                                                            <div className="flex flex-col items-center mt-1">
+                                                                {currentQuestion.correctAnswer.map((pair: any, i: number) => (
+                                                                    <span key={i}>{pair.a} &rarr; {pair.b}</span>
+                                                                ))}
+                                                            </div>
+                                                          ) : (
+                                                            String(currentQuestion.correctAnswer)
+                                                          )}
+                                                      </span>
                                                     </div>
                                                 )}
                                             </div>
