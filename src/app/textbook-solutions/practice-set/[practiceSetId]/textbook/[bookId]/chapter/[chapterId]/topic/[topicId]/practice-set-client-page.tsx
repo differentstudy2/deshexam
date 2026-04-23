@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -112,6 +113,8 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
 
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [visibleQuestions, setVisibleQuestions] = useState(5);
+  const [viewMode, setViewMode] = useState<'all' | 'single'>('all');
+
 
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
   
@@ -389,6 +392,8 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
     }, [pdfContent]);
 
 
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
   const handleNext = () => {
     if (test && currentQuestionIndex < test.questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -434,7 +439,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                     </CardContent>
                 </Card>
                 <div className="p-6 space-y-8 mt-6">
-                    {[...Array(1)].map((_, i) => (
+                    {[...Array(3)].map((_, i) => (
                         <Card key={i} className="p-6">
                             <Skeleton className="h-6 w-1/2 mb-4" />
                             <div className="space-y-3">
@@ -460,7 +465,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
   const totalDuration = (test.duration || totalMarks) * 60;
   const backToTopicUrl = topicId !== 'null' 
     ? `/textbook-solutions/${textbookId}/chapter/${chapterId}/topic/${topicId}`
-    : `/textbook-solutions/${textbookId}/chapter/${chapterId}`;
+    : `/admin/textbooks/${textbookId}/practice-sets`;
 
   const currentQuestion = test.questions[currentQuestionIndex];
   
@@ -618,29 +623,29 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                             {currentQuestion.type === 'Multiple Choice' && currentQuestion.options && (
                                 <RadioGroup onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)} value={answers[currentQuestion.id]} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {currentQuestion.options.map((option, optIndex) => (
-                                        <div key={optIndex} className={cn(
-                                            "p-3 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors cursor-pointer flex flex-col gap-3",
-                                            optionBgColors[optIndex % optionBgColors.length]
-                                        )}>
-                                            <RadioGroupItem value={option.text} id={`q${currentQuestion.id}-opt${optIndex}`} className="sr-only" />
-                                            <Label htmlFor={`q${currentQuestion.id}-opt${optIndex}`} className="text-base font-normal flex-1 cursor-pointer w-full">
-                                                {option.image && (
-                                                    <div className="relative w-full aspect-video mb-4 rounded-md overflow-hidden bg-white/20">
-                                                        <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
-                                                    </div>
-                                                )}
-                                                <div className="flex items-center gap-3 w-full">
-                                                    <div className="border bg-background/50 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
-                                                        <span className="font-bold text-sm">
-                                                            {String.fromCharCode(65 + optIndex)}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
-                                                    </div>
+                                        <Label
+                                            key={optIndex}
+                                            htmlFor={`q-all-${currentQuestion.id}-opt${optIndex}`}
+                                            className={cn(
+                                                "p-3 border rounded-lg has-[:checked]:bg-primary/10 has-[:checked]:border-primary transition-colors cursor-pointer flex flex-col gap-3",
+                                                optionBgColors[optIndex % optionBgColors.length]
+                                            )}
+                                        >
+                                            <RadioGroupItem value={option.text} id={`q-all-${currentQuestion.id}-opt${optIndex}`} className="sr-only" />
+                                            {option.image && (
+                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-white/20">
+                                                    <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                                 </div>
-                                            </Label>
-                                        </div>
+                                            )}
+                                            <div className="flex items-center gap-3 w-full">
+                                                <div className="border bg-background/50 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                                    <span className="font-bold text-sm">{String.fromCharCode(65 + optIndex)}</span>
+                                                </div>
+                                                <div className="flex-1 text-base font-normal">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        </Label>
                                     ))}
                                 </RadioGroup>
                             )}
@@ -678,7 +683,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                         >
                                             <RadioGroupItem value={option.text} id={`q-all-${question.id}-opt${optIndex}`} className="sr-only" />
                                             {option.image && (
-                                                <div className="relative w-full aspect-video mb-4 rounded-md overflow-hidden bg-white/20">
+                                                <div className="relative w-full aspect-video rounded-md overflow-hidden bg-white/20">
                                                     <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
                                                 </div>
                                             )}

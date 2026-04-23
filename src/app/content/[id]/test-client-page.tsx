@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -14,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Clock, HelpCircle, ArrowLeft, GripVertical, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -22,6 +23,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useAuthDialog } from '@/hooks/use-auth-dialog';
 import { addTestSubmission, getUserProfile } from '@/lib/firebase/firestore';
 import { cn } from "@/lib/utils";
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -41,7 +43,6 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Image from 'next/image';
 
 type Option = {
   text: string;
@@ -400,19 +401,23 @@ export default function TestClientPage({ test }: { test: Test }) {
                         <RadioGroup onValueChange={(value) => handleAnswerChange(question.id, value)} value={answers[question.id] || ''} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {question.options.map((option, optIndex) => {
                             const isCorrectAnswer = question.correctAnswer === option.text;
+                            const isUserAnswer = userAnswer === option.text;
                             return (
-                              <div key={optIndex}>
-                                <Label htmlFor={`q-${question.id}-opt${optIndex}`} className={cn(
+                                <Label
+                                    key={optIndex}
+                                    htmlFor={`q-${question.id}-opt${optIndex}`}
+                                    className={cn(
                                     "flex flex-col p-4 border rounded-lg cursor-pointer transition-all",
                                     isAnswerRevealed && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-100 dark:bg-green-900/30",
-                                    isAnswerRevealed && userAnswer === option.text && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
+                                    isAnswerRevealed && isUserAnswer && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-100 dark:bg-red-900/30",
                                     !isAnswerRevealed && "hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/10",
-                                )}>
-                                  {option.image && (
-                                      <div className="relative w-full aspect-video mb-4 rounded-md overflow-hidden">
-                                          <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
-                                      </div>
-                                  )}
+                                    )}
+                                >
+                                     {option.image && (
+                                        <div className="relative w-full aspect-video mb-4 rounded-md overflow-hidden">
+                                            <Image src={option.image} alt={option.text || `Option image`} fill className="object-contain" />
+                                        </div>
+                                    )}
                                   <div className="flex items-center space-x-3 w-full">
                                     <RadioGroupItem value={option.text} id={`q-${question.id}-opt${optIndex}`} />
                                     <div className="text-base font-normal flex-1">
@@ -420,11 +425,10 @@ export default function TestClientPage({ test }: { test: Test }) {
                                     </div>
                                     {isAnswerRevealed && (
                                         isCorrectAnswer ? <CheckCircle className="w-5 h-5 text-green-500" /> :
-                                        userAnswer === option.text ? <XCircle className="w-5 h-5 text-destructive" /> : null
+                                        isUserAnswer ? <XCircle className="w-5 h-5 text-destructive" /> : null
                                     )}
                                   </div>
                                 </Label>
-                              </div>
                             )
                           })}
                         </RadioGroup>
