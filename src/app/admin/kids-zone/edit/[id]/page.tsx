@@ -51,6 +51,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
+import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
 
 
 const funQuizQuestionSchema = z.object({
@@ -104,8 +105,27 @@ const formSchema = z.object({
     }
 });
 
+const aiGeneratorFormSchema = z.object({
+    sourceType: z.enum(['topic', 'text', 'file']),
+    sourceTopic: z.string().optional(),
+    sourceText: z.string().optional(),
+    sourceFile: z.string().optional(),
+    numQuestions: z.coerce.number().int().min(1).max(20),
+    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Matching', 'Fill in the Blank', 'Direct Question', 'Any']),
+}).refine(data => {
+    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
+    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
+    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
+    return false;
+}, {
+    message: 'Source content must be at least 3 characters.',
+    path: ['sourceTopic'], 
+});
+
 
 type FormValues = z.infer<typeof formSchema>;
+type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
 
 type Subject = { id: string, name: string };
 type Board = { id: string, name: string };
@@ -275,6 +295,10 @@ export default function EditKidsContentPage() {
     const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
     const [newCategoryData, setNewCategoryData] = useState({ title: '', description: '', icon: 'ToyBrick' });
     const [isAddingCategory, setIsAddingCategory] = useState(false);
+    
+    const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const aiFormFileInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -302,6 +326,19 @@ export default function EditKidsContentPage() {
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: 'questions',
+    });
+    
+    const aiForm = useForm<AIGeneratorFormValues>({
+        resolver: zodResolver(aiGeneratorFormSchema),
+        defaultValues: {
+          sourceType: 'topic',
+          sourceTopic: '',
+          sourceText: '',
+          sourceFile: '',
+          numQuestions: 5,
+          difficulty: 'Easy',
+          questionType: 'Multiple Choice',
+        },
     });
 
     useEffect(() => {
@@ -520,7 +557,6 @@ export default function EditKidsContentPage() {
             };
             await updateContent(contentId, contentToSave);
             toast({ title: 'Content Updated!', description: `The item "${data.title}" has been successfully updated.` });
-            router.push('/admin/kids-zone/manage');
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -592,7 +628,7 @@ export default function EditKidsContentPage() {
         }
         setIsAddingCategory(true);
         try {
-            await addKidsZoneCategory(newCategoryData);
+            const newCatId = await addKidsZoneCategory(newCategoryData);
             toast({ title: 'Category added!' });
             setIsCategoryDialogOpen(false);
             setNewCategoryData({ title: '', description: '', icon: 'ToyBrick' });
@@ -608,6 +644,83 @@ export default function EditKidsContentPage() {
             toast({ variant: 'destructive', title: 'Failed to add category', description: (error as Error).message });
         } finally {
             setIsAddingCategory(false);
+        }
+    };
+
+     const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
+        setIsGenerating(true);
+        try {
+            const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
+                         : aiData.sourceType === 'text' ? aiData.sourceText
+                         : aiData.sourceFile || null;
+    
+            if (!source || source.length < 3) {
+                toast({
+                    variant: "destructive",
+                    title: 'AI Generation Failed',
+                    description: 'Source content must be at least 3 characters.',
+                });
+                setIsGenerating(false);
+                return;
+            }
+    
+            const input: AIContentGeneratorInput = {
+                contentType: 'Kids Zone Quiz',
+                numQuestions: aiData.numQuestions,
+                difficulty: aiData.difficulty,
+                sourceType: aiData.sourceType,
+                source: source,
+                questionType: aiData.questionType === 'Direct Question' ? 'Short Answer' : aiData.questionType,
+            };
+
+            const result: AIContentGeneratorOutput = await generateContent(input);
+            
+            const mappedQuestions = result.questions.map((q: any) => ({
+                ...q,
+                type: q.type === 'Short Answer' ? 'Direct Question' : q.type,
+            }));
+            
+            append(mappedQuestions);
+            
+            toast({
+                title: 'Questions Added!',
+                description: `${result.questions.length} new questions have been added to your quiz.`,
+            });
+            setIsGeneratorOpen(false);
+    
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+          });
+        } finally {
+          setIsGenerating(false);
+        }
+    };
+    
+    const handleAiFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            if (file.type.startsWith('image/') || file.type === 'application/pdf' || file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const result = e.target?.result as string;
+                    aiForm.setValue('sourceFile', result, { shouldValidate: true });
+                    aiForm.setValue('sourceType', 'file');
+                };
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Invalid File Type',
+                    description: 'Please upload an image, PDF, or .txt file.',
+                });
+            }
         }
     };
 
@@ -1157,6 +1270,55 @@ export default function EditKidsContentPage() {
                                             <Button type="button" variant="outline" onClick={() => append({ text: '', type: 'Multiple Choice', options: [{text: ''}, {text: ''}, {text: ''}, {text: ''}], correctAnswer: '', explanation: '' })}>
                                                 <PlusCircle className="mr-2 h-4 w-4" /> Add Question
                                             </Button>
+                                            <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
+                                                <DialogTrigger asChild>
+                                                     <Button type="button" variant="outline"><Sparkles className="mr-2 h-4 w-4" /> Generate with AI</Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-xl">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Generate Quiz with AI</DialogTitle>
+                                                        <DialogDescription>Describe the quiz you want to create, and Gemini will generate questions for you.</DialogDescription>
+                                                    </DialogHeader>
+                                                    <Form {...aiForm}>
+                                                        <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                                                             <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
+                                                                <TabsList className="grid w-full grid-cols-3">
+                                                                    <TabsTrigger value="topic">From Topic</TabsTrigger>
+                                                                    <TabsTrigger value="text">From Text</TabsTrigger>
+                                                                    <TabsTrigger value="file">From File</TabsTrigger>
+                                                                </TabsList>
+                                                                <TabsContent value="topic" className="pt-4">
+                                                                    <FormField control={aiForm.control} name="sourceTopic" render={({ field }) => (<FormItem><FormLabel>Topic</FormLabel><FormControl><Input placeholder="e.g., 'Animal Sounds'" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                                                                </TabsContent>
+                                                                <TabsContent value="text" className="pt-4">
+                                                                    <FormField control={aiForm.control} name="sourceText" render={({ field }) => (<FormItem><FormLabel>Paste Text</FormLabel><FormControl><Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" /></FormControl><FormMessage /></FormItem>)}/>
+                                                                </TabsContent>
+                                                                <TabsContent value="file" className="pt-4">
+                                                                    <FormItem><FormLabel>Upload File</FormLabel>
+                                                                        <FormControl>
+                                                                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer" onClick={() => aiFormFileInputRef.current?.click()}>
+                                                                                <div className="space-y-1 text-center">
+                                                                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                                                    <p className="pl-1">{aiForm.watch('sourceFile') ? 'File selected' : 'Upload an Image, PDF or .txt file'}</p>
+                                                                                    <p className="text-xs text-muted-foreground">{aiForm.watch('sourceFile') ? (aiForm.watch('sourceFile') || '').substring(0, 50) + '...' : 'Text, image or PDF file up to 10MB'}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </FormControl>
+                                                                        <Input type="file" ref={aiFormFileInputRef} onChange={handleAiFileChange} className="hidden" accept="image/*,application/pdf,.txt"/>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                </TabsContent>
+                                                            </Tabs>
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                <FormField control={aiForm.control} name="numQuestions" render={({ field }) => (<FormItem><FormLabel>Number of Questions</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                                                                <FormField control={aiForm.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulty</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>
+                                                            </div>
+                                                            <FormField control={aiForm.control} name="questionType" render={({ field }) => (<FormItem><FormLabel>Question Type</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value="Any">Any</SelectItem><SelectItem value="Multiple Choice">Multiple Choice</SelectItem><SelectItem value="True/False">True/False</SelectItem><SelectItem value="Direct Question">Direct Question</SelectItem><SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem><SelectItem value="Matching">Matching</SelectItem></SelectContent></Select><FormMessage /></FormItem>)}/>
+                                                            <DialogFooter><Button type="submit" disabled={isGenerating}>{isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate Quiz"}</Button></DialogFooter>
+                                                        </form>
+                                                    </Form>
+                                                </DialogContent>
+                                            </Dialog>
                                             <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
                                                 <DialogTrigger asChild>
                                                     <Button type="button" variant="outline"><FileJson className="mr-2 h-4 w-4" /> Bulk Import</Button>
@@ -1238,13 +1400,14 @@ export default function EditKidsContentPage() {
                                     </CardFooter>
                                 </Card>
                             )}
-              </CardContent>
-            </Card>
-          <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Content"}
-          </Button>
-        </form>
-      </Form>
-    </div>
-  );
+                        </CardContent>
+                    </Card>
+                  <Button type="submit" disabled={isSubmitting}>
+                      <Save className="mr-2 h-4 w-4" />
+                      {isSubmitting ? "Saving..." : "Save Content"}
+                  </Button>
+                </form>
+            </Form>
+        </div>
+    );
 }
