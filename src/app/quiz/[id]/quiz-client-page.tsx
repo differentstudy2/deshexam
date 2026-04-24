@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -244,7 +243,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [captureMode, setCaptureMode] = useState<'idle' | 'question' | 'answer'>('idle');
     const [isLoading, setIsLoading] = useState(true);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('bn');
+    const [language, setLanguage] = useState<'en' | 'hi' | 'bn'>('en');
     const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
     const [textAnswer, setTextAnswer] = useState('');
 
@@ -1023,7 +1022,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </CardContent>
                             </Card>
                             <div ref={quizCardRef}>
-                                 <Card className={cn(
+                                <Card className={cn(
                                     "shadow-2xl overflow-hidden mt-2",
                                     (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
                                     captureMode === 'question' && 'bg-orange-500'
@@ -1033,7 +1032,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
                                         captureMode === 'question' && 'bg-orange-500'
                                     )}>
-                                        <div className="relative z-10">
+                                        <div className="relative z-10 min-h-[100px] flex items-center justify-center">
                                             <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
                                                 <span>{currentQuestion?.text}</span>
                                                 {currentQuestion?.audio && (
@@ -1062,7 +1061,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     <CardContent className="p-6 bg-orange-50 dark:bg-slate-900 rounded-b-xl">
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
-                                                <div className={cn("grid gap-4 w-full", viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1')}>
+                                                <div className={cn(
+                                                    "grid gap-4 w-full",
+                                                        viewMode === 'desktop' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'
+                                                )}>
                                                     {currentQuestion.options.map((option, index) => {
                                                         const isSelected = selectedAnswer === option.text;
                                                         const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
@@ -1074,10 +1076,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         return (
                                                             <div key={index}>
                                                                 {option.image && (<div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2"><Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" /></div>)}
-                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105 justify-between items-center", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
+                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
                                                                     {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
                                                                     {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
-                                                                    <span className={cn( "font-bold text-lg md:text-xl", !isCapturing && "flex-1 text-left", isCapturing && "text-black dark:text-white")}>{String.fromCharCode(65 + index)}. {option.text}</span>
+                                                                    <span className={cn( "font-bold text-lg md:text-xl", !isCapturing && "flex-1 text-left", isCapturing && "text-black dark:text-white justify-center flex")}>{String.fromCharCode(65 + index)}. {option.text}</span>
                                                                     {!isCapturing && <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50 shrink-0" />}
                                                                 </Label>
                                                             </div>
@@ -1188,3 +1190,5 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
+    
