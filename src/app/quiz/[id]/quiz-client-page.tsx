@@ -275,16 +275,15 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
         
         let soundUrl = '';
-        const langPath = language === 'en' ? '' : `${language}/`;
-        if (type === 'correct') soundUrl = `/audio/${langPath}correct.wav`;
-        else if (type === 'incorrect') soundUrl = `/audio/${langPath}incorrect.wav`;
-        else if (type === 'win') soundUrl = `/audio/win.mp3`;
+        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
+        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
+        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
         
         if(soundUrl) {
             const audio = new Audio(soundUrl);
             audio.play().catch(error => console.error(`Error playing sound:`, error));
         }
-    }, [stopSound, language]);
+    }, [stopSound]);
 
     const nextQuestion = useCallback(() => {
         stopSound();
@@ -883,21 +882,21 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                         <Confetti active={quizFinished} />
                         <CardHeader>
                             <Trophy className="w-20 h-20 text-yellow-500 mx-auto" />
-                            <CardTitle className="text-4xl font-bold font-headline mt-4">{t.quizComplete}</CardTitle>
-                            <CardDescription className="text-lg">{t.amazingJob}</CardDescription>
+                            <CardTitle className="text-4xl font-bold font-headline mt-4">Quiz Complete!</CardTitle>
+                            <CardDescription className="text-lg">You did an amazing job!</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <p className="text-5xl font-bold">{displayNum(score)} <span className="text-3xl text-muted-foreground">/ {displayNum(shuffledQuestions.length)}</span></p>
-                            <p className="text-xl mt-2 font-semibold">{t.yourScore}</p>
+                            <p className="text-xl mt-2 font-semibold">Your Score</p>
                             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button onClick={restartQuiz} size="lg">
                                     <RefreshCw className="mr-2 h-4 w-4" />
-                                    {t.playAgain}
+                                    Play Again
                                 </Button>
                                 <Button asChild variant="outline" size="lg">
                                     <Link href="/quizzes">
                                         <ArrowLeft className="mr-2 h-4 w-4" />
-                                        {t.backToQuizzes}
+                                        Back to Quizzes
                                     </Link>
                                 </Button>
                             </div>
@@ -947,11 +946,11 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent>
-                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>{t.saveAsDefault}</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />{t.saveForLandscape}</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />{t.saveForShorts}</DropdownMenuItem>
-                                                         <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>{t.saveForInstagram}</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>{t.saveForFacebook}</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('default')}>Save as Default</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('16:9')}><Video className="mr-2 h-4 w-4" />Save for Landscape (16:9)</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('9:16')}><Video className="mr-2 h-4 w-4 rotate-90" />Save for Shorts (9:16)</DropdownMenuItem>
+                                                         <DropdownMenuItem onClick={() => handleSaveAsImage('1:1')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>Save for Instagram (1:1)</DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleSaveAsImage('4:5')}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /></svg>Save for Facebook (4:5)</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
@@ -989,26 +988,26 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                             </Select>
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
-                                                            <Label htmlFor="timer-select" className="col-span-2">{t.timer}</Label>
+                                                            <Label htmlFor="timer-select" className="col-span-2">Timer</Label>
                                                             <Select value={timerDuration.toString()} onValueChange={handleTimerChange} disabled={selectedAnswer !== null}>
                                                                 <SelectTrigger id="timer-select" className="col-span-2 h-9">
                                                                     <SelectValue />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
-                                                                <SelectItem value="0">{t.off}</SelectItem>
-                                                                    <SelectItem value="15">15 {t.seconds}</SelectItem>
-                                                                    <SelectItem value="30">30 {t.seconds}</SelectItem>
-                                                                    <SelectItem value="60">60 {t.seconds}</SelectItem>
+                                                                <SelectItem value="0">Off</SelectItem>
+                                                                    <SelectItem value="15">15 seconds</SelectItem>
+                                                                    <SelectItem value="30">30 seconds</SelectItem>
+                                                                    <SelectItem value="60">60 seconds</SelectItem>
                                                                     
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
                                                         <div className="flex items-center justify-between">
-                                                            <Label htmlFor="autoplay-switch" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> {t.autoplayAudio}</Label>
+                                                            <Label htmlFor="autoplay-switch" className="flex items-center gap-2"><Volume2 className="w-5 h-5"/> Autoplay Audio</Label>
                                                             <Switch id="autoplay-switch" checked={autoplayEnabled} onCheckedChange={(checked) => { setAutoplayEnabled(checked); if (!checked) { stopSound(); } }} />
                                                         </div>
                                                         <div className="flex items-center justify-between">
-                                                            <Label htmlFor="auto-answer-switch" className="flex items-center gap-2"><Sparkles className="w-5 h-5"/> {t.autoAnswer}</Label>
+                                                            <Label htmlFor="auto-answer-switch" className="flex items-center gap-2"><Sparkles className="w-5 h-5"/> Auto Answer</Label>
                                                             <Switch id="auto-answer-switch" checked={autoAnswerEnabled} onCheckedChange={setAutoAnswerEnabled} />
                                                         </div>
                                                     </div>
@@ -1121,19 +1120,9 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                         return (
-                                                            <div 
-                                                                key={index} 
-                                                                onClick={() => { if (!selectedAnswer) handleAnswer(option.text); }}
-                                                                className={cn(
-                                                                    selectedAnswer ? "cursor-default" : "cursor-pointer group/option"
-                                                                )}
-                                                            >
-                                                                {option.image && (
-                                                                    <div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2 group-hover/option:ring-2 ring-primary transition-all">
-                                                                        <Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" />
-                                                                    </div>
-                                                                )}
-                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer group-hover/option:scale-105 group-hover/option:border-primary", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
+                                                            <div key={index}>
+                                                                {option.image && (<div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2"><Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" /></div>)}
+                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
                                                                     {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
                                                                     {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
                                                                     <div className={cn("flex-1", !isCapturing && "text-left", isCapturing && 'text-center')}>
@@ -1235,5 +1224,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
-    

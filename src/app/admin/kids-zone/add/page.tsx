@@ -415,9 +415,9 @@ export default function AddKidsContentPage() {
                 text: q.text,
                 image: q.image,
                 type: q.type === 'Short Answer' ? 'Direct Question' : q.type,
-                options: q.options || [],
+                options: q.options?.map((opt: any) => ({ text: opt.text, image: opt.image || '', audio: '' })) || [],
                 correctAnswer: q.correctAnswer,
-                explanation: q.explanation,
+                explanation: q.explanation || '',
                 audio: '',
                 wordBank: '',
                 correctAnswerString: '',
@@ -637,7 +637,7 @@ export default function AddKidsContentPage() {
                 contentType: 'Kids Zone Quiz',
                 numQuestions: aiData.numQuestions,
                 difficulty: aiData.difficulty,
-                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                sourceType: aiData.sourceType,
                 source: source,
                 questionType: aiData.questionType,
             };
@@ -650,14 +650,14 @@ export default function AddKidsContentPage() {
             
             const mappedQuestions = result.questions.map((q: any) => ({
                 text: q.text,
-                image: q.image || '',
+                image: q.image,
                 type: q.type === 'Short Answer' ? 'Direct Question' : q.type,
                 options: q.options?.map((opt: any) => ({ text: opt.text, image: opt.image || '', audio: '' })) || [],
                 correctAnswer: q.correctAnswer,
                 explanation: q.explanation || '',
                 audio: '',
-                wordBank: '',
-                correctAnswerString: '',
+                wordBank: q.wordBank || '',
+                correctAnswerString: q.correctAnswerString || '',
                 answerImage: '',
                 answerAudio: '',
             }));
@@ -684,19 +684,23 @@ export default function AddKidsContentPage() {
     const handleAiFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.type === 'text/plain') {
+            if (file.type.startsWith('image/') || file.type === 'application/pdf' || file.type === 'text/plain') {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const text = e.target?.result as string;
-                    aiForm.setValue('sourceFile', text, { shouldValidate: true });
+                    const result = e.target?.result as string;
+                    aiForm.setValue('sourceFile', result, { shouldValidate: true });
                     aiForm.setValue('sourceType', 'file');
                 };
-                reader.readAsText(file);
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
             } else {
                 toast({
                     variant: 'destructive',
                     title: 'Invalid File Type',
-                    description: 'Please upload a .txt file.',
+                    description: 'Please upload an image, PDF, or .txt file.',
                 });
             }
         }
@@ -828,10 +832,10 @@ export default function AddKidsContentPage() {
                                                 <div className="space-y-1 text-center">
                                                     <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                                                     <p className="pl-1">
-                                                        {aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}
+                                                        {aiForm.watch('sourceFile') ? 'File selected' : 'Upload an Image, PDF or .txt file'}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
-                                                    {aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}
+                                                    {aiForm.watch('sourceFile') ? (aiForm.watch('sourceFile') || '').substring(0, 50) + '...' : 'Text, image or PDF file up to 10MB'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -841,7 +845,7 @@ export default function AddKidsContentPage() {
                                             ref={aiFormFileInputRef}
                                             onChange={handleAiFileChange}
                                             className="hidden"
-                                            accept=".txt"
+                                            accept="image/*,application/pdf,.txt"
                                         />
                                         <FormMessage />
                                     </FormItem>
