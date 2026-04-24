@@ -275,15 +275,16 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
         
         let soundUrl = '';
-        if (type === 'correct') soundUrl = '/audio/correct-83487.mp3';
-        else if (type === 'incorrect') soundUrl = '/audio/incorrect-293358.mp3';
-        else if (type === 'win') soundUrl = '/audio/win-fanfare.mp3';
+        const langPath = language === 'en' ? '' : `${language}/`;
+        if (type === 'correct') soundUrl = `/audio/${langPath}correct.wav`;
+        else if (type === 'incorrect') soundUrl = `/audio/${langPath}incorrect.wav`;
+        else if (type === 'win') soundUrl = `/audio/win.mp3`;
         
         if(soundUrl) {
             const audio = new Audio(soundUrl);
             audio.play().catch(error => console.error(`Error playing sound:`, error));
         }
-    }, [stopSound]);
+    }, [stopSound, language]);
 
     const nextQuestion = useCallback(() => {
         stopSound();
@@ -348,7 +349,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (isCorrect) {
             setFeedback({ message: t.correct, type: 'correct' });
             setIsCorrect(true);
-            setScore(prev => prev + 1); // For quizzes, assume 1 point per question
+            setScore(prev => prev + 1);
             playSystemSound('correct');
         } else {
             setFeedback({ message: isPartial ? 'Partially Correct!' : t.incorrect, type: 'incorrect' });
@@ -1120,9 +1121,19 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                         return (
-                                                            <div key={index}>
-                                                                {option.image && (<div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2"><Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" /></div>)}
-                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
+                                                            <div 
+                                                                key={index} 
+                                                                onClick={() => { if (!selectedAnswer) handleAnswer(option.text); }}
+                                                                className={cn(
+                                                                    selectedAnswer ? "cursor-default" : "cursor-pointer group/option"
+                                                                )}
+                                                            >
+                                                                {option.image && (
+                                                                    <div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2 group-hover/option:ring-2 ring-primary transition-all">
+                                                                        <Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" />
+                                                                    </div>
+                                                                )}
+                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer group-hover/option:scale-105 group-hover/option:border-primary", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
                                                                     {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
                                                                     {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
                                                                     <div className={cn("flex-1", !isCapturing && "text-left", isCapturing && 'text-center')}>
@@ -1224,3 +1235,5 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
+
+    
