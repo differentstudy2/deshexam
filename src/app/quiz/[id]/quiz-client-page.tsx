@@ -221,7 +221,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
     const [matchingAnswers, setMatchingAnswers] = useState<{ [key: string]: string }>({});
-    const [feedback, setFeedback] = useState('');
+    const [feedback, setFeedback] = useState<{message: string, type: 'correct' | 'incorrect' | 'none'}>({message: '', type: 'none'});
     const [isCorrect, setIsCorrect] = useState(false);
     const [score, setScore] = useState(0);
     const [quizFinished, setQuizFinished] = useState(false);
@@ -291,7 +291,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (currentQuestionIndex < shuffledQuestions.length - 1) {
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedAnswer(null);
-            setFeedback('');
+            setFeedback({ message: '', type: 'none' });
             setIsCorrect(false);
             setMatchingAnswers({});
             setTextAnswer('');
@@ -334,6 +334,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
             } else if (correctCount > 0) {
                 isPartial = true;
             }
+        } else if (currentQuestion.type === 'Fill in the Blank' && typeof answer === 'boolean') {
+             isCorrect = answer;
         } else {
              const processedUserAnswer = typeof answer === 'string' ? answer.toLowerCase().trim() : answer;
              const correctAnswer = typeof currentQuestion.correctAnswer === 'string' 
@@ -344,12 +346,12 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         }
 
         if (isCorrect) {
-            setFeedback(t.correct);
+            setFeedback({ message: t.correct, type: 'correct' });
             setIsCorrect(true);
             setScore(prev => prev + 1); // For quizzes, assume 1 point per question
             playSystemSound('correct');
         } else {
-            setFeedback(isPartial ? 'Partially Correct!' : t.incorrect);
+            setFeedback({ message: isPartial ? 'Partially Correct!' : t.incorrect, type: 'incorrect' });
             playSystemSound(isPartial ? 'correct' : 'incorrect');
         }
 
@@ -469,7 +471,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         setCurrentQuestionIndex(0);
         setSelectedAnswer(null);
         setMatchingAnswers({});
-        setFeedback('');
+        setFeedback({ message: '', type: 'none' });
         setIsCorrect(false);
         setScore(0);
         setQuizFinished(false);
@@ -538,7 +540,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
                     stopSound();
                     playSystemSound('incorrect');
-                    setFeedback(t.timesUp);
+                    setFeedback({ message: t.timesUp, type: 'incorrect' });
                     setTimeout(nextQuestion, 5000); 
                     return 0;
                 }
@@ -577,7 +579,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(prev => prev - 1);
             setSelectedAnswer(null);
-            setFeedback('');
+            setFeedback({ message: '', type: 'none' });
             setIsCorrect(false);
             setMatchingAnswers({});
             if (timerDuration > 0) {
@@ -786,7 +788,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         const correctAnswers = (currentQuestion.correctAnswer as string[]).slice(0, fillInTheBlankAnswers.length);
         const userAnswers = fillInTheBlankAnswers.filter(a => a !== null);
 
-        const isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every((ans, i) => ans === correctAnswers[i]);
+        const isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every((ans, i) => ans?.toLowerCase().trim() === correctAnswers[i].toLowerCase().trim());
         
         handleAnswer(isCorrect);
     }, [isSubmitting, currentQuestion, fillInTheBlankAnswers, handleAnswer]);
@@ -1089,7 +1091,20 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         </div>
                                     )}
 
-                                    <CardContent className="p-6 bg-orange-50 dark:bg-slate-900 rounded-b-xl">
+                                    <CardContent className="p-6 bg-orange-50 dark:bg-slate-900 rounded-b-xl relative">
+                                        {feedback.message && captureMode === 'idle' && (
+                                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-b-xl p-4">
+                                                <div className={`flex items-center justify-center gap-4 font-bold text-4xl text-white`}>
+                                                    {isCorrect ? <CheckCircle className="w-12 h-12 text-white" /> : <XCircle className="w-12 h-12 text-white" />}
+                                                    {feedback.message}
+                                                </div>
+                                                {feedback.type === 'incorrect' && selectedAnswer && (
+                                                    <div className="mt-4 text-lg text-slate-200 text-center">
+                                                        {t.correctAnswer}: {String(currentQuestion.correctAnswer)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                                 <div className={cn(
@@ -1107,10 +1122,10 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         return (
                                                             <div key={index}>
                                                                 {option.image && (<div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2"><Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" /></div>)}
-                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
+                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
                                                                     {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
                                                                     {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
-                                                                    <div className={cn("flex-1", !isCapturing && "text-left")}>
+                                                                    <div className={cn("flex-1", !isCapturing && "text-left", isCapturing && 'text-center')}>
                                                                         <span className={cn( "font-bold text-lg md:text-xl", isCapturing && "text-black dark:text-white")}>{String.fromCharCode(65 + index)}. {option.text}</span>
                                                                     </div>
                                                                     {option.audio && (
@@ -1180,25 +1195,6 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                             </div>)
                                         ) : (
                                           <div className="text-center text-muted-foreground">This question type is not supported in this view.</div>
-                                        )}
-                                        {feedback && captureMode === 'idle' && (
-                                            <div className={`mt-4 font-bold text-xl text-center ${isCorrect ? 'text-green-600' : 'text-destructive'}`}>
-                                                {feedback}
-                                                {!isCorrect && selectedAnswer && (
-                                                    <div className="text-sm font-normal text-muted-foreground mt-2 flex items-center justify-center">
-                                                      <span>{t.correctAnswer}: </span>
-                                                      {currentQuestion.type === 'Matching' && Array.isArray(currentQuestion.correctAnswer) ? (
-                                                          <div className="flex flex-col items-center mt-1">
-                                                              {currentQuestion.correctAnswer.map((pair: any, i: number) => (
-                                                                  <span key={i} className="ml-1">{pair.a} &rarr; {pair.b}</span>
-                                                              ))}
-                                                          </div>
-                                                      ) : (
-                                                          <span className="ml-1">{String(currentQuestion.correctAnswer)}</span>
-                                                      )}
-                                                    </div>
-                                                )}
-                                            </div>
                                         )}
                                     </CardContent>
                                 </Card>
