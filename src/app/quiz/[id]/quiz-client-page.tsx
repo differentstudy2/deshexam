@@ -1022,7 +1022,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                 </CardContent>
                             </Card>
                             <div ref={quizCardRef}>
-                                <Card className={cn(
+                                 <Card className={cn(
                                     "shadow-2xl overflow-hidden mt-2",
                                     (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
                                     captureMode === 'question' && 'bg-orange-500'
@@ -1190,5 +1190,3 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         </div>
     );
 }
-
-    
