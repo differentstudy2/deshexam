@@ -46,6 +46,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
+import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
 
 
 const funQuizQuestionSchema = z.object({
@@ -241,6 +242,25 @@ const hardcodedCategories = [
     { id: 'learning-urdu', title: 'Learning Urdu' },
 ];
 
+const aiGeneratorFormSchema = z.object({
+    sourceType: z.enum(['topic', 'text', 'file']),
+    sourceTopic: z.string().optional(),
+    sourceText: z.string().optional(),
+    sourceFile: z.string().optional(),
+    numQuestions: z.coerce.number().int().min(1).max(20),
+    difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+    questionType: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Any']),
+}).refine(data => {
+    if (data.sourceType === 'topic') return !!data.sourceTopic && data.sourceTopic.length >= 3;
+    if (data.sourceType === 'text') return !!data.sourceText && data.sourceText.length >= 3;
+    if (data.sourceType === 'file') return !!data.sourceFile && data.sourceFile.length >= 3;
+    return false;
+}, {
+    message: 'Source content must be at least 3 characters.',
+    path: ['sourceTopic'], 
+});
+type AIGeneratorFormValues = z.infer<typeof aiGeneratorFormSchema>;
+
 
 export default function AddKidsContentPage() {
   const { toast } = useToast();
@@ -249,6 +269,10 @@ export default function AddKidsContentPage() {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const [uploadingAudioField, setUploadingAudioField] = useState<string | null>(null);
 
+  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const aiFormFileInputRef = useRef<HTMLInputElement>(null);
+  
   const [isImporting, setIsImporting] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [jsonText, setJsonText] = useState('');
@@ -298,6 +322,19 @@ export default function AddKidsContentPage() {
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'questions',
+  });
+
+  const aiForm = useForm<AIGeneratorFormValues>({
+    resolver: zodResolver(aiGeneratorFormSchema),
+    defaultValues: {
+      sourceType: 'topic',
+      sourceTopic: '',
+      sourceText: '',
+      sourceFile: '',
+      numQuestions: 5,
+      difficulty: 'Easy',
+      questionType: 'Multiple Choice',
+    },
   });
 
   const selectedClassCategory = form.watch('classCategory');
@@ -350,7 +387,7 @@ export default function AddKidsContentPage() {
 
     } catch (error) {
         toast({
-            variant: 'destructive',
+            variant: "destructive",
             title: 'Error loading metadata',
             description: (error as Error).message
         });
@@ -579,6 +616,92 @@ export default function AddKidsContentPage() {
         }
     };
 
+    const handleAIGenerate = async (aiData: AIGeneratorFormValues) => {
+        setIsGenerating(true);
+        try {
+            const source = aiData.sourceType === 'topic' ? aiData.sourceTopic
+                         : aiData.sourceType === 'text' ? aiData.sourceText
+                         : aiData.sourceFile || null;
+    
+            if (!source || source.length < 3) {
+                toast({
+                    variant: "destructive",
+                    title: 'AI Generation Failed',
+                    description: 'Source content must be at least 3 characters.',
+                });
+                setIsGenerating(false);
+                return;
+            }
+    
+            const input: AIContentGeneratorInput = {
+                contentType: 'Kids Zone Quiz',
+                numQuestions: aiData.numQuestions,
+                difficulty: aiData.difficulty,
+                sourceType: aiData.sourceType === 'file' ? 'text' : aiData.sourceType,
+                source: source,
+                questionType: aiData.questionType,
+            };
+
+            const result: AIContentGeneratorOutput = await generateContent(input);
+            
+            form.setValue('title', result.title);
+            form.setValue('description', result.description);
+            form.setValue('contentType', 'Quiz');
+            
+            const mappedQuestions = result.questions.map((q: any) => ({
+                text: q.text,
+                image: q.image || '',
+                type: q.type === 'Short Answer' ? 'Direct Question' : q.type,
+                options: q.options?.map((opt: any) => ({ text: opt.text, image: opt.image || '', audio: '' })) || [],
+                correctAnswer: q.correctAnswer,
+                explanation: q.explanation || '',
+                audio: '',
+                wordBank: '',
+                correctAnswerString: '',
+                answerImage: '',
+                answerAudio: '',
+            }));
+            
+            replace(mappedQuestions);
+            
+            toast({
+                title: 'Quiz Generated!',
+                description: `AI has created a draft for "${result.title}".`,
+            });
+            setIsGeneratorOpen(false);
+    
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: 'AI Generation Failed',
+            description: (error as Error).message,
+          });
+        } finally {
+          setIsGenerating(false);
+        }
+    };
+    
+    const handleAiFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            if (file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const text = e.target?.result as string;
+                    aiForm.setValue('sourceFile', text, { shouldValidate: true });
+                    aiForm.setValue('sourceType', 'file');
+                };
+                reader.readAsText(file);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Invalid File Type',
+                    description: 'Please upload a .txt file.',
+                });
+            }
+        }
+    };
+
     const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
         const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
             control: control,
@@ -642,12 +765,152 @@ export default function AddKidsContentPage() {
                     Create a new game, quiz, or learning activity for the Kids Zone.
                 </p>
             </div>
-            <Button asChild variant="outline">
-                <Link href="/admin/add-content/ai-content">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate with AI
-                </Link>
-            </Button>
+            <Dialog open={isGeneratorOpen} onOpenChange={setIsGeneratorOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Generate with AI
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-xl">
+                    <DialogHeader>
+                        <DialogTitle>Generate Quiz with AI</DialogTitle>
+                        <DialogDescription>
+                            Describe the quiz you want to create, and Gemini will generate it for you.
+                        </DialogDescription>
+                    </DialogHeader>
+                     <Form {...aiForm}>
+                        <form onSubmit={aiForm.handleSubmit(handleAIGenerate)} className="space-y-4">
+                            <Tabs defaultValue="topic" className="w-full" onValueChange={(value) => aiForm.setValue('sourceType', value as 'topic' | 'text' | 'file')}>
+                                <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="topic">From Topic</TabsTrigger>
+                                    <TabsTrigger value="text">From Text</TabsTrigger>
+                                    <TabsTrigger value="file">From File</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="topic" className="pt-4">
+                                    <FormField
+                                        control={aiForm.control}
+                                        name="sourceTopic"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Topic</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="e.g., 'Animal Sounds'" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </TabsContent>
+                                <TabsContent value="text" className="pt-4">
+                                    <FormField
+                                        control={aiForm.control}
+                                        name="sourceText"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Paste Text</FormLabel>
+                                                <FormControl>
+                                                    <Textarea placeholder="Paste your content here..." {...field} className="min-h-[150px]" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </TabsContent>
+                                <TabsContent value="file" className="pt-4">
+                                    <FormItem>
+                                        <FormLabel>Upload File</FormLabel>
+                                        <FormControl>
+                                            <div 
+                                                className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer"
+                                                onClick={() => aiFormFileInputRef.current?.click()}
+                                            >
+                                                <div className="space-y-1 text-center">
+                                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                                    <p className="pl-1">
+                                                        {aiForm.watch('sourceFile') ? 'File selected' : 'Upload a .txt file'}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                    {aiForm.watch('sourceFile') ? aiForm.watch('sourceFile')?.substring(0, 50) + '...' : 'Text file up to 10MB'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </FormControl>
+                                        <Input
+                                            type="file"
+                                            ref={aiFormFileInputRef}
+                                            onChange={handleAiFileChange}
+                                            className="hidden"
+                                            accept=".txt"
+                                        />
+                                        <FormMessage />
+                                    </FormItem>
+                                </TabsContent>
+                            </Tabs>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={aiForm.control}
+                                    name="numQuestions"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Number of Questions</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={aiForm.control}
+                                    name="difficulty"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Difficulty</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="Easy">Easy</SelectItem>
+                                                    <SelectItem value="Medium">Medium</SelectItem>
+                                                    <SelectItem value="Hard">Hard</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <FormField
+                                control={aiForm.control}
+                                name="questionType"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Question Type</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Any">Any</SelectItem>
+                                                <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                                <SelectItem value="True/False">True/False</SelectItem>
+                                                <SelectItem value="Short Answer">Short Answer</SelectItem>
+                                                <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                                <SelectItem value="Matching">Matching</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <Button type="submit" disabled={isGenerating}>
+                                    {isGenerating ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> : "Generate Quiz"}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
         </div>
 
       <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
