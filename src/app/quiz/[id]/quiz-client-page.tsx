@@ -64,7 +64,7 @@ type Quiz = {
 
 const translations = {
     en: {
-        backToQuizzes: "Back to Fun Quizzes",
+        backToQuizzes: "Back to Quizzes",
         quizComplete: "Quiz Complete!",
         amazingJob: "You did an amazing job!",
         yourScore: "Your Score",
@@ -90,7 +90,7 @@ const translations = {
         copyQuestion: "Copy Question"
     },
     hi: {
-        backToQuizzes: "मज़ेदार क्विज़ पर वापस जाएं",
+        backToQuizzes: "क्विज़ पर वापस जाएं",
         quizComplete: "क्विज़ पूरा हुआ!",
         amazingJob: "आपने अद्भुत काम किया!",
         yourScore: "आपका स्कोर",
@@ -116,7 +116,7 @@ const translations = {
         copyQuestion: "प्रश्न कॉपी करें"
     },
     bn: {
-        backToQuizzes: "মজার কুইজে ফিরে যান",
+        backToQuizzes: "কুইজে ফিরে যান",
         quizComplete: "কুইজ সম্পন্ন!",
         amazingJob: "আপনি একটি আশ্চর্যজনক কাজ করেছেন!",
         yourScore: "আপনার স্কোর",
@@ -249,9 +249,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const [fillInTheBlankAnswers, setFillInTheBlankAnswers] = useState<(string | null)[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
-    const [draggedWordInfo, setDraggedWordInfo] = useState<{ word: string, from: 'bank' | number } | null>(null);
-
-
+    
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -894,7 +892,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     {t.playAgain}
                                 </Button>
                                 <Button asChild variant="outline" size="lg">
-                                    <Link href="/kids-zone/fun-quizzes">
+                                    <Link href="/quizzes">
                                         <ArrowLeft className="mr-2 h-4 w-4" />
                                         {t.backToQuizzes}
                                     </Link>
@@ -1029,13 +1027,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
                                     captureMode === 'question' && 'bg-orange-500'
                                 )}>
-                                     <CardHeader className={cn(
-                                        "relative p-6 text-white text-center",
-                                        captureMode === 'question' && 'bg-orange-500',
-                                        captureMode !== 'question' && bgGradients[currentQuestionIndex % bgGradients.length]
+                                    <CardHeader className={cn(
+                                        "relative p-6 text-white",
+                                        (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
+                                        captureMode === 'question' && 'bg-orange-500'
                                     )}>
                                         <div className="relative z-10">
-                                            <CardTitle className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-2">
+                                            <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
                                                 <span>{currentQuestion?.text}</span>
                                                 {currentQuestion?.audio && (
                                                     <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
@@ -1047,7 +1045,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                     </CardHeader>
                                     
                                     {currentQuestion && currentQuestion.image && (
-                                        <div className="p-4 bg-orange-100 dark:bg-slate-800 border-y-4 border-red-500">
+                                        <div className="p-4 bg-black/10">
                                             <div className="relative h-48 w-full">
                                                 <Image 
                                                     src={currentQuestion.image} 
@@ -1193,3 +1191,4 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
     );
 }
 
+    
