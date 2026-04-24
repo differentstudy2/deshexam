@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { addContent, uploadFile, getSubjects, getBoards, getClasses, getStates, getGradesByClass, getKidsZoneCategories, addKidsZoneCategory } from '@/lib/firebase/firestore';
 import { Loader2, Sparkles, PlusCircle, Trash2, Upload, FileJson, Copy, GripVertical } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/feature/image-uploader';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -45,6 +45,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
+import Link from 'next/link';
 
 
 const funQuizQuestionSchema = z.object({
@@ -294,7 +295,7 @@ export default function AddKidsContentPage() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'questions',
   });
@@ -302,7 +303,7 @@ export default function AddKidsContentPage() {
   const selectedClassCategory = form.watch('classCategory');
   const contentType = form.watch('contentType');
 
-  const fetchKidsCategories = async () => {
+  const fetchKidsCategories = useCallback(async () => {
     setLoadingCategories(true);
     try {
         const fetched = await getKidsZoneCategories();
@@ -323,44 +324,89 @@ export default function AddKidsContentPage() {
     } finally {
         setLoadingCategories(false);
     }
-  };
+  }, [toast]);
 
+
+   const fetchMetadata = useCallback(async () => {
+    try {
+        setLoadingMetadata(true);
+        const [subjectData, boardData, classData, stateData, kidsCategories] = await Promise.all([
+            getSubjects(),
+            getBoards(),
+            getClasses(),
+            getStates(),
+            getKidsZoneCategories()
+        ]);
+        setSubjects(subjectData);
+        setBoards(boardData);
+        setClassCategories(classData);
+        setStates(stateData);
+
+        const firestoreCategories = kidsCategories.map((c: any) => ({id: c.id, title: c.title}));
+        const combined = [...hardcodedCategories, ...firestoreCategories];
+        const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
+        uniqueCategories.sort((a, b) => a.title.localeCompare(b.title));
+        setCategories(uniqueCategories);
+
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error loading metadata',
+            description: (error as Error).message
+        });
+    } finally {
+        setLoadingMetadata(false);
+        setLoadingCategories(false); // Also set this to false
+    }
+  }, [toast]);
 
    useEffect(() => {
-    const fetchMetadata = async () => {
-        try {
-            setLoadingMetadata(true);
-            const [subjectData, boardData, classData, stateData, kidsCategories] = await Promise.all([
-                getSubjects(),
-                getBoards(),
-                getClasses(),
-                getStates(),
-                getKidsZoneCategories()
-            ]);
-            setSubjects(subjectData);
-            setBoards(boardData);
-            setClassCategories(classData);
-            setStates(stateData);
-
-            const firestoreCategories = kidsCategories.map((c: any) => ({id: c.id, title: c.title}));
-            const combined = [...hardcodedCategories, ...firestoreCategories];
-            const uniqueCategories = Array.from(new Map(combined.map(item => [item.title, item])).values());
-            uniqueCategories.sort((a, b) => a.title.localeCompare(b.title));
-            setCategories(uniqueCategories);
-
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Error loading metadata',
-                description: (error as Error).message
-            });
-        } finally {
-            setLoadingMetadata(false);
-            setLoadingCategories(false); // Also set this to false
-        }
-    }
     fetchMetadata();
-  }, [toast]);
+  }, [fetchMetadata]);
+
+  useEffect(() => {
+    const aiContentRaw = sessionStorage.getItem('aiGeneratedContent');
+    if (aiContentRaw) {
+      try {
+        const aiContent = JSON.parse(aiContentRaw);
+        if (aiContent.testType === 'Kids Zone Quiz') {
+            form.setValue('title', aiContent.title);
+            form.setValue('description', aiContent.description);
+            form.setValue('contentType', 'Quiz');
+            
+            const mappedQuestions = aiContent.questions.map((q: any) => ({
+                text: q.text,
+                image: q.image,
+                type: q.type === 'Short Answer' ? 'Direct Question' : q.type,
+                options: q.options || [],
+                correctAnswer: q.correctAnswer,
+                explanation: q.explanation,
+                audio: '',
+                wordBank: '',
+                correctAnswerString: '',
+                answerImage: '',
+                answerAudio: '',
+            }));
+            
+            replace(mappedQuestions);
+
+            toast({
+                title: 'AI Content Loaded!',
+                description: 'The generated quiz has been populated into the form.',
+            });
+        }
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: 'Failed to load AI content',
+            description: (error as Error).message,
+        });
+      } finally {
+          sessionStorage.removeItem('aiGeneratedContent');
+      }
+    }
+  }, [form, toast, replace]);
+
 
   useEffect(() => {
     const fetchGrades = async () => {
@@ -596,6 +642,12 @@ export default function AddKidsContentPage() {
                     Create a new game, quiz, or learning activity for the Kids Zone.
                 </p>
             </div>
+            <Button asChild variant="outline">
+                <Link href="/admin/add-content/ai-content">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate with AI
+                </Link>
+            </Button>
         </div>
 
       <Input type="file" ref={audioInputRef} onChange={handleAudioFileChange} className="hidden" accept="audio/*" />
@@ -1273,6 +1325,3 @@ export default function AddKidsContentPage() {
     </div>
   );
 }
-
-    
-    

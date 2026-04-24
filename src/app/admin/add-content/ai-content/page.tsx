@@ -126,6 +126,8 @@ export default function AIContentGeneratorPage() {
                 redirectUrl = '/admin/add-practice-questions';
             } else if (aiData.contentType === 'Exam') {
                 redirectUrl = '/admin/add-exam';
+            } else if (aiData.contentType === 'Kids Zone Quiz') {
+                redirectUrl = '/admin/kids-zone/add';
             }
 
             router.push(redirectUrl);
@@ -263,6 +265,7 @@ export default function AIContentGeneratorPage() {
                                                 <SelectItem value="Mock Test">Mock Test</SelectItem>
                                                 <SelectItem value="Practice Questions">Practice Questions</SelectItem>
                                                 <SelectItem value="Exam">Exam</SelectItem>
+                                                <SelectItem value="Kids Zone Quiz">Kids Zone Quiz</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
