@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
+import { ArrowLeft, RefreshCw, Mic, Sparkles, X, Check, Eye, ImageDown, Video, Play, Pause, Volume2, FileQuestion, Languages, Settings, Copy, Trophy, Loader2, ChevronLeft, ChevronRight, GripVertical, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import Confetti from 'react-dom-confetti';
 import { Progress } from '@/components/ui/progress';
@@ -249,9 +249,7 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
 
     const [fillInTheBlankAnswers, setFillInTheBlankAnswers] = useState<(string | null)[]>([]);
     const [wordBank, setWordBank] = useState<string[]>([]);
-    const [draggedWordInfo, setDraggedWordInfo] = useState<{ word: string, from: 'bank' | number } | null>(null);
-
-
+    
     const t = translations[language];
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -744,54 +742,42 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
         return num.toString();
     }
     
-    const handleDropOnBank = (e: React.DragEvent) => {
+    const handleDragStart = (e: React.DragEvent, word: string, from: 'bank' | number) => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ word, from }));
+    };
+
+    const handleDrop = (e: React.DragEvent, to: 'bank' | number) => {
         e.preventDefault();
-        if (!draggedWordInfo || draggedWordInfo.from === 'bank') return;
+        const data = e.dataTransfer.getData("text/plain");
+        if (!data) return;
 
-        const { word, from } = draggedWordInfo;
-
-        // Word is coming from a blank, so put it back in the bank
-        const newAnswers = [...fillInTheBlankAnswers];
-        newAnswers[from as number] = null; 
-        setFillInTheBlankAnswers(newAnswers);
-
-        const newWordBank = [...wordBank, word];
-        setWordBank(newWordBank);
-
-        setDraggedWordInfo(null);
-    };
-    
-    const handleDropOnBlank = (blankIndex: number) => {
-        if (!draggedWordInfo || isSubmitting) return;
+        const { word, from } = JSON.parse(data);
 
         const newAnswers = [...fillInTheBlankAnswers];
-        const oldWordInBlank = newAnswers[blankIndex];
-
-        // Place the new word
-        newAnswers[blankIndex] = draggedWordInfo.word;
-
-        // Manage word bank
         let newWordBank = [...wordBank];
-        if (draggedWordInfo.from === 'bank') {
-            // Remove from word bank
-            newWordBank = newWordBank.filter(w => w !== draggedWordInfo.word);
-        } else {
-            // It was dragged from another blank, so clear the source blank
-            newAnswers[draggedWordInfo.from as number] = null;
-        }
-        
-        // If we replaced a word, put it back in the bank
-        if (oldWordInBlank) {
-            newWordBank.push(oldWordInBlank);
+
+        if (to === 'bank') {
+            if (from !== 'bank') { // Moving from blank to bank
+                newAnswers[from] = null;
+                newWordBank.push(word);
+            }
+        } else { // Dropping on a blank
+            const oldWordInBlank = newAnswers[to];
+            newAnswers[to] = word;
+
+            if (from === 'bank') {
+                newWordBank = newWordBank.filter(w => w !== word);
+            } else { // Moving from another blank
+                newAnswers[from] = null;
+            }
+            
+            if (oldWordInBlank) {
+                newWordBank.push(oldWordInBlank);
+            }
         }
 
         setFillInTheBlankAnswers(newAnswers);
         setWordBank(newWordBank);
-        setDraggedWordInfo(null);
-    };
-
-    const handleDragStart = (word: string, from: 'bank' | number) => {
-        setDraggedWordInfo({ word, from });
     };
     
     const checkFillInTheBlankAnswer = useCallback(() => {
@@ -1037,48 +1023,71 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                             </Card>
                             <div ref={quizCardRef}>
                                  <Card className={cn(
-                                    "shadow-2xl overflow-hidden mt-2 bg-gradient-to-br",
-                                    bgGradients[currentQuestionIndex % bgGradients.length]
+                                    "shadow-2xl overflow-hidden mt-2",
+                                    (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
+                                    captureMode === 'question' && 'bg-orange-500'
                                 )}>
-                                    <CardHeader className="relative p-6 text-white min-h-[200px] flex flex-col justify-center">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold">
+                                    <CardHeader className={cn(
+                                        "relative p-6 text-white",
+                                        (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
+                                        captureMode === 'question' && 'bg-orange-500'
+                                    )}>
+                                        <div className="relative z-10">
+                                            <CardTitle className="text-left text-2xl md:text-3xl font-bold flex items-start gap-2">
                                                 {currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 ? (
-                                                    currentQuestion.text.split('____').map((part, index, arr) => (
-                                                        <React.Fragment key={index}>
-                                                            {part}
-                                                            {index < arr.length - 1 && (
-                                                                <div 
-                                                                    className="inline-block w-24 h-12 bg-slate-200/20 dark:bg-slate-700/50 rounded-md align-middle mx-2 border-2 border-dashed border-white/50"
-                                                                    onDragOver={(e) => e.preventDefault()}
-                                                                    onDrop={() => handleDropOnBlank(index)}
-                                                                >
-                                                                    {fillInTheBlankAnswers[index] && (
-                                                                         <Button
-                                                                            draggable
-                                                                            onDragStart={() => handleDragStart(fillInTheBlankAnswers[index]!, index)}
-                                                                            className="h-full w-full text-xl font-bold bg-white/90 text-slate-800"
-                                                                            variant="outline"
-                                                                        >
-                                                                            {fillInTheBlankAnswers[index]}
-                                                                        </Button>
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </React.Fragment>
-                                                    ))
+                                                    <span>
+                                                        {currentQuestion.text.split('____').map((part, index, arr) => (
+                                                            <React.Fragment key={index}>
+                                                                {part}
+                                                                {index < arr.length - 1 && (
+                                                                    <div 
+                                                                        className="inline-block w-24 h-12 bg-slate-200/20 dark:bg-slate-700/50 rounded-md align-middle mx-2 border-2 border-dashed border-white/50"
+                                                                        onDragOver={(e) => e.preventDefault()}
+                                                                        onDrop={(e) => handleDrop(e, index)}
+                                                                    >
+                                                                        {fillInTheBlankAnswers[index] && (
+                                                                            <Button
+                                                                                draggable
+                                                                                onDragStart={(e) => handleDragStart(e, fillInTheBlankAnswers[index]!, index)}
+                                                                                className="h-full w-full text-xl font-bold bg-white/90 text-slate-800"
+                                                                                variant="outline"
+                                                                            >
+                                                                                {fillInTheBlankAnswers[index]}
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </span>
                                                 ) : (
                                                     <span>{currentQuestion?.text}</span>
                                                 )}
+
+                                                {currentQuestion?.audio && (
+                                                    <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
+                                                        {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
+                                                    </Button>
+                                                )}
                                             </CardTitle>
                                         </div>
-                                        {currentQuestion && currentQuestion.image && (
-                                            <div className="relative h-48 w-full mt-4">
-                                                <Image src={currentQuestion.image} alt={currentQuestion.text || 'Question Image'} layout="fill" objectFit="contain" className="rounded-lg" />
-                                            </div>
-                                        )}
                                     </CardHeader>
-                                    <CardContent className="p-6 bg-card/60 backdrop-blur-sm rounded-b-xl">
+                                    
+                                    {currentQuestion && currentQuestion.image && (
+                                        <div className="p-4 bg-black/10">
+                                            <div className="relative h-48 w-full">
+                                                <Image 
+                                                    src={currentQuestion.image} 
+                                                    alt={currentQuestion.text || 'Question Image'} 
+                                                    layout="fill" 
+                                                    objectFit="contain" 
+                                                    className="rounded-lg" 
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <CardContent className="p-6 bg-orange-50 dark:bg-slate-900 rounded-b-xl">
                                         {currentQuestion?.type === 'Multiple Choice' && currentQuestion.options ? (
                                             <RadioGroup onValueChange={handleAnswer} value={selectedAnswer || ''} disabled={selectedAnswer !== null}>
                                                 <div className={cn(
@@ -1090,7 +1099,8 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         const isCorrectAnswer = currentQuestion.correctAnswer === option.text;
                                                         const isShown = selectedAnswer !== null;
                                                         const isCorrectForCapture = captureMode === 'answer' && isCorrectAnswer;
-                                                         const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
+                                                        const isIncorrectForCapture = captureMode === 'answer' && !isCorrectAnswer;
+                                                        const gradientClass = `bg-gradient-to-br text-white hover:brightness-110 ${optionGradients[(currentQuestionIndex + index) % optionGradients.length]}`;
 
                                                         return (
                                                             <div key={index}>
@@ -1108,16 +1118,28 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                                 <Label
                                                                     htmlFor={`q-${currentQuestionIndex}-opt-${index}`}
                                                                     className={cn(
-                                                                        "rounded-xl border-2 p-4 flex justify-between items-center gap-4 h-16 transition-all duration-300 relative",
-                                                                        !isShown && "cursor-pointer hover:scale-105",
-                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white",
-                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white",
-                                                                        !isShown && gradientClass,
-                                                                        isCorrectForCapture && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white"
+                                                                        "rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative",
+                                                                        !isShown && !isCapturing && "cursor-pointer hover:scale-105",
+                                                                        // Answer revealed state
+                                                                        isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center",
+                                                                        isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center",
+                                                                        !isShown && !isCapturing && gradientClass,
+                                                                        // Capture state
+                                                                        isCapturing && "items-center",
+                                                                        isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20",
+                                                                        isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20",
                                                                     )}
                                                                 >
-                                                                    <span className={cn("font-bold text-lg md:text-xl")}>{String.fromCharCode(65 + index)}. {option.text}</span>
-                                                                    <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50" />
+                                                                    {isCapturing && isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
+                                                                    {isCapturing && isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
+                                                                    <span className={cn(
+                                                                        "font-bold text-lg md:text-xl",
+                                                                        !isCapturing && "text-left flex-1",
+                                                                        isCapturing && "text-black dark:text-white"
+                                                                    )}>
+                                                                        {String.fromCharCode(65 + index)}. {option.text}
+                                                                    </span>
+                                                                    {!isCapturing && <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50 shrink-0" />}
                                                                 </Label>
                                                             </div>
                                                         );
@@ -1173,13 +1195,13 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                 <div 
                                                     className="flex flex-wrap justify-center gap-4 p-4 rounded-lg bg-secondary min-h-[70px] w-full"
                                                     onDragOver={(e) => e.preventDefault()}
-                                                    onDrop={handleDropOnBank}
+                                                    onDrop={(e) => handleDrop(e, 'bank')}
                                                 >
                                                     {wordBank.map((word, index) => (
                                                         <Button
                                                             key={index}
                                                             draggable
-                                                            onDragStart={() => handleDragStart(word, 'bank')}
+                                                            onDragStart={(e) => handleDragStart(e, word, 'bank')}
                                                             className="h-auto p-4 text-2xl font-bold rounded-xl shadow-lg cursor-grab active:cursor-grabbing bg-white text-slate-800"
                                                             variant="outline"
                                                         >
