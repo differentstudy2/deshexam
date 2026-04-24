@@ -1032,9 +1032,40 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                         (captureMode !== 'question') && `bg-gradient-to-br ${bgGradients[currentQuestionIndex % bgGradients.length]}`,
                                         captureMode === 'question' && 'bg-orange-500'
                                     )}>
-                                        <div className="relative z-10 min-h-[100px] flex items-center justify-center">
-                                            <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
-                                                <span>{currentQuestion?.text}</span>
+                                       <div className="relative z-10 min-h-[100px] flex items-center justify-center">
+                                            <CardTitle className="text-center text-2xl md:text-3xl font-bold flex items-start gap-2">
+                                                 <div className="flex-1">
+                                                    {currentQuestion?.type === 'Fill in the Blank' && currentQuestion.options && currentQuestion.options.length > 0 ? (
+                                                        <span>
+                                                            {currentQuestion.text.split('____').map((part, index, arr) => (
+                                                                <React.Fragment key={index}>
+                                                                    {part}
+                                                                    {index < arr.length - 1 && (
+                                                                        <div 
+                                                                            className="inline-block w-24 h-12 bg-slate-200/20 dark:bg-slate-700/50 rounded-md align-middle mx-2 border-2 border-dashed border-white/50"
+                                                                            onDragOver={(e) => e.preventDefault()}
+                                                                            onDrop={(e) => handleDrop(e, index)}
+                                                                        >
+                                                                            {fillInTheBlankAnswers[index] && (
+                                                                                <Button
+                                                                                    draggable
+                                                                                    onDragStart={(e) => handleDragStart(e, fillInTheBlankAnswers[index]!, index)}
+                                                                                    className="h-full w-full text-xl font-bold bg-white/90 text-slate-800"
+                                                                                    variant="outline"
+                                                                                >
+                                                                                    {fillInTheBlankAnswers[index]}
+                                                                                </Button>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </React.Fragment>
+                                                            ))}
+                                                        </span>
+                                                    ) : (
+                                                        <span>{currentQuestion?.text}</span>
+                                                    )}
+                                                </div>
+
                                                 {currentQuestion?.audio && (
                                                     <Button variant="ghost" size="icon" onClick={() => togglePlayUrl(currentQuestion.audio!)}>
                                                         {playingUrl === currentQuestion.audio ? <Pause /> : <Play />}
@@ -1076,10 +1107,17 @@ export default function QuizClientPage({ quiz }: { quiz: Quiz }) {
                                                         return (
                                                             <div key={index}>
                                                                 {option.image && (<div className="relative h-32 w-full rounded-md overflow-hidden bg-white/20 mb-2"><Image src={option.image} alt={option.text || `Option ${index + 1}`} layout="fill" objectFit="contain" className="rounded-md" /></div>)}
-                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 h-16 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
+                                                                <Label htmlFor={`q-${currentQuestionIndex}-opt-${index}`} className={cn("rounded-xl border-2 p-4 flex gap-4 transition-all duration-300 relative", !isShown && !isCapturing && "cursor-pointer hover:scale-105", isShown && isCorrectAnswer && "border-green-500 ring-2 ring-green-500/50 bg-green-500 text-white justify-between items-center", isShown && isSelected && !isCorrectAnswer && "border-destructive ring-2 ring-destructive/50 bg-red-500 text-white justify-between items-center", !isShown && !isCapturing && gradientClass, isCapturing && "items-center", isCorrectForCapture && "border-green-500 bg-green-100 dark:bg-green-900/20", isIncorrectForCapture && "border-destructive bg-red-100 dark:bg-red-900/20")}>
                                                                     {isCorrectForCapture && <CheckCircle className="w-6 h-6 text-green-500 shrink-0" />}
                                                                     {isIncorrectForCapture && <XCircle className="w-6 h-6 text-destructive shrink-0" />}
-                                                                    <span className={cn( "font-bold text-lg md:text-xl", !isCapturing && "flex-1 text-left", isCapturing && "text-black dark:text-white justify-center flex")}>{String.fromCharCode(65 + index)}. {option.text}</span>
+                                                                    <div className={cn("flex-1", !isCapturing && "text-left")}>
+                                                                        <span className={cn( "font-bold text-lg md:text-xl", isCapturing && "text-black dark:text-white")}>{String.fromCharCode(65 + index)}. {option.text}</span>
+                                                                    </div>
+                                                                    {option.audio && (
+                                                                        <Button variant="ghost" size="icon" className="shrink-0" onClick={(e) => { e.preventDefault(); e.stopPropagation(); togglePlayUrl(option.audio!); }}>
+                                                                            {playingUrl === option.audio ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5"/>}
+                                                                        </Button>
+                                                                    )}
                                                                     {!isCapturing && <RadioGroupItem value={option.text} id={`q-${currentQuestionIndex}-opt-${index}`} className="bg-white/50 border-primary-foreground/50 shrink-0" />}
                                                                 </Label>
                                                             </div>
