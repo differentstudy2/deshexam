@@ -47,6 +47,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
 import { generateContent, AIContentGeneratorInput, AIContentGeneratorOutput } from '@/ai/flows/ai-content-generator';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 
 
 const funQuizQuestionSchema = z.object({
@@ -290,6 +291,9 @@ export default function AddKidsContentPage() {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [newCategoryData, setNewCategoryData] = useState({ title: '', description: '', icon: 'ToyBrick' });
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState<string | null>(null);
+  const [language, setLanguage] = useState('en-US');
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -706,6 +710,36 @@ export default function AddKidsContentPage() {
         }
     };
 
+    const handleGenerateAudio = async (text: string, fieldName: any) => {
+        if (!text || !text.trim()) {
+            toast({ variant: 'destructive', title: 'No text to generate audio from.' });
+            return;
+        }
+        setIsGeneratingAudio(fieldName);
+        try {
+            const result = await textToSpeech({ text: text, lang: language });
+            const dataUri = result.audioUrl;
+    
+            const response = await fetch(dataUri);
+            const blob = await response.blob();
+            const audioFile = new File([blob], `generated_${Date.now()}.wav`, { type: 'audio/wav' });
+            
+            const downloadURL = await uploadFile(audioFile);
+    
+            form.setValue(fieldName, downloadURL, { shouldDirty: true });
+    
+            toast({ title: 'Audio Generated!', description: 'The audio has been generated and linked.' });
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Audio Generation Failed',
+                description: (error as Error).message,
+            });
+        } finally {
+            setIsGeneratingAudio(null);
+        }
+    };
+
     const MatchingPairsField = ({ control, questionIndex, setValue }: { control: any, questionIndex: number, setValue: any }) => {
         const { fields: matchingPairFields, append: appendMatchingPair, remove: removeMatchingPair } = useFieldArray({
             control: control,
@@ -1091,6 +1125,19 @@ export default function AddKidsContentPage() {
                     <Card>
                         <CardHeader>
                             <h3 className="text-lg font-medium">Quiz Questions</h3>
+                            <div className="flex items-center gap-2 pt-4">
+                                <Label>Audio Language</Label>
+                                <Select value={language} onValueChange={(v) => setLanguage(v as any)}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="en-US">English (US)</SelectItem>
+                                        <SelectItem value="hi-IN">Hindi (India)</SelectItem>
+                                        <SelectItem value="bn-IN">Bengali (India)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             {fields.map((question, index) => {
@@ -1138,6 +1185,9 @@ export default function AddKidsContentPage() {
                                                             <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
                                                                 {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                             </Button>
+                                                             <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.getValues(`questions.${index}.text`) || '', `questions.${index}.audio`)} disabled={isGeneratingAudio === `questions.${index}.audio` || !form.getValues(`questions.${index}.text`)}>
+                                                                {isGeneratingAudio === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                            </Button>
                                                             {!!field.value && (
                                                                 <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
                                                                     <Trash2 className="w-4 h-4" />
@@ -1178,7 +1228,19 @@ export default function AddKidsContentPage() {
                                                                         <div className="grid grid-cols-2 gap-2">
                                                                             <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
                                                                             <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                                                <FormItem><FormLabel className="text-xs">Audio</FormLabel><FormControl><div className="flex items-center gap-2"><Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} /><Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>{!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}</div></FormControl>{form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}<FormMessage /></FormItem>
+                                                                                <FormItem><FormLabel className="text-xs">Audio</FormLabel>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
+                                                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
+                                                                                        {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                                    </Button>
+                                                                                    <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.getValues(`questions.${index}.options.${optionIndex}.text`) || '', `questions.${index}.options.${optionIndex}.audio`)} disabled={isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` || !form.getValues(`questions.${index}.options.${optionIndex}.text`)}>
+                                                                                        {isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                                                    </Button>
+                                                                                    {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}
+                                                                                </div>
+                                                                                <FormMessage />
+                                                                                </FormItem>
                                                                             )}/>
                                                                         </div>
                                                                     </div>
@@ -1296,6 +1358,9 @@ export default function AddKidsContentPage() {
                                                                     <Input {...field} placeholder="Audio URL" value={field.value ?? ''} />
                                                                     <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.answerAudio`)} disabled={isUploadingAudio}>
                                                                         {isUploadingAudio && uploadingAudioField === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                    </Button>
+                                                                     <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.getValues(`questions.${index}.correctAnswer`) || '', `questions.${index}.answerAudio`)} disabled={isGeneratingAudio === `questions.${index}.answerAudio` || !form.getValues(`questions.${index}.correctAnswer`)}>
+                                                                        {isGeneratingAudio === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4" />}
                                                                     </Button>
                                                                     {!!field.value && (
                                                                         <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.answerAudio`, '')}>
