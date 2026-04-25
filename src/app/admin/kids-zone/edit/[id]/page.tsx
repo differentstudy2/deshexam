@@ -598,6 +598,26 @@ export default function EditKidsContentPage() {
             setIsGeneratingAudio(null);
         }
     };
+    
+    const handleGenerateFullQuestionAudio = async (index: number) => {
+        const question = form.getValues(`questions.${index}`);
+        if (!question || !question.text) {
+            toast({ variant: 'destructive', title: 'No question text to generate audio from.' });
+            return;
+        }
+
+        let textToSpeak = `${question.text}. `;
+        if (question.type === 'Multiple Choice' && question.options) {
+            question.options.forEach((opt: any, optIndex: number) => {
+                if (opt.text) {
+                    const optionLetter = String.fromCharCode(65 + optIndex);
+                    textToSpeak += `Option ${optionLetter}: ${opt.text}. `;
+                }
+            });
+        }
+        
+        await handleGenerateAudio(textToSpeak, `questions.${index}.audio`);
+    };
 
     const handleAudioUploadClick = (fieldName: string) => {
         setUploadingAudioField(fieldName);
@@ -1075,6 +1095,9 @@ export default function EditKidsContentPage() {
                                                                         <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.audio`)} disabled={isUploadingAudio}>
                                                                             {isUploadingAudio && uploadingAudioField === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                         </Button>
+                                                                         <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateFullQuestionAudio(index)} disabled={isGeneratingAudio === `questions.${index}.audio` || !form.getValues(`questions.${index}.text`)}>
+                                                                            {isGeneratingAudio === `questions.${index}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                                        </Button>
                                                                         {!!field.value && (
                                                                             <Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.audio`, '')}>
                                                                                 <Trash2 className="w-4 h-4" />
@@ -1114,9 +1137,25 @@ export default function EditKidsContentPage() {
 
                                                                                     <div className="grid grid-cols-2 gap-2">
                                                                                         <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.image`} render={({ field: imageField }) => (<FormItem><FormLabel className="text-xs">Image</FormLabel><FormControl><ImageUploader fieldName={imageField.name} onUrlChange={(url) => form.setValue(`questions.${index}.options.${optionIndex}.image`, url)} value={imageField.value} /></FormControl><FormMessage /></FormItem>)}/>
-                                                                                        <FormField control={form.control} name={`questions.${index}.options.${optionIndex}.audio`} render={({ field: audioField }) => (
-                                                                                            <FormItem><FormLabel className="text-xs">Audio</FormLabel><FormControl><div className="flex items-center gap-2"><Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} /><Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>{isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}</Button>{!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}</div></FormControl>{form.getValues(`questions.${index}.options.${optionIndex}.audio`) && (<audio controls src={form.getValues(`questions.${index}.options.${optionIndex}.audio`)} className="w-full mt-2" /> )}<FormMessage /></FormItem>
-                                                                                        )}/>
+                                                                                        <FormField
+                                                                                            control={form.control}
+                                                                                            name={`questions.${index}.options.${optionIndex}.audio`}
+                                                                                            render={({ field: audioField }) => (
+                                                                                                <FormItem><FormLabel className="text-xs">Audio</FormLabel>
+                                                                                                    <div className="flex items-center gap-2">
+                                                                                                        <Input {...audioField} placeholder="Audio URL" value={audioField.value ?? ''} />
+                                                                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.options.${optionIndex}.audio`)} disabled={isUploadingAudio}>
+                                                                                                            {isUploadingAudio && uploadingAudioField === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
+                                                                                                        </Button>
+                                                                                                        <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.getValues(`questions.${index}.options.${optionIndex}.text`) || '', `questions.${index}.options.${optionIndex}.audio`)} disabled={isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` || !form.getValues(`questions.${index}.options.${optionIndex}.text`)}>
+                                                                                                            {isGeneratingAudio === `questions.${index}.options.${optionIndex}.audio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                                                                                                        </Button>
+                                                                                                        {!!audioField.value && (<Button type="button" variant="destructive" size="icon" onClick={() => form.setValue(`questions.${index}.options.${optionIndex}.audio`, '')}><Trash2 className="w-4 h-4" /></Button>)}
+                                                                                                    </div>
+                                                                                                    {!!audioField.value && <audio controls src={audioField.value} className="w-full mt-2" />}
+                                                                                                    <FormMessage />
+                                                                                                </FormItem>
+                                                                                            )}/>
                                                                                     </div>
                                                                                 </div>
                                                                             </Card>
@@ -1234,7 +1273,7 @@ export default function EditKidsContentPage() {
                                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleAudioUploadClick(`questions.${index}.answerAudio`)} disabled={isUploadingAudio}>
                                                                                     {isUploadingAudio && uploadingAudioField === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Upload className="w-4 h-4" />}
                                                                                 </Button>
-                                                                                <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.getValues(`questions.${index}.correctAnswer`) || '', `questions.${index}.answerAudio`)} disabled={isGeneratingAudio === `questions.${index}.answerAudio` || !form.getValues(`questions.${index}.correctAnswer`)}>
+                                                                                 <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateAudio(form.getValues(`questions.${index}.correctAnswer`) || '', `questions.${index}.answerAudio`)} disabled={isGeneratingAudio === `questions.${index}.answerAudio` || !form.getValues(`questions.${index}.correctAnswer`)}>
                                                                                     {isGeneratingAudio === `questions.${index}.answerAudio` ? <Loader2 className="animate-spin" /> : <Sparkles className="w-4 h-4" />}
                                                                                 </Button>
                                                                                 {!!field.value && (
