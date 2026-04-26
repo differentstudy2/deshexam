@@ -44,6 +44,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Separator } from '@/components/ui/separator';
 
 type Option = {
   text: string;
