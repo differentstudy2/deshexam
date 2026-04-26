@@ -43,6 +43,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { ScoreCircle } from '@/components/feature/score-circle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 type Option = {
   text: string;
@@ -169,6 +170,15 @@ export default function TestClientPage({ test }: { test: Test }) {
     };
   }, [lastQuestionRef, testWithShuffledOptions, visibleQuestions]);
 
+  const totalMarks = useMemo(() => {
+    return testWithShuffledOptions?.questions.reduce((total, q) => {
+        if (q.type === 'Matching') {
+            return total + (q.correctAnswer?.length || 0);
+        }
+        return total + (q.marks || 1);
+    }, 0) || 0;
+  }, [testWithShuffledOptions]);
+
   const handleSubmit = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     if (isSubmitting) return;
@@ -264,16 +274,6 @@ export default function TestClientPage({ test }: { test: Test }) {
     const s = seconds % 60;
     return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
   };
-
-  const totalMarks = useMemo(() => {
-    return testWithShuffledOptions?.questions.reduce((total, q) => {
-        if (q.type === 'Matching') {
-            return total + (q.correctAnswer?.length || 0);
-        }
-        return total + (q.marks || 1);
-    }, 0) || 0;
-  }, [testWithShuffledOptions]);
-
 
   const handleConfirmAction = () => {
     setIsConfirming(false);
