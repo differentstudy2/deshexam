@@ -447,11 +447,7 @@ export const addContent = async (contentData: any) => {
         };
 
         if (['Mock Test', 'Quiz', 'Practice Questions', 'Exam'].includes(cleanedContent.testType) && cleanedContent.questions) {
-            const questionsWithIds = await Promise.all(cleanedContent.questions.map(async (question: any) => {
-                const questionId = await addQuestion(question);
-                return { ...question, id: questionId };
-            }));
-            finalContentData.questions = questionsWithIds;
+            finalContentData.questions = cleanedContent.questions.map((q: any) => ({ ...q, id: doc(collection(db, 'temp')).id }));
         }
 
         if (collectionName === 'textbooks') {
@@ -560,6 +556,30 @@ export const getAllContent = async (type?: string) => {
     }
 }
 
+export const getContentById = async (contentId: string) => {
+    if (!contentId) {
+        return null;
+    }
+    try {
+        let docSnap = await getDoc(doc(db, "content", contentId));
+        
+        if (!docSnap.exists()) {
+            docSnap = await getDoc(doc(db, "textbooks", contentId));
+        }
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+                id: docSnap.id,
+                ...data,
+            };
+        }
+        return null;
+    } catch (e) {
+        console.error(`Error getting document with id ${contentId}: `, e);
+        throw new Error("Failed to fetch content.");
+    }
+};
 
 export const addTestSubmission = async (submissionData: any) => {
     const auth = getAuth();
@@ -1972,6 +1992,20 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
 };
 
 export const getPracticeSetById = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string) => {
+    if (!chapterId === null || chapterId === 'null') {
+        try {
+            const practiceSetRef = doc(db, 'content', practiceSetId);
+            const docSnap = await getDoc(practiceSetRef);
+            if(docSnap.exists()){
+                return { id: docSnap.id, ...docSnap.data() };
+            }
+            return null;
+        } catch(e) {
+             console.error("Error getting content by ID: ", e);
+             throw new Error("Failed to fetch practice set.");
+        }
+
+    }
     if (!textbookId || !chapterId || !practiceSetId) return null;
     try {
         const path = (topicId && topicId !== 'null')
