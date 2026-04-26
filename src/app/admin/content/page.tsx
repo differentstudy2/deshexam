@@ -66,6 +66,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ContentBadge } from '@/components/content-badge';
+import { format } from 'date-fns';
+import { DocumentSnapshot } from 'firebase/firestore';
 
 
 type Content = {
@@ -306,16 +308,7 @@ export default function ManageContentPage() {
             let pubDate = 'N/A';
             const dateField = c.publishedAt || c.createdAt;
             if (dateField && typeof dateField.toDate === 'function') {
-                pubDate = dateField.toDate().toLocaleDateString();
-            } else if (dateField) {
-                try {
-                    const d = new Date(dateField);
-                    if (!isNaN(d.getTime())) {
-                        pubDate = d.toLocaleDateString();
-                    }
-                } catch(e) {
-                    // Ignore invalid date strings
-                }
+                pubDate = format(dateField.toDate(), 'PPP');
             }
             return {
                 ...c,
@@ -664,4 +657,3 @@ export default function ManageContentPage() {
     </div>
   );
 }
-

@@ -515,9 +515,12 @@ export const getContentById = async (contentId: string) => {
             // Ensure timestamp is converted correctly if it exists
             const createdAt = data.createdAt;
             if (createdAt && typeof createdAt.toDate === 'function') {
-                data.createdAt = createdAt.toDate().toLocaleDateString();
+                data.createdAt = createdAt.toDate();
             } else if (createdAt) {
-                data.createdAt = new Date(createdAt).toLocaleDateString();
+                const d = new Date(createdAt);
+                if (!isNaN(d.getTime())) {
+                    data.createdAt = d;
+                }
             }
             return { id: contentDoc.id, ...data };
         } else {
@@ -527,9 +530,12 @@ export const getContentById = async (contentId: string) => {
                 const data = textbookDoc.data();
                  const createdAt = data.createdAt;
                 if (createdAt && typeof createdAt.toDate === 'function') {
-                    data.createdAt = createdAt.toDate().toLocaleDateString();
+                    data.createdAt = createdAt.toDate();
                 } else if (createdAt) {
-                    data.createdAt = new Date(createdAt).toLocaleDateString();
+                    const d = new Date(createdAt);
+                    if (!isNaN(d.getTime())) {
+                       data.createdAt = d;
+                    }
                 }
                 return { id: textbookDoc.id, ...data };
             }
@@ -650,20 +656,9 @@ export const getAllContent = async (type?: string) => {
         }
 
         const formattedContents = allContents.map(data => {
-            const createdAt = data.createdAt;
-            let formattedDate = 'N/A';
-            if (createdAt && typeof createdAt.toDate === 'function') {
-                formattedDate = createdAt.toDate().toLocaleDateString();
-            } else if (createdAt) {
-                const d = new Date(createdAt);
-                if (!isNaN(d.getTime())) {
-                    formattedDate = d.toLocaleDateString();
-                }
-            }
             return {
                 ...data,
                 questions: data.questions || [],
-                createdAt: formattedDate,
             };
         });
 
