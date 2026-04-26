@@ -1,8 +1,10 @@
 
+
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { format } from 'date-fns';
 
 
 export type Order = {
@@ -197,19 +199,26 @@ export const getQuestionById = async (questionId: string) => {
         if (questionDoc.exists()) {
              const data = questionDoc.data();
              const createdAt = data.createdAt;
-             let formattedDate = new Date();
              if (createdAt && typeof createdAt.toDate === 'function') {
-                 formattedDate = createdAt.toDate();
+                 data.createdAt = createdAt.toDate();
              } else if (createdAt) {
                  const d = new Date(createdAt);
                  if (!isNaN(d.getTime())) {
-                     formattedDate = d;
+                     data.createdAt = d;
+                 }
+             }
+             const publishedAt = data.publishedAt;
+             if (publishedAt && typeof publishedAt.toDate === 'function') {
+                 data.publishedAt = publishedAt.toDate();
+             } else if (publishedAt) {
+                 const d = new Date(publishedAt);
+                 if (!isNaN(d.getTime())) {
+                     data.publishedAt = d;
                  }
              }
             return {
                 id: questionDoc.id,
                 ...data,
-                createdAt: formattedDate,
             };
         }
         
@@ -429,11 +438,12 @@ export const addContent = async (contentData: any) => {
     try {
         const collectionName = cleanedContent.testType === 'Textbook' ? 'textbooks' : 'content';
         
-        let finalContentData: any = {
+        const finalContentData: any = {
             ...cleanedContent,
             authorId: user.uid,
             authorName: user.displayName || user.email,
-            createdAt: cleanedContent.publishedAt || new Date(),
+            createdAt: serverTimestamp(),
+            publishedAt: cleanedContent.publishedAt || new Date(),
         };
 
         if (['Mock Test', 'Quiz', 'Practice Questions', 'Exam'].includes(cleanedContent.testType) && cleanedContent.questions) {
@@ -444,8 +454,6 @@ export const addContent = async (contentData: any) => {
             finalContentData.questions = questionsWithIds;
         }
 
-        delete finalContentData.publishedAt;
-        
         if (collectionName === 'textbooks') {
             delete finalContentData.questions;
             delete finalContentData.duration;
@@ -504,130 +512,6 @@ export const deleteContent = async (contentId: string) => {
     }
 }
 
-export const getContentById = async (contentId: string) => {
-    if (!contentId) {
-        throw new Error("Content ID is required to fetch a content.");
-    }
-    try {
-        const contentDoc = await getDoc(doc(db, "content", contentId));
-        if (contentDoc.exists()) {
-            const data = contentDoc.data();
-            // Ensure timestamp is converted correctly if it exists
-            const createdAt = data.createdAt;
-            if (createdAt && typeof createdAt.toDate === 'function') {
-                data.createdAt = createdAt.toDate();
-            } else if (createdAt) {
-                const d = new Date(createdAt);
-                if (!isNaN(d.getTime())) {
-                    data.createdAt = d;
-                }
-            }
-            return { id: contentDoc.id, ...data };
-        } else {
-            // Check textbooks collection if not in content
-            const textbookDoc = await getDoc(doc(db, "textbooks", contentId));
-            if (textbookDoc.exists()) {
-                const data = textbookDoc.data();
-                 const createdAt = data.createdAt;
-                if (createdAt && typeof createdAt.toDate === 'function') {
-                    data.createdAt = createdAt.toDate();
-                } else if (createdAt) {
-                    const d = new Date(createdAt);
-                    if (!isNaN(d.getTime())) {
-                       data.createdAt = d;
-                    }
-                }
-                return { id: textbookDoc.id, ...data };
-            }
-            return null;
-        }
-    } catch (e) {
-        console.error("Error getting document: ", e);
-        throw new Error("Failed to fetch content.");
-    }
-};
-
-export const updateContent = async (contentId: string, contentData: any) => {
-    if (!contentId) {
-        throw new Error("Content ID is required to update content.");
-    }
-
-    const testType = Array.isArray(contentData.testType) ? contentData.testType[0] : contentData.testType;
-    const isTextbook = testType === 'Textbook';
-
-    const collectionName = isTextbook ? 'textbooks' : 'content';
-    const contentRef = doc(db, collectionName, contentId);
-
-    const cleanedData = cleanDataForFirebase(contentData);
-
-    const finalContentData = {
-        ...cleanedData,
-        updatedAt: serverTimestamp(),
-    };
-
-    try {
-        await updateDoc(contentRef, finalContentData);
-    } catch (e) {
-        console.error("Error updating document: ", e);
-        throw new Error("Failed to update content.");
-    }
-};
-
-export const addQuestionToContent = async (contentId: string, questionData: any) => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) {
-        throw new Error("Authentication required.");
-    }
-
-    const questionId = doc(collection(db, 'idGenerator')).id;
-    
-    const newQuestion = cleanDataForFirebase({
-        ...questionData,
-        id: questionId,
-        authorId: user.uid,
-        authorName: user.displayName || user.email,
-        createdAt: new Date(),
-    });
-
-    try {
-        const contentRef = doc(db, "content", contentId);
-        await updateDoc(contentRef, {
-            questions: arrayUnion(newQuestion)
-        });
-        return questionId; // Return the generated ID
-    } catch (e) {
-        console.error("Error adding question to content: ", e);
-        throw new Error("Failed to add question.");
-    }
-};
-
-export const deleteQuestionFromContent = async (contentId: string, questionId: string) => {
-    if (!contentId || !questionId) {
-        throw new Error("Content ID and Question ID are required.");
-    }
-    const contentRef = doc(db, "content", contentId);
-    try {
-        const contentDoc = await getDoc(contentRef);
-        if (!contentDoc.exists()) {
-            throw new Error("Content not found.");
-        }
-        const contentData = contentDoc.data();
-        const questionToDelete = contentData.questions?.find((q: any) => q.id === questionId);
-
-        if (questionToDelete) {
-            await updateDoc(contentRef, {
-                questions: arrayRemove(questionToDelete)
-            });
-        } else {
-            console.warn("Question not found in content, nothing to delete.");
-        }
-    } catch (e) {
-        console.error("Error deleting question from content:", e);
-        throw new Error("Failed to delete question from content.");
-    }
-};
-
 export const getAllContent = async (type?: string) => {
     try {
         let allContents: any[] = [];
@@ -656,9 +540,16 @@ export const getAllContent = async (type?: string) => {
         }
 
         const formattedContents = allContents.map(data => {
+            const dateField = data.publishedAt || data.createdAt;
+            let pubDate = 'N/A';
+            if (dateField && typeof dateField.toDate === 'function') {
+                pubDate = format(dateField.toDate(), 'PPP');
+            }
+            
             return {
                 ...data,
                 questions: data.questions || [],
+                publishedAt: pubDate
             };
         });
 
@@ -2279,7 +2170,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         const progressRef = doc(db, `users/${userId}/textbookProgress`, textbookId);
         await setDoc(progressRef, { [chapterId]: data }, { merge: true });
     } catch (error) {
-        console.error("Error updating textbook progress: ", error);
+        console.error("Error updating textbook progress: ", e);
         throw new Error("Failed to update progress.");
     }
 }

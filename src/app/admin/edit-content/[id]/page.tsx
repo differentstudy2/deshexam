@@ -354,18 +354,14 @@ export default function EditContentPage() {
               ? contentData.testType 
               : (typeof contentData.testType === 'string' ? [contentData.testType] : []);
           
-          let parsedPublishedDate = new Date();
-          const dateValue = contentData.publishedAt;
-          
-          if (dateValue) {
-              if (typeof dateValue.toDate === 'function') {
-                  parsedPublishedDate = dateValue.toDate();
-              } else {
-                  const d = new Date(dateValue);
-                  if (!isNaN(d.getTime())) {
-                      parsedPublishedDate = d;
-                  }
-              }
+          let parsedPublishedDate = contentData.publishedAt || contentData.createdAt || new Date();
+          if (typeof parsedPublishedDate.toDate === 'function') { // It's a Firestore Timestamp
+            parsedPublishedDate = parsedPublishedDate.toDate();
+          } else if (typeof parsedPublishedDate === 'string' || typeof parsedPublishedDate === 'number') {
+            const d = new Date(parsedPublishedDate);
+            if (!isNaN(d.getTime())) {
+              parsedPublishedDate = d;
+            }
           }
 
           const questionsWithDefaults = (contentData.questions || []).map((q: any) => ({
