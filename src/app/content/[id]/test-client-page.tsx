@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -426,7 +427,7 @@ export default function TestClientPage({ test }: { test: Test }) {
                                 <Label
                                     htmlFor={`q-all-${question.id}-opt${optIndex}`}
                                     className={cn(
-                                        "w-full flex items-center justify-between h-16 p-4 text-left border rounded-lg",
+                                        "w-full flex items-center justify-between min-h-[4rem] p-4 text-left border rounded-lg",
                                         "cursor-pointer hover:bg-accent"
                                     )}
                                 >

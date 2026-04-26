@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, Suspense, useMemo, useCallback, useRef } from 'react';
@@ -606,16 +607,16 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                                 </div>
                                             )}
                                             <Label
-                                                htmlFor={`q-single-${currentQuestion.id}-opt${optIndex}`}
+                                                htmlFor={`q-all-${currentQuestion.id}-opt${optIndex}`}
                                                 className={cn(
-                                                    "p-3 border rounded-lg flex items-center justify-between gap-3 w-full cursor-pointer h-16 transition-colors",
+                                                    "p-3 border rounded-lg flex items-center justify-between gap-3 w-full cursor-pointer min-h-[4rem] transition-colors",
                                                     optionBgColors[optIndex % optionBgColors.length]
                                                 )}
                                             >
                                                 <div className="flex-1 text-base font-normal">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeRaw, rehypeKatex]}>{option.text}</ReactMarkdown>
                                                 </div>
-                                                <RadioGroupItem value={option.text} id={`q-single-${currentQuestion.id}-opt${optIndex}`} />
+                                                <RadioGroupItem value={option.text} id={`q-all-${currentQuestion.id}-opt${optIndex}`} />
                                             </Label>
                                         </div>
                                     ))}
@@ -654,7 +655,7 @@ export default function PracticeSetClientPage({ initialTest, initialTextbook, in
                                                 <Label
                                                     htmlFor={`q-all-${question.id}-opt${optIndex}`}
                                                     className={cn(
-                                                        "p-3 border rounded-lg flex items-center justify-between gap-3 w-full cursor-pointer h-16 transition-colors",
+                                                        "p-3 border rounded-lg flex items-center justify-between gap-3 w-full cursor-pointer min-h-[4rem] transition-colors",
                                                         optionBgColors[optIndex % optionBgColors.length]
                                                     )}
                                                 >
