@@ -50,5 +50,69 @@ export default async function QuizPage({ params }: Props) {
   
   const quiz = serializeTimestamps(quizData);
 
-  return <QuizClientPage quiz={quiz as any} />;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Quiz',
+    'name': quiz.title,
+    'description': quiz.description,
+    'about': {
+        '@type': 'Thing',
+        'name': quiz.subject
+    },
+    'mainEntityOfPage': {
+      '@type': 'WebPage',
+      '@id': `https://deshexam.com/quiz/${quiz.id}`,
+    },
+    'headline': quiz.title,
+    'image': quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`,
+    'author': {
+      '@type': 'Organization',
+      'name': 'DeshExam',
+    },
+    'publisher': {
+      '@type': 'Organization',
+      'name': 'DeshExam',
+      'logo': {
+        '@type': 'ImageObject',
+        'url': 'https://deshexam.com/logo.png',
+      },
+    },
+    'datePublished': quiz.createdAt,
+    'hasPart': (quiz.questions || []).map((q: any) => {
+        const questionObj: any = {
+            '@type': 'Question',
+            'text': q.text,
+        };
+
+        if (q.type === 'Multiple Choice' || q.type === 'True/False') {
+            questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
+            questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
+                '@type': 'Answer',
+                'text': opt.text
+            }));
+            questionObj.acceptedAnswer = {
+                '@type': 'Answer',
+                'text': q.correctAnswer
+            };
+        } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank') {
+            questionObj.eduQuestionType = 'Short answer';
+            questionObj.acceptedAnswer = {
+                '@type': 'Answer',
+                'text': q.correctAnswer
+            };
+        }
+
+        return questionObj;
+    })
+  };
+
+  return (
+    <>
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <QuizClientPage quiz={quiz as any} />
+    </>
+  );
 }

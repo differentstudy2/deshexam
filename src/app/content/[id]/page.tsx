@@ -1,5 +1,4 @@
 
-
 import { getContentById } from '@/lib/firebase/firestore';
 import type { Metadata, ResolvingMetadata } from 'next';
 import TestClientPage from './test-client-page';
@@ -52,29 +51,63 @@ export default async function TestPage({ params }: Props) {
       updatedAt: testData.updatedAt?.toDate ? testData.updatedAt.toDate().toISOString() : null,
   };
 
+  const primaryType = Array.isArray(test.testType) ? test.testType[0] : test.testType;
+  const typeSlug = (primaryType || 'content').toLowerCase().replace(/\s+/g, '-');
+
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
-    mainEntityOfPage: {
+    '@type': 'Quiz',
+    'name': test.title,
+    'description': test.description,
+    'about': {
+        '@type': 'Thing',
+        'name': test.subject
+    },
+    'mainEntityOfPage': {
       '@type': 'WebPage',
-      '@id': `https://deshexam.com/mock-test/${test.id}`,
+      '@id': `https://deshexam.com/${typeSlug}/${test.id}`,
     },
-    headline: test.title,
-    description: test.description,
-    image: `https://picsum.photos/seed/${test.id}/400/225`,
-    author: {
+    'headline': test.title,
+    'image': test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`,
+    'author': {
       '@type': 'Organization',
-      name: 'DeshExam',
+      'name': 'DeshExam',
     },
-    publisher: {
+    'publisher': {
       '@type': 'Organization',
-      name: 'DeshExam',
-      logo: {
+      'name': 'DeshExam',
+      'logo': {
         '@type': 'ImageObject',
-        url: 'https://deshexam.com/logo.png',
+        'url': 'https://deshexam.com/logo.png',
       },
     },
-    datePublished: test.createdAt,
+    'datePublished': test.createdAt,
+    'hasPart': (test.questions || []).map((q: any) => {
+        const questionObj: any = {
+            '@type': 'Question',
+            'text': q.text,
+        };
+
+        if (q.type === 'Multiple Choice' || q.type === 'True/False') {
+            questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
+            questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
+                '@type': 'Answer',
+                'text': opt.text
+            }));
+            questionObj.acceptedAnswer = {
+                '@type': 'Answer',
+                'text': q.correctAnswer
+            };
+        } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank') {
+            questionObj.eduQuestionType = 'Short answer';
+            questionObj.acceptedAnswer = {
+                '@type': 'Answer',
+                'text': q.correctAnswer
+            };
+        }
+
+        return questionObj;
+    })
   };
 
   return (
