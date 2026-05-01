@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Trash2, Eye, Loader2, PlusCircle, Gem } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Eye, Loader2, PlusCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,12 +49,11 @@ type Quiz = {
     subject: string;
     testType: string | string[];
     access: 'free' | 'premium' | 'pro';
-    createdAt: string;
+    publishedAt: string;
 }
 
 function getUrlForTest(testType: string | string[], testId: string) {
     const primaryType = Array.isArray(testType) ? testType[0] : testType;
-    // Fallback for safety, though every item should have a type.
     if (!primaryType) return `/content/${testId}`;
     const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}`;
@@ -134,7 +133,7 @@ export default function ManageQuizzesPage() {
                 <TableHead>Title</TableHead>
                 <TableHead className="hidden md:table-cell">Subject</TableHead>
                 <TableHead className="hidden md:table-cell">Access</TableHead>
-                <TableHead className="hidden lg:table-cell">Created At</TableHead>
+                <TableHead className="hidden lg:table-cell">Published At</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -157,7 +156,7 @@ export default function ManageQuizzesPage() {
                     <TableCell className="hidden md:table-cell">
                         <ContentBadge type={quiz.access} />
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">{quiz.createdAt}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{quiz.publishedAt}</TableCell>
                     <TableCell className="text-right">
                         <DropdownMenu>
                         <DropdownMenuTrigger asChild>

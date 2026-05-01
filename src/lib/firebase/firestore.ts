@@ -52,7 +52,7 @@ const cleanDataForFirebase = (data: any): any => {
         const cleanedData: { [key: string]: any } = {};
         for (const key in data) {
             const value = data[key];
-            if (value !== undefined) { // Change from value !== null && value !== undefined
+            if (value !== undefined) {
                 cleanedData[key] = cleanDataForFirebase(value);
             }
         }
@@ -162,7 +162,6 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
             const data = doc.data();
             const createdAt = data.createdAt;
             let formattedDate = 'N/A';
-            // Firestore timestamps have a toDate method, JS Dates do not.
             if (createdAt && typeof createdAt.toDate === 'function') {
                 formattedDate = createdAt.toDate().toLocaleDateString();
             } else if (createdAt instanceof Date) {
@@ -177,7 +176,6 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
 
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length-1];
         
-        // A simple way to check if there are more pages
         const nextQuery = query(collection(db, "questions"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(1));
         const nextSnapshot = await getDocs(nextQuery);
         const hasMore = !nextSnapshot.empty;
@@ -191,7 +189,7 @@ export const getPaginatedQuestions = async (itemsPerPage: number, startAfterDoc:
 
 export const getQuestionById = async (questionId: string) => {
     if (!questionId) {
-        throw new Error("Question ID is required to fetch a question.");
+        return null;
     }
     try {
         const questionDoc = await getDoc(doc(db, "questions", questionId));
@@ -230,9 +228,8 @@ export const getQuestionById = async (questionId: string) => {
                 if (question) {
                     return {
                         ...question,
-                        // Provide default/fallback values for fields that might be missing
-                        createdAt: new Date(), // Use current date as a fallback
-                        authorName: 'Textbook Author', // Fallback author
+                        createdAt: new Date(),
+                        authorName: 'Textbook Author',
                         subject: textbookDoc.data().subject,
                         textbookId: textbookDoc.id,
                         chapterId: chapterDoc.id,
@@ -298,9 +295,9 @@ export const handleQuestionVote = async (questionId: string, voteType: 'like') =
             let newLikedBy = [...likedBy];
 
             if (voteType === 'like') {
-                if (hasLiked) { // User is un-liking
+                if (hasLiked) {
                     newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
-                } else { // User is liking
+                } else {
                     newLikedBy.push(user.uid);
                 }
             }
@@ -455,13 +452,9 @@ export const addContent = async (contentData: any) => {
             delete finalContentData.difficulty;
         } else if (cleanedContent.testType === 'Learn') {
              delete finalContentData.questions;
-        } else if (cleanedContent.testType === 'Exam') {
-            // Ensure exam-specific logic is correct, if any.
         }
 
-
         const docRef = await addDoc(collection(db, collectionName), finalContentData);
-        console.log("Document written with ID: ", docRef.id);
         return docRef.id;
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -469,9 +462,6 @@ export const addContent = async (contentData: any) => {
     }
 };
 
-/**
- * Updates an existing content document in either the 'content' or 'textbooks' collection.
- */
 export const updateContent = async (contentId: string, data: any) => {
     if (!contentId) {
         throw new Error("Content ID is required to update content.");
@@ -479,7 +469,6 @@ export const updateContent = async (contentId: string, data: any) => {
     try {
         const cleanedData = cleanDataForFirebase(data);
         
-        // Content could be in 'content' or 'textbooks'
         let contentRef = doc(db, "content", contentId);
         let contentSnap = await getDoc(contentRef);
         
@@ -569,8 +558,17 @@ export const getAllContent = async (type?: string) => {
         const formattedContents = allContents.map(data => {
             const dateField = data.publishedAt || data.createdAt;
             let pubDate = 'N/A';
-            if (dateField && typeof dateField.toDate === 'function') {
-                pubDate = format(dateField.toDate(), 'PPP');
+            if (dateField) {
+                if (typeof dateField.toDate === 'function') {
+                    pubDate = format(dateField.toDate(), 'PPP');
+                } else if (dateField instanceof Date) {
+                    pubDate = format(dateField, 'PPP');
+                } else {
+                    const d = new Date(dateField);
+                    if (!isNaN(d.getTime())) {
+                        pubDate = format(d, 'PPP');
+                    }
+                }
             }
             
             return {
@@ -642,7 +640,6 @@ export const addPracticeSetSubmission = async (submissionData: any) => {
     }
     
     try {
-        // Fetch textbook details to add to submission
         const textbookDoc = await getDoc(doc(db, 'textbooks', submissionData.textbookId));
         if (!textbookDoc.exists()) {
             throw new Error("Associated textbook not found.");
@@ -673,11 +670,9 @@ export const getSubmissionById = async (submissionId: string) => {
         throw new Error("Submission ID is required to fetch a submission.");
     }
     try {
-        // Try fetching from 'submissions' first
         let submissionDoc = await getDoc(doc(db, "submissions", submissionId));
 
         if (!submissionDoc.exists()) {
-            // If not found, try 'practiceSetSubmissions'
             submissionDoc = await getDoc(doc(db, "practiceSetSubmissions", submissionId));
         }
 
@@ -722,10 +717,10 @@ export const getSubmissionsByUserId = (
     const data = doc.data() as any;
     if (!data) return null;
 
-    let dateValue = new Date(); // Default to now if invalid
+    let dateValue = new Date();
     if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
       dateValue = data.submittedAt.toDate();
-    } else if (data.submittedAt instanceof Date) { // It might already be a Date object
+    } else if (data.submittedAt instanceof Date) {
       dateValue = data.submittedAt;
     } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
       dateValue = new Date(data.submittedAt);
@@ -745,12 +740,11 @@ export const getSubmissionsByUserId = (
   const testSubsQuery = query(collection(db, "submissions"), where("userId", "==", userId));
   const practiceSubsQuery = query(collection(db, "practiceSetSubmissions"), where("userId", "==", userId));
 
-  let combinedSubmissions: any[] = [];
   let testSubmissions: any[] = [];
   let practiceSubmissions: any[] = [];
 
   const updateAndSort = () => {
-    combinedSubmissions = [...testSubmissions, ...practiceSubmissions];
+    const combinedSubmissions = [...testSubmissions, ...practiceSubmissions];
     combinedSubmissions.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
     callback(combinedSubmissions);
   };
@@ -777,10 +771,10 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
             const data = doc.data() as any;
             if (!data) return null;
 
-            let dateValue = new Date(); // Default to now if invalid
+            let dateValue = new Date();
             if (data.submittedAt && typeof data.submittedAt.toDate === 'function') {
                 dateValue = data.submittedAt.toDate();
-            } else if (data.submittedAt instanceof Date) { // It might already be a Date object
+            } else if (data.submittedAt instanceof Date) {
                 dateValue = data.submittedAt;
             } else if (data.submittedAt && !isNaN(new Date(data.submittedAt).getTime())) {
                 dateValue = new Date(data.submittedAt);
@@ -792,7 +786,7 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
                 userId: data.userId,
                 score: data.score,
                 totalQuestions: data.totalQuestions,
-                submittedAt: dateValue, // Keep as Date object for sorting
+                submittedAt: dateValue,
                 testId: isPracticeSet ? data.practiceSetId : data.testId,
                 testTitle: isPracticeSet ? data.practiceSetTitle : data.testTitle,
                 testType: isPracticeSet ? "Practice Set" : data.testType,
@@ -827,7 +821,7 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
 
         const submissionsWithFormattedDate = allSubmissions.map(sub => ({
             ...sub,
-            submittedAt: sub.submittedAt.toLocaleDateString(),
+            submittedAt: sub!.submittedAt.toLocaleDateString(),
         }));
 
         return { submissions: submissionsWithFormattedDate, lastVisible: lastVisible || null, hasMore };
@@ -843,7 +837,6 @@ export const deleteSubmissions = async (submissionIds: string[]) => {
     }
     try {
         const deletePromises = submissionIds.map(async (id) => {
-            // Need to check both collections
             let docRef = doc(db, "submissions", id);
             let docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
@@ -1363,8 +1356,7 @@ export const getUserProfile = async (userId: string): Promise<any> => {
 export const getUserByUsername = async (username: string) => {
     if (!username) return null;
     try {
-        // Check if the passed value might be a UID instead of a username
-        if (username.length > 20 && !username.includes('-')) { // Simple heuristic for UID
+        if (username.length > 20 && !username.includes('-')) {
              return await getUserProfile(username);
         }
 
@@ -1402,7 +1394,6 @@ export const updateUserProfile = async (userId: string, data: any) => {
             let newData = { ...data };
             delete newData.newSchool;
 
-            // Using set with merge instead of separate update/set
             const newProfileData = {
                 ...currentData,
                 ...newData,
@@ -1456,7 +1447,6 @@ export const toggleFollowUser = async (targetUserId: string) => {
             const isFollowing = currentUserData.following?.includes(targetUserId);
 
             if (isFollowing) {
-                // Unfollow
                 transaction.update(currentUserRef, {
                     following: arrayRemove(targetUserId),
                     followingCount: increment(-1)
@@ -1466,7 +1456,6 @@ export const toggleFollowUser = async (targetUserId: string) => {
                     followersCount: increment(-1)
                 });
             } else {
-                // Follow
                 transaction.update(currentUserRef, {
                     following: arrayUnion(targetUserId),
                     followingCount: increment(1)
@@ -1559,7 +1548,6 @@ export const getCoupons = async () => {
 
 export const addCoupon = async (couponData: any) => {
     try {
-        // Convert expiresAt to Firestore Timestamp if it exists
         if (couponData.expiresAt) {
             couponData.expiresAt = new Date(couponData.expiresAt);
         } else {
@@ -1636,12 +1624,9 @@ export const deleteUser = async (userId: string) => {
     if (!userId) {
         throw new Error("User ID is required to delete a user.");
     }
-    // This is a placeholder. Deleting a user from Auth requires a backend (e.g., Cloud Function).
-    // This function will only delete the user's Firestore document.
     try {
         const userDocRef = doc(db, "users", userId);
         await deleteDoc(userDocRef);
-        // Also delete the username mapping
         const usernameQuery = query(collection(db, "usernames"), where("uid", "==", userId));
         const usernameSnapshot = await getDocs(usernameQuery);
         if(!usernameSnapshot.empty){
@@ -1665,7 +1650,7 @@ export const updateUserSubscription = async (userIds: string[], plan: 'pro' | 'p
             
             if (plan) {
                 const expiresAt = new Date();
-                expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Example: 1 year subscription
+                expiresAt.setFullYear(expiresAt.getFullYear() + 1);
                 updateData.subscriptionExpiresAt = expiresAt;
             } else {
                 updateData.subscriptionExpiresAt = null;
@@ -1828,7 +1813,6 @@ export const getEarningStats = async (): Promise<EarningStats> => {
         };
 
     } catch (error: any) {
-        // Firestore will suggest creating an index in the error message.
         if (error.code === 'failed-precondition') {
             console.error("Firestore error: ", error.message);
             throw new Error(`Query failed. Firestore likely requires a new index. Please check the console logs for a link to create it.`);
@@ -1982,7 +1966,6 @@ export const deletePracticeSet = async (textbookId: string, chapterId: string, t
     }
     try {
         const practiceSetRef = doc(db, `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets`, practiceSetId);
-        // Also need to delete subcollection of questions, ideally with a cloud function for robustness
         const questionsRef = collection(practiceSetRef, 'questions');
         const questionsSnap = await getDocs(questionsRef);
         for (const qDoc of questionsSnap.docs) {
@@ -2023,7 +2006,7 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
 };
 
 export const getPracticeSetById = async (textbookId: string, chapterId: string | null, topicId: string | null, practiceSetId: string) => {
-    if (!chapterId === null || chapterId === 'null') {
+    if (chapterId === null || chapterId === 'null') {
         try {
             const practiceSetRef = doc(db, 'content', practiceSetId);
             const docSnap = await getDoc(practiceSetRef);
@@ -2091,7 +2074,7 @@ export const getQuestionsByPracticeSet = async (textbookId: string, chapterId: s
     let path = '';
     if (textbookId && chapterId && chapterId !== 'null' && topicId && topicId !== 'null') {
         path = `textbooks/${textbookId}/chapters/${chapterId}/topics/${topicId}/practiceSets/${practiceSetId}/questions`;
-    } else if (textbookId && chapterId && chapterId !== 'null' && (topicId === 'null' || !topicId)) { // Chapter-level practice set
+    } else if (textbookId && chapterId && chapterId !== 'null' && (topicId === 'null' || !topicId)) {
         path = `textbooks/${textbookId}/chapters/${chapterId}/practiceSets/${practiceSetId}/questions`;
     } else if (textbookId && (chapterId === 'null' || !chapterId)) {
         const contentDoc = await getDoc(doc(db, 'content', practiceSetId));
@@ -2150,25 +2133,19 @@ export const deleteTextbook = async (textbookId: string) => {
 
     const textbookRef = doc(db, "textbooks", textbookId);
 
-    // This is a simplified delete. For production, you'd want a more robust, recursive delete,
-    // possibly triggered by a Cloud Function to handle nested subcollections reliably.
     try {
-        // Get all chapters
         const chaptersRef = collection(db, `textbooks/${textbookId}/chapters`);
         const chaptersSnapshot = await getDocs(chaptersRef);
 
         for (const chapterDoc of chaptersSnapshot.docs) {
-            // Get all topics for each chapter
             const topicsRef = collection(chapterDoc.ref, "topics");
             const topicsSnapshot = await getDocs(topicsRef);
 
             for (const topicDoc of topicsSnapshot.docs) {
-                // Get all practice sets for each topic
                 const practiceSetsRef = collection(topicDoc.ref, "practiceSets");
                 const practiceSetsSnapshot = await getDocs(practiceSetsRef);
                 
                 for(const practiceSetDoc of practiceSetsSnapshot.docs) {
-                    // Delete questions within practice set
                     const questionsRef = collection(practiceSetDoc.ref, "questions");
                     const questionsSnapshot = await getDocs(questionsRef);
                     for (const qDoc of questionsSnapshot.docs) {
@@ -2183,7 +2160,6 @@ export const deleteTextbook = async (textbookId: string) => {
             await deleteDoc(chapterDoc.ref);
         }
 
-        // Finally, delete the textbook document
         await deleteDoc(textbookRef);
         
     } catch (error) {
@@ -2235,7 +2211,7 @@ export const updateTextbookProgress = async (userId: string, textbookId: string,
         const progressRef = doc(db, `users/${userId}/textbookProgress`, textbookId);
         await setDoc(progressRef, { [chapterId]: data }, { merge: true });
     } catch (error) {
-        console.error("Error updating textbook progress: ", e);
+        console.error("Error updating textbook progress: ", error);
         throw new Error("Failed to update progress.");
     }
 }
@@ -2270,7 +2246,7 @@ export const getRelatedQuestions = async (currentQuestion: Partial<Question>): P
         const q = query(
             collection(db, "questions"),
             where("subject", "==", currentQuestion.subject),
-            where("__name__", "!=", currentQuestion.id), // Exclude the current question using its document ID
+            where("__name__", "!=", currentQuestion.id),
             limit(5)
         );
 

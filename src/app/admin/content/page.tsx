@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -104,7 +103,7 @@ type BulkAction =
 
 function getUrlForTest(testType: string | string[], testId: string) {
     const primaryType = Array.isArray(testType) ? testType[0] : testType;
-    const typeSlug = primaryType.toLowerCase().replace(/\s+/g, '-');
+    const typeSlug = (primaryType || 'content').toLowerCase().replace(/\s+/g, '-');
     return `/${typeSlug}/${testId}`;
 }
 
@@ -304,19 +303,7 @@ export default function ManageContentPage() {
           getExamTypes(),
         ]);
         
-        const formattedContent = content.map((c: any) => {
-            let pubDate = 'N/A';
-            const dateField = c.publishedAt || c.createdAt;
-            if (dateField && typeof dateField.toDate === 'function') {
-                pubDate = format(dateField.toDate(), 'PPP');
-            }
-            return {
-                ...c,
-                publishedAt: pubDate
-            } as Content;
-        });
-
-        setAllContent(formattedContent);
+        setAllContent(content as Content[]);
         setContentTypes(types);
         setSubjects(subjectData);
         setBoards(boardData);
