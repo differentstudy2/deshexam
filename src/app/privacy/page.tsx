@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'Learn how DeshExam collects, uses, and protects your personal information and academic data.',
+  keywords: ['privacy policy', 'data protection', 'user data', 'DeshExam privacy'],
+};
 
 export default function PrivacyPolicyPage() {
   return (

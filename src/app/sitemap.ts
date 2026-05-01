@@ -2,12 +2,10 @@ import { MetadataRoute } from 'next';
 import { 
   getAllContent, 
   getAllQuestions, 
-  getSubjects, 
   getAllTextbooks, 
   getChaptersByTextbookId, 
   getTopicsByChapterId, 
-  getKidsZoneCategories,
-  getPracticeSetsByTopicId 
+  getKidsZoneCategories
 } from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -36,35 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: route === '' ? 1.0 : 0.8,
   }));
 
-  // 2. Kids Zone Categories & Specific Pages
+  // 2. Kids Zone Categories
   const kidsCategories = await getKidsZoneCategories();
   const kidsCategoryRoutes = kidsCategories.map(cat => ({
     url: `${baseUrl}/kids-zone/category/${(cat as any).slug}`,
     lastModified: new Date(),
     priority: 0.7,
-  }));
-
-  const kidsSpecificRoutes = [
-    '/kids-zone/fun-quizzes',
-    '/kids-zone/learning-games',
-    '/kids-zone/learning-games/math-puzzles',
-    '/kids-zone/learning-games/math-puzzles/addition-adventure',
-    '/kids-zone/learning-games/number-recognition',
-    '/kids-zone/learning-games/number-recognition/learn-numbers',
-    '/kids-zone/learning-bengali',
-    '/kids-zone/learning-bengali/alphabet',
-    '/kids-zone/learning-bengali/matra',
-    '/kids-zone/learning-bengali/matra/matra-pronounsation',
-    '/kids-zone/learning-bengali/spelling',
-    '/kids-zone/learning-bengali/reading',
-    '/kids-zone/learning-english',
-    '/kids-zone/learning-arabic',
-    '/kids-zone/learning-hindi',
-    '/kids-zone/learning-urdu',
-  ].map(route => ({
-      url: `${baseUrl}${route}`,
-      lastModified: new Date(),
-      priority: 0.7,
   }));
 
   // 3. Main Content Items (Mock Tests, Quizzes, Articles)
@@ -78,7 +53,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
     const slug = type.toLowerCase().replace(/\s+/g, '-');
     
-    // Map to friendly URLs used in rewrites
     let path = `/${slug}/${item.id}`;
     if (slug === 'kids-zone' && item.category === 'Fun Quizzes') {
         path = `/kids-zone/fun-quizzes/${item.id}`;
@@ -99,7 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // 5. Textbooks, Chapters, Topics, and Practice Sets
+  // 5. Textbooks, Chapters, and Topics
   const allTextbooks = await getAllTextbooks();
   const textbookTreeRoutes: MetadataRoute.Sitemap = [];
 
@@ -128,27 +102,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 lastModified: new Date(),
                 priority: 0.6,
             });
-            
-            const practiceSets = await getPracticeSetsByTopicId(bookId, chapterId, topicId);
-            for (const ps of practiceSets) {
-                 textbookTreeRoutes.push({
-                    url: `${baseUrl}/textbook-solutions/practice-set/${(ps as any).id}/textbook/${bookId}/chapter/${chapterId}/topic/${topicId}`,
-                    lastModified: new Date(),
-                    priority: 0.5,
-                });
-            }
-        }
-        
-        // Handle chapter-level practice sets (no specific topic)
-        const chapterDoc = await getDoc(doc(db, `textbooks/${bookId}/chapters`, chapterId));
-        const chapterData = chapterDoc.data();
-        const chapterPracticeSets = (chapterData as any)?.practiceSets || [];
-        for (const ps of chapterPracticeSets) {
-             textbookTreeRoutes.push({
-                url: `${baseUrl}/textbook-solutions/practice-set/${(ps as any).id}/textbook/${bookId}/chapter/${chapterId}/topic/null`,
-                lastModified: new Date(),
-                priority: 0.5,
-            });
         }
     }
   }
@@ -156,7 +109,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes,
     ...kidsCategoryRoutes,
-    ...kidsSpecificRoutes,
     ...contentRoutes,
     ...questionRoutes,
     ...textbookTreeRoutes,

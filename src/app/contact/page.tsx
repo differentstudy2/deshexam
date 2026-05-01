@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -6,14 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Mail, Phone, MapPin } from 'lucide-react';
 import { addContactMessage } from '@/lib/firebase/firestore';
-import { useEffect } from 'react';
-
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -35,14 +32,6 @@ export default function ContactPage() {
             message: '',
         },
     });
-
-    useEffect(() => {
-        document.title = "Contact Us | DeshExam";
-        const descriptionMeta = document.querySelector('meta[name="description"]');
-        descriptionMeta?.setAttribute('content', "Get in touch with the DeshExam team. We'd love to hear from you for any questions, feedback, or support inquiries.");
-        const keywordsMeta = document.querySelector('meta[name="keywords"]');
-        keywordsMeta?.setAttribute('content', 'contact deshexam, deshexam support, contact us, customer service');
-    }, []);
 
     const onSubmit: SubmitHandler<ContactFormValues> = async (data) => {
         try {

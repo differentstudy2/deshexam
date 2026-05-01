@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: 'Read the terms and conditions for using DeshExam, including user conduct, subscription terms, and intellectual property rights.',
+  keywords: ['terms of service', 'user agreement', 'DeshExam terms', 'legal terms'],
+};
 
 export default function TermsOfServicePage() {
   return (
