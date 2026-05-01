@@ -1,5 +1,4 @@
 
-
 import { db } from "@/lib/firebase/client";
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc, getDoc, updateDoc, orderBy, setDoc, runTransaction, arrayUnion, arrayRemove, increment, limit, startAfter, DocumentSnapshot,getCountFromServer, onSnapshot } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -467,6 +466,38 @@ export const addContent = async (contentData: any) => {
     } catch (e) {
         console.error("Error adding document: ", e);
         throw new Error("Failed to create content.");
+    }
+};
+
+/**
+ * Updates an existing content document in either the 'content' or 'textbooks' collection.
+ */
+export const updateContent = async (contentId: string, data: any) => {
+    if (!contentId) {
+        throw new Error("Content ID is required to update content.");
+    }
+    try {
+        const cleanedData = cleanDataForFirebase(data);
+        
+        // Content could be in 'content' or 'textbooks'
+        let contentRef = doc(db, "content", contentId);
+        let contentSnap = await getDoc(contentRef);
+        
+        if (!contentSnap.exists()) {
+            contentRef = doc(db, "textbooks", contentId);
+            contentSnap = await getDoc(contentRef);
+            if (!contentSnap.exists()) {
+                throw new Error("Content not found.");
+            }
+        }
+        
+        await updateDoc(contentRef, {
+            ...cleanedData,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (e) {
+        console.error("Error updating content: ", e);
+        throw new Error("Failed to update content.");
     }
 };
 
