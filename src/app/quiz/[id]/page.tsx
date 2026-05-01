@@ -49,21 +49,22 @@ export default async function QuizPage({ params }: Props) {
   }
   
   const quiz = serializeTimestamps(quizData);
+  const cleanTitle = formatTitleForBrowser(quiz.title);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Quiz',
-    'name': quiz.title,
-    'description': quiz.description,
+    'name': cleanTitle,
+    'description': formatTitleForBrowser(quiz.description),
     'about': {
         '@type': 'Thing',
-        'name': quiz.subject
+        'name': quiz.subject || 'Education'
     },
     'mainEntityOfPage': {
       '@type': 'WebPage',
       '@id': `https://deshexam.com/quiz/${quiz.id}`,
     },
-    'headline': quiz.title,
+    'headline': cleanTitle,
     'image': quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`,
     'author': {
       '@type': 'Organization',
@@ -79,26 +80,28 @@ export default async function QuizPage({ params }: Props) {
     },
     'datePublished': quiz.createdAt,
     'hasPart': (quiz.questions || []).map((q: any) => {
+        const cleanQuestionText = formatTitleForBrowser(q.text);
         const questionObj: any = {
             '@type': 'Question',
-            'text': q.text,
+            'name': cleanQuestionText.substring(0, 100),
+            'text': cleanQuestionText,
         };
 
         if (q.type === 'Multiple Choice' || q.type === 'True/False') {
             questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
             questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
                 '@type': 'Answer',
-                'text': opt.text
+                'text': formatTitleForBrowser(opt.text)
             }));
             questionObj.acceptedAnswer = {
                 '@type': 'Answer',
-                'text': q.correctAnswer
+                'text': formatTitleForBrowser(q.correctAnswer)
             };
         } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank') {
             questionObj.eduQuestionType = 'Short answer';
             questionObj.acceptedAnswer = {
                 '@type': 'Answer',
-                'text': q.correctAnswer
+                'text': formatTitleForBrowser(q.correctAnswer)
             };
         }
 

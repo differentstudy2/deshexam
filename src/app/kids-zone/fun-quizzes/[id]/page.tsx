@@ -3,6 +3,7 @@ import { getContentById } from '@/lib/firebase/firestore';
 import type { Metadata } from 'next';
 import QuizClientPage from './quiz-client-page';
 import { notFound } from 'next/navigation';
+import { formatTitleForBrowser } from '@/lib/utils';
 
 type Props = {
   params: { id: string };
@@ -34,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Quiz Not Found' };
   }
   return {
-    title: `${quiz.title} | Kids Zone`,
-    description: `A fun quiz about ${quiz.title}.`,
+    title: `${formatTitleForBrowser(quiz.title)} | Kids Zone`,
+    description: `A fun quiz about ${formatTitleForBrowser(quiz.title)}.`,
   };
 }
 
@@ -46,12 +47,13 @@ export default async function FunQuizPage({ params }: Props) {
   }
   
   const quiz = serializeTimestamps(quizData);
+  const cleanTitle = formatTitleForBrowser(quiz.title);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Quiz',
-    'name': quiz.title,
-    'description': quiz.description,
+    'name': cleanTitle,
+    'description': formatTitleForBrowser(quiz.description),
     'about': {
         '@type': 'Thing',
         'name': 'Kids Learning'
@@ -60,7 +62,7 @@ export default async function FunQuizPage({ params }: Props) {
       '@type': 'WebPage',
       '@id': `https://deshexam.com/kids-zone/fun-quizzes/${quiz.id}`,
     },
-    'headline': quiz.title,
+    'headline': cleanTitle,
     'image': quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`,
     'author': {
       '@type': 'Organization',
@@ -76,26 +78,28 @@ export default async function FunQuizPage({ params }: Props) {
     },
     'datePublished': quiz.createdAt,
     'hasPart': (quiz.questions || []).map((q: any) => {
+        const cleanQuestionText = formatTitleForBrowser(q.text);
         const questionObj: any = {
             '@type': 'Question',
-            'text': q.text,
+            'name': cleanQuestionText.substring(0, 100),
+            'text': cleanQuestionText,
         };
 
         if (q.type === 'Multiple Choice' || q.type === 'True/False') {
             questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
             questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
                 '@type': 'Answer',
-                'text': opt.text
+                'text': formatTitleForBrowser(opt.text)
             }));
             questionObj.acceptedAnswer = {
                 '@type': 'Answer',
-                'text': q.correctAnswer
+                'text': formatTitleForBrowser(q.correctAnswer)
             };
         } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank' || q.type === 'Direct Question') {
             questionObj.eduQuestionType = 'Short answer';
             questionObj.acceptedAnswer = {
                 '@type': 'Answer',
-                'text': q.correctAnswer
+                'text': formatTitleForBrowser(q.correctAnswer)
             };
         }
 

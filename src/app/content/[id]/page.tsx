@@ -53,12 +53,13 @@ export default async function TestPage({ params }: Props) {
 
   const primaryType = Array.isArray(test.testType) ? test.testType[0] : test.testType;
   const typeSlug = (primaryType || 'content').toLowerCase().replace(/\s+/g, '-');
+  const cleanTitle = formatTitleForBrowser(test.title);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Quiz',
-    'name': test.title,
-    'description': test.description,
+    'name': cleanTitle,
+    'description': formatTitleForBrowser(test.description),
     'about': {
         '@type': 'Thing',
         'name': test.subject
@@ -67,7 +68,7 @@ export default async function TestPage({ params }: Props) {
       '@type': 'WebPage',
       '@id': `https://deshexam.com/${typeSlug}/${test.id}`,
     },
-    'headline': test.title,
+    'headline': cleanTitle,
     'image': test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`,
     'author': {
       '@type': 'Organization',
@@ -83,26 +84,28 @@ export default async function TestPage({ params }: Props) {
     },
     'datePublished': test.createdAt,
     'hasPart': (test.questions || []).map((q: any) => {
+        const cleanQuestionText = formatTitleForBrowser(q.text);
         const questionObj: any = {
             '@type': 'Question',
-            'text': q.text,
+            'name': cleanQuestionText.substring(0, 100),
+            'text': cleanQuestionText,
         };
 
         if (q.type === 'Multiple Choice' || q.type === 'True/False') {
             questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
             questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
                 '@type': 'Answer',
-                'text': opt.text
+                'text': formatTitleForBrowser(opt.text)
             }));
             questionObj.acceptedAnswer = {
                 '@type': 'Answer',
-                'text': q.correctAnswer
+                'text': formatTitleForBrowser(q.correctAnswer)
             };
         } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank') {
             questionObj.eduQuestionType = 'Short answer';
             questionObj.acceptedAnswer = {
                 '@type': 'Answer',
-                'text': q.correctAnswer
+                'text': formatTitleForBrowser(q.correctAnswer)
             };
         }
 

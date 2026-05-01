@@ -123,12 +123,39 @@ export default async function MockTestPage({ params }: PageProps) {
         testType: 'Mock Test'
     };
     
+    const cleanTitle = formatTitleForBrowser(initialTest.title);
+
     const jsonLd = {
       "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": `${(mockTest as any).title} | ${topic?.title || chapter.title}`,
-      "description": `Take the interactive mock test "${(mockTest as any).title}" for the topic "${topic?.title || chapter.title}" from the ${textbook.title} textbook.`,
-      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
+      "@type": "Quiz",
+      "name": cleanTitle,
+      "description": formatTitleForBrowser(initialTest.description),
+      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
+      'hasPart': (initialTest.questions || []).map((q: any) => {
+          const cleanQuestionText = formatTitleForBrowser(q.text);
+          const questionObj: any = {
+              '@type': 'Question',
+              'name': cleanQuestionText.substring(0, 100),
+              'text': cleanQuestionText,
+          };
+
+          if (q.type === 'Multiple Choice' || q.type === 'True/False') {
+              questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(opt.text)
+              }));
+              questionObj.acceptedAnswer = {
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(q.correctAnswer)
+              };
+          } else {
+              questionObj.acceptedAnswer = {
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(q.correctAnswer)
+              };
+          }
+          return questionObj;
+      })
     };
 
     return (

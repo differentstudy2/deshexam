@@ -5,7 +5,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import type { Textbook, Chapter, Exam as Quiz, Topic } from '@/lib/types';
-import { getContentById } from '@/lib/firebase/firestore';
+import { getContentById, getTextbookById } from '@/lib/firebase/firestore';
 import PracticeSetClientPage from '@/app/textbook-solutions/practice-set/[practiceSetId]/textbook/[bookId]/chapter/[chapterId]/topic/[topicId]/practice-set-client-page';
 import { notFound } from 'next/navigation';
 import { formatTitleForBrowser } from '@/lib/utils';
@@ -39,7 +39,7 @@ async function getPageData(params: PageProps['params']) {
     const { quizId, bookId } = params;
     try {
         const quiz = await getContentById(quizId);
-        const textbook = await getContentById(bookId);
+        const textbook = await getTextbookById(bookId);
         
         return { 
             quiz: serializeFirestoreTimestamps(quiz),
@@ -113,13 +113,39 @@ export default async function TextbookQuizPage({ params }: PageProps) {
 
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: null = null;
+    const cleanTitle = formatTitleForBrowser(initialTest.title);
     
     const jsonLd = {
       "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": `${(quiz as any).title} | ${(textbook as any).title}`,
-      "description": `Take the quiz "${(quiz as any).title}" for the ${(textbook as any).title} textbook. Check your knowledge and prepare for your exams with DeshExam.`,
-      "url": `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`
+      "@type": "Quiz",
+      "name": cleanTitle,
+      "description": formatTitleForBrowser(initialTest.description),
+      "url": `https://deshexam.com/textbook-solutions/quiz/${params.quizId}/textbook/${params.bookId}`,
+      'hasPart': (initialTest.questions || []).map((q: any) => {
+          const cleanQuestionText = formatTitleForBrowser(q.text);
+          const questionObj: any = {
+              '@type': 'Question',
+              'name': cleanQuestionText.substring(0, 100),
+              'text': cleanQuestionText,
+          };
+
+          if (q.type === 'Multiple Choice' || q.type === 'True/False') {
+              questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(opt.text)
+              }));
+              questionObj.acceptedAnswer = {
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(q.correctAnswer)
+              };
+          } else {
+              questionObj.acceptedAnswer = {
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(q.correctAnswer)
+              };
+          }
+          return questionObj;
+      })
     };
 
 

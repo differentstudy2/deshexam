@@ -110,13 +110,39 @@ export default async function TextbookMockTestPage({ params }: PageProps) {
 
     const mockChapter: Chapter = { id: 'null', title: 'Full Textbook', topics: [] , access: 'free'};
     const mockTopic: null = null;
+    const cleanTitle = formatTitleForBrowser(initialTest.title);
     
     const jsonLd = {
       "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": `${(mockTest as any).title} | ${(textbook as any).title}`,
-      "description": `Take the interactive mock test "${(mockTest as any).title}" for the ${(textbook as any).title} textbook. Check your knowledge and prepare for your exams.`,
-      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}`
+      "@type": "Quiz",
+      "name": cleanTitle,
+      "description": formatTitleForBrowser(initialTest.description),
+      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}`,
+      'hasPart': (initialTest.questions || []).map((q: any) => {
+          const cleanQuestionText = formatTitleForBrowser(q.text);
+          const questionObj: any = {
+              '@type': 'Question',
+              'name': cleanQuestionText.substring(0, 100),
+              'text': cleanQuestionText,
+          };
+
+          if (q.type === 'Multiple Choice' || q.type === 'True/False') {
+              questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(opt.text)
+              }));
+              questionObj.acceptedAnswer = {
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(q.correctAnswer)
+              };
+          } else {
+              questionObj.acceptedAnswer = {
+                  '@type': 'Answer',
+                  'text': formatTitleForBrowser(q.correctAnswer)
+              };
+          }
+          return questionObj;
+      })
     };
 
 
