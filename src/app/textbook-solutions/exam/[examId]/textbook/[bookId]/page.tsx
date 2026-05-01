@@ -122,39 +122,54 @@ export default async function TextbookExamPage({ params }: PageProps) {
     const mockTopic: Topic | null = null;
     const cleanTitle = formatTitleForBrowser(initialTest.title);
 
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "Quiz",
-      "name": cleanTitle,
-      "description": formatTitleForBrowser(initialTest.description),
-      "url": `https://deshexam.com/textbook-solutions/exam/${params.examId}/textbook/${params.bookId}`,
-      'hasPart': (initialTest.questions || []).map((q: any) => {
-          const cleanQuestionText = formatTitleForBrowser(q.text);
-          const questionObj: any = {
-              '@type': 'Question',
-              'name': cleanQuestionText.substring(0, 100),
-              'text': cleanQuestionText,
-          };
-
-          if (q.type === 'Multiple Choice' || q.type === 'True/False') {
-              questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
-                  '@type': 'Answer',
-                  'text': formatTitleForBrowser(opt.text)
-              }));
-              questionObj.acceptedAnswer = {
-                  '@type': 'Answer',
-                  'text': formatTitleForBrowser(q.correctAnswer)
-              };
-          } else {
-              questionObj.acceptedAnswer = {
-                  '@type': 'Answer',
-                  'text': formatTitleForBrowser(q.correctAnswer)
-              };
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": cleanTitle,
+        "description": formatTitleForBrowser(initialTest.description),
+        "learningResourceType": "Exam",
+        "educationalLevel": textbook.class || 'All Levels',
+        "about": {
+          "@type": "Thing",
+          "name": textbook.subject
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "DeshExam"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://deshexam.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Textbook Solutions",
+            "item": "https://deshexam.com/textbook-solutions"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": textbook.title,
+            "item": `https://deshexam.com/textbook-solutions/${textbook.id}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": cleanTitle,
+            "item": `https://deshexam.com/textbook-solutions/exam/${params.examId}/textbook/${params.bookId}`
           }
-          return questionObj;
-      })
-    };
-
+        ]
+      }
+    ];
 
     return (
         <>

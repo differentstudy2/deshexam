@@ -9,7 +9,6 @@ type Props = {
   params: { id: string };
 };
 
-// Helper function to serialize Firestore Timestamps
 const serializeTimestamps = (data: any): any => {
     if (!data) return data;
     if (Array.isArray(data)) {
@@ -27,7 +26,6 @@ const serializeTimestamps = (data: any): any => {
     }
     return data;
 };
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const quiz = await getContentById(params.id) as any;
@@ -49,63 +47,56 @@ export default async function FunQuizPage({ params }: Props) {
   const quiz = serializeTimestamps(quizData);
   const cleanTitle = formatTitleForBrowser(quiz.title);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Quiz',
-    'name': cleanTitle,
-    'description': formatTitleForBrowser(quiz.description),
-    'about': {
-        '@type': 'Thing',
-        'name': 'Kids Learning'
-    },
-    'mainEntityOfPage': {
-      '@type': 'WebPage',
-      '@id': `https://deshexam.com/kids-zone/fun-quizzes/${quiz.id}`,
-    },
-    'headline': cleanTitle,
-    'image': quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`,
-    'author': {
-      '@type': 'Organization',
-      'name': 'DeshExam',
-    },
-    'publisher': {
-      '@type': 'Organization',
-      'name': 'DeshExam',
-      'logo': {
-        '@type': 'ImageObject',
-        'url': 'https://deshexam.com/logo.png',
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'LearningResource',
+      'name': cleanTitle,
+      'description': formatTitleForBrowser(quiz.description),
+      'learningResourceType': 'Quiz',
+      'educationalLevel': 'Primary',
+      'about': {
+          '@type': 'Thing',
+          'name': 'Kids Learning'
       },
+      'image': quiz.featureImage || `https://picsum.photos/seed/${quiz.id}/400/225`,
+      'author': {
+        '@type': 'Organization',
+        'name': 'DeshExam',
+      },
+      'datePublished': quiz.createdAt,
     },
-    'datePublished': quiz.createdAt,
-    'hasPart': (quiz.questions || []).map((q: any) => {
-        const cleanQuestionText = formatTitleForBrowser(q.text);
-        const questionObj: any = {
-            '@type': 'Question',
-            'name': cleanQuestionText.substring(0, 100),
-            'text': cleanQuestionText,
-        };
-
-        if (q.type === 'Multiple Choice' || q.type === 'True/False') {
-            questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
-            questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
-                '@type': 'Answer',
-                'text': formatTitleForBrowser(opt.text)
-            }));
-            questionObj.acceptedAnswer = {
-                '@type': 'Answer',
-                'text': formatTitleForBrowser(q.correctAnswer)
-            };
-        } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank' || q.type === 'Direct Question') {
-            questionObj.eduQuestionType = 'Short answer';
-            questionObj.acceptedAnswer = {
-                '@type': 'Answer',
-                'text': formatTitleForBrowser(q.correctAnswer)
-            };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        {
+          '@type': 'ListItem',
+          'position': 1,
+          'name': 'Home',
+          'item': 'https://deshexam.com/'
+        },
+        {
+          '@type': 'ListItem',
+          'position': 2,
+          'name': 'Kids Zone',
+          'item': 'https://deshexam.com/kids-zone'
+        },
+        {
+          '@type': 'ListItem',
+          'position': 3,
+          'name': 'Fun Quizzes',
+          'item': 'https://deshexam.com/kids-zone/fun-quizzes'
+        },
+        {
+          '@type': 'ListItem',
+          'position': 4,
+          'name': cleanTitle,
+          'item': `https://deshexam.com/kids-zone/fun-quizzes/${quiz.id}`
         }
-
-        return questionObj;
-    })
-  };
+      ]
+    }
+  ];
 
   return (
     <>

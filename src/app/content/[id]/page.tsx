@@ -55,63 +55,50 @@ export default async function TestPage({ params }: Props) {
   const typeSlug = (primaryType || 'content').toLowerCase().replace(/\s+/g, '-');
   const cleanTitle = formatTitleForBrowser(test.title);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Quiz',
-    'name': cleanTitle,
-    'description': formatTitleForBrowser(test.description),
-    'about': {
-        '@type': 'Thing',
-        'name': test.subject
-    },
-    'mainEntityOfPage': {
-      '@type': 'WebPage',
-      '@id': `https://deshexam.com/${typeSlug}/${test.id}`,
-    },
-    'headline': cleanTitle,
-    'image': test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`,
-    'author': {
-      '@type': 'Organization',
-      'name': 'DeshExam',
-    },
-    'publisher': {
-      '@type': 'Organization',
-      'name': 'DeshExam',
-      'logo': {
-        '@type': 'ImageObject',
-        'url': 'https://deshexam.com/logo.png',
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'LearningResource',
+      'name': cleanTitle,
+      'description': formatTitleForBrowser(test.description),
+      'learningResourceType': 'Assessment',
+      'educationalLevel': test.class || 'All Levels',
+      'about': {
+          '@type': 'Thing',
+          'name': test.subject
       },
+      'author': {
+        '@type': 'Organization',
+        'name': 'DeshExam',
+      },
+      'image': test.featureImage || `https://picsum.photos/seed/${test.id}/400/225`,
+      'datePublished': test.createdAt,
     },
-    'datePublished': test.createdAt,
-    'hasPart': (test.questions || []).map((q: any) => {
-        const cleanQuestionText = formatTitleForBrowser(q.text);
-        const questionObj: any = {
-            '@type': 'Question',
-            'name': cleanQuestionText.substring(0, 100),
-            'text': cleanQuestionText,
-        };
-
-        if (q.type === 'Multiple Choice' || q.type === 'True/False') {
-            questionObj.eduQuestionType = q.type === 'Multiple Choice' ? 'Multiple choice' : 'True/false';
-            questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
-                '@type': 'Answer',
-                'text': formatTitleForBrowser(opt.text)
-            }));
-            questionObj.acceptedAnswer = {
-                '@type': 'Answer',
-                'text': formatTitleForBrowser(q.correctAnswer)
-            };
-        } else if (q.type === 'Short Answer' || q.type === 'Fill in the Blank') {
-            questionObj.eduQuestionType = 'Short answer';
-            questionObj.acceptedAnswer = {
-                '@type': 'Answer',
-                'text': formatTitleForBrowser(q.correctAnswer)
-            };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        {
+          '@type': 'ListItem',
+          'position': 1,
+          'name': 'Home',
+          'item': 'https://deshexam.com/'
+        },
+        {
+          '@type': 'ListItem',
+          'position': 2,
+          'name': primaryType || 'Content',
+          'item': `https://deshexam.com/${typeSlug}s`
+        },
+        {
+          '@type': 'ListItem',
+          'position': 3,
+          'name': cleanTitle,
+          'item': `https://deshexam.com/content/${test.id}`
         }
-
-        return questionObj;
-    })
-  };
+      ]
+    }
+  ];
 
   return (
     <>

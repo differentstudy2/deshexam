@@ -68,7 +68,8 @@ async function getPageData(params: PageProps['params']) {
 }
 
 export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { textbook, chapter, topic, mockTest } = await getPageData(params);
+  const awaitedParams = await params;
+  const { textbook, chapter, topic, mockTest } = await getPageData(awaitedParams);
 
   if (!mockTest || !textbook || !chapter) {
     return {
@@ -112,7 +113,8 @@ export async function generateMetadata({ params }: PageProps, parent: ResolvingM
 
 
 export default async function MockTestPage({ params }: PageProps) {
-    const { mockTest, textbook, chapter, topic } = await getPageData(params);
+    const awaitedParams = await params;
+    const { mockTest, textbook, chapter, topic } = await getPageData(awaitedParams);
     
     if (!mockTest || !textbook || !chapter) {
         notFound();
@@ -125,38 +127,66 @@ export default async function MockTestPage({ params }: PageProps) {
     
     const cleanTitle = formatTitleForBrowser(initialTest.title);
 
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "Quiz",
-      "name": cleanTitle,
-      "description": formatTitleForBrowser(initialTest.description),
-      "url": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`,
-      'hasPart': (initialTest.questions || []).map((q: any) => {
-          const cleanQuestionText = formatTitleForBrowser(q.text);
-          const questionObj: any = {
-              '@type': 'Question',
-              'name': cleanQuestionText.substring(0, 100),
-              'text': cleanQuestionText,
-          };
-
-          if (q.type === 'Multiple Choice' || q.type === 'True/False') {
-              questionObj.suggestedAnswer = (q.options || []).map((opt: any) => ({
-                  '@type': 'Answer',
-                  'text': formatTitleForBrowser(opt.text)
-              }));
-              questionObj.acceptedAnswer = {
-                  '@type': 'Answer',
-                  'text': formatTitleForBrowser(q.correctAnswer)
-              };
-          } else {
-              questionObj.acceptedAnswer = {
-                  '@type': 'Answer',
-                  'text': formatTitleForBrowser(q.correctAnswer)
-              };
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": cleanTitle,
+        "description": formatTitleForBrowser(initialTest.description),
+        "learningResourceType": "Assessment",
+        "educationalLevel": textbook.class || 'All Levels',
+        "about": {
+          "@type": "Thing",
+          "name": textbook.subject
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "DeshExam"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://deshexam.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Textbook Solutions",
+            "item": "https://deshexam.com/textbook-solutions"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": textbook.title,
+            "item": `https://deshexam.com/textbook-solutions/${textbook.id}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": chapter.title,
+            "item": `https://deshexam.com/textbook-solutions/${textbook.id}/chapter/${chapter.id}`
+          },
+          ...(topic ? [{
+            "@type": "ListItem",
+            "position": 5,
+            "name": topic.title,
+            "item": `https://deshexam.com/textbook-solutions/${textbook.id}/chapter/${chapter.id}/topic/${topic.id}`
+          }] : []),
+          {
+            "@type": "ListItem",
+            "position": topic ? 6 : 5,
+            "name": cleanTitle,
+            "item": `https://deshexam.com/textbook-solutions/mock-test/${params.mockTestId}/textbook/${params.bookId}/chapter/${params.chapterId}/topic/${params.topicId}`
           }
-          return questionObj;
-      })
-    };
+        ]
+      }
+    ];
 
     return (
         <>
