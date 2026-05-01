@@ -1,24 +1,22 @@
-
 import { MetadataRoute } from 'next';
-import { getAllContent, getContentTypes, getAllQuestions, getBoards, getClasses, getExamTypes, getSubjects, getAllTextbooks, getChaptersByTextbookId, getTopicsByChapterId, getAllUsers, getPracticeSetsByTopicId } from '@/lib/firebase/firestore';
+import { 
+  getAllContent, 
+  getAllQuestions, 
+  getSubjects, 
+  getAllTextbooks, 
+  getChaptersByTextbookId, 
+  getTopicsByChapterId, 
+  getKidsZoneCategories,
+  getPracticeSetsByTopicId 
+} from '@/lib/firebase/firestore';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://deshexam.com';
 
-  // Helper to safely get a slug from a potentially array-like testType
-  const getUrlSlug = (testType: string | string[] | undefined): string => {
-    let type = 'content';
-    if (Array.isArray(testType) && testType.length > 0) {
-        type = testType[0];
-    } else if (typeof testType === 'string') {
-        type = testType;
-    }
-    return type.toLowerCase().replace(/\s+/g, '-');
-  };
-
-  // 1. Statically defined routes
+  // 1. Static Routes
   const staticRoutes = [
     '', 
+    '/about',
     '/features', 
     '/leaderboard', 
     '/pricing', 
@@ -26,177 +24,141 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/faq', 
     '/terms', 
     '/privacy', 
-    '/about',
     '/kids-zone',
-    '/kids-zone/fun-quizzes',
-    '/kids-zone/fun-quizzes/amazing-animals',
-    '/kids-zone/learning-games',
-    '/kids-zone/learning-games/math-puzzles',
-    '/kids-zone/learning-games/math-puzzles/addition-adventure',
-    '/kids-zone/learning-games/number-recognition',
-    '/kids-zone/learning-games/number-recognition/learn-numbers',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/0-10',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/11-20',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/21-30',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/31-40',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/41-50',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/51-60',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/61-70',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/71-80',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/81-90',
-    '/kids-zone/learning-games/number-recognition/learn-numbers/91-100',
-    '/kids-zone/learning-games/number-recognition/numbers-0-9',
-    '/kids-zone/learning-bengali',
-    '/kids-zone/learning-bengali/alphabet',
-    '/kids-zone/learning-bengali/matra',
-    '/kids-zone/learning-bengali/matra/matra-pronounsation',
-    '/kids-zone/learning-bengali/spelling',
-    '/kids-zone/learning-bengali/reading',
-    '/kids-zone/learning-bengali/reading/sheyaler-chalaki',
-    '/kids-zone/learning-bengali/reading/kocchop-o-khorgosh',
-    '/kids-zone/learning-bengali/reading/trishnarto-kak',
-    '/kids-zone/learning-bengali/reading/lion-and-mouse',
-    '/kids-zone/learning-bengali/reading/two-friends-and-bear',
-    '/kids-zone/learning-english',
     '/textbook-solutions',
+    '/exams',
+    '/quizzes',
+    '/mock-tests',
+    '/questions',
   ].map(route => ({
       url: `${baseUrl}${route}`,
       lastModified: new Date(),
       priority: route === '' ? 1.0 : 0.8,
   }));
 
-  // 2. Fetch all content types to generate category pages
-  const contentTypes = await getContentTypes();
-  const contentTypeRoutes = contentTypes.map((type) => {
-    const slug = type.name.toLowerCase().replace(/\s+/g, '-');
-    return {
-      url: `${baseUrl}/${slug}`,
-      lastModified: new Date(),
-      priority: 0.8,
-    };
-  });
+  // 2. Kids Zone Categories & Specific Pages
+  const kidsCategories = await getKidsZoneCategories();
+  const kidsCategoryRoutes = kidsCategories.map(cat => ({
+    url: `${baseUrl}/kids-zone/category/${(cat as any).slug}`,
+    lastModified: new Date(),
+    priority: 0.7,
+  }));
 
-  // 3. Fetch all individual content items for dynamic routes
+  const kidsSpecificRoutes = [
+    '/kids-zone/fun-quizzes',
+    '/kids-zone/learning-games',
+    '/kids-zone/learning-games/math-puzzles',
+    '/kids-zone/learning-games/math-puzzles/addition-adventure',
+    '/kids-zone/learning-games/number-recognition',
+    '/kids-zone/learning-games/number-recognition/learn-numbers',
+    '/kids-zone/learning-bengali',
+    '/kids-zone/learning-bengali/alphabet',
+    '/kids-zone/learning-bengali/matra',
+    '/kids-zone/learning-bengali/matra/matra-pronounsation',
+    '/kids-zone/learning-bengali/spelling',
+    '/kids-zone/learning-bengali/reading',
+    '/kids-zone/learning-english',
+    '/kids-zone/learning-arabic',
+    '/kids-zone/learning-hindi',
+    '/kids-zone/learning-urdu',
+  ].map(route => ({
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+      priority: 0.7,
+  }));
+
+  // 3. Main Content Items (Mock Tests, Quizzes, Articles)
   const allContent = await getAllContent();
-  const contentItemRoutes = allContent.map((item: any) => {
-    const typeSlug = getUrlSlug(item.testType);
-    const path = `/${typeSlug}/${item.id}`;
-    let lastMod;
-    if (item.updatedAt && typeof item.updatedAt.toDate === 'function') {
-        lastMod = item.updatedAt.toDate();
-    } else if (item.createdAt && typeof item.createdAt.toDate === 'function') {
-        lastMod = item.createdAt.toDate();
-    } else {
-        lastMod = new Date();
+  const contentRoutes = allContent.map((item: any) => {
+    let type = 'content';
+    if (Array.isArray(item.testType) && item.testType.length > 0) {
+        type = item.testType[0];
+    } else if (typeof item.testType === 'string') {
+        type = item.testType;
     }
+    const slug = type.toLowerCase().replace(/\s+/g, '-');
     
+    // Map to friendly URLs used in rewrites
+    let path = `/${slug}/${item.id}`;
+    if (slug === 'kids-zone' && item.category === 'Fun Quizzes') {
+        path = `/kids-zone/fun-quizzes/${item.id}`;
+    }
+
     return {
       url: `${baseUrl}${path}`,
-      lastModified: lastMod,
+      lastModified: item.updatedAt?.toDate?.() || item.createdAt?.toDate?.() || new Date(),
       priority: 0.7,
     };
   });
-  
-  // 4. Fetch all individual questions for dynamic routes
+
+  // 4. Individual Questions
   const allQuestions = await getAllQuestions();
-  const questionItemRoutes = allQuestions.map((item: any) => {
-    const path = `/question/${item.id}`;
-    let lastMod;
-     if (item.createdAt && typeof item.createdAt.toDate === 'function') {
-        lastMod = item.createdAt.toDate();
-    } else {
-        lastMod = new Date();
-    }
-    
-    return {
-      url: `${baseUrl}${path}`,
-      lastModified: lastMod,
-      priority: 0.6,
-    };
-  });
-
-  // 5. Fetch all metafields for dynamic routes
-  const [boards, classes, examTypes, subjects] = await Promise.all([
-      getBoards(),
-      getClasses(),
-      getExamTypes(),
-      getSubjects()
-  ]);
-
-  const generateMetafieldRoutes = (items: any[], pathPrefix: string) => {
-      return items.map(item => ({
-          url: `${baseUrl}/${pathPrefix}/${item.name.toLowerCase().replace(/\s+/g, '-')}`,
-          lastModified: new Date(),
-          priority: 0.7
-      }));
-  }
-
-  const boardRoutes = generateMetafieldRoutes(boards, 'boards');
-  const classRoutes = generateMetafieldRoutes(classes, 'classes');
-  const examTypeRoutes = generateMetafieldRoutes(examTypes, 'exam-types');
-  const subjectRoutes = generateMetafieldRoutes(subjects, 'subjects');
-
-  // 6. Fetch all textbook and their chapter/topic/practice set routes
-  const allTextbooks = await getAllTextbooks();
-  const textbookRoutes = allTextbooks.map(book => ({
-    url: `${baseUrl}/textbook-solutions/${(book as any).id}`,
-    lastModified: new Date(), // Assuming textbook document has no lastModified timestamp
-    priority: 0.8,
+  const questionRoutes = allQuestions.map((q: any) => ({
+    url: `${baseUrl}/question/${q.id}`,
+    lastModified: q.createdAt?.toDate?.() || new Date(),
+    priority: 0.6,
   }));
 
-  const textbookChapterTopicRoutes: MetadataRoute.Sitemap = [];
-  const practiceSetRoutes: MetadataRoute.Sitemap = [];
+  // 5. Textbooks, Chapters, Topics, and Practice Sets
+  const allTextbooks = await getAllTextbooks();
+  const textbookTreeRoutes: MetadataRoute.Sitemap = [];
 
   for (const book of allTextbooks) {
-      const chapters = await getChaptersByTextbookId((book as any).id);
-      for (const chapter of chapters) {
-          textbookChapterTopicRoutes.push({
-            url: `${baseUrl}/textbook-solutions/${(book as any).id}/chapter/${(chapter as any).id}`,
+    const bookId = (book as any).id;
+    textbookTreeRoutes.push({
+      url: `${baseUrl}/textbook-solutions/${bookId}`,
+      lastModified: new Date(),
+      priority: 0.8,
+    });
+
+    const chapters = await getChaptersByTextbookId(bookId);
+    for (const chapter of chapters) {
+        const chapterId = (chapter as any).id;
+        textbookTreeRoutes.push({
+            url: `${baseUrl}/textbook-solutions/${bookId}/chapter/${chapterId}`,
             lastModified: new Date(),
-            priority: 0.7
-          });
-          const topics = await getTopicsByChapterId((book as any).id, (chapter as any).id);
-          for (const topic of topics) {
-              textbookChapterTopicRoutes.push({
-                  url: `${baseUrl}/textbook-solutions/${(book as any).id}/chapter/${(chapter as any).id}/topic/${(topic as any).id}`,
-                  lastModified: new Date(),
-                  priority: 0.6
-              });
-              
-              const practiceSets = await getPracticeSetsByTopicId((book as any).id, (chapter as any).id, (topic as any).id);
-              for (const practiceSet of practiceSets) {
-                  practiceSetRoutes.push({
-                      url: `${baseUrl}/textbook-solutions/practice-set/${(practiceSet as any).id}/textbook/${(book as any).id}/chapter/${(chapter as any).id}/topic/${(topic as any).id}`,
-                      lastModified: new Date(),
-                      priority: 0.5,
-                  });
-              }
-          }
-      }
+            priority: 0.7,
+        });
+
+        const topics = await getTopicsByChapterId(bookId, chapterId);
+        for (const topic of topics) {
+            const topicId = (topic as any).id;
+            textbookTreeRoutes.push({
+                url: `${baseUrl}/textbook-solutions/${bookId}/chapter/${chapterId}/topic/${topicId}`,
+                lastModified: new Date(),
+                priority: 0.6,
+            });
+            
+            const practiceSets = await getPracticeSetsByTopicId(bookId, chapterId, topicId);
+            for (const ps of practiceSets) {
+                 textbookTreeRoutes.push({
+                    url: `${baseUrl}/textbook-solutions/practice-set/${(ps as any).id}/textbook/${bookId}/chapter/${chapterId}/topic/${topicId}`,
+                    lastModified: new Date(),
+                    priority: 0.5,
+                });
+            }
+        }
+        
+        // Handle chapter-level practice sets (no specific topic)
+        const chapterDoc = await getDoc(doc(db, `textbooks/${bookId}/chapters`, chapterId));
+        const chapterData = chapterDoc.data();
+        const chapterPracticeSets = (chapterData as any)?.practiceSets || [];
+        for (const ps of chapterPracticeSets) {
+             textbookTreeRoutes.push({
+                url: `${baseUrl}/textbook-solutions/practice-set/${(ps as any).id}/textbook/${bookId}/chapter/${chapterId}/topic/null`,
+                lastModified: new Date(),
+                priority: 0.5,
+            });
+        }
+    }
   }
 
-  // 7. Fetch all user profiles for dynamic routes
-  const allUsers = await getAllUsers();
-  const userProfileRoutes = allUsers.map((user: any) => ({
-      url: `${baseUrl}/profile/${user.username}`,
-      lastModified: new Date(user.createdAt),
-      priority: 0.5,
-  }));
-
-
-  // 8. Combine all routes
   return [
-    ...staticRoutes, 
-    ...contentTypeRoutes, 
-    ...contentItemRoutes, 
-    ...questionItemRoutes,
-    ...boardRoutes,
-    ...classRoutes,
-    ...examTypeRoutes,
-    ...subjectRoutes,
-    ...textbookRoutes,
-    ...textbookChapterTopicRoutes,
-    ...practiceSetRoutes,
-    ...userProfileRoutes,
+    ...staticRoutes,
+    ...kidsCategoryRoutes,
+    ...kidsSpecificRoutes,
+    ...contentRoutes,
+    ...questionRoutes,
+    ...textbookTreeRoutes,
   ];
 }
