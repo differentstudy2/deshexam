@@ -28,7 +28,7 @@ const features = [
   {
     icon: <ClipboardCheck className="w-8 h-8 text-primary" />,
     title: "Mock Tests",
-    description: "Distraction-free interface with timer and instant scoring. add more content",
+    description: "Distraction-free interface with timer and instant scoring.",
     link: "/mock-tests",
   },
   {
@@ -94,16 +94,32 @@ const testimonials = [
 ];
 
 export default function Home() {
-    const organizationJsonLd = {
+  const organizationJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "EducationalOrganization",
     "name": "DeshExam",
     "url": "https://deshexam.com",
     "logo": "https://deshexam.com/logo.png",
+    "description": "Premium educational platform offering mock tests and AI-powered learning solutions.",
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+91-123-456-7890",
-      "contactType": "Customer Service"
+      "contactType": "customer service"
+    }
+  };
+
+  const webAppJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "DeshExam",
+    "url": "https://deshexam.com",
+    "operatingSystem": "All",
+    "applicationCategory": "EducationalApplication",
+    "description": "Online platform for mock tests, quizzes, and textbook solutions.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR"
     }
   };
 
@@ -116,7 +132,7 @@ export default function Home() {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://deshexam.com/search?q={search_term_string}"
+        "urlTemplate": "https://deshexam.com/questions?search={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }
@@ -127,6 +143,10 @@ export default function Home() {
        <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
       />
       <script
         type="application/ld+json"
