@@ -30,6 +30,12 @@ To push your changes to GitHub, use the following commands in your terminal:
 2. `git commit -m "Your descriptive message"`
 3. `git push origin main`
 
+### 🔧 Git Troubleshooting (Non-fast-forward error)
+If your `git push` is rejected with a `non-fast-forward` error:
+1. Run `git pull origin main --rebase` to integrate remote changes.
+2. If there are conflicts, resolve them, then run `git add .` followed by `git rebase --continue`.
+3. Try `git push origin main` again.
+
 ### Reconnecting GitHub
 If you need to disconnect and reconnect your GitHub repository:
 1. Go to the **Firebase Console**.
