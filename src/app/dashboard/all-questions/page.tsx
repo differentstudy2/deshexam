@@ -25,23 +25,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/hooks/use-auth';
-<<<<<<< HEAD
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import rehypeRaw from 'rehype-raw';
-=======
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'All Questions',
-  description: 'Browse the entire question bank. View questions, see answers, and engage with the community.',
-  keywords: ['question bank', 'all questions', 'exam questions', 'practice problems'],
-};
-
->>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
 
 type Question = {
     id: string;
@@ -65,7 +54,7 @@ export default function AllQuestionsPage() {
   const fetchQuestions = async (page: number, startAfterDoc: DocumentSnapshot | null) => {
       try {
         setLoading(true);
-        const { questions: fetchedQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(itemsPerPage, startAfterDoc);
+        const { questions: fetchedQuestions, lastVisible: newLastVisible, hasMore: newHasMore } = await getPaginatedQuestions(ITEMS_PER_PAGE, startAfterDoc);
         setQuestions(fetchedQuestions as Question[]);
         setLastVisible(newLastVisible);
         setHasMore(newHasMore);
@@ -104,7 +93,7 @@ export default function AllQuestionsPage() {
   const handlePrevPage = () => {
       if (currentPage > 1) {
           const prevPage = currentPage - 1;
-          const prevStartAfter = pageHistory[prevPage - 1]; // -1 because pageHistory is 0-indexed and has a null at the beginning
+          const prevStartAfter = pageHistory[prevPage - 1]; 
           fetchQuestions(prevPage, prevStartAfter);
           setCurrentPage(prevPage);
       }

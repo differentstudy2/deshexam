@@ -67,11 +67,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-<<<<<<< HEAD
   async rewrites() {
     return [
       {
         source: '/mock-test/:id*',
+        destination: '/content/:id*',
+      },
+      {
+        source: '/quiz/:id*',
         destination: '/content/:id*',
       },
       {
@@ -100,11 +103,6 @@ const nextConfig: NextConfig = {
       },
     ];
   }
-=======
->>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
 };
 
 export default nextConfig;
-
-
-
