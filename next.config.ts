@@ -67,6 +67,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+<<<<<<< HEAD
   async rewrites() {
     return [
       {
@@ -99,6 +100,8 @@ const nextConfig: NextConfig = {
       },
     ];
   }
+=======
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
 };
 
 export default nextConfig;

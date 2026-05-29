@@ -1,11 +1,19 @@
 
 'use client';
 
+<<<<<<< HEAD
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { getQuestionById, addComment, getComments, handleQuestionVote, getAllTextbooks, getClasses, getGradesByClass, getRelatedQuestions } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, User, Calendar, Book, Layers, BarChart, GraduationCap, Target, School, BadgeCheck, FileQuestion, Clock, Star, ThumbsUp, ThumbsDown, CornerDownRight, CheckCircle, XCircle, MessageSquare, GripVertical, ExternalLink, Brain, Sparkles, ChevronRight, ChevronLeft, Flag, Heart } from 'lucide-react';
+=======
+import { useEffect, useState } from 'react';
+import { getComments, addComment, handleQuestionVote } from '@/lib/firebase/firestore';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Loader2, ArrowLeft, ThumbsUp, ThumbsDown, MessageSquare, GripVertical, CheckCircle, XCircle, Info, User, Calendar } from 'lucide-react';
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -47,6 +55,10 @@ type Question = {
   dislikes: number;
   likedBy: string[];
   dislikedBy: string[];
+<<<<<<< HEAD
+=======
+  createdAt: string; // Serialized Date
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
   authorName: string;
   authorId: string;
   createdAt: any;
@@ -75,6 +87,7 @@ type Comment = {
     replies?: Comment[];
 }
 
+<<<<<<< HEAD
 const UserProfileCard = ({ user }: { user: any }) => {
     if (!user) return null;
     return (
@@ -211,10 +224,19 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
   const [relatedQuestions, setRelatedQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingRelated, setLoadingRelated] = useState(true);
+=======
+export default function QuestionClientPage({ initialQuestion }: { initialQuestion: Question }) {
+  const [question, setQuestion] = useState<Question>(initialQuestion);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(true);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
   const [isVoting, setIsVoting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useAuth();
+<<<<<<< HEAD
   
   const [comments, setComments] = useState<Comment[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
@@ -291,19 +313,35 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
             setLoadingRelated(false);
         }
 
+=======
+  const questionId = initialQuestion.id;
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!questionId) return;
+      try {
+        setLoadingComments(true);
+        const commentsData = await getComments('questions', questionId);
+        setComments(commentsData as Comment[]);
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
       } catch (error) {
         toast({
           variant: "destructive",
-          title: 'Error fetching data',
+          title: 'Error fetching comments',
           description: (error as Error).message,
         });
       } finally {
-        setLoading(false);
+        setLoadingComments(false);
       }
     };
 
+<<<<<<< HEAD
     fetchQuestion();
   }, [questionId, toast, router]);
+=======
+    fetchComments();
+  }, [questionId, toast]);
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
 
   const handleVote = async (type: 'like') => {
     if (!user || !question) {
@@ -319,10 +357,31 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
 
     let newLikedBy = [...(question.likedBy || [])];
 
+<<<<<<< HEAD
     if (hasLiked) {
         newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
     } else {
         newLikedBy.push(user.uid);
+=======
+    if (type === 'like') {
+        if (hasLiked) { 
+            newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+        } else { 
+            newLikedBy.push(user.uid);
+            if (hasDisliked) { 
+                newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+            }
+        }
+    } else { // dislike
+        if (hasDisliked) { 
+            newDislikedBy = newDislikedBy.filter(uid => uid !== user.uid);
+        } else { 
+            newDislikedBy.push(user.uid);
+            if (hasLiked) { 
+                newLikedBy = newLikedBy.filter(uid => uid !== user.uid);
+            }
+        }
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
     }
     
     const updatedQuestion = {
@@ -359,10 +418,16 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     try {
         await addComment('questions', questionId, { text, parentId });
         setNewComment('');
+<<<<<<< HEAD
         setReplyText('');
         setReplyingTo(null);
         await fetchComments();
         toast({ title: parentId ? "Reply posted!" : "Answer posted!" });
+=======
+        const updatedComments = await getComments('questions', questionId);
+        setComments(updatedComments as Comment[]);
+        toast({ title: "Comment posted!" });
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
     } catch (error) {
          toast({
           variant: "destructive",
@@ -374,6 +439,7 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     }
   }
 
+<<<<<<< HEAD
   const handleCommentVote = async (commentId: string, voteType: 'like' | 'dislike') => {
     if (!user) {
         toast({ variant: "destructive", title: "Please log in to vote." });
@@ -613,6 +679,8 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
     );
   }
   
+=======
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
   const userHasLiked = user && question.likedBy?.includes(user.uid);
 
   return (
@@ -849,13 +917,88 @@ export default function QuestionClientPage({ questionId }: { questionId: string 
                                         </Button>
                                     </div>
                                 </form>
+<<<<<<< HEAD
+=======
+                                <Separator className="my-6" />
+                                <div className="space-y-6">
+                                    {loadingComments ? (
+                                        <div className="flex justify-center"><Loader2 className="animate-spin"/></div>
+                                    ) : comments.length > 0 ? comments.map(comment => (
+                                        <div key={comment.id} className="flex items-start gap-4">
+                                            <Avatar>
+                                               <AvatarImage src={comment.authorPhotoURL || `https://picsum.photos/seed/${comment.authorName}/40/40`} />
+                                                <AvatarFallback>{comment.authorName?.[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <Link href={`/profile/${comment.authorId}`} className="font-semibold hover:underline">{comment.authorName}</Link>
+                                                    <span className="text-muted-foreground">{formatDistanceToNow(comment.createdAt, { addSuffix: true })}</span>
+                                                </div>
+                                                <p className="text-foreground mt-1">{comment.text}</p>
+                                            </div>
+                                        </div>
+                                    )) : (
+                                        <p className="text-center text-muted-foreground">No comments yet. Be the first to start the discussion!</p>
+                                    )}
+                                </div>
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
                             </CardContent>
                         </Card>
 
+<<<<<<< HEAD
                         <TextbookSolutionsSection currentClass={question.class} />
                       </div>
                     )}
                     
+=======
+                    {/* Sidebar */}
+                    <aside className="space-y-6">
+                        <Card>
+                             <CardHeader>
+                                <CardTitle>Question Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                    <User className="w-4 h-4 text-muted-foreground" />
+                                    <span>Asked by: <span className="font-semibold">{question.authorName}</span></span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                                    <span>Asked on: {new Date(question.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                             <CardHeader>
+                                <CardTitle>Community Feedback</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex items-center gap-2">
+                                <Button 
+                                    variant={userHasLiked ? "default" : "outline"}
+                                    size="sm" 
+                                    onClick={() => handleVote('like')} 
+                                    disabled={isVoting}
+                                    className={cn("flex-1", userHasLiked && "bg-green-500 hover:bg-green-600 text-white")}
+                                >
+                                    <ThumbsUp className="mr-2" /> Like ({question.likes || 0})
+                                </Button>
+                                <Button 
+                                    variant={userHasDisliked ? "destructive" : "outline"} 
+                                    size="sm" 
+                                    onClick={() => handleVote('dislike')} 
+                                    disabled={isVoting}
+                                    className="flex-1"
+                                >
+                                    <ThumbsDown className="mr-2" /> Dislike ({question.dislikes || 0})
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        <Button variant="outline" onClick={() => router.back()} className="w-full">
+                            <ArrowLeft className="mr-2 h-4 w-4"/>
+                            Go Back
+                        </Button>
+                    </aside>
+>>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
                 </div>
 
                 <aside className="space-y-6">
