@@ -20,27 +20,29 @@ DeshExam is a comprehensive, AI-powered educational platform built with Next.js,
 - **AI Integration**: [Genkit](https://firebase.google.com/docs/genkit) with Google Gemini
 - **Payments**: [Razorpay](https://razorpay.com/)
 
-## 📦 Deployment
+## 📦 Deployment & GitHub Connection
 
 This project is configured for **Firebase App Hosting**. 
 
-To deploy your changes:
+### Pushing Changes
+To push your changes to GitHub, use the following commands in your terminal:
+1. `git add .`
+2. `git commit -m "Your descriptive message"`
+3. `git push origin main`
 
-1. Commit your changes:
-   ```bash
-   git add .
-   git commit -m "Your descriptive commit message"
-   ```
-2. Push to your main branch on GitHub:
-   ```bash
-   git push origin main
-   ```
-The GitHub Action defined in `.github/workflows/firebase-hosting-pull-request.yml` will automatically build and deploy the application to your Firebase environment.
+### Reconnecting GitHub
+If you need to disconnect and reconnect your GitHub repository:
+1. Go to the **Firebase Console**.
+2. Select your project.
+3. Navigate to **App Hosting** in the left sidebar.
+4. Select your backend and go to the **Settings** tab.
+5. Under **Deployment**, you can manage the GitHub connection (Disconnect/Reconnect).
+6. Ensure that the `GCP_SA_KEY`, `FIREBASE_PROJECT_ID`, and `GEMINI_API_KEY` secrets are correctly set in your GitHub repository secrets if you recreate the connection.
 
 ## 📈 SEO & Discovery
 
 - **Sitemap**: `/sitemap.xml` (Dynamically generated)
-- **Robots**: `/robots.txt`
+- **Robots**: `/robots.txt` (Configured to allow full indexing)
 - **AdSense**: Enabled via root layout.
 
 ---
