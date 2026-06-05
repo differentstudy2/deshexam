@@ -13,6 +13,7 @@ import { Inter, Lexend, Hind_Siliguri } from 'next/font/google';
 import { Footer } from "@/components/layout/footer";
 import { FirebaseProvider } from "@/hooks/use-firebase";
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,12 +32,23 @@ const hindSiliguri = Hind_Siliguri({
   weight: ['400', '600', '700'],
 });
 
+const ConditionalHeader = () => {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard')) return null;
+  return <Header />;
+};
+
+const ConditionalFooter = () => {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard')) return null;
+  return <Footer />;
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -60,9 +72,9 @@ export default function RootLayout({
             <AuthProvider>
               <AuthDialogProvider>
                 <div className="flex flex-col min-h-screen">
-                  <Header />
+                  <ConditionalHeader />
                   <main className="flex-grow">{children}</main>
-                  <Footer />
+                  <ConditionalFooter />
                 </div>
                 <AuthDialog />
               </AuthDialogProvider>

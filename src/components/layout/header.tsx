@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, BarChart2 } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -37,29 +37,103 @@ const mainNavLinks = [
     { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
 ];
 
-const dashboardNavItems = [
-  { href: '/dashboard', label: 'Overview', icon: <LayoutGrid className="h-5 w-5" /> },
-  { href: '/dashboard/my-content', label: 'My Content', icon: <Library className="h-5 w-5" /> },
-  { href: '/dashboard/all-questions', label: 'All Questions', icon: <ClipboardList className="h-5 w-5" /> },
-  { href: '/dashboard/my-results', label: 'My Results', icon: <FileText className="h-5 w-5" /> },
-  { href: '/dashboard/profile', label: 'Profile', icon: <BookUser className="h-5 w-5" /> },
-  { href: '/dashboard/settings', label: 'Settings', icon: <Settings className="h-5 w-5" /> },
-  { href: '/pricing', label: 'Plans', icon: <ShoppingCart className="h-5 w-5" /> },
+const dashboardNavGroups = [
+  {
+    title: "", // Main group has no title
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+      { href: '/dashboard/practice', label: 'Practice', icon: <Award className="h-4 w-4" /> },
+      { href: '/dashboard/question-bank', label: 'Question Bank', icon: <Gem className="h-4 w-4" /> },
+      { href: '/dashboard/leaderboard', label: 'Leaderboard', icon: <Trophy className="h-4 w-4" /> },
+      { href: '/dashboard/challenges', label: 'Challenges', icon: <Award className="h-4 w-4" /> },
+      { href: '/dashboard/exams', label: 'Exams', icon: <FileText className="h-4 w-4" /> },
+      { href: '/dashboard/books', label: 'Books', icon: <Book className="h-4 w-4" /> },
+      { href: '/dashboard/profile', label: 'Profile', icon: <BookUser className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "PROGRESS",
+    items: [
+      { href: '/dashboard/mistake-vault', label: 'Mistake Vault', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/dashboard/achievements', label: 'Achievements', icon: <Award className="h-4 w-4" /> },
+      { href: '/dashboard/subject-progress', label: 'Subject Progress', icon: <BarChart2 className="h-4 w-4" /> },
+      { href: '/dashboard/activity-log', label: 'Activity Log', icon: <Activity className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "STUDY & RESOURCES",
+    items: [
+      { href: '/dashboard/courses', label: 'Courses', icon: <BookOpen className="h-4 w-4" /> },
+      { href: '/dashboard/skill-development', label: 'Skill Development', icon: <Zap className="h-4 w-4" /> },
+      { href: '/dashboard/hand-notes', label: 'Hand Notes', icon: <FileText className="h-4 w-4" /> },
+      { href: '/dashboard/question-papers', label: 'Question Papers', icon: <FilePlus className="h-4 w-4" /> },
+      { href: '/dashboard/dynamic-print', label: 'Dynamic Print', icon: <Printer className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "COMMUNITY",
+    items: [
+      { href: '/dashboard/forum', label: 'Forum', icon: <MessageSquare className="h-4 w-4" /> },
+      { href: '/dashboard/blog', label: 'Blog', icon: <FileText className="h-4 w-4" /> },
+      { href: '/dashboard/news-notices', label: 'News & Notices', icon: <Bell className="h-4 w-4" /> },
+      { href: '/dashboard/my-network', label: 'My Network', icon: <Users className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "MY SPACE",
+    items: [
+      { href: '/dashboard/favorites', label: 'Favorites', icon: <Heart className="h-4 w-4" /> },
+      { href: '/dashboard/bookmarks', label: 'Bookmarks', icon: <Bookmark className="h-4 w-4" /> },
+      { href: '/dashboard/contributions', label: 'Contributions', icon: <Gift className="h-4 w-4" /> },
+      { href: '/dashboard/resume-builder', label: 'Resume Builder', icon: <FileText className="h-4 w-4" /> },
+      { href: '/dashboard/referrals', label: 'Referrals', icon: <Share2 className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "OTHERS",
+    items: [
+      { href: '/dashboard/career-hub', label: 'Career Hub', icon: <Briefcase className="h-4 w-4" /> },
+      { href: '/dashboard/partner-hub', label: 'Partner Hub', icon: <Users className="h-4 w-4" /> },
+      { href: '/dashboard/e-question-builder', label: 'E-Question Builder', icon: <FilePlus className="h-4 w-4" /> },
+      { href: '/dashboard/package-plans', label: 'Package Plans', icon: <Package className="h-4 w-4" /> },
+      { href: '/dashboard/faqs', label: 'FAQs', icon: <HelpCircle className="h-4 w-4" /> },
+    ]
+  }
 ];
 
-const adminNavItems = [
-    { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-5 w-5" /> },
-    { href: '/admin/content', label: 'Content', icon: <FileText className="h-5 w-5" /> },
-    { href: '/admin/quizzes', label: 'Quizzes', icon: <Gem className="h-5 w-5" /> },
-    { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-5 w-5" /> },
-    { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-5 w-5" /> },
-    { href: '/admin/users', label: 'Users', icon: <Users className="h-5 w-5" /> },
-    { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-5 w-5" />},
-    { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-5 w-5" /> },
-    { href: '/admin/push-notification', label: 'Push Notification', icon: <Send className="h-5 w-5" />},
-    { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-5 w-5" />},
-    { href: '/admin/earning', label: 'Earning', icon: <DollarSign className="h-5 w-5" />},
-    { href: '/admin/settings', label: 'Settings', icon: <Settings className="h-5 w-5" /> },
+const adminNavGroups = [
+  {
+    title: "Overview",
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-4 w-4" /> },
+      { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "Management",
+    items: [
+      { href: '/admin/users', label: 'Users', icon: <Users className="h-4 w-4" /> },
+      { href: '/admin/content', label: 'Content', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/quizzes', label: 'Quizzes', icon: <Gem className="h-4 w-4" /> },
+      { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-4 w-4" /> },
+      { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" />},
+    ]
+  },
+  {
+    title: "Monetization",
+    items: [
+      { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-4 w-4" />},
+      { href: '/admin/earning', label: 'Earning', icon: <DollarSign className="h-4 w-4" />},
+    ]
+  },
+  {
+    title: "Configuration",
+    items: [
+      { href: '/admin/push-notification', label: 'Push Notification', icon: <Send className="h-4 w-4" />},
+      { href: '/admin/settings', label: 'Settings', icon: <Settings className="h-4 w-4" /> },
+    ]
+  }
 ];
 
 
@@ -171,15 +245,17 @@ const UserNav = () => {
   );
 };
 
-const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLinkClick?: () => void }) => {
+const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobile?: boolean, onLinkClick?: () => void, isScrolled?: boolean }) => {
   const pathname = usePathname();
   const NavLink = ({ href, label, icon }: { href: string; label: string, icon?: React.ReactNode }) => (
     <Link
       href={href}
       onClick={onLinkClick}
       className={cn(
-        "transition-colors hover:text-primary flex items-center gap-4 nav-link-style",
-        pathname === href ? "text-primary font-bold" : "text-muted-foreground",
+        "transition-colors flex items-center gap-4 nav-link-style hover:text-[#00a651]",
+        pathname === href 
+            ? "text-[#00a651] font-bold" 
+            : (isScrolled ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-slate-900"),
         isMobile && "text-lg py-2"
       )}
     >
@@ -205,50 +281,55 @@ const MainNav = ({ isMobile = false, onLinkClick }: { isMobile?: boolean, onLink
 export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void; logOut: () => void; }) => {
     const pathname = usePathname();
     return (
-        <ScrollArea className="h-full">
-            <div className="border-b p-4">
-                <Link href="/admin" onClick={onLinkClick}>
-                    <DeshExamLogo />
+        <ScrollArea className="h-full bg-slate-900 text-slate-300">
+            <div className="border-b border-slate-800 p-4 bg-slate-950 flex items-center h-16">
+                <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-2">
+                    <div className="text-white font-bold text-xl tracking-tight">DeshExam <span className="text-[#00a651]">Admin</span></div>
                 </Link>
             </div>
-            <div className="flex flex-col h-[calc(100%-4.5rem)]">
-                <ul className="mt-6 space-y-1 p-4 flex-1">
-                    {adminNavItems.map((item) => (
-                        <li key={item.href}>
-                            <Button
-                                asChild
-                                variant="ghost"
-                                className={cn(
-                                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                                    pathname === item.href ? "bg-primary/20 text-primary font-semibold" : "hover:bg-primary/10 hover:text-primary"
-                                )}
-                            >
-                                <Link href={item.href} onClick={onLinkClick}>
-                                    {item.icon}
-                                    <span className="ml-3">{item.label}</span>
-                                </Link>
-                            </Button>
-                        </li>
+            <div className="flex flex-col h-[calc(100%-4rem)]">
+                <div className="mt-4 space-y-6 p-4 flex-1">
+                    {adminNavGroups.map((group, idx) => (
+                        <div key={idx} className="space-y-2">
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-2">{group.title}</h4>
+                            <ul className="space-y-1">
+                                {group.items.map((item) => (
+                                    <li key={item.href}>
+                                        <Button
+                                            asChild
+                                            variant="ghost"
+                                            className={cn(
+                                                "justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
+                                                pathname === item.href ? "bg-[#00a651] text-white hover:bg-[#00a651]/90" : "hover:bg-slate-800 hover:text-white"
+                                            )}
+                                        >
+                                            <Link href={item.href} onClick={onLinkClick}>
+                                                {item.icon}
+                                                <span className="ml-3">{item.label}</span>
+                                            </Link>
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     ))}
-                    <li>
+                    
+                    <div className="pt-4 mt-4 border-t border-slate-800 space-y-2">
                         <Button
                             asChild
                             variant="ghost"
-                            className={cn(
-                                "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                                "hover:bg-secondary/80"
-                            )}
+                            className="justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md hover:bg-slate-800 hover:text-white"
                         >
                             <Link href="/dashboard" onClick={onLinkClick}>
-                                <LayoutGrid className="h-5 w-5" />
-                                <span className="ml-3">User Dashboard</span>
+                                <LayoutGrid className="h-4 w-4" />
+                                <span className="ml-3">Exit Admin</span>
                             </Link>
                         </Button>
-                    </li>
-                </ul>
-                <div className="p-4 border-t">
-                    <Button variant="ghost" className="w-full justify-start" onClick={logOut}>
-                        <LogOut className="mr-3 h-5 w-5"/>
+                    </div>
+                </div>
+                <div className="p-4 border-t border-slate-800 bg-slate-950">
+                    <Button variant="ghost" className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950/30" onClick={logOut}>
+                        <LogOut className="mr-3 h-4 w-4"/>
                         Logout
                     </Button>
                 </div>
@@ -272,57 +353,88 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
   }, [user]);
 
   return (
-    <ScrollArea className="h-full">
-        <div className="border-b p-4">
-            <Link href="/dashboard" onClick={onLinkClick}>
-                <DeshExamLogo />
+    <ScrollArea className="h-full bg-white text-slate-800 border-r border-slate-200">
+        <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-100">
+            <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2">
+                <div className="font-extrabold text-2xl tracking-tighter flex items-center">
+                    <span className="text-green-600">DESH </span>
+                    <span className="text-slate-800 ml-1">EXAM</span>
+                </div>
             </Link>
         </div>
-        <div className="flex flex-col h-[calc(100%-4.5rem)]">
-          <ul className="mt-6 space-y-1 p-4 flex-1">
-            {dashboardNavItems.map((item) => (
-              <li key={item.href}>
-                <Button
-                  asChild
-                  variant="ghost"
-                  className={cn(
-                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                    pathname === item.href
-                      ? "bg-primary/20 text-primary font-semibold"
-                      : "hover:bg-primary/10 hover:text-primary"
-                  )}
-                >
-                  <Link href={item.href} onClick={onLinkClick}>
-                    {item.icon}
-                    <span className="ml-3">{item.label}</span>
-                  </Link>
-                </Button>
-              </li>
+        <div className="flex flex-col h-[calc(100%-4rem)]">
+          <div className="space-y-4 py-4 flex-1">
+            {dashboardNavGroups.map((group, idx) => (
+              <div key={idx} className="space-y-1">
+                {group.title && (
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-4 mb-2">{group.title}</h4>
+                )}
+                <ul className="space-y-0.5 px-2">
+                  {group.items.map((item) => (
+                    <li key={item.href}>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className={cn(
+                          "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
+                          pathname === item.href
+                            ? "bg-slate-100 text-slate-900 font-semibold"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        )}
+                      >
+                        <Link href={item.href} onClick={onLinkClick}>
+                          <span className={pathname === item.href ? "text-green-600" : "text-slate-400"}>{item.icon}</span>
+                          <span className="ml-3">{item.label}</span>
+                        </Link>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
+            
             {profile?.role === 'admin' && (
-              <li>
+              <div className="px-2 pt-4">
                 <Button
                   asChild
                   variant="ghost"
                   className={cn(
-                    "justify-start w-full h-11 px-4 py-2 text-base font-normal rounded-lg transition-colors duration-200",
-                    "hover:bg-secondary/80"
+                    "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
+                    "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   )}
                 >
                   <Link href="/admin" onClick={onLinkClick}>
-                    <ShieldCheck className="h-5 w-5" />
+                    <ShieldCheck className="h-4 w-4 text-slate-400" />
                     <span className="ml-3">Admin Dashboard</span>
                   </Link>
                 </Button>
-              </li>
+              </div>
             )}
-          </ul>
-           <div className="p-4 border-t">
-                <Button variant="ghost" className="w-full justify-start" onClick={logOut}>
-                    <LogOut className="mr-3 h-5 w-5"/>
-                    Logout
+          </div>
+          
+          <div className="p-4 border-t border-slate-100 space-y-3 shrink-0">
+             <Button variant="outline" className="w-full justify-between rounded-full bg-white shadow-sm border-slate-200 text-slate-700 h-10" asChild>
+                 <Link href="/pricing">
+                    Upgrade Plan <ChevronRight className="h-4 w-4 text-slate-400" />
+                 </Link>
+             </Button>
+             
+             <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors">
+                <div className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9 border border-slate-200">
+                        <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
+                        <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-800 leading-tight">{user?.displayName || "User"}</span>
+                        <span className="text-[10px] text-slate-500 leading-tight mt-0.5">Free Plan</span>
+                    </div>
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50" onClick={logOut}>
+                    <LogOut className="h-4 w-4"/>
                 </Button>
-            </div>
+             </div>
+          </div>
         </div>
     </ScrollArea>
   );
@@ -335,11 +447,27 @@ export function Header() {
   const pathname = usePathname();
   
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isDashboardLayout = pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header 
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all duration-300",
+        isScrolled 
+          ? "bg-[#0f172a]/95 backdrop-blur-xl border-b border-white/10 shadow-lg text-white" 
+          : "bg-transparent border-transparent text-slate-800"
+      )}
+    >
       <div className="container flex h-16 items-center">
         <div className="mr-auto md:mr-6 flex items-center">
             <Link href="/" className="flex items-center">
@@ -347,7 +475,7 @@ export function Header() {
             </Link>
         </div>
         
-        <MainNav />
+        <MainNav isScrolled={isScrolled} />
 
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />

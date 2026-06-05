@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import {
@@ -10,7 +8,7 @@ import {
   CardTitle,
   CardFooter,
 } from '@/components/ui/card';
-import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2, Book } from 'lucide-react';
+import { Users, FileText, BarChart2, Activity, PlusCircle, FilePlus, Eye, Trash2, Book, ArrowUpRight, TrendingUp, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getPaginatedSubmissions, getAllContent, getUserProfile, deleteSubmissions, getAllUsers } from '@/lib/firebase/firestore';
@@ -22,6 +20,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { DocumentSnapshot } from 'firebase/firestore';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { Input } from '@/components/ui/input';
 
 type Submission = {
   id: string;
@@ -36,12 +36,19 @@ type Submission = {
     displayName: string;
     photoURL?: string;
   };
-  textbookId?: string;
-  chapterId?: string;
-  topicId?: string;
 };
 
 const ITEMS_PER_PAGE = 5;
+
+const activityData = [
+  { name: 'Mon', submissions: 120 },
+  { name: 'Tue', submissions: 150 },
+  { name: 'Wed', submissions: 180 },
+  { name: 'Thu', submissions: 140 },
+  { name: 'Fri', submissions: 210 },
+  { name: 'Sat', submissions: 250 },
+  { name: 'Sun', submissions: 310 },
+];
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -53,19 +60,15 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
-  const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null);
-
+  
   const [submissionsCurrentPage, setSubmissionsCurrentPage] = useState(1);
   const [submissionsLastVisible, setSubmissionsLastVisible] = useState<DocumentSnapshot | null>(null);
   const [submissionsPageHistory, setSubmissionsPageHistory] = useState<(DocumentSnapshot | null)[]>([null]);
   const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
 
-
   const fetchStatsAndSubmissions = async (page: number, startAfter: DocumentSnapshot | null) => {
     try {
       setLoading(true);
-
-      // Fetch stats only on the first page load
       if (page === 1) {
         const [users, content] = await Promise.all([
           getAllUsers(),
@@ -74,7 +77,7 @@ export default function AdminDashboardPage() {
         setStats({
           totalUsers: users.length,
           totalContent: content.length,
-          submissionsToday: 0, // This is no longer accurate as we fetch all submissions
+          submissionsToday: 0,
         });
       }
       
@@ -100,7 +103,6 @@ export default function AdminDashboardPage() {
       if (page >= submissionsPageHistory.length) {
         setSubmissionsPageHistory(prev => [...prev, lastVisible]);
       }
-      
     } catch (error) {
       console.error("Failed to fetch admin dashboard stats:", error);
     } finally {
@@ -149,7 +151,6 @@ export default function AdminDashboardPage() {
         toast({ title: `${ids.length} submission(s) deleted successfully!` });
         setRecentSubmissions(prev => prev.filter(sub => !ids.includes(sub.id)));
         setSelectedSubmissions([]);
-        setSubmissionToDelete(null);
     } catch (error) {
          toast({
             variant: "destructive",
@@ -159,140 +160,233 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const adminStats = [
-    { title: "Total Users", value: stats.totalUsers, icon: <Users/>, description: "Total registered users" },
-    { title: "Total Content", value: stats.totalContent, icon: <FileText/>, description: "Tests, quizzes, and articles" },
-    { title: "Total Submissions", value: stats.submissionsToday, icon: <BarChart2/>, description: "All test submissions" },
-     { title: "Site Activity", value: "High", icon: <Activity/>, description: "All systems normal" },
-  ];
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 className="font-headline text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">
-                Welcome, Admin! Here's an overview of your platform.
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard Overview</h1>
+            <p className="text-muted-foreground mt-1">
+                Here's what's happening with your platform today.
             </p>
+        </div>
+        <div className="flex items-center gap-2">
+            <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input type="search" placeholder="Search..." className="w-64 pl-8 bg-white" />
+            </div>
         </div>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {adminStats.map((stat, index) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <span className="text-muted-foreground">{stat.icon}</span>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <>
-                  <Skeleton className="h-8 w-1/2 mb-2" />
-                  <Skeleton className="h-3 w-3/4" />
-                </>
-              ) : (
-                <>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <p className="text-xs text-muted-foreground">{stat.description}</p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="border-none shadow-sm bg-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Users className="w-16 h-16" />
+          </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
+            <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Users</CardTitle>
+          </CardHeader>
+          <CardContent className="z-10 relative">
+            {loading ? <Skeleton className="h-8 w-24" /> : (
+              <div className="flex items-baseline gap-2">
+                <div className="text-3xl font-bold text-slate-900">{stats.totalUsers}</div>
+                <span className="text-sm font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 12%</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <FileText className="w-16 h-16" />
+          </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
+            <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Content</CardTitle>
+          </CardHeader>
+          <CardContent className="z-10 relative">
+            {loading ? <Skeleton className="h-8 w-24" /> : (
+              <div className="flex items-baseline gap-2">
+                <div className="text-3xl font-bold text-slate-900">{stats.totalContent}</div>
+                <span className="text-sm font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 4%</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <BarChart2 className="w-16 h-16" />
+          </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
+            <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">Submissions</CardTitle>
+          </CardHeader>
+          <CardContent className="z-10 relative">
+            {loading ? <Skeleton className="h-8 w-24" /> : (
+              <div className="flex items-baseline gap-2">
+                <div className="text-3xl font-bold text-slate-900">1,248</div>
+                <span className="text-sm font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 24%</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-[#00a651] text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+             <TrendingUp className="w-16 h-16" />
+          </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
+            <CardTitle className="text-sm font-medium text-green-100 uppercase tracking-wider">Revenue (Monthly)</CardTitle>
+          </CardHeader>
+          <CardContent className="z-10 relative">
+            <div className="flex items-baseline gap-2">
+              <div className="text-3xl font-bold">₹ 45,200</div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                    <CardDescription>Perform common administrative tasks.</CardDescription>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 gap-4">
-                    <Link href="/admin/users" className="p-4 border rounded-lg hover:bg-secondary text-center">
-                        <Users className="mx-auto mb-2" />
-                        <span>Manage Users</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Main Chart Area */}
+        <Card className="lg:col-span-2 border-none shadow-sm">
+            <CardHeader>
+                <CardTitle>Activity Overview</CardTitle>
+                <CardDescription>Daily test submissions over the last week.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={activityData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="colorSubmissions" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#00a651" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#00a651" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
+                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                            <Area type="monotone" dataKey="submissions" stroke="#00a651" strokeWidth={3} fillOpacity={1} fill="url(#colorSubmissions)" />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card className="border-none shadow-sm">
+            <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+                <CardDescription>Common administrative tasks.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                    <Link href="/admin/add-content" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-[#00a651] hover:text-white hover:border-[#00a651] transition-all group">
+                        <PlusCircle className="mb-2 h-6 w-6 text-slate-500 group-hover:text-white" />
+                        <span className="text-sm font-medium">Add Quiz</span>
                     </Link>
-                     <Link href="/admin/content" className="p-4 border rounded-lg hover:bg-secondary text-center">
-                        <FileText className="mx-auto mb-2" />
-                        <span>Manage Content</span>
+                    <Link href="/admin/add-article" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-[#00a651] hover:text-white hover:border-[#00a651] transition-all group">
+                        <FilePlus className="mb-2 h-6 w-6 text-slate-500 group-hover:text-white" />
+                        <span className="text-sm font-medium">Add Article</span>
                     </Link>
-                    <Link href="/admin/textbooks" className="p-4 border rounded-lg hover:bg-secondary text-center">
-                        <Book className="mx-auto mb-2" />
-                        <span>Manage Textbooks</span>
+                    <Link href="/admin/users" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-slate-100 transition-all">
+                        <Users className="mb-2 h-6 w-6 text-slate-500" />
+                        <span className="text-sm font-medium">Users</span>
                     </Link>
-                    <Link href="/admin/add-content" className="p-4 border rounded-lg hover:bg-secondary text-center">
-                        <PlusCircle className="mx-auto mb-2" />
-                        <span>Add Quiz/Test</span>
+                    <Link href="/admin/textbooks" className="flex flex-col items-center justify-center p-4 border rounded-xl hover:bg-slate-100 transition-all">
+                        <Book className="mb-2 h-6 w-6 text-slate-500" />
+                        <span className="text-sm font-medium">Textbooks</span>
                     </Link>
-                     <Link href="/admin/add-article" className="p-4 border rounded-lg hover:bg-secondary text-center">
-                        <FilePlus className="mx-auto mb-2" />
-                        <span>Add Article</span>
-                    </Link>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Recent Submissions</CardTitle>
-                     <CardDescription>The latest test submissions from users.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {selectedSubmissions.length > 0 && (
-                       <div className="mb-4">
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="sm">
-                                        <Trash2 className="mr-2 h-4 w-4"/>
-                                        Delete Selected ({selectedSubmissions.length})
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>This will permanently delete {selectedSubmissions.length} submission(s).</AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDelete(selectedSubmissions)}>Delete</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    )}
-                    {loading ? (
-                       <Skeleton className="h-48 w-full" />
-                    ) : recentSubmissions.length > 0 ? (
-                        <div className="space-y-4">
+                </div>
+            </CardContent>
+        </Card>
+      </div>
+
+      {/* Submissions Table */}
+      <Card className="border-none shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <CardTitle>Recent Submissions</CardTitle>
+                <CardDescription>Latest test results from users across the platform.</CardDescription>
+            </div>
+            {selectedSubmissions.length > 0 && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm" className="shadow-sm">
+                            <Trash2 className="mr-2 h-4 w-4"/>
+                            Delete ({selectedSubmissions.length})
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>This will permanently delete {selectedSubmissions.length} submission(s).</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(selectedSubmissions)} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+        </CardHeader>
+        <CardContent>
+            {loading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-16 w-full rounded-xl" />
+                    <Skeleton className="h-16 w-full rounded-xl" />
+                    <Skeleton className="h-16 w-full rounded-xl" />
+                </div>
+            ) : recentSubmissions.length > 0 ? (
+                <div className="rounded-md border border-slate-100">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-slate-50/50 text-slate-500 text-xs uppercase font-semibold">
+                            <tr>
+                                <th className="px-4 py-3 w-10"></th>
+                                <th className="px-4 py-3">User</th>
+                                <th className="px-4 py-3">Test Title</th>
+                                <th className="px-4 py-3 text-center">Score</th>
+                                <th className="px-4 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
                             {recentSubmissions.map(sub => (
-                                <div key={sub.id} className="relative p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                     <Checkbox 
-                                        className="absolute top-2 right-2 sm:static sm:mr-4" 
-                                        checked={selectedSubmissions.includes(sub.id)}
-                                        onCheckedChange={() => handleSelectSubmission(sub.id)}
-                                    />
-                                    <div className="flex items-center gap-3 flex-grow min-w-0">
-                                        <Avatar className="h-9 w-9">
-                                            <AvatarImage src={sub.user?.photoURL} />
-                                            <AvatarFallback>{sub.user?.displayName?.[0]}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="min-w-0">
-                                            <div className="font-medium truncate">{sub.user?.displayName}</div>
-                                            <div className="text-sm text-muted-foreground truncate">{sub.testTitle}</div>
+                                <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <td className="px-4 py-3">
+                                        <Checkbox 
+                                            checked={selectedSubmissions.includes(sub.id)}
+                                            onCheckedChange={() => handleSelectSubmission(sub.id)}
+                                        />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-8 w-8 border">
+                                                <AvatarImage src={sub.user?.photoURL} />
+                                                <AvatarFallback className="bg-primary/10 text-primary text-xs">{sub.user?.displayName?.[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <span className="font-medium text-slate-900">{sub.user?.displayName}</span>
                                         </div>
-                                    </div>
-                                    <div className="flex items-center justify-between sm:justify-end gap-4 flex-shrink-0 self-end sm:self-center">
-                                        <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={36} />
-                                        <div className="flex gap-2">
-                                            <Button asChild variant="outline" size="sm" className="flex-shrink-0">
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-600">{sub.testTitle}</td>
+                                    <td className="px-4 py-3 text-center">
+                                        <div className="flex justify-center">
+                                            <ScoreCircle score={(sub.score / sub.totalQuestions) * 100} size={32} />
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button asChild variant="outline" size="icon" className="h-8 w-8 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50">
                                                 <Link href={getUrlForResults(sub)}>
-                                                    <Eye className="mr-2 h-4 w-4" />
-                                                    View
+                                                    <Eye className="h-4 w-4" />
                                                 </Link>
                                             </Button>
-                                             <AlertDialog>
+                                            <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4"/></Button>
+                                                    <Button variant="outline" size="icon" className="h-8 w-8 text-slate-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50">
+                                                        <Trash2 className="h-4 w-4"/>
+                                                    </Button>
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
@@ -301,44 +395,55 @@ export default function AdminDashboardPage() {
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete([sub.id])}>Delete</AlertDialogAction>
+                                                        <AlertDialogAction onClick={() => handleDelete([sub.id])} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
                                         </div>
-                                    </div>
-                                </div>
+                                    </td>
+                                </tr>
                             ))}
-                        </div>
-                    ) : (
-                       <p className="text-muted-foreground text-center py-10">No submissions yet.</p>
-                    )}
-                </CardContent>
-                 <CardFooter>
-                    <div className="flex items-center justify-end space-x-2 w-full">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handlePrevPage}
-                            disabled={submissionsCurrentPage === 1 || loading}
-                        >
-                            Previous
-                        </Button>
-                        <span className="text-sm text-muted-foreground">
-                            Page {submissionsCurrentPage}
-                        </span>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleNextPage}
-                            disabled={!hasMoreSubmissions || loading}
-                        >
-                            Next
-                        </Button>
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                        <FileText className="h-6 w-6 text-slate-400" />
                     </div>
-                </CardFooter>
-            </Card>
-       </div>
+                    <h3 className="font-medium text-slate-900">No submissions found</h3>
+                    <p className="text-sm text-slate-500 mt-1">There hasn't been any test activity yet.</p>
+                </div>
+            )}
+        </CardContent>
+        <CardFooter className="border-t border-slate-100 bg-slate-50/50 rounded-b-xl py-3">
+            <div className="flex items-center justify-between w-full">
+                <span className="text-xs text-slate-500">
+                    Showing Page {submissionsCurrentPage}
+                </span>
+                <div className="flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrevPage}
+                        disabled={submissionsCurrentPage === 1 || loading}
+                        className="h-8 text-xs"
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNextPage}
+                        disabled={!hasMoreSubmissions || loading}
+                        className="h-8 text-xs"
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

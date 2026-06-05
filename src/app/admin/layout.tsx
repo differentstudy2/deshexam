@@ -62,13 +62,19 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen w-full bg-slate-50">
             <Sidebar>
                 <AdminSidebar logOut={logOut} />
             </Sidebar>
-            <div className="flex flex-col flex-1">
-                <SidebarInset>
-                    <main className="flex-grow p-4 md:p-6 lg:p-8">
+            <div className="flex flex-col flex-1 w-full overflow-hidden">
+                <SidebarInset className="bg-transparent">
+                    <header className="flex h-16 items-center gap-4 border-b bg-white px-6 shadow-sm">
+                        <SidebarTrigger />
+                        <div className="flex-1 font-semibold text-slate-800 tracking-tight">
+                            Admin Control Panel
+                        </div>
+                    </header>
+                    <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-y-auto">
                         {children}
                     </main>
                 </SidebarInset>
