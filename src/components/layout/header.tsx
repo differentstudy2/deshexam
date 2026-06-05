@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, BarChart2 } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2 } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -341,6 +341,11 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
 export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: () => void; user: any; logOut: () => void; }) => {
   const pathname = usePathname();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    const initialState: Record<string, boolean> = {};
+    dashboardNavGroups.forEach(g => { if(g.title) initialState[g.title] = true });
+    return initialState;
+  });
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -364,34 +369,44 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
         </div>
         <ScrollArea className="flex-1">
           <div className="space-y-4 py-4">
-            {dashboardNavGroups.map((group, idx) => (
+            {dashboardNavGroups.map((group, idx) => {
+              const isOpen = !group.title || openGroups[group.title];
+              return (
               <div key={idx} className="space-y-1">
                 {group.title && (
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-4 mb-2">{group.title}</h4>
+                    <div 
+                      className="flex justify-between items-center px-4 mb-2 cursor-pointer group"
+                      onClick={() => setOpenGroups(prev => ({...prev, [group.title]: !prev[group.title]}))}
+                    >
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-slate-600 transition-colors">{group.title}</h4>
+                      {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 transition-colors" /> : <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 transition-colors" />}
+                    </div>
                 )}
-                <ul className="space-y-0.5 px-2">
-                  {group.items.map((item) => (
-                    <li key={item.href}>
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className={cn(
-                          "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
-                          pathname === item.href
-                            ? "bg-slate-100 text-slate-900 font-semibold"
-                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                        )}
-                      >
-                        <Link href={item.href} onClick={onLinkClick}>
-                          <span className={pathname === item.href ? "text-green-600" : "text-slate-400"}>{item.icon}</span>
-                          <span className="ml-3">{item.label}</span>
-                        </Link>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
+                <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <ul className="space-y-0.5 px-2">
+                    {group.items.map((item) => (
+                      <li key={item.href}>
+                        <Button
+                          asChild
+                          variant="ghost"
+                          className={cn(
+                            "justify-start w-full h-9 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
+                            pathname === item.href
+                              ? "bg-slate-100 text-slate-900 font-semibold"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          )}
+                        >
+                          <Link href={item.href} onClick={onLinkClick}>
+                            <span className={pathname === item.href ? "text-green-600" : "text-slate-400"}>{item.icon}</span>
+                            <span className="ml-3">{item.label}</span>
+                          </Link>
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            ))}
+            )})}
             
             {profile?.role === 'admin' && (
               <div className="px-2 pt-4">

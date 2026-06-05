@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { 
   ArrowRight,
   ChevronDown,
+  ChevronUp,
   User,
   Medal,
   FileText,
@@ -15,23 +16,45 @@ import {
   XCircle,
   MinusCircle,
   ChevronLeft,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon,
+  Check
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
 // MOCK DATA
 const subjects = [
-  { name: 'সাহিত্য কণিকা', progress: 0.96 },
-  { name: 'আনন্দ পাঠ(বাংলা দ্রুত পঠন)', progress: 0.00 },
-  { name: 'বাংলা ব্যাকরণ ও নির্মিতি', progress: 0.29 },
-  { name: 'English for Today', progress: 0.00 },
-  { name: 'English Grammar and C...', progress: 0.00 },
-  { name: 'গণিত', progress: 0.00 },
-  { name: 'তথ্য ও যোগাযোগ প্রযুক্তি', progress: 0.00 },
-  { name: 'বাংলাদেশ ও বিশ্বপরিচয়', progress: 0.00 },
-  { name: 'বিজ্ঞান', progress: 0.05 },
-  { name: 'আরবি', progress: 0.00 },
-  { name: 'সংস্কৃত', progress: 0.00 },
+  { 
+    name: 'সাহিত্য কণিকা', 
+    progress: 0.96,
+    mcq: { current: 10, total: 2389, pct: '0.42%' },
+    cq: { current: 0, total: 1845, pct: '' },
+    content: { current: 1, total: 186, pct: '0.54%' },
+    started: '4 months ago'
+  },
+  { 
+    name: 'আনন্দ পাঠ(বাংলা দ্রুত পঠন)', 
+    progress: 0.00,
+    mcq: { current: 0, total: 255, pct: '' },
+    cq: { current: 0, total: 118, pct: '' },
+    content: { current: 0, total: 41, pct: '' },
+    started: ''
+  },
+  { 
+    name: 'বাংলা ব্যাকরণ ও নির্মিতি', 
+    progress: 0.29,
+    mcq: { current: 2, total: 700, pct: '0.29%' },
+    cq: { current: 0, total: 385, pct: '' },
+    content: { current: 0, total: 76, pct: '' },
+    started: '4 months ago'
+  },
+  { name: 'English for Today', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'English Grammar and C...', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'গণিত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'তথ্য ও যোগাযোগ প্রযুক্তি', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'বাংলাদেশ ও বিশ্বপরিচয়', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'বিজ্ঞান', progress: 0.05, mcq: { current: 1, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'আরবি', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
+  { name: 'সংস্কৃত', progress: 0.00, mcq: { current: 0, total: 100 }, cq: { current: 0, total: 50 }, content: { current: 0, total: 20 }, started: '' },
 ];
 
 const achievements = [
@@ -42,6 +65,12 @@ const achievements = [
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
+  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
+
+  const toggleSubject = (name: string) => {
+    setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
+  };
 
   return (
     <div className="w-full max-w-[1400px] mx-auto pb-12 text-slate-800 dark:text-slate-100">
@@ -95,21 +124,66 @@ export default function ProfilePage() {
           </Card>
 
           {/* Upgrade Banner */}
-          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-2xl p-5 flex justify-between items-center relative">
-            <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-6 h-3 bg-white dark:bg-slate-950 border-b border-l border-r border-purple-200 dark:border-purple-800 rounded-b-md flex justify-center items-center">
-               <ChevronDown className="w-3 h-3 text-purple-300" />
+          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-2xl relative transition-all duration-300">
+            <div className="p-5 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
+              <div>
+                <h3 className="font-bold text-purple-800 dark:text-purple-300 text-lg">প্রিমিয়াম প্যাকেজে আপগ্রেড করুন</h3>
+                <p className="text-xs font-medium text-purple-600/70 dark:text-purple-400 mt-1">সকল ফিচারে এক্সেস পেতে যেকোনো একটি প্যাকেজ সাবস্ক্রাইব করুন।</p>
+              </div>
+              <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white rounded-full font-bold px-6 shadow-md shadow-purple-500/20 shrink-0">
+                সাবস্ক্রাইব করুন
+              </Button>
             </div>
-            <div>
-              <h3 className="font-bold text-purple-800 dark:text-purple-300 text-lg">প্রিমিয়াম প্যাকেজে আপগ্রেড করুন</h3>
-              <p className="text-xs font-medium text-purple-600/70 dark:text-purple-400 mt-1">সকল ফিচারে এক্সেস পেতে যেকোনো একটি প্যাকেজ সাবস্ক্রাইব করুন।</p>
-            </div>
-            <Button className="bg-[#a855f7] hover:bg-[#9333ea] text-white rounded-full font-bold px-6 shadow-md shadow-purple-500/20">
-              সাবস্ক্রাইব করুন
-            </Button>
+            
+            {isUpgradeOpen && (
+              <div className="px-8 pb-8 pt-2">
+                <div className="w-full h-px bg-purple-200/50 dark:bg-purple-800/50 mb-6"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> বিগত বছরের প্রশ্ন
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> আনলিমিটেড পরীক্ষা ও ব্যাখ্যা
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> ডাউট সলভিং চ্যাট AI
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> ইচ্ছেমত কাস্টম মক টেস্ট
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> অ্যাড ফ্রি কনটেন্ট ও ∞ পেজ ভিউ
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> স্যাট একাডেমি (বুক ডাউনলোড)
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> প্রিমিয়াম ভিডিও কোর্স ও মডেল টেস্ট
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> সারা দেশব্যাপী লিডারবোর্ড
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> ২৪/৭ লাইভ সাপোর্ট
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button 
+              onClick={() => setIsUpgradeOpen(!isUpgradeOpen)}
+              className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 translate-y-1/2 w-7 h-7 bg-white dark:bg-slate-950 border border-purple-200 dark:border-purple-800 rounded-full flex justify-center items-center cursor-pointer hover:bg-purple-50 dark:hover:bg-slate-900 transition-colors z-10 shadow-sm"
+            >
+               {isUpgradeOpen ? <ChevronUp className="w-4 h-4 text-purple-400" /> : <ChevronDown className="w-4 h-4 text-purple-400" />}
+            </button>
           </div>
 
           {/* Learning Statistics */}
-          <div>
+          <div className="pt-2">
             <h3 className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-200">Learning Statistics</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card className="shadow-sm border-slate-200 dark:border-slate-800 rounded-xl">
@@ -285,7 +359,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Achievements */}
-          <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl">
+          <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl mb-8">
             <CardHeader className="p-6 pb-2 flex flex-row items-center justify-between">
               <CardTitle className="text-sm font-bold">Achievements</CardTitle>
               <span className="text-[10px] font-bold text-[#00bcd4] cursor-pointer">VIEW ALL</span>
@@ -317,25 +391,88 @@ export default function ProfilePage() {
         </div>
 
         {/* RIGHT COLUMN: Subjects Report Sidebar */}
-        <div className="w-full lg:w-[350px] shrink-0">
+        <div className="w-full lg:w-[380px] shrink-0">
           <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 rounded-2xl sticky top-24">
             <CardHeader className="p-5 pb-4 flex flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <CardTitle className="text-sm font-bold">Subjects Report</CardTitle>
               <ArrowRight className="w-4 h-4 text-slate-300" />
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y divide-slate-100 dark:divide-slate-800 h-[800px] overflow-y-auto pr-1 custom-scrollbar">
-                {subjects.map((sub, i) => (
-                  <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{sub.name}</span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
-                      <div className="bg-slate-100 dark:bg-slate-800 rounded-md p-1 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              <div className="h-[800px] overflow-y-auto pr-1 pl-2 py-2 custom-scrollbar space-y-2">
+                {subjects.map((sub, i) => {
+                  const isOpen = openSubjects[sub.name];
+                  
+                  if (isOpen) {
+                    return (
+                      <div key={i} className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-900 mx-2 shadow-sm">
+                        <div 
+                          className="flex justify-between items-center cursor-pointer mb-4"
+                          onClick={() => toggleSubject(sub.name)}
+                        >
+                          <h4 className="font-bold text-[15px] text-slate-800 dark:text-slate-100">{sub.name}</h4>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
+                            <div className="bg-slate-100 dark:bg-slate-800 rounded-full p-1 cursor-pointer hover:bg-slate-200 transition-colors">
+                              <ChevronUp className="w-4 h-4 text-slate-500" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-green-500"></span> {sub.mcq.current}<span className="text-slate-400 font-medium">/{sub.mcq.total} {sub.mcq.pct && `(${sub.mcq.pct})`}</span>
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5">MCQ</div>
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-blue-500"></span> {sub.cq.current}<span className="text-slate-400 font-medium">/{sub.cq.total} {sub.cq.pct && `(${sub.cq.pct})`}</span>
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5">CQ</div>
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-purple-500"></span> {sub.content.current}<span className="text-slate-400 font-medium">/{sub.content.total} {sub.content.pct && `(${sub.content.pct})`}</span>
+                            </div>
+                            <div className="text-[10px] font-semibold text-slate-400 ml-3.5 uppercase">Content</div>
+                          </div>
+                        </div>
+                        
+                        <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full mb-4 overflow-hidden flex">
+                          <div className="h-full bg-green-500" style={{ width: `${(sub.mcq.current / sub.mcq.total) * 100}%` }}></div>
+                          <div className="h-full bg-blue-500" style={{ width: `${(sub.cq.current / sub.cq.total) * 100}%` }}></div>
+                          <div className="h-full bg-purple-500" style={{ width: `${(sub.content.current / sub.content.total) * 100}%` }}></div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="text-[11px] text-slate-500 font-medium">
+                            {sub.started ? `Started: ${sub.started}` : ''}
+                          </div>
+                          <div className="text-[11px] font-semibold text-blue-500 flex items-center gap-1 cursor-pointer hover:underline">
+                            View Report <ArrowRight className="w-3 h-3" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div 
+                      key={i} 
+                      className="px-6 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer group mx-2 rounded-xl"
+                      onClick={() => toggleSubject(sub.name)}
+                    >
+                      <span className="text-[13px] font-bold text-slate-700 dark:text-slate-300">{sub.name}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-green-600">{sub.progress.toFixed(2)}%</span>
+                        <div className="bg-slate-100 dark:bg-slate-800 rounded-md p-1 group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
+                          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -349,13 +486,15 @@ export default function ProfilePage() {
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
+          margin-top: 10px;
+          margin-bottom: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #e2e8f0;
+          background-color: #94a3b8;
           border-radius: 10px;
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #334155;
+          background-color: #475569;
         }
       `}</style>
     </div>
