@@ -127,7 +127,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onDeleteClick }: TreeNodeProps)
             )}
           </div>
 
-          <div className="flex items-center gap-1 opacity-0 hover:opacity-100 transition-opacity" style={{ opacity: level === 0 ? 1 : undefined }}>
+          <div className="flex items-center gap-1">
             {node.type === 'topic' ? (
               <Link href={`/admin/guide-content/topic/${node.id}`}>
                 <Button variant="ghost" size="sm" className="h-7 px-2 text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100">

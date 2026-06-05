@@ -13,36 +13,33 @@ import { getGuideSubjects, getCurriculumBySubject, getReadingContent } from '@/l
 import { Chapter } from './guide-data';
 import Image from 'next/image';
 
-// Temporary helper until we fully migrate navigation logic
-function getPageType(id: string) {
-  if (['sahitya-kanika', 'bangla-byakoron', 'english-for-today', 'gonit', 'ict'].includes(id)) {
-    return 'subject';
-  }
-  if (id.startsWith('c1') || id.startsWith('c2') || id.includes('গদ্য') || id.includes('কবিতা')) {
-    return 'chapter';
-  }
-  return 'reading';
-}
-
 export default async function GuideDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const decodedId = decodeURIComponent(id);
-  const pageType = getPageType(decodedId);
 
   // Fetch common data
   const subjects = await getGuideSubjects();
+  
+  // Dynamic page type detection
+  let pageType = 'reading';
+  if (subjects.some(s => s.id === decodedId)) {
+    pageType = 'subject';
+  } else if (decodedId.startsWith('chapter-') || decodedId.startsWith('c1') || decodedId.startsWith('c2') || decodedId.includes('গদ্য') || decodedId.includes('কবিতা')) {
+    pageType = 'chapter';
+  }
 
   if (pageType === 'subject' || pageType === 'chapter') {
     // Determine the subject ID to fetch curriculum for
-    const subjectId = pageType === 'subject' ? decodedId : 'sahitya-kanika'; // Fallback to sahitya-kanika for chapters right now
+    // If it's a chapter, we ideally need to know its parent subject, but for now fallback to the first subject
+    const subjectId = pageType === 'subject' ? decodedId : (subjects[0]?.id || 'sahitya-kanika');
     const curriculum = await getCurriculumBySubject(subjectId);
     
-    return <SubjectDashboard id={decodedId} pageType={pageType} subjects={subjects} curriculum={curriculum} />;
+    return <SubjectDashboard id={decodedId} pageType={pageType as 'subject' | 'chapter'} subjects={subjects} curriculum={curriculum} />;
   }
 
   // Reading Page
   const readingData = await getReadingContent(decodedId);
-  const curriculum = await getCurriculumBySubject('sahitya-kanika'); // Fetch curriculum for left sidebar
+  const curriculum = await getCurriculumBySubject(subjects[0]?.id || 'sahitya-kanika'); // Fetch curriculum for left sidebar
 
   return <ReadingLayout id={decodedId} data={readingData} subjects={subjects} curriculum={curriculum} />;
 }
