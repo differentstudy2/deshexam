@@ -18,14 +18,15 @@ import {
 } from './guide-data';
 import Image from 'next/image';
 
-export default function GuideDetailsPage({ params }: { params: { id: string } }) {
-  const pageType = getGuidePageType(params.id);
+export default function GuideDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const unwrappedParams = React.use(params);
+  const pageType = getGuidePageType(unwrappedParams.id);
 
   if (pageType === 'subject') {
-    return <SubjectDashboard id={params.id} />;
+    return <SubjectDashboard id={unwrappedParams.id} />;
   }
 
-  return <ReadingLayout id={params.id} />;
+  return <ReadingLayout id={unwrappedParams.id} />;
 }
 
 // ============================================================================
