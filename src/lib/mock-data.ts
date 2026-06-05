@@ -118,6 +118,18 @@ export const faqData = [
         question: "I do not have online payment activated. Can I use any other mode for payment?", 
         answer: "We support a variety of payment methods, including credit/debit cards, net banking, and UPI. Please check the payment page for all available options. If you face any issues, our support team is ready to help." 
     },
+    {
+        question: "Can I use my DeshExam Pass Pro on multiple devices?",
+        answer: "Yes, you can log into your account from multiple devices, including your laptop, tablet, or smartphone. However, simultaneous test attempts on multiple devices are not permitted for security reasons."
+    },
+    {
+        question: "Is there any refund policy if I am not satisfied with the Pass?",
+        answer: "Currently, we do not offer refunds once the Pass Pro is purchased and activated, as it grants immediate access to premium digital content. We highly recommend trying out our free mock tests before making a purchase."
+    },
+    {
+        question: "Are the mock tests and previous year papers available in multiple languages?",
+        answer: "Yes, a significant portion of our test library is available in both English and Bengali. You can choose your preferred language at the start of most tests."
+    }
 ];
 
 

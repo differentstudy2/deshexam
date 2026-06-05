@@ -1,32 +1,17 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Info, Loader2, Tag } from 'lucide-react';
+import { Check, X, BookCopy, FileClock, CircleUser, Video, Repeat, Loader2, Tag, ChevronRight } from 'lucide-react';
 import { pricingData, faqData } from "@/lib/mock-data";
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createRazorpayOrder } from '@/ai/flows/create-razorpay-order';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import Image from 'next/image';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Separator } from '@/components/ui/separator';
 import { getCouponByCode } from '@/lib/firebase/firestore';
 import Script from 'next/script';
-
 
 declare global {
     interface Window {
@@ -41,7 +26,6 @@ type Coupon = {
   discountValue: number;
 };
 
-
 export default function PricingClientPage() {
     const { toast } = useToast();
     const { user } = useAuth();
@@ -54,26 +38,19 @@ export default function PricingClientPage() {
 
     useEffect(() => {
         document.title = "Pricing Plans | DeshExam";
-        const descriptionMeta = document.querySelector('meta[name="description"]');
-        descriptionMeta?.setAttribute('content', 'Choose the perfect plan for your exam preparation. Compare DeshExam Pass and Pass Pro to unlock mock tests, previous year papers, and premium features.');
     }, []);
 
-    
     useEffect(() => {
         const newPlans = pricingData.plans[planType];
         const bestseller = newPlans.find(p => p.bestseller) || newPlans[0];
         setSelectedDurationId(bestseller.id);
-        // Reset coupon when plan type changes
         setAppliedCoupon(null);
         setCouponCode('');
         setCouponDiscount(0);
     }, [planType]);
 
     useEffect(() => {
-        // Recalculate discount when selected plan changes
-        if(appliedCoupon) {
-            calculateCouponDiscount();
-        }
+        if(appliedCoupon) calculateCouponDiscount();
     }, [selectedDurationId, appliedCoupon]);
 
     const currentPlans = pricingData.plans[planType];
@@ -91,51 +68,30 @@ export default function PricingClientPage() {
         if (!appliedCoupon || !selectedPlan) {
             setCouponDiscount(0);
             return;
-        };
-
-        let discount = 0;
-        if (appliedCoupon.discountType === 'percentage') {
-            discount = (selectedPlan.price * appliedCoupon.discountValue) / 100;
-        } else {
-            discount = appliedCoupon.discountValue;
         }
-        // Ensure discount doesn't exceed the plan price
-        const finalDiscount = Math.min(discount, selectedPlan.price);
-        setCouponDiscount(finalDiscount);
-    }
+        let discount = appliedCoupon.discountType === 'percentage' 
+          ? (selectedPlan.price * appliedCoupon.discountValue) / 100 
+          : appliedCoupon.discountValue;
+        
+        setCouponDiscount(Math.min(discount, selectedPlan.price));
+    };
     
     const handleApplyCoupon = async () => {
         if (!couponCode) {
-            toast({
-                variant: 'destructive',
-                title: 'No Coupon Code',
-                description: 'Please enter a coupon code to apply.',
-            });
+            toast({ variant: 'destructive', title: 'Error', description: 'Please enter a coupon code.' });
             return;
         }
         try {
             const couponData = await getCouponByCode(couponCode);
             if (couponData) {
                 setAppliedCoupon(couponData as Coupon);
-                toast({
-                    title: 'Coupon Applied!',
-                    description: `Successfully applied coupon "${couponData.code}".`,
-                });
             } else {
                 setAppliedCoupon(null);
                 setCouponDiscount(0);
-                toast({
-                    variant: 'destructive',
-                    title: 'Invalid Coupon',
-                    description: 'The coupon code is invalid or has expired.',
-                });
+                toast({ variant: 'destructive', title: 'Invalid Coupon', description: 'Code is invalid or expired.' });
             }
         } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Could not validate coupon. Please try again.',
-            });
+            toast({ variant: 'destructive', title: 'Error', description: 'Could not validate coupon.' });
         }
     };
     
@@ -143,38 +99,19 @@ export default function PricingClientPage() {
         setAppliedCoupon(null);
         setCouponCode('');
         setCouponDiscount(0);
-        toast({
-            title: 'Coupon Removed',
-        });
     };
 
     const handlePayment = async () => {
         if (!user) {
-            toast({
-                variant: 'destructive',
-                title: 'Authentication Error',
-                description: 'Please log in to make a purchase.',
-            });
+            toast({ variant: 'destructive', title: 'Authentication Error', description: 'Please log in to purchase.' });
             return;
         }
-
-        if (!selectedPlan) {
-            toast({
-                variant: 'destructive',
-                title: 'Selection Error',
-                description: 'Please select a plan.',
-            });
-            return;
-        }
+        if (!selectedPlan) return;
 
         setIsProcessingPayment(true);
 
         try {
-            const order = await createRazorpayOrder({
-                amount: total * 100, // amount in the smallest currency unit
-                currency: 'INR',
-            });
-
+            const order = await createRazorpayOrder({ amount: total * 100, currency: 'INR' });
             const options = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: order.amount,
@@ -183,302 +120,265 @@ export default function PricingClientPage() {
                 description: `Purchase of ${selectedPlan.name}`,
                 order_id: order.id,
                 handler: async function (response: any) {
-                    // Here you would typically verify the payment signature on your backend
-                    toast({
-                        title: 'Payment Successful!',
-                        description: `Payment ID: ${response.razorpay_payment_id}`,
-                    });
+                    toast({ title: 'Payment Successful!', description: `ID: ${response.razorpay_payment_id}` });
                 },
-                prefill: {
-                    name: user.displayName || 'Test User',
-                    email: user.email,
-                },
-                theme: {
-                    color: '#16a34a', // Corresponds to primary green
-                },
+                prefill: { name: user.displayName || 'Test User', email: user.email },
+                theme: { color: '#6366f1' },
             };
-
             const rzp = new window.Razorpay(options);
             rzp.open();
-
         } catch (error) {
-            console.error(error);
-            toast({
-                variant: 'destructive',
-                title: 'Payment Error',
-                description: 'Could not initialize payment. Please try again.',
-            });
+            toast({ variant: 'destructive', title: 'Payment Error', description: 'Could not initialize payment.' });
         } finally {
             setIsProcessingPayment(false);
         }
     };
 
-
     const whyMustHave = [
-        {
-            icon: <BookCopy className="w-8 h-8 text-primary" />,
-            title: "150,000+ Mock tests",
-            description: "Attempt All Mock Test"
-        },
-        {
-            icon: <FileClock className="w-8 h-8 text-primary" />,
-            title: "30000+ Prev. Year Papers Tests",
-            description: "Attempt All Prev. Year Papers as Online Tests to get your AIR & Detailed Analysis"
-        },
-        {
-            icon: <CircleUser className="w-8 h-8 text-primary" />,
-            title: "Access to Practice Pro Questions",
-            description: "Get access to expert curated Practice Questions to improve concepts"
-        },
-        {
-            icon: <Video className="w-8 h-8 text-primary" />,
-            title: "Access to Pro Live Tests",
-            description: "Unlock All Daily Live Tests to check your All India Ranking"
-        },
-        {
-            icon: <Repeat className="w-8 h-8 text-primary" />,
-            title: "Unlimited Re-Attempt for All Tests",
-            description: "Re-attempt Tests multiple times and get to learn & improve from past mistakes"
-        }
+        { icon: <BookCopy className="w-5 h-5 text-slate-700" />, title: "150,000+ Mock tests" },
+        { icon: <FileClock className="w-5 h-5 text-slate-700" />, title: "30,000+ Prev. Year Papers" },
+        { icon: <CircleUser className="w-5 h-5 text-slate-700" />, title: "Pro Practice Questions" },
+        { icon: <Video className="w-5 h-5 text-slate-700" />, title: "Daily Live Tests & Rankings" },
+        { icon: <Repeat className="w-5 h-5 text-slate-700" />, title: "Unlimited Test Re-Attempts" }
     ];
 
   return (
-    <div className="bg-secondary/30">
+    <div className="w-full pb-12 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans">
         <Script id="razorpay-checkout-js" src="https://checkout.razorpay.com/v1/checkout.js" />
-        <div className="container py-12 md:py-16">
-            <Tabs value={planType} onValueChange={(value) => setPlanType(value as 'pro' | 'pass')} className="w-full max-w-sm mx-auto mb-4">
-                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="pro">
-                        <span className="flex items-center gap-2">Pass Pro <Badge variant="suggested">Suggested</Badge></span>
-                    </TabsTrigger>
-                    <TabsTrigger value="pass">Pass</TabsTrigger>
-                </TabsList>
-            </Tabs>
+        
+        <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-6 pt-6">
+            
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold">Choose a Plan</h1>
+                <p className="text-sm text-slate-500 mt-1">Unlock premium mock tests and analytics.</p>
+            </div>
 
-            <Card className="w-full max-w-5xl mx-auto shadow-lg">
-                <CardContent className="p-6 md:p-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Left side: Benefits and Comparison */}
-                        <div className="flex flex-col">
-                            <div className="hidden lg:flex p-1">
-                                <div className="w-1/2 py-4 pr-4 mt-8 border shadow-md rounded-lg mb-8">
-                                    <h3 className="font-bold text-lg mb-6 pl-4">Plan Benefits</h3>
-                                    <div className="space-y-5">
-                                        {pricingData.benefits.map(benefit => (
-                                            <div key={benefit.id} className="text-sm h-10 flex items-center pl-4">{benefit.name}</div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div onClick={() => setPlanType('pro')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pro' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
-                                     <h4 className="font-semibold mb-2 text-sm">Pass Pro</h4>
-                                     <div className="space-y-5">
-                                        {pricingData.benefits.map(benefit => (
-                                            <div key={benefit.id} className="h-10 flex items-center justify-center">
-                                                {benefit.pro ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
-                                            </div>
-                                        ))}
-                                        <div className="h-10 flex items-center justify-center pt-2">
-                                            <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
-                                                <RadioGroupItem value="pro" id="select-pro" />
-                                            </RadioGroup>
+            {/* Native iOS-style Segmented Control */}
+            <div className="flex w-full mb-8">
+                <div className="flex w-full bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                    <button 
+                        onClick={() => setPlanType('pro')}
+                        className={cn("flex-1 py-2 text-sm font-semibold rounded-md transition-all flex items-center justify-center gap-1.5", 
+                            planType === 'pro' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500')}
+                    >
+                        Pass Pro
+                        <span className="bg-[#6366f1] text-white text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wide">Pro</span>
+                    </button>
+                    <button 
+                        onClick={() => setPlanType('pass')}
+                        className={cn("flex-1 py-2 text-sm font-semibold rounded-md transition-all", 
+                            planType === 'pass' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500')}
+                    >
+                        Pass
+                    </button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                
+                {/* LEFT: Features & FAQ (Native List View) */}
+                <div className="space-y-8">
+                    
+                    {/* Features List */}
+                    <div>
+                        <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">Features Included</h3>
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                            {pricingData.benefits.map((benefit, index) => {
+                                const isIncluded = (planType === 'pro' && benefit.pro) || (planType === 'pass' && benefit.pass);
+                                const isLast = index === pricingData.benefits.length - 1;
+                                
+                                return (
+                                    <div key={benefit.id} className={cn(
+                                        "flex items-center justify-between p-3.5 mx-2",
+                                        !isLast && "border-b border-slate-100 dark:border-slate-800"
+                                    )}>
+                                        <span className={cn(
+                                            "text-[13px] font-medium leading-tight",
+                                            isIncluded ? "text-slate-700 dark:text-slate-300" : "text-slate-400 line-through"
+                                        )}>
+                                            {benefit.name}
+                                        </span>
+                                        <div className="shrink-0 ml-4">
+                                            {isIncluded ? (
+                                                <Check className="w-4 h-4 text-[#6366f1]" strokeWidth={2.5} />
+                                            ) : (
+                                                <X className="w-4 h-4 text-slate-300" strokeWidth={2.5} />
+                                            )}
                                         </div>
                                     </div>
-                                </div>
-                                <div onClick={() => setPlanType('pass')} className={cn("w-1/4 text-center rounded-md p-2 transition-all shadow-md cursor-pointer", planType === 'pass' ? 'bg-blue-50 border border-blue-200' : 'bg-card')}>
-                                   <h4 className="font-semibold mb-2 text-sm">Pass</h4>
-                                     <div className="space-y-5">
-                                        {pricingData.benefits.map(benefit => (
-                                            <div key={benefit.id} className="h-10 flex items-center justify-center">
-                                                {benefit.pass ? <Check className="text-green-500"/> : <X className="text-destructive"/>}
-                                            </div>
-                                        ))}
-                                         <div className="h-10 flex items-center justify-center pt-2">
-                                            <RadioGroup value={planType} onValueChange={(val) => setPlanType(val as 'pro' | 'pass')}>
-                                                <RadioGroupItem value="pass" id="select-pass" />
-                                            </RadioGroup>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="lg:hidden">
-                                <h3 className="font-bold text-lg mb-4">Plan Benefits</h3>
-                                <ul className="space-y-2 text-sm">
-                                    {pricingData.benefits.map(benefit => (
-                                        (planType === 'pro' && benefit.pro) || (planType === 'pass' && benefit.pass) ? (
-                                            <li key={benefit.id} className="flex items-center gap-2">
-                                                <Check className="w-4 h-4 text-green-500" />
-                                                {benefit.name}
-                                            </li>
-                                        ) : null
-                                    ))}
-                                </ul>
-                            </div>
+                                );
+                            })}
                         </div>
+                    </div>
 
-
-                        {/* Right side: Plan selection and payment */}
-                        <div>
-                            <div className="mb-4 space-y-2">
-                                <h3 className="font-bold text-lg">Special Offers for You!</h3>
-                                {appliedCoupon ? (
-                                     <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-lg">
-                                        <div className="flex items-center gap-2">
-                                            <Tag className="w-5 h-5 text-green-600"/>
-                                            <p className="text-sm font-semibold text-green-700">Coupon "{appliedCoupon.code}" applied!</p>
+                    {/* What you get */}
+                    <div>
+                        <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">What you get</h3>
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                            {whyMustHave.map((item, index) => {
+                                const isLast = index === whyMustHave.length - 1;
+                                return (
+                                    <div key={item.title} className={cn(
+                                        "flex items-center gap-3 p-3.5 mx-2",
+                                        !isLast && "border-b border-slate-100 dark:border-slate-800"
+                                    )}>
+                                        <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                            {item.icon}
                                         </div>
-                                        <Button variant="ghost" size="sm" onClick={removeCoupon} className="text-green-700 hover:text-green-800">Remove</Button>
+                                        <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">
+                                            {item.title}
+                                        </span>
                                     </div>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <Input 
-                                            placeholder="Enter Coupon Code" 
-                                            className="h-9" 
-                                            value={couponCode} 
-                                            onChange={(e) => setCouponCode(e.target.value)}
-                                        />
-                                        <Button variant="outline" size="sm" onClick={handleApplyCoupon}>Apply</Button>
-                                    </div>
-                                )}
-                            </div>
-                            <h4 className="font-semibold text-md mb-4">Select your {planType === 'pro' ? 'Pass Pro' : 'Pass'} Plan</h4>
-                            
-                             <RadioGroup value={selectedDurationId} onValueChange={setSelectedDurationId}>
-                                <div className="space-y-3">
-                                {currentPlans.map((plan) => (
-                                    <Label 
+                                )
+                            })}
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                {/* RIGHT: Plan Selection & Checkout */}
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">Select Duration</h3>
+                        <div className="space-y-3">
+                            {currentPlans.map((plan) => {
+                                const isSelected = selectedDurationId === plan.id;
+                                return (
+                                    <div 
                                         key={plan.id}
-                                        htmlFor={plan.id}
+                                        onClick={() => setSelectedDurationId(plan.id)}
                                         className={cn(
-                                            "flex items-center p-4 border rounded-lg cursor-pointer transition-all relative",
-                                            selectedDurationId === plan.id ? "border-primary bg-primary/5" : "border-border"
+                                            "relative p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between",
+                                            isSelected 
+                                                ? "border-[#6366f1] bg-[#6366f1]/5 dark:bg-[#6366f1]/10" 
+                                                : "border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-900"
                                         )}
                                     >
                                         {plan.bestseller && (
-                                            <Badge className="absolute -top-2 right-24 bg-yellow-400 text-yellow-900">Bestseller</Badge>
+                                            <div className="absolute -top-2.5 left-4 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                Bestseller
+                                            </div>
                                         )}
                                         {plan.discount && (
-                                            <Badge className="absolute -top-2 right-2 bg-green-500 text-white">{plan.discount}% OFF</Badge>
+                                            <div className="absolute -top-2.5 right-4 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                {plan.discount}% OFF
+                                            </div>
                                         )}
-                                        <RadioGroupItem value={plan.id} id={plan.id} className="mr-4"/>
-                                        <div className="flex-grow">
-                                            <p className="font-semibold">{plan.name}</p>
-                                            <p className="text-sm text-muted-foreground">Valid for {plan.validity}</p>
+                                        
+                                        <div className="flex items-center gap-3">
+                                            <div className={cn(
+                                                "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
+                                                isSelected ? "border-[#6366f1]" : "border-slate-300"
+                                            )}>
+                                                {isSelected && <div className="w-2.5 h-2.5 bg-[#6366f1] rounded-full" />}
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm text-slate-900 dark:text-white">{plan.name}</h4>
+                                                <p className="text-[11px] font-medium text-slate-500">Valid for {plan.validity}</p>
+                                            </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-sm line-through text-muted-foreground">₹{plan.originalPrice}</span>
-                                            <span className="font-bold text-lg ml-2">₹{plan.price}</span>
-                                        </div>
-                                    </Label>
-                                ))}
-                                </div>
-                            </RadioGroup>
-
-                            <div className="flex justify-between items-center mt-6 py-4 border-t">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span className="font-semibold flex items-center gap-1 cursor-pointer">
-                                        To Pay <Info className="w-4 h-4 text-muted-foreground"/>
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="bg-slate-800 text-white border-slate-800 p-0 rounded-lg shadow-lg">
-                                        <div className="p-4 space-y-2">
-                                            <div className="flex justify-between font-medium">
-                                                <span>{selectedPlan?.name}</span>
-                                                <span>₹{originalPrice}</span>
-                                            </div>
-                                            <Separator className="bg-slate-600"/>
-                                            <div className="flex justify-between text-green-400">
-                                                <span>Discounted Cost</span>
-                                                <span>- ₹{(originalPrice - price).toFixed(2)}</span>
-                                            </div>
-                                            {couponDiscount > 0 && (
-                                                <div className="flex justify-between text-green-400">
-                                                    <span>Coupon Discount</span>
-                                                    <span>- ₹{couponDiscount.toFixed(2)}</span>
-                                                </div>
-                                            )}
-                                            <Separator className="bg-slate-600"/>
-                                             <div className="flex justify-between">
-                                                <span>Platform Fee</span>
-                                                <span>+ ₹{platformFee}</span>
-                                            </div>
-                                            <div className="flex justify-between text-xs text-slate-400">
-                                                <span>GST (18% on fees)</span>
-                                                <span>+ ₹{gst.toFixed(2)}</span>
-                                            </div>
-                                            <Separator className="bg-slate-600"/>
-                                            <div className="flex justify-between font-bold text-lg">
-                                                <span>Total</span>
-                                                <span>₹{total.toFixed(2)}</span>
+                                            <div className="flex items-center justify-end gap-1.5">
+                                                <span className="text-[11px] line-through text-slate-400 font-medium">₹{plan.originalPrice}</span>
+                                                <span className="font-bold text-base text-slate-900 dark:text-white">₹{plan.price}</span>
                                             </div>
                                         </div>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-
-                                <span className="font-bold text-xl">₹{total.toFixed(2)}</span>
-                            </div>
-
-                            <Button onClick={handlePayment} disabled={isProcessingPayment} className="w-full h-12 text-lg bg-green-500 hover:bg-green-600 text-white">
-                                {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</> : 'Proceed To Payment'}
-                            </Button>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
-                </CardContent>
-            </Card>
 
-            <Card className="w-full max-w-5xl mx-auto shadow-lg mt-8 p-6">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="text-center md:text-left">
-                        <p className="font-semibold">This subscription does not include these individual goals:</p>
-                        <ul className="text-sm text-muted-foreground list-disc list-inside mt-2">
-                            <li>UPSC, UGC, CAT, CSIR, Judiciary</li>
-                            <li>IT/UM & JEE, CLAT, RRB grade-B, NEET</li>
-                            <li>CUET UG</li>
-                        </ul>
-                    </div>
-                    <div className="text-center md:text-right mt-4 md:mt-0">
-                        <p className="text-sm text-muted-foreground">Find these in our Exclusively created Test Series with New exam specific featuers in <span className="font-bold">DeshExam Elite</span></p>
-                        <Button variant="outline" className="mt-2">Explore Pass Elite</Button>
-                    </div>
-                </div>
-            </Card>
-
-
-            <div className="w-full max-w-5xl mx-auto mt-16">
-                <h2 className="text-center text-3xl font-bold font-headline mb-2">Why is DeshExam Pass Pro a must-have?</h2>
-                <div className="w-24 h-1 bg-primary mx-auto mb-10"></div>
-                <Card>
-                    <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {whyMustHave.map(item => (
-                            <div key={item.title} className="flex items-start gap-4">
-                                <div className="bg-primary/10 p-3 rounded-full">
-                                    {item.icon}
+                    {/* Native List Style Coupon */}
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+                        {appliedCoupon ? (
+                            <div className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-900/10">
+                                <div className="flex items-center gap-2">
+                                    <Tag className="w-4 h-4 text-emerald-600" />
+                                    <p className="text-sm font-semibold text-emerald-700">Coupon "{appliedCoupon.code}" applied</p>
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-lg">{item.title}</h4>
-                                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                                </div>
+                                <button onClick={removeCoupon} className="text-xs font-bold text-slate-400 hover:text-slate-600">
+                                    Remove
+                                </button>
                             </div>
-                        ))}
-                    </CardContent>
-                </Card>
+                        ) : (
+                            <div className="flex items-center p-2 pl-4">
+                                <Input 
+                                    placeholder="Enter Coupon Code" 
+                                    className="h-10 border-none shadow-none focus-visible:ring-0 px-0 text-sm font-medium" 
+                                    value={couponCode} 
+                                    onChange={(e) => setCouponCode(e.target.value)}
+                                />
+                                <Button onClick={handleApplyCoupon} variant="ghost" className="text-[#6366f1] font-bold hover:text-[#4f46e5] hover:bg-transparent">
+                                    Apply
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Native Table View Summary */}
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+                        <h4 className="font-bold text-[15px] mb-3 text-slate-900 dark:text-white">Order Summary</h4>
+                        <div className="space-y-3 text-[13px]">
+                            <div className="flex justify-between text-slate-600 dark:text-slate-400 font-medium">
+                                <span>{selectedPlan?.name}</span>
+                                <span>₹{originalPrice}</span>
+                            </div>
+                            <div className="flex justify-between text-emerald-600 font-medium">
+                                <span>Discount</span>
+                                <span>- ₹{(originalPrice - price).toFixed(2)}</span>
+                            </div>
+                            {couponDiscount > 0 && (
+                                <div className="flex justify-between text-emerald-600 font-medium">
+                                    <span>Coupon Discount</span>
+                                    <span>- ₹{couponDiscount.toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between text-slate-600 dark:text-slate-400 font-medium">
+                                <span>Platform Fee</span>
+                                <span>+ ₹{platformFee}</span>
+                            </div>
+                            <div className="flex justify-between text-slate-600 dark:text-slate-400 font-medium pb-3 border-b border-slate-100 dark:border-slate-800">
+                                <span>GST (18%)</span>
+                                <span>+ ₹{gst.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between items-center pt-1">
+                                <span className="font-bold text-slate-900 dark:text-white">Total Amount</span>
+                                <span className="font-bold text-lg text-slate-900 dark:text-white">₹{total.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Button 
+                        onClick={handlePayment} 
+                        disabled={isProcessingPayment} 
+                        className="w-full h-12 rounded-xl text-[15px] font-bold bg-[#6366f1] hover:bg-[#4f46e5] text-white shadow-none"
+                    >
+                        {isProcessingPayment ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</> : 'Proceed to Pay'}
+                    </Button>
+                </div>
+
             </div>
 
-
-            <div className="w-full max-w-5xl mx-auto mt-16">
-                <h2 className="text-center text-3xl font-bold font-headline mb-10">Frequently Asked Questions</h2>
-                <Accordion type="single" collapsible className="w-full bg-card p-4 rounded-lg shadow-sm">
-                    {faqData.map((faq, index) => (
-                        <AccordionItem value={`item-${index}`} key={index}>
-                            <AccordionTrigger className="text-left hover:no-underline">{faq.question}</AccordionTrigger>
-                            <AccordionContent className="text-muted-foreground">
-                            {faq.answer}
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
+            {/* Native Accordion FAQ - Single Panel */}
+            <div className="mt-8">
+                <h3 className="font-bold text-[15px] mb-3 uppercase tracking-wide text-slate-500">FAQ</h3>
+                <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden px-4">
+                    <Accordion type="single" collapsible className="w-full">
+                        {faqData.map((faq, index) => (
+                            <AccordionItem value={`item-${index}`} key={index} className="border-slate-100 dark:border-slate-800">
+                                <AccordionTrigger className="text-left font-medium text-[13px] hover:no-underline py-4">
+                                    {faq.question}
+                                </AccordionTrigger>
+                                <AccordionContent className="text-[12px] text-slate-500 leading-relaxed pb-4">
+                                    {faq.answer}
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
+                </div>
             </div>
         </div>
     </div>
