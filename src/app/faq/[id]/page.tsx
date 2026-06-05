@@ -83,7 +83,7 @@ export default function SingleFAQPage() {
                             
                             <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-[#737373] text-[14px] font-medium mb-8 pb-6 border-b border-slate-100">
                                 <div className="flex items-center gap-2.5">
-                                    <img src="https://picsum.photos/seed/raju/32/32" alt="Author" className="w-6 h-6 rounded-full" />
+                                    <img src="https://picsum.photos/seed/raju/32/32" alt="Author" className="w-6 h-6 rounded-full mb-0" />
                                     <span>লেখক: Najjar Hossain Raju</span>
                                 </div>
                                 <div className="flex items-center gap-2">
