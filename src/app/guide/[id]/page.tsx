@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { ChevronRight, Share2, MoreVertical, Search, Clock, Play } from 'lucide-react';
 import Link from 'next/link';
@@ -11,42 +9,70 @@ import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
-import { 
-  curriculumData, 
-  sidebarSubjects, 
-  readingContentData,
-  getGuidePageType 
-} from './guide-data';
+import { getGuideSubjects, getCurriculumBySubject, getReadingContent } from '@/lib/firebase/guide';
+import { Chapter } from './guide-data';
 import Image from 'next/image';
 
-export default function GuideDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const unwrappedParams = React.use(params);
-  const pageType = getGuidePageType(unwrappedParams.id);
+// Temporary helper until we fully migrate navigation logic
+function getPageType(id: string) {
+  if (['sahitya-kanika', 'bangla-byakoron', 'english-for-today', 'gonit', 'ict'].includes(id)) {
+    return 'subject';
+  }
+  if (id.startsWith('c1') || id.startsWith('c2') || id.includes('গদ্য') || id.includes('কবিতা')) {
+    return 'chapter';
+  }
+  return 'reading';
+}
+
+export default async function GuideDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const decodedId = decodeURIComponent(id);
+  const pageType = getPageType(decodedId);
+
+  // Fetch common data
+  const subjects = await getGuideSubjects();
 
   if (pageType === 'subject' || pageType === 'chapter') {
-    return <SubjectDashboard id={unwrappedParams.id} pageType={pageType} />;
+    // Determine the subject ID to fetch curriculum for
+    const subjectId = pageType === 'subject' ? decodedId : 'sahitya-kanika'; // Fallback to sahitya-kanika for chapters right now
+    const curriculum = await getCurriculumBySubject(subjectId);
+    
+    return <SubjectDashboard id={decodedId} pageType={pageType} subjects={subjects} curriculum={curriculum} />;
   }
 
-  return <ReadingLayout id={unwrappedParams.id} />;
+  // Reading Page
+  const readingData = await getReadingContent(decodedId);
+  const curriculum = await getCurriculumBySubject('sahitya-kanika'); // Fetch curriculum for left sidebar
+
+  return <ReadingLayout id={decodedId} data={readingData} subjects={subjects} curriculum={curriculum} />;
 }
 
 // ============================================================================
 // Layout A: Subject Dashboard (Curriculum Tree + Right Subjects Sidebar)
 // ============================================================================
-function SubjectDashboard({ id, pageType }: { id: string; pageType: 'subject' | 'chapter' }) {
-  const currentSubject = sidebarSubjects.find(s => s.id === id) || sidebarSubjects[0];
+function SubjectDashboard({ 
+  id, 
+  pageType, 
+  subjects, 
+  curriculum 
+}: { 
+  id: string; 
+  pageType: 'subject' | 'chapter'; 
+  subjects: any[]; 
+  curriculum: Chapter[];
+}) {
+  const currentSubject = subjects.find(s => s.id === id) || subjects[0];
   const chapterTitle = id.includes('গদ্য') ? 'গদ্য' : id.includes('কবিতা') ? 'কবিতা' : 'গদ্য';
-  const displayTitle = pageType === 'chapter' ? chapterTitle : currentSubject.title;
+  const displayTitle = pageType === 'chapter' ? chapterTitle : currentSubject?.title || 'Subject';
 
-  let treeData = curriculumData;
+  let treeData = curriculum;
   if (pageType === 'chapter') {
-    const chapter = curriculumData.find(c => c.id === id || (id.includes('গদ্য') && c.id === 'c1') || (id.includes('কবিতা') && c.id === 'c2'));
+    const chapter = curriculum.find(c => c.id === id || (id.includes('গদ্য') && c.id === 'c1') || (id.includes('কবিতা') && c.id === 'c2'));
     if (chapter) {
-      // Elevate topics to act as chapters, and subtopics to act as topics
       treeData = chapter.topics.map(topic => ({
         id: topic.id,
         title: topic.title,
-        topics: topic.subtopics.map(sub => ({
+        topics: topic.subtopics.map((sub: any) => ({
           id: sub.id,
           title: sub.title,
           type: 'topic',
@@ -73,18 +99,8 @@ function SubjectDashboard({ id, pageType }: { id: string; pageType: 'subject' | 
               <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <Link href="/guide/sahitya-kanika" className="hover:text-emerald-600 transition-colors">সাহিত্য কণিকা</Link>
-              {pageType === 'chapter' && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
-                </>
-              )}
-              {pageType !== 'chapter' && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
-                  <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
-                </>
-              )}
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
             </div>
           </div>
           
@@ -169,7 +185,7 @@ function SubjectDashboard({ id, pageType }: { id: string; pageType: 'subject' | 
 
         {/* Right Column (Sidebar) */}
         <div className="w-full lg:w-[340px] shrink-0">
-          <GuideSidebar subjects={sidebarSubjects} activeId={id} />
+          <GuideSidebar subjects={subjects} activeId={id} />
         </div>
       </div>
     </div>
@@ -179,9 +195,21 @@ function SubjectDashboard({ id, pageType }: { id: string; pageType: 'subject' | 
 // ============================================================================
 // Layout B: Reading Content (Left Nav Sidebar + Reading Area)
 // ============================================================================
-function ReadingLayout({ id }: { id: string }) {
-  // If the specific content id isn't in mock data, fallback to 'shobdartho'
-  const data = readingContentData[id] || readingContentData['shobdartho'];
+function ReadingLayout({ 
+  id, 
+  data, 
+  subjects, 
+  curriculum 
+}: { 
+  id: string; 
+  data: any; 
+  subjects: any[]; 
+  curriculum: Chapter[];
+}) {
+  
+  if (!data) {
+    return <div className="p-20 text-center text-xl text-slate-500">Content not found!</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
@@ -220,7 +248,7 @@ function ReadingLayout({ id }: { id: string }) {
       <div className="max-w-[1600px] mx-auto flex items-start">
         
         {/* Left Navigation Sidebar */}
-        <ContentNavigationSidebar curriculum={curriculumData} activeId={id} />
+        <ContentNavigationSidebar curriculum={curriculum} activeId={id} />
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
@@ -231,7 +259,7 @@ function ReadingLayout({ id }: { id: string }) {
         <div className="w-full xl:w-[320px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 xl:bg-slate-50 dark:xl:bg-[#020817] xl:h-[calc(100vh)] xl:sticky top-0 hidden xl:block">
           <ScrollArea className="h-full w-full">
             <div className="p-6">
-              <GuideSidebar subjects={sidebarSubjects} activeId="sahitya-kanika" />
+              <GuideSidebar subjects={subjects} activeId="sahitya-kanika" />
             </div>
           </ScrollArea>
         </div>

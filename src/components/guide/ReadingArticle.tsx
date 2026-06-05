@@ -101,9 +101,10 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
           )}
 
           {sec.type === 'article' && (
-            <div className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-              {sec.body}
-            </div>
+            <div 
+              className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-300"
+              dangerouslySetInnerHTML={{ __html: sec.body }}
+            />
           )}
 
           {sec.type === 'mcq' && (
