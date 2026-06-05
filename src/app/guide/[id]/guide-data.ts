@@ -58,6 +58,88 @@ export const curriculumData: Chapter[] = [
           { id: 'pp-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
           { id: 'pp-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
           { id: 'pp-path', title: 'পাঠ-পরিচিতি', type: 'subtopic' },
+          { id: 'pp-lekhok', title: 'লেখক পরিচিতি', type: 'subtopic' },
+          { id: 'pp-kormo', title: 'কর্ম-অনুশীলন', type: 'subtopic' },
+          { id: 'pp-mcq', title: 'বহুনির্বাচনি প্রশ্ন', type: 'subtopic' },
+          { id: 'pp-cq', title: 'সৃজনশীল প্রশ্ন', type: 'subtopic' },
+        ]
+      },
+      {
+        id: 'toilochitrer-vut',
+        title: 'তৈলচিত্রের ভূত (মানিক বন্দ্যোপাধ্যায়)',
+        type: 'topic',
+        subtopics: [
+          { id: 'tv-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+          { id: 'tv-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
+          { id: 'tv-path', title: 'পাঠ-পরিচিতি', type: 'subtopic' },
+          { id: 'tv-lekhok', title: 'লেখক-পরিচিতি', type: 'subtopic' },
+          { id: 'tv-kormo', title: 'কর্ম-অনুশীলন', type: 'subtopic' },
+          { id: 'tv-mcq', title: 'বহুনির্বাচনি প্রশ্ন', type: 'subtopic' },
+          { id: 'tv-cq', title: 'সৃজনশীল প্রশ্ন', type: 'subtopic' },
+        ]
+      },
+      {
+        id: 'amader-lokoshilpo',
+        title: 'আমাদের লোকশিল্প (কামরুল হাসান)',
+        type: 'topic',
+        subtopics: [
+          { id: 'al-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+          { id: 'al-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
+          { id: 'al-path', title: 'পাঠ-পরিচিতি', type: 'subtopic' },
+          { id: 'al-lekhok', title: 'লেখক-পরিচিতি', type: 'subtopic' },
+          { id: 'al-kormo', title: 'কর্ম-অনুশীলন', type: 'subtopic' },
+        ]
+      },
+      {
+        id: 'sukhi-manush',
+        title: 'সুখী মানুষ (মমতাজউদদীন আহমদ)',
+        type: 'topic',
+        subtopics: [
+          { id: 'sm-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+          { id: 'sm-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
+          { id: 'sm-path', title: 'পাঠ-পরিচিতি', type: 'subtopic' },
+        ]
+      },
+      {
+        id: 'mongdur-pothe',
+        title: 'মংডুর পথে (অন্নদাশঙ্কর রায়)',
+        type: 'topic',
+        subtopics: [
+          { id: 'mp-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+          { id: 'mp-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
+          { id: 'mp-path', title: 'পাঠ-পরিচিতি', type: 'subtopic' },
+        ]
+      },
+      {
+        id: 'bangla-noboborsho',
+        title: 'বাংলা নববর্ষ (শামসুজ্জামান খান)',
+        type: 'topic',
+        subtopics: [
+          { id: 'bn-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+          { id: 'bn-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
+        ]
+      },
+      {
+        id: 'bangla-vashar-jonmokotha',
+        title: 'বাংলা ভাষার জন্মকথা (হুমায়ুন আজাদ)',
+        type: 'topic',
+        subtopics: [
+          { id: 'bv-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'c2',
+    title: 'কবিতা',
+    topics: [
+      {
+        id: 'manob-dhormo',
+        title: 'মানব ধর্ম (লালন শাহ)',
+        type: 'topic',
+        subtopics: [
+          { id: 'md-shobdartho', title: 'শব্দার্থ ও টীকা', type: 'subtopic' },
+          { id: 'md-pather', title: 'পাঠের উদ্দেশ্য', type: 'subtopic' },
         ]
       }
     ]

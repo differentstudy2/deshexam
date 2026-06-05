@@ -1,7 +1,6 @@
-'use client';
-
 import React, { useState } from 'react';
-import { ChevronsRight, CircleDot, MoreHorizontal, ArrowUp, MoreVertical } from 'lucide-react';
+import { ChevronsRight, CircleDot, MoreHorizontal, ArrowUp, ArrowDown } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Chapter } from '@/app/guide/[id]/guide-data';
 import {
@@ -50,12 +49,11 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
             {/* Chapter Row */}
             <div 
               className={cn(
-                "flex items-center justify-between py-3 px-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group",
+                "flex items-center justify-between py-3 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group",
                 cIdx !== 0 && "border-t border-slate-100 dark:border-slate-800"
               )}
-              onClick={() => toggleChapter(chapter.id)}
             >
-              <div className="flex items-center gap-3">
+              <Link href={`/guide/${chapter.id}`} className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
                 <ChevronsRight className={cn(
                   "w-5 h-5 text-emerald-500 transition-transform duration-200",
                   isChapterExpanded && "rotate-90"
@@ -63,14 +61,29 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 <span className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400">
                   {chapter.title}
                 </span>
-              </div>
+              </Link>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 bg-blue-50/50 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-sm">
-                  <ArrowUp className="w-4 h-4" />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50 bg-blue-50/50 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-sm"
+                  onClick={() => toggleChapter(chapter.id)}
+                >
+                  {isChapterExpanded ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600 bg-slate-50 dark:bg-slate-800 rounded-sm">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600 bg-slate-50 dark:bg-slate-800 rounded-sm">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 p-1 shadow-lg border-slate-100 dark:border-slate-800">
+                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Test Yourself</DropdownMenuItem>
+                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Favorite</DropdownMenuItem>
+                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Bookmark</DropdownMenuItem>
+                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Show Video</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
@@ -87,12 +100,16 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                         className="flex items-center justify-between py-3 px-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-lg cursor-pointer hover:shadow-sm transition-shadow group"
                         onClick={(e) => toggleTopic(topic.id, e)}
                       >
-                        <div className="flex items-center gap-3">
+                        <Link 
+                          href={`/guide/${topic.id}`} 
+                          className="flex items-center gap-3 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <CircleDot className="w-4 h-4 text-slate-700 dark:text-slate-300" strokeWidth={3} />
                           <span className="font-medium text-[15px] text-slate-700 dark:text-slate-200">
                             {topic.title}
                           </span>
-                        </div>
+                        </Link>
                         
                         <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
@@ -119,13 +136,28 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                           {topic.subtopics.map((subtopic) => (
                             <div 
                               key={subtopic.id} 
-                              className="flex items-center justify-between py-3 px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-50 dark:border-slate-800/50 last:border-0"
+                              className="flex items-center justify-between py-3 px-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-50 dark:border-slate-800/50 last:border-0 group"
                             >
-                              <div className="flex items-center gap-3">
+                              <Link href={`/guide/${subtopic.id}`} className="flex items-center gap-3 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                                 <CircleDot className="w-3.5 h-3.5 text-slate-500" strokeWidth={3} />
                                 <span className="font-medium text-sm text-slate-600 dark:text-slate-300">
                                   {subtopic.title}
                                 </span>
+                              </Link>
+                              <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-48 p-1 shadow-lg border-slate-100 dark:border-slate-800">
+                                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Test Yourself</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Favorite</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Bookmark</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 text-[13px] text-slate-600 dark:text-slate-300 cursor-pointer">Show Video</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
                             </div>
                           ))}
