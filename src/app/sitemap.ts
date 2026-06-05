@@ -1,4 +1,6 @@
 import { MetadataRoute } from 'next';
+export const dynamic = 'force-dynamic';
+
 import { 
   getAllContent, 
   getAllQuestions, 
