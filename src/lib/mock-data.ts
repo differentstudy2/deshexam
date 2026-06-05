@@ -129,6 +129,22 @@ export const faqData = [
     {
         question: "Are the mock tests and previous year papers available in multiple languages?",
         answer: "Yes, a significant portion of our test library is available in both English and Bengali. You can choose your preferred language at the start of most tests."
+    },
+    {
+        question: "What is the exact difference between DeshExam Pass and Pass Pro?",
+        answer: "DeshExam Pass gives you access to our basic library of 70,000+ mock tests. Pass Pro unlocks everything: unlimited Pro Live Tests, 17,000+ Previous Year Papers, expert curated Pro Practice Questions, and unlimited re-attempts for all tests."
+    },
+    {
+        question: "What happens if my internet disconnects in the middle of a live test?",
+        answer: "Don't worry! Your progress is automatically saved in real-time. If you lose connection, you can resume the test from exactly where you left off once your internet is restored, provided the test window is still active."
+    },
+    {
+        question: "How can I get discount coupons for the subscription?",
+        answer: "We frequently share discount coupons on our official Telegram channel, Facebook page, and via email newsletters. Keep an eye out during festive seasons for special 'Bestseller' discounts automatically applied to our yearly plans."
+    },
+    {
+        question: "How can I contact support if I face technical issues?",
+        answer: "You can reach our 24/7 support team by clicking the 'Help' icon in your dashboard, emailing support@deshexam.com, or calling our toll-free student helpline. We typically respond within 2 hours."
     }
 ];
 
