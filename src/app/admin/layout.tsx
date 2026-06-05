@@ -5,9 +5,23 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@/lib/firebase/firestore';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Bell } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/header';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
+import Link from "next/link";
+import { useTheme } from "next-themes";
 
 export default function AdminLayout({
   children,
@@ -15,6 +29,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const { user, loading: authLoading, logOut } = useAuth();
+  const { setTheme } = useTheme();
   const router = useRouter();
   const [verifying, setVerifying] = useState(true);
 
@@ -62,19 +77,58 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-slate-50">
-            <Sidebar>
-                <AdminSidebar logOut={logOut} />
-            </Sidebar>
-            <div className="flex flex-col flex-1 w-full overflow-hidden">
+      <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-900">
+        <Sidebar>
+          <AdminSidebar logOut={logOut} />
+        </Sidebar>
+        <div className="flex flex-col flex-1 w-full relative">
+          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 shadow-sm">
+                    <SidebarTrigger className="-ml-1 text-slate-500 dark:text-slate-400" />
+                    <div className="flex-1 font-semibold text-slate-800 dark:text-slate-100 tracking-tight text-xl">
+                        Admin Control Panel
+                    </div>
+                    <div className="ml-auto flex items-center space-x-2 md:space-x-4">
+                        <ThemeToggle />
+                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-full relative">
+                            <Bell className="h-5 w-5" />
+                            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white dark:border-slate-950"></span>
+                        </Button>
+                        
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Avatar className="h-8 w-8 border border-slate-200 dark:border-slate-700 cursor-pointer ml-2">
+                                    <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
+                                    <AvatarFallback>{user?.displayName?.[0] || 'A'}</AvatarFallback>
+                                </Avatar>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="end" forceMount>
+                                <DropdownMenuLabel className="font-normal">
+                                    <div className="flex flex-col space-y-1">
+                                        <p className="text-sm font-medium leading-none">{user?.displayName || "Admin User"}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">
+                                            {user?.email}
+                                        </p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/dashboard">
+                                        <UserIcon className="mr-2 h-4 w-4" />
+                                        <span>Dashboard</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={logOut}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </header>
+                
                 <SidebarInset className="bg-transparent">
-                    <header className="flex h-16 items-center gap-4 border-b bg-white px-6 shadow-sm">
-                        <SidebarTrigger />
-                        <div className="flex-1 font-semibold text-slate-800 tracking-tight">
-                            Admin Control Panel
-                        </div>
-                    </header>
-                    <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-y-auto">
+                    <main className="flex-grow p-4 md:p-6 lg:p-8">
                         {children}
                     </main>
                 </SidebarInset>

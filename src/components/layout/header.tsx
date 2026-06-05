@@ -281,17 +281,17 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
 export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void; logOut: () => void; }) => {
     const pathname = usePathname();
     return (
-        <ScrollArea className="h-full bg-slate-900 text-slate-300">
-            <div className="border-b border-slate-800 p-4 bg-slate-950 flex items-center h-16">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">
+            <div className="border-b border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-950 flex items-center h-16 shrink-0">
                 <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-2">
-                    <div className="text-white font-bold text-xl tracking-tight">DeshExam <span className="text-[#00a651]">Admin</span></div>
+                    <div className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">DeshExam <span className="text-[#00a651]">Admin</span></div>
                 </Link>
             </div>
-            <div className="flex flex-col h-[calc(100%-4rem)]">
-                <div className="mt-4 space-y-6 p-4 flex-1">
+            <ScrollArea className="flex-1">
+                <div className="mt-4 space-y-6 p-4">
                     {adminNavGroups.map((group, idx) => (
                         <div key={idx} className="space-y-2">
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-2">{group.title}</h4>
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2">{group.title}</h4>
                             <ul className="space-y-1">
                                 {group.items.map((item) => (
                                     <li key={item.href}>
@@ -300,7 +300,7 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                                             variant="ghost"
                                             className={cn(
                                                 "justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
-                                                pathname === item.href ? "bg-[#00a651] text-white hover:bg-[#00a651]/90" : "hover:bg-slate-800 hover:text-white"
+                                                pathname === item.href ? "bg-[#00a651] text-white hover:bg-[#00a651]/90" : "hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                                             )}
                                         >
                                             <Link href={item.href} onClick={onLinkClick}>
@@ -314,11 +314,11 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                         </div>
                     ))}
                     
-                    <div className="pt-4 mt-4 border-t border-slate-800 space-y-2">
+                    <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
                         <Button
                             asChild
                             variant="ghost"
-                            className="justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md hover:bg-slate-800 hover:text-white"
+                            className="justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                         >
                             <Link href="/dashboard" onClick={onLinkClick}>
                                 <LayoutGrid className="h-4 w-4" />
@@ -327,14 +327,14 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                         </Button>
                     </div>
                 </div>
-                <div className="p-4 border-t border-slate-800 bg-slate-950">
-                    <Button variant="ghost" className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950/30" onClick={logOut}>
-                        <LogOut className="mr-3 h-4 w-4"/>
-                        Logout
-                    </Button>
-                </div>
+            </ScrollArea>
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
+                <Button variant="ghost" className="w-full justify-start text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30" onClick={logOut}>
+                    <LogOut className="mr-3 h-4 w-4"/>
+                    Logout
+                </Button>
             </div>
-        </ScrollArea>
+        </div>
     );
 };
 
@@ -353,7 +353,7 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
   }, [user]);
 
   return (
-    <ScrollArea className="h-full bg-white text-slate-800 border-r border-slate-200">
+    <div className="flex flex-col h-full bg-white text-slate-800 border-r border-slate-200">
         <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-100">
             <Link href="/dashboard" onClick={onLinkClick} className="flex items-center gap-2">
                 <div className="font-extrabold text-2xl tracking-tighter flex items-center">
@@ -362,8 +362,8 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                 </div>
             </Link>
         </div>
-        <div className="flex flex-col h-[calc(100%-4rem)]">
-          <div className="space-y-4 py-4 flex-1">
+        <ScrollArea className="flex-1">
+          <div className="space-y-4 py-4">
             {dashboardNavGroups.map((group, idx) => (
               <div key={idx} className="space-y-1">
                 {group.title && (
@@ -411,8 +411,8 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
               </div>
             )}
           </div>
-          
-          <div className="p-4 border-t border-slate-100 space-y-3 shrink-0">
+        </ScrollArea>
+        <div className="p-4 border-t border-slate-100 space-y-3 shrink-0">
              <Button variant="outline" className="w-full justify-between rounded-full bg-white shadow-sm border-slate-200 text-slate-700 h-10" asChild>
                  <Link href="/pricing">
                     Upgrade Plan <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -435,8 +435,7 @@ export const DashboardSidebar = ({ onLinkClick, user, logOut }: { onLinkClick?: 
                 </Button>
              </div>
           </div>
-        </div>
-    </ScrollArea>
+    </div>
   );
 };
 
