@@ -8,12 +8,31 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
-import { curriculumData, sidebarSubjects } from './guide-data';
+import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
+import { ReadingArticle } from '@/components/guide/ReadingArticle';
+import { 
+  curriculumData, 
+  sidebarSubjects, 
+  readingContentData,
+  getGuidePageType 
+} from './guide-data';
 import Image from 'next/image';
 
 export default function GuideDetailsPage({ params }: { params: { id: string } }) {
-  // Mock data fetching
-  const currentSubject = sidebarSubjects.find(s => s.id === params.id) || sidebarSubjects[0];
+  const pageType = getGuidePageType(params.id);
+
+  if (pageType === 'subject') {
+    return <SubjectDashboard id={params.id} />;
+  }
+
+  return <ReadingLayout id={params.id} />;
+}
+
+// ============================================================================
+// Layout A: Subject Dashboard (Curriculum Tree + Right Subjects Sidebar)
+// ============================================================================
+function SubjectDashboard({ id }: { id: string }) {
+  const currentSubject = sidebarSubjects.find(s => s.id === id) || sidebarSubjects[0];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
@@ -52,7 +71,6 @@ export default function GuideDetailsPage({ params }: { params: { id: string } })
           
           {/* Green Header Box */}
           <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-6 py-5 relative">
-            {/* Top Right Icons */}
             <div className="absolute top-5 right-5 flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
               <div className="flex items-center gap-1 text-[13px] font-bold">
                 <Clock className="w-4 h-4" />
@@ -66,7 +84,6 @@ export default function GuideDetailsPage({ params }: { params: { id: string } })
               </button>
             </div>
 
-            {/* Title & Subtitle */}
             <h2 className="text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1">
               {currentSubject.title}
             </h2>
@@ -74,7 +91,6 @@ export default function GuideDetailsPage({ params }: { params: { id: string } })
               Class 8 Sahitya Kanika Guide
             </p>
 
-            {/* Progress Section */}
             <div className="mt-auto">
               <p className="text-[11px] font-bold text-[#6a8b7a] dark:text-emerald-200/60 mb-2">
                 Started: 4 months ago || Progress: 0.54%
@@ -83,7 +99,6 @@ export default function GuideDetailsPage({ params }: { params: { id: string } })
             </div>
           </div>
 
-          {/* Search Bar */}
           <div className="relative border-b border-slate-200 dark:border-slate-800">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-slate-400" />
@@ -95,17 +110,10 @@ export default function GuideDetailsPage({ params }: { params: { id: string } })
             />
           </div>
 
-          {/* Badges Row */}
           <div className="px-6 py-4 flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800">
-            <span className="px-3 py-1 bg-[#107c41] text-white text-[12px] font-bold rounded-full">
-              MCQ: 2.3k
-            </span>
-            <span className="px-3 py-1 bg-[#107c41] text-white text-[12px] font-bold rounded-full">
-              CQ: 1.8k
-            </span>
-            <span className="px-3 py-1 bg-[#0b5c30] text-white text-[12px] font-bold rounded-full">
-              Board Exam: 1
-            </span>
+            <span className="px-3 py-1 bg-[#107c41] text-white text-[12px] font-bold rounded-full">MCQ: 2.3k</span>
+            <span className="px-3 py-1 bg-[#107c41] text-white text-[12px] font-bold rounded-full">CQ: 1.8k</span>
+            <span className="px-3 py-1 bg-[#0b5c30] text-white text-[12px] font-bold rounded-full">Board Exam: 1</span>
             <button className="px-3 py-1 bg-white dark:bg-slate-800 border-2 border-[#107c41] text-[#107c41] dark:text-emerald-400 text-[12px] font-bold rounded-full flex items-center gap-1 hover:bg-[#f0f9f4] dark:hover:bg-emerald-900/20 transition-colors">
               <Play className="w-3 h-3 fill-current" /> Practice
             </button>
@@ -120,17 +128,68 @@ export default function GuideDetailsPage({ params }: { params: { id: string } })
             </div>
           </div>
 
-          {/* Curriculum Tree */}
           <div className="p-4 sm:p-6">
             <CurriculumTree curriculum={curriculumData} />
           </div>
-          
         </div>
 
         {/* Right Column (Sidebar) */}
         <div className="w-full lg:w-[340px] shrink-0">
-          <GuideSidebar subjects={sidebarSubjects} activeId={params.id} />
+          <GuideSidebar subjects={sidebarSubjects} activeId={id} />
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Layout B: Reading Content (Left Nav Sidebar + Reading Area)
+// ============================================================================
+function ReadingLayout({ id }: { id: string }) {
+  // If the specific content id isn't in mock data, fallback to 'shobdartho'
+  const data = readingContentData[id] || readingContentData['shobdartho'];
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
+      
+      {/* Top Header Bar (White) */}
+      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
+            
+            <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
+              <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <Link href="/academy" className="hover:text-emerald-600 transition-colors">Academy</Link>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <Link href="/guide/sahitya-kanika" className="hover:text-emerald-600 transition-colors">সাহিত্য কণিকা</Link>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <span className="hover:text-emerald-600 transition-colors cursor-pointer">গদ্য</span>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <span className="text-slate-800 dark:text-slate-200">{data.title}</span>
+            </div>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
+          >
+            Back
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Reading Layout Area */}
+      <div className="max-w-[1600px] mx-auto flex items-start">
+        
+        {/* Left Navigation Sidebar */}
+        <ContentNavigationSidebar curriculum={curriculumData} activeId={id} />
+
+        {/* Main Content Area */}
+        <ReadingArticle data={data} />
         
       </div>
     </div>
