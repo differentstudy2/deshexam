@@ -24,13 +24,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/terms', 
     '/privacy', 
     '/kids-zone',
-<<<<<<< HEAD
     '/textbook-solutions',
     '/exams',
     '/quizzes',
     '/mock-tests',
     '/questions',
-=======
     '/kids-zone/learning-games',
     '/kids-zone/learning-games/math-puzzles',
     '/kids-zone/learning-games/math-puzzles/addition-adventure',
@@ -60,7 +58,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/kids-zone/learning-bengali/reading/lion-and-mouse',
     '/kids-zone/learning-bengali/reading/two-friends-and-bear',
     '/kids-zone/learning-english',
->>>>>>> 49fc1c0c874748b5830da174a57557d18a08f292
   ].map(route => ({
       url: `${baseUrl}${route}`,
       lastModified: new Date(),
