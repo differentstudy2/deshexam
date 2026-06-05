@@ -214,10 +214,10 @@ function AcademyCard({ subject }: { subject: Subject }) {
 
   return (
     <Card className={cn(
-      "relative bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl hover:shadow-md transition-shadow flex flex-col h-full",
+      "relative bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl hover:shadow-md transition-shadow flex flex-col",
       subject.progressValue > 0 && "theme-border-left"
     )}>
-      <CardContent className="p-5 flex flex-col h-full">
+      <CardContent className="p-5 flex flex-col">
         
         {/* Card Header (Title & Right Icon) */}
         <div className="flex justify-between items-start gap-4 mb-4">
@@ -373,7 +373,7 @@ export default function AcademyPage() {
         </div>
 
         {/* Grid of Subjects */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-12 items-start">
           {subjectsData.map((subject, idx) => (
             <AcademyCard key={idx} subject={subject} />
           ))}
