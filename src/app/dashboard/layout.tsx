@@ -9,8 +9,16 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset } from '@/compon
 import { DashboardSidebar } from '@/components/layout/header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Bell, Search, Moon } from 'lucide-react';
+import { Bell, Search, Moon, LogOut, User as UserIcon, Settings as SettingsIcon, Briefcase } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
 export default function DashboardLayout({
   children,
@@ -81,10 +89,55 @@ export default function DashboardLayout({
                             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
                         </Button>
                         
-                        <Avatar className="h-8 w-8 border border-slate-200 cursor-pointer ml-2">
-                            <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
-                            <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
-                        </Avatar>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Avatar className="h-8 w-8 border border-slate-200 cursor-pointer ml-2">
+                                    <AvatarImage src={user?.photoURL || `https://picsum.photos/seed/${user?.uid}/40/40`} />
+                                    <AvatarFallback>{user?.displayName?.[0] || 'U'}</AvatarFallback>
+                                </Avatar>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-64 p-2 bg-white border-slate-200 shadow-lg rounded-xl" align="end" forceMount>
+                                <div className="flex flex-col space-y-1 p-2">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-semibold leading-none text-slate-800">{user?.displayName || "Jahanur Miah"}</p>
+                                        <div className="px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                                            FREE
+                                        </div>
+                                    </div>
+                                    <p className="text-xs leading-none text-slate-500 mt-1">
+                                        @{user?.displayName?.toLowerCase().replace(/\s+/g, '-') || "jahanur-miah"}
+                                    </p>
+                                    
+                                    <div className="mt-3 mb-1 px-3 py-1.5 border border-dashed border-slate-200 rounded-full flex justify-center items-center bg-transparent">
+                                        <p className="text-xs font-medium text-slate-700">Balance: ৳1.75</p>
+                                    </div>
+                                </div>
+                                <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50">
+                                    <Link href="/dashboard/profile">
+                                        <UserIcon className="mr-3 h-4 w-4 text-slate-700" />
+                                        <span className="text-slate-700 font-medium">Profile</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50">
+                                    <Link href="/dashboard/settings">
+                                        <SettingsIcon className="mr-3 h-4 w-4 text-slate-700" />
+                                        <span className="text-slate-700 font-medium">Settings</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild className="p-2.5 cursor-pointer rounded-md hover:bg-slate-50 focus:bg-slate-50">
+                                    <Link href="/dashboard/business">
+                                        <Briefcase className="mr-3 h-4 w-4 text-slate-700" />
+                                        <span className="text-slate-700 font-medium">Business Accounts</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                                <DropdownMenuItem onClick={logOut} className="p-2.5 cursor-pointer rounded-md hover:bg-red-50 focus:bg-red-50 text-red-600 focus:text-red-600">
+                                    <LogOut className="mr-3 h-4 w-4" />
+                                    <span className="font-medium">Logout</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </header>
                 
