@@ -582,3 +582,16 @@ strong {
 .rounded-lg.border.text-card-foreground.shadow-2xl.bg-card\/60.backdrop-blur-sm.overflow-hidden.mt-2 {
   background: linear-gradient(to right, #c4c4c4, hwb(204 67% 31%));
 }
+
+.theme-border-left::before {
+    content: "";
+    display: inline-block;
+    background-color: #50cd89;
+    border-radius: 6px;
+    width: 3px;
+    height: 64px;
+    flex-shrink: 0;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}

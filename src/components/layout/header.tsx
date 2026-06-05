@@ -26,15 +26,14 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useAuthDialog } from "@/hooks/use-auth-dialog";
 
 const mainNavLinks = [
-    { href: "/features", label: "Features", icon: <Sparkles className="h-5 w-5" /> },
-    { href: "/kids-zone", label: "Kids Zone", icon: <ToyBrick className="h-5 w-5" /> },
-    { href: "/mock-tests", label: "Mock Tests", icon: <BookOpen className="h-5 w-5" /> },
+    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
+    { href: "/skill", label: "Skill", icon: <Zap className="h-5 w-5" /> },
+    { href: "/course", label: "Course", icon: <Book className="h-5 w-5" /> },
+    { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
     { href: "/exams", label: "Exams", icon: <Award className="h-5 w-5" /> },
-    { href: "/quizzes", label: "Quizzes", icon: <Gem className="h-5 w-5" /> },
-    { href: "/learn", label: "Learn", icon: <LayoutDashboard className="h-5 w-5" /> },
-    { href: "/textbook-solutions", label: "Textbook Solutions", icon: <Book className="h-5 w-5" /> },
-    { href: "/leaderboard", label: "Leaderboard", icon: <Trophy className="h-5 w-5" /> },
     { href: "/pricing", label: "Pricing", icon: <ShoppingCart className="h-5 w-5" /> },
+    { href: "/others", label: "Others", icon: <PlusCircle className="h-5 w-5" /> },
 ];
 
 const dashboardNavGroups = [
