@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from 'react';
-import { Search, List, Folder, Plus, ChevronDown, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { Search, List, Folder, Plus, Minus, ChevronDown, Clock, Globe, Eye, Copy, CheckCircle2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Metadata } from 'next';
+import { useToast } from '@/hooks/use-toast';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const categories = [
     { id: 'all', name: 'সকল FAQ', icon: <List className="w-4 h-4" /> },
@@ -42,23 +49,39 @@ const recentFaqs = [
 ];
 
 const faqsList = [
-    { id: 1, text: "ফন্ট ও লেআউট কাস্টমাইজ করা যাবে?", category: "E-Question Builder" },
-    { id: 2, text: "আমি কি কলাম ডিজাইন নিজের মতো করতে পারি?", category: "E-Question Builder" },
-    { id: 3, text: "আমি কি একাধিক সেট (Set-A, Set-B) তৈরি করতে পারি?", category: "E-Question Builder" },
-    { id: 4, text: "প্রশ্নপত্র কিভাবে শেয়ার বা প্রকাশ করবো?", category: "E-Question Builder" },
-    { id: 5, text: "আমি কি নিজের প্রতিষ্ঠানের Watermark যুক্ত করতে পারি?", category: "E-Question Builder" },
-    { id: 6, text: "প্রশ্নের সাথে উত্তরপত্র কি প্রিন্ট করা যায়?", category: "E-Question Builder" },
-    { id: 7, text: "আমি কি প্রশ্ন সম্পাদনা করতে পারি?", category: "E-Question Builder" },
-    { id: 8, text: "কোন কোন প্রশ্ন ধরন সাপোর্ট করে?", category: "E-Question Builder" },
-    { id: 9, text: "একাধিক বিষয়ের প্রশ্ন একসাথে কি তৈরি করা সম্ভব?", category: "E-Question Builder" },
-    { id: 10, text: "E-Question Builder-এ কোন স্তরের প্রশ্ন তৈরি করা যায়?", category: "E-Question Builder" },
-    { id: 11, text: "E-Question Builder কী?", category: "E-Question Builder" },
-    { id: 12, text: "আমি কি পাসওয়ার্ড পরিবর্তন করতে পারি?", category: "Account" },
+    { id: 1, text: "ফন্ট ও লেআউট কাস্টমাইজ করা যাবে?", category: "E-Question Builder", answer: "অবশ্যই, E-Question Builder-এ রয়েছে Font Size, Font Style, Layout Control - যার মাধ্যমে আপনি প্রিন্ট বা PDF এর চেহারা একদম নিজের মতো করে ডিজাইন করতে পারবেন।" },
+    { id: 2, text: "আমি কি কলাম ডিজাইন নিজের মতো করতে পারি?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি Custom Column Divider ব্যবহার করে প্রশ্নপত্রের কলাম ডিজাইন করতে পারবেন।" },
+    { id: 3, text: "আমি কি একাধিক সেট (Set-A, Set-B) তৈরি করতে পারি?", category: "E-Question Builder", answer: "E-Question Builder এর মাধ্যমে আপনি একাধিক সেট (Set-A, Set-B) তৈরি করতে পারবেন।" },
+    { id: 4, text: "প্রশ্নপত্র কিভাবে শেয়ার বা প্রকাশ করবো?", category: "E-Question Builder", answer: "প্রশ্নপত্র তৈরি করার পর আপনি তা লিংক আকারে শেয়ার করতে পারবেন।" },
+    { id: 5, text: "আমি কি নিজের প্রতিষ্ঠানের Watermark যুক্ত করতে পারি?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি প্রশ্নপত্রে নিজের প্রতিষ্ঠান বা কোচিংয়ের Watermark যুক্ত করতে পারবেন।" },
+    { id: 6, text: "প্রশ্নের সাথে উত্তরপত্র কি প্রিন্ট করা যায়?", category: "E-Question Builder", answer: "হ্যাঁ, প্রশ্নের সাথে উত্তরপত্র প্রিন্ট করার অপশন রয়েছে।" },
+    { id: 7, text: "আমি কি প্রশ্ন সম্পাদনা করতে পারি?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি যেকোনো সময় প্রশ্ন সম্পাদনা করতে পারবেন।" },
+    { id: 8, text: "কোন কোন প্রশ্ন ধরন সাপোর্ট করে?", category: "E-Question Builder", answer: "MCQ, Written, True/False সহ অনেক ধরনের প্রশ্ন সাপোর্ট করে।" },
+    { id: 9, text: "একাধিক বিষয়ের প্রশ্ন একসাথে কি তৈরি করা সম্ভব?", category: "E-Question Builder", answer: "হ্যাঁ, আপনি একাধিক বিষয় নির্বাচন করে একত্রে প্রশ্ন সেট তৈরি করতে পারবেন।" },
+    { id: 10, text: "E-Question Builder-এ কোন স্তরের প্রশ্ন তৈরি করা যায়?", category: "E-Question Builder", answer: "এখানে ৪র্থ শ্রেণি থেকে দ্বাদশ শ্রেণি, বিশ্ববিদ্যালয় ভর্তি প্রস্তুতি ও চাকরি প্রস্তুতির প্রশ্ন তৈরি করা যায়।" },
+    { id: 11, text: "E-Question Builder কী?", category: "E-Question Builder", answer: "E-Question Builder হলো একটি স্মার্ট টুল যা শিক্ষকদের জন্য লক্ষ লক্ষ প্রশ্নের ভাণ্ডার থেকে প্রশ্নপত্র তৈরি করতে সাহায্য করে।" },
+    { id: 12, text: "আমি কি পাসওয়ার্ড পরিবর্তন করতে পারি?", category: "Account", answer: "হ্যাঁ, আপনি আপনার অ্যাকাউন্ট সেটিংসে গিয়ে পাসওয়ার্ড পরিবর্তন করতে পারবেন।" },
 ];
 
 export default function FAQPage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+    const { toast } = useToast();
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        toast({
+            description: (
+                <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                    <span className="font-semibold text-[15px] text-white">লিংক কপি হয়েছে!</span>
+                </div>
+            ),
+            className: "bg-[#5cb85c] border-none shadow-lg top-0 right-0 mt-4 mr-4 fixed w-auto min-w-[200px]",
+            duration: 2000,
+        });
+    };
 
     return (
         <div className="min-h-screen bg-[#f8f9fa] font-sans">
@@ -154,32 +177,80 @@ export default function FAQPage() {
                         {/* Header */}
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
                             <h2 className="text-[17px] font-bold text-slate-800">সকল FAQ (873)</h2>
-                            <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 transition-colors text-slate-700 px-3 py-1.5 rounded text-[13px] font-semibold border border-slate-200">
-                                <List className="w-3.5 h-3.5" />
-                                সর্ট করুন
-                                <ChevronDown className="w-3.5 h-3.5 ml-1" />
-                            </button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 transition-colors text-slate-800 px-3 py-1.5 rounded text-[14px] font-semibold border border-slate-200 outline-none">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                                        সর্ট করুন
+                                        <ChevronDown className="w-4 h-4 ml-1 text-black" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-40 font-medium text-slate-700 bg-white p-1">
+                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">নতুন প্রথম</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">পুরাতন প্রথম</DropdownMenuItem>
+                                    <DropdownMenuItem className="py-2 px-3 text-[15px] cursor-pointer focus:bg-slate-50">জনপ্রিয়</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
 
                         {/* FAQ List */}
                         <div className="space-y-3">
                             {faqsList.map((faq) => (
-                                <div key={faq.id} className="flex items-center gap-4 bg-white border border-slate-200 rounded-lg p-3 hover:border-slate-300 transition-colors cursor-pointer group">
-                                    
-                                    <div className="w-8 h-8 rounded-md bg-[#0ea5e9] text-white flex items-center justify-center font-bold text-sm shrink-0">
-                                        {faq.id}
+                                <div key={faq.id} className={cn(
+                                    "bg-white border rounded-lg overflow-hidden transition-colors",
+                                    expandedFaq === faq.id ? "border-[#bfdbfe]" : "border-slate-200 hover:border-slate-300"
+                                )}>
+                                    <div 
+                                        onClick={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
+                                        className={cn(
+                                            "flex items-center gap-4 p-3 cursor-pointer group",
+                                            expandedFaq === faq.id ? "bg-[#dbeafe]" : "hover:bg-slate-50"
+                                        )}
+                                    >
+                                        <div className="w-8 h-8 rounded-md bg-[#0ea5e9] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                                            {faq.id}
+                                        </div>
+                                        <h3 className="flex-1 text-[14px] font-semibold text-slate-800">
+                                            {faq.text}
+                                        </h3>
+                                        <div className="hidden sm:flex items-center gap-3 shrink-0">
+                                            <span className={cn(
+                                                "px-3 py-1 rounded text-[11px] font-bold whitespace-nowrap",
+                                                expandedFaq === faq.id ? "bg-white/50 text-slate-700" : "bg-slate-100 text-slate-600"
+                                            )}>
+                                                {faq.category}
+                                            </span>
+                                            {expandedFaq === faq.id ? (
+                                                <Minus className="w-4 h-4 text-slate-600" />
+                                            ) : (
+                                                <Plus className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                                            )}
+                                        </div>
                                     </div>
                                     
-                                    <h3 className="flex-1 text-[14px] font-semibold text-slate-800">
-                                        {faq.text}
-                                    </h3>
-                                    
-                                    <div className="hidden sm:flex items-center gap-3 shrink-0">
-                                        <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded text-[11px] font-bold whitespace-nowrap">
-                                            {faq.category}
-                                        </span>
-                                        <Plus className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-                                    </div>
+                                    {expandedFaq === faq.id && (
+                                        <div className="p-4 bg-white">
+                                            {/* Tab */}
+                                            <div className="inline-flex items-center gap-1.5 border border-slate-200 border-b-transparent bg-slate-50 px-4 py-2 rounded-t-md relative top-[1px] z-10 text-sm font-medium text-slate-600">
+                                                <Globe className="w-4 h-4" /> ওয়েব প্ল্যাটফর্ম
+                                            </div>
+                                            {/* Content Box */}
+                                            <div className="bg-slate-50 border border-slate-200 rounded-b-md rounded-tr-md p-4 mb-4">
+                                                <p className="text-[14px] text-slate-800 leading-relaxed">
+                                                    {faq.answer}
+                                                </p>
+                                            </div>
+                                            {/* Action Buttons */}
+                                            <div className="flex justify-end gap-3">
+                                                <Link href={`/faq/${faq.id}`} className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded-md transition-colors">
+                                                    <Eye className="w-4 h-4" /> বিস্তারিত দেখুন
+                                                </Link>
+                                                <button onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-[13px] font-bold rounded-md transition-colors">
+                                                    <Copy className="w-4 h-4" /> লিংক কপি
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
