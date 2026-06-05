@@ -104,9 +104,7 @@ const questions = [
 ];
 
 export default function MistakeVaultPage() {
-  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({
-    'আমার বাংলা বই': true
-  });
+  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
 
   const toggleSubject = (name: string) => {
     setOpenSubjects(prev => ({ ...prev, [name]: !prev[name] }));
