@@ -157,7 +157,7 @@ const topContributors = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 font-sans">
+    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0f172a] font-sans">
       {/* Hero Section */}
       <section className="relative w-full bg-[#0f172a] pt-24 pb-32 overflow-hidden">
         {/* Abstract Clouds/Shapes in background (simulated with absolute divs) */}
@@ -165,7 +165,10 @@ export default function Home() {
         <div className="absolute top-20 right-20 w-40 h-20 bg-white/5 rounded-full blur-xl"></div>
         
         <div className="container relative z-10 px-4 mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">DeshExam</h1>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter uppercase mb-4 flex justify-center items-center">
+            <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-lg">DESH</span>
+            <span className="ml-3 text-white">EXAM</span>
+          </h1>
           <p className="text-lg md:text-xl text-[#00a651] mb-12">One Stop Learning Platform</p>
           
           <div className="flex flex-wrap justify-center gap-6 md:gap-12">
@@ -204,7 +207,7 @@ export default function Home() {
         {/* Curved Bottom Divider */}
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
           <svg className="relative block w-full h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,120 C300,0 900,0 1200,120 L1200,120 L0,120 Z" className="fill-slate-50"></path>
+            <path d="M0,120 C300,0 900,0 1200,120 L1200,120 L0,120 Z" className="fill-slate-50 dark:fill-[#0f172a]"></path>
           </svg>
         </div>
       </section>
@@ -217,17 +220,17 @@ export default function Home() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {smartFeatures.map((feature, idx) => (
-            <Card key={idx} className="relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+            <Card key={idx} className="relative overflow-hidden hover:shadow-md transition-shadow cursor-pointer dark:bg-slate-800 dark:border-slate-700">
               {feature.badge && (
                 <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 shadow-sm">
                   {feature.badge}
                 </div>
               )}
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-2 bg-gray-50 rounded-lg shrink-0 shadow-sm border border-gray-100">
+                <div className="p-2 bg-gray-50 dark:bg-slate-900 rounded-lg shrink-0 shadow-sm border border-gray-100 dark:border-slate-700">
                   {feature.icon}
                 </div>
-                <h3 className="font-semibold text-gray-800 text-sm md:text-base">{feature.title}</h3>
+                <h3 className="font-semibold text-gray-800 dark:text-gray-100 text-sm md:text-base">{feature.title}</h3>
               </CardContent>
             </Card>
           ))}
@@ -235,53 +238,53 @@ export default function Home() {
       </section>
 
       {/* Package Price */}
-      <section className="py-12 bg-white border-y border-gray-100">
+      <section className="py-12 bg-white dark:bg-transparent border-y border-gray-100 dark:border-slate-800">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-[#00a651] mb-6">Package Price</h2>
             <Tabs defaultValue="monthly" className="w-[200px] mx-auto">
-              <TabsList className="grid w-full grid-cols-2 rounded-full border border-gray-200 p-1 bg-white h-auto">
+              <TabsList className="grid w-full grid-cols-2 rounded-full border border-gray-200 dark:border-slate-700 p-1 bg-white dark:bg-slate-800 h-auto">
                 <TabsTrigger value="monthly" className="rounded-full py-2 data-[state=active]:bg-[#00a651] data-[state=active]:text-white">Monthly</TabsTrigger>
                 <TabsTrigger value="yearly" className="rounded-full py-2 data-[state=active]:bg-[#00a651] data-[state=active]:text-white">Yearly</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
-            <table className="w-full text-left text-sm text-gray-500">
-              <thead className="bg-[#e8f5e9] text-gray-700 text-center">
+          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
+            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+              <thead className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-gray-700 dark:text-gray-200 text-center">
                 <tr>
-                  <th scope="col" className="px-6 py-4 font-semibold text-gray-900">Package</th>
-                  <th scope="col" className="px-6 py-4 font-semibold text-gray-900">Price</th>
-                  <th scope="col" className="px-6 py-4 font-semibold text-gray-900">Action</th>
+                  <th scope="col" className="px-6 py-4 font-semibold text-gray-900 dark:text-white">Package</th>
+                  <th scope="col" className="px-6 py-4 font-semibold text-gray-900 dark:text-white">Price</th>
+                  <th scope="col" className="px-6 py-4 font-semibold text-gray-900 dark:text-white">Action</th>
                 </tr>
               </thead>
               <tbody className="text-center font-medium">
-                <tr className="border-b bg-white hover:bg-gray-50">
-                  <td className="px-6 py-4">S-BASIC</td>
+                <tr className="border-b dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                  <td className="px-6 py-4 dark:text-white">S-BASIC</td>
                   <td className="px-6 py-4">
                     <span className="line-through text-red-500 mr-2">100₹</span>
-                    <span className="text-gray-900">50₹</span>
+                    <span className="text-gray-900 dark:text-white">50₹</span>
                   </td>
                   <td className="px-6 py-4">
                     <Button size="sm" className="bg-[#00a651] hover:bg-green-700">Purchase</Button>
                   </td>
                 </tr>
-                <tr className="border-b bg-white hover:bg-gray-50">
-                  <td className="px-6 py-4">S-PLUS</td>
+                <tr className="border-b dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                  <td className="px-6 py-4 dark:text-white">S-PLUS</td>
                   <td className="px-6 py-4">
                     <span className="line-through text-red-500 mr-2">250₹</span>
-                    <span className="text-gray-900">100₹</span>
+                    <span className="text-gray-900 dark:text-white">100₹</span>
                   </td>
                   <td className="px-6 py-4">
                     <Button size="sm" className="bg-[#00a651] hover:bg-green-700">Purchase</Button>
                   </td>
                 </tr>
-                <tr className="bg-white hover:bg-gray-50">
-                  <td className="px-6 py-4">S-PRO</td>
+                <tr className="bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                  <td className="px-6 py-4 dark:text-white">S-PRO</td>
                   <td className="px-6 py-4">
                     <span className="line-through text-red-500 mr-2">400₹</span>
-                    <span className="text-gray-900">200₹</span>
+                    <span className="text-gray-900 dark:text-white">200₹</span>
                   </td>
                   <td className="px-6 py-4">
                     <Button size="sm" className="bg-[#00a651] hover:bg-green-700">Purchase</Button>
@@ -301,41 +304,41 @@ export default function Home() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h2 className="text-3xl font-bold text-[#00a651]">ট্রেন্ডিং কোর্স</h2>
-            <p className="text-gray-500 text-sm mt-1">সবচেয়ে জনপ্রিয় কোর্সগুলো ঘুরে দেখুন</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">সবচেয়ে জনপ্রিয় কোর্সগুলো ঘুরে দেখুন</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className="bg-[#00a651] text-white border-none hover:bg-[#00a651] cursor-pointer">All</Badge>
-            <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">SSC</Badge>
-            <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">HSC / Alim</Badge>
-            <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">Admission</Badge>
-            <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">Job Preparation</Badge>
-            <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">Medical</Badge>
+            <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">SSC</Badge>
+            <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">HSC / Alim</Badge>
+            <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">Admission</Badge>
+            <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">Job Preparation</Badge>
+            <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">Medical</Badge>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingCourses.map((course, idx) => (
-            <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border-none shadow-md">
+            <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border-none shadow-md dark:bg-slate-800">
               <div className="relative h-40 w-full">
                 <Image src={course.image} alt={course.title} fill className="object-cover" />
                 <Badge className="absolute top-2 right-2 bg-pink-500 hover:bg-pink-600 border-none text-[10px]">Popular</Badge>
               </div>
-              <CardContent className="p-4 bg-white">
-                <h3 className="font-bold text-gray-800 line-clamp-2 mb-2 min-h-[2.5rem] leading-tight text-sm">{course.title}</h3>
+              <CardContent className="p-4 bg-white dark:bg-slate-800">
+                <h3 className="font-bold text-gray-800 dark:text-white line-clamp-2 mb-2 min-h-[2.5rem] leading-tight text-sm">{course.title}</h3>
                 <div className="flex items-center gap-1 mb-2">
                   <div className="flex text-yellow-400">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className={`w-3 h-3 ${i < Math.floor(course.rating) ? 'fill-current' : ''}`} />
                     ))}
                   </div>
-                  <span className="text-[10px] text-gray-500">({course.reviews})</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400">({course.reviews})</span>
                 </div>
-                <div className="text-[11px] text-gray-500 mb-1 flex items-center gap-1 border-b border-gray-100 pb-2">
+                <div className="text-[11px] text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1 border-b border-gray-100 dark:border-slate-700 pb-2">
                   <Users className="w-3 h-3 text-[#00a651]" /> {course.students} Students
                 </div>
                 <div className="flex justify-between items-center mt-3">
                   <span className="font-bold text-[#00a651] text-sm">{course.price}</span>
-                  <Button size="sm" variant="outline" className="text-[10px] h-7 px-2 border-[#00a651] text-[#00a651] hover:bg-green-50 rounded-full">View Details</Button>
+                  <Button size="sm" variant="outline" className="text-[10px] h-7 px-2 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full">View Details</Button>
                 </div>
               </CardContent>
             </Card>
@@ -347,42 +350,42 @@ export default function Home() {
       </section>
 
       {/* Book Collection */}
-      <section className="py-12 md:py-20 bg-white border-t border-gray-100">
+      <section className="py-12 md:py-20 bg-white dark:bg-transparent border-t border-gray-100 dark:border-slate-800">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
               <h2 className="text-3xl font-bold text-[#00a651]">বই কালেকশন</h2>
-              <p className="text-gray-500 text-sm mt-1">আপনার প্রয়োজনীয় বইগুলো সংগ্রহ করুন</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">আপনার প্রয়োজনীয় বইগুলো সংগ্রহ করুন</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="bg-[#00a651] text-white border-none hover:bg-[#00a651] cursor-pointer">All</Badge>
-              <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">SSC</Badge>
-              <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">HSC / Alim</Badge>
-              <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">Admission</Badge>
-              <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">Job Preparation</Badge>
-              <Badge variant="outline" className="bg-[#e8f5e9] text-[#00a651] border-none hover:bg-green-200 cursor-pointer">Medical</Badge>
+              <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">SSC</Badge>
+              <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">HSC / Alim</Badge>
+              <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">Admission</Badge>
+              <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">Job Preparation</Badge>
+              <Badge variant="outline" className="bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] border-none hover:bg-green-200 dark:hover:bg-green-900/40 cursor-pointer">Medical</Badge>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {bookCollection.map((book, idx) => (
-              <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border-none shadow-md">
-                <div className="relative h-60 w-full bg-gray-50 p-4 flex items-center justify-center">
+              <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border-none shadow-md dark:bg-slate-800">
+                <div className="relative h-60 w-full bg-gray-50 dark:bg-slate-900 p-4 flex items-center justify-center">
                   <div className="relative w-full h-full shadow-lg rounded-sm overflow-hidden">
                      <Image src={book.image} alt={book.title} fill className="object-cover" />
                   </div>
                 </div>
-                <CardContent className="p-4 bg-white">
-                  <h3 className="font-bold text-gray-800 line-clamp-2 mb-2 min-h-[2.5rem] leading-tight text-sm">{book.title}</h3>
+                <CardContent className="p-4 bg-white dark:bg-slate-800">
+                  <h3 className="font-bold text-gray-800 dark:text-white line-clamp-2 mb-2 min-h-[2.5rem] leading-tight text-sm">{book.title}</h3>
                   <div className="flex items-center gap-1 mb-2">
                     <div className="flex text-yellow-400">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className={`w-3 h-3 ${i < Math.floor(book.rating) ? 'fill-current' : ''}`} />
                       ))}
                     </div>
-                    <span className="text-[10px] text-gray-500">({book.reviews})</span>
+                    <span className="text-[10px] text-gray-500 dark:text-gray-400">({book.reviews})</span>
                   </div>
-                  <p className="text-[11px] text-gray-500 mb-3 border-b border-gray-100 pb-2 flex items-center gap-1">
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-3 border-b border-gray-100 dark:border-slate-700 pb-2 flex items-center gap-1">
                     <Users className="w-3 h-3 text-[#00a651]" /> {book.author}
                   </p>
                   <div className="flex justify-between items-center mt-2">
@@ -390,7 +393,7 @@ export default function Home() {
                       <span className="line-through text-red-500 text-[10px]">{book.oldPrice}</span>
                       <span className="font-bold text-[#00a651] text-sm">{book.price}</span>
                     </div>
-                    <Button size="sm" variant="outline" className="text-[10px] h-7 px-2 border-[#00a651] text-[#00a651] hover:bg-green-50 rounded-full">View Details</Button>
+                    <Button size="sm" variant="outline" className="text-[10px] h-7 px-2 border-[#00a651] text-[#00a651] hover:bg-green-50 dark:hover:bg-green-900/20 rounded-full">View Details</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -404,8 +407,8 @@ export default function Home() {
 
       {/* Top Contributors */}
       <section className="py-12 md:py-20 container mx-auto px-4 max-w-6xl">
-        <div className="flex justify-between items-center mb-8 border-b border-gray-200 pb-4">
-          <div className="flex items-center gap-2 text-gray-600">
+        <div className="flex justify-between items-center mb-8 border-b border-gray-200 dark:border-slate-800 pb-4">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <span className="font-semibold text-sm">📅 May 30, 2024</span>
           </div>
           <Link href="#" className="text-blue-500 text-sm font-medium hover:underline flex items-center gap-1">
@@ -415,26 +418,26 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {topContributors.map((user, idx) => (
-            <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 shadow-sm">
+            <Card key={idx} className="overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 dark:border-slate-700 shadow-sm dark:bg-slate-800">
               <CardContent className="p-6 text-center">
                 <div className="relative w-20 h-20 mx-auto mb-4">
-                  <Image src={user.image} alt={user.name} fill className="object-cover rounded-full border-2 border-[#00a651] shadow-sm p-1" />
+                  <Image src={user.image} alt={user.name} fill className="object-cover rounded-full border-2 border-[#00a651] shadow-sm p-1 dark:border-teal-500" />
                 </div>
-                <h3 className="font-bold text-gray-800 text-sm truncate">{user.name}</h3>
-                <p className="text-[10px] text-gray-500 mb-4">{user.role}</p>
+                <h3 className="font-bold text-gray-800 dark:text-white text-sm truncate">{user.name}</h3>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-4">{user.role}</p>
                 
-                <div className="grid grid-cols-2 gap-2 text-[10px] text-left mb-4 bg-gray-50 p-2 rounded-md">
+                <div className="grid grid-cols-2 gap-2 text-[10px] text-left mb-4 bg-gray-50 dark:bg-slate-900 p-2 rounded-md">
                   <div className="flex flex-col gap-0.5 items-center">
                     <span className="text-gray-400">Questions</span>
-                    <span className="font-semibold text-gray-700">{user.questions}</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">{user.questions}</span>
                   </div>
-                  <div className="flex flex-col gap-0.5 items-center border-l border-gray-200">
+                  <div className="flex flex-col gap-0.5 items-center border-l border-gray-200 dark:border-slate-700">
                      <span className="text-gray-400">Answers</span>
-                    <span className="font-semibold text-gray-700">{user.answers}</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">{user.answers}</span>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-center gap-1.5 bg-[#e8f5e9] text-[#00a651] py-1.5 px-3 rounded-full text-xs font-semibold mx-auto w-max">
+                <div className="flex items-center justify-center gap-1.5 bg-[#e8f5e9] dark:bg-[#00a651]/10 text-[#00a651] py-1.5 px-3 rounded-full text-xs font-semibold mx-auto w-max">
                    <Star className="w-3 h-3 fill-current" /> {user.points} Points
                 </div>
               </CardContent>

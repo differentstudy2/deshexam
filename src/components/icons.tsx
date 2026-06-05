@@ -39,7 +39,7 @@ export const DeshExamLogo = () => (
       />
     </svg>
     <div className="font-extrabold text-2xl tracking-tighter flex items-center">
-        <span className="text-[#00a651]">DESH</span>
+        <span className="bg-gradient-to-r from-[#00a651] to-teal-400 bg-clip-text text-transparent drop-shadow-sm">DESH</span>
         <span className="ml-1 text-inherit">EXAM</span>
     </div>
   </div>
