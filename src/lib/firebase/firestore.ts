@@ -2349,3 +2349,35 @@ export const getKidsCategoryBySlug = async (slug: string) => {
         throw new Error("Failed to fetch category.");
     }
 }
+
+
+export const addQuestionToContent = async (contentId: string, questionData: any) => {
+    if (!contentId) throw new Error("Content ID required.");
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const dataToSave = cleanDataForFirebase({
+        ...questionData,
+        authorId: user?.uid || 'admin',
+        authorName: user?.displayName || user?.email || 'Admin',
+        createdAt: serverTimestamp(),
+    });
+    try {
+        const questionsRef = collection(db, `content/${contentId}/questions`);
+        const docRef = await addDoc(questionsRef, dataToSave);
+        return docRef.id;
+    } catch (e) {
+        console.error("Error adding question to content: ", e);
+        throw new Error("Failed to add question.");
+    }
+};
+
+export const deleteQuestionFromContent = async (contentId: string, questionId: string) => {
+    if (!contentId || !questionId) throw new Error("Content ID and Question ID required.");
+    try {
+        const questionRef = doc(db, `content/${contentId}/questions`, questionId);
+        await deleteDoc(questionRef);
+    } catch (e) {
+        console.error("Error deleting question from content: ", e);
+        throw new Error("Failed to delete question.");
+    }
+};
