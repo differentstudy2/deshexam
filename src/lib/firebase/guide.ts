@@ -143,6 +143,14 @@ export const deleteGuideReadingContent = async (id: string) => {
   await deleteDoc(doc(db, "guide_reading_content", id));
 };
 
+export const deleteGuideClass = async (id: string) => {
+  await deleteDoc(doc(db, "guide_classes", id));
+};
+
+export const deleteGuideTextbook = async (id: string) => {
+  await deleteDoc(doc(db, "guide_textbooks", id));
+};
+
 // --- NEW HIERARCHY FETCHERS ---
 
 export const getGuideStats = async () => {
@@ -168,33 +176,38 @@ export const getGuideStats = async () => {
 };
 
 export const getGuideClasses = async () => {
-  const q = query(collection(db, 'guide_classes'), orderBy('orderIndex', 'asc'));
+  const q = query(collection(db, 'guide_classes'));
   const snap = await getDocs(q);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getGuideSubjectsByClass = async (classId: string) => {
-  const q = query(collection(db, 'guide_subjects'), where('classId', '==', classId), orderBy('orderIndex', 'asc'));
+  const q = query(collection(db, 'guide_subjects'), where('classId', '==', classId));
   const snap = await getDocs(q);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getGuideTextbooksBySubject = async (subjectId: string) => {
-  const q = query(collection(db, 'guide_textbooks'), where('subjectId', '==', subjectId), orderBy('orderIndex', 'asc'));
+  const q = query(collection(db, 'guide_textbooks'), where('subjectId', '==', subjectId));
   const snap = await getDocs(q);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getGuideChaptersByTextbook = async (textbookId: string) => {
-  const q = query(collection(db, 'guide_chapters'), where('textbookId', '==', textbookId), orderBy('orderIndex', 'asc'));
+  const q = query(collection(db, 'guide_chapters'), where('textbookId', '==', textbookId));
   const snap = await getDocs(q);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getGuideTopicsByChapter = async (chapterId: string) => {
-  const q = query(collection(db, 'guide_topics'), where('chapterId', '==', chapterId), orderBy('orderIndex', 'asc'));
+  const q = query(collection(db, 'guide_topics'), where('chapterId', '==', chapterId));
   const snap = await getDocs(q);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getTopicSections = async (topicId: string) => {
@@ -229,6 +242,7 @@ export const createGuideClass = async (title: string) => {
   const docRef = await addDoc(collection(db, 'guide_classes'), {
     title,
     status: 'published',
+    orderIndex: Date.now(),
     createdAt: serverTimestamp()
   });
   return docRef.id;
@@ -239,6 +253,7 @@ export const createGuideSubject = async (classId: string, title: string) => {
     classId,
     title,
     status: 'published',
+    orderIndex: Date.now(),
     createdAt: serverTimestamp()
   });
   return docRef.id;
@@ -249,6 +264,7 @@ export const createGuideTextbook = async (subjectId: string, title: string) => {
     subjectId,
     title,
     status: 'published',
+    orderIndex: Date.now(),
     createdAt: serverTimestamp()
   });
   return docRef.id;
@@ -259,6 +275,7 @@ export const createGuideChapter = async (textbookId: string, title: string) => {
     textbookId,
     title,
     status: 'published',
+    orderIndex: Date.now(),
     createdAt: serverTimestamp()
   });
   return docRef.id;

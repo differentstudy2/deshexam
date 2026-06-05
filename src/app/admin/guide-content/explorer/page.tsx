@@ -3,12 +3,25 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
-  Plus, MoreVertical, Edit2, Loader2
+  Plus, MoreVertical, Edit2, Loader2, Trash2
 } from 'lucide-react';
 import Link from 'next/link';
-import { getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter } from '@/lib/firebase/guide';
+import { 
+  getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
+  createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter,
+  deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic
+} from '@/lib/firebase/guide';
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -22,7 +35,14 @@ const getIcon = (type: string) => {
   }
 };
 
-const TreeNode = ({ node, level = 0 }: { node: any; level?: number }) => {
+type TreeNodeProps = {
+  node: any;
+  level?: number;
+  onAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
+  onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
+};
+
+const TreeNode = ({ node, level = 0, onAddClick, onDeleteClick }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -60,30 +80,27 @@ const TreeNode = ({ node, level = 0 }: { node: any; level?: number }) => {
     }
   };
 
-  const handleAddChild = async (e: React.MouseEvent) => {
+  const handleAddChild = (e: React.MouseEvent) => {
     e.stopPropagation();
     let typeName = '';
     if (node.type === 'class') typeName = 'Subject';
     else if (node.type === 'subject') typeName = 'Textbook';
     else if (node.type === 'textbook') typeName = 'Chapter';
-    else return; // Topic creation is done via its own page
+    else return;
 
-    const title = window.prompt(`Enter title for the new ${typeName}:`);
-    if (!title || title.trim() === '') return;
-
-    try {
-      if (node.type === 'class') await createGuideSubject(node.id, title);
-      else if (node.type === 'subject') await createGuideTextbook(node.id, title);
-      else if (node.type === 'textbook') await createGuideChapter(node.id, title);
-      
-      // Force refresh by collapsing and expanding
+    onAddClick(node.id, node.type, typeName, () => {
+      // Force refresh of this node
       setExpanded(false);
       setChildren(null);
       setTimeout(() => handleToggle(), 100);
-    } catch (e) {
-      console.error(e);
-      alert('Failed to create node');
-    }
+    });
+  };
+
+  const handleDeleteChild = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteClick(node.id, node.type, node.name, () => {
+      // The parent will handle the refresh, or if root, the whole page refreshes
+    });
   };
 
   const hasChildren = node.type !== 'section';
@@ -131,9 +148,16 @@ const TreeNode = ({ node, level = 0 }: { node: any; level?: number }) => {
                 }
               </Button>
             ) : null}
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-slate-400 hover:text-slate-900">
-              <MoreVertical className="w-4 h-4" />
-            </Button>
+            {node.type !== 'section' && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                onClick={handleDeleteChild}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -142,7 +166,23 @@ const TreeNode = ({ node, level = 0 }: { node: any; level?: number }) => {
             {children.length === 0 ? (
               <div className="text-xs text-slate-400 italic py-2" style={{ paddingLeft: `${(level + 1) * 24 + 8}px` }}>No items found.</div>
             ) : (
-              children.map(child => <TreeNode key={child.id} node={child} level={level + 1} />)
+              children.map(child => (
+                <TreeNode 
+                  key={child.id} 
+                  node={child} 
+                  level={level + 1} 
+                  onAddClick={onAddClick} 
+                  onDeleteClick={(id, type, name, successCb) => {
+                    // Pass up but intercept the success callback to refresh THIS node's children
+                    onDeleteClick(id, type, name, () => {
+                      setExpanded(false);
+                      setChildren(null);
+                      setTimeout(() => handleToggle(), 100);
+                      successCb();
+                    });
+                  }} 
+                />
+              ))
             )}
           </div>
         )}
@@ -154,6 +194,15 @@ const TreeNode = ({ node, level = 0 }: { node: any; level?: number }) => {
 export default function ContentExplorer() {
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Add Dialog State
+  const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
+  const [titleInput, setTitleInput] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  // Delete Dialog State
+  const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
+  const [deleting, setDeleting] = useState(false);
 
   const fetchRoot = async () => {
     setLoading(true);
@@ -171,15 +220,56 @@ export default function ContentExplorer() {
     fetchRoot();
   }, []);
 
-      const handleAddClass = async () => {
-    const title = window.prompt("Enter title for the new Class:");
-    if (!title || title.trim() === '') return;
+  const handleOpenDialog = (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
+    setTitleInput('');
+    setDialogState({ isOpen: true, parentId, parentType, typeName, onSuccess });
+  };
+
+  const handleSaveDialog = async () => {
+    if (!titleInput.trim()) return;
+    setSaving(true);
     try {
-      await createGuideClass(title);
-      fetchRoot();
+      if (dialogState.parentType === 'root') await createGuideClass(titleInput);
+      else if (dialogState.parentType === 'class') await createGuideSubject(dialogState.parentId, titleInput);
+      else if (dialogState.parentType === 'subject') await createGuideTextbook(dialogState.parentId, titleInput);
+      else if (dialogState.parentType === 'textbook') await createGuideChapter(dialogState.parentId, titleInput);
+
+      dialogState.onSuccess();
+      setDialogState(prev => ({ ...prev, isOpen: false }));
     } catch (e) {
       console.error(e);
-      alert('Failed to create Class');
+      alert('Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleOpenDelete = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
+    setDeleteDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess });
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleting(true);
+    try {
+      const { nodeId, nodeType } = deleteDialog;
+      if (nodeType === 'class') await deleteGuideClass(nodeId);
+      else if (nodeType === 'subject') await deleteGuideSubject(nodeId);
+      else if (nodeType === 'textbook') await deleteGuideTextbook(nodeId);
+      else if (nodeType === 'chapter') await deleteGuideChapter(nodeId);
+      else if (nodeType === 'topic') await deleteGuideTopic(nodeId);
+
+      // If we deleted a class, we need to refresh root
+      if (nodeType === 'class') {
+        fetchRoot();
+      }
+
+      deleteDialog.onSuccess();
+      setDeleteDialog(prev => ({ ...prev, isOpen: false }));
+    } catch (e) {
+      console.error(e);
+      alert('Failed to delete item. It may have child items still associated.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -194,7 +284,7 @@ export default function ContentExplorer() {
           <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire 6-level curriculum tree.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleAddClass}>
+          <Button variant="outline" onClick={() => handleOpenDialog('root', 'root', 'Class', fetchRoot)}>
             <Plus className="w-4 h-4 mr-2" />
             Add Class
           </Button>
@@ -212,11 +302,64 @@ export default function ContentExplorer() {
             ) : classes.length === 0 ? (
               <div className="text-center py-8 text-slate-500">No classes found. Add some to get started!</div>
             ) : (
-              classes.map(c => <TreeNode key={c.id} node={c} />)
+              classes.map(c => <TreeNode key={c.id} node={c} onAddClick={handleOpenDialog} onDeleteClick={handleOpenDelete} />)
             )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Node Dialog */}
+      <Dialog open={dialogState.isOpen} onOpenChange={(open) => !open && setDialogState(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New {dialogState.typeName}</DialogTitle>
+            <DialogDescription>
+              Enter the title for the new {dialogState.typeName.toLowerCase()}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input 
+              value={titleInput}
+              onChange={(e) => setTitleInput(e.target.value)}
+              placeholder={`Enter ${dialogState.typeName.toLowerCase()} title...`}
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveDialog()}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogState(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button className="bg-[#107c41] hover:bg-[#0b5c30]" onClick={handleSaveDialog} disabled={saving || !titleInput.trim()}>
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Node Dialog */}
+      <Dialog open={deleteDialog.isOpen} onOpenChange={(open) => !open && setDeleteDialog(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete {deleteDialog.nodeType.charAt(0).toUpperCase() + deleteDialog.nodeType.slice(1)}</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <strong>{deleteDialog.nodeName}</strong>? This action cannot be undone. 
+              {deleteDialog.nodeType !== 'topic' && ' Any child items may become orphaned.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeleteDialog(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete} disabled={deleting}>
+              {deleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
