@@ -49,12 +49,20 @@ export default function SingleFAQPage() {
             
             {/* Top Bar / Breadcrumb */}
             <div className="bg-white border-b border-slate-200">
-                <div className="container mx-auto px-4 h-14 flex flex-col sm:flex-row sm:items-center justify-between text-sm">
-                    <div className="font-bold text-slate-800 text-[15px] pt-2 sm:pt-0">প্রশ্ন করুন</div>
-                    <div className="text-slate-500 font-medium pb-2 sm:pb-0 text-xs sm:text-sm">
-                        <Link href="/" className="hover:text-slate-800">হোম</Link> <span className="mx-1">›</span> 
-                        <Link href="/faq" className="hover:text-slate-800">প্রশ্ন করুন</Link> <span className="mx-1">›</span> 
-                        <span className="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-[300px] inline-block align-bottom">ফন্ট ও লেআউট কা...</span>
+                <div className="container mx-auto px-4 h-14 flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="font-bold text-slate-800 text-[15px]">প্রশ্ন করুন</div>
+                        <div className="w-[1px] h-4 bg-slate-200 hidden sm:block"></div>
+                        <div className="text-slate-500 font-medium text-[13px] hidden sm:block">
+                            <Link href="/" className="hover:text-slate-800">হোম</Link> <span className="mx-1.5 text-slate-300">›</span> 
+                            <Link href="/faq" className="hover:text-slate-800">প্রশ্ন করুন</Link> <span className="mx-1.5 text-slate-300">›</span> 
+                            <span className="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-[300px] inline-block align-bottom">ফন্ট ও লেআউট কা...</span>
+                        </div>
+                    </div>
+                    <div>
+                        <Link href="/faq" className="inline-flex items-center justify-center px-5 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 text-[13px] font-bold rounded transition-colors">
+                            পিছনে
+                        </Link>
                     </div>
                 </div>
             </div>
