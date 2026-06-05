@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
@@ -22,8 +23,8 @@ export default function GuideDetailsPage({ params }: { params: Promise<{ id: str
   const unwrappedParams = React.use(params);
   const pageType = getGuidePageType(unwrappedParams.id);
 
-  if (pageType === 'subject') {
-    return <SubjectDashboard id={unwrappedParams.id} />;
+  if (pageType === 'subject' || pageType === 'chapter') {
+    return <SubjectDashboard id={unwrappedParams.id} pageType={pageType} />;
   }
 
   return <ReadingLayout id={unwrappedParams.id} />;
@@ -32,8 +33,28 @@ export default function GuideDetailsPage({ params }: { params: Promise<{ id: str
 // ============================================================================
 // Layout A: Subject Dashboard (Curriculum Tree + Right Subjects Sidebar)
 // ============================================================================
-function SubjectDashboard({ id }: { id: string }) {
+function SubjectDashboard({ id, pageType }: { id: string; pageType: 'subject' | 'chapter' }) {
   const currentSubject = sidebarSubjects.find(s => s.id === id) || sidebarSubjects[0];
+  const chapterTitle = id.includes('গদ্য') ? 'গদ্য' : id.includes('কবিতা') ? 'কবিতা' : 'গদ্য';
+  const displayTitle = pageType === 'chapter' ? chapterTitle : currentSubject.title;
+
+  let treeData = curriculumData;
+  if (pageType === 'chapter') {
+    const chapter = curriculumData.find(c => c.id === id || (id.includes('গদ্য') && c.id === 'c1') || (id.includes('কবিতা') && c.id === 'c2'));
+    if (chapter) {
+      // Elevate topics to act as chapters, and subtopics to act as topics
+      treeData = chapter.topics.map(topic => ({
+        id: topic.id,
+        title: topic.title,
+        topics: topic.subtopics.map(sub => ({
+          id: sub.id,
+          title: sub.title,
+          type: 'topic',
+          subtopics: []
+        }))
+      })) as any;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
@@ -51,7 +72,19 @@ function SubjectDashboard({ id }: { id: string }) {
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="text-slate-800 dark:text-slate-200">{currentSubject.title}</span>
+              <Link href="/guide/sahitya-kanika" className="hover:text-emerald-600 transition-colors">সাহিত্য কণিকা</Link>
+              {pageType === 'chapter' && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
+                </>
+              )}
+              {pageType !== 'chapter' && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
+                </>
+              )}
             </div>
           </div>
           
@@ -86,7 +119,7 @@ function SubjectDashboard({ id }: { id: string }) {
             </div>
 
             <h2 className="text-[26px] font-bold text-[#1e293b] dark:text-slate-100 mb-1">
-              {currentSubject.title}
+              {displayTitle}
             </h2>
             <p className="text-[14px] text-[#5c7a6b] dark:text-emerald-200/70 mb-8">
               Class 8 Sahitya Kanika Guide
@@ -130,7 +163,7 @@ function SubjectDashboard({ id }: { id: string }) {
           </div>
 
           <div className="p-4 sm:p-6">
-            <CurriculumTree curriculum={curriculumData} />
+            <CurriculumTree curriculum={treeData} />
           </div>
         </div>
 
@@ -190,7 +223,18 @@ function ReadingLayout({ id }: { id: string }) {
         <ContentNavigationSidebar curriculum={curriculumData} activeId={id} />
 
         {/* Main Content Area */}
-        <ReadingArticle data={data} />
+        <div className="flex-1 min-w-0">
+          <ReadingArticle data={data} />
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-full xl:w-[320px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 xl:bg-slate-50 dark:xl:bg-[#020817] xl:h-[calc(100vh)] xl:sticky top-0 hidden xl:block">
+          <ScrollArea className="h-full w-full">
+            <div className="p-6">
+              <GuideSidebar subjects={sidebarSubjects} activeId="sahitya-kanika" />
+            </div>
+          </ScrollArea>
+        </div>
         
       </div>
     </div>
