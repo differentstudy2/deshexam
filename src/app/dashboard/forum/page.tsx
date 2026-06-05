@@ -3,6 +3,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Heart, 
   MessageSquare, 
@@ -14,7 +20,9 @@ import {
   ChevronRight,
   ChevronDown,
   TrendingUp,
-  Award
+  Award,
+  Bookmark,
+  Link as LinkIcon
 } from 'lucide-react';
 
 const posts = [
@@ -215,9 +223,23 @@ export default function ForumPage() {
                           <span className="text-[11px] font-medium text-slate-400">{post.time}</span>
                         </div>
                       </div>
-                      <button className="text-slate-400 hover:text-slate-600">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="text-slate-400 hover:text-slate-600 outline-none">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40 rounded-xl p-1.5 border-slate-200 dark:border-slate-800">
+                          <DropdownMenuItem className="cursor-pointer gap-2.5 py-2 px-3 text-slate-700 dark:text-slate-300 focus:bg-slate-50 dark:focus:bg-slate-800 rounded-lg transition-colors">
+                            <Bookmark className="w-4 h-4" />
+                            <span className="font-medium text-sm">Bookmark</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer gap-2.5 py-2 px-3 text-slate-700 dark:text-slate-300 focus:bg-slate-50 dark:focus:bg-slate-800 rounded-lg transition-colors">
+                            <LinkIcon className="w-4 h-4" />
+                            <span className="font-medium text-sm">Copy Link</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {/* Post Content */}
