@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ import {
 import Link from 'next/link';
 import { 
   getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
-  createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter,
+  createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
   deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
   updateGuideNodeTitle
 } from '@/lib/firebase/guide';
@@ -41,7 +42,7 @@ type TreeNodeProps = {
   node: any;
   level?: number;
   onAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
-  onEditClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
+  onEditClick: (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
   onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
 };
 
@@ -60,16 +61,16 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
         let fetchedChildren: any[] = [];
         if (node.type === 'class') {
           const res = (await getGuideSubjectsByClass(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published' }));
+          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published', author: r.author }));
         } else if (node.type === 'subject') {
           const res = (await getGuideTextbooksBySubject(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'textbook', status: r.status || 'published' }));
+          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'textbook', status: r.status || 'published', author: r.author }));
         } else if (node.type === 'textbook') {
           const res = (await getGuideChaptersByTextbook(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'chapter', status: r.status || 'published' }));
+          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'chapter', status: r.status || 'published', author: r.author }));
         } else if (node.type === 'chapter') {
           const res = (await getGuideTopicsByChapter(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'topic', status: r.status || 'published' }));
+          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'topic', status: r.status || 'published', author: r.author }));
         } else if (node.type === 'topic') {
           const res = (await getTopicSections(node.id)) as Record<string, any>;
           fetchedChildren = Object.keys(res).map(key => ({ id: key, name: key, type: 'section', status: 'published' }));
@@ -89,6 +90,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
     if (node.type === 'class') typeName = 'Subject';
     else if (node.type === 'subject') typeName = 'Textbook';
     else if (node.type === 'textbook') typeName = 'Chapter';
+    else if (node.type === 'chapter') typeName = 'Topic';
     else return;
 
     onAddClick(node.id, node.type, typeName, () => {
@@ -122,12 +124,14 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
               ) : <div className="w-4" />}
             </div>
             {getIcon(node.type)}
-            <span className="text-slate-700 dark:text-slate-200 text-sm">
-              {node.name}
-            </span>
-            {node.status === 'draft' && (
-              <span className="text-[10px] uppercase font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-sm ml-2">Draft</span>
-            )}
+            <div className="flex flex-col">
+              <span className="font-medium text-slate-800 dark:text-slate-200">
+                {node.name}
+              </span>
+              {node.author && (
+                <span className="text-xs text-slate-500 italic mt-0.5">Author: {node.author}</span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-1">
@@ -158,7 +162,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
                   variant="ghost" 
                   size="sm" 
                   className="h-7 w-7 p-0 text-blue-400 hover:text-blue-600 hover:bg-blue-50"
-                  onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, () => {}); }}
+                  onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, node.author, () => {}); }}
                 >
                   <Edit2 className="w-4 h-4" />
                 </Button>
@@ -186,8 +190,8 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
                   node={child} 
                   level={level + 1} 
                   onAddClick={onAddClick} 
-                  onEditClick={(id, type, name, successCb) => {
-                    onEditClick(id, type, name, () => {
+                  onEditClick={(id, type, name, author, successCb) => {
+                    onEditClick(id, type, name, author, () => {
                       setExpanded(false);
                       setChildren(null);
                       setTimeout(() => handleToggle(), 100);
@@ -214,17 +218,20 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
 };
 
 export default function ContentExplorer() {
+  const { toast } = useToast();
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Add Dialog State
   const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
   const [titleInput, setTitleInput] = useState('');
+  const [authorInput, setAuthorInput] = useState('');
   const [saving, setSaving] = useState(false);
 
   // Edit Dialog State
-  const [editDialog, setEditDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
+  const [editDialog, setEditDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', authorName: '', onSuccess: () => {} });
   const [editTitleInput, setEditTitleInput] = useState('');
+  const [editAuthorInput, setEditAuthorInput] = useState('');
   const [editing, setEditing] = useState(false);
 
   // Delete Dialog State
@@ -235,7 +242,7 @@ export default function ContentExplorer() {
     setLoading(true);
     try {
       const cls = (await getGuideClasses()) as any[];
-      setClasses(cls.map(c => ({ id: c.id, name: c.title || c.name || c.id, type: 'class', status: c.status || 'published' })));
+      setClasses(cls.map(c => ({ id: c.id, name: c.title || c.name || c.id, type: 'class', status: c.status || 'published', author: c.author })));
     } catch (e) {
       console.error(e);
     } finally {
@@ -249,6 +256,7 @@ export default function ContentExplorer() {
 
   const handleOpenDialog = (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
     setTitleInput('');
+    setAuthorInput('');
     setDialogState({ isOpen: true, parentId, parentType, typeName, onSuccess });
   };
 
@@ -262,37 +270,42 @@ export default function ContentExplorer() {
       } else if (dialogState.parentType === 'class') {
         for (const item of items) await createGuideSubject(dialogState.parentId, item);
       } else if (dialogState.parentType === 'subject') {
-        for (const item of items) await createGuideTextbook(dialogState.parentId, item);
+        for (const item of items) await createGuideTextbook(dialogState.parentId, item, authorInput);
       } else if (dialogState.parentType === 'textbook') {
-        for (const item of items) await createGuideChapter(dialogState.parentId, item);
+        for (const item of items) await createGuideChapter(dialogState.parentId, item, authorInput);
+      } else if (dialogState.parentType === 'chapter') {
+        for (const item of items) await createGuideTopic(dialogState.parentId, item, authorInput);
       }
 
       dialogState.onSuccess();
       setDialogState(prev => ({ ...prev, isOpen: false }));
+      toast({ title: "Success", description: "Created successfully!" });
     } catch (e) {
       console.error(e);
-      alert('Failed to save');
+      toast({ title: "Error", description: "Failed to save", variant: "destructive" });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleOpenEdit = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
+  const handleOpenEdit = (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => {
     setEditTitleInput(nodeName);
-    setEditDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess });
+    setEditAuthorInput(nodeAuthor || '');
+    setEditDialog({ isOpen: true, nodeId, nodeType, nodeName, authorName: nodeAuthor || '', onSuccess });
   };
 
   const handleSaveEdit = async () => {
     if (!editTitleInput.trim()) return;
     setEditing(true);
     try {
-      await updateGuideNodeTitle(editDialog.nodeId, editDialog.nodeType, editTitleInput);
+      await updateGuideNodeTitle(editDialog.nodeId, editDialog.nodeType, editTitleInput, editAuthorInput);
       if (editDialog.nodeType === 'class') fetchRoot();
       editDialog.onSuccess();
       setEditDialog(prev => ({ ...prev, isOpen: false }));
+      toast({ title: "Success", description: "Changes saved successfully!" });
     } catch (e) {
       console.error(e);
-      alert('Failed to edit title');
+      toast({ title: "Error", description: "Failed to edit item", variant: "destructive" });
     } finally {
       setEditing(false);
     }
@@ -319,9 +332,10 @@ export default function ContentExplorer() {
 
       deleteDialog.onSuccess();
       setDeleteDialog(prev => ({ ...prev, isOpen: false }));
+      toast({ title: "Success", description: "Deleted successfully!" });
     } catch (e) {
       console.error(e);
-      alert('Failed to delete item. It may have child items still associated.');
+      toast({ title: "Error", description: "Failed to delete item. It may have child items still associated.", variant: "destructive" });
     } finally {
       setDeleting(false);
     }
@@ -371,7 +385,7 @@ export default function ContentExplorer() {
               Enter the title for the new {dialogState.typeName.toLowerCase()}.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 space-y-4">
             <Textarea 
               value={titleInput}
               onChange={(e) => {
@@ -389,6 +403,16 @@ export default function ContentExplorer() {
               className="min-h-[60px] max-h-[300px] overflow-y-auto"
               autoFocus
             />
+            {['Textbook', 'Chapter', 'Topic'].includes(dialogState.typeName) && (
+              <Input
+                value={authorInput}
+                onChange={(e) => setAuthorInput(e.target.value)}
+                placeholder="Author (Optional)"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveDialog();
+                }}
+              />
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogState(prev => ({ ...prev, isOpen: false }))}>
@@ -433,7 +457,7 @@ export default function ContentExplorer() {
               Rename this {editDialog.nodeType}.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 space-y-4">
             <Input 
               value={editTitleInput}
               onChange={(e) => setEditTitleInput(e.target.value)}
@@ -441,19 +465,26 @@ export default function ContentExplorer() {
               onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
               autoFocus
             />
+            {['textbook', 'chapter', 'topic'].includes(editDialog.nodeType) && (
+              <Input
+                value={editAuthorInput}
+                onChange={(e) => setEditAuthorInput(e.target.value)}
+                placeholder="Author (Optional)"
+                onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+              />
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialog(prev => ({ ...prev, isOpen: false }))}>
               Cancel
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSaveEdit} disabled={editing || !editTitleInput.trim() || editTitleInput === editDialog.nodeName}>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSaveEdit} disabled={editing || !editTitleInput.trim()}>
               {editing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Save Changes
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

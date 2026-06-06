@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChevronLeft, Plus, Trash2, AlignLeft, ListOrdered, Box, Save, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from "@/hooks/use-toast";
 
 type BuilderSection = {
   id: string;
@@ -18,6 +19,7 @@ type BuilderSection = {
 };
 
 export default function ContentManagerPage() {
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const topicId = searchParams.get('topicId') || '';
   
@@ -69,7 +71,10 @@ export default function ContentManagerPage() {
   }, [topicId]);
 
   const handleSave = async () => {
-    if (!contentId || !title) return alert('Content ID and Title are required');
+    if (!contentId || !title) {
+      toast({ title: "Validation Error", description: "Content ID and Title are required", variant: "destructive" });
+      return;
+    }
     setSaving(true);
     
     // Map internal Builder sections back to ContentSection backend format
@@ -99,10 +104,10 @@ export default function ContentManagerPage() {
 
     try {
       await saveGuideReadingContent(contentId, dataToSave);
-      alert('Content saved successfully!');
+      toast({ title: "Success", description: "Content saved successfully!" });
     } catch (error) {
       console.error(error);
-      alert('Error saving content');
+      toast({ title: "Error", description: "Error saving content", variant: "destructive" });
     }
     setSaving(false);
   };

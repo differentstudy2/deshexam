@@ -13,9 +13,11 @@ import Link from 'next/link';
 import { getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreateTopicPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
 
   const [classes, setClasses] = useState<any[]>([]);
@@ -64,7 +66,11 @@ export default function CreateTopicPage() {
 
   const handleSave = async () => {
     if (!formData.name || !formData.chapterId) {
-      alert("Please fill out Topic Name and select a Chapter.");
+      toast({
+        title: "Missing Information",
+        description: "Please fill out Topic Name and select a Chapter.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -97,10 +103,18 @@ export default function CreateTopicPage() {
         });
       }
       
+      toast({
+        title: "Success",
+        description: "Topic created successfully!"
+      });
       router.push('/admin/guide-content/topic/' + newTopicId);
     } catch (error) {
       console.error(error);
-      alert("Failed to save topic");
+      toast({
+        title: "Error",
+        description: "Failed to save topic",
+        variant: "destructive"
+      });
     } finally {
       setSaving(false);
     }

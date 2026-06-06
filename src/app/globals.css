@@ -595,3 +595,13 @@ strong {
     left: 0px;
     top: 0px;
 }
+
+/* Tiptap Placeholder styles */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+

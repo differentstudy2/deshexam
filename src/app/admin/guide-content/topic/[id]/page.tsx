@@ -13,6 +13,7 @@ import { getTopicSections, saveTopicSections, updateTopicStatus } from '@/lib/fi
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import { useToast } from "@/hooks/use-toast";
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
   ssr: false,
@@ -39,6 +40,7 @@ const sectionTypes = [
 export default function TopicEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const topicId = resolvedParams.id;
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('lesson');
   const [contentMap, setContentMap] = useState<Record<string, any>>({});
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
@@ -62,9 +64,14 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
         const initial: Record<string, any> = {};
         sectionTypes.forEach(s => {
           if (sections[s.id]) {
-            initial[s.id] = sections[s.id].content || '';
+            let loadedContent = sections[s.id].content || '';
+            // Clean up any accidentally saved hardcoded placeholders from previous versions
+            if (loadedContent === '<p>Start typing here...</p>') {
+              loadedContent = '';
+            }
+            initial[s.id] = loadedContent;
           } else if (!['word_meaning', 'mcq', 'pdf', 'video'].includes(s.id)) {
-            initial[s.id] = '<p>Start typing here...</p>';
+            initial[s.id] = '';
           }
         });
         setContentMap(initial);
@@ -92,10 +99,17 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
       await saveTopicSections(topicId, formattedSections);
       await updateTopicStatus(topicId, status);
       
-      alert('Content saved successfully!');
+      toast({
+        title: "Success",
+        description: "Content saved successfully!",
+      });
     } catch (e) {
       console.error(e);
-      alert('Failed to save content');
+      toast({
+        title: "Error",
+        description: "Failed to save content",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
@@ -179,6 +193,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
               {!['word_meaning', 'mcq', 'pdf', 'video'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TiptapEditor 
+                    key={activeTab}
                     content={contentMap[activeTab] || ''} 
                     onChange={handleRichTextChange} 
                   />

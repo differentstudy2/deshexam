@@ -1,5 +1,7 @@
 'use client';
-
+import React from 'react';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase/client';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Heading from '@tiptap/extension-heading';
@@ -13,6 +15,7 @@ import Youtube from '@tiptap/extension-youtube';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
+import Placeholder from '@tiptap/extension-placeholder';
 
 import { 
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3, 
@@ -20,16 +23,66 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Loader2, UploadCloud, Link as LinkIcon } from 'lucide-react';
 
 interface TiptapEditorProps {
   content: string;
   onChange: (html: string) => void;
 }
 
+import { useToast } from "@/hooks/use-toast";
+
 const MenuBar = ({ editor }: { editor: any }) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = React.useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = React.useState(false);
+  const [imageUrlInput, setImageUrlInput] = React.useState('');
+  const [youtubeDialogOpen, setYoutubeDialogOpen] = React.useState(false);
+  const [youtubeUrlInput, setYoutubeUrlInput] = React.useState('');
+  const { toast } = useToast();
+
   if (!editor) {
     return null;
   }
+
+  const handleAddImageUrl = () => {
+    if (imageUrlInput.trim()) {
+      editor.chain().focus().setImage({ src: imageUrlInput.trim() }).run();
+      setImageUrlInput('');
+      setImageDialogOpen(false);
+    }
+  };
+
+  const handleAddYoutube = () => {
+    if (youtubeUrlInput.trim()) {
+      editor.commands.setYoutubeVideo({ src: youtubeUrlInput.trim() });
+      setYoutubeUrlInput('');
+      setYoutubeDialogOpen(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const storageRef = ref(storage, `guide-images/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      editor.chain().focus().setImage({ src: url }).run();
+      setImageDialogOpen(false);
+      toast({ title: "Image Uploaded", description: "Your image was successfully uploaded." });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({ title: "Upload Failed", description: "Failed to upload image.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <div className="flex flex-wrap gap-1 p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 rounded-t-md">
@@ -109,37 +162,101 @@ const MenuBar = ({ editor }: { editor: any }) => {
       >
         <Code className="h-4 w-4" />
       </Toggle>
+      
+      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 self-center" />
+      
+      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="sm" title="Add Image">
+            <ImageIcon className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Image</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Upload from computer</label>
+              <Button 
+                onClick={() => fileInputRef.current?.click()} 
+                disabled={uploading} 
+                variant="outline" 
+                className="w-full"
+              >
+                {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                {uploading ? 'Uploading...' : 'Choose File'}
+              </Button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleImageUpload} 
+                accept="image/*" 
+                className="hidden" 
+              />
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-slate-950 px-2 text-slate-500">Or paste URL</span>
+              </div>
+            </div>
 
-      <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1 my-auto" />
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Image URL</label>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="https://example.com/image.jpg" 
+                  value={imageUrlInput}
+                  onChange={(e) => setImageUrlInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddImageUrl();
+                  }}
+                />
+                <Button onClick={handleAddImageUrl} disabled={!imageUrlInput.trim()}>Add</Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => {
-          const url = window.prompt('Image URL');
-          if (url) {
-            editor.chain().focus().setImage({ src: url }).run();
-          }
-        }}
-      >
-        <ImageIcon className="h-4 w-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => {
-          const url = window.prompt('YouTube URL');
-          if (url) {
-            editor.commands.setYoutubeVideo({ src: url });
-          }
-        }}
-      >
-        <Video className="h-4 w-4" />
-      </Button>
+      <Dialog open={youtubeDialogOpen} onOpenChange={setYoutubeDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="sm" title="Add YouTube Video">
+            <Video className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add YouTube Video</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">YouTube URL</label>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="https://www.youtube.com/watch?v=..." 
+                  value={youtubeUrlInput}
+                  onChange={(e) => setYoutubeUrlInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddYoutube();
+                  }}
+                  autoFocus
+                />
+                <Button onClick={handleAddYoutube} disabled={!youtubeUrlInput.trim()}>Add</Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        title="Add Table"
       >
         <TableIcon className="h-4 w-4" />
       </Button>
@@ -161,7 +278,11 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
       Youtube,
       TextStyle,
       Color,
-      Highlight
+      Highlight,
+      Placeholder.configure({
+        placeholder: 'Start typing here...',
+        emptyEditorClass: 'is-editor-empty',
+      })
     ],
     content: content,
     onUpdate: ({ editor }) => {
@@ -169,7 +290,7 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm dark:prose-invert sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none min-h-[300px]',
+        class: 'prose prose-sm dark:prose-invert sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none min-h-[300px] max-h-[600px] overflow-y-auto',
       },
     },
   });
