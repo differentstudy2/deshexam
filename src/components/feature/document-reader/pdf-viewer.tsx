@@ -58,8 +58,11 @@ export function PdfViewer({ url }: PdfViewerProps) {
         const pdfjsLib = await loadPdfJs();
         if (cancelled) return;
 
+        // Proxy external URLs to avoid CORS errors with Firebase Storage
+        const fetchUrl = url.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(url)}` : url;
+
         const loadingTask = pdfjsLib.getDocument({
-          url,
+          url: fetchUrl,
           cMapUrl: CMAP_URL,
           cMapPacked: true,
         });
