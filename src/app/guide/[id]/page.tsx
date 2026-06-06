@@ -29,19 +29,26 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
     pageType = 'chapter';
   }
 
-  if (pageType === 'subject' || pageType === 'chapter') {
-    // Determine the subject ID to fetch curriculum for
-    // If it's a chapter, we ideally need to know its parent subject, but for now fallback to the first subject
-    const subjectId = pageType === 'subject' ? decodedId : (subjects[0]?.id || 'sahitya-kanika');
-    const curriculum = await getCurriculumBySubject(subjectId);
+  const hierarchy = await getTopicHierarchy(decodedId);
+  const finalSubjectId = hierarchy?.subjectId || subjects[0]?.id || 'sahitya-kanika';
 
-    return <SubjectDashboard id={decodedId} pageType={pageType as 'subject' | 'chapter'} subjects={subjects} curriculum={curriculum} />;
+  if (pageType === 'subject' || pageType === 'chapter') {
+    const curriculum = await getCurriculumBySubject(finalSubjectId);
+
+    return <SubjectDashboard 
+      id={decodedId} 
+      pageType={pageType as 'subject' | 'chapter'} 
+      subjects={subjects} 
+      curriculum={curriculum} 
+      boardTitle={hierarchy?.boardTitle || 'Board'}
+      classTitle={hierarchy?.classTitle || 'Class'}
+      subjectTitle={hierarchy?.subjectTitle || 'Subject'}
+      chapterTitle={hierarchy?.chapterTitle}
+    />;
   }
 
   // Reading Page
   const readingData = await getReadingContent(decodedId);
-  const hierarchy = await getTopicHierarchy(decodedId);
-  const finalSubjectId = hierarchy?.subjectId || subjects[0]?.id || 'sahitya-kanika';
   const fullCurriculum = await getCurriculumBySubject(finalSubjectId); // Fetch full curriculum
 
   // Isolate the curriculum just for the current textbook
@@ -49,9 +56,6 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
     ? fullCurriculum.filter(c => c.id === hierarchy.textbookId)
     : fullCurriculum;
 
-  // The sidebar needs to display the chapters for this textbook directly
-  // `ContentNavigationSidebar` expects `curriculum` array to be textbooks, so passing `textbookCurriculum` works
-  // But wait, the user wants the TOP to be the textbook name!
   const textbookTitleToDisplay = hierarchy?.textbookTitle || 'Textbook Content';
 
   return <ReadingLayout
@@ -59,6 +63,8 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
     data={readingData}
     subjects={subjects}
     curriculum={textbookCurriculum}
+    boardTitle={hierarchy?.boardTitle || 'Board'}
+    classTitle={hierarchy?.classTitle || 'Class'}
     subjectTitle={hierarchy?.subjectTitle || 'Subject Content'}
     textbookTitle={textbookTitleToDisplay}
     chapterTitle={hierarchy?.chapterTitle}
@@ -72,16 +78,22 @@ function SubjectDashboard({
   id,
   pageType,
   subjects,
-  curriculum
+  curriculum,
+  boardTitle,
+  classTitle,
+  subjectTitle,
+  chapterTitle
 }: {
   id: string;
   pageType: 'subject' | 'chapter';
   subjects: any[];
   curriculum: Chapter[];
+  boardTitle?: string;
+  classTitle?: string;
+  subjectTitle?: string;
+  chapterTitle?: string;
 }) {
-  const currentSubject = subjects.find(s => s.id === id) || subjects[0];
-  const chapterTitle = id.includes('গদ্য') ? 'গদ্য' : id.includes('কবিতা') ? 'কবিতা' : 'গদ্য';
-  const displayTitle = pageType === 'chapter' ? chapterTitle : currentSubject?.title || 'Subject';
+  const displayTitle = pageType === 'chapter' ? (chapterTitle || 'Chapter') : (subjectTitle || 'Subject');
 
   let treeData = curriculum;
   if (pageType === 'chapter') {
@@ -109,16 +121,34 @@ function SubjectDashboard({
           <div className="flex items-center gap-6">
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
 
-            <div className="hidden sm:flex items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
+            <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
               <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <Link href="/academy" className="hover:text-emerald-600 transition-colors">Academy</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <Link href="/guide/sahitya-kanika" className="hover:text-emerald-600 transition-colors">সাহিত্য কণিকা</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
+              {boardTitle && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
+                </>
+              )}
+              {classTitle && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{classTitle}</span>
+                </>
+              )}
+              {subjectTitle && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+                </>
+              )}
+              {pageType === 'chapter' && chapterTitle && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="text-slate-800 dark:text-slate-200">{chapterTitle}</span>
+                </>
+              )}
             </div>
           </div>
 
@@ -218,6 +248,8 @@ function ReadingLayout({
   data,
   subjects,
   curriculum,
+  boardTitle,
+  classTitle,
   subjectTitle,
   textbookTitle,
   chapterTitle
@@ -226,6 +258,8 @@ function ReadingLayout({
   data: any;
   subjects: any[];
   curriculum: Chapter[];
+  boardTitle: string;
+  classTitle: string;
   subjectTitle: string;
   textbookTitle: string;
   chapterTitle?: string;
@@ -249,9 +283,13 @@ function ReadingLayout({
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <Link href="/academy" className="hover:text-emerald-600 transition-colors">Academy</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
+              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{boardTitle}</span>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{classTitle}</span>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+              <ChevronRight className="w-3.5 h-3.5 mx-2" />
+              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{textbookTitle}</span>
               {chapterTitle && (
                 <>
                   <ChevronRight className="w-3.5 h-3.5 mx-2" />

@@ -197,23 +197,42 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
   }
 };
 
-export const getTopicHierarchy = async (topicId: string) => {
+export const getTopicHierarchy = async (nodeId: string) => {
   try {
     let chapterId: string | null = null;
     let textbookId: string | null = null;
     let subjectId: string | null = null;
+    let classId: string | null = null;
+    let boardId: string | null = null;
+    
     let textbookTitle: string = 'Textbook';
     let subjectTitle: string = 'Subject';
-
     let chapterTitle: string = 'Chapter';
+    let classTitle: string = 'Class';
+    let boardTitle: string = 'Board';
 
-    const topicDoc = await getDoc(doc(db, "guide_topics", topicId));
+    const topicDoc = await getDoc(doc(db, "guide_topics", nodeId));
     if (topicDoc.exists() && topicDoc.data().chapterId) {
       chapterId = topicDoc.data().chapterId;
     } else {
-      const chapterDoc = await getDoc(doc(db, "guide_chapters", topicId));
+      const chapterDoc = await getDoc(doc(db, "guide_chapters", nodeId));
       if (chapterDoc.exists()) {
-        chapterId = topicId;
+        chapterId = nodeId;
+      } else {
+        const textbookDoc = await getDoc(doc(db, "guide_textbooks", nodeId));
+        if (textbookDoc.exists()) {
+          textbookId = nodeId;
+        } else {
+          const subjectDoc = await getDoc(doc(db, "guide_subjects", nodeId));
+          if (subjectDoc.exists()) {
+            subjectId = nodeId;
+          } else {
+            const classDoc = await getDoc(doc(db, "guide_classes", nodeId));
+            if (classDoc.exists()) {
+              classId = nodeId;
+            }
+          }
+        }
       }
     }
 
@@ -221,26 +240,42 @@ export const getTopicHierarchy = async (topicId: string) => {
       const chapterDoc = await getDoc(doc(db, "guide_chapters", chapterId));
       if (chapterDoc.exists()) {
         chapterTitle = chapterDoc.data().title;
-        if (chapterDoc.data().textbookId) {
-          textbookId = chapterDoc.data().textbookId as string;
-          if (textbookId) {
-            const textbookDoc = await getDoc(doc(db, "guide_textbooks", textbookId));
-            if (textbookDoc.exists()) {
-              textbookTitle = textbookDoc.data().title;
-              subjectId = textbookDoc.data().subjectId as string;
-              
-              if (subjectId) {
-                 const subjectDoc = await getDoc(doc(db, "guide_subjects", subjectId));
-                 if (subjectDoc.exists()) {
-                   subjectTitle = subjectDoc.data().title;
-                 }
-              }
-            }
-          }
-        }
+        if (chapterDoc.data().textbookId) textbookId = chapterDoc.data().textbookId as string;
       }
     }
-    return { subjectId, subjectTitle, textbookId, textbookTitle, chapterId, chapterTitle };
+
+    if (textbookId) {
+      const textbookDoc = await getDoc(doc(db, "guide_textbooks", textbookId));
+      if (textbookDoc.exists()) {
+        textbookTitle = textbookDoc.data().title;
+        if (textbookDoc.data().subjectId) subjectId = textbookDoc.data().subjectId as string;
+      }
+    }
+
+    if (subjectId) {
+      const subjectDoc = await getDoc(doc(db, "guide_subjects", subjectId));
+      if (subjectDoc.exists()) {
+        subjectTitle = subjectDoc.data().title;
+        if (subjectDoc.data().classId) classId = subjectDoc.data().classId as string;
+      }
+    }
+
+    if (classId) {
+      const classDoc = await getDoc(doc(db, "guide_classes", classId));
+      if (classDoc.exists()) {
+        classTitle = classDoc.data().title;
+        if (classDoc.data().boardId) boardId = classDoc.data().boardId as string;
+      }
+    }
+
+    if (boardId) {
+      const boardDoc = await getDoc(doc(db, "guide_boards", boardId));
+      if (boardDoc.exists()) {
+        boardTitle = boardDoc.data().title;
+      }
+    }
+
+    return { boardId, boardTitle, classId, classTitle, subjectId, subjectTitle, textbookId, textbookTitle, chapterId, chapterTitle };
   } catch (error) {
     console.error("Error finding topic hierarchy:", error);
     return null;
@@ -288,6 +323,10 @@ export const deleteGuideClass = async (id: string) => {
   await deleteDoc(doc(db, "guide_classes", id));
 };
 
+export const deleteGuideBoard = async (id: string) => {
+  await deleteDoc(doc(db, "guide_boards", id));
+};
+
 export const deleteGuideTextbook = async (id: string) => {
   await deleteDoc(doc(db, "guide_textbooks", id));
 };
@@ -296,7 +335,8 @@ export const deleteGuideTextbook = async (id: string) => {
 
 export const getGuideStats = async () => {
   try {
-    const [classes, subjects, textbooks, chapters, topics] = await Promise.all([
+    const [boards, classes, subjects, textbooks, chapters, topics] = await Promise.all([
+      getCountFromServer(collection(db, 'guide_boards')),
       getCountFromServer(collection(db, 'guide_classes')),
       getCountFromServer(collection(db, 'guide_subjects')),
       getCountFromServer(collection(db, 'guide_textbooks')),
@@ -304,6 +344,7 @@ export const getGuideStats = async () => {
       getCountFromServer(collection(db, 'guide_topics'))
     ]);
     return {
+      boards: boards.data().count,
       classes: classes.data().count,
       subjects: subjects.data().count,
       textbooks: textbooks.data().count,
@@ -312,12 +353,26 @@ export const getGuideStats = async () => {
     };
   } catch (error) {
     console.error('Error fetching guide stats:', error);
-    return { classes: 0, subjects: 0, textbooks: 0, chapters: 0, topics: 0 };
+    return { boards: 0, classes: 0, subjects: 0, textbooks: 0, chapters: 0, topics: 0 };
   }
+};
+
+export const getGuideBoards = async () => {
+  const q = query(collection(db, 'guide_boards'));
+  const snap = await getDocs(q);
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
 export const getGuideClasses = async () => {
   const q = query(collection(db, 'guide_classes'));
+  const snap = await getDocs(q);
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+};
+
+export const getGuideClassesByBoard = async (boardId: string) => {
+  const q = query(collection(db, 'guide_classes'), where('boardId', '==', boardId));
   const snap = await getDocs(q);
   const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
   return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
@@ -380,7 +435,8 @@ export const updateTopicStatus = async (topicId: string, status: 'draft' | 'publ
 };
 
 export const updateGuideNodeTitle = async (nodeId: string, nodeType: string, newTitle: string, author?: string) => {
-  const collectionName = nodeType === 'class' ? 'guide_classes' :
+  const collectionName = nodeType === 'board' ? 'guide_boards' :
+                         nodeType === 'class' ? 'guide_classes' :
                          nodeType === 'subject' ? 'guide_subjects' :
                          nodeType === 'textbook' ? 'guide_textbooks' :
                          nodeType === 'chapter' ? 'guide_chapters' : 'guide_topics';
@@ -391,8 +447,19 @@ export const updateGuideNodeTitle = async (nodeId: string, nodeType: string, new
   await setDoc(doc(db, collectionName, nodeId), updateData, { merge: true });
 };
 
-export const createGuideClass = async (title: string) => {
+export const createGuideBoard = async (title: string) => {
+  const docRef = await addDoc(collection(db, 'guide_boards'), {
+    title,
+    status: 'published',
+    orderIndex: Date.now(),
+    createdAt: serverTimestamp()
+  });
+  return docRef.id;
+};
+
+export const createGuideClass = async (boardId: string, title: string) => {
   const docRef = await addDoc(collection(db, 'guide_classes'), {
+    boardId,
     title,
     status: 'published',
     orderIndex: Date.now(),

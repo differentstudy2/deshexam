@@ -20,14 +20,17 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
-  getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
-  createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
-  deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
+  getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
+  createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
+  deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
   updateGuideNodeTitle
 } from '@/lib/firebase/guide';
+import { db } from '@/lib/firebase/client';
+import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
 
 const getIcon = (type: string) => {
   switch (type) {
+    case 'board': return <FolderTree className="w-4 h-4 text-emerald-600" />;
     case 'class': return <GraduationCap className="w-4 h-4 text-blue-500" />;
     case 'subject': return <Library className="w-4 h-4 text-indigo-500" />;
     case 'textbook': return <BookOpen className="w-4 h-4 text-purple-500" />;
@@ -59,7 +62,10 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
       setLoading(true);
       try {
         let fetchedChildren: any[] = [];
-        if (node.type === 'class') {
+        if (node.type === 'board') {
+          const res = (await getGuideClassesByBoard(node.id)) as any[];
+          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'class', status: r.status || 'published', author: r.author }));
+        } else if (node.type === 'class') {
           const res = (await getGuideSubjectsByClass(node.id)) as any[];
           fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published', author: r.author }));
         } else if (node.type === 'subject') {
@@ -87,7 +93,8 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
   const handleAddChild = (e: React.MouseEvent) => {
     e.stopPropagation();
     let typeName = '';
-    if (node.type === 'class') typeName = 'Subject';
+    if (node.type === 'board') typeName = 'Class';
+    else if (node.type === 'class') typeName = 'Subject';
     else if (node.type === 'subject') typeName = 'Textbook';
     else if (node.type === 'textbook') typeName = 'Chapter';
     else if (node.type === 'chapter') typeName = 'Topic';
@@ -150,6 +157,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
                 onClick={node.type === 'chapter' ? () => window.location.href = `/admin/guide-content/topic/create?chapterId=${node.id}` : handleAddChild}
               >
                 <Plus className="w-3 h-3 mr-1" /> Add {
+                  node.type === 'board' ? 'Class' :
                   node.type === 'class' ? 'Subject' : 
                   node.type === 'subject' ? 'Textbook' : 
                   node.type === 'textbook' ? 'Chapter' : 'Topic'
@@ -241,8 +249,8 @@ export default function ContentExplorer() {
   const fetchRoot = async () => {
     setLoading(true);
     try {
-      const cls = (await getGuideClasses()) as any[];
-      setClasses(cls.map(c => ({ id: c.id, name: c.title || c.name || c.id, type: 'class', status: c.status || 'published', author: c.author })));
+      const cls = (await getGuideBoards()) as any[];
+      setClasses(cls.map(c => ({ id: c.id, name: c.title || c.name || c.id, type: 'board', status: c.status || 'published', author: c.author })));
     } catch (e) {
       console.error(e);
     } finally {
@@ -266,7 +274,9 @@ export default function ContentExplorer() {
     try {
       const items = titleInput.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
       if (dialogState.parentType === 'root') {
-        for (const item of items) await createGuideClass(item);
+        for (const item of items) await createGuideBoard(item);
+      } else if (dialogState.parentType === 'board') {
+        for (const item of items) await createGuideClass(dialogState.parentId, item);
       } else if (dialogState.parentType === 'class') {
         for (const item of items) await createGuideSubject(dialogState.parentId, item);
       } else if (dialogState.parentType === 'subject') {
@@ -319,14 +329,15 @@ export default function ContentExplorer() {
     setDeleting(true);
     try {
       const { nodeId, nodeType } = deleteDialog;
-      if (nodeType === 'class') await deleteGuideClass(nodeId);
+      if (nodeType === 'board') await deleteGuideBoard(nodeId);
+      else if (nodeType === 'class') await deleteGuideClass(nodeId);
       else if (nodeType === 'subject') await deleteGuideSubject(nodeId);
       else if (nodeType === 'textbook') await deleteGuideTextbook(nodeId);
       else if (nodeType === 'chapter') await deleteGuideChapter(nodeId);
       else if (nodeType === 'topic') await deleteGuideTopic(nodeId);
 
-      // If we deleted a class, we need to refresh root
-      if (nodeType === 'class') {
+      // If we deleted a root-level board, we need to refresh root
+      if (nodeType === 'board') {
         fetchRoot();
       }
 
@@ -341,6 +352,36 @@ export default function ContentExplorer() {
     }
   };
 
+  const handleMigrateClasses = async () => {
+    setLoading(true);
+    try {
+      const boardsSnap = await getDocs(query(collection(db, 'guide_boards')));
+      let boardId = '';
+      if (boardsSnap.empty) {
+        boardId = await createGuideBoard('National Curriculum');
+      } else {
+        boardId = boardsSnap.docs[0].id;
+      }
+
+      const classesSnap = await getDocs(query(collection(db, 'guide_classes')));
+      let migrated = 0;
+      for (const cls of classesSnap.docs) {
+        if (!cls.data().boardId) {
+          await setDoc(doc(db, 'guide_classes', cls.id), { boardId }, { merge: true });
+          migrated++;
+        }
+      }
+      
+      toast({ title: "Migration Complete", description: `Migrated ${migrated} classes to the board.` });
+      fetchRoot();
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Migration Failed", description: "See console for details.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -352,9 +393,12 @@ export default function ContentExplorer() {
           <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire 6-level curriculum tree.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => handleOpenDialog('root', 'root', 'Class', fetchRoot)}>
+          <Button variant="outline" onClick={handleMigrateClasses} className="border-orange-500 text-orange-600 hover:bg-orange-50">
+            Migrate Old Classes
+          </Button>
+          <Button variant="outline" onClick={() => handleOpenDialog('root', 'root', 'Board', fetchRoot)}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Class
+            Add Board
           </Button>
           <Button className="bg-[#107c41] hover:bg-[#0b5c30]" onClick={fetchRoot}>
             Refresh Tree
@@ -368,7 +412,7 @@ export default function ContentExplorer() {
             {loading ? (
               <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
             ) : classes.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">No classes found. Add some to get started!</div>
+              <div className="text-center py-8 text-slate-500">No boards found. Add some to get started!</div>
             ) : (
               classes.map(c => <TreeNode key={c.id} node={c} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} />)
             )}

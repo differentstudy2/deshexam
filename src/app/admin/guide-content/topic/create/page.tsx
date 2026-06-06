@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Save, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook } from '@/lib/firebase/guide';
+import { getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from "@/hooks/use-toast";
@@ -20,16 +20,18 @@ export default function CreateTopicPage() {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
 
+  const [boards, setBoards] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [textbooks, setTextbooks] = useState<any[]>([]);
   const [chapters, setChapters] = useState<any[]>([]);
 
   useEffect(() => {
-    getGuideClasses().then(setClasses);
+    getGuideBoards().then(setBoards);
   }, []);
 
   const [formData, setFormData] = useState({
+    boardId: '',
     classId: '',
     subjectId: '',
     textbookId: '',
@@ -48,6 +50,11 @@ export default function CreateTopicPage() {
 
   const handleSelectChange = async (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'boardId') {
+      getGuideClassesByBoard(value).then(setClasses);
+      setFormData(prev => ({ ...prev, classId: '', subjectId: '', textbookId: '', chapterId: '' }));
+      setSubjects([]); setTextbooks([]); setChapters([]);
+    }
     if (name === 'classId') {
       getGuideSubjectsByClass(value).then(setSubjects);
       setFormData(prev => ({ ...prev, subjectId: '', textbookId: '', chapterId: '' }));
@@ -83,9 +90,10 @@ export default function CreateTopicPage() {
         title: formData.name,
         slug: formData.slug,
         chapterId: formData.chapterId,
-        subjectId: formData.subjectId,
         textbookId: formData.textbookId,
+        subjectId: formData.subjectId,
         classId: formData.classId,
+        boardId: formData.boardId,
         status: formData.status,
         orderIndex: Number(formData.orderIndex),
         createdAt: serverTimestamp(),
@@ -159,10 +167,19 @@ export default function CreateTopicPage() {
           <CardDescription>Select where this topic belongs in the curriculum tree.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label>Board</Label>
+              <Select onValueChange={(val) => handleSelectChange('boardId', val)}>
+                <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
+                <SelectContent>
+                  {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.title || b.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label>Class</Label>
-              <Select onValueChange={(val) => handleSelectChange('classId', val)}>
+              <Select onValueChange={(val) => handleSelectChange('classId', val)} disabled={!formData.boardId}>
                 <SelectTrigger><SelectValue placeholder="Select Class" /></SelectTrigger>
                 <SelectContent>
                   {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.title || c.name}</SelectItem>)}
