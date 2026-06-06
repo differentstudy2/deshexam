@@ -145,7 +145,55 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
   }
 };
 
-// --- Write Functions for Admin Manager ---
+export const getTopicHierarchy = async (topicId: string) => {
+  try {
+    let chapterId: string | null = null;
+    let textbookId: string | null = null;
+    let subjectId: string | null = null;
+    let textbookTitle: string = 'Textbook';
+    let subjectTitle: string = 'Subject';
+
+    const topicDoc = await getDoc(doc(db, "guide_topics", topicId));
+    if (topicDoc.exists() && topicDoc.data().chapterId) {
+      chapterId = topicDoc.data().chapterId;
+    } else {
+      const chapterDoc = await getDoc(doc(db, "guide_chapters", topicId));
+      if (chapterDoc.exists()) {
+        chapterId = topicId;
+      }
+    }
+
+    if (chapterId) {
+      const chapterDoc = await getDoc(doc(db, "guide_chapters", chapterId));
+      if (chapterDoc.exists() && chapterDoc.data().textbookId) {
+        textbookId = chapterDoc.data().textbookId as string;
+        if (textbookId) {
+          const textbookDoc = await getDoc(doc(db, "guide_textbooks", textbookId));
+          if (textbookDoc.exists()) {
+            textbookTitle = textbookDoc.data().title;
+            subjectId = textbookDoc.data().subjectId as string;
+            
+            if (subjectId) {
+               const subjectDoc = await getDoc(doc(db, "guide_subjects", subjectId));
+               if (subjectDoc.exists()) {
+                 subjectTitle = subjectDoc.data().title;
+               }
+            }
+          }
+        }
+      }
+    }
+    return { subjectId, subjectTitle, textbookId, textbookTitle, chapterId };
+  } catch (error) {
+    console.error("Error finding topic hierarchy:", error);
+    return null;
+  }
+};
+
+export const getSubjectIdFromTopicId = async (topicId: string): Promise<string | null> => {
+  const hierarchy = await getTopicHierarchy(topicId);
+  return hierarchy ? hierarchy.subjectId : null;
+};
 
 export const saveGuideSubject = async (id: string, data: any) => {
   await setDoc(doc(db, "guide_subjects", id), data);

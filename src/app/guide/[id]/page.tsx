@@ -9,13 +9,13 @@ import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
-import { getGuideSubjects, getCurriculumBySubject, getReadingContent } from '@/lib/firebase/guide';
+import { getReadingContent, getCurriculumBySubject, getGuideSubjects, getSubjectIdFromTopicId, getTopicHierarchy } from '@/lib/firebase/guide';
 import { Chapter } from './guide-data';
 import Image from 'next/image';
 
 export default async function GuideDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const decodedId = decodeURIComponent(id);
+  const resolvedParams = await params;
+  const decodedId = decodeURIComponent(resolvedParams.id);
 
   // Fetch common data
   const subjects = await getGuideSubjects();
@@ -39,9 +39,28 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
 
   // Reading Page
   const readingData = await getReadingContent(decodedId);
-  const curriculum = await getCurriculumBySubject(subjects[0]?.id || 'sahitya-kanika'); // Fetch curriculum for left sidebar
+  const hierarchy = await getTopicHierarchy(decodedId);
+  const finalSubjectId = hierarchy?.subjectId || subjects[0]?.id || 'sahitya-kanika';
+  const fullCurriculum = await getCurriculumBySubject(finalSubjectId); // Fetch full curriculum
+  
+  // Isolate the curriculum just for the current textbook
+  const textbookCurriculum = hierarchy?.textbookId 
+    ? fullCurriculum.filter(c => c.id === hierarchy.textbookId)
+    : fullCurriculum;
 
-  return <ReadingLayout id={decodedId} data={readingData} subjects={subjects} curriculum={curriculum} />;
+  // The sidebar needs to display the chapters for this textbook directly
+  // `ContentNavigationSidebar` expects `curriculum` array to be textbooks, so passing `textbookCurriculum` works
+  // But wait, the user wants the TOP to be the textbook name!
+  const textbookTitleToDisplay = hierarchy?.textbookTitle || 'Textbook Content';
+
+  return <ReadingLayout 
+    id={decodedId} 
+    data={readingData} 
+    subjects={subjects} 
+    curriculum={textbookCurriculum} 
+    subjectTitle={hierarchy?.subjectTitle || 'Subject Content'}
+    textbookTitle={textbookTitleToDisplay}
+  />;
 }
 
 // ============================================================================
@@ -196,12 +215,16 @@ function ReadingLayout({
   id, 
   data, 
   subjects, 
-  curriculum 
+  curriculum,
+  subjectTitle,
+  textbookTitle
 }: { 
   id: string; 
   data: any; 
   subjects: any[]; 
   curriculum: Chapter[];
+  subjectTitle: string;
+  textbookTitle: string;
 }) {
   
   if (!data) {
@@ -224,9 +247,7 @@ function ReadingLayout({
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <Link href="/guide/sahitya-kanika" className="hover:text-emerald-600 transition-colors">সাহিত্য কণিকা</Link>
-              <ChevronRight className="w-3.5 h-3.5 mx-2" />
-              <span className="hover:text-emerald-600 transition-colors cursor-pointer">গদ্য</span>
+              <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <span className="text-slate-800 dark:text-slate-200">{data.title}</span>
             </div>
@@ -245,7 +266,7 @@ function ReadingLayout({
       <div className="max-w-[1600px] mx-auto flex items-start">
         
         {/* Left Navigation Sidebar */}
-        <ContentNavigationSidebar curriculum={curriculum} activeId={id} />
+        <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle} />
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
