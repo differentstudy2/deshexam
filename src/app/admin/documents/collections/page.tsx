@@ -24,7 +24,7 @@ export default function CollectionsPage() {
   useEffect(() => {
     Promise.all([
       getDocs(collection(db, 'document_collections')).then(s => s.docs.map(d => ({ id: d.id, ...d.data() }))),
-      getDocs(collection(db, 'documents')).then(s => s.docs.map(d => ({ id: d.id, ...d.data() }))),
+      getDocs(collection(db, 'guide_documents')).then(s => s.docs.map(d => ({ id: d.id, ...d.data() }))),
     ]).then(([cols, docs]) => {
       setCollections(cols);
       setAllDocs(docs);

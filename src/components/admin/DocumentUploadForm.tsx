@@ -45,6 +45,10 @@ export interface DocumentUploadFormProps {
   onSaved?: (docId: string, data: any) => void;
   /** Compact mode — hides curriculum fields when they're already known */
   compact?: boolean;
+  /** Initial data for editing */
+  initialData?: any;
+  /** Document ID for editing */
+  documentId?: string;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -99,7 +103,7 @@ function FileTypeIcon({ ext, size = 'md' }: { ext: string; size?: 'sm' | 'md' | 
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
-export function DocumentUploadForm({ topicId, onSaved, compact = false }: DocumentUploadFormProps) {
+export function DocumentUploadForm({ topicId, onSaved, compact = false, initialData, documentId }: DocumentUploadFormProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const thumbInputRef = useRef<HTMLInputElement>(null);
@@ -115,11 +119,11 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
   const [thumbPreview, setThumbPreview] = useState('');
 
   const [form, setForm] = useState<DocumentFormData>({
-    title: '', slug: '', shortDescription: '', description: '',
-    category: 'study_notes', language: 'bengali', pages: '',
-    version: '', author: '', tags: '', boardId: '', classId: '',
-    subjectId: '', textbookId: '', chapterId: '', topicId: topicId || '',
-    access: 'free', status: 'published', thumbnail: '',
+    title: initialData?.title || '', slug: initialData?.slug || '', shortDescription: initialData?.shortDescription || '', description: initialData?.description || '',
+    category: initialData?.category || 'study_notes', language: initialData?.language || 'bengali', pages: initialData?.pages?.toString() || '',
+    version: initialData?.version || '', author: initialData?.author || '', tags: initialData?.tags?.join(', ') || '', boardId: initialData?.boardId || '', classId: initialData?.classId || '',
+    subjectId: initialData?.subjectId || '', textbookId: initialData?.textbookId || '', chapterId: initialData?.chapterId || '', topicId: initialData?.topicId || topicId || '',
+    access: initialData?.access || 'free', status: initialData?.status || 'published', thumbnail: initialData?.thumbnail || '',
   });
 
   const update = (key: string, val: string) =>
@@ -158,7 +162,7 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
     setUploadProgress(0);
 
     try {
-      const newRef = doc(collection(db, 'documents'));
+      const newRef = documentId ? doc(db, 'guide_documents', documentId) : doc(collection(db, 'guide_documents'));
       const docId = newRef.id;
 
       let fileUrl = '';
@@ -171,11 +175,17 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
         fileType = getExt(file);
         fileSize = file.size;
         setIsUploading(false);
+      } else if (initialData?.fileUrl) {
+        fileUrl = initialData.fileUrl;
+        fileType = initialData.fileType || '';
+        fileSize = initialData.fileSize || 0;
       }
 
       let thumbnailUrl = form.thumbnail;
       if (thumbFile) {
         thumbnailUrl = await uploadFileToStorage(thumbFile, `documents/${docId}/thumbnail`);
+      } else if (!thumbnailUrl && initialData?.thumbnail) {
+        thumbnailUrl = initialData.thumbnail;
       }
 
       const effectiveTopicId = form.topicId || topicId || '';
@@ -193,12 +203,12 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
         pages: form.pages ? parseInt(form.pages) : null,
         tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         downloads: 0,
-        views: 0,
-        createdAt: new Date(),
+        views: initialData?.views || 0,
+        createdAt: initialData?.createdAt || new Date(),
         updatedAt: new Date(),
       };
 
-      await setDoc(newRef, payload);
+      await setDoc(newRef, payload, { merge: true });
       setSaved(true);
       toast({ title: '✅ Document uploaded!', description: 'It is now in the Document Library.' });
       onSaved?.(docId, payload);
@@ -231,7 +241,7 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
       <div className="space-y-3">
         <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Document File</Label>
         <input ref={fileInputRef} type="file" accept={ACCEPTED_TYPES} className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
-        {!file ? (
+        {!file && !initialData?.fileUrl ? (
           <div
             onDragOver={e => { e.preventDefault(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
@@ -253,10 +263,10 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
           </div>
         ) : (
           <div className="flex items-center gap-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
-            <FileTypeIcon ext={getExt(file)} size="md" />
+            <FileTypeIcon ext={file ? getExt(file) : initialData?.fileType || 'pdf'} size="md" />
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-slate-800 dark:text-slate-100 truncate">{file.name}</p>
-              <p className="text-sm text-slate-500 mt-0.5">{(file.size / (1024 * 1024)).toFixed(2)} MB · {getExt(file).toUpperCase()}</p>
+              <p className="font-bold text-slate-800 dark:text-slate-100 truncate">{file ? file.name : (initialData?.title + ' (Existing File)')}</p>
+              <p className="text-sm text-slate-500 mt-0.5">{file ? (file.size / (1024 * 1024)).toFixed(2) : ((initialData?.fileSize || 0) / (1024 * 1024)).toFixed(2)} MB · {file ? getExt(file).toUpperCase() : (initialData?.fileType || 'PDF').toUpperCase()}</p>
               {isUploading && (
                 <div className="mt-2">
                   <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -266,20 +276,30 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
                 </div>
               )}
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setFile(null)} className="text-red-400 hover:text-red-600 shrink-0">
-              <X className="w-5 h-5" />
-            </Button>
+              {file ? (
+                <Button variant="ghost" size="icon" onClick={() => setFile(null)} className="text-red-400 hover:text-red-600 shrink-0">
+                  <X className="w-5 h-5" />
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="shrink-0 text-amber-600 border-amber-200 hover:bg-amber-100">
+                  Replace File
+                </Button>
+              )}
           </div>
         )}
       </div>
 
       {/* Basic Info */}
-      <div className="grid grid-cols-1 gap-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2 md:col-span-1">
           <Label>Title *</Label>
           <Input value={form.title} onChange={e => update('title', e.target.value)} placeholder="e.g. The Wind Cap — Full Chapter Notes" className="dark:bg-slate-800" />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-1">
+          <Label>Slug *</Label>
+          <Input value={form.slug} onChange={e => update('slug', e.target.value)} placeholder="e.g. the-wind-cap-notes" className="dark:bg-slate-800" />
+        </div>
+        <div className="space-y-2 md:col-span-2">
           <Label>Short Description</Label>
           <Textarea value={form.shortDescription} onChange={e => update('shortDescription', e.target.value)} rows={2} placeholder="Brief description visible in listings..." className="dark:bg-slate-800 resize-none" />
         </div>
@@ -302,10 +322,10 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
       <div className="space-y-3">
         <Label>Cover Thumbnail</Label>
         <input ref={thumbInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbChange} />
-        {thumbPreview ? (
+        {thumbPreview || form.thumbnail ? (
           <div className="relative w-28 h-36 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group">
-            <img src={thumbPreview} alt="Cover" className="w-full h-full object-cover" />
-            <button onClick={() => { setThumbPreview(''); setThumbFile(null); }}
+            <img src={thumbPreview || form.thumbnail} alt="Cover" className="w-full h-full object-cover" />
+            <button onClick={() => { setThumbPreview(''); setThumbFile(null); setForm(prev => ({ ...prev, thumbnail: '' })); }}
               className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
               <X className="w-5 h-5" />
             </button>
@@ -384,7 +404,7 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false }: Docume
           {saving ? (
             <><Loader2 className="w-4 h-4 animate-spin" />{isUploading ? `Uploading ${Math.round(uploadProgress)}%` : 'Saving...'}</>
           ) : (
-            <><Save className="w-4 h-4" /> Upload & Publish</>
+            <><Save className="w-4 h-4" /> {documentId ? 'Save Changes' : 'Upload & Publish'}</>
           )}
         </Button>
         <Button variant="outline" onClick={() => handleSave('draft')} disabled={saving} className="gap-2">

@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Prevent optional 'canvas' module from causing server-side errors
+      config.externals = [...(config.externals || []), { canvas: 'canvas' }];
+    }
+    return config;
+  },
+
   images: {
     remotePatterns: [
       {

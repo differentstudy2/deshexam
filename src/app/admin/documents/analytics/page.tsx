@@ -24,7 +24,7 @@ export default function DocumentAnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getDocs(collection(db, 'documents'))
+    getDocs(collection(db, 'guide_documents'))
       .then(s => setDocs(s.docs.map(d => ({ id: d.id, ...d.data() }))))
       .catch(console.error)
       .finally(() => setLoading(false));

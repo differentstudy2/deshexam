@@ -52,7 +52,7 @@ export function TopicDocumentManager({ topicId }: TopicDocumentManagerProps) {
   const fetchAttached = async () => {
     setLoadingAttached(true);
     try {
-      const q = query(collection(db, 'documents'), where('topicIds', 'array-contains', topicId));
+      const q = query(collection(db, 'guide_documents'), where('topicIds', 'array-contains', topicId));
       const snap = await getDocs(q);
       setAttached(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (e) { console.error(e); }
@@ -63,7 +63,7 @@ export function TopicDocumentManager({ topicId }: TopicDocumentManagerProps) {
   const fetchAll = async () => {
     setLoadingAll(true);
     try {
-      const snap = await getDocs(collection(db, 'documents'));
+      const snap = await getDocs(collection(db, 'guide_documents'));
       setAllDocs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (e) { console.error(e); }
     finally { setLoadingAll(false); }
@@ -79,7 +79,7 @@ export function TopicDocumentManager({ topicId }: TopicDocumentManagerProps) {
   const attachDoc = async (document: any) => {
     try {
       const updatedTopicIds = [...(document.topicIds || []), topicId];
-      await updateDoc(doc(db, 'documents', document.id), {
+      await updateDoc(doc(db, 'guide_documents', document.id), {
         topicIds: updatedTopicIds,
         updatedAt: new Date(),
       });
@@ -95,7 +95,7 @@ export function TopicDocumentManager({ topicId }: TopicDocumentManagerProps) {
     if (!confirm(`Detach "${document.title}" from this topic?`)) return;
     try {
       const updatedTopicIds = (document.topicIds || []).filter((id: string) => id !== topicId);
-      await updateDoc(doc(db, 'documents', document.id), {
+      await updateDoc(doc(db, 'guide_documents', document.id), {
         topicIds: updatedTopicIds,
         updatedAt: new Date(),
       });

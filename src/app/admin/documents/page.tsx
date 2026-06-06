@@ -49,7 +49,7 @@ export default function AdminDocumentsPage() {
   const loadDocuments = async () => {
     setLoading(true);
     try {
-      const snap = await getDocs(collection(db, 'documents'));
+      const snap = await getDocs(collection(db, 'guide_documents'));
       setDocuments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     } catch (e) {
       console.error(e);
@@ -61,7 +61,7 @@ export default function AdminDocumentsPage() {
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
     try {
-      await deleteDoc(doc(db, 'documents', id));
+      await deleteDoc(doc(db, 'guide_documents', id));
       toast({ title: 'Deleted', description: `"${title}" was deleted.` });
       setDocuments(prev => prev.filter(d => d.id !== id));
     } catch (e: any) {
