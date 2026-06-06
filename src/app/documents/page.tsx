@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   FileText, Eye, Download, Bookmark, Search, SlidersHorizontal,
   Filter, X, ChevronLeft, ChevronRight, Plus, Minus, BookOpen,
   Lightbulb, HelpCircle, ScrollText, Star, BookMarked, Grid3X3,
-  List, LayoutGrid
+  List, LayoutGrid, BookOpenCheck
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -149,26 +150,51 @@ function PDFPreviewModal({ doc, onClose }: { doc: any; onClose: () => void }) {
 function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) {
   const [bookmarked, setBookmarked] = useState(false);
 
+  // Prefer slug-based URL; fall back to ID-based for docs without a slug
+  const docHref = doc.slug
+    ? `/documents/${doc.slug}`
+    : doc.id && !doc.id.startsWith('mock-')
+      ? `/documents/id/${doc.id}`
+      : null;
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 flex flex-col overflow-hidden group">
-      {/* Thumbnail */}
+      {/* Thumbnail — clicking navigates to document page */}
       <div className="relative bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 pt-5 pb-3 px-4 flex items-center justify-center">
-        {doc.thumbnail ? (
-          <img src={doc.thumbnail} alt={doc.title} className="w-14 h-16 object-cover rounded shadow" />
-        ) : (
-          <div className="relative">
-            {/* PDF icon */}
-            <div className="w-14 h-16 bg-red-500 rounded-lg flex flex-col overflow-hidden shadow-md">
-              <div className="bg-red-700 px-1.5 py-0.5 text-[8px] font-black text-white tracking-wider">PDF</div>
-              <div className="flex-1 p-1">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-0.5 bg-white/40 rounded mb-0.5" style={{ width: `${60 + i * 8}%` }} />
-                ))}
+        {docHref ? (
+          <Link href={docHref} className="block">
+            {doc.thumbnail ? (
+              <img src={doc.thumbnail} alt={doc.title} className="w-14 h-16 object-cover rounded shadow hover:opacity-90 transition-opacity" />
+            ) : (
+              <div className="relative">
+                <div className="w-14 h-16 bg-red-500 rounded-lg flex flex-col overflow-hidden shadow-md hover:bg-red-600 transition-colors">
+                  <div className="bg-red-700 px-1.5 py-0.5 text-[8px] font-black text-white tracking-wider">PDF</div>
+                  <div className="flex-1 p-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-0.5 bg-white/40 rounded mb-0.5" style={{ width: `${60 + i * 8}%` }} />
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-200 dark:bg-red-900 rounded-bl" />
               </div>
+            )}
+          </Link>
+        ) : (
+          doc.thumbnail ? (
+            <img src={doc.thumbnail} alt={doc.title} className="w-14 h-16 object-cover rounded shadow" />
+          ) : (
+            <div className="relative">
+              <div className="w-14 h-16 bg-red-500 rounded-lg flex flex-col overflow-hidden shadow-md">
+                <div className="bg-red-700 px-1.5 py-0.5 text-[8px] font-black text-white tracking-wider">PDF</div>
+                <div className="flex-1 p-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-0.5 bg-white/40 rounded mb-0.5" style={{ width: `${60 + i * 8}%` }} />
+                  ))}
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-200 dark:bg-red-900 rounded-bl" />
             </div>
-            {/* Folded corner */}
-            <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-200 dark:bg-red-900 rounded-bl" />
-          </div>
+          )
         )}
 
         {/* Bookmark btn */}
@@ -182,9 +208,18 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
 
       {/* Info */}
       <div className="p-3 flex flex-col flex-1">
-        <h3 className="text-[13px] font-bold text-slate-800 dark:text-slate-100 line-clamp-2 mb-2 leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
-          {doc.title}
-        </h3>
+        {/* Title — links to document page */}
+        {docHref ? (
+          <Link href={docHref}>
+            <h3 className="text-[13px] font-bold text-slate-800 dark:text-slate-100 line-clamp-2 mb-2 leading-snug hover:text-blue-700 dark:hover:text-blue-400 transition-colors cursor-pointer">
+              {doc.title}
+            </h3>
+          </Link>
+        ) : (
+          <h3 className="text-[13px] font-bold text-slate-800 dark:text-slate-100 line-clamp-2 mb-2 leading-snug">
+            {doc.title}
+          </h3>
+        )}
 
         <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-0.5 mb-3">
           <div className="flex items-center gap-1">
@@ -203,13 +238,23 @@ function DocCard({ doc, onPreview }: { doc: any; onPreview: (d: any) => void }) 
 
         {/* Actions */}
         <div className="mt-auto flex items-center justify-around border-t border-slate-100 dark:border-slate-800 pt-2.5 gap-1">
-          <button
-            onClick={() => onPreview(doc)}
-            className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
-          >
-            <Eye className="w-4 h-4" />
-            Preview
-          </button>
+          {docHref ? (
+            <Link
+              href={docHref}
+              className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              <BookOpenCheck className="w-4 h-4" />
+              Read
+            </Link>
+          ) : (
+            <button
+              onClick={() => onPreview(doc)}
+              className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-blue-600 transition-colors px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
+            >
+              <Eye className="w-4 h-4" />
+              Preview
+            </button>
+          )}
           <button
             className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-emerald-600 transition-colors px-2 py-1 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
             onClick={() => doc.url && window.open(doc.url, '_blank')}
