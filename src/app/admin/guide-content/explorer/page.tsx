@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,8 @@ import Link from 'next/link';
 import { 
   getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
   createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter,
-  deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic
+  deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
+  updateGuideNodeTitle
 } from '@/lib/firebase/guide';
 
 const getIcon = (type: string) => {
@@ -39,10 +41,11 @@ type TreeNodeProps = {
   node: any;
   level?: number;
   onAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
+  onEditClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
   onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
 };
 
-const TreeNode = ({ node, level = 0, onAddClick, onDeleteClick }: TreeNodeProps) => {
+const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -128,13 +131,14 @@ const TreeNode = ({ node, level = 0, onAddClick, onDeleteClick }: TreeNodeProps)
           </div>
 
           <div className="flex items-center gap-1">
-            {node.type === 'topic' ? (
+            {node.type === 'topic' || node.type === 'chapter' ? (
               <Link href={`/admin/guide-content/topic/${node.id}`}>
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100">
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100 mr-1">
                   <Edit2 className="w-3 h-3 mr-1" /> Edit Content
                 </Button>
               </Link>
-            ) : node.type !== 'section' ? (
+            ) : null}
+            {node.type !== 'section' && node.type !== 'topic' ? (
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -149,14 +153,24 @@ const TreeNode = ({ node, level = 0, onAddClick, onDeleteClick }: TreeNodeProps)
               </Button>
             ) : null}
             {node.type !== 'section' && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
-                onClick={handleDeleteChild}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0 text-blue-400 hover:text-blue-600 hover:bg-blue-50"
+                  onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, () => {}); }}
+                >
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                  onClick={handleDeleteChild}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -172,6 +186,14 @@ const TreeNode = ({ node, level = 0, onAddClick, onDeleteClick }: TreeNodeProps)
                   node={child} 
                   level={level + 1} 
                   onAddClick={onAddClick} 
+                  onEditClick={(id, type, name, successCb) => {
+                    onEditClick(id, type, name, () => {
+                      setExpanded(false);
+                      setChildren(null);
+                      setTimeout(() => handleToggle(), 100);
+                      successCb();
+                    });
+                  }} 
                   onDeleteClick={(id, type, name, successCb) => {
                     // Pass up but intercept the success callback to refresh THIS node's children
                     onDeleteClick(id, type, name, () => {
@@ -199,6 +221,11 @@ export default function ContentExplorer() {
   const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
   const [titleInput, setTitleInput] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Edit Dialog State
+  const [editDialog, setEditDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
+  const [editTitleInput, setEditTitleInput] = useState('');
+  const [editing, setEditing] = useState(false);
 
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
@@ -229,10 +256,16 @@ export default function ContentExplorer() {
     if (!titleInput.trim()) return;
     setSaving(true);
     try {
-      if (dialogState.parentType === 'root') await createGuideClass(titleInput);
-      else if (dialogState.parentType === 'class') await createGuideSubject(dialogState.parentId, titleInput);
-      else if (dialogState.parentType === 'subject') await createGuideTextbook(dialogState.parentId, titleInput);
-      else if (dialogState.parentType === 'textbook') await createGuideChapter(dialogState.parentId, titleInput);
+      const items = titleInput.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+      if (dialogState.parentType === 'root') {
+        for (const item of items) await createGuideClass(item);
+      } else if (dialogState.parentType === 'class') {
+        for (const item of items) await createGuideSubject(dialogState.parentId, item);
+      } else if (dialogState.parentType === 'subject') {
+        for (const item of items) await createGuideTextbook(dialogState.parentId, item);
+      } else if (dialogState.parentType === 'textbook') {
+        for (const item of items) await createGuideChapter(dialogState.parentId, item);
+      }
 
       dialogState.onSuccess();
       setDialogState(prev => ({ ...prev, isOpen: false }));
@@ -241,6 +274,27 @@ export default function ContentExplorer() {
       alert('Failed to save');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleOpenEdit = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
+    setEditTitleInput(nodeName);
+    setEditDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editTitleInput.trim()) return;
+    setEditing(true);
+    try {
+      await updateGuideNodeTitle(editDialog.nodeId, editDialog.nodeType, editTitleInput);
+      if (editDialog.nodeType === 'class') fetchRoot();
+      editDialog.onSuccess();
+      setEditDialog(prev => ({ ...prev, isOpen: false }));
+    } catch (e) {
+      console.error(e);
+      alert('Failed to edit title');
+    } finally {
+      setEditing(false);
     }
   };
 
@@ -302,7 +356,7 @@ export default function ContentExplorer() {
             ) : classes.length === 0 ? (
               <div className="text-center py-8 text-slate-500">No classes found. Add some to get started!</div>
             ) : (
-              classes.map(c => <TreeNode key={c.id} node={c} onAddClick={handleOpenDialog} onDeleteClick={handleOpenDelete} />)
+              classes.map(c => <TreeNode key={c.id} node={c} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} />)
             )}
           </div>
         </CardContent>
@@ -318,11 +372,21 @@ export default function ContentExplorer() {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Input 
+            <Textarea 
               value={titleInput}
-              onChange={(e) => setTitleInput(e.target.value)}
-              placeholder={`Enter ${dialogState.typeName.toLowerCase()} title...`}
-              onKeyDown={(e) => e.key === 'Enter' && handleSaveDialog()}
+              onChange={(e) => {
+                setTitleInput(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }}
+              placeholder={`Enter ${dialogState.typeName.toLowerCase()} title(s)...\nSeparate multiple items by comma or new line.`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSaveDialog();
+                }
+              }}
+              className="min-h-[60px] max-h-[300px] overflow-y-auto"
               autoFocus
             />
           </div>
@@ -355,6 +419,36 @@ export default function ContentExplorer() {
             <Button variant="destructive" onClick={handleConfirmDelete} disabled={deleting}>
               {deleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Node Dialog */}
+      <Dialog open={editDialog.isOpen} onOpenChange={(open) => !open && setEditDialog(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Title</DialogTitle>
+            <DialogDescription>
+              Rename this {editDialog.nodeType}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input 
+              value={editTitleInput}
+              onChange={(e) => setEditTitleInput(e.target.value)}
+              placeholder={`Enter new title...`}
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialog(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSaveEdit} disabled={editing || !editTitleInput.trim() || editTitleInput === editDialog.nodeName}>
+              {editing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Save Changes
             </Button>
           </DialogFooter>
         </DialogContent>

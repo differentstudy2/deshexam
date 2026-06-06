@@ -47,7 +47,10 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 "flex items-center justify-between py-3 px-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group border-b border-slate-100 dark:border-slate-800"
               )}
             >
-              <Link href={`/guide/${chapter.id}`} className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+              <div 
+                onClick={() => toggleChapter(chapter.id)} 
+                className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <ChevronsRight className={cn(
                   "w-5 h-5 text-emerald-500 transition-transform duration-200",
                   isChapterExpanded && "rotate-90"
@@ -55,7 +58,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                 <span className="font-semibold text-[17px] text-emerald-600 dark:text-emerald-400">
                   {chapter.title}
                 </span>
-              </Link>
+              </div>
               <div className="flex items-center gap-2">
                 <Button 
                   variant="ghost" 
@@ -92,15 +95,21 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                       <div 
                         className="flex items-center justify-between py-3 pl-8 pr-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-dashed border-slate-200 dark:border-slate-800 group"
                       >
-                        <Link 
-                          href={`/guide/${topic.id}`} 
-                          className="flex items-center gap-3 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-                        >
-                          <CircleDot className="w-4 h-4 text-slate-700 dark:text-slate-300" strokeWidth={3} />
-                          <span className="font-medium text-[16px] text-slate-700 dark:text-slate-200">
-                            {topic.title}
-                          </span>
-                        </Link>
+                        {(!topic.subtopics || topic.subtopics.length === 0) ? (
+                          <Link href={`/guide/${topic.id}`} className="flex items-center gap-3 flex-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                            <CircleDot className="w-4 h-4 text-emerald-500 dark:text-emerald-400" strokeWidth={3} />
+                            <span className="font-semibold text-[15px] text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400">
+                              {topic.title}
+                            </span>
+                          </Link>
+                        ) : (
+                          <div className="flex items-center gap-3 flex-1">
+                            <CircleDot className="w-4 h-4 text-slate-400 dark:text-slate-500" strokeWidth={3} />
+                            <span className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
+                              {topic.title}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex items-center transition-opacity">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>

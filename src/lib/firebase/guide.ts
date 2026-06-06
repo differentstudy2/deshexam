@@ -19,45 +19,74 @@ export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
 
 export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter[]> => {
   try {
-    // 1. Fetch Chapters for this subject
-    const chaptersQuery = query(
-      collection(db, "guide_chapters"), 
-      where("subjectId", "==", subjectId),
-      orderBy("orderIndex", "asc")
-    );
+    // New Hierarchy: Subject -> Textbooks -> Chapters -> Topics
+    
+    // 1. Fetch Textbooks for this subject
+    const textbooksQuery = query(collection(db, "guide_textbooks"), where("subjectId", "==", subjectId));
+    const textbooksSnap = await getDocs(textbooksQuery);
+    
+    if (textbooksSnap.empty) {
+      // Fallback for old mock structure (just in case)
+      const chaptersQuery = query(collection(db, "guide_chapters"), where("subjectId", "==", subjectId));
+      const chaptersSnap = await getDocs(chaptersQuery);
+      if (chaptersSnap.empty) return [];
+
+      const topicsQuery = query(collection(db, "guide_topics"), where("subjectId", "==", subjectId));
+      const topicsSnap = await getDocs(topicsQuery);
+      const topicsByChapterId: Record<string, any[]> = {};
+      topicsSnap.forEach(doc => {
+        const data = doc.data();
+        if (!topicsByChapterId[data.chapterId]) topicsByChapterId[data.chapterId] = [];
+        topicsByChapterId[data.chapterId].push({ id: doc.id, title: data.title, type: 'topic', subtopics: data.subtopics || [] });
+      });
+
+      return chaptersSnap.docs.map(doc => ({
+        id: doc.id,
+        title: doc.data().title,
+        topics: topicsByChapterId[doc.id] || []
+      }));
+    }
+
+    // 2. Fetch Chapters for these textbooks
+    const textbookIds = textbooksSnap.docs.map(doc => doc.id);
+    const chaptersQuery = query(collection(db, "guide_chapters"), where("textbookId", "in", textbookIds.length > 0 ? textbookIds : ['temp']));
     const chaptersSnap = await getDocs(chaptersQuery);
     
-    if (chaptersSnap.empty) return [];
-
-    // 2. Fetch Topics for these chapters
-    // For simplicity, we fetch all topics for this subject (we can filter by subjectId if we add it to topics, 
-    // or fetch by chunks of chapterIds if > 10). Let's fetch all guide_topics and filter in memory if small,
-    // or add subjectId to topics. Let's assume topics have subjectId.
-    const topicsQuery = query(
-      collection(db, "guide_topics"),
-      where("subjectId", "==", subjectId),
-      orderBy("orderIndex", "asc")
-    );
-    const topicsSnap = await getDocs(topicsQuery);
+    // 3. Fetch Topics for these chapters
+    const chapterIds = chaptersSnap.docs.map(doc => doc.id);
+    let topicsSnap = { docs: [] as any[] };
+    if (chapterIds.length > 0) {
+      // Note: Firestore 'in' query supports max 10 values, but for a typical subject, 
+      // we'll chunk it if it gets large. For now, fetch all topics and filter in-memory if needed.
+      const tQuery = query(collection(db, "guide_topics"));
+      topicsSnap = await getDocs(tQuery) as any;
+    }
 
     const topicsByChapterId: Record<string, any[]> = {};
-    topicsSnap.forEach(doc => {
+    topicsSnap.docs.forEach(doc => {
       const data = doc.data();
-      if (!topicsByChapterId[data.chapterId]) {
-        topicsByChapterId[data.chapterId] = [];
+      if (chapterIds.includes(data.chapterId)) {
+        if (!topicsByChapterId[data.chapterId]) topicsByChapterId[data.chapterId] = [];
+        topicsByChapterId[data.chapterId].push({ id: doc.id, title: data.title, type: 'topic' });
       }
-      topicsByChapterId[data.chapterId].push({
+    });
+
+    const chaptersByTextbookId: Record<string, any[]> = {};
+    chaptersSnap.docs.forEach(doc => {
+      const data = doc.data();
+      if (!chaptersByTextbookId[data.textbookId]) chaptersByTextbookId[data.textbookId] = [];
+      chaptersByTextbookId[data.textbookId].push({
         id: doc.id,
         title: data.title,
-        type: 'topic',
-        subtopics: data.subtopics || [],
+        type: 'chapter',
+        subtopics: topicsByChapterId[doc.id] || [] // Map Topics to Subtopics for the UI
       });
     });
 
-    const curriculum: Chapter[] = chaptersSnap.docs.map(doc => ({
+    const curriculum: Chapter[] = textbooksSnap.docs.map(doc => ({
       id: doc.id,
       title: doc.data().title,
-      topics: topicsByChapterId[doc.id] || []
+      topics: chaptersByTextbookId[doc.id] || [] // Map Chapters to Topics for the UI
     }));
 
     return curriculum;
@@ -69,8 +98,15 @@ export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter
 
 export const getReadingContent = async (contentId: string): Promise<ReadingContentData | null> => {
   try {
-    const topicDoc = await getDoc(doc(db, "guide_topics", contentId));
+    let topicDoc = await getDoc(doc(db, "guide_topics", contentId));
     let topicData = topicDoc.exists() ? topicDoc.data() : null;
+
+    if (!topicData || !topicData.title) {
+      const chapterDoc = await getDoc(doc(db, "guide_chapters", contentId));
+      if (chapterDoc.exists()) {
+        topicData = { ...topicData, ...chapterDoc.data() };
+      }
+    }
 
     const q = query(collection(db, "guide_topics", contentId, "content_sections"));
     const snap = await getDocs(q);
@@ -236,6 +272,14 @@ export const saveTopicSections = async (topicId: string, sections: Record<string
 export const updateTopicStatus = async (topicId: string, status: 'draft' | 'published') => {
   const docRef = doc(db, 'guide_topics', topicId);
   await setDoc(docRef, { status, updatedAt: serverTimestamp() }, { merge: true });
+};
+
+export const updateGuideNodeTitle = async (nodeId: string, nodeType: string, newTitle: string) => {
+  const collectionName = nodeType === 'class' ? 'guide_classes' :
+                         nodeType === 'subject' ? 'guide_subjects' :
+                         nodeType === 'textbook' ? 'guide_textbooks' :
+                         nodeType === 'chapter' ? 'guide_chapters' : 'guide_topics';
+  await setDoc(doc(db, collectionName, nodeId), { title: newTitle, updatedAt: serverTimestamp() }, { merge: true });
 };
 
 export const createGuideClass = async (title: string) => {

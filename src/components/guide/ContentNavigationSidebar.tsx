@@ -54,19 +54,32 @@ export function ContentNavigationSidebar({ curriculum, activeId }: ContentNaviga
                   return (
                     <div key={topic.id} className="flex flex-col border-b border-white dark:border-slate-900">
                       
-                      {/* Topic Row */}
-                      <Link href={`/guide/${topic.id}`}>
+                      {/* Topic Row (Chapter in DB layer) */}
+                      {(!topic.subtopics || topic.subtopics.length === 0) ? (
+                        <Link href={`/guide/${topic.id}`}>
+                          <div 
+                            className={cn(
+                              "px-4 py-2 text-[15.5px] transition-colors cursor-pointer",
+                              isTopicActive
+                                ? "bg-[#e2e8f0] dark:bg-slate-800 text-[#0ea5e9] dark:text-blue-400"
+                                : "bg-[#eaf5ef] dark:bg-emerald-900/20 text-slate-800 dark:text-slate-200 hover:bg-[#d1e8dc] dark:hover:bg-emerald-900/40"
+                            )}
+                          >
+                            {displayTitle}
+                          </div>
+                        </Link>
+                      ) : (
                         <div 
                           className={cn(
                             "px-4 py-2 text-[15.5px] transition-colors",
                             isTopicActive
                               ? "bg-[#e2e8f0] dark:bg-slate-800 text-[#0ea5e9] dark:text-blue-400"
-                              : "bg-[#eaf5ef] dark:bg-emerald-900/20 text-slate-800 dark:text-slate-200 hover:bg-[#d1e8dc] dark:hover:bg-emerald-900/40"
+                              : "bg-[#eaf5ef] dark:bg-emerald-900/20 text-slate-800 dark:text-slate-200"
                           )}
                         >
                           {displayTitle}
                         </div>
-                      </Link>
+                      )}
 
                       {/* Subtopics */}
                       <div className="flex flex-col">
