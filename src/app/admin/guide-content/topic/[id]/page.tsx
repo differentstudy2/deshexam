@@ -23,6 +23,7 @@ const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').the
 });
 
 import { TopicVideoManager } from '@/components/admin/TopicVideoManager';
+import { TopicDocumentManager } from '@/components/admin/TopicDocumentManager';
 
 const sectionTypes = [
   { id: 'lesson', label: 'Read Lesson', icon: BookOpen },
@@ -258,7 +259,11 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                 <div className="animate-in fade-in duration-300">
                   <TopicVideoManager topicId={topicId} />
                 </div>
-              ) : !['word_meaning', 'mcq', 'pdf', 'audio'].includes(activeTab) ? (
+              ) : activeTab === 'pdf' ? (
+                <div className="animate-in fade-in duration-300">
+                  <TopicDocumentManager topicId={topicId} />
+                </div>
+              ) : !['word_meaning', 'mcq', 'audio'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TiptapEditor 
                     key={activeTab}
