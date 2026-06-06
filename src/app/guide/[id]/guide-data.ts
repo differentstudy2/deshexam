@@ -154,9 +154,9 @@ export type ContentAuthor = {
 };
 
 export type ContentSection =
-  | { type: 'article'; title: string; body: string; author: ContentAuthor; badges?: string[] }
-  | { type: 'mcq'; title: string; questions: { q: string; options: string[]; correctIdx: number }[]; author: ContentAuthor }
-  | { type: 'subtopic'; title: string; content: { word?: string; meaning?: string; text?: string }[]; author: ContentAuthor };
+  | { id?: string; type: 'article'; title: string; body: string; author: ContentAuthor; badges?: string[] }
+  | { id?: string; type: 'mcq'; title: string; questions: { q: string; options: string[]; correctIdx: number }[]; author: ContentAuthor }
+  | { id?: string; type: 'subtopic'; title: string; content: { word?: string; meaning?: string; text?: string }[]; author: ContentAuthor };
 
 export type ReadingContentData = {
   id: string;

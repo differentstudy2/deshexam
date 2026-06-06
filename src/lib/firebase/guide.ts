@@ -108,12 +108,56 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       }
     }
 
+    const SECTION_ORDER = [
+      'lesson',
+      'guide_content',
+      'word_meaning',
+      'objective',
+      'introduction',
+      'author',
+      'explanation',
+      'exercise',
+      'mcq',
+      'creative_question',
+      'short_question',
+      'model_test',
+      'pdf',
+      'video',
+      'q_a',
+      'cq',
+      'board_question',
+      'video_classes'
+    ];
+
+    const SECTION_LABELS: Record<string, string> = {
+      'lesson': 'Read Lesson',
+      'guide_content': 'Guide Content',
+      'word_meaning': 'Word Meaning',
+      'objective': 'Objective',
+      'introduction': 'Introduction',
+      'author': 'Author',
+      'explanation': 'Explanation',
+      'exercise': 'Exercise',
+      'mcq': 'MCQ',
+      'creative_question': 'Creative Question',
+      'short_question': 'Short Question',
+      'model_test': 'Model Test',
+      'pdf': 'PDF',
+      'video': 'Video',
+      'q_a': 'Q/A',
+      'cq': 'CQ',
+      'board_question': 'Board Question',
+      'video_classes': 'Video Classes'
+    };
+
     const q = query(collection(db, "guide_topics", contentId, "content_sections"));
     const snap = await getDocs(q);
     const sections: any[] = [];
     snap.forEach(d => {
+      const sectionType = d.data().sectionType || d.id;
       sections.push({
-        title: d.data().sectionType || d.id,
+        id: d.id, // keep id for sorting
+        title: SECTION_LABELS[sectionType] || sectionType,
         type: 'article',
         body: d.data().content,
         author: {
@@ -121,6 +165,14 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
           avatarUrl: 'https://i.pravatar.cc/150?u=sattar'
         }
       });
+    });
+
+    sections.sort((a, b) => {
+      const aIndex = SECTION_ORDER.indexOf(a.id);
+      const bIndex = SECTION_ORDER.indexOf(b.id);
+      const aPos = aIndex === -1 ? 999 : aIndex;
+      const bPos = bIndex === -1 ? 999 : bIndex;
+      return aPos - bPos;
     });
 
     if (topicData) {
@@ -153,6 +205,8 @@ export const getTopicHierarchy = async (topicId: string) => {
     let textbookTitle: string = 'Textbook';
     let subjectTitle: string = 'Subject';
 
+    let chapterTitle: string = 'Chapter';
+
     const topicDoc = await getDoc(doc(db, "guide_topics", topicId));
     if (topicDoc.exists() && topicDoc.data().chapterId) {
       chapterId = topicDoc.data().chapterId;
@@ -165,25 +219,28 @@ export const getTopicHierarchy = async (topicId: string) => {
 
     if (chapterId) {
       const chapterDoc = await getDoc(doc(db, "guide_chapters", chapterId));
-      if (chapterDoc.exists() && chapterDoc.data().textbookId) {
-        textbookId = chapterDoc.data().textbookId as string;
-        if (textbookId) {
-          const textbookDoc = await getDoc(doc(db, "guide_textbooks", textbookId));
-          if (textbookDoc.exists()) {
-            textbookTitle = textbookDoc.data().title;
-            subjectId = textbookDoc.data().subjectId as string;
-            
-            if (subjectId) {
-               const subjectDoc = await getDoc(doc(db, "guide_subjects", subjectId));
-               if (subjectDoc.exists()) {
-                 subjectTitle = subjectDoc.data().title;
-               }
+      if (chapterDoc.exists()) {
+        chapterTitle = chapterDoc.data().title;
+        if (chapterDoc.data().textbookId) {
+          textbookId = chapterDoc.data().textbookId as string;
+          if (textbookId) {
+            const textbookDoc = await getDoc(doc(db, "guide_textbooks", textbookId));
+            if (textbookDoc.exists()) {
+              textbookTitle = textbookDoc.data().title;
+              subjectId = textbookDoc.data().subjectId as string;
+              
+              if (subjectId) {
+                 const subjectDoc = await getDoc(doc(db, "guide_subjects", subjectId));
+                 if (subjectDoc.exists()) {
+                   subjectTitle = subjectDoc.data().title;
+                 }
+              }
             }
           }
         }
       }
     }
-    return { subjectId, subjectTitle, textbookId, textbookTitle, chapterId };
+    return { subjectId, subjectTitle, textbookId, textbookTitle, chapterId, chapterTitle };
   } catch (error) {
     console.error("Error finding topic hierarchy:", error);
     return null;

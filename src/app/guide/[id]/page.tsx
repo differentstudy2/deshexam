@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CurriculumTree } from '@/components/guide/CurriculumTree';
 import { GuideSidebar } from '@/components/guide/GuideSidebar';
+import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
 import { getReadingContent, getCurriculumBySubject, getGuideSubjects, getSubjectIdFromTopicId, getTopicHierarchy } from '@/lib/firebase/guide';
@@ -19,7 +20,7 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
 
   // Fetch common data
   const subjects = await getGuideSubjects();
-  
+
   // Dynamic page type detection
   let pageType = 'reading';
   if (subjects.some(s => s.id === decodedId)) {
@@ -33,7 +34,7 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
     // If it's a chapter, we ideally need to know its parent subject, but for now fallback to the first subject
     const subjectId = pageType === 'subject' ? decodedId : (subjects[0]?.id || 'sahitya-kanika');
     const curriculum = await getCurriculumBySubject(subjectId);
-    
+
     return <SubjectDashboard id={decodedId} pageType={pageType as 'subject' | 'chapter'} subjects={subjects} curriculum={curriculum} />;
   }
 
@@ -42,9 +43,9 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
   const hierarchy = await getTopicHierarchy(decodedId);
   const finalSubjectId = hierarchy?.subjectId || subjects[0]?.id || 'sahitya-kanika';
   const fullCurriculum = await getCurriculumBySubject(finalSubjectId); // Fetch full curriculum
-  
+
   // Isolate the curriculum just for the current textbook
-  const textbookCurriculum = hierarchy?.textbookId 
+  const textbookCurriculum = hierarchy?.textbookId
     ? fullCurriculum.filter(c => c.id === hierarchy.textbookId)
     : fullCurriculum;
 
@@ -53,28 +54,29 @@ export default async function GuideDetailsPage({ params }: { params: Promise<{ i
   // But wait, the user wants the TOP to be the textbook name!
   const textbookTitleToDisplay = hierarchy?.textbookTitle || 'Textbook Content';
 
-  return <ReadingLayout 
-    id={decodedId} 
-    data={readingData} 
-    subjects={subjects} 
-    curriculum={textbookCurriculum} 
+  return <ReadingLayout
+    id={decodedId}
+    data={readingData}
+    subjects={subjects}
+    curriculum={textbookCurriculum}
     subjectTitle={hierarchy?.subjectTitle || 'Subject Content'}
     textbookTitle={textbookTitleToDisplay}
+    chapterTitle={hierarchy?.chapterTitle}
   />;
 }
 
 // ============================================================================
 // Layout A: Subject Dashboard (Curriculum Tree + Right Subjects Sidebar)
 // ============================================================================
-function SubjectDashboard({ 
-  id, 
-  pageType, 
-  subjects, 
-  curriculum 
-}: { 
-  id: string; 
-  pageType: 'subject' | 'chapter'; 
-  subjects: any[]; 
+function SubjectDashboard({
+  id,
+  pageType,
+  subjects,
+  curriculum
+}: {
+  id: string;
+  pageType: 'subject' | 'chapter';
+  subjects: any[];
   curriculum: Chapter[];
 }) {
   const currentSubject = subjects.find(s => s.id === id) || subjects[0];
@@ -100,13 +102,13 @@ function SubjectDashboard({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
-      
+
       {/* Top Header Bar (White) */}
       <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
-            
+
             <div className="hidden sm:flex items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
               <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
@@ -119,9 +121,9 @@ function SubjectDashboard({
               <span className="text-slate-800 dark:text-slate-200">{displayTitle}</span>
             </div>
           </div>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             className="h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
           >
             Back
@@ -131,10 +133,10 @@ function SubjectDashboard({
 
       {/* Main Layout Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-6 items-start">
-        
+
         {/* Left Column (Main Content) */}
         <div className="flex-1 w-full flex flex-col bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-          
+
           {/* Green Header Box */}
           <div className="bg-[#dcefe2] dark:bg-emerald-900/20 px-6 py-5 relative">
             <div className="absolute top-5 right-5 flex items-center gap-3 text-[#589d76] dark:text-emerald-500">
@@ -169,9 +171,9 @@ function SubjectDashboard({
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-slate-400" />
             </div>
-            <Input 
-              type="text" 
-              placeholder="Search" 
+            <Input
+              type="text"
+              placeholder="Search"
               className="pl-14 h-14 bg-transparent border-none focus-visible:ring-0 w-full text-base placeholder:text-slate-400 placeholder:font-medium font-medium text-slate-700"
             />
           </div>
@@ -184,11 +186,11 @@ function SubjectDashboard({
               <Play className="w-3 h-3 fill-current" /> Practice
             </button>
             <div className="ml-auto">
-              <Image 
-                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" 
-                alt="Get it on Google Play" 
-                width={110} 
-                height={32} 
+              <Image
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+                width={110}
+                height={32}
                 className="h-8 w-auto cursor-pointer"
               />
             </div>
@@ -211,35 +213,37 @@ function SubjectDashboard({
 // ============================================================================
 // Layout B: Reading Content (Left Nav Sidebar + Reading Area)
 // ============================================================================
-function ReadingLayout({ 
-  id, 
-  data, 
-  subjects, 
+function ReadingLayout({
+  id,
+  data,
+  subjects,
   curriculum,
   subjectTitle,
-  textbookTitle
-}: { 
-  id: string; 
-  data: any; 
-  subjects: any[]; 
+  textbookTitle,
+  chapterTitle
+}: {
+  id: string;
+  data: any;
+  subjects: any[];
   curriculum: Chapter[];
   subjectTitle: string;
   textbookTitle: string;
+  chapterTitle?: string;
 }) {
-  
+
   if (!data) {
     return <div className="p-20 text-center text-xl text-slate-500">Content not found!</div>;
   }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
-      
+
       {/* Top Header Bar (White) */}
       <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
-            
+
             <div className="hidden sm:flex flex-wrap items-center text-[13px] text-slate-500 dark:text-slate-400 font-medium border-l border-slate-200 dark:border-slate-800 pl-6">
               <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
@@ -248,13 +252,19 @@ function ReadingLayout({
               <Link href="/guide" className="hover:text-emerald-600 transition-colors">অষ্টম শ্রেণি</Link>
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <span className="hover:text-emerald-600 transition-colors cursor-pointer">{subjectTitle}</span>
+              {chapterTitle && (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5 mx-2" />
+                  <span className="hover:text-emerald-600 transition-colors cursor-pointer">{chapterTitle}</span>
+                </>
+              )}
               <ChevronRight className="w-3.5 h-3.5 mx-2" />
               <span className="text-slate-800 dark:text-slate-200">{data.title}</span>
             </div>
           </div>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             className="h-8 px-5 bg-[#dcefe2] text-[#1b6b3e] border-transparent hover:bg-[#c2e2cc] hover:text-[#11512d] dark:bg-emerald-900/40 dark:text-emerald-400 dark:hover:bg-emerald-900/60 rounded-md font-bold text-sm shadow-sm"
           >
             Back
@@ -263,8 +273,8 @@ function ReadingLayout({
       </div>
 
       {/* Main Reading Layout Area */}
-      <div className="max-w-[1600px] mx-auto flex items-start">
-        
+      <div className="max-w-[1400px] mx-auto flex items-stretch mt-[10px]">
+
         {/* Left Navigation Sidebar */}
         <ContentNavigationSidebar curriculum={curriculum} activeId={id} subjectTitle={textbookTitle} />
 
@@ -274,14 +284,20 @@ function ReadingLayout({
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-full xl:w-[320px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 xl:bg-slate-50 dark:xl:bg-[#020817] xl:h-[calc(100vh)] xl:sticky top-0 hidden xl:block">
-          <ScrollArea className="h-full w-full">
-            <div className="p-6">
-              <GuideSidebar subjects={subjects} activeId="sahitya-kanika" />
-            </div>
-          </ScrollArea>
+        <div className="w-full xl:w-[320px] shrink-0 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 xl:bg-slate-50 dark:xl:bg-[#020817] hidden xl:block">
+          <div className="h-[calc(100vh-120px)] sticky top-[120px]">
+            <ScrollArea className="h-full w-full">
+              <div className="pt-0 px-2 sm:px-2 pb-6">
+                {data.sections && data.sections.length > 0 ? (
+                  <TopicSectionsSidebar sections={data.sections} />
+                ) : (
+                  <GuideSidebar subjects={subjects} activeId="sahitya-kanika" />
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         </div>
-        
+
       </div>
     </div>
   );

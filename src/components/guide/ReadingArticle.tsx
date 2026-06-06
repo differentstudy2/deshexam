@@ -67,10 +67,10 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
 
   const renderSection = (sec: ContentSection, idx: number) => {
     return (
-      <div key={idx} className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden mb-6 last:mb-0">
+      <div key={idx} id={sec.id} className="bg-white dark:bg-slate-900 scroll-mt-20 border-b border-slate-100 dark:border-slate-800">
         
         {/* Section Header */}
-        <div className="bg-[#eaf5ef] dark:bg-emerald-900/10 px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+        <div className="bg-[#eaf5ef] dark:bg-emerald-900/10 px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <h2 className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400">
               {sec.title}
@@ -149,15 +149,15 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
   };
 
   return (
-    <div className="flex-1 w-full bg-slate-50 dark:bg-[#020817] min-h-screen">
-      <div className="max-w-4xl mx-auto p-4 sm:p-8">
+    <div className="flex-1 w-full bg-white dark:bg-[#020817] min-h-screen">
+      <div className="w-full mx-auto">
         
         {data.sections ? (
           <div className="flex flex-col">
             {data.sections.map(renderSection)}
             
             {/* Tags and Pagination */}
-            <div className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg p-6 sm:p-8 mt-6">
+            <div className="px-6 py-6 sm:px-8 mt-4">
               
               {data.tags && (
                 <div className="mb-8">
