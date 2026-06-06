@@ -20,8 +20,31 @@ import {
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "DeshExam | One Stop Learning Platform",
-  description: "Premium educational platform offering mock tests, trending courses, and book collections.",
+  title: "DeshExam - Best Online Learning Platform & Mock Test App",
+  description: "DeshExam is the ultimate online educational platform featuring 2M+ questions, 100K+ contents, model tests, live classes, trending courses, and book collections for HSC, SSC, Admission, and Job preparations.",
+  keywords: ["online learning platform", "mock test", "question bank", "live classes", "exam preparation", "DeshExam", "HSC preparation", "SSC preparation", "university admission", "job preparation"],
+  openGraph: {
+    title: "DeshExam - Best Online Learning Platform & Mock Test App",
+    description: "Prepare for SSC, HSC, Admission & Job exams with DeshExam. Get access to 2M+ questions, live classes, model tests, and trending courses.",
+    url: "https://deshexam.com",
+    siteName: "DeshExam",
+    images: [
+      {
+        url: "https://deshexam.com/image/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "DeshExam - One Stop Learning Platform",
+      },
+    ],
+    locale: "bn_BD",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DeshExam - Best Online Learning Platform & Mock Test App",
+    description: "Prepare for SSC, HSC, Admission & Job exams with DeshExam. Get access to 2M+ questions, live classes, model tests, and trending courses.",
+    images: ["https://deshexam.com/image/logo.png"],
+  },
 };
 
 const smartFeatures = [
