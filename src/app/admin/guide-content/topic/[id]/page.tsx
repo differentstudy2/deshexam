@@ -4,21 +4,25 @@ import React, { useState, useEffect, use } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video } from 'lucide-react';
+import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, Headphones, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { getTopicSections, saveTopicSections, updateTopicStatus } from '@/lib/firebase/guide';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { db, storage } from '@/lib/firebase/client';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useToast } from "@/hooks/use-toast";
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
   ssr: false,
   loading: () => <div className="min-h-[300px] flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md">Loading Editor...</div>
 });
+
+import { TopicVideoManager } from '@/components/admin/TopicVideoManager';
 
 const sectionTypes = [
   { id: 'lesson', label: 'Read Lesson', icon: BookOpen },
@@ -35,6 +39,7 @@ const sectionTypes = [
   { id: 'model_test', label: 'Model Test', icon: FileArchive },
   { id: 'pdf', label: 'PDF', icon: FileImage },
   { id: 'video', label: 'Video', icon: Video },
+  { id: 'audio', label: 'Audio', icon: Headphones },
 ];
 
 export default function TopicEditorPage({ params }: { params: Promise<{ id: string }> }) {
@@ -70,7 +75,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
               loadedContent = '';
             }
             initial[s.id] = loadedContent;
-          } else if (!['word_meaning', 'mcq', 'pdf', 'video'].includes(s.id)) {
+          } else if (!['word_meaning', 'mcq', 'pdf', 'video', 'audio'].includes(s.id)) {
             initial[s.id] = '';
           }
         });
@@ -88,6 +93,65 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
     setContentMap(prev => ({ ...prev, [activeTab]: html }));
   };
 
+  const getMediaData = (type: string): any[] => {
+    const val = contentMap[type];
+    if (typeof val === 'string') {
+      if (val.startsWith('[')) {
+        try { return JSON.parse(val); } catch(e) { return []; }
+      } else if (val.startsWith('{')) {
+        try { 
+          const parsed = JSON.parse(val); 
+          if (parsed.url || parsed.title) {
+            return [{ ...parsed, id: Date.now().toString() }]; 
+          }
+          return [];
+        } catch(e) { return []; }
+      }
+    }
+    return [];
+  };
+
+  const updateMediaItem = (type: string, index: number, field: string, value: string) => {
+    const data = getMediaData(type);
+    if (data[index]) {
+      data[index][field] = value;
+      setContentMap(prev => ({ ...prev, [type]: JSON.stringify(data) }));
+    }
+  };
+
+  const removeMediaItem = (type: string, index: number) => {
+    const data = getMediaData(type);
+    data.splice(index, 1);
+    setContentMap(prev => ({ ...prev, [type]: JSON.stringify(data) }));
+  };
+
+  const addMediaItem = (type: string) => {
+    const data = getMediaData(type);
+    data.push({ id: Date.now().toString() + Math.random().toString(), title: '', url: '', description: '', tags: '' });
+    setContentMap(prev => ({ ...prev, [type]: JSON.stringify(data) }));
+  };
+
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setLoading(true);
+    try {
+      const folder = type === 'audio' ? 'audio' : 'pdfs';
+      const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      
+      updateMediaItem(type, index, 'url', url);
+      toast({ title: 'Success', description: `${type.toUpperCase()} uploaded successfully` });
+    } catch (error) {
+      console.error(error);
+      toast({ title: 'Error', description: `Failed to upload ${type}`, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -190,7 +254,11 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
               </div>
 
               {/* Dynamic Content Renderer based on type */}
-              {!['word_meaning', 'mcq', 'pdf', 'video'].includes(activeTab) ? (
+              {activeTab === 'video' ? (
+                <div className="animate-in fade-in duration-300">
+                  <TopicVideoManager topicId={topicId} />
+                </div>
+              ) : !['word_meaning', 'mcq', 'pdf', 'audio'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TiptapEditor 
                     key={activeTab}
@@ -198,28 +266,88 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                     onChange={handleRichTextChange} 
                   />
                 </div>
-              ) : activeTab === 'pdf' ? (
-                <div className="space-y-4 max-w-md animate-in fade-in duration-300">
-                  <div className="space-y-2">
-                    <Label>Document Title</Label>
-                    <Input placeholder="e.g. Chapter 1 Summary" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Upload PDF File</Label>
-                    <Input type="file" accept=".pdf" />
-                    <p className="text-xs text-slate-500">Max size 20MB</p>
-                  </div>
-                </div>
-              ) : activeTab === 'video' ? (
-                <div className="space-y-4 max-w-md animate-in fade-in duration-300">
-                  <div className="space-y-2">
-                    <Label>Video Title</Label>
-                    <Input placeholder="e.g. Explanation of Poem" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>YouTube Link</Label>
-                    <Input placeholder="https://youtube.com/watch?v=..." />
-                  </div>
+              ) : ['pdf', 'audio'].includes(activeTab) ? (
+                <div className="space-y-6 max-w-2xl animate-in fade-in duration-300">
+                  {getMediaData(activeTab).map((item: any, index: number) => (
+                    <Card key={item.id} className="border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-visible">
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -right-3 -top-3 w-8 h-8 rounded-full shadow-md z-10"
+                        onClick={() => removeMediaItem(activeTab, index)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                      <CardContent className="p-5 space-y-4">
+                        <div className="space-y-2">
+                          <Label>{activeTab.toUpperCase()} Title</Label>
+                          <Input 
+                            placeholder={`e.g. ${activeTab === 'video' ? 'Explanation of Poem' : 'Chapter 1 Summary'}`} 
+                            value={item.title || ''}
+                            onChange={(e) => updateMediaItem(activeTab, index, 'title', e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Description</Label>
+                          <Textarea 
+                            placeholder="Brief description of this media..." 
+                            value={item.description || ''}
+                            onChange={(e) => updateMediaItem(activeTab, index, 'description', e.target.value)}
+                            className="resize-none"
+                            rows={3}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Tags (comma-separated)</Label>
+                          <Input 
+                            placeholder="e.g. physics, chapter 1, revision" 
+                            value={item.tags || ''}
+                            onChange={(e) => updateMediaItem(activeTab, index, 'tags', e.target.value)}
+                          />
+                        </div>
+                        
+                        {activeTab === 'video' ? (
+                          <div className="space-y-2">
+                            <Label>YouTube Link</Label>
+                            <Input 
+                              placeholder="https://youtube.com/watch?v=..." 
+                              value={item.url}
+                              onChange={(e) => updateMediaItem(activeTab, index, 'url', e.target.value)}
+                            />
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <Label>Upload {activeTab.toUpperCase()} File</Label>
+                            <Input 
+                              type="file" 
+                              accept={activeTab === 'pdf' ? '.pdf' : 'audio/*'} 
+                              onChange={(e) => handleMediaUpload(e, activeTab, index)} 
+                            />
+                            {item.url && (
+                              <div className="mt-2 text-sm text-emerald-600 font-medium">
+                                {activeTab === 'pdf' ? (
+                                  <a href={item.url} target="_blank" rel="noopener noreferrer">View current PDF</a>
+                                ) : (
+                                  <audio controls src={item.url} className="mt-2 w-full"></audio>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-dashed border-2 py-8 text-slate-500 hover:text-[#107c41] hover:border-[#107c41] transition-colors"
+                    onClick={() => addMediaItem(activeTab)}
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Add Another {activeTab.toUpperCase()}
+                  </Button>
                 </div>
               ) : (
                 <div className="p-8 text-center text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg animate-in fade-in duration-300">

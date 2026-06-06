@@ -14,6 +14,9 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
   Plus, MoreVertical, Edit2, Loader2, Trash2
@@ -246,6 +249,14 @@ export default function ContentExplorer() {
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
   const [deleting, setDeleting] = useState(false);
 
+  // Bulk Move Dialog State
+  const [bulkMoveDialog, setBulkMoveDialog] = useState(false);
+  const [allClassesForMove, setAllClassesForMove] = useState<any[]>([]);
+  const [allBoardsForMove, setAllBoardsForMove] = useState<any[]>([]);
+  const [selectedClassesForMove, setSelectedClassesForMove] = useState<string[]>([]);
+  const [targetBoardForMove, setTargetBoardForMove] = useState<string>('');
+  const [movingClasses, setMovingClasses] = useState(false);
+
   const fetchRoot = async () => {
     setLoading(true);
     try {
@@ -382,6 +393,38 @@ export default function ContentExplorer() {
     }
   };
 
+  const handleOpenBulkMove = async () => {
+    setBulkMoveDialog(true);
+    try {
+      const [boards, classes] = await Promise.all([getGuideBoards(), getGuideClasses()]);
+      setAllBoardsForMove(boards);
+      setAllClassesForMove(classes);
+      setSelectedClassesForMove([]);
+      setTargetBoardForMove('');
+    } catch (e) {
+      console.error(e);
+      toast({ title: 'Error', description: 'Failed to load data for bulk move', variant: 'destructive' });
+    }
+  };
+
+  const handleExecuteBulkMove = async () => {
+    if (!targetBoardForMove || selectedClassesForMove.length === 0) return;
+    setMovingClasses(true);
+    try {
+      for (const classId of selectedClassesForMove) {
+        await setDoc(doc(db, 'guide_classes', classId), { boardId: targetBoardForMove }, { merge: true });
+      }
+      toast({ title: 'Success', description: `Moved ${selectedClassesForMove.length} classes to the new board.` });
+      setBulkMoveDialog(false);
+      fetchRoot();
+    } catch (e) {
+      console.error(e);
+      toast({ title: 'Error', description: 'Failed to move classes.', variant: 'destructive' });
+    } finally {
+      setMovingClasses(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -390,10 +433,13 @@ export default function ContentExplorer() {
             <FolderTree className="w-6 h-6 text-[#107c41]" />
             Content Explorer
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire 6-level curriculum tree.</p>
+          <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire curriculum tree.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleMigrateClasses} className="border-orange-500 text-orange-600 hover:bg-orange-50">
+          <Button variant="outline" onClick={handleOpenBulkMove} className="border-blue-500 text-blue-600 hover:bg-blue-50">
+            Bulk Move Classes
+          </Button>
+          <Button variant="outline" onClick={handleMigrateClasses} className="border-orange-500 text-orange-600 hover:bg-orange-50 hidden">
             Migrate Old Classes
           </Button>
           <Button variant="outline" onClick={() => handleOpenDialog('root', 'root', 'Board', fetchRoot)}>
@@ -525,6 +571,71 @@ export default function ContentExplorer() {
             <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSaveEdit} disabled={editing || !editTitleInput.trim()}>
               {editing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Move Dialog */}
+      <Dialog open={bulkMoveDialog} onOpenChange={(open) => !open && setBulkMoveDialog(false)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Bulk Move Classes</DialogTitle>
+            <DialogDescription>
+              Select multiple classes and move them to a different board.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-6">
+            <div className="space-y-3">
+              <Label>Target Board</Label>
+              <Select value={targetBoardForMove} onValueChange={setTargetBoardForMove}>
+                <SelectTrigger><SelectValue placeholder="Select destination board" /></SelectTrigger>
+                <SelectContent>
+                  {allBoardsForMove.map(b => <SelectItem key={b.id} value={b.id}>{b.title || b.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-3">
+              <Label>Select Classes to Move</Label>
+              <div className="max-h-[300px] overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-md p-3 space-y-2">
+                {allClassesForMove.map(cls => {
+                  const currentBoard = allBoardsForMove.find(b => b.id === cls.boardId)?.title || 'Unknown Board';
+                  return (
+                    <div key={cls.id} className="flex items-start space-x-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-md">
+                      <Checkbox 
+                        id={`cls-${cls.id}`} 
+                        checked={selectedClassesForMove.includes(cls.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) setSelectedClassesForMove(prev => [...prev, cls.id]);
+                          else setSelectedClassesForMove(prev => prev.filter(id => id !== cls.id));
+                        }}
+                      />
+                      <div className="flex flex-col cursor-pointer" onClick={() => {
+                        const checked = !selectedClassesForMove.includes(cls.id);
+                        if (checked) setSelectedClassesForMove(prev => [...prev, cls.id]);
+                        else setSelectedClassesForMove(prev => prev.filter(id => id !== cls.id));
+                      }}>
+                        <label className="text-sm font-medium leading-none cursor-pointer">{cls.title || cls.name}</label>
+                        <span className="text-xs text-slate-500 mt-1">Current Board: {currentBoard}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkMoveDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-[#107c41] hover:bg-[#0b5c30] text-white" 
+              onClick={handleExecuteBulkMove} 
+              disabled={movingClasses || !targetBoardForMove || selectedClassesForMove.length === 0}
+            >
+              {movingClasses ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Move {selectedClassesForMove.length} Classes
             </Button>
           </DialogFooter>
         </DialogContent>

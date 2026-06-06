@@ -28,6 +28,7 @@ import { useAuthDialog } from "@/hooks/use-auth-dialog";
 const mainNavLinks = [
     { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
     { href: "/academy", label: "Academy", icon: <BookOpen className="h-5 w-5" /> },
+    { href: "/videos", label: "Videos", icon: <Zap className="h-5 w-5" /> },
     { href: "/skill", label: "Skill", icon: <Zap className="h-5 w-5" /> },
     { href: "/course", label: "Course", icon: <Book className="h-5 w-5" /> },
     { href: "/book", label: "Book", icon: <Library className="h-5 w-5" /> },
@@ -114,6 +115,7 @@ const adminNavGroups = [
       { href: '/admin/users', label: 'Users', icon: <Users className="h-4 w-4" /> },
       { href: '/admin/content', label: 'Content', icon: <FileText className="h-4 w-4" /> },
       { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
+      { href: '/admin/video', label: 'Video Library', icon: <Activity className="h-4 w-4" /> },
       { href: '/admin/quizzes', label: 'Quizzes', icon: <Gem className="h-4 w-4" /> },
       { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-4 w-4" /> },
       { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-4 w-4" /> },

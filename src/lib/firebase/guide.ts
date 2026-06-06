@@ -1,5 +1,5 @@
-import { db } from "@/lib/firebase/client";
 import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, deleteDoc, getCountFromServer, serverTimestamp, addDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/[id]/guide-data"; // Types
 
 export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
@@ -123,6 +123,7 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       'model_test',
       'pdf',
       'video',
+      'audio',
       'q_a',
       'cq',
       'board_question',
@@ -144,6 +145,7 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       'model_test': 'Model Test',
       'pdf': 'PDF',
       'video': 'Video',
+      'audio': 'Audio',
       'q_a': 'Q/A',
       'cq': 'CQ',
       'board_question': 'Board Question',
@@ -155,17 +157,82 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
     const sections: any[] = [];
     snap.forEach(d => {
       const sectionType = d.data().sectionType || d.id;
+      const data = d.data();
+      
+      let type = 'article';
+      let sectionData: any = { body: data.content };
+      
+      if (sectionType === 'mcq') {
+        type = 'mcq';
+        try {
+          sectionData = { questions: typeof data.content === 'string' ? JSON.parse(data.content) : data.content };
+        } catch (e) {
+          sectionData = { questions: [] };
+        }
+      } else if (sectionType === 'pdf') {
+        type = 'pdf';
+        try {
+          const parsed = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+          sectionData = { pdfData: Array.isArray(parsed) ? parsed : [parsed].filter(p => p && (p.url || p.title)) };
+        } catch (e) {
+          sectionData = { pdfData: [] };
+        }
+      } else if (sectionType === 'video') {
+        type = 'video';
+        try {
+          const parsed = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+          sectionData = { videoData: Array.isArray(parsed) ? parsed : [parsed].filter(p => p && (p.url || p.title)) };
+        } catch (e) {
+          sectionData = { videoData: [] };
+        }
+      } else if (sectionType === 'audio') {
+        type = 'audio';
+        try {
+          const parsed = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+          sectionData = { audioData: Array.isArray(parsed) ? parsed : [parsed].filter(p => p && (p.url || p.title)) };
+        } catch (e) {
+          sectionData = { audioData: [] };
+        }
+      }
+
       sections.push({
         id: d.id, // keep id for sorting
         title: SECTION_LABELS[sectionType] || sectionType,
-        type: 'article',
-        body: d.data().content,
+        type,
+        ...sectionData,
         author: {
           name: 'Sattar Uddin Sohel',
           avatarUrl: 'https://i.pravatar.cc/150?u=sattar'
         }
       });
     });
+
+    // Fetch globally attached videos for this topic
+    try {
+      const vQuery = query(collection(db, "guide_videos"), where('topicIds', 'array-contains', contentId));
+      const vSnap = await getDocs(vQuery);
+      if (!vSnap.empty) {
+        const videoData = vSnap.docs.map(d => {
+          const v = d.data();
+          return { url: v.videoUrl || v.url, title: v.title };
+        });
+        
+        // Check if there's already a video section (from legacy JSON)
+        const existingVideoSec = sections.find(s => s.id === 'video');
+        if (existingVideoSec) {
+           existingVideoSec.videoData = [...(existingVideoSec.videoData || []), ...videoData];
+        } else {
+           sections.push({
+             id: 'video',
+             title: 'Video',
+             type: 'video',
+             videoData: videoData
+           });
+        }
+      }
+    } catch (e) {
+      console.error('Error fetching global videos', e);
+    }
 
     sections.sort((a, b) => {
       const aIndex = SECTION_ORDER.indexOf(a.id);
@@ -425,6 +492,33 @@ export const saveTopicSections = async (topicId: string, sections: Record<string
       sectionType: sectionId,
       updatedAt: serverTimestamp()
     }, { merge: true });
+
+    if (sectionId === 'pdf' || sectionId === 'video' || sectionId === 'audio') {
+      try {
+        const items = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+        if (Array.isArray(items)) {
+          const collectionName = sectionId === 'pdf' ? 'guide_documents' : sectionId === 'video' ? 'guide_videos' : 'guide_audios';
+          const itemPromises = items.map(async (item: any) => {
+            if (item.url && item.id) {
+              const itemRef = doc(db, collectionName, item.id);
+              await setDoc(itemRef, {
+                title: item.title || `Untitled ${sectionId}`,
+                url: item.url,
+                description: item.description || '',
+                tags: item.tags || '',
+                topicId,
+                type: sectionId,
+                updatedAt: serverTimestamp(),
+                createdAt: item.createdAt || serverTimestamp()
+              }, { merge: true });
+            }
+          });
+          await Promise.all(itemPromises);
+        }
+      } catch (e) {
+        console.error("Failed to sync standalone items:", e);
+      }
+    }
   });
   await Promise.all(promises);
 };
@@ -513,4 +607,89 @@ export const createGuideTopic = async (chapterId: string, title: string, author?
     createdAt: serverTimestamp()
   });
   return docRef.id;
+};
+
+export const fetchGuideItems = async (collectionName: string): Promise<any[]> => {
+  const q = query(collection(db, collectionName), orderBy('updatedAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const getMediaItemBySlug = async (collectionName: string, slug: string): Promise<any> => {
+  const q = query(collection(db, collectionName), where('slug', '==', slug));
+  const snap = await getDocs(q);
+  if (!snap.empty) {
+    const docSnap = snap.docs[0];
+    return { id: docSnap.id, ...docSnap.data() };
+  }
+  // Fallback to searching by ID if slug not found
+  return await getMediaItemById(collectionName, slug);
+};
+
+export const getMediaItemById = async (collectionName: string, id: string): Promise<any> => {
+  const docRef = doc(db, collectionName, id);
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    return { id: snap.id, ...snap.data() };
+  }
+  return null;
+};
+
+export const updateMediaItemExtraData = async (collectionName: string, id: string, data: any) => {
+  const docRef = doc(db, collectionName, id);
+  await setDoc(docRef, data, { merge: true });
+};
+
+export const getTopicById = async (id: string): Promise<any> => {
+  const docRef = doc(db, 'guide_topics', id);
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    return { id: snap.id, ...snap.data() };
+  }
+  return null;
+};
+
+export const getTopicFullHierarchy = async (topicId: string) => {
+  let hierarchy: any = { topic: null, chapter: null, textbook: null, subject: null, class: null, board: null };
+
+  const topicSnap = await getDoc(doc(db, 'guide_topics', topicId));
+  if (!topicSnap.exists()) return hierarchy;
+  hierarchy.topic = { id: topicSnap.id, ...topicSnap.data() };
+
+  if (hierarchy.topic.chapterId) {
+    const chapterSnap = await getDoc(doc(db, 'guide_chapters', hierarchy.topic.chapterId));
+    if (chapterSnap.exists()) {
+      hierarchy.chapter = { id: chapterSnap.id, ...chapterSnap.data() };
+      
+      if (hierarchy.chapter.textbookId) {
+        const textbookSnap = await getDoc(doc(db, 'guide_textbooks', hierarchy.chapter.textbookId));
+        if (textbookSnap.exists()) {
+          hierarchy.textbook = { id: textbookSnap.id, ...textbookSnap.data() };
+
+          if (hierarchy.textbook.subjectId) {
+            const subjectSnap = await getDoc(doc(db, 'guide_subjects', hierarchy.textbook.subjectId));
+            if (subjectSnap.exists()) {
+              hierarchy.subject = { id: subjectSnap.id, ...subjectSnap.data() };
+
+              if (hierarchy.subject.classId) {
+                const classSnap = await getDoc(doc(db, 'guide_classes', hierarchy.subject.classId));
+                if (classSnap.exists()) {
+                  hierarchy.class = { id: classSnap.id, ...classSnap.data() };
+
+                  if (hierarchy.class.boardId) {
+                    const boardSnap = await getDoc(doc(db, 'guide_boards', hierarchy.class.boardId));
+                    if (boardSnap.exists()) {
+                      hierarchy.board = { id: boardSnap.id, ...boardSnap.data() };
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return hierarchy;
 };

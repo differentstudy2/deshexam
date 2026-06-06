@@ -5,6 +5,7 @@ import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle
 import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/guide/[id]/guide-data';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { CustomVideoPlayer } from '@/components/ui/CustomVideoPlayer';
 
 interface ReadingArticleProps {
   data: ReadingContentData;
@@ -139,6 +140,65 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
                 if (item.text) return <p key={iIdx} className="whitespace-pre-wrap">{item.text}</p>;
                 return null;
               })}
+            </div>
+          )}
+
+          {sec.type === 'pdf' && sec.pdfData && sec.pdfData.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {sec.pdfData.map((pdf: any, i: number) => pdf.url && (
+                <div key={i} className="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M10 13v6"/><path d="M12 13v6"/><path d="M14 13v6"/></svg>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4 text-center line-clamp-2">
+                    {pdf.title || `Document ${i + 1}`}
+                  </h3>
+                  <a 
+                    href={pdf.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-colors shadow-sm"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View PDF
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {sec.type === 'video' && sec.videoData && sec.videoData.length > 0 && (
+            <div className="flex flex-col gap-6">
+              {sec.videoData.map((vid: any, i: number) => vid.url && (
+                <div key={i} className="flex flex-col gap-3">
+                  {vid.title && (
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                      {vid.title}
+                    </h3>
+                  )}
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-900 shadow-sm">
+                    <CustomVideoPlayer 
+                      url={vid.url} 
+                      title={vid.title} 
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {sec.type === 'audio' && sec.audioData && sec.audioData.length > 0 && (
+            <div className="flex flex-col gap-4">
+              {sec.audioData.map((aud: any, i: number) => aud.url && (
+                <div key={i} className="flex flex-col gap-3 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                  {aud.title && (
+                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                      {aud.title}
+                    </h3>
+                  )}
+                  <audio controls src={aud.url} className="w-full h-10 rounded outline-none"></audio>
+                </div>
+              ))}
             </div>
           )}
 
