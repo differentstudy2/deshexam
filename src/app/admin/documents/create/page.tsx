@@ -58,8 +58,8 @@ export default function CreateDocumentPage() {
       </div>
 
       {/* Form */}
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 sm:p-6 md:p-8">
           <DocumentUploadForm
             onSaved={() => {
               setTimeout(() => router.push('/admin/documents'), 1800);

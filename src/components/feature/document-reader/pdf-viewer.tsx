@@ -22,7 +22,7 @@ export function PdfViewer({ url }: PdfViewerProps) {
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState(0);
-  const [scale, setScale] = useState(1.3);
+  const [scale, setScale] = useState(0.6);
   const [isLoading, setIsLoading] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -304,7 +304,7 @@ export function PdfViewer({ url }: PdfViewerProps) {
             )}
             <canvas
               ref={canvasRef}
-              className="rounded shadow-xl block max-w-full bg-white"
+              className="rounded shadow-xl block bg-white mx-auto"
             />
           </div>
         )}

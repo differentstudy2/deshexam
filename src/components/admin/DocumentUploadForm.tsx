@@ -116,6 +116,26 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false, initialD
 
   const [file, setFile] = useState<File | null>(null);
   const [thumbFile, setThumbFile] = useState<File | null>(null);
+  const [inputMode, setInputMode] = useState<'upload' | 'url'>('upload');
+  const [fileUrlInput, setFileUrlInput] = useState(initialData?.fileUrl || '');
+
+  React.useEffect(() => {
+    if (file && getExt(file) === 'pdf' && !form.pages) {
+      const getPages = async () => {
+        try {
+          const PDFJS_VERSION = '4.4.168';
+          const lib = await import(/* webpackIgnore: true */ `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/pdf.min.mjs`);
+          lib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/build/pdf.worker.min.mjs`;
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
+          setForm(prev => ({ ...prev, pages: pdf.numPages.toString() }));
+        } catch (e) {
+          console.error('Failed to parse pdf pages', e);
+        }
+      };
+      getPages();
+    }
+  }, [file]);
   const [thumbPreview, setThumbPreview] = useState('');
 
   const [form, setForm] = useState<DocumentFormData>({
@@ -169,12 +189,17 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false, initialD
       let fileType = '';
       let fileSize = 0;
 
-      if (file) {
+      if (inputMode === 'upload' && file) {
         setIsUploading(true);
         fileUrl = await uploadFileToStorage(file, `documents/${docId}/${file.name}`);
         fileType = getExt(file);
         fileSize = file.size;
         setIsUploading(false);
+      } else if (inputMode === 'url' && fileUrlInput) {
+        fileUrl = fileUrlInput;
+        const extMatch = fileUrl.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/);
+        fileType = extMatch ? extMatch[1].toLowerCase() : 'pdf';
+        fileSize = 0;
       } else if (initialData?.fileUrl) {
         fileUrl = initialData.fileUrl;
         fileType = initialData.fileType || '';
@@ -236,181 +261,226 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false, initialD
   }
 
   return (
-    <div className="space-y-6">
-      {/* File Drop Zone */}
-      <div className="space-y-3">
-        <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Document File</Label>
-        <input ref={fileInputRef} type="file" accept={ACCEPTED_TYPES} className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
-        {!file && !initialData?.fileUrl ? (
-          <div
-            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleFileDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all select-none ${dragOver ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 scale-[1.01]' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50/40 dark:hover:bg-amber-900/10'}`}
-          >
-            <div className="flex justify-center gap-3 mb-4 opacity-60">
-              <FileTypeIcon ext="pdf" size="sm" />
-              <FileTypeIcon ext="docx" size="sm" />
-              <FileTypeIcon ext="pptx" size="sm" />
-              <FileTypeIcon ext="xlsx" size="sm" />
+    <div className={`grid gap-6 sm:gap-8 ${!compact ? 'lg:grid-cols-12' : 'grid-cols-1'}`}>
+      
+      {/* ── Left Column (File, Thumbnail, Categories) ── */}
+      <div className={`space-y-6 ${!compact ? 'lg:col-span-5' : ''}`}>
+        {/* File Drop Zone / URL Input */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Document Source</Label>
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setInputMode('upload')}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${inputMode === 'upload' ? 'bg-white dark:bg-slate-700 shadow text-amber-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+              >
+                Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputMode('url')}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${inputMode === 'url' ? 'bg-white dark:bg-slate-700 shadow text-amber-600' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+              >
+                Link URL
+              </button>
             </div>
-            <p className="font-bold text-slate-700 dark:text-slate-300 text-base">Drag & Drop your file here</p>
-            <p className="text-sm text-slate-500 mt-1 mb-4">PDF · DOCX · PPTX · XLSX · ZIP · TXT</p>
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" onClick={e => { e.stopPropagation(); fileInputRef.current?.click(); }}>
-              <Upload className="w-4 h-4 mr-2" /> Browse Files
-            </Button>
           </div>
-        ) : (
-          <div className="flex items-center gap-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
-            <FileTypeIcon ext={file ? getExt(file) : initialData?.fileType || 'pdf'} size="md" />
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-slate-800 dark:text-slate-100 truncate">{file ? file.name : (initialData?.title + ' (Existing File)')}</p>
-              <p className="text-sm text-slate-500 mt-0.5">{file ? (file.size / (1024 * 1024)).toFixed(2) : ((initialData?.fileSize || 0) / (1024 * 1024)).toFixed(2)} MB · {file ? getExt(file).toUpperCase() : (initialData?.fileType || 'PDF').toUpperCase()}</p>
-              {isUploading && (
-                <div className="mt-2">
-                  <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 transition-all duration-300 rounded-full" style={{ width: `${uploadProgress}%` }} />
+          
+          {inputMode === 'upload' ? (
+            <>
+              <input ref={fileInputRef} type="file" accept={ACCEPTED_TYPES} className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
+              {!file && (!initialData?.fileUrl || inputMode === 'url') ? (
+                <div
+                  onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleFileDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all select-none ${dragOver ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 scale-[1.02]' : 'border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50/40 dark:hover:bg-amber-900/10'}`}
+                >
+                  <div className="flex justify-center gap-2 sm:gap-3 mb-4 opacity-60 flex-wrap">
+                    <FileTypeIcon ext="pdf" size="sm" />
+                    <FileTypeIcon ext="docx" size="sm" />
+                    <FileTypeIcon ext="pptx" size="sm" />
+                    <FileTypeIcon ext="xlsx" size="sm" />
                   </div>
-                  <p className="text-xs text-amber-600 mt-1">Uploading {Math.round(uploadProgress)}%...</p>
+                  <p className="font-bold text-slate-700 dark:text-slate-300 text-sm sm:text-base">Drag & Drop your file here</p>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-4">PDF · DOCX · PPTX · XLSX · ZIP · TXT</p>
+                  <Button type="button" size="sm" className="bg-amber-500 hover:bg-amber-600 text-white w-full sm:w-auto" onClick={e => { e.stopPropagation(); fileInputRef.current?.click(); }}>
+                    <Upload className="w-4 h-4 mr-2" /> Browse Files
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                  <FileTypeIcon ext={file ? getExt(file) : initialData?.fileType || 'pdf'} size="md" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-800 dark:text-slate-100 truncate text-sm sm:text-base">{file ? file.name : (initialData?.title + ' (Existing File)')}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">{file ? (file.size / (1024 * 1024)).toFixed(2) : ((initialData?.fileSize || 0) / (1024 * 1024)).toFixed(2)} MB · {file ? getExt(file).toUpperCase() : (initialData?.fileType || 'PDF').toUpperCase()}</p>
+                    {isUploading && (
+                      <div className="mt-2">
+                        <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 transition-all duration-300 rounded-full" style={{ width: `${uploadProgress}%` }} />
+                        </div>
+                        <p className="text-xs text-amber-600 mt-1">Uploading {Math.round(uploadProgress)}%...</p>
+                      </div>
+                    )}
+                  </div>
+                  {file ? (
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setFile(null)} className="text-red-400 hover:text-red-600 shrink-0">
+                      <X className="w-5 h-5" />
+                    </Button>
+                  ) : (
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="shrink-0 text-amber-600 border-amber-200 hover:bg-amber-100 text-xs sm:text-sm">
+                      Replace File
+                    </Button>
+                  )}
                 </div>
               )}
+            </>
+          ) : (
+            <div className="space-y-2 mt-2">
+              <Input 
+                placeholder="https://example.com/document.pdf" 
+                value={fileUrlInput} 
+                onChange={e => setFileUrlInput(e.target.value)} 
+                className="dark:bg-slate-800 rounded-xl font-mono text-sm"
+              />
+              <p className="text-xs text-slate-500">Provide a direct link to the document (e.g., PDF URL, Google Drive file link).</p>
             </div>
-              {file ? (
-                <Button variant="ghost" size="icon" onClick={() => setFile(null)} className="text-red-400 hover:text-red-600 shrink-0">
-                  <X className="w-5 h-5" />
-                </Button>
-              ) : (
-                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="shrink-0 text-amber-600 border-amber-200 hover:bg-amber-100">
-                  Replace File
-                </Button>
-              )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* Basic Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2 md:col-span-1">
-          <Label>Title *</Label>
-          <Input value={form.title} onChange={e => update('title', e.target.value)} placeholder="e.g. The Wind Cap — Full Chapter Notes" className="dark:bg-slate-800" />
-        </div>
-        <div className="space-y-2 md:col-span-1">
-          <Label>Slug *</Label>
-          <Input value={form.slug} onChange={e => update('slug', e.target.value)} placeholder="e.g. the-wind-cap-notes" className="dark:bg-slate-800" />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label>Short Description</Label>
-          <Textarea value={form.shortDescription} onChange={e => update('shortDescription', e.target.value)} rows={2} placeholder="Brief description visible in listings..." className="dark:bg-slate-800 resize-none" />
-        </div>
-      </div>
-
-      {/* Category chips */}
-      <div className="space-y-3">
-        <Label>Category</Label>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map(c => (
-            <button key={c.value} onClick={() => update('category', c.value)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${form.category === c.value ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-900/30'}`}>
-              {c.label}
+        {/* Thumbnail */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Cover Thumbnail</Label>
+          <input ref={thumbInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbChange} />
+          {thumbPreview || form.thumbnail ? (
+            <div className="relative w-32 h-40 sm:w-36 sm:h-48 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group mx-auto">
+              <img src={thumbPreview || form.thumbnail} alt="Cover" className="w-full h-full object-cover" />
+              <button onClick={() => { setThumbPreview(''); setThumbFile(null); setForm(prev => ({ ...prev, thumbnail: '' })); }}
+                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => thumbInputRef.current?.click()}
+              className="w-32 h-40 sm:w-36 sm:h-48 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-amber-300 transition-colors text-slate-400 hover:text-amber-500 mx-auto bg-slate-50 dark:bg-slate-800/50 hover:bg-amber-50 dark:hover:bg-amber-900/20">
+              <ImageIcon className="w-8 h-8 opacity-50" />
+              <span className="text-xs font-semibold text-center px-2">Upload Cover</span>
             </button>
-          ))}
+          )}
         </div>
-      </div>
 
-      {/* Thumbnail */}
-      <div className="space-y-3">
-        <Label>Cover Thumbnail</Label>
-        <input ref={thumbInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbChange} />
-        {thumbPreview || form.thumbnail ? (
-          <div className="relative w-28 h-36 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group">
-            <img src={thumbPreview || form.thumbnail} alt="Cover" className="w-full h-full object-cover" />
-            <button onClick={() => { setThumbPreview(''); setThumbFile(null); setForm(prev => ({ ...prev, thumbnail: '' })); }}
-              className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        ) : (
-          <button onClick={() => thumbInputRef.current?.click()}
-            className="w-28 h-36 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-amber-300 transition-colors text-slate-400 hover:text-amber-500">
-            <ImageIcon className="w-6 h-6" />
-            <span className="text-[10px] font-semibold text-center px-1">Upload Cover</span>
-          </button>
-        )}
-      </div>
-
-      {/* Curriculum (only shown when not compact or topicId not set) */}
-      {!compact && (
-        <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700">
-          <Label className="text-sm font-bold flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-amber-500" /> Curriculum (optional)
-          </Label>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { key: 'boardId', label: 'Board', placeholder: 'e.g. WBBSE' },
-              { key: 'classId', label: 'Class', placeholder: 'e.g. Class 8' },
-              { key: 'subjectId', label: 'Subject', placeholder: 'e.g. English' },
-              { key: 'topicId', label: 'Topic ID', placeholder: 'Topic ID' },
-            ].map(f => (
-              <div key={f.key} className="space-y-1.5">
-                <Label className="text-xs">{f.label}</Label>
-                <Input value={(form as any)[f.key]} onChange={e => update(f.key, e.target.value)} placeholder={f.placeholder} className="h-8 text-xs dark:bg-slate-800" />
-              </div>
+        {/* Category chips */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <Label className="text-sm font-bold text-slate-700 dark:text-slate-200">Category</Label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map(c => (
+              <button key={c.value} onClick={() => update('category', c.value)}
+                className={`px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold transition-all ${form.category === c.value ? 'bg-amber-500 text-white shadow-sm ring-2 ring-amber-500 ring-offset-1 dark:ring-offset-slate-900' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-amber-100 dark:hover:bg-amber-900/30'}`}>
+                {c.label}
+              </button>
             ))}
           </div>
         </div>
-      )}
-
-      {/* Access + Metadata row */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="space-y-1.5">
-          <Label className="text-xs">Pages</Label>
-          <Input type="number" value={form.pages} onChange={e => update('pages', e.target.value)} placeholder="24" className="h-9 dark:bg-slate-800" />
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">Language</Label>
-          <select value={form.language} onChange={e => update('language', e.target.value)}
-            className="flex h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs">
-            <option value="bengali">Bengali</option>
-            <option value="english">English</option>
-            <option value="hindi">Hindi</option>
-            <option value="both">Bilingual</option>
-          </select>
-        </div>
-        <div className="space-y-1.5">
-          <Label className="text-xs">Access</Label>
-          <select value={form.access} onChange={e => update('access', e.target.value)}
-            className="flex h-9 w-full rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs">
-            <option value="free">Free</option>
-            <option value="premium">Premium</option>
-            <option value="private">Private</option>
-          </select>
-        </div>
       </div>
 
-      {/* Tags */}
-      <div className="space-y-2">
-        <Label>Tags (comma separated)</Label>
-        <Input value={form.tags} onChange={e => update('tags', e.target.value)} placeholder="notes, chapter-1, wbbse" className="dark:bg-slate-800" />
-      </div>
+      {/* ── Right Column (Metadata, Curriculum, Actions) ── */}
+      <div className={`space-y-6 ${!compact ? 'lg:col-span-7' : ''}`}>
+        
+        {/* Basic Info */}
+        <div className="space-y-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-bold">Title *</Label>
+              <Input value={form.title} onChange={e => update('title', e.target.value)} placeholder="e.g. The Wind Cap — Full Chapter Notes" className="dark:bg-slate-800 rounded-xl" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-bold">Slug *</Label>
+              <Input value={form.slug} onChange={e => update('slug', e.target.value)} placeholder="e.g. the-wind-cap-notes" className="dark:bg-slate-800 rounded-xl font-mono text-sm" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-bold">Short Description</Label>
+            <Textarea value={form.shortDescription} onChange={e => update('shortDescription', e.target.value)} rows={3} placeholder="Brief description visible in listings..." className="dark:bg-slate-800 resize-none rounded-xl" />
+          </div>
+        </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-2">
-        <Button
-          onClick={() => handleSave('published')}
-          disabled={saving}
-          className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold gap-2"
-        >
-          {saving ? (
-            <><Loader2 className="w-4 h-4 animate-spin" />{isUploading ? `Uploading ${Math.round(uploadProgress)}%` : 'Saving...'}</>
-          ) : (
-            <><Save className="w-4 h-4" /> {documentId ? 'Save Changes' : 'Upload & Publish'}</>
-          )}
-        </Button>
-        <Button variant="outline" onClick={() => handleSave('draft')} disabled={saving} className="gap-2">
-          Save Draft
-        </Button>
+        {/* Curriculum (only shown when not compact or topicId not set) */}
+        {!compact && (
+          <div className="space-y-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+            <Label className="text-sm font-bold flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-amber-500" /> Curriculum Link (optional)
+            </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { key: 'boardId', label: 'Board', placeholder: 'e.g. WBBSE' },
+                { key: 'classId', label: 'Class', placeholder: 'e.g. Class 8' },
+                { key: 'subjectId', label: 'Subject', placeholder: 'e.g. English' },
+                { key: 'topicId', label: 'Topic ID', placeholder: 'Topic ID' },
+              ].map(f => (
+                <div key={f.key} className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{f.label}</Label>
+                  <Input value={(form as any)[f.key]} onChange={e => update(f.key, e.target.value)} placeholder={f.placeholder} className="dark:bg-slate-800 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Access + Metadata row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <div className="space-y-2">
+            <Label className="text-sm font-bold flex items-center gap-1.5"><FileText className="w-4 h-4 text-slate-400" /> Pages</Label>
+            <Input type="number" value={form.pages} onChange={e => update('pages', e.target.value)} placeholder="24" className="dark:bg-slate-800 rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-bold flex items-center gap-1.5"><Globe className="w-4 h-4 text-slate-400" /> Language</Label>
+            <select value={form.language} onChange={e => update('language', e.target.value)}
+              className="flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 dark:focus-visible:ring-slate-300">
+              <option value="bengali">Bengali</option>
+              <option value="english">English</option>
+              <option value="hindi">Hindi</option>
+              <option value="both">Bilingual</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-bold flex items-center gap-1.5"><Lock className="w-4 h-4 text-slate-400" /> Access</Label>
+            <select value={form.access} onChange={e => update('access', e.target.value)}
+              className="flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 dark:focus-visible:ring-slate-300">
+              <option value="free">Free</option>
+              <option value="premium">Premium</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+          <Label className="text-sm font-bold flex items-center gap-2"><Tag className="w-4 h-4 text-slate-400" /> Tags</Label>
+          <Input value={form.tags} onChange={e => update('tags', e.target.value)} placeholder="notes, chapter-1, wbbse (comma separated)" className="dark:bg-slate-800 rounded-xl" />
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button
+            onClick={() => handleSave('published')}
+            disabled={saving}
+            size="lg"
+            className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold gap-2 rounded-xl h-12 shadow-md shadow-amber-500/20"
+          >
+            {saving ? (
+              <><Loader2 className="w-5 h-5 animate-spin" />{isUploading ? `Uploading ${Math.round(uploadProgress)}%` : 'Saving...'}</>
+            ) : (
+              <><Save className="w-5 h-5" /> {documentId ? 'Save Changes' : 'Upload & Publish Document'}</>
+            )}
+          </Button>
+          <Button variant="outline" size="lg" onClick={() => handleSave('draft')} disabled={saving} className="gap-2 rounded-xl h-12 w-full sm:w-auto">
+            Save Draft
+          </Button>
+        </div>
       </div>
+      
     </div>
   );
 }
