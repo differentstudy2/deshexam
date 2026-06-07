@@ -10,6 +10,7 @@ import {
   BookOpen, HelpCircle, PenLine, Layers, ArrowLeft, Crown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AdUnit } from '@/components/ui/ad-unit';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface DocItem {
@@ -41,6 +42,11 @@ interface Props {
   settings?: {
     autoDownload: boolean;
     adsMode: string;
+    adsensePublisherId?: string;
+    leftAdSlot?: string;
+    rightAdSlot?: string;
+    sidebarAdSlot?: string;
+    belowHeroAdSlot?: string;
   };
 }
 
@@ -303,7 +309,7 @@ function RelatedMaterialCard({ doc }: { doc: DocItem }) {
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-function DownloadSidebar({ relatedDocs, document: doc }: { relatedDocs: DocItem[]; document: DocItem }) {
+function DownloadSidebar({ relatedDocs, document: doc, settings, showAds }: { relatedDocs: DocItem[]; document: DocItem; settings: any; showAds: boolean }) {
   return (
     <aside className="hidden lg:flex flex-col gap-6 w-72 xl:w-80 shrink-0">
       {/* Related Study Materials */}
@@ -336,6 +342,11 @@ function DownloadSidebar({ relatedDocs, document: doc }: { relatedDocs: DocItem[
           ))}
         </div>
       </div>
+
+      {/* Sidebar Ad Slot */}
+      {showAds && settings?.sidebarAdSlot && (
+        <AdUnit publisherId={settings.adsensePublisherId} slotId={settings.sidebarAdSlot} className="w-full min-h-[250px] rounded-xl shadow-sm" />
+      )}
 
       {/* Premium Promo Card */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 p-5 text-white shadow-lg">
@@ -394,6 +405,15 @@ export function DownloadPageClient({ document: doc, relatedDocs, settings = { au
     }
   };
 
+  const handleBookmark = async () => {
+    setBookmarked(b => !b);
+    try {
+      await fetch(`/api/documents/${doc.id}/bookmark`, { method: 'POST' });
+    } catch {
+      setBookmarked(b => !b); // revert on error
+    }
+  };
+
   const updatedDate = doc.updatedAt
     ? formatDistanceToNow(new Date(doc.updatedAt), { addSuffix: true })
     : null;
@@ -423,7 +443,7 @@ export function DownloadPageClient({ document: doc, relatedDocs, settings = { au
           {/* Actions */}
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setBookmarked(b => !b)}
+              onClick={handleBookmark}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${bookmarked ? 'border-emerald-300 text-emerald-600 bg-emerald-50' : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'}`}
             >
               <Bookmark className={`w-3.5 h-3.5 ${bookmarked ? 'fill-current' : ''}`} />
@@ -517,19 +537,32 @@ export function DownloadPageClient({ document: doc, relatedDocs, settings = { au
               </div>
             </div>
 
-            {/* Download Waiting Card */}
-            <div className="mb-8">
-              {/* Pass slug only — real fileUrl is never sent to the client */}
-              <CountdownCard slug={slug} fileType={ext} autoDownload={settings.autoDownload} />
-            </div>
-
-            {/* Ad Placeholder */}
-            {showAds && (
-              <div className="mb-8 w-full h-24 sm:h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400">
-                <span className="text-xs uppercase tracking-widest font-bold mb-1">Advertisement</span>
-                <span className="text-sm">Support us by viewing ads</span>
+            {/* Below Hero Ad Slot */}
+            {showAds && settings.belowHeroAdSlot && (
+              <div className="mb-6">
+                <AdUnit publisherId={settings.adsensePublisherId} slotId={settings.belowHeroAdSlot} className="w-full min-h-[90px] rounded-xl overflow-hidden shadow-sm" />
               </div>
             )}
+
+            {/* Download Area with Side Ads */}
+            <div className="mb-8 flex flex-col md:flex-row gap-6 items-start justify-center">
+              {showAds && settings.leftAdSlot && (
+                <div className="hidden md:block w-[160px] lg:w-[300px] shrink-0">
+                  <AdUnit publisherId={settings.adsensePublisherId} slotId={settings.leftAdSlot} className="w-full h-[600px] rounded-xl shadow-sm" />
+                </div>
+              )}
+              
+              <div className="flex-1 w-full max-w-2xl">
+                {/* Pass slug only — real fileUrl is never sent to the client */}
+                <CountdownCard slug={slug} fileType={ext} autoDownload={settings.autoDownload} />
+              </div>
+
+              {showAds && settings.rightAdSlot && (
+                <div className="hidden md:block w-[160px] lg:w-[300px] shrink-0">
+                  <AdUnit publisherId={settings.adsensePublisherId} slotId={settings.rightAdSlot} className="w-full h-[600px] rounded-xl shadow-sm" />
+                </div>
+              )}
+            </div>
 
             {/* Continue Learning */}
             <ContinueLearningSection />
@@ -561,9 +594,20 @@ export function DownloadPageClient({ document: doc, relatedDocs, settings = { au
           </div>
 
           {/* ── Sidebar ────────────────────────────────────────────────────── */}
-          <DownloadSidebar relatedDocs={relatedDocs} document={doc} />
+          <DownloadSidebar relatedDocs={relatedDocs} document={doc} settings={settings} showAds={showAds} />
         </div>
       </div>
+
+      {/* Trigger Analytics (Client side tracking) */}
+      <script dangerouslySetInnerHTML={{
+        __html: `
+          if (typeof window !== 'undefined') {
+             setTimeout(() => {
+                fetch('/api/documents/${doc.id}/analytics', { method: 'POST' }).catch(console.error);
+             }, 3000);
+          }
+        `
+      }} />
     </div>
   );
 }

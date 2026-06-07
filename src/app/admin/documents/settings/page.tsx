@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Settings, Save, Loader2 } from 'lucide-react';
 
@@ -17,6 +18,11 @@ export default function DocumentSettingsPage() {
   const [settings, setSettings] = useState({
     autoDownload: true,
     adsMode: 'guests_only', // 'none', 'guests_only', 'everyone'
+    adsensePublisherId: '',
+    leftAdSlot: '',
+    rightAdSlot: '',
+    sidebarAdSlot: '',
+    belowHeroAdSlot: '',
   });
 
   useEffect(() => {
@@ -29,6 +35,11 @@ export default function DocumentSettingsPage() {
           setSettings({
             autoDownload: snap.data().autoDownload ?? true,
             adsMode: snap.data().adsMode || 'guests_only',
+            adsensePublisherId: snap.data().adsensePublisherId || '',
+            leftAdSlot: snap.data().leftAdSlot || '',
+            rightAdSlot: snap.data().rightAdSlot || '',
+            sidebarAdSlot: snap.data().sidebarAdSlot || '',
+            belowHeroAdSlot: snap.data().belowHeroAdSlot || '',
           });
         }
       } catch (error) {
@@ -111,6 +122,59 @@ export default function DocumentSettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {settings.adsMode !== 'none' && (
+        <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+          <CardHeader>
+            <CardTitle>Google AdSense Configuration</CardTitle>
+            <CardDescription>Enter your publisher and slot IDs. Leave a slot ID blank to disable that specific placement.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Publisher ID</Label>
+              <Input
+                placeholder="e.g. ca-pub-1234567890123456"
+                value={settings.adsensePublisherId}
+                onChange={(e) => setSettings({ ...settings, adsensePublisherId: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Left Download Ad Slot ID</Label>
+                <Input
+                  placeholder="e.g. 1234567890"
+                  value={settings.leftAdSlot}
+                  onChange={(e) => setSettings({ ...settings, leftAdSlot: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Right Download Ad Slot ID</Label>
+                <Input
+                  placeholder="e.g. 1234567890"
+                  value={settings.rightAdSlot}
+                  onChange={(e) => setSettings({ ...settings, rightAdSlot: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Sidebar Popular Downloads Ad Slot ID</Label>
+                <Input
+                  placeholder="e.g. 1234567890"
+                  value={settings.sidebarAdSlot}
+                  onChange={(e) => setSettings({ ...settings, sidebarAdSlot: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Below Document Hero Ad Slot ID</Label>
+                <Input
+                  placeholder="e.g. 1234567890"
+                  value={settings.belowHeroAdSlot}
+                  onChange={(e) => setSettings({ ...settings, belowHeroAdSlot: e.target.value })}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Button onClick={handleSave} disabled={saving} className="bg-[#107c41] hover:bg-[#0b5c30]">
         {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}

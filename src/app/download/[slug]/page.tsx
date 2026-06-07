@@ -58,13 +58,12 @@ export default async function DownloadWaitingPage({ params }: { params: Promise<
   }
 
   // Fetch settings
-  let settings = { autoDownload: true, adsMode: 'guests_only' };
+  let settings: any = { autoDownload: true, adsMode: 'guests_only' };
   try {
     const settingsSnap = await getDoc(doc(db, 'settings', 'download_page'));
     if (settingsSnap.exists()) {
       const data = settingsSnap.data();
-      if (typeof data.autoDownload === 'boolean') settings.autoDownload = data.autoDownload;
-      if (data.adsMode) settings.adsMode = data.adsMode;
+      settings = { ...settings, ...data };
     }
   } catch {
     // silent fallback

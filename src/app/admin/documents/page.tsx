@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   FolderOpen, Plus, Loader2, Search, Eye, Edit3, Trash2, Download,
   FileText, FileArchive, FileSpreadsheet, Presentation, BookOpen,
-  Filter, BarChart2, Layers, RefreshCw, ExternalLink
+  Filter, BarChart2, Layers, RefreshCw, ExternalLink, Settings
 } from 'lucide-react';
 
 const FILE_TYPE_ICONS: Record<string, React.ReactNode> = {
@@ -115,6 +115,11 @@ export default function AdminDocumentsPage() {
               <Button className="gap-2 bg-amber-500 hover:bg-amber-600 text-white">
                 <Plus className="w-4 h-4" />
                 Upload Document
+              </Button>
+            </Link>
+            <Link href="/admin/documents/settings">
+              <Button variant="outline" size="icon" className="w-9 h-9 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-emerald-600" title="Settings">
+                <Settings className="w-4 h-4" />
               </Button>
             </Link>
           </div>
