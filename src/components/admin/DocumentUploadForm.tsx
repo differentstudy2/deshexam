@@ -290,7 +290,7 @@ export function DocumentUploadForm({ topicId, onSaved, compact = false, initialD
           {inputMode === 'upload' ? (
             <>
               <input ref={fileInputRef} type="file" accept={ACCEPTED_TYPES} className="hidden" onChange={e => setFile(e.target.files?.[0] || null)} />
-              {!file && (!initialData?.fileUrl || inputMode === 'url') ? (
+              {!file && !initialData?.fileUrl ? (
                 <div
                   onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                   onDragLeave={() => setDragOver(false)}

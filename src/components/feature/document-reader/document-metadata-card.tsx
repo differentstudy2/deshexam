@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { BookOpen, Download, Bookmark, Share2, Eye, FileText, Globe, Clock, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -30,6 +31,8 @@ export function DocumentMetadataCard({ document }: DocumentMetadataProps) {
   const formattedDate = document.updatedAt || document.createdAt 
     ? formatDistanceToNow(new Date(document.updatedAt?.toMillis ? document.updatedAt.toMillis() : document.updatedAt || Date.now()), { addSuffix: true }) 
     : 'Unknown';
+
+  const slug = document.slug || document.id;
 
   return (
     <Card className="border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-8">
@@ -69,11 +72,11 @@ export function DocumentMetadataCard({ document }: DocumentMetadataProps) {
           <Button onClick={handleScrollToReader} className="bg-[#107c41] hover:bg-[#0b5c30] text-white">
             <BookOpen className="w-4 h-4 mr-2" /> Read Online
           </Button>
-          <a href={document.fileUrl || document.url} download target="_blank" rel="noopener noreferrer">
+          <Link href={`/download/${slug}`}>
             <Button variant="outline" className="border-[#107c41] text-[#107c41] hover:bg-green-50 dark:hover:bg-green-900/20">
               <Download className="w-4 h-4 mr-2" /> Download PDF
             </Button>
-          </a>
+          </Link>
           <Button variant="ghost" className="text-slate-600 dark:text-slate-400">
             <Bookmark className="w-4 h-4 mr-2" /> Bookmark
           </Button>
