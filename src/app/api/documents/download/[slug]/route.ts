@@ -27,6 +27,29 @@ export async function GET(
     return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
   }
 
+  // ── Hotlink / off-site direct-link protection ────────────────────────────
+  // If someone copies this URL and puts it on their website, visitors clicking
+  // that link should land on our /download/[slug] waiting page — not get a
+  // bare file download bypassing our site entirely.
+  //
+  // How it works:
+  //   • Browsers always send the Referer header when following a link.
+  //   • We check if the referer origin matches our own host.
+  //   • No referer  → treat as off-site (direct URL paste / external link).
+  //   • Wrong site  → redirect to our waiting page.
+  //   • Our site    → proceed with the actual file stream.
+  const referer  = request.headers.get('referer') || '';
+  const host     = request.headers.get('host') || '';
+  const isOwnSite = host !== '' && referer.includes(host);
+
+  if (!isOwnSite) {
+    // Determine protocol (Vercel / reverse-proxy sets x-forwarded-proto)
+    const proto = request.headers.get('x-forwarded-proto') || 'https';
+    const waitingPageUrl = `${proto}://${host}/download/${slug}`;
+    return NextResponse.redirect(waitingPageUrl, { status: 302 });
+  }
+  // ────────────────────────────────────────────────────────────────────────
+
   try {
     // 1. Look up document by slug field
     let item: any = null;
