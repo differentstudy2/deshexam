@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  ChevronRight, Bookmark, Share2, Download, ExternalLink,
+  ChevronRight, Bookmark, Share2, Download,
   FileText, Globe, Eye, Clock, CheckCircle2, Play, Headphones,
   BookOpen, HelpCircle, PenLine, Layers, ArrowLeft, Crown
 } from 'lucide-react';
@@ -64,37 +64,30 @@ function FileTypeBadge({ ext }: { ext: string }) {
 }
 
 // ─── Countdown / Download Core ────────────────────────────────────────────────
-function CountdownCard({ fileUrl, fileType }: { fileUrl: string; fileType: string }) {
+// NOTE: fileUrl is NEVER passed to this component — the proxy URL is used
+// so the real storage URL is never exposed in the browser.
+function CountdownCard({ slug, fileType }: { slug: string; fileType: string }) {
+  // Proxy endpoint — hides the real storage URL from the client
+  const proxyUrl = `/api/documents/download/${slug}`;
+
   const TOTAL = 5;
   const [count, setCount] = useState(TOTAL);
   const [phase, setPhase] = useState<'counting' | 'success' | 'error'>('counting');
-  const [downloaded, setDownloaded] = useState(false);
-  const [manualNeeded, setManualNeeded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const triggerDownload = useCallback(() => {
     try {
       const link = window.document.createElement('a');
-      link.href = fileUrl;
+      link.href = proxyUrl;
       link.download = '';
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
       window.document.body.appendChild(link);
       link.click();
       window.document.body.removeChild(link);
-      setDownloaded(true);
       setPhase('success');
-      // Track download
-      fetch('/api/documents/download-track', {
-        method: 'POST',
-        body: JSON.stringify({ fileUrl }),
-        headers: { 'Content-Type': 'application/json' }
-      }).catch(() => {});
     } catch {
-      setManualNeeded(true);
       setPhase('error');
     }
-  }, [fileUrl]);
+  }, [proxyUrl]);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -119,6 +112,9 @@ function CountdownCard({ fileUrl, fileType }: { fileUrl: string; fileType: strin
   const circleCircumference = 2 * Math.PI * 48;
   const circleDash = ((100 - progress) / 100) * circleCircumference;
 
+  const extLabel = fileType.toUpperCase();
+  const extBg = fileTypeColor[fileType.toLowerCase()] || 'bg-slate-500';
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg p-6 sm:p-8 text-center relative overflow-hidden">
       {/* background glow */}
@@ -126,11 +122,11 @@ function CountdownCard({ fileUrl, fileType }: { fileUrl: string; fileType: strin
 
       {phase === 'counting' && (
         <>
-          {/* PDF animated icon */}
+          {/* File type animated icon */}
           <div className="flex justify-center mb-5">
-            <div className="relative w-16 h-16 animate-bounce">
-              <div className="w-full h-full bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-200 dark:shadow-red-900/30">
-                <span className="text-white text-[11px] font-black tracking-wider">PDF</span>
+            <div className={`relative w-16 h-16 animate-bounce`}>
+              <div className={`w-full h-full ${extBg} rounded-2xl flex items-center justify-center shadow-lg`}>
+                <span className="text-white text-[11px] font-black tracking-wider">{extLabel}</span>
               </div>
             </div>
           </div>
@@ -193,14 +189,12 @@ function CountdownCard({ fileUrl, fileType }: { fileUrl: string; fileType: strin
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Your file is ready.</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Download started successfully.</p>
           <div className="flex flex-col gap-3">
-            <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
+            {/* Download again — still uses proxy, not raw URL */}
+            <a href={proxyUrl} download>
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 h-12 rounded-xl text-base shadow-lg shadow-emerald-500/20">
-                <Download className="w-5 h-5" /> Download Now
+                <Download className="w-5 h-5" /> Download Again
               </Button>
             </a>
-            <Button variant="outline" className="w-full gap-2 h-11 rounded-xl border-slate-200 dark:border-slate-700" onClick={() => window.history.back()}>
-              <ExternalLink className="w-4 h-4" /> Open Online
-            </Button>
             <Button variant="ghost" className="w-full gap-2 h-10 text-slate-500" onClick={() => window.history.back()}>
               <ArrowLeft className="w-4 h-4" /> Return to Chapter
             </Button>
@@ -217,7 +211,8 @@ function CountdownCard({ fileUrl, fileType }: { fileUrl: string; fileType: strin
           </div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Auto-download blocked</h2>
           <p className="text-sm text-slate-500 mb-4">Your browser blocked the auto-download. Please click below.</p>
-          <a href={fileUrl} download target="_blank" rel="noopener noreferrer">
+          {/* Fallback button — proxy URL only */}
+          <a href={proxyUrl} download>
             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 h-12 rounded-xl">
               <Download className="w-5 h-5" /> Download Now
             </Button>
@@ -361,7 +356,7 @@ function DownloadSidebar({ relatedDocs, document: doc }: { relatedDocs: DocItem[
 export function DownloadPageClient({ document: doc, relatedDocs }: Props) {
   const { user } = useAuth();
   const [bookmarked, setBookmarked] = useState(false);
-  const fileUrl = doc.fileUrl || doc.url || '';
+  // fileUrl is intentionally NOT extracted here — it must never be sent to the browser.
   const ext = doc.fileType || 'pdf';
   const slug = doc.slug || doc.id;
 
@@ -498,16 +493,8 @@ export function DownloadPageClient({ document: doc, relatedDocs }: Props) {
 
             {/* Download Waiting Card */}
             <div className="mb-8">
-              {fileUrl ? (
-                <CountdownCard fileUrl={fileUrl} fileType={ext} />
-              ) : (
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-red-200 dark:border-red-800 p-8 text-center">
-                  <p className="text-slate-600 dark:text-slate-300 font-medium">This document does not have a downloadable file yet.</p>
-                  <Link href={`/documents/${slug}`}>
-                    <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white">View Document</Button>
-                  </Link>
-                </div>
-              )}
+              {/* Pass slug only — real fileUrl is never sent to the client */}
+              <CountdownCard slug={slug} fileType={ext} />
             </div>
 
             {/* Continue Learning */}
