@@ -38,6 +38,10 @@ interface DocItem {
 interface Props {
   document: DocItem;
   relatedDocs: DocItem[];
+  settings?: {
+    autoDownload: boolean;
+    adsMode: string;
+  };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -66,13 +70,13 @@ function FileTypeBadge({ ext }: { ext: string }) {
 // ─── Countdown / Download Core ────────────────────────────────────────────────
 // NOTE: fileUrl is NEVER passed to this component — the proxy URL is used
 // so the real storage URL is never exposed in the browser.
-function CountdownCard({ slug, fileType }: { slug: string; fileType: string }) {
+function CountdownCard({ slug, fileType, autoDownload }: { slug: string; fileType: string; autoDownload?: boolean }) {
   // Proxy endpoint — hides the real storage URL from the client
   const proxyUrl = `/api/documents/download/${slug}`;
 
   const TOTAL = 5;
   const [count, setCount] = useState(TOTAL);
-  const [phase, setPhase] = useState<'counting' | 'success' | 'error'>('counting');
+  const [phase, setPhase] = useState<'counting' | 'manual' | 'success' | 'error'>(autoDownload === false ? 'manual' : 'counting');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const triggerDownload = useCallback(() => {
@@ -90,6 +94,7 @@ function CountdownCard({ slug, fileType }: { slug: string; fileType: string }) {
   }, [proxyUrl]);
 
   useEffect(() => {
+    if (phase !== 'counting') return;
     intervalRef.current = setInterval(() => {
       setCount(prev => {
         if (prev <= 1) {
@@ -99,8 +104,8 @@ function CountdownCard({ slug, fileType }: { slug: string; fileType: string }) {
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(intervalRef.current!);
-  }, []);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [phase]);
 
   useEffect(() => {
     if (count === 0 && phase === 'counting') {
@@ -177,6 +182,25 @@ function CountdownCard({ slug, fileType }: { slug: string; fileType: string }) {
           </div>
           <p className="text-[11px] text-slate-400 mt-2">File will download automatically…</p>
         </>
+      )}
+
+      {phase === 'manual' && (
+        <div className="animate-in fade-in duration-300">
+          <div className="flex justify-center mb-5">
+            <div className={`relative w-16 h-16`}>
+              <div className={`w-full h-full ${extBg} rounded-2xl flex items-center justify-center shadow-lg`}>
+                <span className="text-white text-[11px] font-black tracking-wider">{extLabel}</span>
+              </div>
+            </div>
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Your file is ready.</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">Click the button below to start the download.</p>
+          <a href={proxyUrl} download onClick={() => setTimeout(() => setPhase('success'), 1000)}>
+            <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2 h-12 rounded-xl text-base shadow-lg shadow-emerald-500/20">
+              <Download className="w-5 h-5" /> Download File Now
+            </Button>
+          </a>
+        </div>
       )}
 
       {phase === 'success' && (
@@ -353,12 +377,14 @@ function DownloadSidebar({ relatedDocs, document: doc }: { relatedDocs: DocItem[
 }
 
 // ─── Main Client Page ─────────────────────────────────────────────────────────
-export function DownloadPageClient({ document: doc, relatedDocs }: Props) {
+export function DownloadPageClient({ document: doc, relatedDocs, settings = { autoDownload: true, adsMode: 'guests_only' } }: Props) {
   const { user } = useAuth();
   const [bookmarked, setBookmarked] = useState(false);
   // fileUrl is intentionally NOT extracted here — it must never be sent to the browser.
   const ext = doc.fileType || 'pdf';
   const slug = doc.slug || doc.id;
+
+  const showAds = settings.adsMode === 'everyone' || (settings.adsMode === 'guests_only' && !user);
 
   const handleShare = () => {
     if (navigator.share) {
@@ -494,8 +520,16 @@ export function DownloadPageClient({ document: doc, relatedDocs }: Props) {
             {/* Download Waiting Card */}
             <div className="mb-8">
               {/* Pass slug only — real fileUrl is never sent to the client */}
-              <CountdownCard slug={slug} fileType={ext} />
+              <CountdownCard slug={slug} fileType={ext} autoDownload={settings.autoDownload} />
             </div>
+
+            {/* Ad Placeholder */}
+            {showAds && (
+              <div className="mb-8 w-full h-24 sm:h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400">
+                <span className="text-xs uppercase tracking-widest font-bold mb-1">Advertisement</span>
+                <span className="text-sm">Support us by viewing ads</span>
+              </div>
+            )}
 
             {/* Continue Learning */}
             <ContinueLearningSection />

@@ -38,9 +38,12 @@ export async function GET(
   //   • No referer  → treat as off-site (direct URL paste / external link).
   //   • Wrong site  → redirect to our waiting page.
   //   • Our site    → proceed with the actual file stream.
-  const referer  = request.headers.get('referer') || '';
-  const host     = request.headers.get('host') || '';
-  const isOwnSite = host !== '' && referer.includes(host);
+  const referer = request.headers.get('referer') || '';
+  const forwardedHost = request.headers.get('x-forwarded-host');
+  const host = forwardedHost || request.headers.get('host') || '';
+  const originalHost = request.headers.get('host') || '';
+  
+  const isOwnSite = (host !== '' && referer.includes(host)) || (originalHost !== '' && referer.includes(originalHost));
 
   if (!isOwnSite) {
     // Determine protocol (Vercel / reverse-proxy sets x-forwarded-proto)
@@ -48,7 +51,6 @@ export async function GET(
     const waitingPageUrl = `${proto}://${host}/download/${slug}`;
     return NextResponse.redirect(waitingPageUrl, { status: 302 });
   }
-  // ────────────────────────────────────────────────────────────────────────
 
   try {
     // 1. Look up document by slug field
@@ -136,6 +138,16 @@ export async function GET(
     // Pass through Content-Length so the browser can show download progress
     const upstreamLength = upstream.headers.get('content-length');
     if (upstreamLength) responseHeaders.set('Content-Length', upstreamLength);
+
+    // Auto-update fileSize if missing
+    if (docId && (!item.fileSize || item.fileSize === 0) && upstreamLength) {
+      const parsedSize = parseInt(upstreamLength, 10);
+      if (!isNaN(parsedSize) && parsedSize > 0) {
+        updateDoc(doc(db, 'guide_documents', docId), {
+          fileSize: parsedSize
+        }).catch(() => { /* non-critical */ });
+      }
+    }
 
     return new Response(upstream.body, {
       // 206 Partial Content if upstream honoured a Range request

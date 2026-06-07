@@ -1,7 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { getMediaItemBySlug } from '@/lib/firebase/guide';
 import { DownloadPageClient } from './download-client';
@@ -57,6 +57,19 @@ export default async function DownloadWaitingPage({ params }: { params: Promise<
     // silent — related docs are non-critical
   }
 
+  // Fetch settings
+  let settings = { autoDownload: true, adsMode: 'guests_only' };
+  try {
+    const settingsSnap = await getDoc(doc(db, 'settings', 'download_page'));
+    if (settingsSnap.exists()) {
+      const data = settingsSnap.data();
+      if (typeof data.autoDownload === 'boolean') settings.autoDownload = data.autoDownload;
+      if (data.adsMode) settings.adsMode = data.adsMode;
+    }
+  } catch {
+    // silent fallback
+  }
+
   // Serialize Firestore timestamps
   const serialized = {
     ...item,
@@ -68,5 +81,5 @@ export default async function DownloadWaitingPage({ params }: { params: Promise<
       : typeof item.updatedAt === 'number' ? item.updatedAt : Date.now(),
   };
 
-  return <DownloadPageClient document={serialized} relatedDocs={relatedDocs} />;
+  return <DownloadPageClient document={serialized} relatedDocs={relatedDocs} settings={settings} />;
 }
