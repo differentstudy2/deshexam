@@ -156,6 +156,15 @@ export default function QuestionBankQuestionsPage() {
   useEffect(() => {
     fetchQuestions();
     fetchTaxonomies();
+    
+    if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const topicIdParam = params.get('topicId');
+        if (topicIdParam) {
+            setView('editor');
+            setEditData(prev => ({ ...prev, topicId: topicIdParam }));
+        }
+    }
   }, []);
 
   const handleSave = async () => {
