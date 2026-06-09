@@ -1855,9 +1855,9 @@ export const getChaptersByTextbookId = async (textbookId: string) => {
         const chaptersRef = collection(db, "textbooks", textbookId, "chapters");
         const q = query(chaptersRef);
         const querySnapshot = await getDocs(q);
-        const chaptersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as { title: string } }));
+        const chaptersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
 
-        chaptersData.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true }));
+        chaptersData.sort((a, b) => (a.title || "").localeCompare(b.title || "", undefined, { numeric: true }));
 
         return chaptersData;
     } catch (e) {

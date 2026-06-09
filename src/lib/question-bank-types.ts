@@ -119,11 +119,13 @@ export interface QuestionImportRow {
   Textbook: string;
   Chapter: string;
   Topic: string;
+  'Question Type': string;
   Question: string;
   'Option A': string;
   'Option B': string;
   'Option C': string;
   'Option D': string;
+  'Option E': string;
   'Correct Answer': string;
   Explanation: string;
   Difficulty: string;

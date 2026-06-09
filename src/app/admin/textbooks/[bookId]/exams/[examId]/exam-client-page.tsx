@@ -38,7 +38,7 @@ import QuestionForm from './question-form';
 const questionSchema = z.object({
   id: z.string().optional(),
   text: z.string().min(1, 'Question text cannot be empty.'),
-  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching']),
+  type: z.enum(['Multiple Choice', 'True/False', 'Short Answer', 'Fill in the Blank', 'Matching', 'Grouped', 'Descriptive']),
   marks: z.coerce.number().int().positive('Marks must be a positive number.'),
   options: z.array(z.object({ text: z.string().min(1, 'Option text cannot be empty.'), explanation: z.string().optional() })).optional(),
   matchingOptions: z.object({
@@ -208,7 +208,7 @@ export default function ExamClientPage({ initialTest, initialTextbook }: { initi
     }
     
     const handleSelectQuestion = (questionId: string) => {
-        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, id]);
+        setSelectedQuestions(prev => prev.includes(questionId) ? prev.filter(id => id !== questionId) : [...prev, questionId]);
     };
     
     const handleSelectAllQuestions = (checked: boolean) => {
