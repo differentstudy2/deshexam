@@ -319,15 +319,17 @@ export default function BulkImportPage() {
                     <Card>
                         <CardContent className="p-6 space-y-4">
                             <div className="space-y-2">
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                                     <Label htmlFor="json-paste">Paste JSON Data</Label>
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm" 
-                                        onClick={() => setJsonText(JSON.stringify(demoJsonData, null, 2))}
-                                    >
-                                        Load Demo Data
-                                    </Button>
+                                    <div className="flex items-center flex-wrap gap-2">
+                                        <span className="text-xs text-slate-500 mr-1">Load Demo:</span>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setJsonText(JSON.stringify(demoJsonData, null, 2))}>All</Button>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setJsonText(JSON.stringify([demoJsonData[0]], null, 2))}>MCQ</Button>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setJsonText(JSON.stringify([demoJsonData[1]], null, 2))}>T/F</Button>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setJsonText(JSON.stringify([demoJsonData[2]], null, 2))}>FITB</Button>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setJsonText(JSON.stringify([demoJsonData[3]], null, 2))}>Matching</Button>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => setJsonText(JSON.stringify([demoJsonData[4]], null, 2))}>Desc</Button>
+                                    </div>
                                 </div>
                                 <Textarea 
                                     id="json-paste"
