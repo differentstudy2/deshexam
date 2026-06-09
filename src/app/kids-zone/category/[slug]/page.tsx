@@ -173,7 +173,8 @@ async function getCategoryData(slug: string) {
 }
 
 export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { slug } = params;
+  const { slug: rawSlug } = params;
+  const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
   const { category, categoryName } = await getCategoryData(slug);
   
   if (!categoryName) {
@@ -195,7 +196,8 @@ export async function generateMetadata({ params }: PageProps, parent: ResolvingM
 }
 
 export default async function KidsZoneCategoryServerPage({ params }: PageProps) {
-  const { slug } = params;
+  const { slug: rawSlug } = params;
+  const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
   const { category, categoryName } = await getCategoryData(slug);
   
   if (!categoryName) {

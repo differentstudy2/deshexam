@@ -34,7 +34,8 @@ export default function ClassPage({ params }: { params: { slug: string } }) {
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { slug } = params;
+  const { slug: rawSlug } = params;
+  const slug = rawSlug ? decodeURIComponent(rawSlug) : '';
 
   const pageTitle = slug ? slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ') : 'Class';
 

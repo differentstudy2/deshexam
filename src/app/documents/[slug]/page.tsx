@@ -14,7 +14,8 @@ import { FaqSection } from '@/components/feature/document-reader/faq-section';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const item = await getMediaItemBySlug('guide_documents', resolvedParams.slug);
+  const decodedSlug = decodeURIComponent(resolvedParams.slug);
+  const item = await getMediaItemBySlug('guide_documents', decodedSlug);
   
   if (!item) return { title: 'Document Not Found' };
 
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title,
       description,
       type: 'article',
-      url: `https://deshexam.com/documents/${resolvedParams.slug}`,
+      url: `https://deshexam.com/documents/${decodedSlug}`,
       images: item.thumbnail ? [{ url: item.thumbnail }] : [],
     },
     twitter: {
@@ -38,14 +39,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: item.thumbnail ? [item.thumbnail] : [],
     },
     alternates: {
-      canonical: `https://deshexam.com/documents/${resolvedParams.slug}`,
+      canonical: `https://deshexam.com/documents/${decodedSlug}`,
     }
   };
 }
 
 export default async function DocumentReaderPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const item = await getMediaItemBySlug('guide_documents', resolvedParams.slug);
+  const decodedSlug = decodeURIComponent(resolvedParams.slug);
+  const item = await getMediaItemBySlug('guide_documents', decodedSlug);
 
   if (!item) {
     notFound();
@@ -65,7 +67,7 @@ export default async function DocumentReaderPage({ params }: { params: Promise<{
     ...(hierarchy?.subject ? [{ name: hierarchy.subject.title, item: `https://deshexam.com/subject/${hierarchy.subject.id}` }] : []),
     ...(hierarchy?.textbook ? [{ name: hierarchy.textbook.title, item: `https://deshexam.com/textbook/${hierarchy.textbook.id}` }] : []),
     ...(hierarchy?.chapter ? [{ name: hierarchy.chapter.title, item: `https://deshexam.com/chapter/${hierarchy.chapter.id}` }] : []),
-    { name: item.title, item: `https://deshexam.com/documents/${resolvedParams.slug}` }
+    { name: item.title, item: `https://deshexam.com/documents/${decodedSlug}` }
   ];
 
   const breadcrumbSchema = {

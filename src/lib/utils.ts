@@ -18,3 +18,17 @@ export function formatTitleForBrowser(text: string): string {
         .replace(/\s\s+/g, ' ') // Collapse multiple spaces
         .trim();
 }
+
+export function slugify(text: string): string {
+    if (!text) return '';
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[\s_]+/g, '-')           // Replace spaces and underscores with -
+        .replace(/[^\p{L}\p{M}\p{N}\-]/gu, '') // Keep unicode letters, marks (vowels/conjuncts), numbers, and hyphens
+        .replace(/\-\-+/g, '-')            // Replace multiple - with single -
+        .replace(/^-+/, '')                // Trim - from start of text
+        .replace(/-+$/, '')                // Trim - from end of text
+        .substring(0, 100);                // Cap length to 100 chars max
+}

@@ -9,7 +9,7 @@ import { DownloadPageClient } from './download-client';
 // ─── No-index so waiting pages are never crawled ─────────────────────────────
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const item = await getMediaItemBySlug('guide_documents', resolvedParams.slug);
+  const item = await getMediaItemBySlug('guide_documents', decodeURIComponent(resolvedParams.slug));
   return {
     title: item ? `Downloading: ${item.title} – DeshExam` : 'Download – DeshExam',
     robots: { index: false, follow: false },
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function DownloadWaitingPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const item = await getMediaItemBySlug('guide_documents', resolvedParams.slug);
+  const item = await getMediaItemBySlug('guide_documents', decodeURIComponent(resolvedParams.slug));
 
   if (!item || item.status === 'draft') {
     notFound();

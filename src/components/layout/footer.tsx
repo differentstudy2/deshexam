@@ -21,42 +21,76 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-secondary text-secondary-foreground font-body">
-      <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4 md:col-span-2">
-            <DeshExamLogo />
-            <p className="text-sm text-muted-foreground max-w-md">
-              DeshExam is your ultimate destination for mock tests, quizzes, and personalized learning paths. Our goal is to empower students across India to achieve their academic dreams by providing high-quality, accessible, and affordable exam preparation for NEET, JEE, UPSC, and more.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-headline font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              <li><Link href="/mock-tests" className="text-sm hover:text-primary transition-colors">Mock Tests</Link></li>
-              <li><Link href="/quizzes" className="text-sm hover:text-primary transition-colors">Quizzes</Link></li>
-              <li><Link href="/pricing" className="text-sm hover:text-primary transition-colors">Pricing</Link></li>
-              <li><Link href="/leaderboard" className="text-sm hover:text-primary transition-colors">Leaderboard</Link></li>
+    <footer className="bg-[#0b1120] text-slate-300 font-body py-16">
+      <div className="container max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-sm">
+          {/* EDUCATION */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Education</h4>
+            <ul className="space-y-3">
+              <li><Link href="#" className="hover:text-white transition-colors">Class 10 Notes</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">HSC Preparation</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">WBCS Guide</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">MCQ Library</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Exam Updates</Link></li>
             </ul>
           </div>
-          <div>
-            <h4 className="font-headline font-semibold mb-4">Support</h4>
-            <ul className="space-y-2">
-              <li><Link href="/about" className="text-sm hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="text-sm hover:text-primary transition-colors">Contact Us</Link></li>
-              <li><Link href="/faq" className="text-sm hover:text-primary transition-colors">FAQ</Link></li>
-              <li><Link href="/terms" className="text-sm hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="text-sm hover:text-primary transition-colors">Privacy Policy</Link></li>
+
+          {/* KNOWLEDGE */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Knowledge</h4>
+            <ul className="space-y-3">
+              <li><Link href="#" className="hover:text-white transition-colors">Science & Tech</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">History Hub</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">GK Daily</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Glossary Index</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Academic Dictionary</Link></li>
             </ul>
           </div>
-        </div>
-        <div className="mt-8 pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
-           <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} DeshExam. All rights reserved.</p>
-           <div className="flex space-x-4">
-              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Twitter /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Github /></Link>
-              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors"><Linkedin /></Link>
-            </div>
+
+          {/* SCHOLARSHIPS */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Scholarships</h4>
+            <ul className="space-y-3">
+              <li><Link href="#" className="hover:text-white transition-colors">Govt Scholarships</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Study Abroad</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Private Grants</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Scholarship News</Link></li>
+            </ul>
+          </div>
+
+          {/* RESOURCES */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Resources</h4>
+            <ul className="space-y-3">
+              <li><Link href="#" className="hover:text-white transition-colors">Question Papers</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Syllabus Guide</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">PDF Downloads</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Carrier Roadmap</Link></li>
+            </ul>
+          </div>
+
+          {/* COMPANY */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Company</h4>
+            <ul className="space-y-3">
+              <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Success Stories</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Work with Us</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* LEGAL */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-slate-400 tracking-wider text-xs uppercase mb-6">Legal</h4>
+            <ul className="space-y-3">
+              <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Disclaimer</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

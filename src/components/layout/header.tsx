@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -108,6 +108,20 @@ const adminNavGroups = [
     items: [
       { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-4 w-4" /> },
       { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "Student Portal",
+    items: [
+      { href: '/dashboard/student', label: 'Student Dashboard', icon: <UserIcon className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "Question Bank CMS",
+    items: [
+      { href: '/admin/question-bank/questions', label: 'Questions', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/question-bank/categories', label: 'Taxonomy & Categories', icon: <BookOpen className="h-4 w-4" /> },
+      { href: '/admin/question-bank/import', label: 'Bulk Import', icon: <Upload className="h-4 w-4" /> },
     ]
   },
   {
@@ -259,7 +273,7 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
         "transition-colors flex items-center gap-4 nav-link-style hover:text-[#00a651]",
         pathname === href 
             ? "text-[#00a651] font-bold" 
-            : (isScrolled ? "text-slate-200 hover:text-white" : "text-slate-600 hover:text-slate-900"),
+            : "text-slate-600 hover:text-slate-900",
         isMobile && "text-lg py-2"
       )}
     >
@@ -482,7 +496,7 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
         isScrolled 
-          ? "bg-[#0f172a]/95 backdrop-blur-xl border-b border-white/10 shadow-lg text-white" 
+          ? "bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm text-slate-800" 
           : "bg-transparent border-transparent text-slate-800"
       )}
     >

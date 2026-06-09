@@ -64,7 +64,8 @@ export default function UserProfilePage({ params }: { params: { username: string
   const { toast } = useToast();
   const router = useRouter();
   const { user: currentUser } = useAuth();
-  const { username } = params;
+  const { username: rawUsername } = params;
+  const username = rawUsername ? decodeURIComponent(rawUsername) : '';
 
   useEffect(() => {
     if (!username) return;
@@ -75,17 +76,31 @@ export default function UserProfilePage({ params }: { params: { username: string
         const profileData = await getUserByUsername(username);
 
         if (profileData) {
+          const fetchSubs = new Promise<Submission[]>((resolve, reject) => {
+             const unsubscribe = getSubmissionsByUserId(
+                profileData.uid,
+                (subs) => {
+                   resolve(subs as unknown as Submission[]);
+                   unsubscribe();
+                },
+                (err) => {
+                   reject(err);
+                   unsubscribe();
+                }
+             );
+          });
+
           const [contentData, submissionsData] = await Promise.all([
             getContentByAuthor(profileData.uid),
-            getSubmissionsByUserId(profileData.uid),
+            fetchSubs,
           ]);
           
           setProfile(profileData as UserProfile);
           if (currentUser) {
             setIsFollowing(profileData.followers?.includes(currentUser.uid));
           }
-          setCreatedContent(contentData as Content[]);
-          setSubmissions(submissionsData as Submission[]);
+          setCreatedContent(contentData as unknown as Content[]);
+          setSubmissions(submissionsData);
 
         } else {
           toast({ variant: 'destructive', title: 'Profile not found' });

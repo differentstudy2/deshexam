@@ -1,0 +1,110 @@
+import React from 'react';
+import Link from 'next/link';
+import { getQuestions, getPopularQuestions } from '@/lib/firebase/question-bank';
+import { Flame, Clock, BookOpen, ExternalLink, Speaker } from 'lucide-react';
+
+export default async function QuestionSidebar() {
+    const categories = [
+        { name: 'Class Six (৬ষ্ঠ)', slug: 'class-6' },
+        { name: 'Class Seven (৭ম)', slug: 'class-7' },
+        { name: 'Class Eight (৮ম)', slug: 'class-8' },
+        { name: 'Class Nine (৯ম)', slug: 'class-9' },
+        { name: 'Class Ten (১০ম)', slug: 'class-10' },
+        { name: 'HSC / Class 11-12', slug: 'hsc' },
+        { name: 'University Admission', slug: 'university-admission' },
+        { name: 'Job Preparation', slug: 'job-preparation' },
+        { name: 'BCS Preparation', slug: 'bcs' },
+    ];
+
+    let popularQuestions: any[] = [];
+    let recentQuestions: any[] = [];
+    try {
+        popularQuestions = await getPopularQuestions(5);
+        recentQuestions = await getQuestions({}, 5);
+    } catch(e) {
+        console.error('Failed to load sidebar questions', e);
+    }
+
+    return (
+        <div className="w-full space-y-6">
+            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 mb-3 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[#107c41]" /> Exam Categories
+                </h3>
+                <div className="flex flex-col space-y-1">
+                    {categories.map((cat) => (
+                        <Link
+                            key={cat.slug}
+                            href={`/question/${cat.slug}`}
+                            className="text-slate-600 dark:text-slate-400 hover:text-[#107c41] dark:hover:text-[#107c41] hover:bg-slate-50 dark:hover:bg-slate-900/50 px-3 py-2 rounded-md transition-colors text-sm font-medium"
+                        >
+                            {cat.name}
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            {popularQuestions.length > 0 && (
+                <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 mb-3 flex items-center gap-2">
+                        <Flame className="w-5 h-5 text-orange-500" /> Popular Questions
+                    </h3>
+                    <div className="flex flex-col space-y-3">
+                        {popularQuestions.map((q) => (
+                            <Link key={q.id} href={`/question/${q.slug || q.id}`} className="group">
+                                <p className="text-sm text-slate-700 dark:text-slate-300 font-medium line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {q.questionText}
+                                </p>
+                                <span className="text-xs text-slate-400 mt-1 block">{q.viewsCount || 0} views</span>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {recentQuestions.length > 0 && (
+                <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 mb-3 flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-blue-500" /> Recent Questions
+                    </h3>
+                    <div className="flex flex-col space-y-3">
+                        {recentQuestions.map((q) => (
+                            <Link key={q.id} href={`/question/${q.slug || q.id}`} className="group">
+                                <p className="text-sm text-slate-700 dark:text-slate-300 font-medium line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {q.questionText}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 mb-3 flex items-center gap-2">
+                    <ExternalLink className="w-5 h-5 text-indigo-500" /> Study Resources
+                </h3>
+                <div className="flex flex-col space-y-2">
+                    <Link href="/guide" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Reading Materials & Guides</Link>
+                    <Link href="/learn/video" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Video Classes</Link>
+                    <Link href="/kids-zone" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Kids Zone / Quizzes</Link>
+                </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 flex flex-col items-center justify-center text-center min-h-[250px]">
+                <Speaker className="w-8 h-8 text-slate-300 dark:text-slate-600 mb-2" />
+                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Advertisement</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[200px]">Place your ad script here.</p>
+            </div>
+            
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                    <h4 className="font-bold text-blue-800 dark:text-blue-400 text-sm mb-2">Complete Exam Preparation</h4>
+                    <p className="text-xs text-blue-600/80 dark:text-blue-400/80 mb-3">Learn, practice, analyze and improve</p>
+                    <button className="w-full bg-blue-600 text-white text-xs font-semibold py-2 rounded shadow-sm hover:bg-blue-700 transition-colors">
+                        Download App
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -17,7 +17,7 @@ import { CustomVideoPlayer } from '@/components/ui/CustomVideoPlayer';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const item = await getMediaItemBySlug('guide_videos', resolvedParams.slug);
+  const item = await getMediaItemBySlug('guide_videos', decodeURIComponent(resolvedParams.slug));
   return {
     title: item?.title ? `${item.title} | DeshExam` : 'Video Not Found',
     description: item?.description || 'Watch educational video on DeshExam.',
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function VideoSinglePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const item = await getMediaItemBySlug('guide_videos', resolvedParams.slug);
+  const item = await getMediaItemBySlug('guide_videos', decodeURIComponent(resolvedParams.slug));
 
   if (!item) {
     notFound();
