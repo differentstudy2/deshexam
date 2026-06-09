@@ -26,13 +26,22 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuizTakePage({ params }: Props) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
 
-  const quiz = await getAssessmentBySlug('quizzes', slug) as Quiz | null;
+  // Try finding by slug first
+  let quiz = await getAssessmentBySlug('quizzes', slug) as Quiz | null;
 
-  if (!quiz || quiz.status !== 'Published') {
+  // If not found by slug, try ID
+  if (!quiz) {
+    const { getAssessment } = await import('@/lib/firebase/assessment');
+    quiz = await getAssessment('quizzes', slug) as Quiz | null;
+  }
+
+  if (!quiz) {
     notFound();
   }
 

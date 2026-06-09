@@ -26,15 +26,30 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuizLandingPage({ params }: Props) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
 
-  const quiz = await getAssessmentBySlug('quizzes', slug) as Quiz | null;
+  // Try finding by slug first
+  let quiz = await getAssessmentBySlug('quizzes', slug) as Quiz | null;
 
-  if (!quiz || quiz.status !== 'Published') {
+  // If not found by slug, it might be the ID (for older quizzes where slug wasn't set)
+  if (!quiz) {
+    const { getAssessment } = await import('@/lib/firebase/assessment');
+    quiz = await getAssessment('quizzes', slug) as Quiz | null;
+  }
+
+  if (!quiz) {
     notFound();
   }
+
+  // If it's a draft, maybe show it to admin but for now just allow it to render or show a warning.
+  // We'll let it pass for debugging.
+  // if (quiz.status !== 'Published') {
+  //   notFound();
+  // }
 
   // Fetch related quizzes
   const allQuizzes = await getAssessments('quizzes') as Quiz[];
