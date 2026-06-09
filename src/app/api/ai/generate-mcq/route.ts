@@ -32,8 +32,8 @@ The format MUST exactly match:
   }
 ]`;
 
-    // Using gemini-1.5-flash as it's the stable high-performance model
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // Using gemini-flash-latest
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
