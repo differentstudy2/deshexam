@@ -8,17 +8,48 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { getQuestions, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { slugify } from '@/lib/utils';
 import { doc, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 
+const QA_CHECKLIST_ITEMS = [
+  'Answer Verified',
+  'Syllabus Checked',
+  'Explanation Reviewed',
+  'Exam Pattern Verified',
+  'Fact Checked',
+  'Previous Year Source Verified',
+  'Language Proofread'
+];
+
+const VERIFICATION_LEVELS = [
+  'Academic Team Verified',
+  'Subject Expert Verified',
+  'Senior Teacher Verified',
+  'Board Exam Specialist Verified',
+  'University Faculty Verified',
+  'Competitive Exam Expert Verified',
+  'Question Review Committee Verified',
+  'Content Team Reviewed',
+  'Fact Checked',
+  'Previous Year Question Verified',
+  'Official Syllabus Verified',
+  'Exam Pattern Verified',
+  'Answer Key Verified',
+  'Curriculum Verified',
+  'Premium Verified Content'
+];
+
 export default function QuestionBankQuestionsPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -42,7 +73,8 @@ export default function QuestionBankQuestionsPage() {
       status: 'Published',
       language: 'English',
       options: { a: '', b: '', c: '', d: '', e: '' },
-      examIds: []
+      examIds: [],
+      qaChecklist: []
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
@@ -131,7 +163,10 @@ export default function QuestionBankQuestionsPage() {
           slug: '',
           sourceYear: '',
           tags: [],
-          boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''
+          boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: '', yearId: '',
+          examIds: [],
+          isVerified: false,
+          qaChecklist: []
       });
   }
 
@@ -199,6 +234,30 @@ export default function QuestionBankQuestionsPage() {
           fetchQuestions();
       } catch(e) {
           toast({ title: 'Update failed', variant: 'destructive' });
+      } finally {
+          setIsBulkLoading(false);
+      }
+  };
+
+  const handleBulkVerify = async (isVerified: boolean) => {
+      setIsBulkLoading(true);
+      try {
+          const updateData: any = { isVerified };
+          if (isVerified && user) {
+              updateData.verifiedBy = user.uid;
+              updateData.verifiedByName = user.displayName || user.email || '';
+              updateData.verifiedAt = new Date().toISOString();
+          } else if (!isVerified) {
+              updateData.verifiedBy = '';
+              updateData.verifiedByName = '';
+              updateData.verifiedAt = null;
+          }
+          await bulkUpdateQuestions(selectedIds, updateData);
+          toast({ title: isVerified ? 'Questions Verified' : 'Verification Removed' });
+          setSelectedIds([]);
+          fetchQuestions();
+      } catch(e) {
+          toast({ title: 'Bulk Verification failed', variant: 'destructive' });
       } finally {
           setIsBulkLoading(false);
       }
@@ -473,6 +532,95 @@ export default function QuestionBankQuestionsPage() {
                               )}
                           </CardContent>
                       </Card>
+
+                      <Card className="border-indigo-100 dark:border-indigo-900 shadow-sm">
+                          <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4">
+                              <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
+                                  <ShieldCheck className="w-5 h-5" />
+                                  Quality Assurance & Verification
+                              </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-6 pt-6">
+                              <div className="flex items-center justify-between">
+                                  <div className="space-y-0.5">
+                                      <label className="text-sm font-medium">Verify Question</label>
+                                      <p className="text-xs text-muted-foreground">Mark this question as verified by an expert.</p>
+                                  </div>
+                                  <Switch 
+                                      checked={!!editData.isVerified} 
+                                      onCheckedChange={(checked) => {
+                                          if (checked && !editData.verifiedBy && user) {
+                                              setEditData({
+                                                  ...editData, 
+                                                  isVerified: true,
+                                                  verifiedBy: user.uid,
+                                                  verifiedByName: user.displayName || user.email || '',
+                                                  verifiedDesignation: 'Admin / Content Manager', // Default placeholder
+                                                  verifiedAt: new Date().toISOString()
+                                              });
+                                          } else {
+                                              setEditData({...editData, isVerified: checked});
+                                          }
+                                      }}
+                                  />
+                              </div>
+
+                              {editData.isVerified && (
+                                  <div className="space-y-4 pt-4 border-t border-indigo-100 dark:border-indigo-900/50">
+                                      <div>
+                                          <label className="text-xs text-muted-foreground">Verification Level</label>
+                                          <Select value={editData.verificationLevel || ''} onValueChange={v => setEditData({...editData, verificationLevel: v})}>
+                                              <SelectTrigger><SelectValue placeholder="Select Level" /></SelectTrigger>
+                                              <SelectContent>
+                                                  {VERIFICATION_LEVELS.map(lvl => <SelectItem key={lvl} value={lvl}>{lvl}</SelectItem>)}
+                                              </SelectContent>
+                                          </Select>
+                                      </div>
+                                      
+                                      <div className="grid grid-cols-2 gap-4">
+                                          <div>
+                                              <label className="text-xs text-muted-foreground">Verified By (Name)</label>
+                                              <Input value={editData.verifiedByName || ''} onChange={e => setEditData({...editData, verifiedByName: e.target.value})} placeholder="E.g. Dr. Ahmed" />
+                                          </div>
+                                          <div>
+                                              <label className="text-xs text-muted-foreground">Designation</label>
+                                              <Input value={editData.verifiedDesignation || ''} onChange={e => setEditData({...editData, verifiedDesignation: e.target.value})} placeholder="E.g. Subject Expert" />
+                                          </div>
+                                      </div>
+
+                                      <div>
+                                          <label className="text-xs text-muted-foreground font-medium mb-2 block">QA Checklist</label>
+                                          <div className="space-y-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-md border">
+                                              {QA_CHECKLIST_ITEMS.map(item => (
+                                                  <div key={item} className="flex items-center space-x-2">
+                                                      <Checkbox 
+                                                          id={`qa-${item}`} 
+                                                          checked={(editData.qaChecklist || []).includes(item)}
+                                                          onCheckedChange={(checked) => {
+                                                              const currentList = editData.qaChecklist || [];
+                                                              if (checked) {
+                                                                  setEditData({...editData, qaChecklist: [...currentList, item]});
+                                                              } else {
+                                                                  setEditData({...editData, qaChecklist: currentList.filter(i => i !== item)});
+                                                              }
+                                                          }}
+                                                      />
+                                                      <label htmlFor={`qa-${item}`} className="text-xs font-medium leading-none cursor-pointer">
+                                                          {item}
+                                                      </label>
+                                                  </div>
+                                              ))}
+                                          </div>
+                                      </div>
+
+                                      <div>
+                                          <label className="text-xs text-muted-foreground">Verification Note (Optional)</label>
+                                          <Textarea value={editData.verificationNote || ''} onChange={e => setEditData({...editData, verificationNote: e.target.value})} placeholder="Internal notes about the verification..." className="h-20" />
+                                      </div>
+                                  </div>
+                              )}
+                          </CardContent>
+                      </Card>
                   </div>
               </div>
           </div>
@@ -502,6 +650,12 @@ export default function QuestionBankQuestionsPage() {
                         <SelectItem value="Archived">Archived</SelectItem>
                     </SelectContent>
                  </Select>
+                 <Button variant="outline" size="sm" onClick={() => handleBulkVerify(true)} disabled={isBulkLoading}>
+                     <ShieldCheck className="h-4 w-4 mr-2 text-indigo-500" /> Verify
+                 </Button>
+                 <Button variant="outline" size="sm" onClick={() => handleBulkVerify(false)} disabled={isBulkLoading}>
+                     Remove Verification
+                 </Button>
                  <Button variant="destructive" size="sm" onClick={handleBulkDelete} disabled={isBulkLoading}>
                      {isBulkLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
                      Delete
@@ -518,6 +672,7 @@ export default function QuestionBankQuestionsPage() {
                 <TableHead>Type</TableHead>
                 <TableHead>Difficulty</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Verified</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -531,9 +686,17 @@ export default function QuestionBankQuestionsPage() {
                   <TableRow key={q.id}>
                     <TableCell><input type="checkbox" className="w-4 h-4 rounded border-slate-300" checked={selectedIds.includes(q.id)} onChange={() => toggleSelect(q.id)} /></TableCell>
                     <TableCell className="max-w-[400px] truncate">{q.questionText}</TableCell>
-                    <TableCell>{q.options?.a ? 'MCQ' : 'Subjective'}</TableCell>
+                    <TableCell>{q.questionType || (q.options?.a ? 'MCQ' : 'Subjective')}</TableCell>
                     <TableCell>{q.difficulty}</TableCell>
                     <TableCell>{q.status}</TableCell>
+                    <TableCell>
+                        {q.isVerified ? (
+                            <div className="flex items-center text-xs text-indigo-600 font-medium" title={q.verifiedByName}>
+                                <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+                                Verified
+                            </div>
+                        ) : <span className="text-xs text-slate-400">No</span>}
+                    </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                           <Link href={`/question/${q.slug || q.id}`} target="_blank" rel="noopener noreferrer">

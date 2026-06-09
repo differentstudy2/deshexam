@@ -96,6 +96,17 @@ export interface QuestionBankEntry {
   metaDescription?: string;
   keywords?: string[];
   
+  // Verification System
+  isVerified?: boolean;
+  verificationLevel?: string;
+  verifiedBy?: string;
+  verifiedByName?: string;
+  verifiedDesignation?: string;
+  verifiedAt?: string; // Storing as ISO string or Date
+  verificationNote?: string;
+  verificationScore?: number;
+  qaChecklist?: string[];
+  
   createdAt: Date;
   updatedAt: Date;
 }

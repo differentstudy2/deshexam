@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
-import { Heart, Share2, Eye, ChevronDown, ChevronUp, CheckCircle2, XCircle, ThumbsDown, Bookmark, Flag, Link as LinkIcon, Printer, Save, Download } from 'lucide-react';
+import { Heart, Share2, Eye, ChevronDown, ChevronUp, CheckCircle2, XCircle, ThumbsDown, Bookmark, Flag, Link as LinkIcon, Printer, Save, Download, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
@@ -355,6 +355,12 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
         <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-5 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all hover:shadow-md relative overflow-hidden">
             
             <div className="flex flex-col gap-2 mb-6">
+                {question.isVerified && (
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 w-fit px-2.5 py-1 rounded-full mb-2 border border-indigo-100 dark:border-indigo-500/20">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        {question.verificationLevel || 'Verified Question'}
+                    </div>
+                )}
                 <div className="flex items-start gap-2">
                     {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
                     <div className="text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
@@ -507,6 +513,40 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                         Explanation
                     </span>
                     {question.explanation}
+                </div>
+            )}
+
+            {/* QA Card */}
+            {question.isVerified && question.qaChecklist && question.qaChecklist.length > 0 && (
+                <div className="mt-4 p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/50 text-sm">
+                    <div className="font-semibold text-indigo-900 dark:text-indigo-200 mb-3 flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                        Quality Assurance
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                        {question.qaChecklist.map(item => (
+                            <div key={item} className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-xs">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                                {item}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="pt-3 border-t border-indigo-100 dark:border-indigo-900/50 grid grid-cols-2 gap-4 text-xs">
+                        <div>
+                            <span className="text-slate-500 block mb-0.5">Verified by:</span>
+                            <span className="font-medium text-slate-800 dark:text-slate-200">{question.verifiedByName || 'Expert Team'}</span>
+                            {question.verifiedDesignation && <span className="block text-slate-500">{question.verifiedDesignation}</span>}
+                        </div>
+                        {question.verifiedAt && (
+                            <div>
+                                <span className="text-slate-500 block mb-0.5">Last Verified:</span>
+                                <span className="font-medium text-slate-800 dark:text-slate-200">
+                                    {new Date(question.verifiedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
