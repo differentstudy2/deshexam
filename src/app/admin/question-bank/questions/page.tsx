@@ -11,13 +11,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { getQuestions, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { slugify } from '@/lib/utils';
 import { doc, collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase/client';
+import { db, storage } from '@/lib/firebase/client';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import dynamic from 'next/dynamic';
+
+const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
+  ssr: false,
+  loading: () => <div className="min-h-[200px] flex items-center justify-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md">Loading Editor...</div>
+});
 
 const QA_CHECKLIST_ITEMS = [
   'Answer Verified',
@@ -78,6 +85,25 @@ export default function QuestionBankQuestionsPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'questionImage' | 'questionAudio' | 'questionVideo') => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setIsUploadingMedia(true);
+      try {
+          const folder = field === 'questionImage' ? 'images' : field === 'questionAudio' ? 'audio' : 'video';
+          const storageRef = ref(storage, `questions/${folder}/${Date.now()}_${file.name}`);
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          setEditData(prev => ({ ...prev, [field]: url }));
+          toast({ title: 'Success', description: 'File uploaded successfully' });
+      } catch(e) {
+          toast({ title: 'Upload Failed', variant: 'destructive' });
+      } finally {
+          setIsUploadingMedia(false);
+      }
+  };
 
   const fetchQuestions = async () => {
     setLoading(true);
@@ -93,19 +119,31 @@ export default function QuestionBankQuestionsPage() {
 
   const fetchTaxonomies = async () => {
       const fetchGuideCol = async (colName: string) => {
-          const snap = await getDocs(collection(db, colName));
-          return snap.docs.map(d => {
-              const data = d.data();
-              return { id: d.id, name: data.title || data.name, ...data };
-          });
+          try {
+              const snap = await getDocs(collection(db, colName));
+              return snap.docs.map(d => {
+                  const data = d.data();
+                  return { id: d.id, name: data.title || data.name, ...data };
+              });
+          } catch(e) {
+              return [];
+          }
       };
+
+      const fetchCombinedCol = async (guideCol: string, questionCol: string) => {
+          const [g, q] = await Promise.all([fetchGuideCol(guideCol), fetchGuideCol(questionCol)]);
+          const combined = [...g, ...q];
+          // Filter duplicates by ID
+          return Array.from(new Map(combined.map(item => [item.id, item])).values());
+      };
+
       const [b, c, s, t, ch, tp, ex, yr] = await Promise.all([
-          fetchGuideCol('guide_boards'),
-          fetchGuideCol('guide_classes'),
-          fetchGuideCol('guide_subjects'),
-          fetchGuideCol('guide_textbooks'),
-          fetchGuideCol('guide_chapters'),
-          fetchGuideCol('guide_topics'),
+          fetchCombinedCol('guide_boards', 'question_boards'),
+          fetchCombinedCol('guide_classes', 'question_classes'),
+          fetchCombinedCol('guide_subjects', 'question_subjects'),
+          fetchCombinedCol('guide_textbooks', 'question_textbooks'),
+          fetchCombinedCol('guide_chapters', 'question_chapters'),
+          fetchCombinedCol('guide_topics', 'question_topics'),
           fetchGuideCol('question_exams'),
           fetchGuideCol('question_years')
       ]);
@@ -303,16 +341,37 @@ export default function QuestionBankQuestionsPage() {
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
                                   <div>
-                                      <label className="text-sm font-medium flex items-center gap-1"><ImageIcon className="h-4 w-4"/> Image URL</label>
-                                      <Input placeholder="https://..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
+                                      <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
+                                          <span className="flex items-center gap-1"><ImageIcon className="h-4 w-4"/> Image</span>
+                                          <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
+                                              {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
+                                              Upload
+                                              <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
+                                          </label>
+                                      </label>
+                                      <Input placeholder="URL or upload..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
                                   </div>
                                   <div>
-                                      <label className="text-sm font-medium flex items-center gap-1"><Play className="h-4 w-4"/> Audio URL</label>
-                                      <Input placeholder="https://..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
+                                      <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
+                                          <span className="flex items-center gap-1"><Play className="h-4 w-4"/> Audio</span>
+                                          <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
+                                              {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
+                                              Upload
+                                              <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
+                                          </label>
+                                      </label>
+                                      <Input placeholder="URL or upload..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
                                   </div>
                                   <div>
-                                      <label className="text-sm font-medium flex items-center gap-1"><Video className="h-4 w-4"/> Video URL</label>
-                                      <Input placeholder="https://..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
+                                      <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
+                                          <span className="flex items-center gap-1"><Video className="h-4 w-4"/> Video</span>
+                                          <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
+                                              {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
+                                              Upload
+                                              <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
+                                          </label>
+                                      </label>
+                                      <Input placeholder="URL or upload..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
                                   </div>
                               </div>
                           </CardContent>
@@ -373,24 +432,18 @@ export default function QuestionBankQuestionsPage() {
 
                       <Card>
                           <CardHeader className="flex flex-row items-center justify-between">
-                              <CardTitle>Explanations</CardTitle>
+                              <CardTitle>Explanation</CardTitle>
                               <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
                                   {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
                                   Auto-Generate with AI
                               </Button>
                           </CardHeader>
                           <CardContent className="space-y-4">
-                              <div>
-                                  <label className="text-sm font-medium">Short Explanation</label>
-                                  <Textarea placeholder="Quick hint or formula..." rows={2} value={editData.shortExplanation || ''} onChange={e => setEditData({...editData, shortExplanation: e.target.value})} />
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium">Explanation</label>
-                                  <Textarea placeholder="Explain the answer..." rows={3} value={editData.explanation || ''} onChange={e => setEditData({...editData, explanation: e.target.value})} />
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium">Detailed Explanation</label>
-                                  <Textarea placeholder="In-depth step by step explanation..." rows={5} value={editData.detailedExplanation || ''} onChange={e => setEditData({...editData, detailedExplanation: e.target.value})} />
+                              <div className="prose-editor-container">
+                                  <TiptapEditor 
+                                      content={editData.explanation || ''} 
+                                      onChange={(html) => setEditData({...editData, explanation: html})} 
+                                  />
                               </div>
                           </CardContent>
                       </Card>

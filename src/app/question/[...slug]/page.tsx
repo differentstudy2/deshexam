@@ -1,6 +1,8 @@
 import React from 'react';
 import { getQuestionBySlug, getQuestionsByTaxonomySlug, getQuestion, getQuestions } from '@/lib/firebase/question-bank';
 import { getTopicHierarchy } from '@/lib/firebase/guide';
+import { db } from '@/lib/firebase/client';
+import { doc, getDoc } from 'firebase/firestore';
 import QuestionCard from '@/components/question-bank/QuestionCard';
 import QuestionListViewer from '@/components/question-bank/QuestionListViewer';
 import QuestionSidebar from '@/components/question-bank/QuestionSidebar';
@@ -57,14 +59,40 @@ export default async function DynamicQuestionPage({ params }: Props) {
   if (question) {
       // 1. Fetch Taxonomies
       const leafId = question.topicId || question.chapterId || question.textbookId || question.subjectId || question.classId || question.boardId;
-      if (leafId) {
+      
+      const tryFetchTitle = async (id: string, col1: string, col2: string) => {
+          if (!id) return null;
+          try {
+              let snap = await getDoc(doc(db, col1, id));
+              if (snap.exists()) return snap.data().title || snap.data().name;
+              snap = await getDoc(doc(db, col2, id));
+              if (snap.exists()) return snap.data().title || snap.data().name;
+          } catch(e) {}
+          return null;
+      };
+
+      if (question.boardId) { const t = await tryFetchTitle(question.boardId, 'guide_boards', 'question_boards'); if (t && t !== 'Board') taxonomyTags.push(t); }
+      if (question.classId) { const t = await tryFetchTitle(question.classId, 'guide_classes', 'question_classes'); if (t && t !== 'Class') taxonomyTags.push(t); }
+      if (question.subjectId) { const t = await tryFetchTitle(question.subjectId, 'guide_subjects', 'question_subjects'); if (t && t !== 'Subject') taxonomyTags.push(t); }
+      if (question.textbookId) { const t = await tryFetchTitle(question.textbookId, 'guide_textbooks', 'question_textbooks'); if (t && t !== 'Textbook') taxonomyTags.push(t); }
+      if (question.chapterId) { const t = await tryFetchTitle(question.chapterId, 'guide_chapters', 'question_chapters'); if (t && t !== 'Chapter') taxonomyTags.push(t); }
+      if (question.topicId) { const t = await tryFetchTitle(question.topicId, 'guide_topics', 'question_topics'); if (t && t !== 'Topic') taxonomyTags.push(t); }
+      if (question.yearId) { const t = await tryFetchTitle(question.yearId, 'question_years', 'question_years'); if (t) taxonomyTags.push(t); }
+      if (question.examIds && question.examIds.length > 0) {
+          for (const examId of question.examIds) {
+              const t = await tryFetchTitle(examId, 'question_exams', 'question_exams');
+              if (t) taxonomyTags.push(t);
+          }
+      }
+
+      if (taxonomyTags.length === 0 && leafId) {
           try {
               const hierarchy = await getTopicHierarchy(leafId);
               if (hierarchy) {
-                  if (hierarchy.boardTitle) taxonomyTags.push(hierarchy.boardTitle);
-                  if (hierarchy.classTitle) taxonomyTags.push(hierarchy.classTitle);
-                  if (hierarchy.subjectTitle) taxonomyTags.push(hierarchy.subjectTitle);
-                  if (hierarchy.chapterTitle) taxonomyTags.push(hierarchy.chapterTitle);
+                  if (hierarchy.boardTitle && hierarchy.boardTitle !== 'Board') taxonomyTags.push(hierarchy.boardTitle);
+                  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') taxonomyTags.push(hierarchy.classTitle);
+                  if (hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject') taxonomyTags.push(hierarchy.subjectTitle);
+                  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') taxonomyTags.push(hierarchy.chapterTitle);
               }
           } catch(e) {}
       }

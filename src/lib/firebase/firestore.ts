@@ -816,7 +816,7 @@ export const getPaginatedSubmissions = async (itemsPerPage: number, startAfterDo
         const hasMore = allSubmissions.length === itemsPerPage; 
         
         const lastVisible = allSubmissions.length > 0
-            ? testSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1].id) || practiceSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1].id)
+            ? testSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1]?.id) || practiceSubsSnapshot.docs.find(d => d.id === allSubmissions[allSubmissions.length-1]?.id)
             : null;
 
         const submissionsWithFormattedDate = allSubmissions.map(sub => ({
@@ -1795,14 +1795,14 @@ export const getEarningStats = async (): Promise<EarningStats> => {
 
         const [allOrdersSnapshot, todayOrdersSnapshot, monthOrdersSnapshot, usersCountSnapshot] = await Promise.all([
             getDocs(allOrdersQuery),
-            getDocs(todayOrdersSnapshot),
-            getDocs(monthOrdersSnapshot),
+            getDocs(todayOrdersQuery),
+            getDocs(monthOrdersQuery),
             getCountFromServer(usersCollection),
         ]);
 
-        const totalRevenue = allOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-        const revenueToday = todayOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
-        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const totalRevenue = allOrdersSnapshot.docs.reduce((sum: number, doc: any) => sum + (doc.data().amount || 0), 0);
+        const revenueToday = todayOrdersSnapshot.docs.reduce((sum: number, doc: any) => sum + (doc.data().amount || 0), 0);
+        const revenueThisMonth = monthOrdersSnapshot.docs.reduce((sum: number, doc: any) => sum + (doc.data().amount || 0), 0);
 
         return {
             totalRevenue,
@@ -1985,7 +1985,7 @@ export const getPracticeSetsByTopicId = async (textbookId: string, chapterId: st
         const q = query(practiceSetsRef);
         const querySnapshot = await getDocs(q);
         
-        const practiceSets = [];
+        const practiceSets: any[] = [];
         for (const doc of querySnapshot.docs) {
             const questionsRef = collection(doc.ref, 'questions');
             const questionsSnapshot = await getDocs(questionsRef);
@@ -2238,7 +2238,7 @@ export const deleteQuestionFromChapter = async (textbookId: string, chapterId: s
     }
 };
 
-export const getRelatedQuestions = async (currentQuestion: Partial<Question>): Promise<Question[]> => {
+export const getRelatedQuestions = async (currentQuestion: Partial<any>): Promise<any[]> => {
     if (!currentQuestion.subject || !currentQuestion.id) {
         return [];
     }
@@ -2264,7 +2264,7 @@ export const getRelatedQuestions = async (currentQuestion: Partial<Question>): P
                 id: doc.id,
                 ...data,
                 createdAt: formattedDate,
-            } as Question;
+            } as any;
         });
         return questions;
     } catch (e) {
