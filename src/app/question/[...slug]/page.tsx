@@ -129,19 +129,14 @@ export default async function DynamicQuestionPage({ params }: Props) {
             <QuestionListViewer questions={[safeQuestion]} />
 
             {safeRelated.length > 0 && (
-              <div className="mt-8 flex items-center justify-between gap-4">
-                  {safeRelated[0] && (
-                      <Link href={`/question/${safeRelated[0].slug || safeRelated[0].id}`} className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl hover:shadow-md transition-all group">
-                          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Previous</span>
-                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300 line-clamp-1 group-hover:text-[#107c41] transition-colors">{safeRelated[0].questionText}</span>
-                      </Link>
-                  )}
-                  {safeRelated[1] && (
-                      <Link href={`/question/${safeRelated[1].slug || safeRelated[1].id}`} className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl hover:shadow-md transition-all text-right group">
-                          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Next</span>
-                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300 line-clamp-1 group-hover:text-[#107c41] transition-colors">{safeRelated[1].questionText}</span>
-                      </Link>
-                  )}
+              <div className="mt-12 mb-8">
+                 <div className="flex justify-between items-center mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Questions</h2>
+                    <Link href={`/questions`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-[#107c41] transition-colors border bg-white dark:bg-slate-800 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm">
+                       <Share2 className="w-4 h-4" /> View All
+                    </Link>
+                 </div>
+                 <QuestionListViewer questions={safeRelated} />
               </div>
             )}
 
@@ -161,17 +156,7 @@ export default async function DynamicQuestionPage({ params }: Props) {
                 </div>
             </div>
 
-            {safeRelated.length > 2 && (
-              <div className="mt-12">
-                 <div className="flex justify-between items-center mb-6 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Related Questions</h2>
-                    <Link href={`/questions`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-[#107c41] transition-colors border bg-white dark:bg-slate-800 dark:border-slate-700 px-3 py-1.5 rounded-lg shadow-sm">
-                       <Share2 className="w-4 h-4" /> View All
-                    </Link>
-                 </div>
-                 <QuestionListViewer questions={safeRelated.slice(2)} />
-              </div>
-            )}
+
         </div>
         <div className="lg:w-1/4 w-full hidden lg:block">
             <QuestionSidebar />
