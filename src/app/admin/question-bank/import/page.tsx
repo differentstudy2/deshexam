@@ -26,6 +26,60 @@ export default function BulkImportPage() {
     const [jsonText, setJsonText] = useState('');
     const jsonFileInputRef = useRef<HTMLInputElement>(null);
 
+    const demoJsonData = [
+      {
+        "Question Type": "Multiple Choice",
+        "Subject": "General Knowledge",
+        "Chapter": "Geography",
+        "Question": "What is the capital of France?",
+        "Option A": "Berlin",
+        "Option B": "Madrid",
+        "Option C": "Paris",
+        "Option D": "Rome",
+        "Correct Answer": "C",
+        "Difficulty": "Easy",
+        "Explanation": "Paris is the capital and most populous city of France."
+      },
+      {
+        "Question Type": "True/False",
+        "Subject": "Science",
+        "Chapter": "Astronomy",
+        "Question": "The Earth is the fourth planet from the Sun.",
+        "Option A": "True",
+        "Option B": "False",
+        "Correct Answer": "B",
+        "Difficulty": "Medium",
+        "Explanation": "Earth is the third planet from the Sun. Mars is the fourth."
+      },
+      {
+        "Question Type": "Fill in the Blank",
+        "Subject": "Biology",
+        "Chapter": "Cellular Biology",
+        "Question": "The powerhouse of the cell is the ___.",
+        "Correct Answer": "mitochondria",
+        "Difficulty": "Easy",
+        "Explanation": "Mitochondria generate most of the chemical energy needed to power the cell's biochemical reactions."
+      },
+      {
+        "Question Type": "Matching",
+        "Subject": "History",
+        "Chapter": "World War II",
+        "Question": "Match the leader to their respective country.",
+        "Option A": "Churchill=UK, FDR=USA",
+        "Correct Answer": "1-A, 2-B",
+        "Difficulty": "Hard",
+        "Explanation": "Winston Churchill was the PM of the UK, and Franklin D. Roosevelt was the President of the USA."
+      },
+      {
+        "Question Type": "Descriptive",
+        "Subject": "Science",
+        "Chapter": "Botany",
+        "Question": "Explain the process of photosynthesis in detail.",
+        "Correct Answer": "Photosynthesis is the process used by plants, algae and certain bacteria to harness energy from sunlight and turn it into chemical energy.",
+        "Difficulty": "Medium"
+      }
+    ];
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
@@ -265,7 +319,16 @@ export default function BulkImportPage() {
                     <Card>
                         <CardContent className="p-6 space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="json-paste">Paste JSON Data</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="json-paste">Paste JSON Data</Label>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => setJsonText(JSON.stringify(demoJsonData, null, 2))}
+                                    >
+                                        Load Demo Data
+                                    </Button>
+                                </div>
                                 <Textarea 
                                     id="json-paste"
                                     placeholder='[ { "Question": "What is 2+2?", "Correct Answer": "4" } ]'
