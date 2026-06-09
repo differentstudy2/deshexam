@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import { getQuestions, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { slugify } from '@/lib/utils';
@@ -30,14 +31,17 @@ export default function QuestionBankQuestionsPage() {
   const [textbooks, setTextbooks] = useState<TaxonomyNode[]>([]);
   const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
   const [topics, setTopics] = useState<TaxonomyNode[]>([]);
+  const [exams, setExams] = useState<TaxonomyNode[]>([]);
 
   // View state
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [editData, setEditData] = useState<Partial<QuestionBankEntry>>({
+      questionType: 'MCQ',
       difficulty: 'Medium',
       status: 'Published',
       language: 'English',
-      options: { a: '', b: '', c: '', d: '' }
+      options: { a: '', b: '', c: '', d: '', e: '' },
+      examIds: []
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
@@ -62,16 +66,17 @@ export default function QuestionBankQuestionsPage() {
               return { id: d.id, name: data.title || data.name, ...data };
           });
       };
-      const [b, c, s, t, ch, tp] = await Promise.all([
+      const [b, c, s, t, ch, tp, ex] = await Promise.all([
           fetchGuideCol('guide_boards'),
           fetchGuideCol('guide_classes'),
           fetchGuideCol('guide_subjects'),
           fetchGuideCol('guide_textbooks'),
           fetchGuideCol('guide_chapters'),
           fetchGuideCol('guide_topics'),
+          fetchGuideCol('question_exams')
       ]);
       setBoards(b as TaxonomyNode[]); setClasses(c as TaxonomyNode[]); setSubjects(s as TaxonomyNode[]);
-      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]);
+      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]);
   };
 
   useEffect(() => {
@@ -212,12 +217,42 @@ export default function QuestionBankQuestionsPage() {
                           <CardHeader><CardTitle>Content</CardTitle></CardHeader>
                           <CardContent className="space-y-4">
                               <div>
+                                  <label className="text-sm font-medium">Question Type *</label>
+                                  <Select value={editData.questionType || 'MCQ'} onValueChange={v => setEditData({...editData, questionType: v as any})}>
+                                      <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                                      <SelectContent>
+                                          <SelectItem value="MCQ">MCQ</SelectItem>
+                                          <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
+                                          <SelectItem value="True/False">True/False</SelectItem>
+                                          <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
+                                          <SelectItem value="Matching">Matching</SelectItem>
+                                          <SelectItem value="Creative Question">Creative Question</SelectItem>
+                                          <SelectItem value="Short Question">Short Question</SelectItem>
+                                          <SelectItem value="Long Question">Long Question</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                              </div>
+                              <div>
                                   <label className="text-sm font-medium">Title (Optional)</label>
                                   <Input placeholder="E.g. Newton's First Law" value={editData.title || ''} onChange={e => setEditData({...editData, title: e.target.value})} />
                               </div>
                               <div>
                                   <label className="text-sm font-medium">Question Text *</label>
                                   <Textarea placeholder="What is the capital of France?" rows={4} value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                                  <div>
+                                      <label className="text-sm font-medium flex items-center gap-1"><ImageIcon className="h-4 w-4"/> Image URL</label>
+                                      <Input placeholder="https://..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
+                                  </div>
+                                  <div>
+                                      <label className="text-sm font-medium flex items-center gap-1"><Play className="h-4 w-4"/> Audio URL</label>
+                                      <Input placeholder="https://..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
+                                  </div>
+                                  <div>
+                                      <label className="text-sm font-medium flex items-center gap-1"><Video className="h-4 w-4"/> Video URL</label>
+                                      <Input placeholder="https://..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
+                                  </div>
                               </div>
                           </CardContent>
                       </Card>
@@ -262,6 +297,15 @@ export default function QuestionBankQuestionsPage() {
                                       </div>
                                       <Input value={editData.options?.d || ''} onChange={e => setEditData({...editData, options: {...editData.options!, d: e.target.value}})} />
                                   </div>
+                                  <div className="col-span-1 md:col-span-2 mt-2 pt-2 border-t border-slate-100">
+                                      <div className="flex items-center justify-between mb-1">
+                                          <label className="text-sm font-medium">Option E (Optional)</label>
+                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
+                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'E'} onChange={() => setEditData({...editData, correctAnswer: 'E'})} /> Correct
+                                          </label>
+                                      </div>
+                                      <Input value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
+                                  </div>
                               </div>
                           </CardContent>
                       </Card>
@@ -276,8 +320,16 @@ export default function QuestionBankQuestionsPage() {
                           </CardHeader>
                           <CardContent className="space-y-4">
                               <div>
+                                  <label className="text-sm font-medium">Short Explanation</label>
+                                  <Textarea placeholder="Quick hint or formula..." rows={2} value={editData.shortExplanation || ''} onChange={e => setEditData({...editData, shortExplanation: e.target.value})} />
+                              </div>
+                              <div>
                                   <label className="text-sm font-medium">Explanation</label>
                                   <Textarea placeholder="Explain the answer..." rows={3} value={editData.explanation || ''} onChange={e => setEditData({...editData, explanation: e.target.value})} />
+                              </div>
+                              <div>
+                                  <label className="text-sm font-medium">Detailed Explanation</label>
+                                  <Textarea placeholder="In-depth step by step explanation..." rows={5} value={editData.detailedExplanation || ''} onChange={e => setEditData({...editData, detailedExplanation: e.target.value})} />
                               </div>
                           </CardContent>
                       </Card>
@@ -362,12 +414,57 @@ export default function QuestionBankQuestionsPage() {
                                   </Select>
                               </div>
                               <div>
+                                  <label className="text-xs text-muted-foreground">Textbook</label>
+                                  <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v})}>
+                                      <SelectTrigger><SelectValue placeholder="Select Textbook" /></SelectTrigger>
+                                      <SelectContent>{textbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                              <div>
                                   <label className="text-xs text-muted-foreground">Chapter</label>
                                   <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v})}>
                                       <SelectTrigger><SelectValue placeholder="Select Chapter" /></SelectTrigger>
                                       <SelectContent>{chapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                                   </Select>
                               </div>
+                              <div>
+                                  <label className="text-xs text-muted-foreground">Topic</label>
+                                  <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
+                                      <SelectTrigger><SelectValue placeholder="Select Topic" /></SelectTrigger>
+                                      <SelectContent>{topics.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                          </CardContent>
+                      </Card>
+
+                      <Card>
+                          <CardHeader><CardTitle>Exams Taxonomy</CardTitle></CardHeader>
+                          <CardContent>
+                              {exams.length === 0 ? (
+                                  <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
+                              ) : (
+                                  <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2">
+                                      {exams.map(exam => (
+                                          <div key={exam.id} className="flex items-center space-x-2">
+                                              <Checkbox 
+                                                  id={`exam-${exam.id}`} 
+                                                  checked={(editData.examIds || []).includes(exam.id)}
+                                                  onCheckedChange={(checked) => {
+                                                      const currentIds = editData.examIds || [];
+                                                      if (checked) {
+                                                          setEditData({...editData, examIds: [...currentIds, exam.id]});
+                                                      } else {
+                                                          setEditData({...editData, examIds: currentIds.filter(id => id !== exam.id)});
+                                                      }
+                                                  }}
+                                              />
+                                              <label htmlFor={`exam-${exam.id}`} className="text-sm font-medium leading-none cursor-pointer">
+                                                  {exam.name}
+                                              </label>
+                                          </div>
+                                      ))}
+                                  </div>
+                              )}
                           </CardContent>
                       </Card>
                   </div>

@@ -211,10 +211,10 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
         wrapper.style.position = 'absolute';
         wrapper.style.left = '-9999px';
         wrapper.style.top = '-9999px';
-        wrapper.style.width = \`\${canvasW}px\`;
-        wrapper.style.height = \`\${canvasH}px\`;
+        wrapper.style.width = `${canvasW}px`;
+        wrapper.style.height = `${canvasH}px`;
         
-        wrapper.innerHTML = \`
+        wrapper.innerHTML = `
             <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); font-family: sans-serif; position: relative;">
                 
                 <!-- Blurred background elements for depth -->
@@ -222,7 +222,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                 <div style="position: absolute; width: 600px; height: 600px; background: #2dd4bf; filter: blur(100px); opacity: 0.2; bottom: -100px; right: -100px; border-radius: 50%;"></div>
                 
                 <!-- Phone Frame -->
-                <div style="width: 900px; height: 1800px; background-color: #f8fafc; border-radius: 70px; border: 20px solid #1e293b; box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 4px #475569 inset; overflow: hidden; position: relative; display: flex; flex-direction: column; \${scaleStr} transform-origin: center;">
+                <div style="width: 900px; height: 1800px; background-color: #f8fafc; border-radius: 70px; border: 20px solid #1e293b; box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 4px #475569 inset; overflow: hidden; position: relative; display: flex; flex-direction: column; ${scaleStr} transform-origin: center;">
                     
                     <!-- Top Status Bar -->
                     <div style="display: flex; justify-content: space-between; padding: 16px 36px; background-color: #2563eb; color: white; font-weight: bold; font-size: 16px; z-index: 40;">
@@ -240,8 +240,8 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                             <div style="width: 72px; height: 72px; background-color: white; border-radius: 9999px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; border: 3px solid white;">
                                 👤
                             </div>
-                            <div style="font-size: 18px; font-weight: bold;">\${uName}</div>
-                            <div style="font-size: 16px; opacity: 0.9;">\${uPoints}</div>
+                            <div style="font-size: 18px; font-weight: bold;">${uName}</div>
+                            <div style="font-size: 16px; opacity: 0.9;">${uPoints}</div>
                         </div>
                     </div>
 
@@ -250,17 +250,17 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                         
                         <!-- Question Counter Tag -->
                         <div style="position: absolute; top: -20px; left: 40px; background-color: white; color: #64748b; font-weight: bold; font-size: 18px; padding: 8px 24px; border-radius: 9999px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                            \${qIndex}
+                            ${qIndex}
                         </div>
 
                         <!-- Question Text -->
                         <div style="font-size: 38px; font-weight: 800; color: #0f172a; margin-top: 30px; margin-bottom: 40px; line-height: 1.4;">
-                            \${qText}
+                            ${qText}
                         </div>
 
                         <!-- Options -->
                         <div style="margin-bottom: 40px;">
-                            \${optionsHtml}
+                            ${optionsHtml}
                         </div>
 
                         <!-- Bottom Stats/Feedback -->
@@ -304,7 +304,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                     </div>
                 </div>
             </div>
-        \`;
+        `;
         
         document.body.appendChild(wrapper);
 
@@ -322,7 +322,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
             const image = canvas.toDataURL("image/png");
             const link = document.createElement('a');
             link.href = image;
-            link.download = \`deshexam-\${format}-\${question.id}.png\`;
+            link.download = `deshexam-${format}-${question.id}.png`;
             link.click();
             
             toast({ title: 'Image Downloaded!' });

@@ -1,6 +1,15 @@
 export type QuestionStatus = 'Draft' | 'Published' | 'Archived' | 'Featured' | 'Premium' | 'Free';
 export type QuestionDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Expert';
 export type QuestionLanguage = 'Bangla' | 'English' | 'Hindi' | 'Arabic';
+export type QuestionType = 
+  | 'MCQ'
+  | 'Multiple Choice'
+  | 'True/False'
+  | 'Fill in the Blank'
+  | 'Matching'
+  | 'Creative Question'
+  | 'Short Question'
+  | 'Long Question';
 
 // Base taxonomy node for Board -> Class -> Subject -> Textbook -> Chapter -> Topic
 export interface TaxonomyNode {
@@ -24,9 +33,11 @@ export interface QuestionSubject extends TaxonomyNode { classId: string; }
 export interface QuestionTextbook extends TaxonomyNode { subjectId: string; }
 export interface QuestionChapter extends TaxonomyNode { textbookId: string; }
 export interface QuestionTopic extends TaxonomyNode { chapterId: string; }
+export interface QuestionExam extends TaxonomyNode {}
 
 export interface QuestionBankEntry {
   id: string;
+  questionType?: QuestionType;
   
   // Content
   title?: string;
