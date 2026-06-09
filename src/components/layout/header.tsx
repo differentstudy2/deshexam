@@ -125,6 +125,17 @@ const adminNavGroups = [
     ]
   },
   {
+    title: "Assessment Center",
+    items: [
+      { href: '/admin/assessment-center', label: 'Dashboard', icon: <Activity className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/practice-sets', label: 'Practice Sets', icon: <Award className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/quizzes', label: 'Quizzes', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/mock-tests', label: 'Mock Tests', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/exams', label: 'Exams & Papers', icon: <Book className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/daily-challenges', label: 'Daily Challenges', icon: <Trophy className="h-4 w-4" /> },
+    ]
+  },
+  {
     title: "Management",
     items: [
       { href: '/admin/users', label: 'Users', icon: <Users className="h-4 w-4" /> },

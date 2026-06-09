@@ -1,5 +1,5 @@
 import { db } from './client';
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc, documentId } from 'firebase/firestore';
 import { TaxonomyNode, QuestionBankEntry } from '@/lib/question-bank-types';
 
 export const TAXONOMY_COLLECTIONS = {
@@ -82,6 +82,30 @@ export async function getQuestion(id: string) {
   const snap = await getDoc(docRef);
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() } as QuestionBankEntry;
+}
+
+export async function getQuestionsByIds(ids: string[]) {
+  if (!ids || ids.length === 0) return [];
+  
+  // Firestore 'in' query supports up to 10 items.
+  // For larger arrays, we need to chunk them.
+  const chunks = [];
+  for (let i = 0; i < ids.length; i += 10) {
+    chunks.push(ids.slice(i, i + 10));
+  }
+  
+  const results: QuestionBankEntry[] = [];
+  const colRef = collection(db, QUESTIONS_COLLECTION);
+  
+  for (const chunk of chunks) {
+    const q = query(colRef, where(documentId(), 'in', chunk));
+    const snapshot = await getDocs(q);
+    snapshot.docs.forEach(doc => results.push({ id: doc.id, ...doc.data() } as QuestionBankEntry));
+  }
+  
+  // Sort back to original order of `ids` array
+  const mapped = new Map(results.map(q => [q.id, q]));
+  return ids.map(id => mapped.get(id)).filter(Boolean) as QuestionBankEntry[];
 }
 
 export async function createQuestion(data: Omit<QuestionBankEntry, 'createdAt' | 'updatedAt'>) {
