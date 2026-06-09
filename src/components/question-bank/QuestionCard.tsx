@@ -9,10 +9,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 import { toggleInteraction, getQuestionInteraction, incrementQuestionView } from '@/lib/firebase/question-bank';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 interface QuestionCardProps {
     question: QuestionBankEntry;
@@ -177,17 +177,30 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
         
         wrapper.style.width = `${width}px`;
         wrapper.style.height = `${height}px`;
-        wrapper.className = 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-950 flex flex-col justify-center items-center p-16';
+        // Background matches the light blue from the UI design
+        wrapper.className = 'bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-16 relative overflow-hidden';
 
-        // Fix inner clone width
-        clone.style.width = '80%';
-        clone.style.maxWidth = '1000px';
-        clone.className = "bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-2xl relative z-10 border border-slate-200 dark:border-slate-800";
+        // Fix inner clone width and strip original card borders/backgrounds to match the flat UI
+        clone.style.width = '90%';
+        clone.style.maxWidth = '1100px';
+        clone.className = "p-8 relative z-10 bg-transparent border-none shadow-none";
+        
+        // Make the question text larger for the graphic
+        const qText = clone.querySelector('.text-lg.font-semibold');
+        if (qText) {
+            qText.classList.remove('text-lg');
+            qText.classList.add('text-3xl', 'font-bold', 'text-slate-800');
+        }
+        const qNum = clone.querySelector('.text-lg.font-bold');
+        if (qNum) {
+            qNum.classList.remove('text-lg');
+            qNum.classList.add('text-3xl', 'text-slate-800');
+        }
         
         // Watermark
         const watermark = document.createElement('div');
         watermark.className = 'absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0 select-none overflow-hidden';
-        watermark.innerHTML = `<span class="font-black transform -rotate-45 whitespace-nowrap text-slate-900 dark:text-white" style="font-size: ${Math.min(width, height) / 8}px;">DESHEXAM.COM</span>`;
+        watermark.innerHTML = `<span class="font-black transform -rotate-45 whitespace-nowrap text-slate-900 dark:text-white" style="font-size: ${Math.min(width, height) / 5}px;">DESHEXAM.COM</span>`;
         
         // Branding tag at the bottom
         const branding = document.createElement('div');
@@ -402,22 +415,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                 </div>
             )}
 
-            <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Login Required</DialogTitle>
-                        <DialogDescription>
-                            You need to be logged in to interact with questions, save them, or view your history.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="mt-4 sm:justify-start gap-2">
-                        <Button variant="outline" onClick={() => setShowLoginModal(false)}>Cancel</Button>
-                        <Link href="/login">
-                            <Button>Log In</Button>
-                        </Link>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <AuthModal open={showLoginModal} onOpenChange={setShowLoginModal} />
         </div>
     );
 }
