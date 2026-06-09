@@ -146,88 +146,183 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
     };
 
     const handleDownloadImage = async (format: 'square' | 'story' | 'landscape') => {
-        const cardEl = document.getElementById(`question-card-${question.id}`);
-        if (!cardEl) return;
+        toast({ title: 'Generating premium mockup...' });
 
-        toast({ title: 'Generating image...' });
+        // Variables
+        const uName = user?.displayName || 'Tariq Rahman';
+        const uPoints = '1250 pts';
+        const qIndex = index !== undefined ? `${index}/25` : '12/25';
+        const qText = question.questionText || '';
+        const qLang = question.language || 'Bangla';
 
-        // Clone the card
-        const clone = cardEl.cloneNode(true) as HTMLElement;
+        // Build Options HTML
+        const optionKeys = ['a', 'b', 'c', 'd', 'e', 'f'];
+        let optionsHtml = '';
+        optionKeys.forEach(key => {
+            const value = (question.options as any)?.[key];
+            if (value) {
+                const isCorrect = question.correctAnswer?.toLowerCase() === key.toLowerCase();
+                const label = getOptionLabel(key, qLang);
+                
+                if (isCorrect) {
+                    optionsHtml += `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; margin-bottom: 16px; border-radius: 9999px; border: 3px solid #22c55e; background-color: #dcfce7;">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 9999px; background-color: #22c55e; color: white; font-weight: bold; font-size: 20px;">
+                                    ${label}
+                                </div>
+                                <span style="font-size: 24px; font-weight: bold; color: #166534;">${value}</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#22c55e" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="border-radius: 50%;"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                        </div>
+                    `;
+                } else {
+                    optionsHtml += `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; margin-bottom: 16px; border-radius: 9999px; border: 2px solid #e2e8f0; background-color: white;">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 9999px; background-color: #f1f5f9; border: 2px solid #cbd5e1; color: #475569; font-weight: bold; font-size: 20px;">
+                                    ${label}
+                                </div>
+                                <span style="font-size: 24px; font-weight: normal; color: #334155;">${value}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        // Determine Canvas Sizes based on format
+        let canvasW = 1080;
+        let canvasH = 1920;
+        let scaleStr = 'transform: scale(1);';
         
-        // Remove footer from clone
-        const footer = clone.querySelector('.print-hidden-actions');
-        if (footer) footer.remove();
+        if (format === 'square') {
+            canvasH = 1080;
+            // Scale phone down to fit in 1080x1080, push it down slightly
+            scaleStr = 'transform: scale(0.6) translateY(200px);';
+        } else if (format === 'landscape') {
+            canvasW = 1920;
+            canvasH = 1080;
+            scaleStr = 'transform: scale(0.6) translateY(200px);';
+        }
 
         // Create an offscreen wrapper
         const wrapper = document.createElement('div');
         wrapper.style.position = 'absolute';
         wrapper.style.left = '-9999px';
         wrapper.style.top = '-9999px';
+        wrapper.style.width = \`\${canvasW}px\`;
+        wrapper.style.height = \`\${canvasH}px\`;
         
-        let width = 1080;
-        let height = 1080;
-        
-        if (format === 'story') {
-            width = 1080;
-            height = 1920;
-        } else if (format === 'landscape') {
-            width = 1920;
-            height = 1080;
-        }
-        
-        wrapper.style.width = `${width}px`;
-        wrapper.style.height = `${height}px`;
-        // Background matches the light blue from the UI design
-        wrapper.className = 'bg-slate-50 dark:bg-slate-900 flex flex-col justify-center items-center p-16 relative overflow-hidden';
+        wrapper.innerHTML = \`
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); font-family: sans-serif; position: relative;">
+                
+                <!-- Blurred background elements for depth -->
+                <div style="position: absolute; width: 600px; height: 600px; background: #60a5fa; filter: blur(100px); opacity: 0.3; top: -100px; left: -100px; border-radius: 50%;"></div>
+                <div style="position: absolute; width: 600px; height: 600px; background: #2dd4bf; filter: blur(100px); opacity: 0.2; bottom: -100px; right: -100px; border-radius: 50%;"></div>
+                
+                <!-- Phone Frame -->
+                <div style="width: 900px; height: 1800px; background-color: #f8fafc; border-radius: 70px; border: 20px solid #1e293b; box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 4px #475569 inset; overflow: hidden; position: relative; display: flex; flex-direction: column; \${scaleStr} transform-origin: center;">
+                    
+                    <!-- Top Status Bar -->
+                    <div style="display: flex; justify-content: space-between; padding: 16px 36px; background-color: #2563eb; color: white; font-weight: bold; font-size: 16px; z-index: 40;">
+                        <span>10:09 AM</span>
+                        <span>📱 📶 🔋</span>
+                    </div>
 
-        // Fix inner clone width and strip original card borders/backgrounds to match the flat UI
-        clone.style.width = '90%';
-        clone.style.maxWidth = '1100px';
-        clone.className = "p-8 relative z-10 bg-transparent border-none shadow-none";
-        
-        // Make the question text larger for the graphic
-        const qText = clone.querySelector('.text-lg.font-semibold');
-        if (qText) {
-            qText.classList.remove('text-lg');
-            qText.classList.add('text-3xl', 'font-bold', 'text-slate-800');
-        }
-        const qNum = clone.querySelector('.text-lg.font-bold');
-        if (qNum) {
-            qNum.classList.remove('text-lg');
-            qNum.classList.add('text-3xl', 'text-slate-800');
-        }
-        
-        // Watermark
-        const watermark = document.createElement('div');
-        watermark.className = 'absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0 select-none overflow-hidden';
-        watermark.innerHTML = `<span class="font-black transform -rotate-45 whitespace-nowrap text-slate-900 dark:text-white" style="font-size: ${Math.min(width, height) / 5}px;">DESHEXAM.COM</span>`;
-        
-        // Branding tag at the bottom
-        const branding = document.createElement('div');
-        branding.className = 'absolute bottom-8 right-12 text-blue-900/30 dark:text-blue-100/30 font-bold text-2xl z-10 tracking-widest';
-        branding.innerText = 'WWW.DESHEXAM.COM';
+                    <!-- Blue Header -->
+                    <div style="background-color: #2563eb; color: white; padding: 20px 40px 100px 40px; display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 10;">
+                        <div>
+                            <div style="font-size: 52px; font-weight: 800; margin-bottom: 8px;">দেশএক্সাম</div>
+                            <div style="font-size: 26px; font-weight: 500; opacity: 0.9;">সাধারণ জ্ঞান কুইজ</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; padding-top: 10px;">
+                            <div style="width: 72px; height: 72px; background-color: white; border-radius: 9999px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; border: 3px solid white;">
+                                👤
+                            </div>
+                            <div style="font-size: 18px; font-weight: bold;">\${uName}</div>
+                            <div style="font-size: 16px; opacity: 0.9;">\${uPoints}</div>
+                        </div>
+                    </div>
 
-        wrapper.appendChild(watermark);
-        wrapper.appendChild(clone);
-        wrapper.appendChild(branding);
+                    <!-- Main White Card -->
+                    <div style="background-color: white; border-radius: 40px; margin: -50px 32px 130px 32px; padding: 40px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 2px solid #f1f5f9; position: relative; z-index: 20; flex: 1; display: flex; flex-direction: column;">
+                        
+                        <!-- Question Counter Tag -->
+                        <div style="position: absolute; top: -20px; left: 40px; background-color: white; color: #64748b; font-weight: bold; font-size: 18px; padding: 8px 24px; border-radius: 9999px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                            \${qIndex}
+                        </div>
+
+                        <!-- Question Text -->
+                        <div style="font-size: 38px; font-weight: 800; color: #0f172a; margin-top: 30px; margin-bottom: 40px; line-height: 1.4;">
+                            \${qText}
+                        </div>
+
+                        <!-- Options -->
+                        <div style="margin-bottom: 40px;">
+                            \${optionsHtml}
+                        </div>
+
+                        <!-- Bottom Stats/Feedback -->
+                        <div style="margin-top: auto; padding-top: 20px;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; color: #64748b; font-size: 20px; font-weight: 500; margin-bottom: 16px;">
+                                📊 ৬,০০০+ জন এই উত্তর দিয়েছেন 🧑‍🎓👩‍🎓
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; color: #16a34a; font-size: 24px; font-weight: bold; margin-bottom: 10px;">
+                                ✅ আপনি সঠিক উত্তর দিয়েছেন! 🎉🎉🎉
+                            </div>
+                            <div style="text-align: center; color: #475569; font-size: 20px; margin-bottom: 30px;">
+                                আপনি +২৫ পয়েন্ট পেয়েছেন!
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div style="display: flex; gap: 20px;">
+                                <div style="flex: 1; background-color: #16a34a; color: white; padding: 22px 0; border-radius: 9999px; text-align: center; font-size: 24px; font-weight: bold; box-shadow: 0 4px 15px -3px rgba(22, 163, 74, 0.4);">
+                                    পরবর্তী প্রশ্ন &gt;
+                                </div>
+                                <div style="flex: 1; background-color: white; color: #475569; border: 2px solid #cbd5e1; padding: 22px 0; border-radius: 9999px; text-align: center; font-size: 24px; font-weight: bold;">
+                                    ব্যাখ্যা দেখুন
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Nav Bar -->
+                    <div style="position: absolute; bottom: 0; width: 100%; height: 110px; background-color: white; border-top: 2px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center; z-index: 30; padding-bottom: 15px; box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05);">
+                        <div style="display: flex; flex-direction: column; align-items: center; color: #2563eb;">
+                            <span style="font-size: 32px;">🏠</span><span style="font-size: 16px; font-weight: bold; margin-top: 6px;">Home</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; color: #94a3b8;">
+                            <span style="font-size: 32px;">📋</span><span style="font-size: 16px; font-weight: 500; margin-top: 6px;">Exams</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; color: #94a3b8;">
+                            <span style="font-size: 32px;">📊</span><span style="font-size: 16px; font-weight: 500; margin-top: 6px;">Leaderboard</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; color: #94a3b8;">
+                            <span style="font-size: 32px;">👤</span><span style="font-size: 16px; font-weight: 500; margin-top: 6px;">Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        \`;
         
         document.body.appendChild(wrapper);
 
         try {
             const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(wrapper, {
-                scale: 2,
+                scale: 1, // Keep scale 1 since the internal size is already massive (1080/1920)
                 useCORS: true,
                 logging: false,
                 backgroundColor: null,
-                width: width,
-                height: height
+                width: canvasW,
+                height: canvasH
             });
             
             const image = canvas.toDataURL("image/png");
             const link = document.createElement('a');
             link.href = image;
-            link.download = `deshexam-${format}-${question.id}.png`;
+            link.download = \`deshexam-\${format}-\${question.id}.png\`;
             link.click();
             
             toast({ title: 'Image Downloaded!' });
