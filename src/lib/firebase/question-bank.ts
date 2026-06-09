@@ -192,9 +192,16 @@ export async function getQuestionInteraction(questionId: string, userId: string)
 
 export async function getQuestionComments(questionId: string) {
   const colRef = collection(db, 'question_comments');
-  const q = query(colRef, where('questionId', '==', questionId), orderBy('createdAt', 'desc'));
+  const q = query(colRef, where('questionId', '==', questionId));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  
+  // Sort by createdAt descending client-side to bypass Firebase composite index requirement
+  return docs.sort((a: any, b: any) => {
+    const timeA = a.createdAt?.toMillis() || 0;
+    const timeB = b.createdAt?.toMillis() || 0;
+    return timeB - timeA;
+  });
 }
 
 export async function addQuestionComment(questionId: string, userId: string, comment: string, userName: string, userAvatar: string) {
