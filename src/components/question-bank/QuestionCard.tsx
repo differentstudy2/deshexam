@@ -9,6 +9,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { recordQuestionAttempt } from '@/lib/firebase/student-analytics';
 import { toggleInteraction, getQuestionInteraction, incrementQuestionView } from '@/lib/firebase/question-bank';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface QuestionCardProps {
     question: QuestionBankEntry;
@@ -40,6 +44,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const { user } = useAuth();
     const { toast } = useToast();
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     const [interaction, setInteraction] = useState({ isLiked: false, isDisliked: false, isBookmarked: false });
     const [counts, setCounts] = useState({
@@ -81,7 +86,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
 
     const handleInteract = async (type: 'like' | 'dislike' | 'bookmark') => {
         if (!user) {
-            toast({ title: 'Please log in', description: `You must be logged in to ${type} a question.` });
+            setShowLoginModal(true);
             return;
         }
         
@@ -140,37 +145,76 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
         }, 100);
     };
 
-    const handleDownloadImage = async () => {
+    const handleDownloadImage = async (format: 'square' | 'story' | 'landscape') => {
         const cardEl = document.getElementById(`question-card-${question.id}`);
         if (!cardEl) return;
 
-        // Add a temporary watermark element
-        const watermark = document.createElement('div');
-        watermark.className = 'absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none overflow-hidden z-0 select-none';
-        watermark.innerHTML = '<span class="text-6xl md:text-8xl font-black transform -rotate-45 whitespace-nowrap text-slate-900 dark:text-white">DESHEXAM.COM</span>';
-        
-        // Temporarily prepare for social media style
-        cardEl.classList.add('bg-gradient-to-br', 'from-blue-50', 'to-indigo-50', 'dark:from-slate-900', 'dark:to-slate-950', 'p-8', 'md:p-12');
-        cardEl.appendChild(watermark);
+        toast({ title: 'Generating image...' });
 
-        // Hide footer actions
-        const footer = cardEl.querySelector('.print-hidden-actions');
-        if (footer) footer.classList.add('hidden');
+        // Clone the card
+        const clone = cardEl.cloneNode(true) as HTMLElement;
+        
+        // Remove footer from clone
+        const footer = clone.querySelector('.print-hidden-actions');
+        if (footer) footer.remove();
+
+        // Create an offscreen wrapper
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = '-9999px';
+        wrapper.style.top = '-9999px';
+        
+        let width = 1080;
+        let height = 1080;
+        
+        if (format === 'story') {
+            width = 1080;
+            height = 1920;
+        } else if (format === 'landscape') {
+            width = 1920;
+            height = 1080;
+        }
+        
+        wrapper.style.width = `${width}px`;
+        wrapper.style.height = `${height}px`;
+        wrapper.className = 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-950 flex flex-col justify-center items-center p-16';
+
+        // Fix inner clone width
+        clone.style.width = '80%';
+        clone.style.maxWidth = '1000px';
+        clone.className = "bg-white dark:bg-slate-950 p-8 rounded-2xl shadow-2xl relative z-10 border border-slate-200 dark:border-slate-800";
+        
+        // Watermark
+        const watermark = document.createElement('div');
+        watermark.className = 'absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0 select-none overflow-hidden';
+        watermark.innerHTML = `<span class="font-black transform -rotate-45 whitespace-nowrap text-slate-900 dark:text-white" style="font-size: ${Math.min(width, height) / 8}px;">DESHEXAM.COM</span>`;
+        
+        // Branding tag at the bottom
+        const branding = document.createElement('div');
+        branding.className = 'absolute bottom-8 right-12 text-blue-900/30 dark:text-blue-100/30 font-bold text-2xl z-10 tracking-widest';
+        branding.innerText = 'WWW.DESHEXAM.COM';
+
+        wrapper.appendChild(watermark);
+        wrapper.appendChild(clone);
+        wrapper.appendChild(branding);
+        
+        document.body.appendChild(wrapper);
 
         try {
-            toast({ title: 'Generating image...' });
             const html2canvas = (await import('html2canvas')).default;
-            const canvas = await html2canvas(cardEl, {
+            const canvas = await html2canvas(wrapper, {
                 scale: 2,
                 useCORS: true,
                 logging: false,
                 backgroundColor: null,
+                width: width,
+                height: height
             });
             
             const image = canvas.toDataURL("image/png");
             const link = document.createElement('a');
             link.href = image;
-            link.download = `deshexam-question-${question.id}.png`;
+            link.download = `deshexam-${format}-${question.id}.png`;
             link.click();
             
             toast({ title: 'Image Downloaded!' });
@@ -178,10 +222,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
             console.error("Error generating image:", err);
             toast({ title: 'Download failed', variant: 'destructive' });
         } finally {
-            // Restore original state
-            cardEl.classList.remove('bg-gradient-to-br', 'from-blue-50', 'to-indigo-50', 'dark:from-slate-900', 'dark:to-slate-950', 'p-8', 'md:p-12');
-            cardEl.removeChild(watermark);
-            if (footer) footer.classList.remove('hidden');
+            document.body.removeChild(wrapper);
         }
     };
 
@@ -328,9 +369,18 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                     <button onClick={handlePrint} className="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Print">
                         <Printer className="h-4 w-4" />
                     </button>
-                    <button onClick={handleDownloadImage} className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Download as Image">
-                        <Download className="h-4 w-4" />
-                    </button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors outline-none" title="Download as Image">
+                                <Download className="h-4 w-4" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleDownloadImage('square')}>Instagram Square (1:1)</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownloadImage('story')}>Mobile Story (9:16)</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownloadImage('landscape')}>Desktop Landscape (16:9)</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <button onClick={() => toast({ title: 'Reported', description: 'Thank you for reporting this question.' })} className="flex items-center gap-1.5 hover:text-red-500 transition-colors" title="Report Issue">
                         <Flag className="h-4 w-4" />
                     </button>
@@ -351,6 +401,23 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                     {question.explanation}
                 </div>
             )}
+
+            <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Login Required</DialogTitle>
+                        <DialogDescription>
+                            You need to be logged in to interact with questions, save them, or view your history.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="mt-4 sm:justify-start gap-2">
+                        <Button variant="outline" onClick={() => setShowLoginModal(false)}>Cancel</Button>
+                        <Link href="/login">
+                            <Button>Log In</Button>
+                        </Link>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
