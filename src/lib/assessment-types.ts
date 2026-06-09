@@ -19,7 +19,9 @@ export interface AssessmentBase {
   chapterId?: string;
   topicId?: string;
   examIds?: string[];
+  yearId?: string;
   tags?: string[];
+  verificationBadges?: string[];
 
   questionIds: string[]; // Link to QuestionBankEntry
   difficulty: AssessmentDifficulty;
@@ -79,14 +81,9 @@ export interface ExamPaper extends AssessmentBase {
   verificationStatus: string;
 }
 
-export interface DailyChallenge {
-  id: string;
-  challengeTitle: string;
-  date: string; // ISO date string "YYYY-MM-DD"
-  questionIds: string[];
-  difficulty: AssessmentDifficulty;
+export interface DailyChallenge extends AssessmentBase {
+  activeDate: string; // ISO date string "YYYY-MM-DD"
   rewardPoints: number;
   leaderboardEnabled: boolean;
   badgeReward?: string;
-  status: AssessmentStatus;
 }

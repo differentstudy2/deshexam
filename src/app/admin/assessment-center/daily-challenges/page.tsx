@@ -52,7 +52,7 @@ export default function DailyChallengesPage() {
             difficulty: 'Medium',
             status: 'Draft',
             activeDate: new Date().toISOString().split('T')[0], // default to today
-            rewardCoins: 50
+            rewardPoints: 50
         });
     };
 
@@ -182,8 +182,8 @@ export default function DailyChallengesPage() {
                                     <p className="text-xs text-slate-500 mt-1">The date this challenge becomes active.</p>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium">Reward Coins</label>
-                                    <Input type="number" value={editData.rewardCoins || ''} onChange={e => setEditData({...editData, rewardCoins: parseInt(e.target.value)})} />
+                                    <label className="text-sm font-medium">Reward Points</label>
+                                    <Input type="number" value={editData.rewardPoints || ''} onChange={e => setEditData({...editData, rewardPoints: parseInt(e.target.value)})} />
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium">Status</label>
@@ -262,7 +262,7 @@ export default function DailyChallengesPage() {
                                     <TableRow key={challenge.id}>
                                         <TableCell className="font-medium">{challenge.title}</TableCell>
                                         <TableCell>{challenge.activeDate}</TableCell>
-                                        <TableCell>{challenge.rewardCoins} Coins</TableCell>
+                                        <TableCell>{challenge.rewardPoints} Points</TableCell>
                                         <TableCell>{challenge.status}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">

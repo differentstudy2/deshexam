@@ -10,6 +10,7 @@ import { GuideSidebar } from '@/components/guide/GuideSidebar';
 import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
+import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
 import { getReadingContent, getCurriculumBySubject, getGuideSubjects, getSubjectIdFromTopicId, getTopicHierarchy } from '@/lib/firebase/guide';
 import { Chapter } from './guide-data';
 import Image from 'next/image';
@@ -319,6 +320,10 @@ function ReadingLayout({
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
           <ReadingArticle data={data} />
+          
+          <div className="px-4 sm:px-6 xl:px-12 pb-12">
+            <AssessmentTabs chapterId={id} />
+          </div>
         </div>
 
         {/* Right Sidebar */}
