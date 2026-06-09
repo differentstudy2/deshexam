@@ -88,7 +88,7 @@ export default async function AssessmentHubPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {publishedPracticeSets.map(p => (
-                <AssessmentCard key={p.id} assessment={p} type="Practice" href={`/practice/${p.slug}`} />
+                <AssessmentCard key={p.id} assessment={p} type="Practice" href={`/practice/${p.slug || p.id}`} />
               ))}
             </div>
           </section>

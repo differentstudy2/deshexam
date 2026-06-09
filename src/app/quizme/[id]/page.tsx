@@ -10,13 +10,13 @@ import Link from 'next/link';
 import { AssessmentCard } from '@/components/assessment/AssessmentCard';
 
 type Props = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
-  const quiz = await getAssessmentBySlug('quizzes', slug) as Quiz | null;
+  const id = resolvedParams.id;
+  const quiz = await getAssessmentBySlug('quizzes', id) as Quiz | null;
   if (!quiz) {
     return { title: 'Quiz Not Found' };
   }
@@ -30,22 +30,22 @@ export const dynamic = 'force-dynamic';
 
 export default async function QuizLandingPage({ params }: Props) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const id = resolvedParams.id;
 
   // Try finding by slug first
-  let quiz = await getAssessmentBySlug('quizzes', slug) as Quiz | null;
+  let quiz = await getAssessmentBySlug('quizzes', id) as Quiz | null;
 
   // If not found by slug, it might be the ID (for older new-format quizzes where slug wasn't set)
   if (!quiz) {
     const { getAssessment } = await import('@/lib/firebase/assessment');
-    quiz = await getAssessment('quizzes', slug) as Quiz | null;
+    quiz = await getAssessment('quizzes', id) as Quiz | null;
   }
 
   // LEGACY FALLBACK: If entirely not found in the new Assessment Center,
   // it might be an old content-based quiz (e.g. 'bullo')
   if (!quiz) {
     const { getContentById } = await import('@/lib/firebase/firestore');
-    const legacyQuizData = await getContentById(slug);
+    const legacyQuizData = await getContentById(id);
     
     if (legacyQuizData && legacyQuizData.testType === 'Quiz') {
       // Serialize the timestamps for the client component
@@ -170,7 +170,7 @@ export default async function QuizLandingPage({ params }: Props) {
                   <li className="flex items-center"><ShieldCheck className="w-4 h-4 mr-2 text-slate-400" /> Points awarded based on speed</li>
                 </ul>
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 h-14 text-lg rounded-xl" asChild>
-                  <Link href={`/quiz/${quiz.slug}/take`}>
+                  <Link href={`/quizme/${quiz.slug}/take`}>
                     <PlayCircle className="w-5 h-5 mr-2" /> Start Quiz
                   </Link>
                 </Button>
@@ -198,7 +198,7 @@ export default async function QuizLandingPage({ params }: Props) {
               <h2 className="text-2xl font-bold mb-6">Related Quizzes</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {related.map(r => (
-                  <AssessmentCard key={r.id} assessment={r} type="Quiz" href={`/quiz/${r.slug}`} />
+                  <AssessmentCard key={r.id} assessment={r} type="Quiz" href={`/quizme/${r.slug}`} />
                 ))}
               </div>
             </section>
