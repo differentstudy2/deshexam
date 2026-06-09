@@ -9,6 +9,8 @@ export const TAXONOMY_COLLECTIONS = {
   textbook: 'question_textbooks',
   chapter: 'question_chapters',
   topic: 'question_topics',
+  exam: 'question_exams',
+  year: 'question_years',
 } as const;
 
 export type TaxonomyType = keyof typeof TAXONOMY_COLLECTIONS;

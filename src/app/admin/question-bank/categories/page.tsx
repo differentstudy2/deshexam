@@ -10,6 +10,7 @@ import { getTaxonomyNodes, createTaxonomyNode, updateTaxonomyNode, deleteTaxonom
 import { TaxonomyNode } from '@/lib/question-bank-types';
 import { PlusCircle, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { slugify } from '@/lib/utils';
 
 const taxonomyTabs: { id: TaxonomyType; label: string }[] = [
   { id: 'board', label: 'Boards' },
@@ -18,6 +19,8 @@ const taxonomyTabs: { id: TaxonomyType; label: string }[] = [
   { id: 'textbook', label: 'Textbooks' },
   { id: 'chapter', label: 'Chapters' },
   { id: 'topic', label: 'Topics' },
+  { id: 'exam', label: 'Exams' },
+  { id: 'year', label: 'Years' },
 ];
 
 export default function QuestionBankCategoriesPage() {
@@ -89,7 +92,18 @@ export default function QuestionBankCategoriesPage() {
             {isEditing && (
               <div className="mb-6 grid grid-cols-3 gap-4 border p-4 rounded bg-slate-50 dark:bg-slate-900">
                 <Input placeholder="ID (slug-like)" value={editData.id || ''} onChange={(e) => setEditData({...editData, id: e.target.value})} disabled={!!nodes.find(n => n.id === editData.id)} />
-                <Input placeholder="Name" value={editData.name || ''} onChange={(e) => setEditData({...editData, name: e.target.value})} />
+                <Input placeholder="Name" value={editData.name || ''} onChange={(e) => {
+                  const newName = e.target.value;
+                  const newSlug = slugify(newName);
+                  // Only auto-update id if we are creating a new node, not editing an existing one
+                  const isNew = !nodes.find(n => n.id === editData.id);
+                  setEditData({
+                    ...editData, 
+                    name: newName, 
+                    slug: newSlug,
+                    ...(isNew ? { id: newSlug } : {})
+                  });
+                }} />
                 <Input placeholder="Slug" value={editData.slug || ''} onChange={(e) => setEditData({...editData, slug: e.target.value})} />
                 <Button onClick={handleSave} className="col-span-3">Save</Button>
               </div>

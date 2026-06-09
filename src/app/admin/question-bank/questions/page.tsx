@@ -32,6 +32,7 @@ export default function QuestionBankQuestionsPage() {
   const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
   const [topics, setTopics] = useState<TaxonomyNode[]>([]);
   const [exams, setExams] = useState<TaxonomyNode[]>([]);
+  const [years, setYears] = useState<TaxonomyNode[]>([]);
 
   // View state
   const [view, setView] = useState<'list' | 'editor'>('list');
@@ -66,17 +67,18 @@ export default function QuestionBankQuestionsPage() {
               return { id: d.id, name: data.title || data.name, ...data };
           });
       };
-      const [b, c, s, t, ch, tp, ex] = await Promise.all([
+      const [b, c, s, t, ch, tp, ex, yr] = await Promise.all([
           fetchGuideCol('guide_boards'),
           fetchGuideCol('guide_classes'),
           fetchGuideCol('guide_subjects'),
           fetchGuideCol('guide_textbooks'),
           fetchGuideCol('guide_chapters'),
           fetchGuideCol('guide_topics'),
-          fetchGuideCol('question_exams')
+          fetchGuideCol('question_exams'),
+          fetchGuideCol('question_years')
       ]);
       setBoards(b as TaxonomyNode[]); setClasses(c as TaxonomyNode[]); setSubjects(s as TaxonomyNode[]);
-      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]);
+      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]); setYears(yr as TaxonomyNode[]);
   };
 
   useEffect(() => {
@@ -378,10 +380,7 @@ export default function QuestionBankQuestionsPage() {
                                       </SelectContent>
                                   </Select>
                               </div>
-                              <div>
-                                  <label className="text-sm font-medium">Source Year</label>
-                                  <Input placeholder="E.g. 2023" value={editData.sourceYear || ''} onChange={e => setEditData({...editData, sourceYear: e.target.value})} />
-                              </div>
+
                               <div>
                                   <label className="text-sm font-medium">Tags (comma separated)</label>
                                   <Input placeholder="math, algebra" value={editData.tags?.join(', ') || ''} onChange={e => setEditData({...editData, tags: e.target.value.split(',').map(s=>s.trim())})} />
@@ -397,6 +396,13 @@ export default function QuestionBankQuestionsPage() {
                                   <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v})}>
                                       <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
                                       <SelectContent>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                              <div>
+                                  <label className="text-xs text-muted-foreground">Year</label>
+                                  <Select value={editData.yearId || ''} onValueChange={v => setEditData({...editData, yearId: v})}>
+                                      <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+                                      <SelectContent>{years.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                                   </Select>
                               </div>
                               <div>

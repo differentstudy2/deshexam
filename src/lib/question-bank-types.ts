@@ -34,6 +34,7 @@ export interface QuestionTextbook extends TaxonomyNode { subjectId: string; }
 export interface QuestionChapter extends TaxonomyNode { textbookId: string; }
 export interface QuestionTopic extends TaxonomyNode { chapterId: string; }
 export interface QuestionExam extends TaxonomyNode {}
+export interface QuestionYear extends TaxonomyNode {}
 
 export interface QuestionBankEntry {
   id: string;
@@ -84,6 +85,7 @@ export interface QuestionBankEntry {
   textbookId?: string;
   chapterId?: string;
   topicId?: string;
+  yearId?: string;
   
   // Exams bindings
   examIds?: string[];
