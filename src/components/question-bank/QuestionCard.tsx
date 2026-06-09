@@ -508,11 +508,11 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
 
             {/* Explanation Section */}
             {showAnswer && question.explanation && (
-                <div className="mt-4 p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 leading-relaxed animate-in fade-in slide-in-from-top-2 duration-300">
-                    <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-2">
+                <div className="mt-4 p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 leading-relaxed animate-in fade-in slide-in-from-top-2 duration-300 prose prose-sm dark:prose-invert max-w-none">
+                    <span className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-2 not-prose">
                         Explanation
                     </span>
-                    {question.explanation}
+                    <div dangerouslySetInnerHTML={{ __html: question.explanation }} />
                 </div>
             )}
 
