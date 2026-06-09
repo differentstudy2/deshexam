@@ -78,8 +78,8 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
   const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
   if (filters) {
       results.sort((a, b) => {
-          const timeA = a.createdAt?.seconds || 0;
-          const timeB = b.createdAt?.seconds || 0;
+          const timeA = (a.createdAt as any)?.seconds || ((a.createdAt as any)?.getTime?.() / 1000) || 0;
+          const timeB = (b.createdAt as any)?.seconds || ((b.createdAt as any)?.getTime?.() / 1000) || 0;
           return timeB - timeA;
       });
   }
