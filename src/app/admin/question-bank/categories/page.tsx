@@ -21,6 +21,7 @@ const taxonomyTabs: { id: TaxonomyType; label: string }[] = [
   { id: 'topic', label: 'Topics' },
   { id: 'exam', label: 'Exams' },
   { id: 'year', label: 'Years' },
+  { id: 'tag', label: 'Tags' },
 ];
 
 export default function QuestionBankCategoriesPage() {

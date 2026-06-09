@@ -71,6 +71,7 @@ export default function QuestionBankQuestionsPage() {
   const [topics, setTopics] = useState<TaxonomyNode[]>([]);
   const [exams, setExams] = useState<TaxonomyNode[]>([]);
   const [years, setYears] = useState<TaxonomyNode[]>([]);
+  const [tags, setTags] = useState<TaxonomyNode[]>([]);
 
   // View state
   const [view, setView] = useState<'list' | 'editor'>('list');
@@ -137,7 +138,7 @@ export default function QuestionBankQuestionsPage() {
           return Array.from(new Map(combined.map(item => [item.id, item])).values());
       };
 
-      const [b, c, s, t, ch, tp, ex, yr] = await Promise.all([
+      const [b, c, s, t, ch, tp, ex, yr, tg] = await Promise.all([
           fetchCombinedCol('guide_boards', 'question_boards'),
           fetchCombinedCol('guide_classes', 'question_classes'),
           fetchCombinedCol('guide_subjects', 'question_subjects'),
@@ -145,10 +146,11 @@ export default function QuestionBankQuestionsPage() {
           fetchCombinedCol('guide_chapters', 'question_chapters'),
           fetchCombinedCol('guide_topics', 'question_topics'),
           fetchGuideCol('question_exams'),
-          fetchGuideCol('question_years')
+          fetchGuideCol('question_years'),
+          fetchGuideCol('question_tags')
       ]);
       setBoards(b as TaxonomyNode[]); setClasses(c as TaxonomyNode[]); setSubjects(s as TaxonomyNode[]);
-      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]); setYears(yr as TaxonomyNode[]);
+      setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]); setYears(yr as TaxonomyNode[]); setTags(tg as TaxonomyNode[]);
   };
 
   useEffect(() => {
@@ -494,8 +496,32 @@ export default function QuestionBankQuestionsPage() {
                               </div>
 
                               <div>
-                                  <label className="text-sm font-medium">Tags (comma separated)</label>
-                                  <Input placeholder="math, algebra" value={editData.tags?.join(', ') || ''} onChange={e => setEditData({...editData, tags: e.target.value.split(',').map(s=>s.trim())})} />
+                                  <label className="text-sm font-medium mb-2 block">Tags</label>
+                                  {tags.length === 0 ? (
+                                      <p className="text-xs text-slate-500">No tags defined in categories yet.</p>
+                                  ) : (
+                                      <div className="grid grid-cols-2 gap-3 max-h-[150px] overflow-y-auto pr-2 border rounded-md p-3">
+                                          {tags.map(tag => (
+                                              <div key={tag.id} className="flex items-center space-x-2">
+                                                  <Checkbox 
+                                                      id={`tag-${tag.id}`} 
+                                                      checked={(editData.tags || []).includes(tag.name)}
+                                                      onCheckedChange={(checked) => {
+                                                          const currentTags = editData.tags || [];
+                                                          if (checked) {
+                                                              setEditData({...editData, tags: [...currentTags, tag.name]});
+                                                          } else {
+                                                              setEditData({...editData, tags: currentTags.filter(t => t !== tag.name)});
+                                                          }
+                                                      }}
+                                                  />
+                                                  <label htmlFor={`tag-${tag.id}`} className="text-sm font-medium leading-none cursor-pointer">
+                                                      {tag.name}
+                                                  </label>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  )}
                               </div>
                           </CardContent>
                       </Card>

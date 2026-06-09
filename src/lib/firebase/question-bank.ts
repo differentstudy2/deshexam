@@ -11,6 +11,7 @@ export const TAXONOMY_COLLECTIONS = {
   topic: 'question_topics',
   exam: 'question_exams',
   year: 'question_years',
+  tag: 'question_tags',
 } as const;
 
 export type TaxonomyType = keyof typeof TAXONOMY_COLLECTIONS;
