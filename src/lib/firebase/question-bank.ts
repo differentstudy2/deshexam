@@ -70,12 +70,20 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
       }
     }
     if (conditions.length > 0) {
-      q = query(colRef, ...conditions, orderBy('createdAt', 'desc'), limit(limitCount));
+      q = query(colRef, ...conditions, limit(limitCount));
     }
   }
   
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+  const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+  if (filters) {
+      results.sort((a, b) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+      });
+  }
+  return results;
 }
 
 export async function getQuestion(id: string) {

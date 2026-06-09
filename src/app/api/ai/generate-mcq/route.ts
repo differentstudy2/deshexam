@@ -32,8 +32,8 @@ The format MUST exactly match:
   }
 ]`;
 
-    // Using gemini-flash-latest
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
+    // Using gemini-2.5-flash
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,6 +55,9 @@ The format MUST exactly match:
     });
 
     if (!response.ok) {
+        if (response.status === 429) {
+            return NextResponse.json({ error: `Rate limit exceeded. Please wait 30-60 seconds before trying again.` }, { status: 429 });
+        }
         const errorText = await response.text();
         console.error("Gemini API Error:", errorText);
         return NextResponse.json({ error: `Gemini API returned an error: ${response.statusText}` }, { status: 500 });
