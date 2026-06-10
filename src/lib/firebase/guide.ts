@@ -696,11 +696,20 @@ export const getTopicFullHierarchy = async (topicId: string) => {
   return hierarchy;
 };
 
-export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => void) => {
+export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => void, selectedTextbookId?: string) => {
   try {
-    onProgress?.('Fetching old textbooks...');
-    const oldTextbooksSnap = await getDocs(collection(db, 'textbooks'));
-    const oldTextbooks = oldTextbooksSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+    let oldTextbooks: any[] = [];
+    if (selectedTextbookId && selectedTextbookId !== 'all') {
+      onProgress?.('Fetching selected textbook...');
+      const docSnap = await getDoc(doc(db, 'textbooks', selectedTextbookId));
+      if (docSnap.exists()) {
+        oldTextbooks.push({ id: docSnap.id, ...docSnap.data() as any });
+      }
+    } else {
+      onProgress?.('Fetching old textbooks...');
+      const oldTextbooksSnap = await getDocs(collection(db, 'textbooks'));
+      oldTextbooks = oldTextbooksSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+    }
 
     let boardCache: Record<string, string> = {};
     let classCache: Record<string, string> = {};

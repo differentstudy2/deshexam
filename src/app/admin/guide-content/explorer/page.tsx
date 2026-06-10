@@ -261,13 +261,27 @@ export default function ContentExplorer() {
   const [migrationDialog, setMigrationDialog] = useState(false);
   const [migrationStatus, setMigrationStatus] = useState('');
   const [isMigrating, setIsMigrating] = useState(false);
+  const [oldTextbooksList, setOldTextbooksList] = useState<any[]>([]);
+  const [selectedTextbookId, setSelectedTextbookId] = useState<string>('all');
+
+  const handleOpenMigration = async () => {
+    setMigrationDialog(true);
+    if (oldTextbooksList.length === 0) {
+      try {
+        const snap = await getDocs(query(collection(db, 'textbooks')));
+        setOldTextbooksList(snap.docs.map(d => ({ id: d.id, title: d.data().title || 'Untitled' })));
+      } catch (e) {
+        console.error("Failed to load old textbooks", e);
+      }
+    }
+  };
 
   const startMigration = async () => {
     setIsMigrating(true);
     setMigrationStatus('Starting migration...');
-    const success = await migrateOldTextbooksToGuide((msg) => setMigrationStatus(msg));
+    const success = await migrateOldTextbooksToGuide((msg) => setMigrationStatus(msg), selectedTextbookId);
     if (success) {
-      toast({ title: "Migration Complete", description: "Successfully migrated all old textbooks to the new Guide Content system!" });
+      toast({ title: "Migration Complete", description: "Successfully migrated textbooks!" });
       fetchRoot();
       setMigrationDialog(false);
     } else {
@@ -455,7 +469,7 @@ export default function ContentExplorer() {
           <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire curriculum tree.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setMigrationDialog(true)} className="border-indigo-500 text-indigo-600 hover:bg-indigo-50">
+          <Button variant="outline" onClick={handleOpenMigration} className="border-indigo-500 text-indigo-600 hover:bg-indigo-50">
             Migrate Old Textbooks
           </Button>
           <Button variant="outline" onClick={handleOpenBulkMove} className="border-blue-500 text-blue-600 hover:bg-blue-50">
@@ -681,8 +695,24 @@ export default function ContentExplorer() {
                 </p>
               </div>
             ) : (
-              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-md text-sm">
-                <strong>Note:</strong> Depending on the size of your textbook library, this process may take a minute or two. Do not close this window while the migration is in progress.
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Select Textbook to Migrate</Label>
+                  <Select value={selectedTextbookId} onValueChange={setSelectedTextbookId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Textbooks" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Textbooks</SelectItem>
+                      {oldTextbooksList.map(tb => (
+                        <SelectItem key={tb.id} value={tb.id}>{tb.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-md text-sm">
+                  <strong>Note:</strong> Depending on the size of your textbook library, this process may take a minute or two. Do not close this window while the migration is in progress.
+                </div>
               </div>
             )}
           </div>
