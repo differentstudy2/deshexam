@@ -292,9 +292,9 @@ export default function InteractiveMatching({ pairs, testMode = false, onAttempt
                 className="relative grid grid-cols-2 gap-x-16 gap-y-4 select-none px-2"
                 style={{ paddingBottom: '20px' }} // extra space for last dot
             >
-                {/* SVG Overlay for lines */}
+                {/* SVG Overlay for lines - Hidden in print mode since absolute positioned elements break across pages */}
                 <svg 
-                    className="absolute inset-0 pointer-events-none z-10" 
+                    className="absolute inset-0 pointer-events-none z-10 print:hidden" 
                     style={{ width: '100%', height: svgHeight > 0 ? svgHeight : '100%', overflow: 'visible' }}
                 >
                     {renderMissingLines()}
@@ -433,6 +433,28 @@ export default function InteractiveMatching({ pairs, testMode = false, onAttempt
                     >
                         Submit Matches
                     </button>
+                </div>
+            )}
+
+            {/* Print Mode Answer Key (Only visible when printing in reading mode) */}
+            {(!testMode || isSubmitted) && (
+                <div className="hidden print:block mt-6 pt-4 border-t border-slate-200 break-inside-avoid">
+                    <h4 className="font-bold text-sm text-slate-700 mb-2">Correct Matches:</h4>
+                    <div className="flex flex-col gap-1.5 text-sm text-slate-600">
+                        {pairs.map((pair, idx) => {
+                            const rightIndex = shuffledRight.findIndex(r => r.correctLeftIndex === idx);
+                            const leftChar = String.fromCharCode(65 + idx);
+                            return (
+                                <div key={`print-ans-${idx}`} className="flex items-start gap-2">
+                                    <span className="font-bold text-slate-800 w-6">{leftChar}</span>
+                                    <span className="flex-1">{pair.left}</span>
+                                    <span className="text-slate-400 font-bold px-2">→</span>
+                                    <span className="font-bold text-slate-800 w-6">{rightIndex + 1}</span>
+                                    <span className="flex-1">{pair.right}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
         </div>

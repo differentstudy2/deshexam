@@ -13,7 +13,7 @@ import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
 import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { slugify } from '@/lib/utils';
+import { slugify, cn } from '@/lib/utils';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -553,6 +553,30 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                       </div>
                                       <Input value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
                                   </div>
+                              </div>
+                          ) : ['True/False'].includes(editData.questionType || '') ? (
+                              <div className="space-y-4">
+                                  <label className="text-sm font-medium">Select Correct Answer</label>
+                                  <div className="flex gap-4">
+                                      <label className={cn("flex flex-1 items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-slate-50", editData.correctAnswer === 'True' && "border-blue-500 bg-blue-50")}>
+                                          <input type="radio" name="correctAnswer" checked={editData.correctAnswer === 'True'} onChange={() => setEditData({...editData, correctAnswer: 'True'})} className="w-4 h-4 text-blue-600" />
+                                          <span className="font-semibold text-slate-700">True</span>
+                                      </label>
+                                      <label className={cn("flex flex-1 items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-slate-50", editData.correctAnswer === 'False' && "border-blue-500 bg-blue-50")}>
+                                          <input type="radio" name="correctAnswer" checked={editData.correctAnswer === 'False'} onChange={() => setEditData({...editData, correctAnswer: 'False'})} className="w-4 h-4 text-blue-600" />
+                                          <span className="font-semibold text-slate-700">False</span>
+                                      </label>
+                                  </div>
+                              </div>
+                          ) : ['Fill in the Blank'].includes(editData.questionType || '') ? (
+                              <div>
+                                  <label className="text-sm font-medium">Correct Answer(s)</label>
+                                  <p className="text-xs text-slate-500 mb-2">If there are multiple acceptable variations, separate them with commas (e.g. "gravity, gravitation"). Case-insensitive.</p>
+                                  <Input 
+                                      value={editData.correctAnswer || ''} 
+                                      onChange={e => setEditData({...editData, correctAnswer: e.target.value})} 
+                                      placeholder="Enter the correct answer(s)..."
+                                  />
                               </div>
                           ) : (
                               <div>

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AuthModal } from '@/components/auth/AuthModal';
 import InteractiveMatching from './InteractiveMatching';
+import { Input } from '@/components/ui/input';
 
 interface QuestionCardProps {
     question: QuestionBankEntry;
@@ -43,6 +44,7 @@ const formatDate = (dateValue: any) => {
 export default function QuestionCard({ question, index, testMode = false }: QuestionCardProps) {
     const [showAnswer, setShowAnswer] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
     const { user } = useAuth();
     const { toast } = useToast();
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -353,6 +355,8 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
     };
 
     const isMatching = question.questionType?.toLowerCase() === 'matching';
+    const isTrueFalse = question.questionType?.toLowerCase() === 'true/false';
+    const isFillInTheBlank = question.questionType?.toLowerCase() === 'fill in the blank';
     let displayMatchingPairs = question.matchingPairs || [];
     
     // Fallback for legacy/imported matching questions
@@ -397,7 +401,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
             </div>
 
             {/* MCQ Options */}
-            {!isMatching && question.options && Object.values(question.options).some(o => !!o) && (
+            {!isMatching && !isTrueFalse && !isFillInTheBlank && question.options && Object.values(question.options).some(o => !!o) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 mb-6">
                     {['a', 'b', 'c', 'd', 'e', 'f'].map(key => {
                         const value = (question.options as any)?.[key];
@@ -463,8 +467,100 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                 </div>
             )}
 
+            {/* True/False Options */}
+            {isTrueFalse && (
+                <div className="flex gap-4 mb-6">
+                    {['True', 'False'].map(opt => {
+                        const isCorrectAnswer = question.correctAnswer?.toLowerCase() === opt.toLowerCase();
+                        let containerClasses = "bg-white border-slate-200 text-slate-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300";
+                        let Icon = null;
+
+                        if (!testMode) {
+                            if (isCorrectAnswer) {
+                                containerClasses = "bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400";
+                                Icon = CheckCircle2;
+                            }
+                        } else {
+                            if (selectedOption) {
+                                if (isCorrectAnswer) {
+                                    containerClasses = "bg-green-50 border-green-500 text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400";
+                                    Icon = CheckCircle2;
+                                } else if (selectedOption.toLowerCase() === opt.toLowerCase()) {
+                                    containerClasses = "bg-red-50 border-red-500 text-red-800 dark:bg-red-900/20 dark:border-red-500/50 dark:text-red-400";
+                                    Icon = XCircle;
+                                } else {
+                                    containerClasses = "bg-white border-slate-200 opacity-60 dark:bg-slate-900 dark:border-slate-800";
+                                }
+                            } else {
+                                containerClasses = "bg-white border-slate-200 hover:border-[#107c41] hover:bg-green-50 dark:bg-slate-900 dark:border-slate-700 dark:hover:border-green-500/50 dark:hover:bg-green-900/20 cursor-pointer";
+                            }
+                        }
+
+                        return (
+                            <div 
+                                key={opt} 
+                                className={cn("flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border-2 font-bold text-lg transition-all", containerClasses)}
+                                onClick={() => handleOptionClick(opt)}
+                            >
+                                {Icon && <Icon className="h-6 w-6" />}
+                                {opt}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Fill in the Blank */}
+            {isFillInTheBlank && (
+                <div className="mb-6">
+                    {!testMode ? (
+                        <div className="p-4 bg-green-50 border border-green-500 rounded-lg text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400">
+                            <span className="font-bold mr-2">Correct Answer(s):</span>
+                            {question.correctAnswer}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3 max-w-md">
+                            <Input 
+                                value={fillBlankAnswer} 
+                                onChange={e => setFillBlankAnswer(e.target.value)} 
+                                placeholder="Type your answer here..."
+                                disabled={!!selectedOption}
+                                className={cn(
+                                    "text-lg py-6",
+                                    selectedOption && selectedOption === question.correctAnswer?.split(',').find(a => a.trim().toLowerCase() === selectedOption.trim().toLowerCase())?.trim() 
+                                        ? "border-green-500 bg-green-50 text-green-800"
+                                        : selectedOption 
+                                        ? "border-red-500 bg-red-50 text-red-800"
+                                        : ""
+                                )}
+                            />
+                            {!selectedOption ? (
+                                <Button onClick={async () => {
+                                    if (!fillBlankAnswer.trim()) return;
+                                    setSelectedOption(fillBlankAnswer);
+                                    setShowAnswer(true);
+                                    if (user) {
+                                        const correctAnswers = (question.correctAnswer || '').split(',').map(s => s.trim().toLowerCase());
+                                        const isCorrect = correctAnswers.includes(fillBlankAnswer.trim().toLowerCase());
+                                        await recordQuestionAttempt(user.uid, question.id, fillBlankAnswer, isCorrect).catch(console.error);
+                                    }
+                                }}>Submit Answer</Button>
+                            ) : (
+                                <div className="mt-2 text-sm font-bold">
+                                    {(question.correctAnswer || '').split(',').map(s => s.trim().toLowerCase()).includes(selectedOption.trim().toLowerCase()) ? (
+                                        <span className="text-green-600 flex items-center gap-1"><CheckCircle2 className="w-4 h-4"/> Correct!</span>
+                                    ) : (
+                                        <span className="text-red-600 flex items-center gap-1"><XCircle className="w-4 h-4"/> Incorrect. The correct answer was: {question.correctAnswer}</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Matching Pairs */}
-            {displayMatchingPairs.length > 0 && (
+            {isMatching && displayMatchingPairs.length > 0 && (
                 <div className="mb-6 mx-2 md:mx-6">
                     <InteractiveMatching 
                         pairs={displayMatchingPairs}
