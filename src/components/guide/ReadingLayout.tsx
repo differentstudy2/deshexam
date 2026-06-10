@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
 import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
+import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
 import { Chapter } from '@/app/guide/guide-data';
 
 export function ReadingLayout({

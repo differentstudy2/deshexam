@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video } from 'lucide-react';
+import { BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, ClipboardList, StickyNote, Key, Timer, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContentSection } from '@/app/guide/guide-data';
 
@@ -23,7 +23,13 @@ const SECTION_ICONS: Record<string, any> = {
   'q_a': HelpCircle,
   'cq': FileArchive,
   'board_question': FileImage,
-  'video_classes': Video
+  'video_classes': Video,
+  'practice_sets': ClipboardList,
+  'notes': StickyNote,
+  'solutions': Key,
+  'quizzes': HelpCircle,
+  'mock_tests': Timer,
+  'exams_papers': Award
 };
 
 export function TopicSectionsSidebar({ sections }: { sections: ContentSection[] }) {

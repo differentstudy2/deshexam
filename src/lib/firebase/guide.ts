@@ -1036,6 +1036,34 @@ export const getGuideNodeById = async (id: string) => {
   return null;
 };
 
+export async function findGuideNodeAnyLevel(idOrSlug: string): Promise<{ node: any, level: string } | null> {
+  const collections = [
+    { name: 'guide_topics', level: 'topic' },
+    { name: 'guide_chapters', level: 'chapter' },
+    { name: 'guide_textbooks', level: 'textbook' },
+    { name: 'guide_subjects', level: 'subject' },
+    { name: 'guide_classes', level: 'class' },
+    { name: 'guide_boards', level: 'board' }
+  ];
+
+  for (const coll of collections) {
+    const node = await getGuideNodeBySlugOrId(coll.name, idOrSlug);
+    if (node) {
+      return { node, level: coll.level };
+    }
+  }
+
+  return null;
+}
+
+// Function to generate the correct frontend URL for a guide node
+export function getGuideNodeUrl(node: any): string {
+  if (!node) return '/guide';
+  const idToUse = node.slug || node.id;
+  // Based on user request, all levels should be accessible under /guide/[id]
+  return `/guide/${idToUse}`;
+}
+
 export const getGuideNodeBySlugOrId = async (collectionName: string, slugOrId: string) => {
   // Try ID first
   const docSnap = await getDoc(doc(db, collectionName, slugOrId));

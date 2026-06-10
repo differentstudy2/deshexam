@@ -23,7 +23,7 @@ export function GuideSidebar({ subjects, activeId }: GuideSidebarProps) {
           
           return (
             <Link 
-              href={`/guide/subject/${subject.slug || subject.id}`} 
+              href={`/guide/${subject.slug || subject.id}`} 
               key={subject.id}
             >
               <div 
