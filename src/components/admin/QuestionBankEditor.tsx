@@ -200,6 +200,22 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
       }
   };
 
+  const handleDeleteMedia = async (url: string | undefined, field: 'questionImage' | 'questionAudio' | 'questionVideo') => {
+      // Optimistically update the UI
+      setEditData(prev => ({ ...prev, [field]: undefined }));
+
+      // Only attempt to delete from Firebase if it's a Firebase Storage URL
+      if (!url || !url.includes('firebasestorage.googleapis.com')) return;
+      
+      try {
+          const fileRef = ref(storage, url);
+          await deleteObject(fileRef);
+          toast({ title: 'Media Deleted', description: 'Removed from Firebase storage.' });
+      } catch (e) {
+          console.error("Failed to delete media from Firebase", e);
+      }
+  };
+
   const handleSave = async () => {
       if (!editData.questionText) {
           toast({ title: 'Validation Error', description: 'Question Text is required.', variant: 'destructive' });
@@ -320,7 +336,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                           <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
                                       </label>
                                   </label>
-                                  <Input placeholder="URL or upload..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
+                                  <div className="flex items-center gap-2">
+                                      <Input placeholder="URL or upload..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
+                                      {editData.questionImage && (
+                                          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-red-500 hover:text-red-700" onClick={() => handleDeleteMedia(editData.questionImage, 'questionImage')}>
+                                              <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                      )}
+                                  </div>
                               </div>
                               <div>
                                   <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
@@ -331,7 +354,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                           <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
                                       </label>
                                   </label>
-                                  <Input placeholder="URL or upload..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
+                                  <div className="flex items-center gap-2">
+                                      <Input placeholder="URL or upload..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
+                                      {editData.questionAudio && (
+                                          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-red-500 hover:text-red-700" onClick={() => handleDeleteMedia(editData.questionAudio, 'questionAudio')}>
+                                              <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                      )}
+                                  </div>
                               </div>
                               <div>
                                   <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
@@ -342,7 +372,14 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                           <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
                                       </label>
                                   </label>
-                                  <Input placeholder="URL or upload..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
+                                  <div className="flex items-center gap-2">
+                                      <Input placeholder="URL or upload..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
+                                      {editData.questionVideo && (
+                                          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-red-500 hover:text-red-700" onClick={() => handleDeleteMedia(editData.questionVideo, 'questionVideo')}>
+                                              <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                      )}
+                                  </div>
                               </div>
                           </div>
                       </CardContent>

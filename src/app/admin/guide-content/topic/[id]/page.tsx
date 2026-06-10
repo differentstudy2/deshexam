@@ -14,7 +14,7 @@ import { getTopicSections, saveTopicSections, updateTopicStatus } from '@/lib/fi
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useToast } from "@/hooks/use-toast";
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
@@ -123,6 +123,13 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
 
   const removeMediaItem = (type: string, index: number) => {
     const data = getMediaData(type);
+    const item = data[index];
+    
+    if (item && item.url && item.url.includes('firebasestorage.googleapis.com')) {
+      const fileRef = ref(storage, item.url);
+      deleteObject(fileRef).catch(e => console.error('Failed to delete media from Firebase', e));
+    }
+    
     data.splice(index, 1);
     setContentMap(prev => ({ ...prev, [type]: JSON.stringify(data) }));
   };
