@@ -734,8 +734,11 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
     let boardCache: Record<string, string> = {};
     let classCache: Record<string, string> = {};
     let subjectCache: Record<string, string> = {};
+    let tbCache: Record<string, string> = {};
+    let chapterCache: Record<string, string> = {};
+    let topicCache: Record<string, string> = {};
 
-    // Pre-fetch existing taxonomy
+    onProgress?.('Pre-loading existing taxonomy to prevent network timeouts...');
     const boardsSnap = await getDocs(collection(db, 'guide_boards'));
     boardsSnap.docs.forEach(d => boardCache[d.data().title || d.data().name] = d.id);
 
@@ -744,6 +747,15 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
 
     const subjectsSnap = await getDocs(collection(db, 'guide_subjects'));
     subjectsSnap.docs.forEach(d => subjectCache[d.data().classId + '_' + d.data().title] = d.id);
+
+    const tbsSnap = await getDocs(collection(db, 'guide_textbooks'));
+    tbsSnap.docs.forEach(d => tbCache[d.data().subjectId + '_' + d.data().title] = d.id);
+
+    const chapsSnap = await getDocs(collection(db, 'guide_chapters'));
+    chapsSnap.docs.forEach(d => chapterCache[d.data().textbookId + '_' + d.data().title] = d.id);
+
+    const topicsSnap2 = await getDocs(collection(db, 'guide_topics'));
+    topicsSnap2.docs.forEach(d => topicCache[d.data().chapterId + '_' + d.data().title] = d.id);
 
     let count = 0;
     for (const textbook of oldTextbooks) {
@@ -773,28 +785,25 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
         subjectCache[subjectKey] = subjectId;
       }
 
-      // Create or update textbook
-      const guideTbsSnap = await getDocs(query(collection(db, 'guide_textbooks'), where('subjectId', '==', subjectId), where('title', '==', textbook.title)));
-      let textbookId = '';
-      if (!guideTbsSnap.empty) {
-        textbookId = guideTbsSnap.docs[0].id;
+      const tbKey = subjectId + '_' + textbook.title;
+      let textbookId = tbCache[tbKey];
+      if (textbookId) {
         await setDoc(doc(db, 'guide_textbooks', textbookId), { author: textbook.author || '', updatedAt: serverTimestamp() }, { merge: true });
       } else {
         textbookId = await createGuideTextbook(subjectId, textbook.title, textbook.author || '');
+        tbCache[tbKey] = textbookId;
       }
 
-      // Fetch chapters
-      onProgress?.(`Fetching chapters for ${textbook.title}...`);
       const chaptersSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters`));
       for (const chapterDoc of chaptersSnap.docs) {
         const chapterData = chapterDoc.data();
-        const guideChapsSnap = await getDocs(query(collection(db, 'guide_chapters'), where('textbookId', '==', textbookId), where('title', '==', chapterData.title)));
-        let chapterId = '';
-        if (!guideChapsSnap.empty) {
-          chapterId = guideChapsSnap.docs[0].id;
+        const chapKey = textbookId + '_' + chapterData.title;
+        let chapterId = chapterCache[chapKey];
+        if (chapterId) {
           await setDoc(doc(db, 'guide_chapters', chapterId), { author: chapterData.author || '', updatedAt: serverTimestamp() }, { merge: true });
         } else {
           chapterId = await createGuideChapter(textbookId, chapterData.title, chapterData.author || '');
+          chapterCache[chapKey] = chapterId;
         }
 
         if (chapterData.content) {
@@ -805,17 +814,16 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
           }, { merge: true });
         }
 
-        // Fetch topics
         const topicsSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters/${chapterDoc.id}/topics`));
-        for (const topicDoc of topicsSnap.docs) {
+        const topicPromises = topicsSnap.docs.map(async (topicDoc) => {
           const topicData = topicDoc.data();
-          const guideTopicsSnap = await getDocs(query(collection(db, 'guide_topics'), where('chapterId', '==', chapterId), where('title', '==', topicData.title)));
-          let newTopicId = '';
-          if (!guideTopicsSnap.empty) {
-            newTopicId = guideTopicsSnap.docs[0].id;
+          const topicKey = chapterId + '_' + topicData.title;
+          let newTopicId = topicCache[topicKey];
+          if (newTopicId) {
             await setDoc(doc(db, 'guide_topics', newTopicId), { author: topicData.author || '', updatedAt: serverTimestamp() }, { merge: true });
           } else {
             newTopicId = await createGuideTopic(chapterId, topicData.title, topicData.author || '');
+            topicCache[topicKey] = newTopicId;
           }
 
           if (topicData.content) {
@@ -825,7 +833,12 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
               updatedAt: serverTimestamp()
             }, { merge: true });
           }
-        }
+        });
+        
+        await Promise.all(topicPromises);
+        
+        // Add a tiny delay after each chapter to let the Firebase WebSocket queue flush
+        await new Promise(r => setTimeout(r, 100));
       }
     }
     onProgress?.('Migration complete!');

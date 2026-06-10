@@ -367,7 +367,16 @@ function ReadingLayout({
 
         {/* Main Content Area */}
         <div className="flex-1 min-w-0">
-          <ReadingArticle data={data} />
+          <ReadingArticle 
+            data={data} 
+            hierarchy={{
+              boardTitle,
+              classTitle,
+              subjectTitle,
+              textbookTitle,
+              chapterTitle
+            }}
+          />
           
           <div className="px-4 sm:px-6 xl:px-12 pb-12">
             <AssessmentTabs chapterId={id} />

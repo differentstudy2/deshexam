@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle2 } from 'lucide-react';
+import { Share2, MoreVertical, Eye, ChevronLeft, ChevronRight, Play, CheckCircle2, Printer } from 'lucide-react';
 import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/guide/[id]/guide-data';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,23 @@ import rehypeRaw from 'rehype-raw';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ReadingArticleProps {
   data: ReadingContentData;
+  hierarchy?: {
+    boardTitle?: string;
+    classTitle?: string;
+    subjectTitle?: string;
+    textbookTitle?: string;
+    chapterTitle?: string;
+  };
 }
 
 function SectionFooter({ author }: { author: ContentAuthor }) {
@@ -37,7 +51,7 @@ function SectionFooter({ author }: { author: ContentAuthor }) {
   );
 }
 
-export function ReadingArticle({ data }: ReadingArticleProps) {
+export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
   
   const renderLegacyContent = () => (
     <div className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
@@ -73,29 +87,33 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
   );
 
   const renderSection = (sec: ContentSection, idx: number) => {
+    const isLesson = sec.id === 'lesson';
+
     return (
       <div key={idx} id={sec.id} className="bg-white dark:bg-slate-900 scroll-mt-20 border-b border-slate-100 dark:border-slate-800">
         
         {/* Section Header */}
-        <div className="bg-[#eaf5ef] dark:bg-emerald-900/10 px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <h2 className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400">
-              {sec.title}
-            </h2>
-            {sec.type !== 'article' && (
-              <span className="px-2 py-0.5 bg-[#00a651] text-white text-[11px] font-bold rounded">
-                Reading
-              </span>
-            )}
+        {!isLesson && (
+          <div className="bg-[#eaf5ef] dark:bg-emerald-900/10 px-6 py-4 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <h2 className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400">
+                {sec.title}
+              </h2>
+              {sec.type !== 'article' && (
+                <span className="px-2 py-0.5 bg-[#00a651] text-white text-[11px] font-bold rounded">
+                  Reading
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-slate-400">
+              <button className="hover:text-emerald-600 transition-colors p-1"><Share2 className="w-4 h-4" /></button>
+              <button className="hover:text-emerald-600 transition-colors p-1"><MoreVertical className="w-4 h-4" /></button>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-slate-400">
-            <button className="hover:text-emerald-600 transition-colors p-1"><Share2 className="w-4 h-4" /></button>
-            <button className="hover:text-emerald-600 transition-colors p-1"><MoreVertical className="w-4 h-4" /></button>
-          </div>
-        </div>
+        )}
 
         {/* Section Body */}
-        <div className="p-6 sm:p-8">
+        <div className={`p-6 sm:p-8 ${isLesson ? 'pt-6' : ''}`}>
           
           {sec.type === 'article' && sec.badges && (
             <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -262,6 +280,73 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
         
         {data.sections ? (
           <div className="flex flex-col">
+            
+            {/* Master Banner */}
+            <div className="bg-[#f0f7f4] dark:bg-emerald-900/10 px-6 py-5 border-b border-emerald-100/50 dark:border-slate-800">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-[24px] font-bold text-[#2d4a41] dark:text-slate-100 flex flex-wrap items-center">
+                    {data.title}
+                    {data.author?.name && <span className="text-[#2d4a41] dark:text-slate-100 ml-2">| {data.author.name}</span>}
+                  </h1>
+                  {hierarchy && (
+                    <p className="text-[14px] text-[#5e7c70] dark:text-slate-400 mt-1.5">
+                      {data.title} {data.author?.name ? `| ${data.author.name}` : ''} - {hierarchy.boardTitle ? `${hierarchy.boardTitle} - ` : ''}{hierarchy.classTitle ? `${hierarchy.classTitle} - ` : ''}{hierarchy.subjectTitle ? `${hierarchy.subjectTitle}` : ''}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-4 text-[#759388] mt-1">
+                   <div className="flex items-center gap-1.5 text-[15px] font-medium mr-2">
+                     <Eye className="w-4 h-4" />
+                     {data.views || '3.6k'}
+                   </div>
+                   <button 
+                     onClick={() => window.print()}
+                     className="hover:text-[#2d4a41] transition-colors p-1" 
+                     title="Print"
+                   >
+                     <Printer className="w-5 h-5" />
+                   </button>
+                   <button 
+                     onClick={() => {
+                       if (navigator.share) {
+                         navigator.share({ title: data.title, url: window.location.href });
+                       } else {
+                         navigator.clipboard.writeText(window.location.href);
+                         alert('Link copied to clipboard!');
+                       }
+                     }}
+                     className="hover:text-[#2d4a41] transition-colors p-1" 
+                     title="Share"
+                   >
+                     <Share2 className="w-5 h-5" />
+                   </button>
+                   <DropdownMenu>
+                     <DropdownMenuTrigger asChild>
+                       <button className="bg-white dark:bg-slate-800 rounded px-1.5 py-1.5 hover:text-[#2d4a41] shadow-sm border border-slate-200 dark:border-slate-700 transition-colors ml-1">
+                         <MoreVertical className="w-5 h-5" />
+                       </button>
+                     </DropdownMenuTrigger>
+                     <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900">
+                        <DropdownMenuItem className="cursor-pointer">Test Yourself</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">Favorite</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">Bookmark</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer">View MCQ(129)</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">View Written(115)</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer">প্রশ্ন তৈরি করুন</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">Show Video</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer">Add MCQ</DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">Add Written</DropdownMenuItem>
+                     </DropdownMenuContent>
+                   </DropdownMenu>
+                </div>
+              </div>
+            </div>
+
             {data.sections.map(renderSection)}
             
             {/* Tags and Pagination */}
