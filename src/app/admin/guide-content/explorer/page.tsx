@@ -248,6 +248,7 @@ export default function ContentExplorer() {
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
   const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
 
   // Bulk Move Dialog State
   const [bulkMoveDialog, setBulkMoveDialog] = useState(false);
@@ -366,6 +367,7 @@ export default function ContentExplorer() {
   };
 
   const handleOpenDelete = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
+    setDeleteConfirmInput('');
     setDeleteDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess });
   };
 
@@ -559,14 +561,24 @@ export default function ContentExplorer() {
             <DialogTitle>Delete {deleteDialog.nodeType.charAt(0).toUpperCase() + deleteDialog.nodeType.slice(1)}</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete <strong>{deleteDialog.nodeName}</strong>? This action cannot be undone. 
-              {deleteDialog.nodeType !== 'topic' && ' Any child items may become orphaned.'}
+              {deleteDialog.nodeType !== 'topic' && ' ALL child items (and their content) will be permanently deleted.'}
             </DialogDescription>
           </DialogHeader>
+          <div className="py-2 space-y-3">
+            <Label className="text-sm text-slate-600 dark:text-slate-400">
+              Type <strong className="text-slate-900 dark:text-slate-100">{deleteDialog.nodeName}</strong> to confirm.
+            </Label>
+            <Input 
+              value={deleteConfirmInput}
+              onChange={(e) => setDeleteConfirmInput(e.target.value)}
+              placeholder="Type name here..."
+            />
+          </div>
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setDeleteDialog(prev => ({ ...prev, isOpen: false }))}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete} disabled={deleting}>
+            <Button variant="destructive" onClick={handleConfirmDelete} disabled={deleting || deleteConfirmInput !== deleteDialog.nodeName}>
               {deleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
               Delete
             </Button>

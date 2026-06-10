@@ -360,24 +360,12 @@ export const saveGuideSubject = async (id: string, data: any) => {
   await setDoc(doc(db, "guide_subjects", id), data);
 };
 
-export const deleteGuideSubject = async (id: string) => {
-  await deleteDoc(doc(db, "guide_subjects", id));
-};
-
 export const saveGuideChapter = async (id: string, data: any) => {
   await setDoc(doc(db, "guide_chapters", id), data);
 };
 
-export const deleteGuideChapter = async (id: string) => {
-  await deleteDoc(doc(db, "guide_chapters", id));
-};
-
 export const saveGuideTopic = async (id: string, data: any) => {
   await setDoc(doc(db, "guide_topics", id), data);
-};
-
-export const deleteGuideTopic = async (id: string) => {
-  await deleteDoc(doc(db, "guide_topics", id));
 };
 
 export const saveGuideReadingContent = async (id: string, data: any) => {
@@ -388,16 +376,42 @@ export const deleteGuideReadingContent = async (id: string) => {
   await deleteDoc(doc(db, "guide_reading_content", id));
 };
 
+export const deleteGuideTopic = async (id: string) => {
+  const snap = await getDocs(collection(db, 'guide_topics', id, 'content_sections'));
+  await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+  await deleteDoc(doc(db, "guide_topics", id));
+};
+
+export const deleteGuideChapter = async (id: string) => {
+  const snap = await getDocs(collection(db, 'guide_chapters', id, 'content_sections'));
+  await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+  const topics = await getGuideTopicsByChapter(id);
+  for (const t of topics) await deleteGuideTopic(t.id);
+  await deleteDoc(doc(db, "guide_chapters", id));
+};
+
+export const deleteGuideSubject = async (id: string) => {
+  const textbooks = await getGuideTextbooksBySubject(id);
+  for (const t of textbooks) await deleteGuideTextbook(t.id);
+  await deleteDoc(doc(db, "guide_subjects", id));
+};
+
+export const deleteGuideTextbook = async (id: string) => {
+  const chapters = await getGuideChaptersByTextbook(id);
+  for (const c of chapters) await deleteGuideChapter(c.id);
+  await deleteDoc(doc(db, "guide_textbooks", id));
+};
+
 export const deleteGuideClass = async (id: string) => {
+  const subjects = await getGuideSubjectsByClass(id);
+  for (const s of subjects) await deleteGuideSubject(s.id);
   await deleteDoc(doc(db, "guide_classes", id));
 };
 
 export const deleteGuideBoard = async (id: string) => {
+  const classes = await getGuideClassesByBoard(id);
+  for (const c of classes) await deleteGuideClass(c.id);
   await deleteDoc(doc(db, "guide_boards", id));
-};
-
-export const deleteGuideTextbook = async (id: string) => {
-  await deleteDoc(doc(db, "guide_textbooks", id));
 };
 
 // --- NEW HIERARCHY FETCHERS ---
