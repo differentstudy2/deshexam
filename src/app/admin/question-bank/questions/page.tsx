@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { getQuestions, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -88,6 +89,49 @@ export default function QuestionBankQuestionsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [hasCopied, setHasCopied] = useState(false);
+
+  const demoJsonFormat = [
+      {
+          "Question Type": "Multiple Choice",
+          "Subject": "General Knowledge",
+          "Chapter": "Geography",
+          "Question": "What is the capital of France?",
+          "Option A": "Berlin",
+          "Option B": "Madrid",
+          "Option C": "Paris",
+          "Option D": "Rome",
+          "Correct Answer": "C",
+          "Difficulty": "Easy",
+          "Explanation": "Paris is the capital and most populous city of France."
+      },
+      {
+          "Question Type": "True/False",
+          "Subject": "Science",
+          "Chapter": "Astronomy",
+          "Question": "The Earth is the fourth planet from the Sun.",
+          "Option A": "True",
+          "Option B": "False",
+          "Correct Answer": "B",
+          "Difficulty": "Medium",
+          "Explanation": "Earth is the third planet from the Sun. Mars is the fourth."
+      },
+      {
+          "Question Type": "Matching",
+          "Subject": "History",
+          "Chapter": "World War II",
+          "Question": "Match the leader to their respective country.",
+          "Option A": "Churchill=UK, FDR=USA",
+          "Correct Answer": "1-A, 2-B"
+      }
+  ];
+
+  const handleCopyJson = () => {
+      navigator.clipboard.writeText(JSON.stringify(demoJsonFormat, null, 2));
+      setHasCopied(true);
+      toast({ title: 'JSON Copied to clipboard!' });
+      setTimeout(() => setHasCopied(false), 2000);
+  };
 
   const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'questionImage' | 'questionAudio' | 'questionVideo') => {
       const file = e.target.files?.[0];
@@ -345,9 +389,37 @@ export default function QuestionBankQuestionsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Question Bank</h1>
-        <Button onClick={() => { resetForm(); setView('editor'); }}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Question
-        </Button>
+        <div className="flex items-center gap-3">
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outline">
+                        <FileJson className="mr-2 h-4 w-4" /> Bulk Import JSON Format
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Bulk Import JSON Format</DialogTitle>
+                        <DialogDescription>
+                            Use this exact JSON format when bulk-importing questions from the Import section.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="relative mt-4">
+                        <div className="absolute top-2 right-2 flex gap-2">
+                            <Button size="sm" variant="secondary" className="h-8" onClick={handleCopyJson}>
+                                {hasCopied ? <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" /> : <Copy className="h-4 w-4 mr-2" />}
+                                {hasCopied ? 'Copied!' : 'Copy'}
+                            </Button>
+                        </div>
+                        <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-x-auto text-xs font-mono pt-12">
+                            {JSON.stringify(demoJsonFormat, null, 2)}
+                        </pre>
+                    </div>
+                </DialogContent>
+            </Dialog>
+            <Button onClick={() => { resetForm(); setView('editor'); }}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Question
+            </Button>
+        </div>
       </div>
 
       <Card>

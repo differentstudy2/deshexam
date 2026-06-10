@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AuthModal } from '@/components/auth/AuthModal';
+import InteractiveMatching from './InteractiveMatching';
 
 interface QuestionCardProps {
     question: QuestionBankEntry;
@@ -351,6 +352,27 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
         }
     };
 
+    const isMatching = question.questionType?.toLowerCase() === 'matching';
+    let displayMatchingPairs = question.matchingPairs || [];
+    
+    // Fallback for legacy/imported matching questions
+    if (isMatching && displayMatchingPairs.length === 0 && question.options?.a) {
+        try {
+            // If they just put everything in option A
+            if (question.options.a && !question.options.b) {
+                const pairs = question.options.a.split(',').map(p => p.trim());
+                displayMatchingPairs = pairs.map(p => {
+                    let [left, right] = p.split('=');
+                    if (!right) {
+                        left = p;
+                        right = '';
+                    }
+                    return { left: left.trim(), right: right.trim() };
+                });
+            }
+        } catch(e) {}
+    }
+
     return (
         <div id={`question-card-${question.id}`} className="w-full bg-white dark:bg-slate-950 p-5 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all hover:shadow-md relative overflow-hidden">
             
@@ -375,7 +397,7 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
             </div>
 
             {/* MCQ Options */}
-            {question.options && Object.values(question.options).some(o => !!o) && (
+            {!isMatching && question.options && Object.values(question.options).some(o => !!o) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 mb-6">
                     {['a', 'b', 'c', 'd', 'e', 'f'].map(key => {
                         const value = (question.options as any)?.[key];
@@ -438,6 +460,23 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                             </div>
                         )
                     })}
+                </div>
+            )}
+
+            {/* Matching Pairs */}
+            {displayMatchingPairs.length > 0 && (
+                <div className="mb-6 mx-2 md:mx-6">
+                    <InteractiveMatching 
+                        pairs={displayMatchingPairs}
+                        testMode={testMode}
+                        showAnswer={showAnswer}
+                        onAttempt={(isCorrect) => {
+                            if (user && testMode) {
+                                setShowAnswer(true);
+                                recordQuestionAttempt(user.uid, question.id, "MATCHING_ATTEMPT", isCorrect).catch(console.error);
+                            }
+                        }}
+                    />
                 </div>
             )}
 
