@@ -26,7 +26,7 @@ import {
   getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
   createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
   deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
-  updateGuideNodeTitle
+  updateGuideNodeTitle, migrateOldTextbooksToGuide
 } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -257,6 +257,25 @@ export default function ContentExplorer() {
   const [targetBoardForMove, setTargetBoardForMove] = useState<string>('');
   const [movingClasses, setMovingClasses] = useState(false);
 
+  // Migration State
+  const [migrationDialog, setMigrationDialog] = useState(false);
+  const [migrationStatus, setMigrationStatus] = useState('');
+  const [isMigrating, setIsMigrating] = useState(false);
+
+  const startMigration = async () => {
+    setIsMigrating(true);
+    setMigrationStatus('Starting migration...');
+    const success = await migrateOldTextbooksToGuide((msg) => setMigrationStatus(msg));
+    if (success) {
+      toast({ title: "Migration Complete", description: "Successfully migrated all old textbooks to the new Guide Content system!" });
+      fetchRoot();
+      setMigrationDialog(false);
+    } else {
+      toast({ title: "Migration Failed", description: "Check console for errors.", variant: "destructive" });
+    }
+    setIsMigrating(false);
+  };
+
   const fetchRoot = async () => {
     setLoading(true);
     try {
@@ -436,6 +455,9 @@ export default function ContentExplorer() {
           <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire curriculum tree.</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setMigrationDialog(true)} className="border-indigo-500 text-indigo-600 hover:bg-indigo-50">
+            Migrate Old Textbooks
+          </Button>
           <Button variant="outline" onClick={handleOpenBulkMove} className="border-blue-500 text-blue-600 hover:bg-blue-50">
             Bulk Move Classes
           </Button>
@@ -636,6 +658,44 @@ export default function ContentExplorer() {
             >
               {movingClasses ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Move {selectedClassesForMove.length} Classes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Migration Dialog */}
+      <Dialog open={migrationDialog} onOpenChange={(open) => !isMigrating && setMigrationDialog(open)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Migrate Old Textbooks</DialogTitle>
+            <DialogDescription>
+              This will automatically fetch your old textbooks, chapters, and topics and import them into the new Guide Content tree. It will automatically match or create the required Boards, Classes, and Subjects based on the old data.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6">
+            {isMigrating ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <p className="text-sm font-medium text-slate-700 animate-pulse text-center">
+                  {migrationStatus}
+                </p>
+              </div>
+            ) : (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-md text-sm">
+                <strong>Note:</strong> Depending on the size of your textbook library, this process may take a minute or two. Do not close this window while the migration is in progress.
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMigrationDialog(false)} disabled={isMigrating}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white" 
+              onClick={startMigration} 
+              disabled={isMigrating}
+            >
+              Start Migration
             </Button>
           </DialogFooter>
         </DialogContent>

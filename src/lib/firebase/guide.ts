@@ -693,3 +693,79 @@ export const getTopicFullHierarchy = async (topicId: string) => {
 
   return hierarchy;
 };
+
+export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => void) => {
+  try {
+    onProgress?.('Fetching old textbooks...');
+    const oldTextbooksSnap = await getDocs(collection(db, 'textbooks'));
+    const oldTextbooks = oldTextbooksSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+
+    let boardCache: Record<string, string> = {};
+    let classCache: Record<string, string> = {};
+    let subjectCache: Record<string, string> = {};
+
+    // Pre-fetch existing taxonomy
+    const boardsSnap = await getDocs(collection(db, 'guide_boards'));
+    boardsSnap.docs.forEach(d => boardCache[d.data().title || d.data().name] = d.id);
+
+    const classesSnap = await getDocs(collection(db, 'guide_classes'));
+    classesSnap.docs.forEach(d => classCache[d.data().boardId + '_' + d.data().title] = d.id);
+
+    const subjectsSnap = await getDocs(collection(db, 'guide_subjects'));
+    subjectsSnap.docs.forEach(d => subjectCache[d.data().classId + '_' + d.data().title] = d.id);
+
+    let count = 0;
+    for (const textbook of oldTextbooks) {
+      count++;
+      onProgress?.(`Migrating textbook ${count} of ${oldTextbooks.length}: ${textbook.title}`);
+
+      const boardTitle = textbook.board || 'Default Board';
+      let boardId = boardCache[boardTitle];
+      if (!boardId) {
+        boardId = await createGuideBoard(boardTitle);
+        boardCache[boardTitle] = boardId;
+      }
+
+      const classTitle = textbook.class || 'Default Class';
+      const classKey = boardId + '_' + classTitle;
+      let classId = classCache[classKey];
+      if (!classId) {
+        classId = await createGuideClass(boardId, classTitle);
+        classCache[classKey] = classId;
+      }
+
+      const subjectTitle = textbook.subject || 'Default Subject';
+      const subjectKey = classId + '_' + subjectTitle;
+      let subjectId = subjectCache[subjectKey];
+      if (!subjectId) {
+        subjectId = await createGuideSubject(classId, subjectTitle);
+        subjectCache[subjectKey] = subjectId;
+      }
+
+      // Create textbook
+      const textbookId = await createGuideTextbook(subjectId, textbook.title, textbook.author || '');
+
+      // Fetch chapters
+      onProgress?.(`Fetching chapters for ${textbook.title}...`);
+      const chaptersSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters`));
+      for (const chapterDoc of chaptersSnap.docs) {
+        const chapterData = chapterDoc.data();
+        const chapterId = await createGuideChapter(textbookId, chapterData.title, chapterData.author || '');
+
+        // Fetch topics
+        const topicsSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters/${chapterDoc.id}/topics`));
+        for (const topicDoc of topicsSnap.docs) {
+          const topicData = topicDoc.data();
+          await createGuideTopic(chapterId, topicData.title, topicData.author || '');
+        }
+      }
+    }
+    onProgress?.('Migration complete!');
+    return true;
+  } catch (error) {
+    console.error('Migration error:', error);
+    onProgress?.('Error during migration. Check console.');
+    return false;
+  }
+};
+
