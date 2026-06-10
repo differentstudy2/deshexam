@@ -110,9 +110,39 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
           {sec.type === 'article' && (
             <>
               <style dangerouslySetInnerHTML={{__html: `
-                .custom-reading-font p, .custom-reading-font li, .custom-reading-font span, .custom-reading-font div {
+                .custom-reading-font p, 
+                .custom-reading-font li, 
+                .custom-reading-font a, 
+                .custom-reading-font strong, 
+                .custom-reading-font b, 
+                .custom-reading-font em, 
+                .custom-reading-font i,
+                .custom-reading-font td,
+                .custom-reading-font th {
                   font-size: 1.15rem !important;
                   line-height: 1.8 !important;
+                }
+                
+                .custom-reading-font div:not(.katex-display):not(.katex) {
+                  font-size: 1.15rem;
+                }
+                
+                .custom-reading-font span:not([class*="katex"]) {
+                  font-size: 1.15rem;
+                }
+
+                .custom-reading-font h1, 
+                .custom-reading-font h2, 
+                .custom-reading-font h3, 
+                .custom-reading-font h4, 
+                .custom-reading-font h5, 
+                .custom-reading-font h6 {
+                  font-size: 1.25rem !important;
+                  line-height: 1.6 !important;
+                  font-weight: 700 !important;
+                  margin-top: 1.5em !important;
+                  margin-bottom: 0.5em !important;
+                  color: inherit !important;
                 }
               `}} />
               <div className="prose dark:prose-invert max-w-none custom-reading-font">

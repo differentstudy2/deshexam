@@ -558,7 +558,8 @@ export const updateGuideNodeTitle = async (nodeId: string, nodeType: string, new
 };
 
 export const createGuideBoard = async (title: string) => {
-  const docRef = await addDoc(collection(db, 'guide_boards'), {
+  const docRef = doc(collection(db, 'guide_boards'));
+  await setDoc(docRef, {
     title,
     status: 'published',
     orderIndex: Date.now(),
@@ -568,7 +569,8 @@ export const createGuideBoard = async (title: string) => {
 };
 
 export const createGuideClass = async (boardId: string, title: string) => {
-  const docRef = await addDoc(collection(db, 'guide_classes'), {
+  const docRef = doc(collection(db, 'guide_classes'));
+  await setDoc(docRef, {
     boardId,
     title,
     status: 'published',
@@ -579,7 +581,8 @@ export const createGuideClass = async (boardId: string, title: string) => {
 };
 
 export const createGuideSubject = async (classId: string, title: string) => {
-  const docRef = await addDoc(collection(db, 'guide_subjects'), {
+  const docRef = doc(collection(db, 'guide_subjects'));
+  await setDoc(docRef, {
     classId,
     title,
     status: 'published',
@@ -590,7 +593,8 @@ export const createGuideSubject = async (classId: string, title: string) => {
 };
 
 export const createGuideTextbook = async (subjectId: string, title: string, author?: string) => {
-  const docRef = await addDoc(collection(db, 'guide_textbooks'), {
+  const docRef = doc(collection(db, 'guide_textbooks'));
+  await setDoc(docRef, {
     subjectId,
     title,
     ...(author ? { author } : {}),
@@ -602,7 +606,8 @@ export const createGuideTextbook = async (subjectId: string, title: string, auth
 };
 
 export const createGuideChapter = async (textbookId: string, title: string, author?: string) => {
-  const docRef = await addDoc(collection(db, 'guide_chapters'), {
+  const docRef = doc(collection(db, 'guide_chapters'));
+  await setDoc(docRef, {
     textbookId,
     title,
     ...(author ? { author } : {}),
@@ -614,11 +619,12 @@ export const createGuideChapter = async (textbookId: string, title: string, auth
 };
 
 export const createGuideTopic = async (chapterId: string, title: string, author?: string) => {
-  const docRef = await addDoc(collection(db, 'guide_topics'), {
+  const docRef = doc(collection(db, 'guide_topics'));
+  await setDoc(docRef, {
     chapterId,
     title,
     ...(author ? { author } : {}),
-    status: 'draft',
+    status: 'published',
     orderIndex: Date.now(),
     createdAt: serverTimestamp()
   });
