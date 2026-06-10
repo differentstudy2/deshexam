@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, Headphones, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, BookOpen, FileText, Type, Target, Info, User, Lightbulb, PenTool, HelpCircle, Brain, CheckSquare, FileArchive, FileImage, Video, Headphones, Plus, Trash2, ClipboardList, StickyNote, Key, Timer, Award } from 'lucide-react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Input } from '@/components/ui/input';
@@ -35,10 +35,16 @@ const sectionTypes = [
   { id: 'author', label: 'Author', icon: User },
   { id: 'explanation', label: 'Explanation', icon: Lightbulb },
   { id: 'exercise', label: 'Exercise', icon: PenTool },
+  { id: 'practice_sets', label: 'Practice Sets', icon: ClipboardList },
+  { id: 'notes', label: 'Notes', icon: StickyNote },
+  { id: 'solutions', label: 'Solutions', icon: Key },
   { id: 'mcq', label: 'MCQ', icon: HelpCircle },
+  { id: 'quizzes', label: 'Quizzes', icon: HelpCircle },
   { id: 'creative_question', label: 'Creative Q', icon: Brain },
   { id: 'short_question', label: 'Short Q', icon: CheckSquare },
   { id: 'model_test', label: 'Model Test', icon: FileArchive },
+  { id: 'mock_tests', label: 'Mock Tests', icon: Timer },
+  { id: 'exams_papers', label: 'Exams & Papers', icon: Award },
   { id: 'pdf', label: 'PDF', icon: FileImage },
   { id: 'video', label: 'Video', icon: Video },
   { id: 'audio', label: 'Audio', icon: Headphones },
