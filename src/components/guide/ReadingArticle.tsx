@@ -6,6 +6,12 @@ import { ReadingContentData, ContentSection, ContentAuthor } from '@/app/guide/[
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CustomVideoPlayer } from '@/components/ui/CustomVideoPlayer';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface ReadingArticleProps {
   data: ReadingContentData;
@@ -102,10 +108,14 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
           )}
 
           {sec.type === 'article' && (
-            <div 
-              className="text-[15px] leading-relaxed text-slate-700 dark:text-slate-300"
-              dangerouslySetInnerHTML={{ __html: sec.body }}
-            />
+            <div className="prose dark:prose-invert lg:prose-lg max-w-none">
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm, remarkMath]} 
+                rehypePlugins={[rehypeRaw, rehypeKatex]}
+              >
+                {sec.body || ''}
+              </ReactMarkdown>
+            </div>
           )}
 
           {sec.type === 'mcq' && (
