@@ -875,3 +875,50 @@ export const updateGuideNodeOrders = async (nodeType: string, updates: { id: str
   );
   await Promise.all(promises);
 };
+
+export const updateGuideNodeSEO = async (nodeType: string, id: string, seoData: any) => {
+  const collectionMap: Record<string, string> = {
+    'board': 'guide_boards',
+    'class': 'guide_classes',
+    'subject': 'guide_subjects',
+    'textbook': 'guide_textbooks',
+    'chapter': 'guide_chapters',
+    'topic': 'guide_topics'
+  };
+  const coll = collectionMap[nodeType];
+  if (!coll) return false;
+
+  try {
+    // Generate a default slug if empty and title exists
+    if (!seoData.slug && seoData.title) {
+      seoData.slug = seoData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    }
+
+    await setDoc(doc(db, coll, id), { 
+      slug: seoData.slug || '',
+      seoTitle: seoData.seoTitle || '',
+      description: seoData.description || '',
+      featureImage: seoData.featureImage || '',
+      tags: seoData.tags || [],
+      keywords: seoData.keywords || [],
+      updatedAt: serverTimestamp() 
+    }, { merge: true });
+    return true;
+  } catch (error) {
+    console.error('Error updating SEO data:', error);
+    return false;
+  }
+};
+
+
+export const getGuideNodeById = async (id: string) => {
+  const collections = ['guide_boards', 'guide_classes', 'guide_subjects', 'guide_textbooks', 'guide_chapters', 'guide_topics'];
+  for (const coll of collections) {
+    const docSnap = await getDoc(doc(db, coll, id));
+    if (docSnap.exists()) {
+      return { id: docSnap.id, type: coll.replace('guide_', '').replace(/s$/, ''), ...docSnap.data() };
+    }
+  }
+  return null;
+};
+

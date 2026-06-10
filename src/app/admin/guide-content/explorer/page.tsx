@@ -19,14 +19,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
-  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown
+  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
   getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
   createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
   deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
-  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders
+  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders, updateGuideNodeSEO, getGuideNodeById
 } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -50,20 +50,22 @@ type TreeNodeProps = {
   onAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
   onEditClick: (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
   onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
+  onSeoClick: (nodeId: string, nodeType: string, nodeData: any, onSuccess: () => void) => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  refreshParent?: () => void;
 };
 
-const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onMoveUp, onMoveDown }: TreeNodeProps) => {
+const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveUp, onMoveDown, refreshParent }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleToggle = async () => {
-    const isExpanding = !expanded;
+  const handleToggle = async (forceReload = false) => {
+    const isExpanding = forceReload ? true : !expanded;
     setExpanded(isExpanding);
 
-    if (isExpanding && children === null && node.type !== 'section') {
+    if (isExpanding && (children === null || forceReload) && node.type !== 'section') {
       setLoading(true);
       try {
         let fetchedChildren: any[] = [];
@@ -135,10 +137,8 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onM
     else return;
 
     onAddClick(node.id, node.type, typeName, () => {
-      // Force refresh of this node
-      setExpanded(false);
-      setChildren(null);
-      setTimeout(() => handleToggle(), 100);
+      // Force refresh of this node's children
+      handleToggle(true);
     });
   };
 
@@ -146,6 +146,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onM
     e.stopPropagation();
     onDeleteClick(node.id, node.type, node.name, () => {
       // The parent will handle the refresh, or if root, the whole page refreshes
+      if (refreshParent) refreshParent();
     });
   };
 
@@ -220,11 +221,34 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onM
                     <ArrowDown className="w-4 h-4" />
                   </Button>
                 )}
+                <Link href={`/guide/${node.slug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 w-7 p-0 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50"
+                    title="View in Guide"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0 text-amber-400 hover:text-amber-600 hover:bg-amber-50"
+                  onClick={(e) => { e.stopPropagation(); onSeoClick(node.id, node.type, node, () => {
+                    if (refreshParent) refreshParent();
+                  }); }}
+                  title="SEO Settings"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   className="h-7 w-7 p-0 text-blue-400 hover:text-blue-600 hover:bg-blue-50"
-                  onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, node.author, () => {}); }}
+                  onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, node.author, () => {
+                    if (refreshParent) refreshParent();
+                  }); }}
                 >
                   <Edit2 className="w-4 h-4" />
                 </Button>
@@ -251,25 +275,13 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onM
                   key={child.id} 
                   node={child} 
                   level={level + 1} 
+                  refreshParent={() => handleToggle(true)}
                   onAddClick={onAddClick} 
                   onMoveUp={index > 0 ? () => handleMoveChild(index, -1) : undefined}
                   onMoveDown={index < children.length - 1 ? () => handleMoveChild(index, 1) : undefined}
-                  onEditClick={(id, type, name, author, successCb) => {
-                    onEditClick(id, type, name, author, () => {
-                      setExpanded(false);
-                      setChildren(null);
-                      setTimeout(() => handleToggle(), 100);
-                      successCb();
-                    });
-                  }} 
-                  onDeleteClick={(id, type, name, successCb) => {
-                    onDeleteClick(id, type, name, () => {
-                      setExpanded(false);
-                      setChildren(null);
-                      setTimeout(() => handleToggle(), 100);
-                      successCb();
-                    });
-                  }} 
+                  onSeoClick={onSeoClick}
+                  onEditClick={onEditClick}
+                  onDeleteClick={onDeleteClick}
                 />
               ))
             )}
@@ -296,6 +308,11 @@ export default function ContentExplorer() {
   const [editTitleInput, setEditTitleInput] = useState('');
   const [editAuthorInput, setEditAuthorInput] = useState('');
   const [editing, setEditing] = useState(false);
+
+  // SEO Dialog State
+  const [seoDialog, setSeoDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', onSuccess: () => {} });
+  const [seoInput, setSeoInput] = useState({ title: '', slug: '', seoTitle: '', description: '', featureImage: '', tags: '', keywords: '' });
+  const [savingSeo, setSavingSeo] = useState(false);
 
   // Delete Dialog State
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
@@ -426,6 +443,49 @@ export default function ContentExplorer() {
       toast({ title: "Error", description: "Failed to save", variant: "destructive" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleOpenSeo = async (nodeId: string, nodeType: string, nodeData: any, onSuccess: () => void) => {
+    // We fetch fresh data from the db so the dialog doesn't show stale/empty data for previously updated children
+    const freshNode = await getGuideNodeById(nodeId) || nodeData;
+
+    setSeoInput({
+      title: freshNode.title || '',
+      slug: freshNode.slug || '',
+      seoTitle: freshNode.seoTitle || '',
+      description: freshNode.description || '',
+      featureImage: freshNode.featureImage || '',
+      tags: Array.isArray(freshNode.tags) ? freshNode.tags.join(', ') : (freshNode.tags || ''),
+      keywords: Array.isArray(freshNode.keywords) ? freshNode.keywords.join(', ') : (freshNode.keywords || '')
+    });
+    setSeoDialog({ isOpen: true, nodeId, nodeType, onSuccess });
+  };
+
+  const handleSaveSeo = async () => {
+    setSavingSeo(true);
+    try {
+      const parsedTags = seoInput.tags.split(',').map(t => t.trim()).filter(Boolean);
+      const parsedKeywords = seoInput.keywords.split(',').map(k => k.trim()).filter(Boolean);
+      
+      const success = await updateGuideNodeSEO(seoDialog.nodeType, seoDialog.nodeId, {
+        ...seoInput,
+        tags: parsedTags,
+        keywords: parsedKeywords
+      });
+
+      if (success) {
+        toast({ title: "Success", description: "SEO metadata saved successfully." });
+        setSeoDialog(prev => ({ ...prev, isOpen: false }));
+        seoDialog.onSuccess();
+      } else {
+        toast({ title: "Error", description: "Failed to save SEO metadata.", variant: "destructive" });
+      }
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Error", description: "An error occurred while saving.", variant: "destructive" });
+    } finally {
+      setSavingSeo(false);
     }
   };
 
@@ -584,11 +644,84 @@ export default function ContentExplorer() {
             ) : classes.length === 0 ? (
               <div className="text-center py-8 text-slate-500">No boards found. Add some to get started!</div>
             ) : (
-              classes.map((c, index) => <TreeNode key={c.id} node={c} onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} onMoveDown={index < classes.length - 1 ? () => handleMoveBoard(index, 1) : undefined} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} />)
+              classes.map((c, index) => <TreeNode key={c.id} node={c} refreshParent={fetchRoot} onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} onMoveDown={index < classes.length - 1 ? () => handleMoveBoard(index, 1) : undefined} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} onSeoClick={handleOpenSeo} />)
             )}
           </div>
         </CardContent>
       </Card>
+
+      {/* SEO Dialog */}
+      <Dialog open={seoDialog.isOpen} onOpenChange={(open) => !open && setSeoDialog(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>SEO Settings</DialogTitle>
+            <DialogDescription>
+              Manage SEO metadata for this {seoDialog.nodeType}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto px-1">
+            <div className="space-y-2">
+              <Label>Slug</Label>
+              <Input 
+                value={seoInput.slug}
+                onChange={e => setSeoInput({...seoInput, slug: e.target.value})}
+                placeholder="e.g., class-10-maths"
+              />
+              <p className="text-xs text-slate-500">Leave empty to auto-generate from title.</p>
+            </div>
+            <div className="space-y-2">
+              <Label>SEO Title</Label>
+              <Input 
+                value={seoInput.seoTitle}
+                onChange={e => setSeoInput({...seoInput, seoTitle: e.target.value})}
+                placeholder="Meta title"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Meta Description</Label>
+              <Textarea 
+                value={seoInput.description}
+                onChange={e => setSeoInput({...seoInput, description: e.target.value})}
+                placeholder="Brief description for search engines"
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Feature Image URL</Label>
+              <Input 
+                value={seoInput.featureImage}
+                onChange={e => setSeoInput({...seoInput, featureImage: e.target.value})}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Tags (comma-separated)</Label>
+              <Input 
+                value={seoInput.tags}
+                onChange={e => setSeoInput({...seoInput, tags: e.target.value})}
+                placeholder="math, algebra, class 10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Keywords (comma-separated)</Label>
+              <Input 
+                value={seoInput.keywords}
+                onChange={e => setSeoInput({...seoInput, keywords: e.target.value})}
+                placeholder="math textbook, cbse math"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSeoDialog(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveSeo} disabled={savingSeo} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {savingSeo ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Save SEO Data
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Node Dialog */}
       <Dialog open={dialogState.isOpen} onOpenChange={(open) => !open && setDialogState(prev => ({ ...prev, isOpen: false }))}>

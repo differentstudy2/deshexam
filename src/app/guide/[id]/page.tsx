@@ -11,7 +11,7 @@ import { TopicSectionsSidebar } from '@/components/guide/TopicSectionsSidebar';
 import { ContentNavigationSidebar } from '@/components/guide/ContentNavigationSidebar';
 import { ReadingArticle } from '@/components/guide/ReadingArticle';
 import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
-import { getReadingContent, getCurriculumBySubject, getGuideSubjects, getSubjectIdFromTopicId, getTopicHierarchy } from '@/lib/firebase/guide';
+import { getReadingContent, getCurriculumBySubject, getGuideSubjects, getSubjectIdFromTopicId, getTopicHierarchy, getGuideNodeById } from '@/lib/firebase/guide';
 import { Chapter } from './guide-data';
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -21,44 +21,59 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const decodedId = decodeURIComponent(resolvedParams.id);
   const hierarchy = await getTopicHierarchy(decodedId);
   const readingData = await getReadingContent(decodedId);
+  
+  // Try to fetch custom SEO metadata directly from the node
+  const nodeData = await getGuideNodeById(decodedId);
 
-  if (!hierarchy) {
+  if (!hierarchy && !nodeData) {
     return {
       title: 'Academy Guide | DeshExam',
       description: 'Comprehensive guides and reading materials.',
     };
   }
 
+  // Generate Fallback strings
   const parts = [];
-  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') parts.push(hierarchy.classTitle);
-  if (hierarchy.textbookTitle && hierarchy.textbookTitle !== 'Textbook') parts.push(hierarchy.textbookTitle);
-  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') parts.push(hierarchy.chapterTitle);
-  
-  if (readingData?.title && readingData.title !== hierarchy.chapterTitle && readingData.title !== hierarchy.textbookTitle) {
+  if (hierarchy?.classTitle && hierarchy.classTitle !== 'Class') parts.push(hierarchy.classTitle);
+  if (hierarchy?.textbookTitle && hierarchy.textbookTitle !== 'Textbook') parts.push(hierarchy.textbookTitle);
+  if (hierarchy?.chapterTitle && hierarchy.chapterTitle !== 'Chapter') parts.push(hierarchy.chapterTitle);
+  if (readingData?.title && readingData.title !== hierarchy?.chapterTitle && readingData.title !== hierarchy?.textbookTitle) {
     parts.push(readingData.title);
   }
 
-  const titleStr = parts.length > 0 ? parts.join(' - ') + ' | DeshExam Academy' : 'Academy Guide | DeshExam';
+  const generatedTitle = parts.length > 0 ? parts.join(' - ') + ' | DeshExam Academy' : 'Academy Guide | DeshExam';
   
-  let descriptionStr = `Study material for`;
-  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') descriptionStr += ` ${hierarchy.classTitle}`;
-  if (hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject') descriptionStr += `, ${hierarchy.subjectTitle}`;
-  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') descriptionStr += ` - ${hierarchy.chapterTitle}`;
-  if (readingData?.title) descriptionStr += `. Read comprehensive guide and notes on ${readingData.title}.`;
-  else descriptionStr += `. Access free educational resources and guides on DeshExam Academy.`;
+  let generatedDesc = `Study material for`;
+  if (hierarchy?.classTitle && hierarchy.classTitle !== 'Class') generatedDesc += ` ${hierarchy.classTitle}`;
+  if (hierarchy?.subjectTitle && hierarchy.subjectTitle !== 'Subject') generatedDesc += `, ${hierarchy.subjectTitle}`;
+  if (hierarchy?.chapterTitle && hierarchy.chapterTitle !== 'Chapter') generatedDesc += ` - ${hierarchy.chapterTitle}`;
+  if (readingData?.title) generatedDesc += `. Read comprehensive guide and notes on ${readingData.title}.`;
+  else generatedDesc += `. Access free educational resources and guides on DeshExam Academy.`;
+
+  // Apply custom SEO if available
+  const titleStr = nodeData?.seoTitle || generatedTitle;
+  const descriptionStr = nodeData?.description || generatedDesc;
+  const keywordsStr = (nodeData?.keywords && Array.isArray(nodeData.keywords) && nodeData.keywords.length > 0) 
+    ? nodeData.keywords.join(', ') 
+    : undefined;
+  
+  const featureImage = nodeData?.featureImage || undefined;
 
   return {
     title: titleStr,
     description: descriptionStr,
+    keywords: keywordsStr,
     openGraph: {
       title: titleStr,
       description: descriptionStr,
       type: 'article',
+      ...(featureImage ? { images: [{ url: featureImage }] } : {})
     },
     twitter: {
-      card: 'summary_large_image',
+      card: featureImage ? 'summary_large_image' : 'summary',
       title: titleStr,
       description: descriptionStr,
+      ...(featureImage ? { images: [featureImage] } : {})
     }
   };
 }
