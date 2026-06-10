@@ -767,34 +767,57 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
         subjectCache[subjectKey] = subjectId;
       }
 
-      // Create textbook
-      const textbookId = await createGuideTextbook(subjectId, textbook.title, textbook.author || '');
+      // Create or update textbook
+      const guideTbsSnap = await getDocs(query(collection(db, 'guide_textbooks'), where('subjectId', '==', subjectId), where('title', '==', textbook.title)));
+      let textbookId = '';
+      if (!guideTbsSnap.empty) {
+        textbookId = guideTbsSnap.docs[0].id;
+        await setDoc(doc(db, 'guide_textbooks', textbookId), { author: textbook.author || '', updatedAt: serverTimestamp() }, { merge: true });
+      } else {
+        textbookId = await createGuideTextbook(subjectId, textbook.title, textbook.author || '');
+      }
 
       // Fetch chapters
       onProgress?.(`Fetching chapters for ${textbook.title}...`);
       const chaptersSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters`));
       for (const chapterDoc of chaptersSnap.docs) {
         const chapterData = chapterDoc.data();
-        const chapterId = await createGuideChapter(textbookId, chapterData.title, chapterData.author || '');
+        const guideChapsSnap = await getDocs(query(collection(db, 'guide_chapters'), where('textbookId', '==', textbookId), where('title', '==', chapterData.title)));
+        let chapterId = '';
+        if (!guideChapsSnap.empty) {
+          chapterId = guideChapsSnap.docs[0].id;
+          await setDoc(doc(db, 'guide_chapters', chapterId), { author: chapterData.author || '', updatedAt: serverTimestamp() }, { merge: true });
+        } else {
+          chapterId = await createGuideChapter(textbookId, chapterData.title, chapterData.author || '');
+        }
 
         if (chapterData.content) {
-          await addDoc(collection(db, `guide_chapters/${chapterId}/content_sections`), {
+          await setDoc(doc(db, 'guide_chapters', chapterId, 'content_sections', 'lesson'), {
             sectionType: 'lesson',
-            content: chapterData.content
-          });
+            content: chapterData.content,
+            updatedAt: serverTimestamp()
+          }, { merge: true });
         }
 
         // Fetch topics
         const topicsSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters/${chapterDoc.id}/topics`));
         for (const topicDoc of topicsSnap.docs) {
           const topicData = topicDoc.data();
-          const newTopicId = await createGuideTopic(chapterId, topicData.title, topicData.author || '');
+          const guideTopicsSnap = await getDocs(query(collection(db, 'guide_topics'), where('chapterId', '==', chapterId), where('title', '==', topicData.title)));
+          let newTopicId = '';
+          if (!guideTopicsSnap.empty) {
+            newTopicId = guideTopicsSnap.docs[0].id;
+            await setDoc(doc(db, 'guide_topics', newTopicId), { author: topicData.author || '', updatedAt: serverTimestamp() }, { merge: true });
+          } else {
+            newTopicId = await createGuideTopic(chapterId, topicData.title, topicData.author || '');
+          }
 
           if (topicData.content) {
-            await addDoc(collection(db, `guide_topics/${newTopicId}/content_sections`), {
+            await setDoc(doc(db, 'guide_topics', newTopicId, 'content_sections', 'lesson'), {
               sectionType: 'lesson',
-              content: topicData.content
-            });
+              content: topicData.content,
+              updatedAt: serverTimestamp()
+            }, { merge: true });
           }
         }
       }
