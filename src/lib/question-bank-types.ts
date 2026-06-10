@@ -60,6 +60,9 @@ export interface QuestionBankEntry {
   
   correctAnswer: string; // E.g., 'A', 'B', 'C', 'D' or actual text
   
+  // Matching Questions
+  matchingPairs?: { left: string; right: string; leftImage?: string; rightImage?: string }[];
+  
   // Explanations
   explanation?: string;
   shortExplanation?: string;

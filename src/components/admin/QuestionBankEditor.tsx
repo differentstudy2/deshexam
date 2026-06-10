@@ -7,15 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { slugify } from '@/lib/utils';
 import { collection, getDocs } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { createQuestion, updateQuestion } from '@/lib/firebase/question-bank';
 import dynamic from 'next/dynamic';
 
@@ -68,6 +69,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
       status: 'Published',
       language: 'English',
       options: { a: '', b: '', c: '', d: '', e: '' },
+      matchingPairs: [{ left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }],
       examIds: [],
       qaChecklist: [],
       ...initialData
@@ -76,6 +78,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
   const [isSaving, setIsSaving] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [uploadingPairImage, setUploadingPairImage] = useState<{idx: number, side: 'left'|'right'} | null>(null);
 
   // Taxonomies for dropdowns
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
@@ -94,6 +97,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
         ...initialData,
         id: initialData.id,
         options: initialData.options || { a: '', b: '', c: '', d: '', e: '' },
+        matchingPairs: initialData.matchingPairs || [{ left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }],
         tags: initialData.tags || [],
         examIds: initialData.examIds || [],
         qaChecklist: initialData.qaChecklist || []
@@ -156,10 +160,63 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
       }
   };
 
+  const handlePairImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, idx: number, side: 'left' | 'right') => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setUploadingPairImage({ idx, side });
+      try {
+          const storageRef = ref(storage, `questions/images/${Date.now()}_${file.name}`);
+          await uploadBytes(storageRef, file);
+          const url = await getDownloadURL(storageRef);
+          
+          const newPairs = [...(editData.matchingPairs || [])];
+          if (side === 'left') newPairs[idx].leftImage = url;
+          else newPairs[idx].rightImage = url;
+          
+          setEditData(prev => ({ ...prev, matchingPairs: newPairs }));
+          toast({ title: 'Success', description: 'Pair image uploaded successfully' });
+      } catch(e) {
+          toast({ title: 'Upload Failed', variant: 'destructive' });
+      } finally {
+          setUploadingPairImage(null);
+      }
+  };
+
+  const handleDeletePairImage = async (url: string | undefined, idx: number, side: 'left' | 'right') => {
+      // Optimistically update the UI
+      const newPairs = [...(editData.matchingPairs || [])];
+      if (side === 'left') newPairs[idx].leftImage = undefined;
+      else newPairs[idx].rightImage = undefined;
+      setEditData(prev => ({ ...prev, matchingPairs: newPairs }));
+
+      // Only attempt to delete from Firebase if it's a Firebase Storage URL
+      if (!url || !url.includes('firebasestorage.googleapis.com')) return;
+      
+      try {
+          const fileRef = ref(storage, url);
+          await deleteObject(fileRef);
+      } catch (e) {
+          console.error("Failed to delete image from Firebase", e);
+      }
+  };
+
   const handleSave = async () => {
-      if (!editData.questionText || !editData.correctAnswer) {
-          toast({ title: 'Validation Error', description: 'Question Text and Correct Answer are required.', variant: 'destructive' });
+      if (!editData.questionText) {
+          toast({ title: 'Validation Error', description: 'Question Text is required.', variant: 'destructive' });
           return;
+      }
+      if (editData.questionType !== 'Matching' && !editData.correctAnswer) {
+          toast({ title: 'Validation Error', description: 'Correct Answer is required.', variant: 'destructive' });
+          return;
+      }
+      if (editData.questionType === 'Matching') {
+          const validPairs = editData.matchingPairs?.filter(p => p.left && p.right) || [];
+          if (validPairs.length === 0) {
+              toast({ title: 'Validation Error', description: 'At least one matching pair is required.', variant: 'destructive' });
+              return;
+          }
+          editData.matchingPairs = validPairs;
+          editData.correctAnswer = validPairs.map((p, i) => `${i+1}. ${p.left} -> ${p.right}`).join('\n');
       }
       setIsSaving(true);
       try {
@@ -292,9 +349,127 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                   </Card>
 
                   <Card>
-                      <CardHeader><CardTitle>MCQ Options / Answer Key</CardTitle></CardHeader>
+                      <CardHeader><CardTitle>{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer Key'}</CardTitle></CardHeader>
                       <CardContent className="space-y-4">
-                          {['MCQ', 'Multiple Choice'].includes(editData.questionType || 'MCQ') ? (
+                          {editData.questionType === 'Matching' ? (
+                              <div className="space-y-3">
+                                  <div className="grid grid-cols-2 gap-4">
+                                      <div className="text-sm font-medium text-slate-500">Left Column (Items)</div>
+                                      <div className="text-sm font-medium text-slate-500">Right Column (Matches)</div>
+                                  </div>
+                                  {(editData.matchingPairs || []).map((pair, idx) => (
+                                      <div key={idx} className="grid grid-cols-2 gap-4 mb-2 pb-2 border-b border-slate-100 dark:border-slate-800 last:border-0 last:pb-0 last:mb-0">
+                                          {/* Left */}
+                                          <div className="flex items-center gap-2">
+                                              <span className="text-sm font-semibold w-6 shrink-0">{idx + 1}.</span>
+                                              <Input className="flex-1" placeholder="E.g. Newton's First Law" value={pair.left} onChange={e => {
+                                                  const newPairs = [...(editData.matchingPairs || [])];
+                                                  newPairs[idx].left = e.target.value;
+                                                  setEditData({...editData, matchingPairs: newPairs});
+                                              }} />
+                                              {pair.leftImage ? (
+                                                  <div className="relative group w-9 h-9 shrink-0 border rounded overflow-hidden">
+                                                      <img src={pair.leftImage} alt="Left" className="w-full h-full object-cover" />
+                                                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
+                                                           onClick={() => handleDeletePairImage(pair.leftImage, idx, 'left')}>
+                                                          <Trash2 className="w-4 h-4 text-white" />
+                                                      </div>
+                                                  </div>
+                                              ) : (
+                                                  <Popover>
+                                                      <PopoverTrigger asChild>
+                                                          <button className="w-9 h-9 shrink-0 border border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400">
+                                                              {uploadingPairImage?.idx === idx && uploadingPairImage?.side === 'left' ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                                                          </button>
+                                                      </PopoverTrigger>
+                                                      <PopoverContent className="w-64 p-3" side="top">
+                                                          <div className="space-y-3">
+                                                              <div>
+                                                                  <label className="text-xs font-medium mb-1 block">Upload from device</label>
+                                                                  <label className="flex items-center justify-center w-full h-8 border border-dashed rounded text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                                      <Upload className="w-3 h-3 mr-2" />
+                                                                      Choose file...
+                                                                      <input type="file" className="hidden" accept="image/*" onChange={e => handlePairImageUpload(e, idx, 'left')} disabled={uploadingPairImage !== null} />
+                                                                  </label>
+                                                              </div>
+                                                              <div className="relative flex items-center py-1">
+                                                                  <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
+                                                                  <span className="flex-shrink-0 mx-2 text-[10px] text-slate-400 uppercase">Or</span>
+                                                                  <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
+                                                              </div>
+                                                              <div>
+                                                                  <label className="text-xs font-medium mb-1 block">Add from URL</label>
+                                                                  <Input className="h-8 text-xs" placeholder="https://..." value={pair.leftImage || ''} onChange={e => {
+                                                                      const newPairs = [...(editData.matchingPairs || [])];
+                                                                      newPairs[idx].leftImage = e.target.value;
+                                                                      setEditData({...editData, matchingPairs: newPairs});
+                                                                  }} />
+                                                              </div>
+                                                          </div>
+                                                      </PopoverContent>
+                                                  </Popover>
+                                              )}
+                                          </div>
+                                          {/* Right */}
+                                          <div className="flex items-center gap-2">
+                                              <Input className="flex-1" placeholder="E.g. Law of Inertia" value={pair.right} onChange={e => {
+                                                      const newPairs = [...(editData.matchingPairs || [])];
+                                                      newPairs[idx].right = e.target.value;
+                                                      setEditData({...editData, matchingPairs: newPairs});
+                                              }} />
+                                              {pair.rightImage ? (
+                                                  <div className="relative group w-9 h-9 shrink-0 border rounded overflow-hidden">
+                                                      <img src={pair.rightImage} alt="Right" className="w-full h-full object-cover" />
+                                                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
+                                                           onClick={() => handleDeletePairImage(pair.rightImage, idx, 'right')}>
+                                                          <Trash2 className="w-4 h-4 text-white" />
+                                                      </div>
+                                                  </div>
+                                              ) : (
+                                                  <Popover>
+                                                      <PopoverTrigger asChild>
+                                                          <button className="w-9 h-9 shrink-0 border border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400">
+                                                              {uploadingPairImage?.idx === idx && uploadingPairImage?.side === 'right' ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                                                          </button>
+                                                      </PopoverTrigger>
+                                                      <PopoverContent className="w-64 p-3" side="top">
+                                                          <div className="space-y-3">
+                                                              <div>
+                                                                  <label className="text-xs font-medium mb-1 block">Upload from device</label>
+                                                                  <label className="flex items-center justify-center w-full h-8 border border-dashed rounded text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                                      <Upload className="w-3 h-3 mr-2" />
+                                                                      Choose file...
+                                                                      <input type="file" className="hidden" accept="image/*" onChange={e => handlePairImageUpload(e, idx, 'right')} disabled={uploadingPairImage !== null} />
+                                                                  </label>
+                                                              </div>
+                                                              <div className="relative flex items-center py-1">
+                                                                  <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
+                                                                  <span className="flex-shrink-0 mx-2 text-[10px] text-slate-400 uppercase">Or</span>
+                                                                  <div className="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
+                                                              </div>
+                                                              <div>
+                                                                  <label className="text-xs font-medium mb-1 block">Add from URL</label>
+                                                                  <Input className="h-8 text-xs" placeholder="https://..." value={pair.rightImage || ''} onChange={e => {
+                                                                      const newPairs = [...(editData.matchingPairs || [])];
+                                                                      newPairs[idx].rightImage = e.target.value;
+                                                                      setEditData({...editData, matchingPairs: newPairs});
+                                                                  }} />
+                                                              </div>
+                                                          </div>
+                                                      </PopoverContent>
+                                                  </Popover>
+                                              )}
+                                          </div>
+                                      </div>
+                                  ))}
+                                  <Button variant="outline" size="sm" onClick={() => {
+                                      setEditData({...editData, matchingPairs: [...(editData.matchingPairs || []), { left: '', right: '' }]});
+                                  }} className="mt-2 text-blue-600 border-blue-200 hover:bg-blue-50">
+                                      + Add Pair
+                                  </Button>
+                                  <p className="text-xs text-slate-500 mt-2">Pairs will be shuffled automatically when displayed to students.</p>
+                              </div>
+                          ) : ['MCQ', 'Multiple Choice'].includes(editData.questionType || 'MCQ') ? (
                               <div className="grid grid-cols-2 gap-4">
                                   <div>
                                       <div className="flex items-center justify-between mb-1">
