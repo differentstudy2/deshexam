@@ -19,14 +19,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
-  Plus, MoreVertical, Edit2, Loader2, Trash2
+  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
   getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
   createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
   deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
-  updateGuideNodeTitle, migrateOldTextbooksToGuide
+  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders
 } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -50,9 +50,11 @@ type TreeNodeProps = {
   onAddClick: (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => void;
   onEditClick: (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
   onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 };
 
-const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: TreeNodeProps) => {
+const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onMoveUp, onMoveDown }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,29 +69,58 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
         let fetchedChildren: any[] = [];
         if (node.type === 'board') {
           const res = (await getGuideClassesByBoard(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'class', status: r.status || 'published', author: r.author }));
+          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'class', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
         } else if (node.type === 'class') {
           const res = (await getGuideSubjectsByClass(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published', author: r.author }));
+          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'subject', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
         } else if (node.type === 'subject') {
           const res = (await getGuideTextbooksBySubject(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'textbook', status: r.status || 'published', author: r.author }));
+          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'textbook', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
         } else if (node.type === 'textbook') {
           const res = (await getGuideChaptersByTextbook(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'chapter', status: r.status || 'published', author: r.author }));
+          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'chapter', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
         } else if (node.type === 'chapter') {
           const res = (await getGuideTopicsByChapter(node.id)) as any[];
-          fetchedChildren = res.map(r => ({ id: r.id, name: r.title, type: 'topic', status: r.status || 'published', author: r.author }));
+          fetchedChildren = res.map((r, i) => ({ id: r.id, name: r.title, type: 'topic', status: r.status || 'published', author: r.author, orderIndex: r.orderIndex ?? i }));
         } else if (node.type === 'topic') {
           const res = (await getTopicSections(node.id)) as Record<string, any>;
-          fetchedChildren = Object.keys(res).map(key => ({ id: key, name: key, type: 'section', status: 'published' }));
+          fetchedChildren = Object.keys(res).map((key, i) => ({ id: key, name: key, type: 'section', status: 'published', orderIndex: i }));
         }
+        
+        // Ensure sorted initially
+        fetchedChildren.sort((a, b) => a.orderIndex - b.orderIndex);
         setChildren(fetchedChildren);
       } catch (e) {
         console.error(e);
       } finally {
         setLoading(false);
       }
+    }
+  };
+
+  const handleMoveChild = async (index: number, direction: number) => {
+    if (!children) return;
+    const newChildren = [...children];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= newChildren.length) return;
+
+    // Swap
+    const temp = newChildren[index];
+    newChildren[index] = newChildren[targetIndex];
+    newChildren[targetIndex] = temp;
+
+    // Update orderIndex
+    newChildren.forEach((child, i) => {
+      child.orderIndex = i;
+    });
+
+    setChildren(newChildren);
+
+    try {
+      await updateGuideNodeOrders(newChildren[0].type, newChildren.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
+      // toast could be called here but since it's just visually updated it should be fine
+    } catch (e) {
+      console.error("Failed to reorder", e);
     }
   };
 
@@ -169,6 +200,26 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
             ) : null}
             {node.type !== 'section' && (
               <div className="flex items-center gap-1">
+                {onMoveUp && node.type !== 'section' && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                    onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </Button>
+                )}
+                {onMoveDown && node.type !== 'section' && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 w-7 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                    onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -195,12 +246,14 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
             {children.length === 0 ? (
               <div className="text-xs text-slate-400 italic py-2" style={{ paddingLeft: `${(level + 1) * 24 + 8}px` }}>No items found.</div>
             ) : (
-              children.map(child => (
+              children.map((child, index) => (
                 <TreeNode 
                   key={child.id} 
                   node={child} 
                   level={level + 1} 
                   onAddClick={onAddClick} 
+                  onMoveUp={index > 0 ? () => handleMoveChild(index, -1) : undefined}
+                  onMoveDown={index < children.length - 1 ? () => handleMoveChild(index, 1) : undefined}
                   onEditClick={(id, type, name, author, successCb) => {
                     onEditClick(id, type, name, author, () => {
                       setExpanded(false);
@@ -210,7 +263,6 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick }: T
                     });
                   }} 
                   onDeleteClick={(id, type, name, successCb) => {
-                    // Pass up but intercept the success callback to refresh THIS node's children
                     onDeleteClick(id, type, name, () => {
                       setExpanded(false);
                       setChildren(null);
@@ -295,7 +347,7 @@ export default function ContentExplorer() {
     setLoading(true);
     try {
       const cls = (await getGuideBoards()) as any[];
-      setClasses(cls.map(c => ({ id: c.id, name: c.title || c.name || c.id, type: 'board', status: c.status || 'published', author: c.author })));
+      setClasses(cls.map((c, i) => ({ id: c.id, name: c.title || c.name || c.id, type: 'board', status: c.status || 'published', author: c.author, orderIndex: c.orderIndex ?? i })));
     } catch (e) {
       console.error(e);
     } finally {
@@ -306,6 +358,30 @@ export default function ContentExplorer() {
   useEffect(() => {
     fetchRoot();
   }, []);
+
+  const handleMoveBoard = async (index: number, direction: number) => {
+    const newClasses = [...classes];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= newClasses.length) return;
+
+    // Swap
+    const temp = newClasses[index];
+    newClasses[index] = newClasses[targetIndex];
+    newClasses[targetIndex] = temp;
+
+    // Update orderIndex
+    newClasses.forEach((child, i) => {
+      child.orderIndex = i;
+    });
+
+    setClasses(newClasses);
+
+    try {
+      await updateGuideNodeOrders('board', newClasses.map(c => ({ id: c.id, orderIndex: c.orderIndex })));
+    } catch (e) {
+      console.error("Failed to reorder boards", e);
+    }
+  };
 
   const handleOpenDialog = (parentId: string, parentType: string, typeName: string, onSuccess: () => void) => {
     setTitleInput('');
@@ -498,7 +574,7 @@ export default function ContentExplorer() {
             ) : classes.length === 0 ? (
               <div className="text-center py-8 text-slate-500">No boards found. Add some to get started!</div>
             ) : (
-              classes.map(c => <TreeNode key={c.id} node={c} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} />)
+              classes.map((c, index) => <TreeNode key={c.id} node={c} onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} onMoveDown={index < classes.length - 1 ? () => handleMoveBoard(index, 1) : undefined} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} />)
             )}
           </div>
         </CardContent>

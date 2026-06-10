@@ -850,3 +850,21 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
   }
 };
 
+
+export const updateGuideNodeOrders = async (nodeType: string, updates: { id: string, orderIndex: number }[]) => {
+  const collectionMap: Record<string, string> = {
+    'board': 'guide_boards',
+    'class': 'guide_classes',
+    'subject': 'guide_subjects',
+    'textbook': 'guide_textbooks',
+    'chapter': 'guide_chapters',
+    'topic': 'guide_topics'
+  };
+  const coll = collectionMap[nodeType];
+  if (!coll) return;
+  
+  const promises = updates.map(update => 
+    setDoc(doc(db, coll, update.id), { orderIndex: update.orderIndex }, { merge: true })
+  );
+  await Promise.all(promises);
+};

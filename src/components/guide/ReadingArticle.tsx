@@ -94,7 +94,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
         
         {/* Section Header */}
         {!isLesson && (
-          <div className="bg-[#eaf5ef] dark:bg-emerald-900/10 px-6 py-4 flex justify-between items-center">
+          <div className="flex justify-between items-center p-2">
             <div className="flex items-center gap-3">
               <h2 className="text-[18px] font-bold text-emerald-700 dark:text-emerald-400">
                 {sec.title}
@@ -299,7 +299,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
                 <div className="flex items-center gap-4 text-[#759388] mt-1">
                    <div className="flex items-center gap-1.5 text-[15px] font-medium mr-2">
                      <Eye className="w-4 h-4" />
-                     {data.views || '3.6k'}
+                     {data.views || 0}
                    </div>
                    <button 
                      onClick={() => window.print()}
