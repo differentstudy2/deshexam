@@ -14,6 +14,54 @@ import { AssessmentTabs } from '@/components/guide/AssessmentTabs';
 import { getReadingContent, getCurriculumBySubject, getGuideSubjects, getSubjectIdFromTopicId, getTopicHierarchy } from '@/lib/firebase/guide';
 import { Chapter } from './guide-data';
 import Image from 'next/image';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const decodedId = decodeURIComponent(resolvedParams.id);
+  const hierarchy = await getTopicHierarchy(decodedId);
+  const readingData = await getReadingContent(decodedId);
+
+  if (!hierarchy) {
+    return {
+      title: 'Academy Guide | DeshExam',
+      description: 'Comprehensive guides and reading materials.',
+    };
+  }
+
+  const parts = [];
+  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') parts.push(hierarchy.classTitle);
+  if (hierarchy.textbookTitle && hierarchy.textbookTitle !== 'Textbook') parts.push(hierarchy.textbookTitle);
+  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') parts.push(hierarchy.chapterTitle);
+  
+  if (readingData?.title && readingData.title !== hierarchy.chapterTitle && readingData.title !== hierarchy.textbookTitle) {
+    parts.push(readingData.title);
+  }
+
+  const titleStr = parts.length > 0 ? parts.join(' - ') + ' | DeshExam Academy' : 'Academy Guide | DeshExam';
+  
+  let descriptionStr = `Study material for`;
+  if (hierarchy.classTitle && hierarchy.classTitle !== 'Class') descriptionStr += ` ${hierarchy.classTitle}`;
+  if (hierarchy.subjectTitle && hierarchy.subjectTitle !== 'Subject') descriptionStr += `, ${hierarchy.subjectTitle}`;
+  if (hierarchy.chapterTitle && hierarchy.chapterTitle !== 'Chapter') descriptionStr += ` - ${hierarchy.chapterTitle}`;
+  if (readingData?.title) descriptionStr += `. Read comprehensive guide and notes on ${readingData.title}.`;
+  else descriptionStr += `. Access free educational resources and guides on DeshExam Academy.`;
+
+  return {
+    title: titleStr,
+    description: descriptionStr,
+    openGraph: {
+      title: titleStr,
+      description: descriptionStr,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titleStr,
+      description: descriptionStr,
+    }
+  };
+}
 
 export default async function GuideDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
