@@ -765,7 +765,7 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
 
         if (chapterData.content) {
           await addDoc(collection(db, `guide_chapters/${chapterId}/content_sections`), {
-            sectionType: 'guide_content',
+            sectionType: 'lesson',
             content: chapterData.content
           });
         }
@@ -778,7 +778,7 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
 
           if (topicData.content) {
             await addDoc(collection(db, `guide_topics/${newTopicId}/content_sections`), {
-              sectionType: 'guide_content',
+              sectionType: 'lesson',
               content: topicData.content
             });
           }
