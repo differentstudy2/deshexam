@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { AuthModal } from '@/components/auth/AuthModal';
 import InteractiveMatching from './InteractiveMatching';
+import InteractiveFillInTheBlank from './InteractiveFillInTheBlank';
 import { Input } from '@/components/ui/input';
 
 interface QuestionCardProps {
@@ -389,9 +390,27 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                 )}
                 <div className="flex items-start gap-2">
                     {index !== undefined && <span className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-0.5">{index}.</span>}
-                    <div className="text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
-                        {question.questionText}
-                    </div>
+                    {isFillInTheBlank ? (
+                        <div className="flex-1 w-full min-w-0">
+                            <InteractiveFillInTheBlank 
+                                text={question.questionText || ''}
+                                correctAnswers={(question.correctAnswer || '').split(',')}
+                                distractors={Object.values(question.options || {}).filter(Boolean) as string[]}
+                                testMode={testMode}
+                                showAnswer={showAnswer}
+                                onAttempt={(isCorrect) => {
+                                    if (user && testMode) {
+                                        setShowAnswer(true);
+                                        recordQuestionAttempt(user.uid, question.id, "FILL_IN_THE_BLANK_ATTEMPT", isCorrect).catch(console.error);
+                                    }
+                                }}
+                            />
+                        </div>
+                    ) : (
+                        <div className="text-lg font-semibold text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
+                            {question.questionText}
+                        </div>
+                    )}
                 </div>
                 <div className="text-[11px] text-slate-400 font-medium ml-6 md:ml-8 flex items-center gap-2">
                     {question.createdAt && <span>Created: {formatDate(question.createdAt)}</span>}
@@ -510,54 +529,6 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
                 </div>
             )}
 
-            {/* Fill in the Blank */}
-            {isFillInTheBlank && (
-                <div className="mb-6">
-                    {!testMode ? (
-                        <div className="p-4 bg-green-50 border border-green-500 rounded-lg text-green-800 dark:bg-green-900/20 dark:border-green-500/50 dark:text-green-400">
-                            <span className="font-bold mr-2">Correct Answer(s):</span>
-                            {question.correctAnswer}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col gap-3 max-w-md">
-                            <Input 
-                                value={fillBlankAnswer} 
-                                onChange={e => setFillBlankAnswer(e.target.value)} 
-                                placeholder="Type your answer here..."
-                                disabled={!!selectedOption}
-                                className={cn(
-                                    "text-lg py-6",
-                                    selectedOption && selectedOption === question.correctAnswer?.split(',').find(a => a.trim().toLowerCase() === selectedOption.trim().toLowerCase())?.trim() 
-                                        ? "border-green-500 bg-green-50 text-green-800"
-                                        : selectedOption 
-                                        ? "border-red-500 bg-red-50 text-red-800"
-                                        : ""
-                                )}
-                            />
-                            {!selectedOption ? (
-                                <Button onClick={async () => {
-                                    if (!fillBlankAnswer.trim()) return;
-                                    setSelectedOption(fillBlankAnswer);
-                                    setShowAnswer(true);
-                                    if (user) {
-                                        const correctAnswers = (question.correctAnswer || '').split(',').map(s => s.trim().toLowerCase());
-                                        const isCorrect = correctAnswers.includes(fillBlankAnswer.trim().toLowerCase());
-                                        await recordQuestionAttempt(user.uid, question.id, fillBlankAnswer, isCorrect).catch(console.error);
-                                    }
-                                }}>Submit Answer</Button>
-                            ) : (
-                                <div className="mt-2 text-sm font-bold">
-                                    {(question.correctAnswer || '').split(',').map(s => s.trim().toLowerCase()).includes(selectedOption.trim().toLowerCase()) ? (
-                                        <span className="text-green-600 flex items-center gap-1"><CheckCircle2 className="w-4 h-4"/> Correct!</span>
-                                    ) : (
-                                        <span className="text-red-600 flex items-center gap-1"><XCircle className="w-4 h-4"/> Incorrect. The correct answer was: {question.correctAnswer}</span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
 
             {/* Matching Pairs */}
             {isMatching && displayMatchingPairs.length > 0 && (

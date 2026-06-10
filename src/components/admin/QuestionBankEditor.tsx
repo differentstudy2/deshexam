@@ -569,14 +569,29 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                   </div>
                               </div>
                           ) : ['Fill in the Blank'].includes(editData.questionType || '') ? (
-                              <div>
-                                  <label className="text-sm font-medium">Correct Answer(s)</label>
-                                  <p className="text-xs text-slate-500 mb-2">If there are multiple acceptable variations, separate them with commas (e.g. "gravity, gravitation"). Case-insensitive.</p>
-                                  <Input 
-                                      value={editData.correctAnswer || ''} 
-                                      onChange={e => setEditData({...editData, correctAnswer: e.target.value})} 
-                                      placeholder="Enter the correct answer(s)..."
-                                  />
+                              <div className="space-y-4">
+                                  <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300">
+                                      <strong>How to create blanks:</strong> Type <code className="bg-white dark:bg-slate-800 px-1 rounded text-blue-600 dark:text-blue-400">[blank]</code> anywhere in the Question Text above to create a gap. You can add multiple blanks.
+                                  </div>
+                                  <div>
+                                      <label className="text-sm font-medium">Correct Answer(s) in Order</label>
+                                      <p className="text-xs text-slate-500 mb-2">Separate answers for each blank with commas (e.g. "Paris, Tokyo").</p>
+                                      <Input 
+                                          value={editData.correctAnswer || ''} 
+                                          onChange={e => setEditData({...editData, correctAnswer: e.target.value})} 
+                                          placeholder="Enter correct answers..."
+                                      />
+                                  </div>
+                                  <div className="pt-2">
+                                      <label className="text-sm font-medium">Word Bank Distractors (Optional)</label>
+                                      <p className="text-xs text-slate-500 mb-2">Add extra wrong words to the drag-and-drop word bank to make it harder.</p>
+                                      <div className="grid grid-cols-2 gap-3">
+                                          <Input placeholder="Distractor 1" value={editData.options?.a || ''} onChange={e => setEditData({...editData, options: {...editData.options!, a: e.target.value}})} />
+                                          <Input placeholder="Distractor 2" value={editData.options?.b || ''} onChange={e => setEditData({...editData, options: {...editData.options!, b: e.target.value}})} />
+                                          <Input placeholder="Distractor 3" value={editData.options?.c || ''} onChange={e => setEditData({...editData, options: {...editData.options!, c: e.target.value}})} />
+                                          <Input placeholder="Distractor 4" value={editData.options?.d || ''} onChange={e => setEditData({...editData, options: {...editData.options!, d: e.target.value}})} />
+                                      </div>
+                                  </div>
                               </div>
                           ) : (
                               <div>

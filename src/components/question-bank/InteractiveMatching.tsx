@@ -2,7 +2,22 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import Confetti from 'react-dom-confetti';
 import { CheckCircle2, XCircle } from 'lucide-react';
+
+const confettiConfig = {
+    angle: 90,
+    spread: 360,
+    startVelocity: 40,
+    elementCount: 70,
+    dragFriction: 0.12,
+    duration: 3000,
+    stagger: 3,
+    width: "10px",
+    height: "10px",
+    perspective: "500px",
+    colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
+};
 
 export interface MatchingPair {
     left: string;
@@ -418,14 +433,14 @@ export default function InteractiveMatching({ pairs, testMode = false, onAttempt
                 </div>
             </div>
 
-            {/* Action Area */}
-            {testMode && !isSubmitted && (
-                <div className="flex justify-center mt-6">
+            {/* Action Area & Verification */}
+            <div className="flex flex-col items-center justify-center mt-8 gap-4">
+                {testMode && !isSubmitted && (
                     <button
                         onClick={handleSubmit}
                         disabled={!isAllConnected}
                         className={cn(
-                            "px-6 py-2.5 rounded-full font-bold transition-all",
+                            "px-8 py-3 rounded-full font-bold transition-all text-lg",
                             isAllConnected 
                                 ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5" 
                                 : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed"
@@ -433,8 +448,24 @@ export default function InteractiveMatching({ pairs, testMode = false, onAttempt
                     >
                         Submit Matches
                     </button>
-                </div>
-            )}
+                )}
+
+                {isSubmitted && testMode && (() => {
+                    const isFullyCorrect = connections.length === pairs.length && connections.every(conn => {
+                        const rightItem = shuffledRight.find(r => r.id === conn.rightId);
+                        return rightItem && rightItem.correctLeftIndex === conn.leftIndex;
+                    });
+                    
+                    return (
+                        <div className={cn("text-base font-bold flex items-center gap-2 relative", isFullyCorrect ? "text-green-600" : "text-red-600")}>
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                                <Confetti active={isFullyCorrect} config={confettiConfig} />
+                            </div>
+                            {isFullyCorrect ? <><CheckCircle2 className="w-6 h-6"/> Perfect! All matches are correct.</> : <><XCircle className="w-6 h-6"/> Incorrect. Check the correct matches below.</>}
+                        </div>
+                    );
+                })()}
+            </div>
 
             {/* Print Mode Answer Key (Only visible when printing in reading mode) */}
             {(!testMode || isSubmitted) && (
