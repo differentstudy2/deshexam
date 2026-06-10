@@ -20,6 +20,7 @@ import { doc, collection, getDocs } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase/client';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import dynamic from 'next/dynamic';
+import { QuestionBankEditor } from '@/components/admin/QuestionBankEditor';
 
 const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').then(mod => mod.TiptapEditor), {
   ssr: false,
@@ -161,8 +162,24 @@ export default function QuestionBankQuestionsPage() {
         const params = new URLSearchParams(window.location.search);
         const topicIdParam = params.get('topicId');
         if (topicIdParam) {
-            setView('editor');
-            setEditData(prev => ({ ...prev, topicId: topicIdParam }));
+            import('@/lib/firebase/guide').then(({ getTopicHierarchy }) => {
+                getTopicHierarchy(topicIdParam).then((hierarchy) => {
+                    setView('editor');
+                    if (hierarchy) {
+                        setEditData(prev => ({
+                            ...prev, 
+                            topicId: topicIdParam,
+                            boardId: hierarchy.boardId || '',
+                            classId: hierarchy.classId || '',
+                            subjectId: hierarchy.subjectId || '',
+                            textbookId: hierarchy.textbookId || '',
+                            chapterId: hierarchy.chapterId || '',
+                        }));
+                    } else {
+                        setEditData(prev => ({ ...prev, topicId: topicIdParam }));
+                    }
+                });
+            });
         }
     }
   }, []);
@@ -314,407 +331,16 @@ export default function QuestionBankQuestionsPage() {
 
   if (view === 'editor') {
       return (
-          <div className="p-6 max-w-5xl mx-auto space-y-6">
-              <div className="flex items-center gap-4">
-                  <Button variant="ghost" onClick={() => setView('list')}><ArrowLeft className="h-4 w-4 mr-2" /> Back</Button>
-                  <h1 className="text-2xl font-bold tracking-tight">{editData.id ? 'Edit Question' : 'Create Question'}</h1>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Left Column: Editor */}
-                  <div className="md:col-span-2 space-y-6">
-                      <Card>
-                          <CardHeader><CardTitle>Content</CardTitle></CardHeader>
-                          <CardContent className="space-y-4">
-                              <div>
-                                  <label className="text-sm font-medium">Question Type *</label>
-                                  <Select value={editData.questionType || 'MCQ'} onValueChange={v => setEditData({...editData, questionType: v as any})}>
-                                      <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
-                                      <SelectContent>
-                                          <SelectItem value="MCQ">MCQ</SelectItem>
-                                          <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
-                                          <SelectItem value="True/False">True/False</SelectItem>
-                                          <SelectItem value="Fill in the Blank">Fill in the Blank</SelectItem>
-                                          <SelectItem value="Matching">Matching</SelectItem>
-                                          <SelectItem value="Creative Question">Creative Question</SelectItem>
-                                          <SelectItem value="Short Question">Short Question</SelectItem>
-                                          <SelectItem value="Long Question">Long Question</SelectItem>
-                                      </SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium">Title (Optional)</label>
-                                  <Input placeholder="E.g. Newton's First Law" value={editData.title || ''} onChange={e => setEditData({...editData, title: e.target.value})} />
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium">Question Text *</label>
-                                  <Textarea placeholder="What is the capital of France?" rows={4} value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
-                                  <div>
-                                      <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
-                                          <span className="flex items-center gap-1"><ImageIcon className="h-4 w-4"/> Image</span>
-                                          <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
-                                              {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
-                                              Upload
-                                              <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
-                                          </label>
-                                      </label>
-                                      <Input placeholder="URL or upload..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
-                                  </div>
-                                  <div>
-                                      <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
-                                          <span className="flex items-center gap-1"><Play className="h-4 w-4"/> Audio</span>
-                                          <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
-                                              {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
-                                              Upload
-                                              <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
-                                          </label>
-                                      </label>
-                                      <Input placeholder="URL or upload..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
-                                  </div>
-                                  <div>
-                                      <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
-                                          <span className="flex items-center gap-1"><Video className="h-4 w-4"/> Video</span>
-                                          <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
-                                              {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
-                                              Upload
-                                              <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
-                                          </label>
-                                      </label>
-                                      <Input placeholder="URL or upload..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
-                                  </div>
-                              </div>
-                          </CardContent>
-                      </Card>
-
-                      <Card>
-                          <CardHeader><CardTitle>MCQ Options</CardTitle></CardHeader>
-                          <CardContent className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option A</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'A'} onChange={() => setEditData({...editData, correctAnswer: 'A'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.a || ''} onChange={e => setEditData({...editData, options: {...editData.options!, a: e.target.value}})} />
-                                  </div>
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option B</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'B'} onChange={() => setEditData({...editData, correctAnswer: 'B'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.b || ''} onChange={e => setEditData({...editData, options: {...editData.options!, b: e.target.value}})} />
-                                  </div>
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option C</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'C'} onChange={() => setEditData({...editData, correctAnswer: 'C'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.c || ''} onChange={e => setEditData({...editData, options: {...editData.options!, c: e.target.value}})} />
-                                  </div>
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option D</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'D'} onChange={() => setEditData({...editData, correctAnswer: 'D'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.d || ''} onChange={e => setEditData({...editData, options: {...editData.options!, d: e.target.value}})} />
-                                  </div>
-                                  <div className="col-span-1 md:col-span-2 mt-2 pt-2 border-t border-slate-100">
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option E (Optional)</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'E'} onChange={() => setEditData({...editData, correctAnswer: 'E'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
-                                  </div>
-                              </div>
-                          </CardContent>
-                      </Card>
-
-                      <Card>
-                          <CardHeader className="flex flex-row items-center justify-between">
-                              <CardTitle>Explanation</CardTitle>
-                              <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
-                                  {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                                  Auto-Generate with AI
-                              </Button>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                              <div className="prose-editor-container">
-                                  <TiptapEditor 
-                                      content={editData.explanation || ''} 
-                                      onChange={(html) => setEditData({...editData, explanation: html})} 
-                                  />
-                              </div>
-                          </CardContent>
-                      </Card>
-                  </div>
-
-                  {/* Right Column: Meta & Taxonomy */}
-                  <div className="space-y-6">
-                      <Card>
-                          <CardHeader><CardTitle>Publish Settings</CardTitle></CardHeader>
-                          <CardContent className="space-y-4">
-                              <Button className="w-full" onClick={handleSave} disabled={isSaving}>
-                                  {isSaving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
-                                  Save Question
-                              </Button>
-                              <div>
-                                  <label className="text-sm font-medium">Status</label>
-                                  <Select value={editData.status as string} onValueChange={v => setEditData({...editData, status: v as any})}>
-                                      <SelectTrigger><SelectValue /></SelectTrigger>
-                                      <SelectContent>
-                                          <SelectItem value="Draft">Draft</SelectItem>
-                                          <SelectItem value="Published">Published</SelectItem>
-                                          <SelectItem value="Archived">Archived</SelectItem>
-                                      </SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium">Difficulty</label>
-                                  <Select value={editData.difficulty as string} onValueChange={v => setEditData({...editData, difficulty: v as any})}>
-                                      <SelectTrigger><SelectValue /></SelectTrigger>
-                                      <SelectContent>
-                                          <SelectItem value="Easy">Easy</SelectItem>
-                                          <SelectItem value="Medium">Medium</SelectItem>
-                                          <SelectItem value="Hard">Hard</SelectItem>
-                                          <SelectItem value="Expert">Expert</SelectItem>
-                                      </SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium">Language</label>
-                                  <Select value={editData.language as string} onValueChange={v => setEditData({...editData, language: v as any})}>
-                                      <SelectTrigger><SelectValue /></SelectTrigger>
-                                      <SelectContent>
-                                          <SelectItem value="English">English</SelectItem>
-                                          <SelectItem value="Bangla">Bangla</SelectItem>
-                                          <SelectItem value="Hindi">Hindi</SelectItem>
-                                      </SelectContent>
-                                  </Select>
-                              </div>
-
-                              <div>
-                                  <label className="text-sm font-medium mb-2 block">Tags</label>
-                                  {tags.length === 0 ? (
-                                      <p className="text-xs text-slate-500">No tags defined in categories yet.</p>
-                                  ) : (
-                                      <div className="grid grid-cols-2 gap-3 max-h-[150px] overflow-y-auto pr-2 border rounded-md p-3">
-                                          {tags.map(tag => (
-                                              <div key={tag.id} className="flex items-center space-x-2">
-                                                  <Checkbox 
-                                                      id={`tag-${tag.id}`} 
-                                                      checked={(editData.tags || []).includes(tag.name)}
-                                                      onCheckedChange={(checked) => {
-                                                          const currentTags = editData.tags || [];
-                                                          if (checked) {
-                                                              setEditData({...editData, tags: [...currentTags, tag.name]});
-                                                          } else {
-                                                              setEditData({...editData, tags: currentTags.filter(t => t !== tag.name)});
-                                                          }
-                                                      }}
-                                                  />
-                                                  <label htmlFor={`tag-${tag.id}`} className="text-sm font-medium leading-none cursor-pointer">
-                                                      {tag.name}
-                                                  </label>
-                                              </div>
-                                          ))}
-                                      </div>
-                                  )}
-                              </div>
-                          </CardContent>
-                      </Card>
-
-                      <Card>
-                          <CardHeader><CardTitle>Taxonomy Binding</CardTitle></CardHeader>
-                          <CardContent className="space-y-4">
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Board</label>
-                                  <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
-                                      <SelectContent>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Year</label>
-                                  <Select value={editData.yearId || ''} onValueChange={v => setEditData({...editData, yearId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
-                                      <SelectContent>{years.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Class</label>
-                                  <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Class" /></SelectTrigger>
-                                      <SelectContent>{classes.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Subject</label>
-                                  <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Subject" /></SelectTrigger>
-                                      <SelectContent>{subjects.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Textbook</label>
-                                  <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Textbook" /></SelectTrigger>
-                                      <SelectContent>{textbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Chapter</label>
-                                  <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Chapter" /></SelectTrigger>
-                                      <SelectContent>{chapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                              <div>
-                                  <label className="text-xs text-muted-foreground">Topic</label>
-                                  <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
-                                      <SelectTrigger><SelectValue placeholder="Select Topic" /></SelectTrigger>
-                                      <SelectContent>{topics.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                                  </Select>
-                              </div>
-                          </CardContent>
-                      </Card>
-
-                      <Card>
-                          <CardHeader><CardTitle>Exams Taxonomy</CardTitle></CardHeader>
-                          <CardContent>
-                              {exams.length === 0 ? (
-                                  <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
-                              ) : (
-                                  <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2">
-                                      {exams.map(exam => (
-                                          <div key={exam.id} className="flex items-center space-x-2">
-                                              <Checkbox 
-                                                  id={`exam-${exam.id}`} 
-                                                  checked={(editData.examIds || []).includes(exam.id)}
-                                                  onCheckedChange={(checked) => {
-                                                      const currentIds = editData.examIds || [];
-                                                      if (checked) {
-                                                          setEditData({...editData, examIds: [...currentIds, exam.id]});
-                                                      } else {
-                                                          setEditData({...editData, examIds: currentIds.filter(id => id !== exam.id)});
-                                                      }
-                                                  }}
-                                              />
-                                              <label htmlFor={`exam-${exam.id}`} className="text-sm font-medium leading-none cursor-pointer">
-                                                  {exam.name}
-                                              </label>
-                                          </div>
-                                      ))}
-                                  </div>
-                              )}
-                          </CardContent>
-                      </Card>
-
-                      <Card className="border-indigo-100 dark:border-indigo-900 shadow-sm">
-                          <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4">
-                              <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
-                                  <ShieldCheck className="w-5 h-5" />
-                                  Quality Assurance & Verification
-                              </CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-6 pt-6">
-                              <div className="flex items-center justify-between">
-                                  <div className="space-y-0.5">
-                                      <label className="text-sm font-medium">Verify Question</label>
-                                      <p className="text-xs text-muted-foreground">Mark this question as verified by an expert.</p>
-                                  </div>
-                                  <Switch 
-                                      checked={!!editData.isVerified} 
-                                      onCheckedChange={(checked) => {
-                                          if (checked && !editData.verifiedBy && user) {
-                                              setEditData({
-                                                  ...editData, 
-                                                  isVerified: true,
-                                                  verifiedBy: user.uid,
-                                                  verifiedByName: user.displayName || user.email || '',
-                                                  verifiedDesignation: 'Admin / Content Manager', // Default placeholder
-                                                  verifiedAt: new Date().toISOString()
-                                              });
-                                          } else {
-                                              setEditData({...editData, isVerified: checked});
-                                          }
-                                      }}
-                                  />
-                              </div>
-
-                              {editData.isVerified && (
-                                  <div className="space-y-4 pt-4 border-t border-indigo-100 dark:border-indigo-900/50">
-                                      <div>
-                                          <label className="text-xs text-muted-foreground">Verification Level</label>
-                                          <Select value={editData.verificationLevel || ''} onValueChange={v => setEditData({...editData, verificationLevel: v})}>
-                                              <SelectTrigger><SelectValue placeholder="Select Level" /></SelectTrigger>
-                                              <SelectContent>
-                                                  {VERIFICATION_LEVELS.map(lvl => <SelectItem key={lvl} value={lvl}>{lvl}</SelectItem>)}
-                                              </SelectContent>
-                                          </Select>
-                                      </div>
-                                      
-                                      <div className="grid grid-cols-2 gap-4">
-                                          <div>
-                                              <label className="text-xs text-muted-foreground">Verified By (Name)</label>
-                                              <Input value={editData.verifiedByName || ''} onChange={e => setEditData({...editData, verifiedByName: e.target.value})} placeholder="E.g. Dr. Ahmed" />
-                                          </div>
-                                          <div>
-                                              <label className="text-xs text-muted-foreground">Designation</label>
-                                              <Input value={editData.verifiedDesignation || ''} onChange={e => setEditData({...editData, verifiedDesignation: e.target.value})} placeholder="E.g. Subject Expert" />
-                                          </div>
-                                      </div>
-
-                                      <div>
-                                          <label className="text-xs text-muted-foreground font-medium mb-2 block">QA Checklist</label>
-                                          <div className="space-y-2 bg-slate-50 dark:bg-slate-900 p-3 rounded-md border">
-                                              {QA_CHECKLIST_ITEMS.map(item => (
-                                                  <div key={item} className="flex items-center space-x-2">
-                                                      <Checkbox 
-                                                          id={`qa-${item}`} 
-                                                          checked={(editData.qaChecklist || []).includes(item)}
-                                                          onCheckedChange={(checked) => {
-                                                              const currentList = editData.qaChecklist || [];
-                                                              if (checked) {
-                                                                  setEditData({...editData, qaChecklist: [...currentList, item]});
-                                                              } else {
-                                                                  setEditData({...editData, qaChecklist: currentList.filter(i => i !== item)});
-                                                              }
-                                                          }}
-                                                      />
-                                                      <label htmlFor={`qa-${item}`} className="text-xs font-medium leading-none cursor-pointer">
-                                                          {item}
-                                                      </label>
-                                                  </div>
-                                              ))}
-                                          </div>
-                                      </div>
-
-                                      <div>
-                                          <label className="text-xs text-muted-foreground">Verification Note (Optional)</label>
-                                          <Textarea value={editData.verificationNote || ''} onChange={e => setEditData({...editData, verificationNote: e.target.value})} placeholder="Internal notes about the verification..." className="h-20" />
-                                      </div>
-                                  </div>
-                              )}
-                          </CardContent>
-                      </Card>
-                  </div>
-              </div>
-          </div>
+          <QuestionBankEditor 
+              initialData={editData} 
+              onSaveComplete={() => {
+                  setView('list');
+                  fetchQuestions();
+              }}
+              onCancel={() => setView('list')}
+          />
       );
   }
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">

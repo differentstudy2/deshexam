@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, Save, ExternalLink, Loader2, Sparkles, Upload } from 'lucide-react';
 import { getQuestions, createQuestion, deleteQuestion } from '@/lib/firebase/question-bank';
+import { getTopicHierarchy } from '@/lib/firebase/guide';
+import { QuestionBankEditor } from '@/components/admin/QuestionBankEditor';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import Link from 'next/link';
 
@@ -21,6 +23,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   const { toast } = useToast();
   const [questions, setQuestions] = useState<QuestionBankEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hierarchy, setHierarchy] = useState<any>(null);
   
   // Editor mode state
   const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'ai'>('list');
@@ -60,6 +63,7 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   useEffect(() => {
     fetchTopicQuestions();
     setMode('list');
+    getTopicHierarchy(topicId).then(setHierarchy);
   }, [topicId, tabType]);
 
   const handleSaveInline = async () => {
@@ -219,59 +223,24 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
 
       {/* SINGLE QUESTION EDITOR */}
       {mode === 'single' && (
-          <Card className="border-emerald-200 dark:border-emerald-900 shadow-md animate-in fade-in slide-in-from-top-2">
-              <CardHeader className="bg-emerald-50/50 dark:bg-emerald-900/20 pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">Inline {qType} Creator</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-5 pt-6">
-                  <div className="space-y-2">
-                      <Label>Question Text</Label>
-                      <Textarea value={questionText} onChange={e => setQuestionText(e.target.value)} placeholder="Type your question here..." className="min-h-[80px]"/>
-                  </div>
-
-                  {qType === 'MCQ' && (
-                      <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-900/50 border rounded-lg">
-                          <Label className="mb-2 block text-slate-500">Options (Select the radio button for the correct answer)</Label>
-                          {['a', 'b', 'c', 'd'].map((opt) => (
-                              <div key={opt} className={`flex items-center gap-3 p-2 rounded-md transition-colors ${correctAnswer === opt ? 'bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800' : ''}`}>
-                                  <input 
-                                      type="radio" 
-                                      name="correct-answer" 
-                                      checked={correctAnswer === opt} 
-                                      onChange={() => setCorrectAnswer(opt)} 
-                                      className="w-4 h-4 text-emerald-600 accent-emerald-600 cursor-pointer"
-                                  />
-                                  <Label className="w-16 font-semibold uppercase cursor-pointer" onClick={() => setCorrectAnswer(opt)}>Option {opt}</Label>
-                                  <Input 
-                                      value={options[opt as keyof typeof options]} 
-                                      onChange={e => setOptions({...options, [opt]: e.target.value})} 
-                                      className="flex-1 bg-white dark:bg-slate-950" 
-                                      placeholder={`Enter option ${opt.toUpperCase()}...`}
-                                  />
-                              </div>
-                          ))}
-                      </div>
-                  )}
-
-                  {qType !== 'MCQ' && (
-                      <div className="space-y-2">
-                          <Label>Answer Key</Label>
-                          <Textarea value={correctAnswer} onChange={e => setCorrectAnswer(e.target.value)} placeholder="Type the answer key or main points..." />
-                      </div>
-                  )}
-
-                  <div className="space-y-2">
-                      <Label>Explanation (Optional)</Label>
-                      <Textarea value={explanation} onChange={e => setExplanation(e.target.value)} placeholder="Explain why the answer is correct..." className="min-h-[80px]" />
-                  </div>
-                  
-                  <div className="pt-2 flex justify-end">
-                      <Button onClick={handleSaveInline} className="bg-[#107c41] hover:bg-[#0b5c30]">
-                          <Save className="w-4 h-4 mr-2" /> Save to Question Bank
-                      </Button>
-                  </div>
-              </CardContent>
-          </Card>
+          <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2">
+              <QuestionBankEditor 
+                  initialData={{
+                      topicId,
+                      questionType: qType as any,
+                      boardId: hierarchy?.boardId || '',
+                      classId: hierarchy?.classId || '',
+                      subjectId: hierarchy?.subjectId || '',
+                      textbookId: hierarchy?.textbookId || '',
+                      chapterId: hierarchy?.chapterId || '',
+                  }}
+                  onSaveComplete={() => {
+                      setMode('list');
+                      fetchTopicQuestions();
+                  }}
+                  onCancel={() => setMode('list')}
+              />
+          </div>
       )}
 
       {/* BULK IMPORT EDITOR */}
