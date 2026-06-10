@@ -221,7 +221,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onS
                     <ArrowDown className="w-4 h-4" />
                   </Button>
                 )}
-                <Link href={`/guide/${node.slug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                <Link href={`/guide/${node.type}/${node.slug || node.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
                   <Button 
                     variant="ghost" 
                     size="sm" 

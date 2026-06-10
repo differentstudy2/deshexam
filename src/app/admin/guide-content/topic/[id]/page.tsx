@@ -202,7 +202,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
               Topic Editor
-              <Link href={`/guide/${topicId}`} target="_blank">
+              <Link href={`/guide/topic/${topicId}`} target="_blank">
                 <Button variant="outline" size="sm" className="h-7 text-xs flex gap-1.5 px-2">
                   <BookOpen className="w-3.5 h-3.5" />
                   View Chapter

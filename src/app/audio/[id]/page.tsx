@@ -106,7 +106,7 @@ export default async function AudioSinglePage({ params }: { params: Promise<{ id
                         <div>
                           <span className="block text-xs text-slate-400 uppercase tracking-wider mb-1">Topic</span>
                           <Link 
-                            href={`/guide/${hierarchy.topic.id}`}
+                            href={`/guide/topic/${hierarchy.topic.slug || hierarchy.topic.id}`}
                             className="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
                           >
                             {hierarchy.topic.title}

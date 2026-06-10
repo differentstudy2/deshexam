@@ -1,6 +1,6 @@
 import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, deleteDoc, getCountFromServer, serverTimestamp, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/[id]/guide-data"; // Types
+import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/guide-data"; // Types
 
 export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
   try {
@@ -468,6 +468,13 @@ export const getGuideSubjectsByClass = async (classId: string) => {
   return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
+export const getGuideTextbooks = async () => {
+  const q = query(collection(db, 'guide_textbooks'));
+  const snap = await getDocs(q);
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+};
+
 export const getGuideTextbooksBySubject = async (subjectId: string) => {
   const q = query(collection(db, 'guide_textbooks'), where('subjectId', '==', subjectId));
   const snap = await getDocs(q);
@@ -919,6 +926,24 @@ export const getGuideNodeById = async (id: string) => {
       return { id: docSnap.id, type: coll.replace('guide_', '').replace(/s$/, ''), ...docSnap.data() };
     }
   }
+  return null;
+};
+
+export const getGuideNodeBySlugOrId = async (collectionName: string, slugOrId: string) => {
+  // Try ID first
+  const docSnap = await getDoc(doc(db, collectionName, slugOrId));
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() };
+  }
+  
+  // Try slug
+  const q = query(collection(db, collectionName), where('slug', '==', slugOrId));
+  const querySnap = await getDocs(q);
+  if (!querySnap.empty) {
+    const d = querySnap.docs[0];
+    return { id: d.id, ...d.data() };
+  }
+  
   return null;
 };
 
