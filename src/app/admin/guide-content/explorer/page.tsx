@@ -316,13 +316,23 @@ export default function ContentExplorer() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [oldTextbooksList, setOldTextbooksList] = useState<any[]>([]);
   const [selectedTextbookId, setSelectedTextbookId] = useState<string>('all');
+  const [selectedFilterBoard, setSelectedFilterBoard] = useState<string>('all');
+  const [selectedFilterClass, setSelectedFilterClass] = useState<string>('all');
+
+  const uniqueOldBoards = Array.from(new Set(oldTextbooksList.map(t => t.board)));
+  const uniqueOldClasses = Array.from(new Set(oldTextbooksList.filter(t => selectedFilterBoard === 'all' || t.board === selectedFilterBoard).map(t => t.class)));
 
   const handleOpenMigration = async () => {
     setMigrationDialog(true);
     if (oldTextbooksList.length === 0) {
       try {
         const snap = await getDocs(query(collection(db, 'textbooks')));
-        setOldTextbooksList(snap.docs.map(d => ({ id: d.id, title: d.data().title || 'Untitled' })));
+        setOldTextbooksList(snap.docs.map(d => ({ 
+          id: d.id, 
+          title: d.data().title || 'Untitled',
+          board: d.data().board || 'Default Board',
+          class: d.data().class || 'Default Class'
+        })));
       } catch (e) {
         console.error("Failed to load old textbooks", e);
       }
@@ -332,7 +342,7 @@ export default function ContentExplorer() {
   const startMigration = async () => {
     setIsMigrating(true);
     setMigrationStatus('Starting migration...');
-    const success = await migrateOldTextbooksToGuide((msg) => setMigrationStatus(msg), selectedTextbookId);
+    const success = await migrateOldTextbooksToGuide((msg) => setMigrationStatus(msg), selectedFilterBoard, selectedFilterClass, selectedTextbookId);
     if (success) {
       toast({ title: "Migration Complete", description: "Successfully migrated textbooks!" });
       fetchRoot();
@@ -785,6 +795,26 @@ export default function ContentExplorer() {
             ) : (
               <div className="space-y-4">
                 <div className="space-y-2">
+                  <Label>Filter by Board</Label>
+                  <Select value={selectedFilterBoard} onValueChange={setSelectedFilterBoard}>
+                    <SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Boards</SelectItem>
+                      {uniqueOldBoards.map(b => <SelectItem key={b as string} value={b as string}>{b as string}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Filter by Class</Label>
+                  <Select value={selectedFilterClass} onValueChange={setSelectedFilterClass}>
+                    <SelectTrigger><SelectValue placeholder="All Classes" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Classes</SelectItem>
+                      {uniqueOldClasses.map(c => <SelectItem key={c as string} value={c as string}>{c as string}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label>Select Textbook to Migrate</Label>
                   <Select value={selectedTextbookId} onValueChange={setSelectedTextbookId}>
                     <SelectTrigger>
@@ -792,7 +822,9 @@ export default function ContentExplorer() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Textbooks</SelectItem>
-                      {oldTextbooksList.map(tb => (
+                      {oldTextbooksList
+                        .filter(tb => (selectedFilterBoard === 'all' || tb.board === selectedFilterBoard) && (selectedFilterClass === 'all' || tb.class === selectedFilterClass))
+                        .map(tb => (
                         <SelectItem key={tb.id} value={tb.id}>{tb.title}</SelectItem>
                       ))}
                     </SelectContent>
