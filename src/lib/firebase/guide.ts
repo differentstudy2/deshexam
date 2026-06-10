@@ -98,6 +98,7 @@ export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter
 
 export const getReadingContent = async (contentId: string): Promise<ReadingContentData | null> => {
   try {
+    let collectionPath = "guide_topics";
     let topicDoc = await getDoc(doc(db, "guide_topics", contentId));
     let topicData = topicDoc.exists() ? topicDoc.data() : null;
 
@@ -105,6 +106,7 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       const chapterDoc = await getDoc(doc(db, "guide_chapters", contentId));
       if (chapterDoc.exists()) {
         topicData = { ...topicData, ...chapterDoc.data() };
+        collectionPath = "guide_chapters";
       }
     }
 
@@ -152,7 +154,7 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       'video_classes': 'Video Classes'
     };
 
-    const q = query(collection(db, "guide_topics", contentId, "content_sections"));
+    const q = query(collection(db, collectionPath, contentId, "content_sections"));
     const snap = await getDocs(q);
     const sections: any[] = [];
     snap.forEach(d => {
@@ -752,11 +754,25 @@ export const migrateOldTextbooksToGuide = async (onProgress?: (msg: string) => v
         const chapterData = chapterDoc.data();
         const chapterId = await createGuideChapter(textbookId, chapterData.title, chapterData.author || '');
 
+        if (chapterData.content) {
+          await addDoc(collection(db, `guide_chapters/${chapterId}/content_sections`), {
+            sectionType: 'guide_content',
+            content: chapterData.content
+          });
+        }
+
         // Fetch topics
         const topicsSnap = await getDocs(collection(db, `textbooks/${textbook.id}/chapters/${chapterDoc.id}/topics`));
         for (const topicDoc of topicsSnap.docs) {
           const topicData = topicDoc.data();
-          await createGuideTopic(chapterId, topicData.title, topicData.author || '');
+          const newTopicId = await createGuideTopic(chapterId, topicData.title, topicData.author || '');
+
+          if (topicData.content) {
+            await addDoc(collection(db, `guide_topics/${newTopicId}/content_sections`), {
+              sectionType: 'guide_content',
+              content: topicData.content
+            });
+          }
         }
       }
     }
