@@ -517,14 +517,14 @@ export default function QuestionCard({ question, index, testMode = false }: Ques
             )}
 
             {/* QA Card */}
-            {question.isVerified && question.qaChecklist && question.qaChecklist.length > 0 && (
+            {question.isVerified && (
                 <div className="mt-4 p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/50 text-sm">
                     <div className="font-semibold text-indigo-900 dark:text-indigo-200 mb-3 flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4 text-indigo-500" />
                         Quality Assurance
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-                        {question.qaChecklist.map(item => (
+                        {question.qaChecklist?.map((item: string) => (
                             <div key={item} className="flex items-center gap-2 text-slate-700 dark:text-slate-300 text-xs">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
                                 {item}

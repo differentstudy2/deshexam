@@ -26,7 +26,8 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   const [hierarchy, setHierarchy] = useState<any>(null);
   
   // Editor mode state
-  const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'ai'>('list');
+  const [mode, setMode] = useState<'list' | 'single' | 'bulk' | 'ai' | 'edit'>('list');
+  const [editingQuestion, setEditingQuestion] = useState<QuestionBankEntry | null>(null);
   
   // Minimal editor state
   const [questionText, setQuestionText] = useState('');
@@ -243,6 +244,32 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
           </div>
       )}
 
+      {/* EDIT QUESTION EDITOR */}
+      {mode === 'edit' && editingQuestion && (
+          <div className="animate-in fade-in slide-in-from-top-2 border rounded-xl overflow-hidden bg-white dark:bg-slate-950 shadow-md p-2">
+              <QuestionBankEditor 
+                  initialData={{
+                      ...editingQuestion,
+                      boardId: editingQuestion.boardId || hierarchy?.boardId || '',
+                      classId: editingQuestion.classId || hierarchy?.classId || '',
+                      subjectId: editingQuestion.subjectId || hierarchy?.subjectId || '',
+                      textbookId: editingQuestion.textbookId || hierarchy?.textbookId || '',
+                      chapterId: editingQuestion.chapterId || hierarchy?.chapterId || '',
+                      topicId: editingQuestion.topicId || topicId,
+                  }}
+                  onSaveComplete={() => {
+                      setMode('list');
+                      setEditingQuestion(null);
+                      fetchTopicQuestions();
+                  }}
+                  onCancel={() => {
+                      setMode('list');
+                      setEditingQuestion(null);
+                  }}
+              />
+          </div>
+      )}
+
       {/* BULK IMPORT EDITOR */}
       {mode === 'bulk' && (
           <Card className="border-blue-200 dark:border-blue-900 shadow-md animate-in fade-in slide-in-from-top-2">
@@ -304,9 +331,10 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
               questions.map(q => (
                   <Card key={q.id} className="relative group hover:border-[#107c41]/50 transition-colors">
                       <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                          <Link href={`/admin/question-bank/questions?topicId=${topicId}`}>
-                              <Button variant="outline" size="sm" className="h-8"><Edit className="w-4 h-4" /></Button>
+                          <Link href={`/question/${q.slug || q.id}`} target="_blank">
+                              <Button variant="outline" size="sm" className="h-8"><ExternalLink className="w-4 h-4" /></Button>
                           </Link>
+                          <Button variant="outline" size="sm" className="h-8" onClick={() => { setEditingQuestion(q); setMode('edit'); }}><Edit className="w-4 h-4" /></Button>
                           <Button variant="destructive" size="sm" className="h-8" onClick={() => handleDelete(q.id)}><Trash2 className="w-4 h-4" /></Button>
                       </div>
                       <CardContent className="p-5">

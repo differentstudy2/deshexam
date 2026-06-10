@@ -163,7 +163,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
       }
       setIsSaving(true);
       try {
-          const generatedSlug = editData.slug || slugify(editData.title || editData.questionText.substring(0, 50));
+          const cleanText = (editData.questionText || '').replace(/<[^>]*>?/gm, '');
+          const generatedSlug = editData.slug || slugify(editData.title || cleanText.substring(0, 50));
           const dataToSave = {
               ...editData,
               slug: generatedSlug,
