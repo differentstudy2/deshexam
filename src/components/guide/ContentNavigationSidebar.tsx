@@ -55,7 +55,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
               const isClosed = closedTopics[topic.id];
               
               return (
-                <div key={topic.id} className="flex flex-col border-b border-white dark:border-slate-900">
+                <div key={topic.id} className="flex flex-col mb-1 border-b border-white dark:border-slate-900">
                   
                   {/* Topic Row (Chapter in DB layer) */}
                   <Link href={`/guide/${topic.id}`} className="block">

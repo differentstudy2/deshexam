@@ -108,14 +108,22 @@ export function ReadingArticle({ data }: ReadingArticleProps) {
           )}
 
           {sec.type === 'article' && (
-            <div className="prose dark:prose-invert lg:prose-lg max-w-none">
-              <ReactMarkdown 
-                remarkPlugins={[remarkGfm, remarkMath]} 
-                rehypePlugins={[rehypeRaw, rehypeKatex]}
-              >
-                {sec.body || ''}
-              </ReactMarkdown>
-            </div>
+            <>
+              <style dangerouslySetInnerHTML={{__html: `
+                .custom-reading-font p, .custom-reading-font li, .custom-reading-font span, .custom-reading-font div {
+                  font-size: 1.15rem !important;
+                  line-height: 1.8 !important;
+                }
+              `}} />
+              <div className="prose dark:prose-invert max-w-none custom-reading-font">
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm, remarkMath]} 
+                  rehypePlugins={[rehypeRaw, rehypeKatex]}
+                >
+                  {sec.body || ''}
+                </ReactMarkdown>
+              </div>
+            </>
           )}
 
           {sec.type === 'mcq' && (
