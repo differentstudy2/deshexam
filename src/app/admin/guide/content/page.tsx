@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getReadingContent, saveGuideReadingContent } from '@/lib/firebase/guide';
-import { ReadingContentData } from '@/app/guide/[id]/guide-data';
+import { ReadingContentData } from '@/app/guide/guide-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

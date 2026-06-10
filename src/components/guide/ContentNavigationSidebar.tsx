@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Chapter } from '@/app/guide/[id]/guide-data';
+import { Chapter } from '@/app/guide/guide-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';

@@ -19,14 +19,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
-  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye
+  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye, ArrowRightLeft
 } from 'lucide-react';
 import Link from 'next/link';
 import { 
   getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
   createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
   deleteGuideBoard, deleteGuideClass, deleteGuideSubject, deleteGuideTextbook, deleteGuideChapter, deleteGuideTopic,
-  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders, updateGuideNodeSEO, getGuideNodeById
+  updateGuideNodeTitle, migrateOldTextbooksToGuide, updateGuideNodeOrders, updateGuideNodeSEO, getGuideNodeById,
+  moveGuideNode, getGuideAllChapters, getGuideTextbooks
 } from '@/lib/firebase/guide';
 import { db } from '@/lib/firebase/client';
 import { collection, query, getDocs, doc, setDoc } from 'firebase/firestore';
@@ -51,12 +52,13 @@ type TreeNodeProps = {
   onEditClick: (nodeId: string, nodeType: string, nodeName: string, nodeAuthor: string | undefined, onSuccess: () => void) => void;
   onDeleteClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
   onSeoClick: (nodeId: string, nodeType: string, nodeData: any, onSuccess: () => void) => void;
+  onMoveClick: (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   refreshParent?: () => void;
 };
 
-const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveUp, onMoveDown, refreshParent }: TreeNodeProps) => {
+const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onSeoClick, onMoveClick, onMoveUp, onMoveDown, refreshParent }: TreeNodeProps) => {
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -249,9 +251,23 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onS
                   onClick={(e) => { e.stopPropagation(); onEditClick(node.id, node.type, node.name, node.author, () => {
                     if (refreshParent) refreshParent();
                   }); }}
+                  title="Rename"
                 >
                   <Edit2 className="w-4 h-4" />
                 </Button>
+                {(node.type === 'chapter' || node.type === 'topic') && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-7 w-7 p-0 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50"
+                    onClick={(e) => { e.stopPropagation(); onMoveClick(node.id, node.type, node.name, () => {
+                      if (refreshParent) refreshParent();
+                    }); }}
+                    title="Move / Convert"
+                  >
+                    <ArrowRightLeft className="w-4 h-4" />
+                  </Button>
+                )}
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -282,6 +298,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onS
                   onSeoClick={onSeoClick}
                   onEditClick={onEditClick}
                   onDeleteClick={onDeleteClick}
+                  onMoveClick={onMoveClick}
                 />
               ))
             )}
@@ -318,6 +335,12 @@ export default function ContentExplorer() {
   const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
+
+  // Move Node Dialog State
+  const [moveNodeDialog, setMoveNodeDialog] = useState({ isOpen: false, nodeId: '', nodeType: '', nodeName: '', onSuccess: () => {} });
+  const [movingNode, setMovingNode] = useState(false);
+  const [moveDestinations, setMoveDestinations] = useState<any[]>([]);
+  const [selectedDestination, setSelectedDestination] = useState<string>('');
 
   // Bulk Move Dialog State
   const [bulkMoveDialog, setBulkMoveDialog] = useState(false);
@@ -512,9 +535,72 @@ export default function ContentExplorer() {
     }
   };
 
-  const handleOpenDelete = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
-    setDeleteConfirmInput('');
+  const handleDeleteClick = (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
     setDeleteDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess });
+    setDeleteConfirmInput('');
+  };
+
+  const handleMoveNodeClick = async (nodeId: string, nodeType: string, nodeName: string, onSuccess: () => void) => {
+    setMoveNodeDialog({ isOpen: true, nodeId, nodeType, nodeName, onSuccess });
+    setSelectedDestination('');
+    
+    try {
+      const textbooks = await getGuideTextbooks();
+      const chapters = await getGuideAllChapters();
+
+      let filteredTextbooks = textbooks;
+      let filteredChapters = chapters;
+
+      let textbookId = null;
+      if (nodeType === 'chapter') {
+        const nodeData: any = await getGuideNodeById(nodeId);
+        textbookId = nodeData?.textbookId;
+      } else if (nodeType === 'topic') {
+        const nodeData: any = await getGuideNodeById(nodeId);
+        const chapterId = nodeData?.chapterId;
+        if (chapterId) {
+          const chapData: any = await getGuideNodeById(chapterId);
+          textbookId = chapData?.textbookId;
+        }
+      }
+
+      if (textbookId) {
+        filteredTextbooks = textbooks.filter((t: any) => t.id === textbookId);
+        filteredChapters = chapters.filter((c: any) => c.textbookId === textbookId);
+      }
+      
+      const dests = [
+        ...filteredTextbooks.map((t: any) => ({ id: t.id, name: t.title, type: 'textbook', label: `Textbook: ${t.title}` })),
+        ...filteredChapters.map((c: any) => ({ id: c.id, name: c.title, type: 'chapter', label: `Chapter: ${c.title}` }))
+      ];
+      setMoveDestinations(dests.filter(d => d.id !== nodeId));
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to load destinations", variant: "destructive" });
+    }
+  };
+
+  const handleMoveNodeSubmit = async () => {
+    if (!selectedDestination) return;
+    setMovingNode(true);
+    try {
+      const dest = moveDestinations.find(d => d.id === selectedDestination);
+      if (!dest) throw new Error("Invalid destination");
+
+      const res = await moveGuideNode(moveNodeDialog.nodeId, moveNodeDialog.nodeType as any, dest.id, dest.type as any);
+      
+      if (res.success) {
+        toast({ title: "Success", description: res.message });
+        moveNodeDialog.onSuccess();
+        fetchRoot(); // Refresh root to reflect structural changes
+        setMoveNodeDialog({ ...moveNodeDialog, isOpen: false });
+      } else {
+        toast({ title: "Move failed", description: res.message, variant: "destructive" });
+      }
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message || "Failed to move node", variant: "destructive" });
+    } finally {
+      setMovingNode(false);
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -644,7 +730,7 @@ export default function ContentExplorer() {
             ) : classes.length === 0 ? (
               <div className="text-center py-8 text-slate-500">No boards found. Add some to get started!</div>
             ) : (
-              classes.map((c, index) => <TreeNode key={c.id} node={c} refreshParent={fetchRoot} onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} onMoveDown={index < classes.length - 1 ? () => handleMoveBoard(index, 1) : undefined} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleOpenDelete} onSeoClick={handleOpenSeo} />)
+              classes.map((c, index) => <TreeNode key={c.id} node={c} refreshParent={fetchRoot} onMoveUp={index > 0 ? () => handleMoveBoard(index, -1) : undefined} onMoveDown={index < classes.length - 1 ? () => handleMoveBoard(index, 1) : undefined} onAddClick={handleOpenDialog} onEditClick={handleOpenEdit} onDeleteClick={handleDeleteClick} onSeoClick={handleOpenSeo} onMoveClick={handleMoveNodeClick} />)
             )}
           </div>
         </CardContent>
@@ -838,6 +924,50 @@ export default function ContentExplorer() {
             <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSaveEdit} disabled={editing || !editTitleInput.trim()}>
               {editing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Move Node Dialog */}
+      <Dialog open={moveNodeDialog.isOpen} onOpenChange={(open) => !open && setMoveNodeDialog(prev => ({ ...prev, isOpen: false }))}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Move / Convert Item</DialogTitle>
+            <DialogDescription>
+              Select a new destination for this item.
+              <br/><br/>
+              <strong>Note:</strong> Moving under a Textbook makes it a Chapter. Moving under a Chapter makes it a Topic.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <Label>Moving: {moveNodeDialog.nodeName}</Label>
+              <Select value={selectedDestination} onValueChange={setSelectedDestination}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Search or select new destination..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {moveDestinations.length === 0 ? (
+                    <div className="p-2 text-sm text-slate-500">Loading destinations...</div>
+                  ) : (
+                    moveDestinations.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.label}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMoveNodeDialog(prev => ({ ...prev, isOpen: false }))}>
+              Cancel
+            </Button>
+            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" onClick={handleMoveNodeSubmit} disabled={movingNode || !selectedDestination}>
+              {movingNode ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              Confirm Move
             </Button>
           </DialogFooter>
         </DialogContent>

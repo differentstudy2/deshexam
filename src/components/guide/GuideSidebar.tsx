@@ -1,5 +1,5 @@
 import React from 'react';
-import { SidebarSubject } from '@/app/guide/[id]/guide-data';
+import { SidebarSubject } from '@/app/guide/guide-data';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 

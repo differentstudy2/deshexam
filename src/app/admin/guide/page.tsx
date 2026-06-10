@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getGuideSubjects, getCurriculumBySubject, saveGuideSubject, saveGuideChapter, saveGuideTopic, deleteGuideTopic, deleteGuideChapter, deleteGuideSubject } from '@/lib/firebase/guide';
-import { SidebarSubject, Chapter } from '@/app/guide/[id]/guide-data';
+import { SidebarSubject, Chapter } from '@/app/guide/guide-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2, FolderTree, BookOpen } from 'lucide-react';

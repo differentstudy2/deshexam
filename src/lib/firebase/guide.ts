@@ -414,6 +414,94 @@ export const deleteGuideBoard = async (id: string) => {
   await deleteDoc(doc(db, "guide_boards", id));
 };
 
+export const moveGuideNode = async (
+  nodeId: string,
+  nodeType: 'chapter' | 'topic',
+  newParentId: string,
+  newParentType: 'textbook' | 'chapter'
+) => {
+  // Scenario 1: Topic to another Chapter
+  if (nodeType === 'topic' && newParentType === 'chapter') {
+    await setDoc(doc(db, 'guide_topics', nodeId), { chapterId: newParentId, updatedAt: serverTimestamp() }, { merge: true });
+    return { success: true, message: 'Topic moved successfully' };
+  }
+
+  // Helper to copy content sections
+  const copyContentSections = async (oldCollection: string, newCollection: string, newDocId: string) => {
+    const snap = await getDocs(collection(db, oldCollection, nodeId, 'content_sections'));
+    const promises = snap.docs.map(d => {
+      const data = d.data();
+      return setDoc(doc(db, newCollection, newDocId, 'content_sections', d.id), data);
+    });
+    await Promise.all(promises);
+  };
+
+  // Scenario 2: Chapter to Topic (under another Chapter)
+  if (nodeType === 'chapter' && newParentType === 'chapter') {
+    const topics = await getGuideTopicsByChapter(nodeId);
+    if (topics.length > 0) {
+      return { success: false, message: 'Cannot convert a Chapter with existing Topics. Delete or move the Topics first.' };
+    }
+
+    const chapterSnap = await getDoc(doc(db, 'guide_chapters', nodeId));
+    if (!chapterSnap.exists()) return { success: false, message: 'Chapter not found' };
+    const data = chapterSnap.data();
+
+    // Create new Topic
+    const newTopicId = await createGuideTopic(newParentId, data.title, data.author);
+    
+    // Copy SEO data if exists
+    await setDoc(doc(db, 'guide_topics', newTopicId), {
+      slug: data.slug || '',
+      seoTitle: data.seoTitle || '',
+      description: data.description || '',
+      featureImage: data.featureImage || '',
+      tags: data.tags || [],
+      keywords: data.keywords || [],
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    // Copy sections
+    await copyContentSections('guide_chapters', 'guide_topics', newTopicId);
+
+    // Delete old Chapter
+    await deleteGuideChapter(nodeId);
+
+    return { success: true, message: 'Chapter converted to Topic successfully' };
+  }
+
+  // Scenario 3: Topic to Chapter (under a Textbook)
+  if (nodeType === 'topic' && newParentType === 'textbook') {
+    const topicSnap = await getDoc(doc(db, 'guide_topics', nodeId));
+    if (!topicSnap.exists()) return { success: false, message: 'Topic not found' };
+    const data = topicSnap.data();
+
+    // Create new Chapter
+    const newChapterId = await createGuideChapter(newParentId, data.title, data.author);
+
+    // Copy SEO data if exists
+    await setDoc(doc(db, 'guide_chapters', newChapterId), {
+      slug: data.slug || '',
+      seoTitle: data.seoTitle || '',
+      description: data.description || '',
+      featureImage: data.featureImage || '',
+      tags: data.tags || [],
+      keywords: data.keywords || [],
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    // Copy sections
+    await copyContentSections('guide_topics', 'guide_chapters', newChapterId);
+
+    // Delete old Topic
+    await deleteGuideTopic(nodeId);
+
+    return { success: true, message: 'Topic converted to Chapter successfully' };
+  }
+
+  return { success: false, message: 'Invalid move operation' };
+};
+
 // --- NEW HIERARCHY FETCHERS ---
 
 export const getGuideStats = async () => {
@@ -470,6 +558,13 @@ export const getGuideSubjectsByClass = async (classId: string) => {
 
 export const getGuideTextbooks = async () => {
   const q = query(collection(db, 'guide_textbooks'));
+  const snap = await getDocs(q);
+  const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+  return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+};
+
+export const getGuideAllChapters = async () => {
+  const q = query(collection(db, 'guide_chapters'));
   const snap = await getDocs(q);
   const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
   return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
