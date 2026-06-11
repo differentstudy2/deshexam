@@ -142,9 +142,9 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       'lesson': 'Read Lesson',
       'guide_content': 'Guide Content',
       'word_meaning': 'Word Meaning',
-      'objective': 'Objective',
-      'introduction': 'Introduction',
-      'author': 'Author',
+      'objective': 'Lesson Objective',
+      'introduction': 'Lesson Introduction',
+      'author': 'Author Introduction',
       'explanation': 'Explanation',
       'exercise': 'Exercise',
       'practice_sets': 'Practice Sets',
@@ -152,14 +152,14 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
       'solutions': 'Solutions',
       'mcq': 'MCQ',
       'quizzes': 'Quizzes',
-      'creative_question': 'Creative Question',
-      'short_question': 'Short Question',
+      'creative_question': 'Creative Questions',
+      'short_question': 'Short Questions',
       'model_test': 'Model Test',
       'mock_tests': 'Mock Tests',
       'exams_papers': 'Exams & Papers',
-      'pdf': 'PDF',
-      'video': 'Video',
-      'audio': 'Audio',
+      'pdf': 'PDF Notes',
+      'video': 'Video Lectures',
+      'audio': 'Audio Lessons',
       'q_a': 'Q/A',
       'cq': 'CQ',
       'board_question': 'Board Question',
@@ -172,6 +172,16 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
     snap.forEach(d => {
       const sectionType = d.data().sectionType || d.id;
       const data = d.data();
+      
+      // Filter out truly empty sections
+      const isString = typeof data.content === 'string';
+      const isEmptyString = isString && (!data.content.trim() || data.content.trim() === '<p></p>');
+      const isNullOrUndefined = data.content === null || data.content === undefined;
+      const isEmptyArray = Array.isArray(data.content) && data.content.length === 0;
+      
+      if (isEmptyString || isNullOrUndefined || isEmptyArray) {
+        return; // Skip this section
+      }
       
       let type = 'article';
       let sectionData: any = { body: data.content };
@@ -257,18 +267,35 @@ export const getReadingContent = async (contentId: string): Promise<ReadingConte
     });
 
     if (topicData) {
+      const hasSections = sections && sections.length > 0;
+      const hasContentBlocks = topicData.contentBlocks && topicData.contentBlocks.length > 0;
+      const hasLegacyContent = topicData.content;
+      
+      const finalSections = hasSections ? sections : 
+                            (hasContentBlocks || hasLegacyContent) ? undefined : 
+                            [{ title: 'Overview', type: 'article', body: '<p>No content added yet.</p>', author: { name: 'System', avatarUrl: 'https://i.pravatar.cc/150' } }];
+
+      // Sanitize topicData to remove Firestore Timestamp objects
+      const safeTopicData = { ...topicData };
+      if (safeTopicData.updatedAt?.toDate) safeTopicData.updatedAt = safeTopicData.updatedAt.toDate().toISOString();
+      if (safeTopicData.createdAt?.toDate) safeTopicData.createdAt = safeTopicData.createdAt.toDate().toISOString();
+
       return {
+        ...safeTopicData,
         id: contentId,
         title: topicData.title || contentId,
-        subtitle: 'Topic Content',
-        sections: sections.length > 0 ? sections : [{ title: 'Overview', type: 'article', body: '<p>No content added yet.</p>', author: { name: 'System', avatarUrl: 'https://i.pravatar.cc/150' } }]
+        subtitle: topicData.subtitle || 'Topic Content',
+        ...(finalSections ? { sections: finalSections } : {})
       } as ReadingContentData;
     } else {
       // Fallback
       const docRef = doc(db, "guide_reading_content", contentId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as ReadingContentData;
+        const safeData = docSnap.data();
+        if (safeData.updatedAt?.toDate) safeData.updatedAt = safeData.updatedAt.toDate().toISOString();
+        if (safeData.createdAt?.toDate) safeData.createdAt = safeData.createdAt.toDate().toISOString();
+        return { id: docSnap.id, ...safeData } as ReadingContentData;
       }
       return null;
     }
@@ -603,8 +630,11 @@ export const getGuideTopicsByChapter = async (chapterId: string) => {
   return docs.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 };
 
-export const getTopicSections = async (topicId: string) => {
-  const q = query(collection(db, 'guide_topics', topicId, 'content_sections'));
+export const getTopicSections = async (nodeId: string) => {
+  const nodeInfo = await findGuideNodeAnyLevel(nodeId);
+  const collectionName = nodeInfo?.level === 'chapter' ? 'guide_chapters' : 'guide_topics';
+
+  const q = query(collection(db, collectionName, nodeId, 'content_sections'));
   const snap = await getDocs(q);
   const sections: Record<string, any> = {};
   snap.forEach(doc => {
@@ -613,12 +643,15 @@ export const getTopicSections = async (topicId: string) => {
   return sections;
 };
 
-export const saveTopicSections = async (topicId: string, sections: Record<string, any>) => {
+export const saveTopicSections = async (nodeId: string, sections: Record<string, any>) => {
+  const nodeInfo = await findGuideNodeAnyLevel(nodeId);
+  const collectionName = nodeInfo?.level === 'chapter' ? 'guide_chapters' : 'guide_topics';
+
   const promises = Object.entries(sections).map(async ([sectionId, data]) => {
-    const docRef = doc(db, 'guide_topics', topicId, 'content_sections', sectionId);
+    const docRef = doc(db, collectionName, nodeId, 'content_sections', sectionId);
     await setDoc(docRef, {
       ...data,
-      topicId,
+      topicId: nodeId,
       sectionType: sectionId,
       updatedAt: serverTimestamp()
     }, { merge: true });
@@ -653,8 +686,11 @@ export const saveTopicSections = async (topicId: string, sections: Record<string
   await Promise.all(promises);
 };
 
-export const updateTopicStatus = async (topicId: string, status: 'draft' | 'published') => {
-  const docRef = doc(db, 'guide_topics', topicId);
+export const updateTopicStatus = async (nodeId: string, status: 'draft' | 'published') => {
+  const nodeInfo = await findGuideNodeAnyLevel(nodeId);
+  const collectionName = nodeInfo?.level === 'chapter' ? 'guide_chapters' : 'guide_topics';
+
+  const docRef = doc(db, collectionName, nodeId);
   await setDoc(docRef, { status, updatedAt: serverTimestamp() }, { merge: true });
 };
 

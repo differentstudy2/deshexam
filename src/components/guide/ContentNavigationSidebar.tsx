@@ -58,7 +58,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
                 <div key={topic.id} className="flex flex-col mb-1 border-b border-white dark:border-slate-900">
                   
                   {/* Topic Row (Chapter in DB layer) */}
-                  <Link href={`/guide/${topic.slug || topic.id}`} className="block">
+                  <Link href={`/guide/${topic.id}`} className="block">
                     <div 
                       className={cn(
                         "px-4 py-2 text-[15.5px] transition-colors flex items-center justify-between cursor-pointer",
@@ -90,7 +90,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
                         const isSubActive = subtopic.id === activeId;
                         
                         return (
-                          <Link href={`/guide/${subtopic.slug || subtopic.id}`} key={subtopic.id}>
+                          <Link href={`/guide/${subtopic.id}`} key={subtopic.id}>
                             <div 
                               className={cn(
                                 "px-4 py-2 text-[14.5px] border-b border-dotted border-slate-200 dark:border-slate-800 transition-colors",

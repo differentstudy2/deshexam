@@ -26,6 +26,7 @@ export function SubjectDashboard({
   boardTitle?: string;
   classTitle?: string;
   subjectTitle?: string;
+  textbookTitle?: string;
   chapterTitle?: string;
 }) {
   const displayTitle = pageType === 'chapter' ? (chapterTitle || 'Chapter') : (subjectTitle || 'Subject');

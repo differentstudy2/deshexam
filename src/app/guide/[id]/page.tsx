@@ -42,8 +42,8 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
   const subjectId = hierarchy?.subjectId || subjects[0]?.id || 'sahitya-kanika';
   const fullCurriculum = await getCurriculumBySubject(subjectId);
   
-  // If it's a topic, we show the ReadingLayout
-  if (level === 'topic') {
+  // If it's a topic or chapter, we show the ReadingLayout
+  if (level === 'topic' || level === 'chapter') {
     const readingData = await getReadingContent(node.id);
     
     const curriculum = hierarchy?.textbookId 
@@ -65,7 +65,7 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
     );
   }
 
-  // If it's any other level (board, class, subject, textbook, chapter), we show the SubjectDashboard
+  // If it's any other level (board, class, subject, textbook), we show the SubjectDashboard
   const curriculum = (level === 'textbook' || level === 'chapter') && hierarchy?.textbookId 
     ? fullCurriculum.filter(c => c.id === hierarchy.textbookId)
     : fullCurriculum;
@@ -73,7 +73,7 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
   return (
     <SubjectDashboard 
       id={node.id} 
-      pageType={level}
+      pageType={level as "chapter" | "textbook" | "subject"}
       subjects={subjects} 
       curriculum={curriculum} 
       boardTitle={hierarchy?.boardTitle || 'Board'}

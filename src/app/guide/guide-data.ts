@@ -168,6 +168,7 @@ export type ReadingContentData = {
   views?: number;
   author?: ContentAuthor;
   contentBlocks?: { word: string; meaning: string }[]; // Legacy support
+  content?: string; // Legacy string content
   sections?: ContentSection[]; // New complex format
   tags?: string[];
 };

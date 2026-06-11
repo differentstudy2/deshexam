@@ -96,7 +96,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                         className="flex items-center justify-between py-3 pl-8 pr-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-dashed border-slate-200 dark:border-slate-800 group"
                       >
                         {(!topic.subtopics || topic.subtopics.length === 0) ? (
-                          <Link href={`/guide/${topic.slug || topic.id}`} className="flex items-center gap-3 flex-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                          <Link href={`/guide/${topic.id}`} className="flex items-center gap-3 flex-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                             <CircleDot className="w-4 h-4 text-emerald-500 dark:text-emerald-400" strokeWidth={3} />
                             <span className="font-semibold text-[15px] text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400">
                               {topic.title}
@@ -136,7 +136,7 @@ export function CurriculumTree({ curriculum }: CurriculumTreeProps) {
                               className="flex items-center justify-between py-3 pl-16 pr-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-dashed border-slate-200 dark:border-slate-800 group"
                             >
                               <Link 
-                                href={`/guide/${subtopic.slug || subtopic.id}`} 
+                                href={`/guide/${subtopic.id}`} 
                                 className="flex items-center gap-3 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                               >
                                 <CircleDot className="w-[14px] h-[14px] text-slate-600 dark:text-slate-400" strokeWidth={3} />

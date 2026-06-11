@@ -26,29 +26,46 @@ import { TopicVideoManager } from '@/components/admin/TopicVideoManager';
 import { TopicDocumentManager } from '@/components/admin/TopicDocumentManager';
 import { TopicQuestionManager } from '@/components/admin/TopicQuestionManager';
 
-const sectionTypes = [
-  { id: 'lesson', label: 'Read Lesson', icon: BookOpen },
-  { id: 'guide_content', label: 'Guide Content', icon: FileText },
-  { id: 'word_meaning', label: 'Word Meaning', icon: Type },
-  { id: 'objective', label: 'Objective', icon: Target },
-  { id: 'introduction', label: 'Introduction', icon: Info },
-  { id: 'author', label: 'Author', icon: User },
-  { id: 'explanation', label: 'Explanation', icon: Lightbulb },
-  { id: 'exercise', label: 'Exercise', icon: PenTool },
-  { id: 'practice_sets', label: 'Practice Sets', icon: ClipboardList },
-  { id: 'notes', label: 'Notes', icon: StickyNote },
-  { id: 'solutions', label: 'Solutions', icon: Key },
-  { id: 'mcq', label: 'MCQ', icon: HelpCircle },
-  { id: 'quizzes', label: 'Quizzes', icon: HelpCircle },
-  { id: 'creative_question', label: 'Creative Q', icon: Brain },
-  { id: 'short_question', label: 'Short Q', icon: CheckSquare },
-  { id: 'model_test', label: 'Model Test', icon: FileArchive },
-  { id: 'mock_tests', label: 'Mock Tests', icon: Timer },
-  { id: 'exams_papers', label: 'Exams & Papers', icon: Award },
-  { id: 'pdf', label: 'PDF', icon: FileImage },
-  { id: 'video', label: 'Video', icon: Video },
-  { id: 'audio', label: 'Audio', icon: Headphones },
+const sectionCategories = [
+  {
+    title: '📚 Learning Content',
+    items: [
+      { id: 'lesson', label: 'Read Lesson', icon: BookOpen },
+      { id: 'guide_content', label: 'Guide Content', icon: FileText },
+      { id: 'word_meaning', label: 'Word Meaning', icon: Type },
+      { id: 'objective', label: 'Lesson Objective', icon: Target },
+      { id: 'introduction', label: 'Lesson Introduction', icon: Info },
+      { id: 'author', label: 'Author Introduction', icon: User },
+      { id: 'explanation', label: 'Explanation', icon: Lightbulb },
+      { id: 'exercise', label: 'Exercise', icon: PenTool },
+    ]
+  },
+  {
+    title: '📝 Study Resources',
+    items: [
+      { id: 'notes', label: 'Notes', icon: StickyNote },
+      { id: 'solutions', label: 'Solutions', icon: Key },
+      { id: 'pdf', label: 'PDF Notes', icon: FileImage },
+      { id: 'video', label: 'Video Lectures', icon: Video },
+      { id: 'audio', label: 'Audio Lessons', icon: Headphones },
+    ]
+  },
+  {
+    title: '🎯 Practice & Assessment',
+    items: [
+      { id: 'mcq', label: 'MCQ', icon: HelpCircle },
+      { id: 'short_question', label: 'Short Questions', icon: CheckSquare },
+      { id: 'creative_question', label: 'Creative Questions', icon: Brain },
+      { id: 'practice_sets', label: 'Practice Sets', icon: ClipboardList },
+      { id: 'quizzes', label: 'Quizzes', icon: HelpCircle },
+      { id: 'model_test', label: 'Model Test', icon: FileArchive },
+      { id: 'mock_tests', label: 'Mock Tests', icon: Timer },
+      { id: 'exams_papers', label: 'Exams & Papers', icon: Award },
+    ]
+  }
 ];
+
+const sectionTypes = sectionCategories.flatMap(c => c.items);
 
 export default function TopicEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -66,9 +83,10 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
       setLoading(true);
       try {
         // Fetch topic status
-        const topicDoc = await getDoc(doc(db, 'guide_topics', topicId));
-        if (topicDoc.exists() && topicDoc.data().status) {
-          setStatus(topicDoc.data().status);
+        const { findGuideNodeAnyLevel } = await import('@/lib/firebase/guide');
+        const nodeInfo = await findGuideNodeAnyLevel(topicId);
+        if (nodeInfo && nodeInfo.node && nodeInfo.node.status) {
+          setStatus(nodeInfo.node.status);
         }
 
         // Fetch sections
@@ -244,20 +262,29 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
         <div className="w-full lg:w-64 shrink-0">
           <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full">
             <CardContent className="p-3">
-              <div className="space-y-1">
-                {sectionTypes.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setActiveTab(section.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === section.id 
-                        ? 'bg-[#107c41]/10 text-[#107c41]' 
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <section.icon className={`w-4 h-4 ${activeTab === section.id ? 'text-[#107c41]' : 'text-slate-400'}`} />
-                    {section.label}
-                  </button>
+              <div className="space-y-6">
+                {sectionCategories.map((category, catIdx) => (
+                  <div key={catIdx} className="space-y-2">
+                    <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3">
+                      {category.title}
+                    </h3>
+                    <div className="space-y-1">
+                      {category.items.map((section) => (
+                        <button
+                          key={section.id}
+                          onClick={() => setActiveTab(section.id)}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            activeTab === section.id 
+                              ? 'bg-[#107c41]/10 text-[#107c41]' 
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <section.icon className={`w-4 h-4 shrink-0 ${activeTab === section.id ? 'text-[#107c41]' : 'text-slate-400'}`} />
+                          <span className="truncate">{section.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </CardContent>
