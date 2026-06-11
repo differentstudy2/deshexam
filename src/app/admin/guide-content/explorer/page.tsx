@@ -158,10 +158,10 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onS
     <div className="space-y-1">
       <div className="select-none">
         <div 
-          className={`flex items-center justify-between p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800/50 cursor-pointer ${level === 0 ? 'bg-slate-50 dark:bg-slate-800/20 font-medium' : ''}`}
+          className={`flex flex-col xl:flex-row xl:items-center justify-between items-start gap-2 p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800/50 cursor-pointer ${level === 0 ? 'bg-slate-50 dark:bg-slate-800/20 font-medium' : ''}`}
           style={{ paddingLeft: `${level * 24 + 8}px` }}
         >
-          <div className="flex items-center gap-2" onClick={() => hasChildren && handleToggle()}>
+          <div className="flex items-center gap-2 w-full xl:w-auto" onClick={() => hasChildren && handleToggle()}>
             <div className="w-5 flex justify-center text-slate-400">
               {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : hasChildren ? (
                 expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
@@ -178,7 +178,7 @@ const TreeNode = ({ node, level = 0, onAddClick, onEditClick, onDeleteClick, onS
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1 mt-2 xl:mt-0">
             {node.type === 'topic' || node.type === 'chapter' ? (
               <Link href={`/admin/guide-content/topic/${node.id}`}>
                 <Button variant="ghost" size="sm" className="h-7 px-2 text-xs bg-emerald-50 text-emerald-600 hover:bg-emerald-100 mr-1">
@@ -694,7 +694,7 @@ export default function ContentExplorer() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <FolderTree className="w-6 h-6 text-[#107c41]" />
@@ -702,7 +702,7 @@ export default function ContentExplorer() {
           </h1>
           <p className="text-sm text-slate-500 mt-1">Navigate and manage the entire curriculum tree.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={handleOpenMigration} className="border-indigo-500 text-indigo-600 hover:bg-indigo-50">
             Migrate Old Textbooks
           </Button>
