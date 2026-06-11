@@ -1,4 +1,4 @@
-import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, deleteDoc, getCountFromServer, serverTimestamp, addDoc } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, deleteDoc, getCountFromServer, serverTimestamp, addDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/guide-data"; // Types
 
@@ -669,7 +669,7 @@ export const saveTopicSections = async (nodeId: string, sections: Record<string,
                 url: item.url,
                 description: item.description || '',
                 tags: item.tags || '',
-                topicId,
+                topicId: nodeId,
                 type: sectionId,
                 updatedAt: serverTimestamp(),
                 createdAt: item.createdAt || serverTimestamp()
@@ -1072,6 +1072,21 @@ export const getGuideNodeById = async (id: string) => {
   return null;
 };
 
+export const incrementGuideNodeViews = async (nodeId: string) => {
+  try {
+    const nodeInfo = await findGuideNodeAnyLevel(nodeId);
+    if (!nodeInfo) return;
+    
+    const collectionName = nodeInfo.level === 'chapter' ? 'guide_chapters' : 'guide_topics';
+    const docRef = doc(db, collectionName, nodeId);
+    
+    await updateDoc(docRef, {
+      views: increment(1)
+    });
+  } catch (error) {
+    console.error("Error incrementing views:", error);
+  }
+};
 export async function findGuideNodeAnyLevel(idOrSlug: string): Promise<{ node: any, level: string } | null> {
   const collections = [
     { name: 'guide_topics', level: 'topic' },

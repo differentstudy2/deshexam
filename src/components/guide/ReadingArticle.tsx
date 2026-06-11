@@ -51,8 +51,21 @@ function SectionFooter({ author }: { author: ContentAuthor }) {
   );
 }
 
+import { incrementGuideNodeViews } from '@/lib/firebase/guide';
+
 export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
-  
+  const [viewCount, setViewCount] = React.useState(data.views || 0);
+
+  React.useEffect(() => {
+    if (!data.id) return;
+    const timer = setTimeout(() => {
+      incrementGuideNodeViews(data.id).then(() => {
+        setViewCount(prev => prev + 1);
+      }).catch(console.error);
+    }, 2000); // Wait 2s to count as a legitimate view
+    return () => clearTimeout(timer);
+  }, [data.id]);
+
   const renderLegacyContent = () => (
     <div className="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
       <div className="bg-[#f3f9f5] dark:bg-emerald-900/10 px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start">
@@ -65,12 +78,10 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
           </p>
         </div>
         <div className="flex items-center gap-3 text-slate-400 dark:text-slate-500">
-          {data.views && (
-            <div className="flex items-center gap-1.5 text-[13px] font-medium mr-2">
-              <Eye className="w-4 h-4" />
-              {data.views}
-            </div>
-          )}
+          <div className="flex items-center gap-1.5 text-[13px] font-medium mr-2">
+            <Eye className="w-4 h-4 mr-1.5" />
+            {viewCount}
+          </div>
           <button className="hover:text-[#00a651] transition-colors"><Share2 className="w-4 h-4" /></button>
           <button className="hover:text-[#00a651] transition-colors p-1"><MoreVertical className="w-4 h-4" /></button>
         </div>
@@ -307,7 +318,7 @@ export function ReadingArticle({ data, hierarchy }: ReadingArticleProps) {
                 <div className="flex items-center gap-4 text-[#759388] mt-1">
                    <div className="flex items-center gap-1.5 text-[15px] font-medium mr-2">
                      <Eye className="w-4 h-4" />
-                     {data.views || 0}
+                     {viewCount}
                    </div>
                    <button 
                      onClick={() => window.print()}
