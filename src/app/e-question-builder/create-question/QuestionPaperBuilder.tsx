@@ -148,7 +148,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       footerText
     };
     localStorage.setItem('deshexam_paper_template', JSON.stringify(settings));
-    alert('টেমপ্লেট সফলভাবে সেভ হয়েছে!');
+    alert(t('templateSavedSuccess', appLanguage));
   };
 
   const handleLoadTemplate = () => {
@@ -241,7 +241,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   };
 
   const handleDeleteQuestion = (index: number) => {
-    if (confirm('প্রশ্নটি ডিলিট করতে চান?')) {
+    if (confirm(t('confirmDeleteQuestion', appLanguage))) {
       const newQuestions = [...questions];
       newQuestions.splice(index, 1);
       setQuestions(newQuestions);
@@ -529,26 +529,26 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           </div>
 
           <div className="p-4 border-b border-gray-100">
-            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-4 text-sm"><Settings className="w-4 h-4 text-gray-400" /> বেসিক সেটিংস</h4>
+            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-4 text-sm"><Settings className="w-4 h-4 text-gray-400" /> {t('basicSettings', appLanguage)}</h4>
 
             <div className="mb-4">
-              <label className="text-xs text-gray-500 mb-2 block">ফাইল ফরমেটিং</label>
+              <label className="text-xs text-gray-500 mb-2 block">{t('fileFormatting', appLanguage)}</label>
               <RadioGroup value={format} onValueChange={setFormat} className="grid grid-cols-2 gap-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="qa" id="fmt-qa" />
-                  <label htmlFor="fmt-qa" className="text-sm text-gray-600 cursor-pointer">প্রশ্ন ও উত্তর</label>
+                  <label htmlFor="fmt-qa" className="text-sm text-gray-600 cursor-pointer">{t('qAndA', appLanguage)}</label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="question" id="fmt-q" />
-                  <label htmlFor="fmt-q" className="text-sm text-gray-600 cursor-pointer">প্রশ্ন</label>
+                  <label htmlFor="fmt-q" className="text-sm text-gray-600 cursor-pointer">{t('questionOnly', appLanguage)}</label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="answer" id="fmt-ans" />
-                  <label htmlFor="fmt-ans" className="text-sm text-gray-600 cursor-pointer">উত্তরপত্র</label>
+                  <label htmlFor="fmt-ans" className="text-sm text-gray-600 cursor-pointer">{t('answerKeyOnly', appLanguage)}</label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="suggestion" id="fmt-sug" />
-                  <label htmlFor="fmt-sug" className="text-sm text-gray-600 cursor-pointer">সাজেশন</label>
+                  <label htmlFor="fmt-sug" className="text-sm text-gray-600 cursor-pointer">{t('suggestion', appLanguage)}</label>
                 </div>
               </RadioGroup>
             </div>
@@ -560,22 +560,22 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   onClick={() => setOptionStyle(opt)}
                   className={`px-2 py-1 rounded cursor-pointer text-xs border ${optionStyle === opt ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600'}`}
                 >
-                  {opt === 'ka' && '(ক)'}
+                  {opt === 'ka' && t('kaOptionPrefix', appLanguage)}
                   {opt === 'circle' && 'O'}
-                  {opt === 'u' && 'উঃ'}
+                  {opt === 'u' && t('answerPrefix', appLanguage)}
                   {opt === 'ans' && 'Ans:'}
-                  {opt === 'uttarmala' && 'উত্তরমালা:'}
+                  {opt === 'uttarmala' && t('answerKeyTitle', appLanguage)}
                 </div>
               ))}
             </div>
 
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Edit className="w-3.5 h-3.5 text-blue-500" /> এডিটিং মুড</span>
+              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Edit className="w-3.5 h-3.5 text-blue-500" /> {t('editingMode', appLanguage)}</span>
               <Switch checked={editingMode} onCheckedChange={setEditingMode} />
             </div>
 
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Book className="w-3.5 h-3.5 text-green-600" /> ব্যাখ্যাসহ উত্তর</span>
+              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Book className="w-3.5 h-3.5 text-green-600" /> {t('ansWithExplanation', appLanguage)}</span>
               <Switch checked={showExplanations} onCheckedChange={setShowExplanations} />
             </div>
 
@@ -584,20 +584,20 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 className="flex-1 bg-gray-50 hover:bg-gray-100 cursor-pointer p-2 rounded-md border border-gray-100 flex items-center justify-between text-gray-600 text-sm transition-colors"
                 onClick={handleShuffle}
               >
-                এলোমেলো করুন <Shuffle className="w-3.5 h-3.5" />
+                {t('shuffle', appLanguage)} <Shuffle className="w-3.5 h-3.5" />
               </div>
               <Button
                 size="sm"
                 className="bg-[#03a9f4] hover:bg-[#0288d1] text-white"
                 onClick={() => { setTempSetCode(activeSetCode); setIsSetCodeOpen(true); }}
               >
-                সেভ সেট
+                {t('saveSet', appLanguage)}
               </Button>
             </div>
 
             {savedSets.length > 0 && (
               <div className="mt-4 pt-4 border-t border-gray-100">
-                <h5 className="font-bold text-gray-800 text-sm mb-2">সেভ করা সেটসমূহঃ</h5>
+                <h5 className="font-bold text-gray-800 text-sm mb-2">{t('savedSets', appLanguage)}</h5>
                 <div className="flex flex-wrap gap-2 p-3 border border-dashed border-gray-300 rounded bg-gray-50/50 min-h-[30px]">
                   {savedSets.map((set) => (
                     <button
@@ -608,7 +608,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       }}
                       className={`px-3 py-1 text-[13px] font-medium border bg-[#f8fafc] rounded-sm ${activeSetCode === set.code ? 'border-[#0ea5e9] text-[#0284c7]' : 'border-gray-200 text-gray-700 hover:bg-gray-100'}`}
                     >
-                      সেটঃ {set.code}
+                      {t('setPrefix', appLanguage)} {set.code}
                     </button>
                   ))}
                 </div>
@@ -619,53 +619,53 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           {/* Center & Exam Settings */}
           <div className="p-4 bg-white border-b border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-bold text-gray-700 flex items-center gap-2 text-[15px]"><Landmark className="w-4 h-4 text-purple-500" /> সেন্টার ও পরীক্ষা সেটিংস</h4>
+              <h4 className="font-bold text-gray-700 flex items-center gap-2 text-[15px]"><Landmark className="w-4 h-4 text-purple-500" /> {t('centerAndExamSettings', appLanguage)}</h4>
               <Switch checked={headerSettingsEnabled} onCheckedChange={setHeaderSettingsEnabled} className="data-[state=checked]:bg-blue-600" />
             </div>
 
             {headerSettingsEnabled && (
               <div className="space-y-4">
                 <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">প্রতিষ্ঠানের নাম</label>
-                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: দেশ এক্সাম একাডেমী" />
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('instituteName', appLanguage)}</label>
+                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-8 text-[13px]" placeholder={t('institutePlaceholder', appLanguage)} />
                 </div>
                 <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">ঠিকানা</label>
-                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-8 text-[13px]" placeholder="প্রতিষ্ঠানের ঠিকানা" />
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('address', appLanguage)}</label>
+                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-8 text-[13px]" placeholder={t('addressPlaceholder', appLanguage)} />
                 </div>
                 <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">শ্রেণি ও সাল</label>
-                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬" />
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('classAndYear', appLanguage)}</label>
+                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-8 text-[13px]" placeholder={t('classPlaceholder', appLanguage)} />
                 </div>
                 <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">বিষয়</label>
-                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: বিষয়: বাংলা" />
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('subject', appLanguage)}</label>
+                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-8 text-[13px]" placeholder={t('subjectPlaceholder', appLanguage)} />
                 </div>
                 <div>
-                  <label className="text-[13px] text-gray-700 mb-1.5 block">অধ্যায়ের নাম</label>
-                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: প্রথম অধ্যায়" />
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">{t('chapterName', appLanguage)}</label>
+                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-8 text-[13px]" placeholder={t('chapterPlaceholder', appLanguage)} />
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1">
-                    <label className="text-[13px] text-gray-700 mb-1.5 block">সময় (মিনিট)</label>
-                    <Input value={headerTime} onChange={e => setHeaderTime(e.target.value)} className="h-8 text-[13px]" placeholder="অটোমেটিক" />
+                    <label className="text-[13px] text-gray-700 mb-1.5 block">{t('timeMins', appLanguage)}</label>
+                    <Input value={headerTime} onChange={e => setHeaderTime(e.target.value)} className="h-8 text-[13px]" placeholder={t('automatic', appLanguage)} />
                   </div>
                   <div className="flex-1">
-                    <label className="text-[13px] text-gray-700 mb-1.5 block">পূর্ণমান</label>
-                    <Input value={headerMarks} onChange={e => setHeaderMarks(e.target.value)} className="h-8 text-[13px]" placeholder="অটোমেটিক" />
+                    <label className="text-[13px] text-gray-700 mb-1.5 block">{t('fullMarks', appLanguage)}</label>
+                    <Input value={headerMarks} onChange={e => setHeaderMarks(e.target.value)} className="h-8 text-[13px]" placeholder={t('automatic', appLanguage)} />
                   </div>
                 </div>
 
                 {/* QR Code Settings */}
                 <div className="pt-3 mt-4 border-t border-gray-100">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2"><QrCode className="w-4 h-4 text-blue-500" /> কিউআর কোড (QR Code)</span>
+                    <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2"><QrCode className="w-4 h-4 text-blue-500" /> {t('qrCode', appLanguage)}</span>
                     <Switch checked={qrCodeEnabled} onCheckedChange={setQrCodeEnabled} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
                   </div>
                   {qrCodeEnabled && (
                     <div className="mt-2">
-                      <label className="text-[12px] text-gray-500 mb-1.5 block">কোডের ভিতরের টেক্সট/লিংক</label>
-                      <Input value={qrCodeValue} onChange={e => setQrCodeValue(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: https://yourwebsite.com" />
+                      <label className="text-[12px] text-gray-500 mb-1.5 block">{t('qrLink', appLanguage)}</label>
+                      <Input value={qrCodeValue} onChange={e => setQrCodeValue(e.target.value)} className="h-8 text-[13px]" placeholder="e.g.: https://yourwebsite.com" />
                     </div>
                   )}
                 </div>
@@ -675,89 +675,89 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
           {/* Content Display */}
           <div className="p-4 bg-slate-50/50">
-            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> কন্টেন্ট ডিসপ্লে</h4>
+            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> {t('contentDisplay', appLanguage)}</h4>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Heading className="w-4 h-4 text-yellow-500" /> টাইটেল</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Heading className="w-4 h-4 text-yellow-500" /> {t('titleToggle', appLanguage)}</span>
                 <Switch checked={showTitle} onCheckedChange={setShowTitle} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><MapPin className="w-4 h-4 text-red-500" /> ঠিকানা</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><MapPin className="w-4 h-4 text-red-500" /> {t('addressToggle', appLanguage)}</span>
                 <Switch checked={showAddress} onCheckedChange={setShowAddress} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Landmark className="w-4 h-4 text-green-500" /> ক্লাসের নাম</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Landmark className="w-4 h-4 text-green-500" /> {t('classToggle', appLanguage)}</span>
                 <Switch checked={showClassName} onCheckedChange={setShowClassName} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> বিষয়ের নাম</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> {t('subjectToggle', appLanguage)}</span>
                 <Switch checked={showSubjectName} onCheckedChange={setShowSubjectName} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Monitor className="w-4 h-4 text-green-500" /> অধ্যায়ের নাম</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Monitor className="w-4 h-4 text-green-500" /> {t('chapterToggle', appLanguage)}</span>
                 <Switch checked={showChapterName} onCheckedChange={setShowChapterName} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Lightbulb className="w-4 h-4 text-green-500" /> নির্দেশনা</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Lightbulb className="w-4 h-4 text-green-500" /> {t('instructionsToggle', appLanguage)}</span>
                 <Switch checked={showInstructions} onCheckedChange={setShowInstructions} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><User className="w-4 h-4 text-green-500" /> পরীক্ষার্থীর তথ্য</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><User className="w-4 h-4 text-green-500" /> {t('studentInfo', appLanguage)}</span>
                 <Switch checked={showCandidateInfo} onCheckedChange={setShowCandidateInfo} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Tag className="w-4 h-4 text-green-500" /> প্রশ্নের ট্যাগ</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Tag className="w-4 h-4 text-green-500" /> {t('questionTags', appLanguage)}</span>
                 <Switch checked={showQuestionTags} onCheckedChange={setShowQuestionTags} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Star className="w-4 h-4 text-green-500" /> প্রশ্নের মার্ক</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Star className="w-4 h-4 text-green-500" /> {t('questionMarksToggle', appLanguage)}</span>
                 <Switch checked={showQuestionMarks} onCheckedChange={setShowQuestionMarks} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Grid3X3 className="w-4 h-4 text-green-500" /> OMR যুক্ত</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Grid3X3 className="w-4 h-4 text-green-500" /> {t('omrAttached', appLanguage)}</span>
                 <Switch checked={showOMR} onCheckedChange={setShowOMR} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Columns className="w-4 h-4 text-green-500" /> কলাম ডিভাইডার</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Columns className="w-4 h-4 text-green-500" /> {t('columnDivider', appLanguage)}</span>
                 <Switch checked={showColumnDivider} onCheckedChange={setShowColumnDivider} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Barcode className="w-4 h-4 text-green-500" /> বিষয় কোড</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Barcode className="w-4 h-4 text-green-500" /> {t('subjectCodeToggle', appLanguage)}</span>
                 <Switch checked={showSubjectCode} onCheckedChange={setShowSubjectCode} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><Hash className="w-4 h-4 text-green-500" /> প্রাপ্ত নাম্বার ঘর</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Hash className="w-4 h-4 text-green-500" /> {t('marksBox', appLanguage)}</span>
                 <Switch checked={showMarksBox} onCheckedChange={setShowMarksBox} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><LayoutGrid className="w-4 h-4 text-green-500" /> সেট কোড</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><LayoutGrid className="w-4 h-4 text-green-500" /> {t('setCodeToggle', appLanguage)}</span>
                 <Switch checked={showSetCode} onCheckedChange={setShowSetCode} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 flex items-center gap-3"><FileDigit className="w-4 h-4 text-green-500" /> পেজ নাম্বার</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><FileDigit className="w-4 h-4 text-green-500" /> {t('pageNumberToggle', appLanguage)}</span>
                 <Switch checked={showPageNumber} onCheckedChange={setShowPageNumber} />
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CheckCircle className="w-4 h-4 text-blue-500" /> আলাদা উত্তরপত্র</span>
+                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CheckCircle className="w-4 h-4 text-blue-500" /> {t('separateAnswerKey', appLanguage)}</span>
                   <Switch checked={showAnswerKeySheet} onCheckedChange={setShowAnswerKeySheet} className="data-[state=checked]:bg-blue-600" />
                 </div>
                 {showAnswerKeySheet && (
                   <div className="mt-3 pl-7 flex justify-between items-center">
-                    <span className="text-[13px] text-gray-600">কলাম সংখ্যা</span>
+                    <span className="text-[13px] text-gray-600">{t('columnCount', appLanguage)}</span>
                     <Select value={answerKeyColumns.toString()} onValueChange={v => setAnswerKeyColumns(Number(v))}>
                       <SelectTrigger className="w-[80px] h-7 text-[12px] min-h-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="2">২ কলাম</SelectItem>
-                        <SelectItem value="3">৩ কলাম</SelectItem>
-                        <SelectItem value="4">৪ কলাম</SelectItem>
-                        <SelectItem value="5">৫ কলাম</SelectItem>
+                        <SelectItem value="2">2 {t('columnsLabel', appLanguage)}</SelectItem>
+                        <SelectItem value="3">3 {t('columnsLabel', appLanguage)}</SelectItem>
+                        <SelectItem value="4">4 {t('columnsLabel', appLanguage)}</SelectItem>
+                        <SelectItem value="5">5 {t('columnsLabel', appLanguage)}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 )}
                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CircleDot className="w-4 h-4 text-purple-500" /> OMR Attachment</span>
+                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CircleDot className="w-4 h-4 text-purple-500" /> {t('separateOMR', appLanguage)}</span>
                   <Switch checked={showOMRSheetAttachment} onCheckedChange={setShowOMRSheetAttachment} className="data-[state=checked]:bg-purple-600" />
                 </div>
               </div>
@@ -767,12 +767,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           {/* Question Format */}
           <div className="p-4 bg-slate-50/50 mt-2 border-t border-gray-200/60">
             <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]">
-              <HelpCircle className="w-4 h-4 text-gray-400 fill-gray-200" /> প্রশ্ন ফরম্যাট
+              <HelpCircle className="w-4 h-4 text-gray-400 fill-gray-200" /> {t('questionFormat', appLanguage)}
             </h4>
 
             {/* Column Count */}
             <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">কলাম সংখ্যা</span>
+              <span className="text-sm text-gray-700 mb-3 block">{t('columnCount', appLanguage)}</span>
               <div className="grid grid-cols-3 gap-2">
                 {[1, 2, 3].map(col => (
                   <button
@@ -783,7 +783,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <div className="flex gap-0.5 mb-1 opacity-20">
                       {Array(col).fill(0).map((_, i) => <div key={i} className="w-2.5 h-4 bg-gray-600 rounded-sm"></div>)}
                     </div>
-                    <span className="text-[11px] text-gray-600">{localizeNumber(col, appLanguage)} কলাম</span>
+                    <span className="text-[11px] text-gray-600">{localizeNumber(col, appLanguage)} {t('columnLabel', appLanguage)}</span>
                   </button>
                 ))}
               </div>
@@ -791,7 +791,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
             {/* Option Style */}
             <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">অপশন স্টাইল</span>
+              <span className="text-sm text-gray-700 mb-3 block">{t('optionStyleLabel', appLanguage)}</span>
               <div className="grid grid-cols-4 gap-2">
                 {[
                   { id: 'circle', label: '⭕' },
@@ -812,13 +812,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
             {/* Option Label */}
             <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">অপশন লেভেল</span>
+              <span className="text-sm text-gray-700 mb-3 block">{t('optionLabel', appLanguage)}</span>
               <div className="grid grid-cols-4 gap-2">
                 {[
-                  { id: 'bangla', label: 'ক, খ, গ...' },
-                  { id: 'english', label: 'a, b, c...' },
-                  { id: 'number', label: '১, ২, ৩...' },
-                  { id: 'roman', label: 'i, ii, iii...' }
+                  { id: 'bangla', label: t('banglaLabel', appLanguage) },
+                  { id: 'english', label: t('englishLabel', appLanguage) },
+                  { id: 'number', label: t('numberLabel', appLanguage) },
+                  { id: 'roman', label: t('romanLabel', appLanguage) }
                 ].map(opt => (
                   <button
                     key={opt.id}
@@ -833,7 +833,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
             {/* Option Column Count */}
             <div className="mb-6">
-              <span className="text-sm text-gray-700 mb-3 block">অপশন কলাম সংখ্যা</span>
+              <span className="text-sm text-gray-700 mb-3 block">{t('optionColumnCount', appLanguage)}</span>
               <div className="grid grid-cols-4 gap-2">
                 {[1, 2, 3, 4].map(col => (
                   <button
@@ -851,67 +851,66 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             <div className="mb-6 border border-green-500 rounded-sm p-3 bg-white relative">
               <div className="absolute bottom-0 left-0 right-0 border-b-[1.5px] border-yellow-400"></div>
               <div className="absolute top-0 right-0 bottom-0 border-r-[1.5px] border-yellow-400"></div>
-              <h5 className="font-bold text-gray-800 text-[13px] mb-3">অপশন অটো লেআউট</h5>
+              <h5 className="font-bold text-gray-800 text-[13px] mb-3">{t('optionAutoLayout', appLanguage)}</h5>
               <div className="flex items-center justify-between gap-3">
                 <button onClick={handleResetFormat} className="flex items-center gap-1 text-[13px] text-gray-700 hover:text-gray-900 p-1 border rounded bg-gray-50 border-gray-200">
-                  <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> রিসেট
+                  <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> {t('resetBtn', appLanguage)}
                 </button>
                 <button onClick={handleAutoLayout} className="flex-1 flex items-center justify-center gap-1.5 bg-[#4ade80] hover:bg-[#22c55e] text-white py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm">
-                  <Zap className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> অটো লেআউট
+                  <Zap className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> {t('autoLayoutBtn', appLanguage)}
                 </button>
               </div>
-              <p className="text-[10px] text-gray-400 mt-3">* ক্লিক করলে অপশনগুলো স্বয়ংক্রিয়ভাবে সাজানো হবে।</p>
+              <p className="text-[10px] text-gray-400 mt-3">{t('autoLayoutTip', appLanguage)}</p>
             </div>
 
             {/* Gaps */}
             <div className="mb-6 space-y-4">
               <div>
-                <span className="text-sm text-gray-700 mb-2 block">রো-গ্যাপ</span>
+                <span className="text-sm text-gray-700 mb-2 block">{t('rowGap', appLanguage)}</span>
                 <input type="range" min="0" max="40" value={rowGap} onChange={e => setRowGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
               </div>
               <div>
-                <span className="text-sm text-gray-700 mb-2 block">কলাম-গ্যাপ</span>
+                <span className="text-sm text-gray-700 mb-2 block">{t('columnGap', appLanguage)}</span>
                 <input type="range" min="0" max="100" value={colGap} onChange={e => setColGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
               </div>
               <div>
-                <span className="text-sm text-gray-700 mb-2 block">প্রশ্ন-অপশন গ্যাপ</span>
+                <span className="text-sm text-gray-700 mb-2 block">{t('questionOptionGap', appLanguage)}</span>
                 <input type="range" min="0" max="40" value={questionOptionGap} onChange={e => setQuestionOptionGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
               </div>
             </div>
 
             {/* Font Settings */}
-            <div className="mb-2">
-              <h5 className="font-bold text-gray-800 text-[14px] mb-4">ফন্ট সেটিংস</h5>
-
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[13px] text-gray-700 w-16">ফন্ট:</span>
+            <div className="mb-6">
+              <h5 className="font-bold text-gray-800 text-[14px] mb-4">{t('fontSettings', appLanguage)}</h5>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-[13px] text-gray-700 w-16">{t('font', appLanguage)}</span>
                 <div className="flex-1">
                   <Select value={fontFamily} onValueChange={setFontFamily}>
-                    <SelectTrigger className="h-9 bg-white text-[13px]">
-                      <SelectValue placeholder="বাংলা (ডিফল্ট)" />
+                    <SelectTrigger className="h-8 text-[13px]">
+                      <SelectValue placeholder={t('banglaDefault', appLanguage)} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="bangla">বাংলা (ডিফল্ট)</SelectItem>
-                      <SelectItem value="solaimanlipi">সোলাইমান লিপি</SelectItem>
-                      <SelectItem value="kalpurush">কালপুরুষ</SelectItem>
-                      <SelectItem value="nikosh">নিকষ</SelectItem>
-                      <SelectItem value="siyamrupali">সিয়াম রুপালি</SelectItem>
-                      <SelectItem value="sutonnymj">সুতন্নি এমজে</SelectItem>
-                      <SelectItem value="timesnewroman">টাইমস নিউ রোমান</SelectItem>
-                      <SelectItem value="arial">এরিয়াল</SelectItem>
+                      <SelectItem value="bangla">{t('banglaDefault', appLanguage)}</SelectItem>
+                      <SelectItem value="solaimanlipi">{t('solaimanLipi', appLanguage)}</SelectItem>
+                      <SelectItem value="kalpurush">{t('kalpurush', appLanguage)}</SelectItem>
+                      <SelectItem value="nikosh">{t('nikosh', appLanguage)}</SelectItem>
+                      <SelectItem value="siyamrupali">{t('siyamRupali', appLanguage)}</SelectItem>
+                      <SelectItem value="sutonnymj">{t('sutonnyMj', appLanguage)}</SelectItem>
+                      <SelectItem value="timesnewroman">{t('timesNewRoman', appLanguage)}</SelectItem>
+                      <SelectItem value="arial">{t('arial', appLanguage)}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-[13px] text-gray-700 w-16">সাইজ:</span>
+                <span className="text-[13px] text-gray-700 w-16">{t('size', appLanguage)}</span>
                 <div className="flex items-center">
                   <button onClick={() => setFontSize(Math.max(8, fontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
                   <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
-                    {fontSize}
+                    {localizeNumber(fontSize, appLanguage)}
                   </div>
-                  <button onClick={() => setFontSize(Math.max(8, fontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
+                  <button onClick={() => setFontSize(Math.min(32, fontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
                 </div>
               </div>
             </div>
@@ -920,7 +919,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             <div className="p-4 border-t border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-bold text-[#3f51b5] flex items-center gap-2 text-[14px]">
-                  <Waves className="w-4 h-4 text-[#3f51b5]" /> ব্র্যান্ডিং সেটিংস
+                  <Waves className="w-4 h-4 text-[#3f51b5]" /> {t('brandingSettings', appLanguage)}
                 </h4>
                 <Switch checked={brandingEnabled} onCheckedChange={setBrandingEnabled} className="data-[state=checked]:bg-blue-600" />
               </div>
@@ -929,53 +928,53 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 <div className="space-y-5">
                   {/* Text */}
                   <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">ফুটার টেক্সট</label>
+                    <label className="text-[13px] text-gray-700 mb-2 block">{t('footerTextLabel', appLanguage)}</label>
                     <Input
                       value={footerText}
                       onChange={e => setFooterText(e.target.value)}
-                      placeholder="দেশ এক্সাম একাডেমী"
+                      placeholder={t('institutePlaceholder', appLanguage)}
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200 mb-4"
                     />
-                    <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ টেক্সট</label>
+                    <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkText', appLanguage)}</label>
                     <Input
                       value={watermarkText}
                       onChange={e => setWatermarkText(e.target.value)}
-                      placeholder="দেশ এক্সাম একাডেমী"
+                      placeholder={t('institutePlaceholder', appLanguage)}
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
                     />
                   </div>
 
                   {/* Font */}
                   <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ ফন্ট</label>
+                    <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkFont', appLanguage)}</label>
                     <Select value={watermarkFont} onValueChange={setWatermarkFont}>
                       <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
-                        <SelectValue placeholder="ফন্ট নির্বাচন করুন" />
+                        <SelectValue placeholder={t('selectFont', appLanguage)} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="kalpurush">কালপুরুষ</SelectItem>
-                        <SelectItem value="siyamrupali">সিয়াম রুপালি</SelectItem>
-                        <SelectItem value="solaimanlipi">সোলাইমান লিপি</SelectItem>
-                        <SelectItem value="sutonnymj">সুতন্নি এমজে</SelectItem>
-                        <SelectItem value="nikosh">নিকষ</SelectItem>
+                        <SelectItem value="kalpurush">{t('kalpurush', appLanguage)}</SelectItem>
+                        <SelectItem value="siyamrupali">{t('siyamRupali', appLanguage)}</SelectItem>
+                        <SelectItem value="solaimanlipi">{t('solaimanLipi', appLanguage)}</SelectItem>
+                        <SelectItem value="sutonnymj">{t('sutonnyMj', appLanguage)}</SelectItem>
+                        <SelectItem value="nikosh">{t('nikosh', appLanguage)}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Image */}
                   <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ আইকন</label>
+                    <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkIcon', appLanguage)}</label>
                     {!watermarkImage ? (
                       <label className="border border-dashed border-gray-300 rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 bg-white relative overflow-hidden transition-all h-20">
                         <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleWatermarkImageUpload} />
-                        <span className="text-[13px] text-gray-400 font-medium text-center">ছবি আপলোড করতে এখানে ক্লিক করুন</span>
+                        <span className="text-[13px] text-gray-400 font-medium text-center">{t('uploadImageClick', appLanguage)}</span>
                         <span className="text-[11px] text-gray-300 text-center mt-1">(Max size ~5MB, PNG/JPG)</span>
                       </label>
                     ) : (
                       <div className="flex flex-col items-center gap-3 border border-gray-200 rounded-md p-3 bg-white">
                         <img src={watermarkImage} alt="Watermark Preview" className="w-12 h-12 object-contain" />
                         <button onClick={() => setWatermarkImage(null)} className="flex items-center justify-center gap-1.5 w-full py-1.5 border border-red-200 text-red-600 rounded-sm hover:bg-red-50 text-[13px] transition-colors font-medium">
-                          <Trash2 className="w-3.5 h-3.5" /> আইকন মুছুন
+                          <Trash2 className="w-3.5 h-3.5" /> {t('deleteIcon', appLanguage)}
                         </button>
                       </div>
                     )}
@@ -983,13 +982,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                   {/* Size */}
                   <div>
-                    <span className="text-[13px] text-gray-700 mb-2 block">সাইজ: {watermarkSize}px</span>
+                    <span className="text-[13px] text-gray-700 mb-2 block">{t('size', appLanguage)}: {watermarkSize}px</span>
                     <input type="range" min="20" max="300" value={watermarkSize} onChange={e => setWatermarkSize(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
                   </div>
 
                   {/* Opacity */}
                   <div>
-                    <span className="text-[13px] text-gray-700 mb-2 block">অপাসিটি: {watermarkOpacity}%</span>
+                    <span className="text-[13px] text-gray-700 mb-2 block">{t('opacity', appLanguage)}: {watermarkOpacity}%</span>
                     <input type="range" min="0" max="100" value={watermarkOpacity} onChange={e => setWatermarkOpacity(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
                   </div>
 
@@ -1888,7 +1887,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       <Dialog open={isAddQuestionOpen} onOpenChange={setIsAddQuestionOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>কাস্টম প্রশ্ন যোগ করুন</DialogTitle>
+            <DialogTitle>{t('addCustomQuestion', appLanguage)}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="flex gap-2 mb-2 p-1 bg-gray-100 rounded-md w-fit">
@@ -1896,48 +1895,48 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 onClick={() => setAddQuestionMode('single')}
                 className={`px-4 py-1.5 text-sm rounded ${addQuestionMode === 'single' ? 'bg-white text-blue-700 shadow-sm font-medium' : 'text-gray-600 hover:text-gray-900'}`}
               >
-                সিঙ্গেল প্রশ্ন
+                {t('singleQuestion', appLanguage)}
               </button>
               <button
                 onClick={() => setAddQuestionMode('bulk')}
                 className={`px-4 py-1.5 text-sm rounded ${addQuestionMode === 'bulk' ? 'bg-white text-blue-700 shadow-sm font-medium' : 'text-gray-600 hover:text-gray-900'}`}
               >
-                বাল্ক ইমপোর্ট (Bulk)
+                {t('bulkImport', appLanguage)}
               </button>
             </div>
 
             {addQuestionMode === 'single' ? (
               <>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">প্রশ্ন</label>
-                  <Input value={customQuestion.text} onChange={e => setCustomQuestion({ ...customQuestion, text: e.target.value })} placeholder="প্রশ্ন লিখুন..." />
+                  <label className="text-sm font-medium mb-1.5 block">{t('questionLabel', appLanguage)}</label>
+                  <Input value={customQuestion.text} onChange={e => setCustomQuestion({ ...customQuestion, text: e.target.value })} placeholder={t('enterQuestion', appLanguage)} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="text-xs mb-1 block">অপশন A (ক)</label><Input value={customQuestion.optA} onChange={e => setCustomQuestion({ ...customQuestion, optA: e.target.value })} /></div>
-                  <div><label className="text-xs mb-1 block">অপশন B (খ)</label><Input value={customQuestion.optB} onChange={e => setCustomQuestion({ ...customQuestion, optB: e.target.value })} /></div>
-                  <div><label className="text-xs mb-1 block">অপশন C (গ)</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({ ...customQuestion, optC: e.target.value })} /></div>
-                  <div><label className="text-xs mb-1 block">অপশন D (ঘ)</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({ ...customQuestion, optD: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">{t('optionA', appLanguage)}</label><Input value={customQuestion.optA} onChange={e => setCustomQuestion({ ...customQuestion, optA: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">{t('optionB', appLanguage)}</label><Input value={customQuestion.optB} onChange={e => setCustomQuestion({ ...customQuestion, optB: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">{t('optionC', appLanguage)}</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({ ...customQuestion, optC: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">{t('optionD', appLanguage)}</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({ ...customQuestion, optD: e.target.value })} /></div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">সঠিক উত্তর</label>
+                  <label className="text-sm font-medium mb-1.5 block">{t('correctAnswerLabel', appLanguage)}</label>
                   <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({ ...customQuestion, correctAnswer: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="a">A (ক)</SelectItem>
-                      <SelectItem value="b">B (খ)</SelectItem>
-                      <SelectItem value="c">C (গ)</SelectItem>
-                      <SelectItem value="d">D (ঘ)</SelectItem>
+                      <SelectItem value="a">{t('a_ka', appLanguage)}</SelectItem>
+                      <SelectItem value="b">{t('b_kha', appLanguage)}</SelectItem>
+                      <SelectItem value="c">{t('c_ga', appLanguage)}</SelectItem>
+                      <SelectItem value="d">{t('d_gha', appLanguage)}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </>
             ) : (
               <div>
-                <label className="text-sm font-medium mb-1.5 block">প্রশ্নসমূহ পেস্ট করুন (Text বা JSON)</label>
+                <label className="text-sm font-medium mb-1.5 block">{t('pasteQuestions', appLanguage)}</label>
                 <div className="text-[13px] text-gray-600 mb-3 bg-blue-50/50 p-3 rounded border border-blue-100 max-h-48 overflow-y-auto">
-                  <span className="font-semibold text-blue-700">টেক্সট ফরম্যাট:</span> প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ৬ষ্ঠ লাইনে "উত্তর: খ" লিখে সঠিক উত্তর দিতে পারবেন।
+                  <span className="font-semibold text-blue-700">{t('textFormat', appLanguage)}</span> {t('textFormatTip', appLanguage)}
                   <br />
-                  <span className="font-semibold text-blue-700 mt-2 block">JSON ফরম্যাট (Advanced):</span>
+                  <span className="font-semibold text-blue-700 mt-2 block">{t('jsonFormat', appLanguage)}</span>
                   <pre className="mt-1 bg-white p-2 rounded text-[11px] font-mono text-gray-700 border border-gray-200">
                     {`[
   {
@@ -1951,8 +1950,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 <textarea
                   value={bulkQuestionText}
                   onChange={e => setBulkQuestionText(e.target.value)}
-                  placeholder="১. ভারতের রাজধানী কী?&#10;ক. ঢাকা&#10;খ. নয়াদিল্লি&#10;গ. কলকাতা&#10;ঘ. মুম্বাই&#10;উত্তর: খ&#10;&#10;২. ভারতের জাতীয় পাখি কী?&#10;ক. দোয়েল&#10;খ. ময়ূর&#10;..."
-                  className="w-full h-64 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  placeholder={t('bulkPlaceholder', appLanguage).replace(/\\n/g, '\n')}
+                  className="w-full h-64 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono whitespace-pre-wrap"
                 />
               </div>
             )}
@@ -1966,14 +1965,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
               <label htmlFor="forceNewColumn" className="text-[13px] font-medium text-gray-700 cursor-pointer">
-                নতুন কলাম/রো থেকে শুরু করুন (Force New Column/Row)
+                {t('forceNewColumnLabel', appLanguage)}
               </label>
             </div>
 
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddQuestionOpen(false)}>বাতিল</Button>
-            <Button onClick={handleAddCustomQuestionSubmit} className="bg-blue-600 hover:bg-blue-700 text-white">যোগ করুন</Button>
+            <Button variant="outline" onClick={() => setIsAddQuestionOpen(false)}>{t('cancelBtn', appLanguage)}</Button>
+            <Button onClick={handleAddCustomQuestionSubmit} className="bg-blue-600 hover:bg-blue-700 text-white">{t('addBtn', appLanguage)}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1981,17 +1980,17 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       <Dialog open={isSectionHeaderOpen} onOpenChange={setIsSectionHeaderOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>সেকশন/বিভাগ যোগ করুন</DialogTitle>
+            <DialogTitle>{t('addSectionHeader', appLanguage)}</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div>
-              <label className="text-sm font-medium mb-1.5 block">বিভাগের নাম / নির্দেশনা</label>
-              <Input value={sectionHeaderText} onChange={e => setSectionHeaderText(e.target.value)} placeholder="যেমন: বিভাগ ক - রচনামূলক প্রশ্ন" />
+              <label className="text-sm font-medium mb-1.5 block">{t('sectionNameLabel', appLanguage)}</label>
+              <Input value={sectionHeaderText} onChange={e => setSectionHeaderText(e.target.value)} placeholder={t('sectionNamePlaceholder', appLanguage)} />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-2 block">দ্রুত নির্বাচন করুন (Quick Select)</label>
+              <label className="text-xs text-gray-500 mb-2 block">{t('quickSelect', appLanguage)}</label>
               <div className="flex flex-wrap gap-2">
-                {['বহুনির্বাচনি প্রশ্ন', 'সৃজনশীল প্রশ্ন', 'বিভাগ-ক', 'বিভাগ-খ', 'যেকোনো ৫টি প্রশ্নের উত্তর দাও', 'সকল প্রশ্নের মান সমান'].map(preset => (
+                {[t('mcqPreset', appLanguage), t('creativePreset', appLanguage), t('sectionA', appLanguage), t('sectionB', appLanguage), t('answerAnyFive', appLanguage), t('allQuestionsEqual', appLanguage)].map(preset => (
                   <button
                     key={preset}
                     onClick={() => setSectionHeaderText(preset)}
@@ -2004,8 +2003,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsSectionHeaderOpen(false)}>বাতিল</Button>
-            <Button onClick={handleAddSectionHeaderSubmit} className="bg-green-600 hover:bg-green-700 text-white">যোগ করুন</Button>
+            <Button variant="outline" onClick={() => setIsSectionHeaderOpen(false)}>{t('cancelBtn', appLanguage)}</Button>
+            <Button onClick={handleAddSectionHeaderSubmit} className="bg-green-600 hover:bg-green-700 text-white">{t('addBtn', appLanguage)}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
