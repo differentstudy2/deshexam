@@ -38,7 +38,7 @@ export function ReadingLayout({
     <div className="min-h-screen bg-slate-50 dark:bg-[#020817] text-slate-800 dark:text-slate-200 font-sans pb-20">
 
       {/* Top Header Bar (White) */}
-      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-16 z-40">
+      <div className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <h1 className="font-bold text-[17px] text-slate-900 dark:text-white">Academy</h1>
@@ -100,7 +100,7 @@ export function ReadingLayout({
         </div>
 
         {/* Right Sections Sidebar */}
-        <div className="w-[300px] shrink-0 hidden lg:block">
+        <div className="w-[300px] shrink-0 hidden lg:block sticky top-8 self-start">
           <TopicSectionsSidebar sections={data.sections} />
         </div>
 
