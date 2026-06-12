@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap } from 'lucide-react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 
@@ -56,6 +56,16 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [showMarksBox, setShowMarksBox] = useState(true);
   const [showSetCode, setShowSetCode] = useState(true);
   const [showPageNumber, setShowPageNumber] = useState(true);
+
+  // Question Format State
+  const [paperColumns, setPaperColumns] = useState(2);
+  const [optionShape, setOptionShape] = useState('circle');
+  const [optionLabelType, setOptionLabelType] = useState('bangla');
+  const [optionColumns, setOptionColumns] = useState(2);
+  const [rowGap, setRowGap] = useState(20);
+  const [colGap, setColGap] = useState(48);
+  const [fontFamily, setFontFamily] = useState('bangla');
+  const [fontSize, setFontSize] = useState(14);
 
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
@@ -303,6 +313,151 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               </div>
             </div>
           </div>
+
+          {/* Question Format */}
+          <div className="p-4 bg-slate-50/50 mt-2 border-t border-gray-200/60">
+            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]">
+              <HelpCircle className="w-4 h-4 text-gray-400 fill-gray-200" /> প্রশ্ন ফরম্যাট
+            </h4>
+
+            {/* Column Count */}
+            <div className="mb-6">
+              <span className="text-sm text-gray-700 mb-3 block">কলাম সংখ্যা</span>
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map(col => (
+                  <button
+                    key={col}
+                    onClick={() => setPaperColumns(col)}
+                    className={`flex flex-col items-center justify-center p-2 border rounded-md bg-white ${paperColumns === col ? 'border-green-600 ring-1 ring-green-600' : 'border-gray-200'}`}
+                  >
+                    <div className="flex gap-0.5 mb-1 opacity-20">
+                      {Array(col).fill(0).map((_, i) => <div key={i} className="w-2.5 h-4 bg-gray-600 rounded-sm"></div>)}
+                    </div>
+                    <span className="text-[11px] text-gray-600">{convertToBengaliNumber(col)} কলাম</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Option Style */}
+            <div className="mb-6">
+              <span className="text-sm text-gray-700 mb-3 block">অপশন স্টাইল</span>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { id: 'circle', label: '⭕' },
+                  { id: 'dot', label: '•' },
+                  { id: 'parens', label: '()' },
+                  { id: 'paren', label: ')' }
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setOptionShape(opt.id)}
+                    className={`h-9 flex items-center justify-center border rounded-md bg-white ${optionShape === opt.id ? 'border-green-600 ring-1 ring-green-600 font-bold' : 'border-gray-200 text-gray-500'}`}
+                  >
+                    {opt.id === 'circle' ? <div className="w-4 h-4 rounded-full border-[1.5px] border-gray-500"></div> : opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Option Label */}
+            <div className="mb-6">
+              <span className="text-sm text-gray-700 mb-3 block">অপশন লেভেল</span>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { id: 'bangla', label: 'ক, খ, গ...' },
+                  { id: 'english', label: 'a, b, c...' },
+                  { id: 'number', label: '১, ২, ৩...' },
+                  { id: 'roman', label: 'i, ii, iii...' }
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setOptionLabelType(opt.id)}
+                    className={`h-9 flex items-center justify-center border rounded-md bg-white text-[12px] truncate px-1 ${optionLabelType === opt.id ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Option Column Count */}
+            <div className="mb-6">
+              <span className="text-sm text-gray-700 mb-3 block">অপশন কলাম সংখ্যা</span>
+              <div className="grid grid-cols-4 gap-2">
+                {[1, 2, 3, 4].map(col => (
+                  <button
+                    key={col}
+                    onClick={() => setOptionColumns(col)}
+                    className={`h-9 flex items-center justify-center border rounded-md bg-white text-[13px] ${optionColumns === col ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
+                  >
+                    {convertToBengaliNumber(col)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Option Auto Layout Box */}
+            <div className="mb-6 border border-green-500 rounded-sm p-3 bg-white relative">
+              <div className="absolute bottom-0 left-0 right-0 border-b-[1.5px] border-yellow-400"></div>
+              <div className="absolute top-0 right-0 bottom-0 border-r-[1.5px] border-yellow-400"></div>
+              <h5 className="font-bold text-gray-800 text-[13px] mb-3">অপশন অটো লেআউট</h5>
+              <div className="flex items-center justify-between gap-3">
+                <button className="flex items-center gap-1 text-[13px] text-gray-700 hover:text-gray-900 p-1 border rounded bg-gray-50 border-gray-200">
+                  <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> রিসেট
+                </button>
+                <button className="flex-1 flex items-center justify-center gap-1.5 bg-[#4ade80] hover:bg-[#22c55e] text-white py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm">
+                  <Zap className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> অটো লেআউট
+                </button>
+              </div>
+              <p className="text-[10px] text-gray-400 mt-3">* ক্লিক করলে অপশনগুলো স্বয়ংক্রিয়ভাবে সাজানো হবে।</p>
+            </div>
+
+            {/* Gaps */}
+            <div className="mb-6 space-y-4">
+              <div>
+                <span className="text-sm text-gray-700 mb-2 block">রো-গ্যাপ</span>
+                <input type="range" min="0" max="40" value={rowGap} onChange={e => setRowGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+              </div>
+              <div>
+                <span className="text-sm text-gray-700 mb-2 block">কলাম-গ্যাপ</span>
+                <input type="range" min="0" max="100" value={colGap} onChange={e => setColGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+              </div>
+            </div>
+
+            {/* Font Settings */}
+            <div className="mb-2">
+              <h5 className="font-bold text-gray-800 text-[14px] mb-4">ফন্ট সেটিংস</h5>
+              
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[13px] text-gray-700 w-16">ফন্ট:</span>
+                <div className="flex-1">
+                  <Select value={fontFamily} onValueChange={setFontFamily}>
+                    <SelectTrigger className="h-9 bg-white text-[13px]">
+                      <SelectValue placeholder="বাংলা (ডিফল্ট)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bangla">বাংলা (ডিফল্ট)</SelectItem>
+                      <SelectItem value="siyamrupali">Siyam Rupali</SelectItem>
+                      <SelectItem value="kalpurush">Kalpurush</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] text-gray-700 w-16">সাইজ:</span>
+                <div className="flex items-center">
+                  <button onClick={() => setFontSize(Math.max(8, fontSize - 1))} className="w-8 h-9 border border-gray-200 rounded-l-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">-</button>
+                  <div className="w-12 h-9 border-y border-gray-200 flex items-center justify-center text-[15px] font-bold bg-white text-gray-900">
+                    {fontSize}
+                  </div>
+                  <button onClick={() => setFontSize(Math.max(8, fontSize + 1))} className="w-8 h-9 border border-gray-200 rounded-r-md bg-gray-50 flex items-center justify-center hover:bg-gray-100">+</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </aside>
 
         {/* MAIN PAPER AREA */}
@@ -345,7 +500,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               }
             }
           `}} />
-          <div id="printable-paper" className="preview-page-container mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300">
+          <div 
+            id="printable-paper" 
+            className="preview-page-container mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
+            style={{ 
+              fontFamily: fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' : fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' : 'inherit'
+            }}
+          >
 
             <div className="preview-page-padding relative transition-all duration-300">
 
@@ -356,11 +517,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               ) : (
                 <>
                   {/* Watermark */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0 print:opacity-40">
-                    <span className="text-gray-100/50 text-[120px] font-bold -rotate-45 select-none tracking-widest uppercase">
-                      DeshExam
-                    </span>
-                  </div>
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0 print:opacity-40">
+                      <span className="text-gray-100/50 text-[120px] font-bold -rotate-45 select-none tracking-widest uppercase">
+                        DeshExam
+                      </span>
+                    </div>
 
                   <div className="relative z-10">
                     {/* PAPER HEADER */}
@@ -471,15 +632,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
                     ) : format === 'answer' ? (
                       <div 
-                        className="gap-x-12 text-justify mb-10"
-                        style={{ columnCount: 2, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none' }}
+                        className="text-justify mb-10"
+                        style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                       >
                         {questions.map((q, index) => {
                           const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
                           const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
                           
                           return (
-                            <div key={q.id} className="text-[14px] text-gray-900 leading-snug mb-3 break-inside-avoid flex items-center gap-2 font-bold">
+                            <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex items-center gap-2 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
                               <span>{convertToBengaliNumber(index + 1)}.</span>
                               {optionStyle === 'u' && <span>উঃ {marker}</span>}
                               {optionStyle === 'ans' && <span>Ans: {marker}</span>}
@@ -492,11 +653,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
                     ) : (
                       <div
-                        className="gap-x-12 text-justify"
-                        style={{ columnCount: 2, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none' }}
+                        className="text-justify"
+                        style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                       >
                         {questions.map((q, index) => (
-                          <div key={q.id} className="text-[14px] text-gray-900 leading-snug mb-5 break-inside-avoid">
+                          <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
                             <div className="flex items-start gap-1.5 mb-2">
                               <span className="font-bold min-w-[18px]">{convertToBengaliNumber(index + 1)}.</span>
                               <div className="flex-1 flex flex-col gap-1">
@@ -517,27 +678,38 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                             {/* Options */}
                             {q.options && (
-                              <div className="grid grid-cols-2 gap-y-1.5 gap-x-2 pl-6">
+                              <div 
+                                className="grid gap-y-1.5 gap-x-2 pl-6"
+                                style={{ gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))` }}
+                              >
                                 {['a', 'b', 'c', 'd'].map((optKey, idx) => {
                                   const optValue = (q.options as any)[optKey];
                                   if (!optValue) return null;
 
-                                  const markers = ['ক', 'খ', 'গ', 'ঘ'];
-                                  const marker = markers[idx];
+                                  const getMarker = (idx: number, type: string) => {
+                                    if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                    if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                                    if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                                    if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                                    return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                  };
+                                  const marker = getMarker(idx, optionLabelType);
                                   const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
 
                                   return (
                                     <div key={optKey} className="flex items-start gap-1.5">
                                       <span className="shrink-0 mt-[1px]">
-                                        {optionStyle === 'ka' ? (
-                                          isCorrect ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-800 text-white text-[11px] leading-none pb-[1px]">{marker}</span> : `(${marker})`
-                                        ) : optionStyle === 'circle' ? (
+                                        {optionShape === 'circle' ? (
                                           <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
+                                        ) : optionShape === 'parens' ? (
+                                          <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
+                                        ) : optionShape === 'paren' ? (
+                                          <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
                                         ) : (
-                                          isCorrect ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-800 text-white text-[11px] leading-none pb-[1px]">{marker}</span> : `${marker}.`
+                                          <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
                                         )}
                                       </span>
-                                      <span {...getEditableProps(isCorrect ? 'font-bold' : '')}>
+                                      <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
                                         {optValue}
                                       </span>
                                     </div>
