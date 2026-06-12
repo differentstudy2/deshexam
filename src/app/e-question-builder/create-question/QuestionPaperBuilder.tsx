@@ -15,6 +15,10 @@ import { QuestionBankEntry } from '@/lib/question-bank-types';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { t, localizeNumber, localizeOptionLabel, AppLanguage, translations } from '@/lib/i18n';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface Props {
   subjectId?: string;
@@ -63,6 +67,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [showAnswerKeySheet, setShowAnswerKeySheet] = useState(false);
   const [showOMRSheetAttachment, setShowOMRSheetAttachment] = useState(false);
   const [answerKeyColumns, setAnswerKeyColumns] = useState(3);
+  const [enableLatex, setEnableLatex] = useState(false);
 
   // Center & Exam Settings State
   const [headerSettingsEnabled, setHeaderSettingsEnabled] = useState(true);
@@ -138,6 +143,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);
 
+  // Helper to convert \( \) and \[ \] into $ and $$ for remark-math
+  const formatLatex = (text: string) => {
+    if (!text) return text;
+    return text
+      .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$$1$$$$')
+      .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$$');
+  };
+
   // Template Management
   const handleSaveTemplate = () => {
     const settings = {
@@ -145,7 +158,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       optionColumns, rowGap, colGap, fontFamily, fontSize, questionOptionGap,
       headerTitle, headerAddress, headerClassName, headerSubjectName,
       headerSettingsEnabled, brandingEnabled, watermarkText, watermarkSize, watermarkOpacity,
-      footerText
+      footerText, enableLatex
     };
     localStorage.setItem('deshexam_paper_template', JSON.stringify(settings));
     alert(t('templateSavedSuccess', appLanguage));
@@ -169,13 +182,31 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       if (s.headerTitle) setHeaderTitle(s.headerTitle);
       if (s.headerAddress) setHeaderAddress(s.headerAddress);
       if (s.headerClassName) setHeaderClassName(s.headerClassName);
-      if (s.headerSubjectName) setHeaderSubjectName(s.headerSubjectName);
-      if (s.headerSettingsEnabled !== undefined) setHeaderSettingsEnabled(s.headerSettingsEnabled);
-      if (s.brandingEnabled !== undefined) setBrandingEnabled(s.brandingEnabled);
-      if (s.watermarkText !== undefined) setWatermarkText(s.watermarkText);
-      if (s.watermarkSize !== undefined) setWatermarkSize(s.watermarkSize);
-      if (s.watermarkOpacity !== undefined) setWatermarkOpacity(s.watermarkOpacity);
-      if (s.footerText) setFooterText(s.footerText);
+      try {
+        const s = JSON.parse(saved);
+        if (s.format) setFormat(s.format);
+        if (s.optionStyle) setOptionStyle(s.optionStyle);
+        if (s.paperColumns) setPaperColumns(s.paperColumns);
+        if (s.optionShape) setOptionShape(s.optionShape);
+        if (s.optionLabelType) setOptionLabelType(s.optionLabelType);
+        if (s.optionColumns) setOptionColumns(s.optionColumns);
+        if (s.rowGap !== undefined) setRowGap(s.rowGap);
+        if (s.colGap !== undefined) setColGap(s.colGap);
+        if (s.fontFamily) setFontFamily(s.fontFamily);
+        if (s.fontSize) setFontSize(s.fontSize);
+        if (s.questionOptionGap !== undefined) setQuestionOptionGap(s.questionOptionGap);
+        if (s.headerTitle) setHeaderTitle(s.headerTitle);
+        if (s.headerAddress) setHeaderAddress(s.headerAddress);
+        if (s.headerClassName) setHeaderClassName(s.headerClassName);
+        if (s.headerSubjectName) setHeaderSubjectName(s.headerSubjectName);
+        if (s.headerSettingsEnabled !== undefined) setHeaderSettingsEnabled(s.headerSettingsEnabled);
+        if (s.brandingEnabled !== undefined) setBrandingEnabled(s.brandingEnabled);
+        if (s.watermarkText !== undefined) setWatermarkText(s.watermarkText);
+        if (s.watermarkSize !== undefined) setWatermarkSize(s.watermarkSize);
+        if (s.watermarkOpacity !== undefined) setWatermarkOpacity(s.watermarkOpacity);
+        if (s.footerText !== undefined) setFooterText(s.footerText);
+        if (s.enableLatex !== undefined) setEnableLatex(s.enableLatex);
+      } catch (e) {};
     }
   };
 
@@ -301,23 +332,44 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
         blocks.forEach((block, idx) => {
           const lines = block.split('\n').map(l => l.trim()).filter(l => l);
           if (lines.length > 0) {
-            const qText = lines[0].replace(/^\d+[\.)]\s*/, '');
-            const optA = lines[1] ? lines[1].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
-            const optB = lines[2] ? lines[2].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
-            const optC = lines[3] ? lines[3].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
-            const optD = lines[4] ? lines[4].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
-
+            let qTextLines: string[] = [];
+            let optA = '', optB = '', optC = '', optD = '';
             let correctAns = 'a';
-            if (lines[5]) {
-              const ansMatch = lines[5].toLowerCase().match(/(?:answer|উত্তর|সঠিক উত্তর)[\s:-]*([a-dক-ঘ])/);
+            
+            const optionRegex = /^([a-dক-ঘ])[\.\)]\s*(.*)/i;
+            const answerRegex = /^(?:answer|উত্তর|সঠিক উত্তর|ans|ans\.)[\s:-]*([a-dক-ঘ])/i;
+
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              
+              const ansMatch = line.match(answerRegex);
               if (ansMatch) {
-                const char = ansMatch[1];
+                const char = ansMatch[1].toLowerCase();
                 if (char === 'a' || char === 'ক') correctAns = 'a';
                 if (char === 'b' || char === 'খ') correctAns = 'b';
                 if (char === 'c' || char === 'গ') correctAns = 'c';
                 if (char === 'd' || char === 'ঘ') correctAns = 'd';
+                continue;
+              }
+
+              const optMatch = line.match(optionRegex);
+              if (optMatch) {
+                const char = optMatch[1].toLowerCase();
+                const val = optMatch[2];
+                if (char === 'a' || char === 'ক') optA = val;
+                else if (char === 'b' || char === 'খ') optB = val;
+                else if (char === 'c' || char === 'গ') optC = val;
+                else if (char === 'd' || char === 'ঘ') optD = val;
+                continue;
+              }
+
+              // If it's not an answer and not an option, and we haven't found any options yet, it's a question line
+              if (!optA && !optB && !optC && !optD) {
+                qTextLines.push(line);
               }
             }
+
+            const qText = qTextLines.join('<br/>').replace(/^\d+[\.)]\s*/, '');
 
             newQuestions.push({
               id: `custom_bulk_${Date.now()}_${idx}`,
@@ -676,6 +728,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           {/* Content Display */}
           <div className="p-4 bg-slate-50/50">
             <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> {t('contentDisplay', appLanguage)}</h4>
+            
+            <div className="flex justify-between items-start mb-4 bg-white p-3 rounded-md border border-gray-100 shadow-sm">
+              <div>
+                <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2">{t('enableLatex', appLanguage)}</span>
+                <p className="text-[10px] text-gray-500 mt-0.5">{t('enableLatexTip', appLanguage)}</p>
+              </div>
+              <Switch checked={enableLatex} onCheckedChange={setEnableLatex} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
+            </div>
+
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700 flex items-center gap-3"><Heading className="w-4 h-4 text-yellow-500" /> {t('titleToggle', appLanguage)}</span>
@@ -1379,10 +1440,18 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                     <div className="flex items-start gap-1.5 mb-2">
                                       <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
                                       <div className="flex-1 flex flex-col gap-1">
-                                        <div
-                                          {...getEditableProps()}
-                                          dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
-                                        />
+                                        {enableLatex && !editingMode ? (
+                                          <div className="react-markdown-math-wrapper">
+                                            <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                              {formatLatex(q.questionText)}
+                                            </ReactMarkdown>
+                                          </div>
+                                        ) : (
+                                          <div
+                                            {...getEditableProps()}
+                                            dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
+                                          />
+                                        )}
                                         {(showQuestionTags && q.tags && q.tags.length > 0) && (
                                           <div className="flex gap-1 flex-wrap mt-1">
                                             {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
@@ -1424,7 +1493,19 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                                 )}
                                               </span>
                                               <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
-                                                {optValue}
+                                                {enableLatex && !editingMode ? (
+                                                  <span className="react-markdown-math-wrapper inline-math">
+                                                    <ReactMarkdown 
+                                                      remarkPlugins={[remarkMath]} 
+                                                      rehypePlugins={[rehypeKatex]}
+                                                      components={{ p: ({node, ...props}) => <span {...props} /> }}
+                                                    >
+                                                      {formatLatex(optValue)}
+                                                    </ReactMarkdown>
+                                                  </span>
+                                                ) : (
+                                                  optValue
+                                                )}
                                               </span>
                                             </div>
                                           )
