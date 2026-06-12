@@ -310,55 +310,60 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
 export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void; logOut: () => void; }) => {
     const pathname = usePathname();
     return (
-        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-300 border-r border-slate-200 dark:border-slate-800">
-            <div className="border-b border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-950 flex items-center h-16 shrink-0">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/95 text-slate-800 dark:text-slate-300 border-r border-slate-200/60 dark:border-slate-800/60">
+            <div className="p-4 flex items-center h-16 shrink-0">
                 <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-2">
-                    <div className="text-slate-900 dark:text-white font-bold text-xl tracking-tight">DeshExam <span className="text-[#00a651]">Admin</span></div>
+                    <div className="text-slate-900 dark:text-white font-extrabold text-xl tracking-tight">DeshExam <span className="text-[#00a651]">Admin</span></div>
                 </Link>
             </div>
             <ScrollArea className="flex-1">
-                <div className="mt-4 space-y-6 p-4">
+                <div className="space-y-6 px-3 py-4">
                     {adminNavGroups.map((group, idx) => (
-                        <div key={idx} className="space-y-2">
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2">{group.title}</h4>
-                            <ul className="space-y-1">
-                                {group.items.map((item) => (
-                                    <li key={item.href}>
-                                        <Button
-                                            asChild
-                                            variant="ghost"
-                                            className={cn(
-                                                "justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md transition-colors duration-200",
-                                                pathname === item.href ? "bg-[#00a651] text-white hover:bg-[#00a651]/90" : "hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
-                                            )}
-                                        >
-                                            <Link href={item.href} onClick={onLinkClick}>
-                                                {item.icon}
-                                                <span className="ml-3">{item.label}</span>
-                                            </Link>
-                                        </Button>
-                                    </li>
-                                ))}
+                        <div key={idx} className="space-y-1">
+                            <h4 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 px-3 mb-2">{group.title}</h4>
+                            <ul className="space-y-0.5">
+                                {group.items.map((item) => {
+                                    const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                                    return (
+                                        <li key={item.href}>
+                                            <Button
+                                                asChild
+                                                variant="ghost"
+                                                className={cn(
+                                                    "justify-start w-full h-10 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
+                                                    isActive 
+                                                        ? "bg-[#00a651]/10 text-[#00a651] dark:bg-[#00a651]/20 dark:text-[#00a651] font-semibold" 
+                                                        : "hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                                                )}
+                                            >
+                                                <Link href={item.href} onClick={onLinkClick}>
+                                                    <span className={cn("transition-colors", isActive ? "text-[#00a651]" : "text-slate-400 dark:text-slate-500")}>{item.icon}</span>
+                                                    <span className="ml-3">{item.label}</span>
+                                                </Link>
+                                            </Button>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     ))}
                     
-                    <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <div className="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/60 space-y-2 px-1">
                         <Button
                             asChild
                             variant="ghost"
-                            className="justify-start w-full h-9 px-2 py-1.5 text-sm font-medium rounded-md hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                            className="justify-start w-full h-10 px-3 py-2 text-sm font-medium rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-200"
                         >
                             <Link href="/dashboard" onClick={onLinkClick}>
-                                <LayoutGrid className="h-4 w-4" />
+                                <LayoutGrid className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                                 <span className="ml-3">Exit Admin</span>
                             </Link>
                         </Button>
                     </div>
                 </div>
             </ScrollArea>
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
-                <Button variant="ghost" className="w-full justify-start text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30" onClick={logOut}>
+            <div className="p-4 border-t border-slate-200/60 dark:border-slate-800/60 bg-transparent shrink-0">
+                <Button variant="ghost" className="w-full justify-start text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all duration-200 h-10 px-3" onClick={logOut}>
                     <LogOut className="mr-3 h-4 w-4"/>
                     Logout
                 </Button>

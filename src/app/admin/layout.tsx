@@ -22,6 +22,7 @@ import {
 import { LogOut, UserIcon, Moon, Sun, Monitor } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { AdminMobileBottomNav } from '@/components/layout/admin-mobile-bottom-nav';
 
 export default function AdminLayout({
   children,
@@ -77,15 +78,15 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-900">
-        <Sidebar>
+      <div className="flex min-h-[100dvh] w-full bg-slate-50 dark:bg-slate-900">
+        <Sidebar className="hidden md:flex">
           <AdminSidebar logOut={logOut} />
         </Sidebar>
         <div className="flex flex-col flex-1 w-full relative">
-          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 shadow-sm">
+          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-slate-950/95 dark:supports-[backdrop-filter]:bg-slate-950/60 px-4 md:px-6 shadow-sm">
                     <SidebarTrigger className="-ml-1 text-slate-500 dark:text-slate-400" />
-                    <div className="flex-1 font-semibold text-slate-800 dark:text-slate-100 tracking-tight text-xl">
-                        Admin Control Panel
+                    <div className="flex-1 font-semibold text-slate-800 dark:text-slate-100 tracking-tight text-lg md:text-xl truncate">
+                        Admin
                     </div>
                     <div className="ml-auto flex items-center space-x-2 md:space-x-4">
                         <ThemeToggle />
@@ -128,11 +129,12 @@ export default function AdminLayout({
                 </header>
                 
                 <SidebarInset className="bg-transparent">
-                    <main className="flex-grow p-4 md:p-6 lg:p-8">
+                    <main className="flex-grow p-4 md:p-6 lg:p-8 pb-20 md:pb-8">
                         {children}
                     </main>
                 </SidebarInset>
             </div>
+            <AdminMobileBottomNav />
         </div>
     </SidebarProvider>
   );
