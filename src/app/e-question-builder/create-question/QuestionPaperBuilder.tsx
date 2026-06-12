@@ -138,7 +138,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       case 'kalpurush': return '"Kalpurush", sans-serif';
       case 'siyamrupali': return '"Siyam Rupali", sans-serif';
       case 'solaimanlipi': return '"SolaimanLipi", sans-serif';
-      case 'sutonnymj': return '"SutonnyMJ", sans-serif';
+      case 'sutonnymj': return '"SutonnyMJ", "SutonnyOMJ", sans-serif';
+      case 'nikosh': return '"Nikosh", sans-serif';
       default: return '"Kalpurush", sans-serif';
     }
   };
@@ -559,6 +560,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         <SelectItem value="siyamrupali">সিয়াম রুপালি</SelectItem>
                         <SelectItem value="solaimanlipi">সোলাইমান লিপি</SelectItem>
                         <SelectItem value="sutonnymj">সুতন্নি এমজে</SelectItem>
+                        <SelectItem value="nikosh">নিকষ</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -799,7 +801,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                       {/* Center Info */}
                       <div className="text-center">
-                        {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>DeshExam</h1>}
+                        {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>দেশ এক্সাম একাডেমী</h1>}
                         {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>দ্বারিকামারী, পেটলা, দিনহাটা, কোচবিহার, পশ্চিমবঙ্গ, ৭৩৬১৩৫</p>}
                         {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
                         {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>}
