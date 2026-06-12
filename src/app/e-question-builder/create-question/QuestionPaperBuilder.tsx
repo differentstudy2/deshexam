@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2 } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers } from 'lucide-react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 
@@ -42,8 +42,20 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
   // Content Display State
   const [showTitle, setShowTitle] = useState(true);
-  const [showAddress, setShowAddress] = useState(false);
+  const [showAddress, setShowAddress] = useState(true);
   const [showClassName, setShowClassName] = useState(true);
+  const [showSubjectName, setShowSubjectName] = useState(true);
+  const [showChapterName, setShowChapterName] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [showCandidateInfo, setShowCandidateInfo] = useState(true);
+  const [showQuestionTags, setShowQuestionTags] = useState(false);
+  const [showQuestionMarks, setShowQuestionMarks] = useState(true);
+  const [showOMR, setShowOMR] = useState(true);
+  const [showColumnDivider, setShowColumnDivider] = useState(true);
+  const [showSubjectCode, setShowSubjectCode] = useState(true);
+  const [showMarksBox, setShowMarksBox] = useState(true);
+  const [showSetCode, setShowSetCode] = useState(true);
+  const [showPageNumber, setShowPageNumber] = useState(true);
 
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
@@ -226,20 +238,68 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           </div>
 
           {/* Content Display */}
-          <div className="p-4">
-            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-4 text-sm"><Type className="w-4 h-4 text-gray-400" /> কন্টেন্ট ডিসপ্লে</h4>
-            <div className="space-y-3">
+          <div className="p-4 bg-slate-50/50 mt-2">
+            <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> কন্টেন্ট ডিসপ্লে</h4>
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 flex items-center gap-2"><span className="font-bold text-yellow-500">H</span> টাইটেল</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Heading className="w-4 h-4 text-yellow-500" /> টাইটেল</span>
                 <Switch checked={showTitle} onCheckedChange={setShowTitle} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 flex items-center gap-2"><span className="text-red-400">📍</span> ঠিকানা</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><MapPin className="w-4 h-4 text-red-500" /> ঠিকানা</span>
                 <Switch checked={showAddress} onCheckedChange={setShowAddress} />
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 flex items-center gap-2"><span className="text-green-500">🏛</span> ক্লাসের নাম</span>
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Landmark className="w-4 h-4 text-green-500" /> ক্লাসের নাম</span>
                 <Switch checked={showClassName} onCheckedChange={setShowClassName} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Book className="w-4 h-4 text-green-500" /> বিষয়ের নাম</span>
+                <Switch checked={showSubjectName} onCheckedChange={setShowSubjectName} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Monitor className="w-4 h-4 text-green-500" /> অধ্যায়ের নাম</span>
+                <Switch checked={showChapterName} onCheckedChange={setShowChapterName} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Lightbulb className="w-4 h-4 text-green-500" /> নির্দেশনা</span>
+                <Switch checked={showInstructions} onCheckedChange={setShowInstructions} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><User className="w-4 h-4 text-green-500" /> পরীক্ষার্থীর তথ্য</span>
+                <Switch checked={showCandidateInfo} onCheckedChange={setShowCandidateInfo} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Tag className="w-4 h-4 text-green-500" /> প্রশ্নের ট্যাগ</span>
+                <Switch checked={showQuestionTags} onCheckedChange={setShowQuestionTags} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Star className="w-4 h-4 text-green-500" /> প্রশ্নের মার্ক</span>
+                <Switch checked={showQuestionMarks} onCheckedChange={setShowQuestionMarks} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Grid3X3 className="w-4 h-4 text-green-500" /> OMR যুক্ত</span>
+                <Switch checked={showOMR} onCheckedChange={setShowOMR} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Columns className="w-4 h-4 text-green-500" /> কলাম ডিভাইডার</span>
+                <Switch checked={showColumnDivider} onCheckedChange={setShowColumnDivider} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Barcode className="w-4 h-4 text-green-500" /> বিষয় কোড</span>
+                <Switch checked={showSubjectCode} onCheckedChange={setShowSubjectCode} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><Hash className="w-4 h-4 text-green-500" /> প্রাপ্ত নাম্বার ঘর</span>
+                <Switch checked={showMarksBox} onCheckedChange={setShowMarksBox} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><LayoutGrid className="w-4 h-4 text-green-500" /> সেট কোড</span>
+                <Switch checked={showSetCode} onCheckedChange={setShowSetCode} />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-700 flex items-center gap-3"><FileDigit className="w-4 h-4 text-green-500" /> পেজ নাম্বার</span>
+                <Switch checked={showPageNumber} onCheckedChange={setShowPageNumber} />
               </div>
             </div>
           </div>
@@ -306,25 +366,31 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     {/* PAPER HEADER */}
                     <div className="relative mb-4">
                       {/* Left: Marks Box */}
-                      <div className="absolute top-8 left-0 flex border border-black">
-                        <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
-                        <div className="w-16"></div>
-                      </div>
+                      {showMarksBox && (
+                        <div className="absolute top-8 left-0 flex border border-black">
+                          <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
+                          <div className="w-16"></div>
+                        </div>
+                      )}
 
                       {/* Right: Set & Subject Code */}
                       <div className="absolute top-6 right-0 text-right">
-                        <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
-                          <span {...getEditableProps("flex-1 text-center py-0.5")}>সেট</span>
-                          <span {...getEditableProps("border-l border-black flex-1 text-center py-0.5")}>{activeSetCode}</span>
-                        </div>
-                        <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
-                          <span {...getEditableProps()}>বিষয় কোড :</span>
-                          <div className="flex">
-                            <span {...getEditableProps("border border-black w-5 h-6 flex items-center justify-center")}>০</span>
-                            <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
-                            <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                        {showSetCode && (
+                          <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
+                            <span {...getEditableProps("flex-1 text-center py-0.5")}>সেট</span>
+                            <span {...getEditableProps("border-l border-black flex-1 text-center py-0.5")}>{activeSetCode}</span>
                           </div>
-                        </div>
+                        )}
+                        {showSubjectCode && (
+                          <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
+                            <span {...getEditableProps()}>বিষয় কোড :</span>
+                            <div className="flex">
+                              <span {...getEditableProps("border border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                              <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                              <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Center Info */}
@@ -332,35 +398,41 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>DeshExam</h1>}
                         {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>৬/এ, রাবেয়া ভিলা, বড়বটতলা, ওয়ার্ড-২৭, বোয়ালিয়া, রাজশাহী - ৬২০৪</p>}
                         {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
-                        <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>
-                        <h4 {...getEditableProps("text-[13px] text-gray-700")}>অধ্যায়ের নাম</h4>
+                        {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>}
+                        {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>অধ্যায়ের নাম</h4>}
                       </div>
                     </div>
 
                     {format !== 'answer' && (
                       <>
                         {/* Rules */}
-                        <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
-                          <span {...getEditableProps()}>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
-                          <span {...getEditableProps()}>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
-                        </div>
+                        {showInstructions && (
+                          <>
+                            <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
+                              <span {...getEditableProps()}>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
+                              <span {...getEditableProps()}>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
+                            </div>
 
-                        <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
-                          <p {...getEditableProps()}>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
-                          <p {...getEditableProps("mt-1 font-bold")}>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
-                        </div>
+                            <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
+                              <p {...getEditableProps()}>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
+                              <p {...getEditableProps("mt-1 font-bold")}>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
+                            </div>
+                          </>
+                        )}
 
                         {/* Candidate Info */}
-                        <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
-                          <div className="flex-1 flex">
-                            <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
-                            <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
+                        {showCandidateInfo && (
+                          <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
+                            <div className="flex-1 flex">
+                              <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
+                              <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
+                            </div>
+                            <div className="w-[300px] flex">
+                              <span className="whitespace-nowrap">রোলঃ</span>
+                              <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
+                            </div>
                           </div>
-                          <div className="w-[300px] flex">
-                            <span className="whitespace-nowrap">রোলঃ</span>
-                            <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
-                          </div>
-                        </div>
+                        )}
                       </>
                     )}
 
@@ -400,7 +472,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     ) : format === 'answer' ? (
                       <div 
                         className="gap-x-12 text-justify mb-10"
-                        style={{ columnCount: 2, columnRule: '1px solid #e5e7eb' }}
+                        style={{ columnCount: 2, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none' }}
                       >
                         {questions.map((q, index) => {
                           const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
@@ -421,16 +493,26 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     ) : (
                       <div
                         className="gap-x-12 text-justify"
-                        style={{ columnCount: 2, columnRule: '1px solid #e5e7eb' }}
+                        style={{ columnCount: 2, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none' }}
                       >
                         {questions.map((q, index) => (
                           <div key={q.id} className="text-[14px] text-gray-900 leading-snug mb-5 break-inside-avoid">
                             <div className="flex items-start gap-1.5 mb-2">
                               <span className="font-bold min-w-[18px]">{convertToBengaliNumber(index + 1)}.</span>
-                              <div
-                                {...getEditableProps("flex-1")}
-                                dangerouslySetInnerHTML={{ __html: q.questionText }}
-                              />
+                              <div className="flex-1 flex flex-col gap-1">
+                                <div
+                                  {...getEditableProps()}
+                                  dangerouslySetInnerHTML={{ __html: q.questionText }}
+                                />
+                                {(showQuestionTags && q.tags && q.tags.length > 0) && (
+                                  <div className="flex gap-1 flex-wrap mt-1">
+                                    {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
+                                  </div>
+                                )}
+                              </div>
+                              {showQuestionMarks && (
+                                <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{convertToBengaliNumber(q.marks || 1)}]</span>
+                              )}
                             </div>
 
                             {/* Options */}
