@@ -721,7 +721,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   {/* Watermark */}
                   {brandingEnabled && (
                     <div 
-                      className="absolute inset-0 pointer-events-none overflow-hidden z-0" 
+                      className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0" 
                       style={{ 
                         opacity: watermarkOpacity / 100 
                       }}
