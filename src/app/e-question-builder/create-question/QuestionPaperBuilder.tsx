@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2 } from 'lucide-react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -24,6 +27,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [format, setFormat] = useState('question');
   const [optionStyle, setOptionStyle] = useState('ka');
   const [editingMode, setEditingMode] = useState(false);
+
+  // Page Setup State
+  const [isPageSetupOpen, setIsPageSetupOpen] = useState(false);
+  const [orientation, setOrientation] = useState('Portrait');
+  const [paperSize, setPaperSize] = useState('Letter');
+  const [margins, setMargins] = useState({ top: '0.2', right: '0.2', bottom: '0.2', left: '0.2' });
 
   // Content Display State
   const [showTitle, setShowTitle] = useState(true);
@@ -92,7 +101,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
           <div className="p-4 space-y-4 border-b border-gray-100">
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 text-gray-600 border-gray-300">
+              <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={() => setIsPageSetupOpen(true)}>
                 <FileText className="w-4 h-4 mr-2" /> Page Setup
               </Button>
               <Button variant="outline" className="flex-1 text-gray-600 border-gray-300">
@@ -185,6 +194,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
         <main className="flex-1 overflow-x-auto pb-24 print:pb-0">
           <style dangerouslySetInnerHTML={{
             __html: `
+            .preview-page-container {
+              width: ${orientation === 'Landscape' ? (paperSize === 'Letter' ? 11 : paperSize === 'Legal' ? 14 : 11.69) : (paperSize === 'Letter' ? 8.5 : paperSize === 'Legal' ? 8.5 : 8.27)}in;
+              min-height: ${orientation === 'Landscape' ? (paperSize === 'Letter' ? 8.5 : paperSize === 'Legal' ? 8.5 : 8.27) : (paperSize === 'Letter' ? 11 : paperSize === 'Legal' ? 14 : 11.69)}in;
+            }
+            .preview-page-padding {
+              padding: ${margins.top || '0'}in ${margins.right || '0'}in ${margins.bottom || '0'}in ${margins.left || '0'}in;
+            }
+
             @media print {
               body * {
                 visibility: hidden;
@@ -196,21 +213,26 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 100%;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 box-shadow: none !important;
                 background: white !important;
               }
+              .preview-page-padding {
+                padding: 0 !important; /* Let @page handle print margins */
+              }
               @page {
-                size: A4;
-                margin: 0.5in;
+                size: ${paperSize === 'A4' ? 'A4' : paperSize === 'Letter' ? 'letter' : 'legal'} ${orientation.toLowerCase()};
+                margin: ${margins.top || '0'}in ${margins.right || '0'}in ${margins.bottom || '0'}in ${margins.left || '0'}in;
               }
             }
           `}} />
-          <div id="printable-paper" className="min-w-[800px] max-w-[900px] mx-auto bg-white shadow-xl print:shadow-none print:w-full print:max-w-full print:min-w-0">
+          <div id="printable-paper" className="preview-page-container mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300">
 
-            <div className="p-10 min-h-[1100px] print:px-4 print:pb-4 print:pt-0 print:min-h-0 relative">
+            <div className="preview-page-padding relative transition-all duration-300">
 
               {loading ? (
                 <div className="flex justify-center items-center h-64 print:hidden">
@@ -414,6 +436,83 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       <footer className="bg-[#1e293b] text-white text-center py-4 text-sm font-semibold print:hidden">
         ©2026 Satt Academy. All rights reserved.
       </footer>
+
+      {/* Page Setup Dialog */}
+      <Dialog open={isPageSetupOpen} onOpenChange={setIsPageSetupOpen}>
+        <DialogContent className="max-w-[500px] print:hidden gap-0 p-0 overflow-hidden border-none rounded-xl">
+          <DialogHeader className="p-5 pb-3">
+            <DialogTitle className="flex items-center gap-2 text-[#1c2b4f] text-xl font-bold">
+              <Settings className="w-5 h-5 text-gray-500" /> Page Setup & Print Settings
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="border-b px-5 flex">
+            <div className="px-5 py-2.5 border border-b-0 rounded-t-lg text-[#64748b] bg-[#f8fafc] text-sm font-medium -mb-[1px] bg-white border-gray-200">
+              Page Setup
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6 bg-white">
+            {/* Page Orientation & Size */}
+            <div>
+              <h3 className="font-bold text-[#1c2b4f] mb-3 text-[15px]">Page Orientation & Size</h3>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Orientation</label>
+                  <Select value={orientation} onValueChange={setOrientation}>
+                    <SelectTrigger className="border-gray-200 shadow-none h-[42px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Portrait">Portrait</SelectItem>
+                      <SelectItem value="Landscape">Landscape</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Paper Size</label>
+                  <Select value={paperSize} onValueChange={setPaperSize}>
+                    <SelectTrigger className="border-gray-200 shadow-none h-[42px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Letter">Letter (8.5 × 11 in)</SelectItem>
+                      <SelectItem value="A4">A4 (8.27 × 11.69 in)</SelectItem>
+                      <SelectItem value="Legal">Legal (8.5 × 14 in)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Margins */}
+            <div>
+              <h3 className="font-bold text-[#1c2b4f] mb-3 text-[15px]">Margins (inches)</h3>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Top</label>
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.top} onChange={e => setMargins({...margins, top: e.target.value})} />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Right</label>
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.right} onChange={e => setMargins({...margins, right: e.target.value})} />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Bottom</label>
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.bottom} onChange={e => setMargins({...margins, bottom: e.target.value})} />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Left</label>
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.left} onChange={e => setMargins({...margins, left: e.target.value})} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="p-4 bg-white border-t flex justify-end gap-3 sm:justify-end">
+            <Button variant="secondary" className="bg-[#e8eaf6] text-[#3949ab] hover:bg-[#c5cae9] px-6 h-[42px] rounded-md font-medium" onClick={() => setIsPageSetupOpen(false)}>Cancel</Button>
+            <Button className="bg-[#dcfce7] hover:bg-[#bbf7d0] text-green-800 px-6 h-[42px] rounded-md font-medium" onClick={() => { setIsPageSetupOpen(false); handlePrint(); }}>
+              প্রিভিউ এবং ডাউনলোড
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
