@@ -118,6 +118,28 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     return num.toString().split('').map(d => bengaliDigits[parseInt(d)] || d).join('');
   };
 
+  const handleResetFormat = () => {
+    setPaperColumns(2);
+    setOptionShape('circle');
+    setOptionLabelType('bangla');
+    setOptionColumns(2);
+    setRowGap(20);
+    setColGap(48);
+    setFontFamily('bangla');
+    setFontSize(14);
+  };
+
+  const handleAutoLayout = () => {
+    setPaperColumns(2);
+    setOptionShape('paren');
+    setOptionLabelType('bangla');
+    setOptionColumns(4);
+    setRowGap(12);
+    setColGap(32);
+    setFontFamily('siyamrupali');
+    setFontSize(13);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white">
       {/* Top Header */}
@@ -403,10 +425,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div className="absolute top-0 right-0 bottom-0 border-r-[1.5px] border-yellow-400"></div>
               <h5 className="font-bold text-gray-800 text-[13px] mb-3">অপশন অটো লেআউট</h5>
               <div className="flex items-center justify-between gap-3">
-                <button className="flex items-center gap-1 text-[13px] text-gray-700 hover:text-gray-900 p-1 border rounded bg-gray-50 border-gray-200">
+                <button onClick={handleResetFormat} className="flex items-center gap-1 text-[13px] text-gray-700 hover:text-gray-900 p-1 border rounded bg-gray-50 border-gray-200">
                   <RefreshCw className="w-3.5 h-3.5 text-blue-600" /> রিসেট
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-1.5 bg-[#4ade80] hover:bg-[#22c55e] text-white py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm">
+                <button onClick={handleAutoLayout} className="flex-1 flex items-center justify-center gap-1.5 bg-[#4ade80] hover:bg-[#22c55e] text-white py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm">
                   <Zap className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" /> অটো লেআউট
                 </button>
               </div>
@@ -557,7 +579,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       {/* Center Info */}
                       <div className="text-center">
                         {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>DeshExam</h1>}
-                        {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>৬/এ, রাবেয়া ভিলা, বড়বটতলা, ওয়ার্ড-২৭, বোয়ালিয়া, রাজশাহী - ৬২০৪</p>}
+                        {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>দ্বারিকামারী, পেটলা, দিনহাটা, কোচবিহার, পশ্চিমবঙ্গ, ৭৩৬১৩৫</p>}
                         {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
                         {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>}
                         {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>অধ্যায়ের নাম</h4>}
