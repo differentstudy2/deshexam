@@ -901,15 +901,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
 
                       {/* Center Info */}
-                      {headerSettingsEnabled && (
-                        <div className="text-center">
-                          {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle}</h1>}
-                          {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress}</p>}
-                          {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName}</h2>}
-                          {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName}</h3>}
-                          {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName}</h4>}
-                        </div>
-                      )}
+                      <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
+                        {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle}</h1>}
+                        {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress}</p>}
+                        {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName}</h2>}
+                        {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName}</h3>}
+                        {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName}</h4>}
+                      </div>
                     </div>
 
                     {format !== 'answer' && (
@@ -1104,15 +1102,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           </div>
 
                           {/* Center Info */}
-                          {headerSettingsEnabled && (
-                            <div className="text-center">
-                              {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle}</h1>}
-                              {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress}</p>}
-                              {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName}</h2>}
-                              {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName}</h3>}
-                              {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName}</h4>}
-                            </div>
-                          )}
+                          <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
+                            {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle}</h1>}
+                            {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress}</p>}
+                            {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName}</h2>}
+                            {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName}</h3>}
+                            {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName}</h4>}
+                          </div>
                         </div>
 
                         <hr className="border-t border-gray-200 my-6" />
