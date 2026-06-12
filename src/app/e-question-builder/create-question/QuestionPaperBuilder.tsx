@@ -113,10 +113,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
   // Section Header Modal State
   const [isSectionHeaderOpen, setIsSectionHeaderOpen] = useState(false);
+  const [forceNewColumn, setForceNewColumn] = useState(false);
   const [sectionHeaderText, setSectionHeaderText] = useState('');
 
   // Enhanced Settings State
-  const [footerText, setFooterText] = useState('সৌজন্যে: DeshExam');
+  const [footerText, setFooterText] = useState('দেশ এক্সাম একাডেমী');
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);
 
@@ -214,12 +215,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     if (!editingMode || draggedIndex === null || draggedIndex === index) return;
-    
+
     const newQuestions = [...questions];
     const draggedItem = newQuestions[draggedIndex];
     newQuestions.splice(draggedIndex, 1);
     newQuestions.splice(index, 0, draggedItem);
-    
+
     setQuestions(newQuestions);
     setDraggedIndex(index); // Update dragged index to new position to continue dragging
   };
@@ -246,16 +247,18 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
         status: 'Published',
         createdAt: new Date(),
         updatedAt: new Date(),
-        slug: 'custom-' + Date.now()
+        slug: 'custom-' + Date.now(),
+        breakBeforeColumn: forceNewColumn
       };
       setQuestions([...questions, newQuestion]);
       setIsAddQuestionOpen(false);
       setCustomQuestion({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a' });
+      setForceNewColumn(false);
     } else {
       if (!bulkQuestionText.trim()) return;
-      
+
       let newQuestions: any[] = [];
-      
+
       try {
         // Try parsing as JSON first
         const parsed = JSON.parse(bulkQuestionText);
@@ -263,11 +266,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           newQuestions = parsed.map((item, idx) => ({
             id: `custom_bulk_${Date.now()}_${idx}`,
             questionText: item.questionText || '',
-            options: { 
-              a: item.options?.a || '', 
-              b: item.options?.b || '', 
-              c: item.options?.c || '', 
-              d: item.options?.d || '' 
+            options: {
+              a: item.options?.a || '',
+              b: item.options?.b || '',
+              c: item.options?.c || '',
+              d: item.options?.d || ''
             },
             correctAnswer: item.correctAnswer || 'a',
             explanation: item.explanation || '',
@@ -275,13 +278,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             status: 'Published',
             createdAt: new Date(),
             updatedAt: new Date(),
-            slug: `custom-bulk-${Date.now()}-${idx}`
+            slug: `custom-bulk-${Date.now()}-${idx}`,
+            breakBeforeColumn: idx === 0 && forceNewColumn
           }));
         }
       } catch (e) {
         // Fallback to text block parsing
         const blocks = bulkQuestionText.split(/\n\s*\n/);
-        
+
         blocks.forEach((block, idx) => {
           const lines = block.split('\n').map(l => l.trim()).filter(l => l);
           if (lines.length > 0) {
@@ -290,20 +294,20 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             const optB = lines[2] ? lines[2].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
             const optC = lines[3] ? lines[3].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
             const optD = lines[4] ? lines[4].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
-            
+
             // Try to find the correct answer on the 6th line
             let correctAns = 'a';
             if (lines[5]) {
-               const ansMatch = lines[5].toLowerCase().match(/(?:answer|উত্তর|সঠিক উত্তর)[\s:-]*([a-dক-ঘ])/);
-               if (ansMatch) {
-                 const char = ansMatch[1];
-                 if (char === 'a' || char === 'ক') correctAns = 'a';
-                 if (char === 'b' || char === 'খ') correctAns = 'b';
-                 if (char === 'c' || char === 'গ') correctAns = 'c';
-                 if (char === 'd' || char === 'ঘ') correctAns = 'd';
-               }
+              const ansMatch = lines[5].toLowerCase().match(/(?:answer|উত্তর|সঠিক উত্তর)[\s:-]*([a-dক-ঘ])/);
+              if (ansMatch) {
+                const char = ansMatch[1];
+                if (char === 'a' || char === 'ক') correctAns = 'a';
+                if (char === 'b' || char === 'খ') correctAns = 'b';
+                if (char === 'c' || char === 'গ') correctAns = 'c';
+                if (char === 'd' || char === 'ঘ') correctAns = 'd';
+              }
             }
-            
+
             newQuestions.push({
               id: `custom_bulk_${Date.now()}_${idx}`,
               questionText: qText,
@@ -314,16 +318,18 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               status: 'Published',
               createdAt: new Date(),
               updatedAt: new Date(),
-              slug: `custom-bulk-${Date.now()}-${idx}`
+              slug: `custom-bulk-${Date.now()}-${idx}`,
+              breakBeforeColumn: idx === 0 && forceNewColumn
             });
           }
         });
       }
-      
+
       if (newQuestions.length > 0) {
         setQuestions([...questions, ...newQuestions]);
         setIsAddQuestionOpen(false);
         setBulkQuestionText('');
+        setForceNewColumn(false);
       }
     }
   };
@@ -905,7 +911,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <Input
                       value={footerText}
                       onChange={e => setFooterText(e.target.value)}
-                      placeholder="সৌজন্যে: DeshExam"
+                      placeholder="দেশ এক্সাম একাডেমী"
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200 mb-4"
                     />
                     <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ টেক্সট</label>
@@ -1094,10 +1100,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           `}} />
           <div id="printable-paper" className="flex flex-col gap-8 print:gap-0 print:block">
             {/* Fixed Print Footer (Repeats on every printed page) */}
-            <div 
+            <div
               className="hidden print:flex fixed bottom-0 left-0 right-0 w-full justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
             >
-              <div>সৌজন্যে: DeshExam</div>
+              <div>সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}</div>
               {showPageNumber && <div className="print-page-number-display"></div>}
             </div>
 
@@ -1116,19 +1122,346 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             >
               <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300">
 
-              {loading ? (
-                <div className="flex justify-center items-center h-64 print:hidden">
-                  <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-                </div>
-              ) : (
-                <>
-                  {/* Watermark */}
+                {loading ? (
+                  <div className="flex justify-center items-center h-64 print:hidden">
+                    <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                  </div>
+                ) : (
+                  <>
+                    {/* Watermark */}
+                    {brandingEnabled && (
+                      <div
+                        className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
+                        style={{
+                          opacity: watermarkOpacity / 100
+                        }}
+                      >
+                        {watermarkRepeat ? (
+                          <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
+                            {Array.from({ length: watermarkRepeatCount }).map((_, i) => (
+                              <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
+                                {watermarkImage ? (
+                                  <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
+                                ) : (
+                                  <span className="select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                                    {watermarkText || 'দেশ এক্সাম একাডেমী'}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            {watermarkImage ? (
+                              <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
+                            ) : (
+                              <span className="-rotate-45 select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                                {watermarkText || 'দেশ এক্সাম একাডেমী'}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="relative z-10 flex-1 flex flex-col">
+                      {/* Header Image */}
+                      {headerImageEnabled && headerImage && (
+                        <div className="w-full mb-6">
+                          <img
+                            src={headerImage}
+                            alt="Header Banner"
+                            className="w-full h-32"
+                            style={{ objectFit: headerImageFit as any }}
+                          />
+                        </div>
+                      )}
+
+                      {/* PAPER HEADER */}
+                      <div className="relative mb-4">
+                        {/* Left: QR Code */}
+                        {qrCodeEnabled && (
+                          <div className="absolute top-0 left-0 p-1.5 border border-black/10 bg-white shadow-sm print:shadow-none z-20">
+                            <QRCodeSVG value={qrCodeValue || 'https://deshexam.com'} size={54} />
+                          </div>
+                        )}
+
+                        {/* Left: Marks Box */}
+                        {showMarksBox && (
+                          <div className={`absolute left-0 flex border border-black ${qrCodeEnabled ? 'top-[75px]' : 'top-8'}`}>
+                            <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
+                            <div className="w-16"></div>
+                          </div>
+                        )}
+
+                        {/* Right: Set & Subject Code */}
+                        <div className="absolute top-6 right-0 text-right">
+                          {showSetCode && (
+                            <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
+                              <span {...getEditableProps("flex-1 text-center py-0.5")}>সেট</span>
+                              <span {...getEditableProps("border-l border-black flex-1 text-center py-0.5")}>{activeSetCode}</span>
+                            </div>
+                          )}
+                          {showSubjectCode && (
+                            <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
+                              <span {...getEditableProps()}>বিষয় কোড :</span>
+                              <div className="flex">
+                                <span {...getEditableProps("border border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                                <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                                <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Center Info */}
+                        <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
+                          {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle}</h1>}
+                          {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress}</p>}
+                          {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName}</h2>}
+                          {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName}</h3>}
+                          {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName}</h4>}
+                        </div>
+                      </div>
+
+                      {format !== 'answer' && (
+                        <>
+                          {/* Rules */}
+                          {showInstructions && (
+                            <>
+                              <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
+                                <span {...getEditableProps()}>সময়— {headerTime || convertToBengaliNumber(questions.length)} মিনিট</span>
+                                <span {...getEditableProps()}>পূর্ণমান— {headerMarks || convertToBengaliNumber(questions.length)}</span>
+                              </div>
+
+                              <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
+                                <p {...getEditableProps()}>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
+                                <p {...getEditableProps("mt-1 font-bold")}>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
+                              </div>
+                            </>
+                          )}
+
+                          {/* Candidate Info */}
+                          {showCandidateInfo && (
+                            <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
+                              <div className="flex-1 flex">
+                                <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
+                                <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
+                              </div>
+                              <div className="w-[300px] flex">
+                                <span className="whitespace-nowrap">রোলঃ</span>
+                                <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      <hr className="border-t-[1.5px] border-gray-300 mb-6" />
+
+                      {format === 'answer' && (
+                        <div className="text-center mb-6">
+                          <h3 className="text-lg font-bold text-red-500">নিচে উত্তরপত্র</h3>
+                        </div>
+                      )}
+
+                      {/* QUESTIONS OR ANSWERS */}
+                      {format === 'answer' && optionStyle === 'uttarmala' ? (
+                        <div className="mt-4 mb-10 overflow-x-auto">
+                          <span className="text-sm font-bold text-gray-800 block mb-2">উত্তর মালা:</span>
+                          <table className="border-collapse border border-gray-300 text-center text-sm">
+                            <tbody>
+                              <tr>
+                                <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">প্রশ্ন</td>
+                                {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => (
+                                  <td key={`q-${idx}`} className="border border-gray-300 px-3 py-2 font-bold">{convertToBengaliNumber(idx + 1)}.</td>
+                                ))}
+                              </tr>
+                              <tr>
+                                <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">উত্তর</td>
+                                {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => {
+                                  const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
+                                  const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
+                                  return (
+                                    <td key={`a-${idx}`} className="border border-gray-300 px-3 py-2">{marker}</td>
+                                  );
+                                })}
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : format === 'answer' ? (
+                        <div
+                          className="text-justify mb-10"
+                          style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
+                        >
+                          {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, index) => {
+                            const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
+                            const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
+
+                            return (
+                              <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex flex-col gap-1 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
+                                <div className="flex items-center gap-2">
+                                  <span>{convertToBengaliNumber(index + 1)}.</span>
+                                  {optionStyle === 'u' && <span>উঃ {marker}</span>}
+                                  {optionStyle === 'ans' && <span>Ans: {marker}</span>}
+                                  {(optionStyle === 'ka' || optionStyle === 'circle') && (
+                                    <span className="inline-flex items-center justify-center w-[20px] h-[20px] rounded-full bg-gray-800 text-white text-[12px] leading-none pb-[1px]">{marker}</span>
+                                  )}
+                                </div>
+                                {showExplanations && q.explanation && (
+                                  <div className="text-sm text-gray-600 font-normal mt-1 border-l-2 border-gray-300 pl-2">
+                                    <span className="font-bold text-gray-700">ব্যাখ্যা:</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div
+                          className="text-justify"
+                          style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
+                        >
+                          {questions.map((q, index) => {
+                            const isSectionHeader = q.questionText.startsWith('[[SECTION_HEADER]]');
+                            const sectionTitle = isSectionHeader ? q.questionText.replace('[[SECTION_HEADER]]', '') : '';
+                            const actualQuestionIndex = questions.slice(0, index + 1).filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).length - 1;
+
+                            return (
+                              <div
+                                key={q.id}
+                                className={`relative text-gray-900 leading-snug break-inside-avoid ${draggedIndex === index ? 'opacity-50' : ''}`}
+                                style={{
+                                  marginBottom: `${rowGap}px`,
+                                  fontSize: `${fontSize}px`,
+                                  ...((isSectionHeader || (q as any).breakBeforeColumn) ? { columnSpan: 'all', WebkitColumnSpan: 'all' } as any : {})
+                                }}
+                                draggable={editingMode}
+                                onDragStart={(e) => handleDragStart(e, index)}
+                                onDragEnd={handleDragEnd}
+                                onDragOver={(e) => handleDragOver(e, index)}
+                              >
+                                {editingMode && (
+                                  <div className="absolute -left-8 top-0 flex flex-col gap-1 print:hidden opacity-50 hover:opacity-100 transition-opacity">
+                                    <button className="cursor-grab hover:text-blue-500"><GripVertical className="w-4 h-4" /></button>
+                                    <button onClick={() => handleDeleteQuestion(index)} className="hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                                  </div>
+                                )}
+
+                                {isSectionHeader ? (
+                                  <div className="font-bold text-center my-4 pb-1 border-b-2 border-gray-800 text-[110%] print:break-after-avoid">
+                                    {sectionTitle}
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="flex items-start gap-1.5 mb-2">
+                                      <span className="font-bold min-w-[18px]">{convertToBengaliNumber(actualQuestionIndex + 1)}.</span>
+                                      <div className="flex-1 flex flex-col gap-1">
+                                        <div
+                                          {...getEditableProps()}
+                                          dangerouslySetInnerHTML={{ __html: q.questionText }}
+                                        />
+                                        {(showQuestionTags && q.tags && q.tags.length > 0) && (
+                                          <div className="flex gap-1 flex-wrap mt-1">
+                                            {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
+                                          </div>
+                                        )}
+                                      </div>
+                                      {showQuestionMarks && (
+                                        <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{convertToBengaliNumber(q.marks || 1)}]</span>
+                                      )}
+                                    </div>
+
+                                    {/* Options */}
+                                    {q.options && (
+                                      <div
+                                        className="grid gap-x-2 pl-6"
+                                        style={{
+                                          gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))`,
+                                          rowGap: `${questionOptionGap}px`
+                                        }}
+                                      >
+                                        {['a', 'b', 'c', 'd'].map((optKey, idx) => {
+                                          const optValue = (q.options as any)[optKey];
+                                          if (!optValue) return null;
+
+                                          const getMarker = (idx: number, type: string) => {
+                                            if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                            if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                                            if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                                            if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                                            return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                          };
+                                          const marker = getMarker(idx, optionLabelType);
+                                          const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
+
+                                          return (
+                                            <div key={optKey} className="flex items-start gap-1.5">
+                                              <span className="shrink-0 mt-[1px]">
+                                                {optionShape === 'circle' ? (
+                                                  <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
+                                                ) : optionShape === 'parens' ? (
+                                                  <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
+                                                ) : optionShape === 'paren' ? (
+                                                  <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
+                                                ) : (
+                                                  <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
+                                                )}
+                                              </span>
+                                              <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
+                                                {optValue}
+                                              </span>
+                                            </div>
+                                          )
+                                        })}
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {editingMode && (
+                        <div className="mt-8 flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6">
+                          <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => setIsAddQuestionOpen(true)}>
+                            <PlusCircle className="w-4 h-4 mr-2" /> কাস্টম প্রশ্ন যোগ করুন
+                          </Button>
+                          <Button variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => setIsSectionHeaderOpen(true)}>
+                            <Layers className="w-4 h-4 mr-2" /> নতুন সেকশন/বিভাগ যোগ
+                          </Button>
+                        </div>
+                      )}
+
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Page 2: Answer Key Sheet */}
+            {!loading && showAnswerKeySheet && (
+              <div
+                className="preview-page-container relative flex flex-col mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
+                style={{
+                  fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
+                    fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
+                      fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+                        fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+                          fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+                            fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
+                              fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
+                }}
+              >
+                <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
+                  {/* Watermark for Answer Key */}
                   {brandingEnabled && (
                     <div
                       className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
-                      style={{
-                        opacity: watermarkOpacity / 100
-                      }}
+                      style={{ opacity: watermarkOpacity / 100 }}
                     >
                       {watermarkRepeat ? (
                         <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
@@ -1159,31 +1492,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   )}
 
                   <div className="relative z-10 flex-1 flex flex-col">
-                    {/* Header Image */}
-                    {headerImageEnabled && headerImage && (
-                      <div className="w-full mb-6">
-                        <img
-                          src={headerImage}
-                          alt="Header Banner"
-                          className="w-full h-32"
-                          style={{ objectFit: headerImageFit as any }}
-                        />
-                      </div>
-                    )}
-
-                    {/* PAPER HEADER */}
+                    {/* Duplicate Header Block */}
                     <div className="relative mb-4">
-                      {/* Left: QR Code */}
-                      {qrCodeEnabled && (
-                        <div className="absolute top-0 left-0 p-1.5 border border-black/10 bg-white shadow-sm print:shadow-none z-20">
-                          <QRCodeSVG value={qrCodeValue || 'https://deshexam.com'} size={54} />
-                        </div>
-                      )}
-
                       {/* Left: Marks Box */}
                       {showMarksBox && (
-                        <div className={`absolute left-0 flex border border-black ${qrCodeEnabled ? 'top-[75px]' : 'top-8'}`}>
-                          <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
+                        <div className="absolute top-8 left-0 flex border border-black">
+                          <div className="bg-black text-white text-[11px] px-2 py-1 flex items-center">প্রাপ্ত নম্বর</div>
                           <div className="w-16"></div>
                         </div>
                       )}
@@ -1192,17 +1506,17 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       <div className="absolute top-6 right-0 text-right">
                         {showSetCode && (
                           <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
-                            <span {...getEditableProps("flex-1 text-center py-0.5")}>সেট</span>
-                            <span {...getEditableProps("border-l border-black flex-1 text-center py-0.5")}>{activeSetCode}</span>
+                            <span className="flex-1 text-center py-0.5">সেট</span>
+                            <span className="border-l border-black flex-1 text-center py-0.5">{activeSetCode}</span>
                           </div>
                         )}
                         {showSubjectCode && (
                           <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
-                            <span {...getEditableProps()}>বিষয় কোড :</span>
+                            <span>বিষয় কোড :</span>
                             <div className="flex">
-                              <span {...getEditableProps("border border-black w-5 h-6 flex items-center justify-center")}>০</span>
-                              <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
-                              <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                              <span className="border border-black w-5 h-6 flex items-center justify-center">০</span>
+                              <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
+                              <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
                             </div>
                           </div>
                         )}
@@ -1210,392 +1524,84 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                       {/* Center Info */}
                       <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
-                        {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle}</h1>}
-                        {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress}</p>}
-                        {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName}</h2>}
-                        {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName}</h3>}
-                        {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName}</h4>}
+                        {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle}</h1>}
+                        {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress}</p>}
+                        {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName}</h2>}
+                        {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName}</h3>}
+                        {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName}</h4>}
                       </div>
                     </div>
 
-                    {format !== 'answer' && (
-                      <>
-                        {/* Rules */}
-                        {showInstructions && (
-                          <>
-                            <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
-                              <span {...getEditableProps()}>সময়— {headerTime || convertToBengaliNumber(questions.length)} মিনিট</span>
-                              <span {...getEditableProps()}>পূর্ণমান— {headerMarks || convertToBengaliNumber(questions.length)}</span>
+                    <hr className="border-t border-gray-200 my-6" />
+
+                    <h2 className="text-[20px] font-bold text-center text-red-500 mb-10">
+                      নিচে উত্তরপত্র
+                    </h2>
+
+                    <div className="flex w-full gap-3 justify-center">
+                      {Array.from({ length: answerKeyColumns }).map((_, colIndex) => {
+                        const baseCount = Math.floor(questions.length / answerKeyColumns);
+                        const remainder = questions.length % answerKeyColumns;
+                        const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
+
+                        let startIndex = 0;
+                        for (let i = 0; i < colIndex; i++) {
+                          startIndex += baseCount + (i < remainder ? 1 : 0);
+                        }
+
+                        const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
+
+                        const getMarker = (idx: number, type: string) => {
+                          if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                          if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                          if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                          if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                          return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                        };
+
+                        return (
+                          <div
+                            key={colIndex}
+                            className="flex-1 flex flex-col"
+                          >
+                            {/* Table Header */}
+                            <div className="flex w-full border border-red-500 mb-1">
+                              <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
+                              <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
                             </div>
 
-                            <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
-                              <p {...getEditableProps()}>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
-                              <p {...getEditableProps("mt-1 font-bold")}>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
-                            </div>
-                          </>
-                        )}
+                            {/* Rows */}
+                            <div className="flex flex-col gap-1">
+                              {colItems.map(({ q, originalIndex }) => {
+                                const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
 
-                        {/* Candidate Info */}
-                        {showCandidateInfo && (
-                          <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
-                            <div className="flex-1 flex">
-                              <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
-                              <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
-                            </div>
-                            <div className="w-[300px] flex">
-                              <span className="whitespace-nowrap">রোলঃ</span>
-                              <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <hr className="border-t-[1.5px] border-gray-300 mb-6" />
-
-                    {format === 'answer' && (
-                      <div className="text-center mb-6">
-                        <h3 className="text-lg font-bold text-red-500">নিচে উত্তরপত্র</h3>
-                      </div>
-                    )}
-
-                    {/* QUESTIONS OR ANSWERS */}
-                    {format === 'answer' && optionStyle === 'uttarmala' ? (
-                      <div className="mt-4 mb-10 overflow-x-auto">
-                        <span className="text-sm font-bold text-gray-800 block mb-2">উত্তর মালা:</span>
-                        <table className="border-collapse border border-gray-300 text-center text-sm">
-                          <tbody>
-                            <tr>
-                              <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">প্রশ্ন</td>
-                              {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => (
-                                <td key={`q-${idx}`} className="border border-gray-300 px-3 py-2 font-bold">{convertToBengaliNumber(idx + 1)}.</td>
-                              ))}
-                            </tr>
-                            <tr>
-                              <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">উত্তর</td>
-                              {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => {
-                                const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
-                                const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
                                 return (
-                                  <td key={`a-${idx}`} className="border border-gray-300 px-3 py-2">{marker}</td>
+                                  <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
+                                    <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
+                                      {convertToBengaliNumber(originalIndex + 1)}
+                                    </div>
+                                    <div className="flex-1 flex bg-white min-w-0">
+                                      {[0, 1, 2, 3].map((optIdx) => {
+                                        const isCorrect = optIdx === correctOptIndex;
+                                        return (
+                                          <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
+                                            <div className={`relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border ${isCorrect ? 'border-[#1e293b] bg-[#1e293b]' : 'border-red-500 bg-white'}`}>
+                                              <span className={`text-[10px] font-bold absolute select-none leading-none pt-px ${isCorrect ? 'text-white' : 'text-gray-800'}`}>
+                                                {getMarker(optIdx, optionLabelType)}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
                                 );
                               })}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : format === 'answer' ? (
-                      <div
-                        className="text-justify mb-10"
-                        style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
-                      >
-                        {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, index) => {
-                          const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
-                          const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
-
-                          return (
-                            <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex flex-col gap-1 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
-                              <div className="flex items-center gap-2">
-                                <span>{convertToBengaliNumber(index + 1)}.</span>
-                                {optionStyle === 'u' && <span>উঃ {marker}</span>}
-                                {optionStyle === 'ans' && <span>Ans: {marker}</span>}
-                                {(optionStyle === 'ka' || optionStyle === 'circle') && (
-                                  <span className="inline-flex items-center justify-center w-[20px] h-[20px] rounded-full bg-gray-800 text-white text-[12px] leading-none pb-[1px]">{marker}</span>
-                                )}
-                              </div>
-                              {showExplanations && q.explanation && (
-                                <div className="text-sm text-gray-600 font-normal mt-1 border-l-2 border-gray-300 pl-2">
-                                  <span className="font-bold text-gray-700">ব্যাখ্যা:</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
-                                </div>
-                              )}
                             </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div
-                        className="text-justify"
-                        style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
-                      >
-                        {questions.map((q, index) => {
-                          const isSectionHeader = q.questionText.startsWith('[[SECTION_HEADER]]');
-                          const sectionTitle = isSectionHeader ? q.questionText.replace('[[SECTION_HEADER]]', '') : '';
-                          const actualQuestionIndex = questions.slice(0, index + 1).filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).length - 1;
-
-                          return (
-                          <div 
-                            key={q.id} 
-                            className={`relative text-gray-900 leading-snug break-inside-avoid ${draggedIndex === index ? 'opacity-50' : ''}`} 
-                            style={{ 
-                              marginBottom: `${rowGap}px`, 
-                              fontSize: `${fontSize}px`,
-                              ...(isSectionHeader ? { columnSpan: 'all', WebkitColumnSpan: 'all' } : {})
-                            }}
-                            draggable={editingMode}
-                            onDragStart={(e) => handleDragStart(e, index)}
-                            onDragEnd={handleDragEnd}
-                            onDragOver={(e) => handleDragOver(e, index)}
-                          >
-                            {editingMode && (
-                              <div className="absolute -left-8 top-0 flex flex-col gap-1 print:hidden opacity-50 hover:opacity-100 transition-opacity">
-                                <button className="cursor-grab hover:text-blue-500"><GripVertical className="w-4 h-4" /></button>
-                                <button onClick={() => handleDeleteQuestion(index)} className="hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                              </div>
-                            )}
-
-                            {isSectionHeader ? (
-                              <div className="font-bold text-center my-4 pb-1 border-b-2 border-gray-800 text-[110%] print:break-after-avoid">
-                                {sectionTitle}
-                              </div>
-                            ) : (
-                              <>
-                                <div className="flex items-start gap-1.5 mb-2">
-                                  <span className="font-bold min-w-[18px]">{convertToBengaliNumber(actualQuestionIndex + 1)}.</span>
-                                  <div className="flex-1 flex flex-col gap-1">
-                                    <div
-                                      {...getEditableProps()}
-                                      dangerouslySetInnerHTML={{ __html: q.questionText }}
-                                    />
-                                    {(showQuestionTags && q.tags && q.tags.length > 0) && (
-                                      <div className="flex gap-1 flex-wrap mt-1">
-                                        {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
-                                      </div>
-                                    )}
-                                  </div>
-                                  {showQuestionMarks && (
-                                    <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{convertToBengaliNumber(q.marks || 1)}]</span>
-                                  )}
-                                </div>
-
-                                {/* Options */}
-                                {q.options && (
-                                  <div
-                                    className="grid gap-x-2 pl-6"
-                                    style={{ 
-                                      gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))`,
-                                      rowGap: `${questionOptionGap}px`
-                                    }}
-                                  >
-                                    {['a', 'b', 'c', 'd'].map((optKey, idx) => {
-                                      const optValue = (q.options as any)[optKey];
-                                      if (!optValue) return null;
-
-                                      const getMarker = (idx: number, type: string) => {
-                                        if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                        if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                                        if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                                        if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                                        return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                      };
-                                      const marker = getMarker(idx, optionLabelType);
-                                      const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
-
-                                      return (
-                                        <div key={optKey} className="flex items-start gap-1.5">
-                                          <span className="shrink-0 mt-[1px]">
-                                            {optionShape === 'circle' ? (
-                                              <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
-                                            ) : optionShape === 'parens' ? (
-                                              <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
-                                            ) : optionShape === 'paren' ? (
-                                              <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
-                                            ) : (
-                                              <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
-                                            )}
-                                          </span>
-                                          <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
-                                            {optValue}
-                                          </span>
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                )}
-                              </>
-                            )}
                           </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                    
-                    {editingMode && (
-                      <div className="mt-8 flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6">
-                        <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => setIsAddQuestionOpen(true)}>
-                          <PlusCircle className="w-4 h-4 mr-2" /> কাস্টম প্রশ্ন যোগ করুন
-                        </Button>
-                        <Button variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => setIsSectionHeaderOpen(true)}>
-                          <Layers className="w-4 h-4 mr-2" /> নতুন সেকশন/বিভাগ যোগ
-                        </Button>
-                      </div>
-                    )}
-
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Page 2: Answer Key Sheet */}
-          {!loading && showAnswerKeySheet && (
-            <div
-              className="preview-page-container relative flex flex-col mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
-              style={{
-                fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
-                  fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
-                    fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
-                      fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
-                        fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
-                          fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
-                            fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
-              }}
-            >
-              <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
-                {/* Watermark for Answer Key */}
-                {brandingEnabled && (
-                  <div
-                    className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
-                    style={{ opacity: watermarkOpacity / 100 }}
-                  >
-                    {watermarkRepeat ? (
-                      <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
-                        {Array.from({ length: watermarkRepeatCount }).map((_, i) => (
-                          <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
-                            {watermarkImage ? (
-                              <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
-                            ) : (
-                              <span className="select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
-                                {watermarkText || 'দেশ এক্সাম একাডেমী'}
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        {watermarkImage ? (
-                          <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
-                        ) : (
-                          <span className="-rotate-45 select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
-                            {watermarkText || 'দেশ এক্সাম একাডেমী'}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                <div className="relative z-10 flex-1 flex flex-col">
-                        {/* Duplicate Header Block */}
-                        <div className="relative mb-4">
-                          {/* Left: Marks Box */}
-                          {showMarksBox && (
-                            <div className="absolute top-8 left-0 flex border border-black">
-                              <div className="bg-black text-white text-[11px] px-2 py-1 flex items-center">প্রাপ্ত নম্বর</div>
-                              <div className="w-16"></div>
-                            </div>
-                          )}
-
-                          {/* Right: Set & Subject Code */}
-                          <div className="absolute top-6 right-0 text-right">
-                            {showSetCode && (
-                              <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
-                                <span className="flex-1 text-center py-0.5">সেট</span>
-                                <span className="border-l border-black flex-1 text-center py-0.5">{activeSetCode}</span>
-                              </div>
-                            )}
-                            {showSubjectCode && (
-                              <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
-                                <span>বিষয় কোড :</span>
-                                <div className="flex">
-                                  <span className="border border-black w-5 h-6 flex items-center justify-center">০</span>
-                                  <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
-                                  <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Center Info */}
-                          <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
-                            {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle}</h1>}
-                            {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress}</p>}
-                            {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName}</h2>}
-                            {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName}</h3>}
-                            {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName}</h4>}
-                          </div>
-                        </div>
-
-                        <hr className="border-t border-gray-200 my-6" />
-
-                        <h2 className="text-[20px] font-bold text-center text-red-500 mb-10">
-                          নিচে উত্তরপত্র
-                        </h2>
-
-                        <div className="flex w-full gap-3 justify-center">
-                          {Array.from({ length: answerKeyColumns }).map((_, colIndex) => {
-                            const baseCount = Math.floor(questions.length / answerKeyColumns);
-                            const remainder = questions.length % answerKeyColumns;
-                            const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
-
-                            let startIndex = 0;
-                            for (let i = 0; i < colIndex; i++) {
-                              startIndex += baseCount + (i < remainder ? 1 : 0);
-                            }
-
-                            const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
-
-                            const getMarker = (idx: number, type: string) => {
-                              if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                              if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                              if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                              if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                              return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                            };
-
-                            return (
-                              <div
-                                key={colIndex}
-                                className="flex-1 flex flex-col"
-                              >
-                                {/* Table Header */}
-                                <div className="flex w-full border border-red-500 mb-1">
-                                  <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
-                                  <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
-                                </div>
-                                
-                                {/* Rows */}
-                                <div className="flex flex-col gap-1">
-                                  {colItems.map(({ q, originalIndex }) => {
-                                    const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
-                                    
-                                    return (
-                                      <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
-                                        <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
-                                          {convertToBengaliNumber(originalIndex + 1)}
-                                        </div>
-                                        <div className="flex-1 flex bg-white min-w-0">
-                                          {[0, 1, 2, 3].map((optIdx) => {
-                                            const isCorrect = optIdx === correctOptIndex;
-                                            return (
-                                              <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
-                                                <div className={`relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border ${isCorrect ? 'border-[#1e293b] bg-[#1e293b]' : 'border-red-500 bg-white'}`}>
-                                                  <span className={`text-[10px] font-bold absolute select-none leading-none pt-px ${isCorrect ? 'text-white' : 'text-gray-800'}`}>
-                                                    {getMarker(optIdx, optionLabelType)}
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        );
+                      })}
+                    </div>
 
                   </div>
                 </div>
@@ -1618,141 +1624,141 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               >
                 <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
                   <div className="relative z-10 font-sans flex-1 flex flex-col">
-                        <div className="border-2 border-gray-800 p-8 rounded-xl relative bg-white">
-                          {/* OMR Header */}
-                          <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
-                            <div className="flex flex-col gap-5 w-2/3">
-                              <h2 className="text-3xl font-black text-gray-800 tracking-wider">OMR ANSWER SHEET</h2>
-                              <div className="flex items-center gap-4 text-sm font-bold mt-2">
-                                <span className="w-32 text-gray-700">STUDENT NAME</span>
-                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                              </div>
-                              <div className="flex items-center gap-4 text-sm font-bold">
-                                <span className="w-32 text-gray-700">ROLL NO</span>
-                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                              </div>
-                              <div className="flex items-center gap-4 text-sm font-bold">
-                                <span className="w-32 text-gray-700">CLASS</span>
-                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                                <span className="w-20 text-right text-gray-700">SUBJECT</span>
-                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                              </div>
-                              <div className="flex items-center gap-4 text-sm font-bold">
-                                <span className="w-32 text-gray-700">EXAM DATE</span>
-                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                                <span className="w-20 text-right text-gray-700">SET CODE</span>
-                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                              </div>
-                            </div>
-                            <div className="w-1/3 flex justify-end">
-                              <div className="border-2 border-gray-800 p-2 w-32 h-32 flex flex-col items-center justify-center rounded-lg text-center bg-gray-50">
-                                <div className="text-xs font-bold text-gray-500 mb-1">INVG. SIGN</div>
-                                <div className="w-full h-16 border-b border-gray-300 border-dashed"></div>
-                              </div>
-                            </div>
+                    <div className="border-2 border-gray-800 p-8 rounded-xl relative bg-white">
+                      {/* OMR Header */}
+                      <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
+                        <div className="flex flex-col gap-5 w-2/3">
+                          <h2 className="text-3xl font-black text-gray-800 tracking-wider">OMR ANSWER SHEET</h2>
+                          <div className="flex items-center gap-4 text-sm font-bold mt-2">
+                            <span className="w-32 text-gray-700">STUDENT NAME</span>
+                            <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
-
-                          {/* Instructions */}
-                          <div className="mb-10 border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-sm">
-                            <h3 className="font-bold text-[13px] mb-3 text-gray-800">INSTRUCTIONS FOR FILLING THE SHEET</h3>
-                            <div className="flex items-center gap-8 text-[12px] font-medium text-gray-600">
-                              <div className="flex items-center gap-3">
-                                <span className="text-green-600 font-bold">CORRECT:</span>
-                                <div className="w-6 h-6 rounded-full bg-gray-800"></div>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <span className="text-red-500 font-bold">WRONG:</span>
-                                <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
-                                  <div className="w-7 h-0.5 bg-gray-800 rotate-45 absolute"></div>
-                                  <div className="w-7 h-0.5 bg-gray-800 -rotate-45 absolute"></div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
-                                  <div className="w-3 h-3 rounded-full bg-gray-800"></div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
-                                  <svg className="w-4 h-4 text-gray-800 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                                </div>
-                              </div>
-                              <div className="ml-auto flex items-center gap-2 text-red-600 bg-red-50 px-3 py-1.5 rounded-md border border-red-100">
-                                <Edit className="w-4 h-4" />
-                                <span>Use only Black/Blue Ball Point Pen</span>
-                              </div>
-                            </div>
+                          <div className="flex items-center gap-4 text-sm font-bold">
+                            <span className="w-32 text-gray-700">ROLL NO</span>
+                            <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
-
-                          {/* OMR Bubbles Grid */}
-                          <div className="flex w-full gap-3 justify-center">
-                            {Array.from({ length: 4 }).map((_, colIndex) => {
-                              const baseCount = Math.floor(questions.length / 4);
-                              const remainder = questions.length % 4;
-                              const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
-
-                              let startIndex = 0;
-                              for (let i = 0; i < colIndex; i++) {
-                                startIndex += baseCount + (i < remainder ? 1 : 0);
-                              }
-
-                              const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
-
-                              const getMarker = (idx: number, type: string) => {
-                                if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                                if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                                if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                                return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                              };
-
-                              return (
-                                <div
-                                  key={colIndex}
-                                  className="flex-1 flex flex-col"
-                                >
-                                  {/* Table Header */}
-                                  <div className="flex w-full border border-red-500 mb-1">
-                                    <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
-                                    <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
-                                  </div>
-                                  
-                                  {/* Rows */}
-                                  <div className="flex flex-col gap-1">
-                                    {colItems.map(({ q, originalIndex }, idx) => {
-                                      return (
-                                        <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
-                                          <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
-                                            {convertToBengaliNumber(originalIndex + 1)}
-                                          </div>
-                                          <div className="flex-1 flex bg-white min-w-0">
-                                            {[0, 1, 2, 3].map((optIdx) => (
-                                              <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
-                                                <div className="relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border border-red-500 bg-white">
-                                                  <span className="text-[10px] font-bold text-gray-800 absolute select-none leading-none pt-px">{getMarker(optIdx, optionLabelType)}</span>
-                                                </div>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              );
-                            })}
+                          <div className="flex items-center gap-4 text-sm font-bold">
+                            <span className="w-32 text-gray-700">CLASS</span>
+                            <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                            <span className="w-20 text-right text-gray-700">SUBJECT</span>
+                            <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm font-bold">
+                            <span className="w-32 text-gray-700">EXAM DATE</span>
+                            <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                            <span className="w-20 text-right text-gray-700">SET CODE</span>
+                            <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
                         </div>
-
-                        {/* Footer Logo */}
-                        <div className="mt-auto pt-4 border-t border-gray-300 flex justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 print:hidden">
-                          সৌজন্যে: DeshExam
+                        <div className="w-1/3 flex justify-end">
+                          <div className="border-2 border-gray-800 p-2 w-32 h-32 flex flex-col items-center justify-center rounded-lg text-center bg-gray-50">
+                            <div className="text-xs font-bold text-gray-500 mb-1">INVG. SIGN</div>
+                            <div className="w-full h-16 border-b border-gray-300 border-dashed"></div>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Instructions */}
+                      <div className="mb-10 border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-sm">
+                        <h3 className="font-bold text-[13px] mb-3 text-gray-800">INSTRUCTIONS FOR FILLING THE SHEET</h3>
+                        <div className="flex items-center gap-8 text-[12px] font-medium text-gray-600">
+                          <div className="flex items-center gap-3">
+                            <span className="text-green-600 font-bold">CORRECT:</span>
+                            <div className="w-6 h-6 rounded-full bg-gray-800"></div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-red-500 font-bold">WRONG:</span>
+                            <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                              <div className="w-7 h-0.5 bg-gray-800 rotate-45 absolute"></div>
+                              <div className="w-7 h-0.5 bg-gray-800 -rotate-45 absolute"></div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                              <div className="w-3 h-3 rounded-full bg-gray-800"></div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                              <svg className="w-4 h-4 text-gray-800 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                          </div>
+                          <div className="ml-auto flex items-center gap-2 text-red-600 bg-red-50 px-3 py-1.5 rounded-md border border-red-100">
+                            <Edit className="w-4 h-4" />
+                            <span>Use only Black/Blue Ball Point Pen</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* OMR Bubbles Grid */}
+                      <div className="flex w-full gap-3 justify-center">
+                        {Array.from({ length: 4 }).map((_, colIndex) => {
+                          const baseCount = Math.floor(questions.length / 4);
+                          const remainder = questions.length % 4;
+                          const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
+
+                          let startIndex = 0;
+                          for (let i = 0; i < colIndex; i++) {
+                            startIndex += baseCount + (i < remainder ? 1 : 0);
+                          }
+
+                          const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
+
+                          const getMarker = (idx: number, type: string) => {
+                            if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                            if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                            if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                            if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                            return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                          };
+
+                          return (
+                            <div
+                              key={colIndex}
+                              className="flex-1 flex flex-col"
+                            >
+                              {/* Table Header */}
+                              <div className="flex w-full border border-red-500 mb-1">
+                                <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
+                                <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
+                              </div>
+
+                              {/* Rows */}
+                              <div className="flex flex-col gap-1">
+                                {colItems.map(({ q, originalIndex }, idx) => {
+                                  return (
+                                    <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
+                                      <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
+                                        {convertToBengaliNumber(originalIndex + 1)}
+                                      </div>
+                                      <div className="flex-1 flex bg-white min-w-0">
+                                        {[0, 1, 2, 3].map((optIdx) => (
+                                          <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
+                                            <div className="relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border border-red-500 bg-white">
+                                              <span className="text-[10px] font-bold text-gray-800 absolute select-none leading-none pt-px">{getMarker(optIdx, optionLabelType)}</span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Footer Logo */}
+                    <div className="mt-auto pt-4 border-t border-gray-300 flex justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 print:hidden">
+                      সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}
+                    </div>
                   </div>
                 </div>
               </div>
             )}
-            
+
           </div>
 
           {/* Action button beneath paper (hidden in print) */}
@@ -1883,14 +1889,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="flex gap-2 mb-2 p-1 bg-gray-100 rounded-md w-fit">
-              <button 
-                onClick={() => setAddQuestionMode('single')} 
+              <button
+                onClick={() => setAddQuestionMode('single')}
                 className={`px-4 py-1.5 text-sm rounded ${addQuestionMode === 'single' ? 'bg-white text-blue-700 shadow-sm font-medium' : 'text-gray-600 hover:text-gray-900'}`}
               >
                 সিঙ্গেল প্রশ্ন
               </button>
-              <button 
-                onClick={() => setAddQuestionMode('bulk')} 
+              <button
+                onClick={() => setAddQuestionMode('bulk')}
                 className={`px-4 py-1.5 text-sm rounded ${addQuestionMode === 'bulk' ? 'bg-white text-blue-700 shadow-sm font-medium' : 'text-gray-600 hover:text-gray-900'}`}
               >
                 বাল্ক ইমপোর্ট (Bulk)
@@ -1901,18 +1907,18 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">প্রশ্ন</label>
-                  <Input value={customQuestion.text} onChange={e => setCustomQuestion({...customQuestion, text: e.target.value})} placeholder="প্রশ্ন লিখুন..." />
+                  <Input value={customQuestion.text} onChange={e => setCustomQuestion({ ...customQuestion, text: e.target.value })} placeholder="প্রশ্ন লিখুন..." />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="text-xs mb-1 block">অপশন A (ক)</label><Input value={customQuestion.optA} onChange={e => setCustomQuestion({...customQuestion, optA: e.target.value})} /></div>
-                  <div><label className="text-xs mb-1 block">অপশন B (খ)</label><Input value={customQuestion.optB} onChange={e => setCustomQuestion({...customQuestion, optB: e.target.value})} /></div>
-                  <div><label className="text-xs mb-1 block">অপশন C (গ)</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({...customQuestion, optC: e.target.value})} /></div>
-                  <div><label className="text-xs mb-1 block">অপশন D (ঘ)</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({...customQuestion, optD: e.target.value})} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন A (ক)</label><Input value={customQuestion.optA} onChange={e => setCustomQuestion({ ...customQuestion, optA: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন B (খ)</label><Input value={customQuestion.optB} onChange={e => setCustomQuestion({ ...customQuestion, optB: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন C (গ)</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({ ...customQuestion, optC: e.target.value })} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন D (ঘ)</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({ ...customQuestion, optD: e.target.value })} /></div>
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">সঠিক উত্তর</label>
-                  <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({...customQuestion, correctAnswer: v})}>
-                    <SelectTrigger><SelectValue/></SelectTrigger>
+                  <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({ ...customQuestion, correctAnswer: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="a">A (ক)</SelectItem>
                       <SelectItem value="b">B (খ)</SelectItem>
@@ -1926,27 +1932,41 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div>
                 <label className="text-sm font-medium mb-1.5 block">প্রশ্নসমূহ পেস্ট করুন (Text বা JSON)</label>
                 <div className="text-[13px] text-gray-600 mb-3 bg-blue-50/50 p-3 rounded border border-blue-100 max-h-48 overflow-y-auto">
-                  <span className="font-semibold text-blue-700">টেক্সট ফরম্যাট:</span> প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ৬ষ্ঠ লাইনে "উত্তর: ক" লিখে সঠিক উত্তর দিতে পারবেন।
-                  <br/>
+                  <span className="font-semibold text-blue-700">টেক্সট ফরম্যাট:</span> প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ৬ষ্ঠ লাইনে "উত্তর: খ" লিখে সঠিক উত্তর দিতে পারবেন।
+                  <br />
                   <span className="font-semibold text-blue-700 mt-2 block">JSON ফরম্যাট (Advanced):</span>
                   <pre className="mt-1 bg-white p-2 rounded text-[11px] font-mono text-gray-700 border border-gray-200">
-{`[
+                    {`[
   {
-    "questionText": "বাংলাদেশের রাজধানী কী?",
-    "options": { "a": "ঢাকা", "b": "রাজশাহী", "c": "চট্টগ্রাম", "d": "সিলেট" },
-    "correctAnswer": "a"
+    "questionText": "ভারতের রাজধানী কী?",
+    "options": { "a": "ঢাকা", "b": "নয়াদিল্লি", "c": "কলকাতা", "d": "মুম্বাই" },
+    "correctAnswer": "b"
   }
 ]`}
                   </pre>
                 </div>
-                <textarea 
+                <textarea
                   value={bulkQuestionText}
                   onChange={e => setBulkQuestionText(e.target.value)}
-                  placeholder="১. বাংলাদেশের রাজধানী কী?&#10;ক. ঢাকা&#10;খ. রাজশাহী&#10;গ. চট্টগ্রাম&#10;ঘ. সিলেট&#10;উত্তর: ক&#10;&#10;২. জাতীয় পাখি কী?&#10;ক. দোয়েল&#10;খ. ময়না&#10;..."
+                  placeholder="১. ভারতের রাজধানী কী?&#10;ক. ঢাকা&#10;খ. নয়াদিল্লি&#10;গ. কলকাতা&#10;ঘ. মুম্বাই&#10;উত্তর: খ&#10;&#10;২. ভারতের জাতীয় পাখি কী?&#10;ক. দোয়েল&#10;খ. ময়ূর&#10;..."
                   className="w-full h-64 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                 />
               </div>
             )}
+
+            <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+              <input
+                type="checkbox"
+                id="forceNewColumn"
+                checked={forceNewColumn}
+                onChange={e => setForceNewColumn(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <label htmlFor="forceNewColumn" className="text-[13px] font-medium text-gray-700 cursor-pointer">
+                নতুন কলাম/রো থেকে শুরু করুন (Force New Column/Row)
+              </label>
+            </div>
+
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddQuestionOpen(false)}>বাতিল</Button>
