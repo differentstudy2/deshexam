@@ -139,10 +139,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full p-4 gap-6 relative print:p-0 print:m-0 print:static">
 
         {/* LEFT SIDEBAR - SETTINGS */}
-        <aside className="w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit sticky top-24 print:hidden shrink-0">
+        <aside className="w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-[calc(100vh-120px)] overflow-y-auto sticky top-24 print:hidden shrink-0">
 
           {/* Header */}
-          <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center">
+          <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
             <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> ফিল্টার সেটিংস</h3>
             <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs">
               <Save className="w-3 h-3 mr-1" /> সংরক্ষণ
