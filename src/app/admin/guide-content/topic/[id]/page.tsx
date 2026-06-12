@@ -259,8 +259,8 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
       <div className="flex flex-col lg:flex-row gap-6">
         
         {/* Left Sidebar Tabs */}
-        <div className="w-full lg:w-64 shrink-0">
-          <Card className="border-slate-200 dark:border-slate-800 shadow-sm h-full">
+        <div className="w-full lg:w-64 shrink-0 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full">
+          <Card className="border-slate-200 dark:border-slate-800 shadow-sm min-h-min">
             <CardContent className="p-3">
               <div className="space-y-6">
                 {sectionCategories.map((category, catIdx) => (

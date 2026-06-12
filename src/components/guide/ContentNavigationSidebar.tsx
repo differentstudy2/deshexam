@@ -28,7 +28,7 @@ export function ContentNavigationSidebar({ curriculum, activeId, subjectTitle }:
 
   return (
     <div className="w-[350px] shrink-0 bg-white dark:bg-[#020817] border-r border-slate-200 dark:border-slate-800 hidden lg:block pr-2">
-      <div className="flex flex-col h-[calc(100vh-120px)] sticky top-[120px] pt-0">
+      <div className="flex flex-col h-[calc(100vh-3rem)] sticky top-6 pt-0">
         {/* Search Header */}
         <div className="bg-slate-100 dark:bg-slate-800/50 border-l-4 border-[#107c41] dark:border-emerald-500 p-2 shrink-0">
           <div className="relative">

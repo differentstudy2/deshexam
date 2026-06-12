@@ -100,7 +100,7 @@ export function ReadingLayout({
         </div>
 
         {/* Right Sections Sidebar */}
-        <div className="w-[300px] shrink-0 hidden lg:block sticky top-8 self-start">
+        <div className="w-[300px] shrink-0 hidden lg:block sticky top-6 self-start max-h-[calc(100vh-3rem)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full pr-1">
           <TopicSectionsSidebar sections={data.sections} />
         </div>
 
