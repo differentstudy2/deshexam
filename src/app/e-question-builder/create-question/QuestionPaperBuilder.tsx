@@ -791,16 +791,43 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               .preview-page-padding {
                 padding: 0 !important; /* Let @page handle print margins */
               }
+              body {
+                counter-reset: preview-page;
+              }
+              .preview-page-container {
+                counter-increment: preview-page;
+              }
+              .page-number-display::after {
+                content: "পৃষ্ঠা " counter(preview-page, bengali);
+              }
+              .print-page-number-display {
+                display: none !important;
+              }
               @page {
                 size: ${paperSize === 'A4' ? 'A4' : paperSize === 'Letter' ? 'letter' : 'legal'} ${orientation.toLowerCase()};
-                margin: ${margins.top || '0'}in ${margins.right || '0'}in ${margins.bottom || '0'}in ${margins.left || '0'}in;
+                margin: ${margins.top || '0'}in ${margins.right || '0'}in ${margins.bottom || '0.5'}in ${margins.left || '0'}in;
+                ${showPageNumber ? `
+                @bottom-right {
+                  content: "পৃষ্ঠা " counter(page, bengali);
+                  font-size: 12px;
+                  font-weight: bold;
+                }
+                ` : ''}
               }
             }
           `}} />
           <div id="printable-paper" className="flex flex-col gap-8 print:gap-0 print:block">
+            {/* Fixed Print Footer (Repeats on every printed page) */}
+            <div 
+              className="hidden print:flex fixed bottom-0 left-0 right-0 w-full justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
+            >
+              <div>সৌজন্যে: DeshExam</div>
+              {showPageNumber && <div className="print-page-number-display"></div>}
+            </div>
+
             {/* Page 1: Main Paper */}
             <div
-              className="preview-page-container relative mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
+              className="preview-page-container relative flex flex-col mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
               style={{
                 fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
                   fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
@@ -811,7 +838,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
               }}
             >
-              <div className="preview-page-padding relative transition-all duration-300">
+              <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300">
 
               {loading ? (
                 <div className="flex justify-center items-center h-64 print:hidden">
@@ -855,7 +882,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     </div>
                   )}
 
-                  <div className="relative z-10">
+                  <div className="relative z-10 flex-1 flex flex-col">
                     {/* Header Image */}
                     {headerImageEnabled && headerImage && (
                       <div className="w-full mb-6">
@@ -1073,10 +1100,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
                     )}
                     
-                    {/* Footer Logo */}
-                    <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
-                      সৌজন্যে: DeshExam
-                    </div>
+
                   </div>
                 </>
               )}
@@ -1086,7 +1110,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           {/* Page 2: Answer Key Sheet */}
           {!loading && showAnswerKeySheet && (
             <div
-              className="preview-page-container relative mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
+              className="preview-page-container relative flex flex-col mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
               style={{
                 fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
                   fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
@@ -1097,7 +1121,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
               }}
             >
-              <div className="preview-page-padding relative transition-all duration-300 h-full">
+              <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
                 {/* Watermark for Answer Key */}
                 {brandingEnabled && (
                   <div
@@ -1132,7 +1156,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   </div>
                 )}
                 
-                <div className="relative z-10">
+                <div className="relative z-10 flex-1 flex flex-col">
                         {/* Duplicate Header Block */}
                         <div className="relative mb-4">
                           {/* Left: Marks Box */}
@@ -1243,10 +1267,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             );
                           })}
                         </div>
-                    {/* Footer Logo */}
-                    <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
-                      সৌজন্যে: DeshExam
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -1255,7 +1276,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             {/* Page 3: OMR Sheet Attachment */}
             {!loading && showOMRSheetAttachment && (
               <div
-                className="preview-page-container relative mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
+                className="preview-page-container relative flex flex-col mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
                 style={{
                   fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
                     fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
@@ -1266,8 +1287,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                               fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
                 }}
               >
-                <div className="preview-page-padding relative transition-all duration-300 h-full">
-                  <div className="relative z-10 font-sans">
+                <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
+                  <div className="relative z-10 font-sans flex-1 flex flex-col">
                         <div className="border-2 border-gray-800 p-8 rounded-xl relative bg-white">
                           {/* OMR Header */}
                           <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
@@ -1395,7 +1416,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         </div>
 
                         {/* Footer Logo */}
-                        <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
+                        <div className="mt-auto pt-4 border-t border-gray-300 flex justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 print:hidden">
                           সৌজন্যে: DeshExam
                         </div>
                   </div>
