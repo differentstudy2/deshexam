@@ -312,7 +312,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                 <div className="animate-in fade-in duration-300">
                   <TopicDocumentManager topicId={topicId} />
                 </div>
-              ) : !['word_meaning', 'mcq', 'audio'].includes(activeTab) ? (
+              ) : ['lesson', 'guide_content', 'objective', 'introduction', 'author', 'explanation', 'exercise', 'notes', 'solutions'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TiptapEditor 
                     key={activeTab}
@@ -403,7 +403,7 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                     Add Another {activeTab.toUpperCase()}
                   </Button>
                 </div>
-              ) : ['mcq', 'creative_question', 'short_question', 'model_test'].includes(activeTab) ? (
+              ) : ['mcq', 'creative_question', 'short_question', 'model_test', 'practice_sets', 'quizzes', 'mock_tests', 'exams_papers'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TopicQuestionManager topicId={topicId} tabType={activeTab} />
                 </div>

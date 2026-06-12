@@ -42,8 +42,13 @@ export function TopicQuestionManager({ topicId, tabType }: TopicQuestionManagerP
   
   const mapTabToQuestionType = (tab: string) => {
       if (tab === 'mcq') return 'MCQ';
-      if (tab === 'creative_question') return 'Creative';
-      if (tab === 'short_question') return 'Short Answer';
+      if (tab === 'creative_question') return 'Creative Question'; // Fixed to match QuestionType
+      if (tab === 'short_question') return 'Short Question';       // Fixed to match QuestionType
+      if (tab === 'model_test') return 'Model Test';
+      if (tab === 'practice_sets') return 'Practice Set';
+      if (tab === 'quizzes') return 'Quiz';
+      if (tab === 'mock_tests') return 'Mock Test';
+      if (tab === 'exams_papers') return 'Exam Paper';
       return 'MCQ'; // default
   };
   

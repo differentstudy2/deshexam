@@ -128,7 +128,7 @@ const adminNavGroups = [
   {
     title: "Assessment Center",
     items: [
-      { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/admin/question-bank/questions', label: 'Question Bank', icon: <ClipboardList className="h-4 w-4" /> },
       { href: '/admin/question-bank/categories', label: 'Categories', icon: <BookOpen className="h-4 w-4" /> },
       { href: '/admin/assessment-center/practice-sets', label: 'Practice Sets', icon: <Activity className="h-4 w-4" /> },
       { href: '/admin/assessment-center/quizzes', label: 'Quizzes', icon: <Sparkles className="h-4 w-4" /> },

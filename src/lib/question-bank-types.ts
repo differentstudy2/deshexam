@@ -9,7 +9,12 @@ export type QuestionType =
   | 'Matching'
   | 'Creative Question'
   | 'Short Question'
-  | 'Long Question';
+  | 'Long Question'
+  | 'Model Test'
+  | 'Practice Set'
+  | 'Quiz'
+  | 'Mock Test'
+  | 'Exam Paper';
 
 // Base taxonomy node for Board -> Class -> Subject -> Textbook -> Chapter -> Topic
 export interface TaxonomyNode {
