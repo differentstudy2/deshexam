@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon, QrCode, CheckCircle } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon, QrCode, CheckCircle, CircleDot } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -58,6 +58,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [showSetCode, setShowSetCode] = useState(true);
   const [showPageNumber, setShowPageNumber] = useState(true);
   const [showAnswerKeySheet, setShowAnswerKeySheet] = useState(false);
+  const [showOMRSheetAttachment, setShowOMRSheetAttachment] = useState(false);
   const [answerKeyColumns, setAnswerKeyColumns] = useState(3);
 
   // Center & Exam Settings State
@@ -468,6 +469,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     </Select>
                   </div>
                 )}
+                <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CircleDot className="w-4 h-4 text-purple-500" /> OMR Attachment</span>
+                  <Switch checked={showOMRSheetAttachment} onCheckedChange={setShowOMRSheetAttachment} className="data-[state=checked]:bg-purple-600" />
+                </div>
               </div>
             </div>
           </div>
@@ -792,21 +797,21 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               }
             }
           `}} />
-          <div
-            id="printable-paper"
-            className="preview-page-container mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
-            style={{
-              fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
-                fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
-                  fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
-                    fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
-                      fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
-                        fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
-                          fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
-            }}
-          >
-
-            <div className="preview-page-padding relative transition-all duration-300">
+          <div id="printable-paper" className="flex flex-col gap-8 print:gap-0 print:block">
+            {/* Page 1: Main Paper */}
+            <div
+              className="preview-page-container relative mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
+              style={{
+                fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
+                  fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
+                    fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+                      fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+                        fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+                          fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
+                            fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
+              }}
+            >
+              <div className="preview-page-padding relative transition-all duration-300">
 
               {loading ? (
                 <div className="flex justify-center items-center h-64 print:hidden">
@@ -1067,10 +1072,67 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         ))}
                       </div>
                     )}
+                    
+                    {/* Footer Logo */}
+                    <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
+                      সৌজন্যে: DeshExam
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
 
-                    {/* Answer Key Sheet */}
-                    {showAnswerKeySheet && (
-                      <div className="w-full mt-16 print:mt-0 pt-8 print:pt-0 print:break-before-page relative z-10" style={{ pageBreakBefore: 'always' }}>
+          {/* Page 2: Answer Key Sheet */}
+          {!loading && showAnswerKeySheet && (
+            <div
+              className="preview-page-container relative mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
+              style={{
+                fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
+                  fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
+                    fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+                      fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+                        fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+                          fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
+                            fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
+              }}
+            >
+              <div className="preview-page-padding relative transition-all duration-300 h-full">
+                {/* Watermark for Answer Key */}
+                {brandingEnabled && (
+                  <div
+                    className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
+                    style={{ opacity: watermarkOpacity / 100 }}
+                  >
+                    {watermarkRepeat ? (
+                      <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
+                        {Array.from({ length: watermarkRepeatCount }).map((_, i) => (
+                          <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
+                            {watermarkImage ? (
+                              <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
+                            ) : (
+                              <span className="select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                                {watermarkText || 'দেশ এক্সাম একাডেমী'}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        {watermarkImage ? (
+                          <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
+                        ) : (
+                          <span className="-rotate-45 select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                            {watermarkText || 'দেশ এক্সাম একাডেমী'}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <div className="relative z-10">
                         {/* Duplicate Header Block */}
                         <div className="relative mb-4">
                           {/* Left: Marks Box */}
@@ -1117,7 +1179,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           নিচে উত্তরপত্র
                         </h2>
 
-                        <div className="flex w-full">
+                        <div className="flex w-full gap-3 justify-center">
                           {Array.from({ length: answerKeyColumns }).map((_, colIndex) => {
                             const baseCount = Math.floor(questions.length / answerKeyColumns);
                             const remainder = questions.length % answerKeyColumns;
@@ -1130,51 +1192,224 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                             const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
 
+                            const getMarker = (idx: number, type: string) => {
+                              if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                              if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                              if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                              if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                              return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                            };
+
                             return (
                               <div
                                 key={colIndex}
-                                className={`flex-1 flex flex-col gap-6 ${colIndex === 0 ? 'pr-6' : colIndex === answerKeyColumns - 1 ? 'pl-6' : 'px-6'} ${colIndex < answerKeyColumns - 1 ? 'border-r border-gray-200' : ''}`}
+                                className="flex-1 flex flex-col"
                               >
-                                {colItems.map(({ q, originalIndex }) => {
-                                  const getMarker = (idx: number, type: string) => {
-                                    if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                    if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                                    if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                                    if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                                    return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                  };
-                                  const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
-                                  const marker = correctOptIndex >= 0 ? getMarker(correctOptIndex, optionLabelType) : '-';
-
-                                  return (
-                                    <div key={q.id} className="text-[15px] font-bold flex items-center gap-3 break-inside-avoid">
-                                      <span className="text-gray-800 w-6 text-right">{convertToBengaliNumber(originalIndex + 1)}.</span>
-                                      <span className="bg-[#1e293b] text-white rounded-full w-7 h-7 flex items-center justify-center text-[13px] leading-none pt-0.5">{marker}</span>
-                                    </div>
-                                  );
-                                })}
+                                {/* Table Header */}
+                                <div className="flex w-full border border-red-500 mb-1">
+                                  <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
+                                  <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
+                                </div>
+                                
+                                {/* Rows */}
+                                <div className="flex flex-col gap-1">
+                                  {colItems.map(({ q, originalIndex }) => {
+                                    const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
+                                    
+                                    return (
+                                      <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
+                                        <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
+                                          {convertToBengaliNumber(originalIndex + 1)}
+                                        </div>
+                                        <div className="flex-1 flex bg-white min-w-0">
+                                          {[0, 1, 2, 3].map((optIdx) => {
+                                            const isCorrect = optIdx === correctOptIndex;
+                                            return (
+                                              <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
+                                                <div className={`relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border ${isCorrect ? 'border-[#1e293b] bg-[#1e293b]' : 'border-red-500 bg-white'}`}>
+                                                  <span className={`text-[10px] font-bold absolute select-none leading-none pt-px ${isCorrect ? 'text-white' : 'text-gray-800'}`}>
+                                                    {getMarker(optIdx, optionLabelType)}
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             );
                           })}
                         </div>
-                      </div>
-                    )}
-
                     {/* Footer Logo */}
                     <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
                       সৌজন্যে: DeshExam
                     </div>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+              </div>
+            )}
 
-            {/* Action button beneath paper (hidden in print) */}
-            <div className="bg-gray-50 border-t border-gray-200 p-6 text-center print:hidden rounded-b-lg">
-              <Button className="bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent font-medium shadow-sm">
-                <Plus className="w-4 h-4 mr-2" /> আরও প্রশ্ন যোগ
-              </Button>
-            </div>
+            {/* Page 3: OMR Sheet Attachment */}
+            {!loading && showOMRSheetAttachment && (
+              <div
+                className="preview-page-container relative mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300 print:break-before-page"
+                style={{
+                  fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
+                    fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
+                      fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+                        fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+                          fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+                            fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
+                              fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
+                }}
+              >
+                <div className="preview-page-padding relative transition-all duration-300 h-full">
+                  <div className="relative z-10 font-sans">
+                        <div className="border-2 border-gray-800 p-8 rounded-xl relative bg-white">
+                          {/* OMR Header */}
+                          <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
+                            <div className="flex flex-col gap-5 w-2/3">
+                              <h2 className="text-3xl font-black text-gray-800 tracking-wider">OMR ANSWER SHEET</h2>
+                              <div className="flex items-center gap-4 text-sm font-bold mt-2">
+                                <span className="w-32 text-gray-700">STUDENT NAME</span>
+                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm font-bold">
+                                <span className="w-32 text-gray-700">ROLL NO</span>
+                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm font-bold">
+                                <span className="w-32 text-gray-700">CLASS</span>
+                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                                <span className="w-20 text-right text-gray-700">SUBJECT</span>
+                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm font-bold">
+                                <span className="w-32 text-gray-700">EXAM DATE</span>
+                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                                <span className="w-20 text-right text-gray-700">SET CODE</span>
+                                <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
+                              </div>
+                            </div>
+                            <div className="w-1/3 flex justify-end">
+                              <div className="border-2 border-gray-800 p-2 w-32 h-32 flex flex-col items-center justify-center rounded-lg text-center bg-gray-50">
+                                <div className="text-xs font-bold text-gray-500 mb-1">INVG. SIGN</div>
+                                <div className="w-full h-16 border-b border-gray-300 border-dashed"></div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Instructions */}
+                          <div className="mb-10 border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-sm">
+                            <h3 className="font-bold text-[13px] mb-3 text-gray-800">INSTRUCTIONS FOR FILLING THE SHEET</h3>
+                            <div className="flex items-center gap-8 text-[12px] font-medium text-gray-600">
+                              <div className="flex items-center gap-3">
+                                <span className="text-green-600 font-bold">CORRECT:</span>
+                                <div className="w-6 h-6 rounded-full bg-gray-800"></div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className="text-red-500 font-bold">WRONG:</span>
+                                <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                                  <div className="w-7 h-0.5 bg-gray-800 rotate-45 absolute"></div>
+                                  <div className="w-7 h-0.5 bg-gray-800 -rotate-45 absolute"></div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                                  <div className="w-3 h-3 rounded-full bg-gray-800"></div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                                  <svg className="w-4 h-4 text-gray-800 absolute" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                              </div>
+                              <div className="ml-auto flex items-center gap-2 text-red-600 bg-red-50 px-3 py-1.5 rounded-md border border-red-100">
+                                <Edit className="w-4 h-4" />
+                                <span>Use only Black/Blue Ball Point Pen</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* OMR Bubbles Grid */}
+                          <div className="flex w-full gap-3 justify-center">
+                            {Array.from({ length: 4 }).map((_, colIndex) => {
+                              const baseCount = Math.floor(questions.length / 4);
+                              const remainder = questions.length % 4;
+                              const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
+
+                              let startIndex = 0;
+                              for (let i = 0; i < colIndex; i++) {
+                                startIndex += baseCount + (i < remainder ? 1 : 0);
+                              }
+
+                              const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
+
+                              const getMarker = (idx: number, type: string) => {
+                                if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                                if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                                if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                                return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                              };
+
+                              return (
+                                <div
+                                  key={colIndex}
+                                  className="flex-1 flex flex-col"
+                                >
+                                  {/* Table Header */}
+                                  <div className="flex w-full border border-red-500 mb-1">
+                                    <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
+                                    <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
+                                  </div>
+                                  
+                                  {/* Rows */}
+                                  <div className="flex flex-col gap-1">
+                                    {colItems.map(({ q, originalIndex }, idx) => {
+                                      return (
+                                        <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
+                                          <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
+                                            {convertToBengaliNumber(originalIndex + 1)}
+                                          </div>
+                                          <div className="flex-1 flex bg-white min-w-0">
+                                            {[0, 1, 2, 3].map((optIdx) => (
+                                              <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
+                                                <div className="relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border border-red-500 bg-white">
+                                                  <span className="text-[10px] font-bold text-gray-800 absolute select-none leading-none pt-px">{getMarker(optIdx, optionLabelType)}</span>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Footer Logo */}
+                        <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
+                          সৌজন্যে: DeshExam
+                        </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+          </div>
+
+          {/* Action button beneath paper (hidden in print) */}
+          <div className="bg-gray-50 border-t border-gray-200 p-6 text-center print:hidden rounded-b-lg">
+            <Button className="bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent font-medium shadow-sm">
+              <Plus className="w-4 h-4 mr-2" /> আরও প্রশ্ন যোগ
+            </Button>
           </div>
         </main>
       </div>
