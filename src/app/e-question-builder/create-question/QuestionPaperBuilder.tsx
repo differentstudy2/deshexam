@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2 } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon } from 'lucide-react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 
@@ -76,6 +76,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [watermarkRepeat, setWatermarkRepeat] = useState(false);
   const [watermarkRepeatCount, setWatermarkRepeatCount] = useState(5);
   const [watermarkFont, setWatermarkFont] = useState('sutonnymj');
+
+  // Header Image State
+  const [headerImageEnabled, setHeaderImageEnabled] = useState(false);
+  const [headerImage, setHeaderImage] = useState<string | null>(null);
+  const [headerImageFit, setHeaderImageFit] = useState('cover');
 
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
@@ -165,6 +170,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       const file = e.target.files[0];
       const url = URL.createObjectURL(file);
       setWatermarkImage(url);
+    }
+  };
+
+  const handleHeaderImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setHeaderImage(url);
     }
   };
 
@@ -598,6 +611,48 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               )}
             </div>
 
+            {/* Header Image Settings */}
+            <div className="p-4 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-bold text-[#1e88e5] flex items-center gap-2 text-[14px]">
+                  <ImageIcon className="w-4 h-4 text-[#1e88e5]" /> হেডার ইমেজ সেটিংস
+                </h4>
+                <Switch checked={headerImageEnabled} onCheckedChange={setHeaderImageEnabled} className="data-[state=checked]:bg-blue-600" />
+              </div>
+
+              {headerImageEnabled && (
+                <div className="space-y-4">
+                  {/* Header Image */}
+                  <div>
+                    <label className="text-[13px] text-gray-700 mb-2 block">হেডার ইমেজ</label>
+                    <div className="border border-gray-200 rounded-md bg-white p-1 flex items-center">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleHeaderImageUpload} 
+                        className="text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:border-0 file:text-[13px] file:bg-gray-100 file:text-gray-800 hover:file:bg-gray-200 w-full"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Image Fit */}
+                  <div>
+                    <label className="text-[13px] text-gray-700 mb-2 block">ইমেজ ফিট</label>
+                    <Select value={headerImageFit} onValueChange={setHeaderImageFit}>
+                      <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
+                        <SelectValue placeholder="ফিট নির্বাচন করুন" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cover">Cover (পুরো জায়গা ভরে)</SelectItem>
+                        <SelectItem value="contain">Contain (পুরো ইমেজ দেখাবে)</SelectItem>
+                        <SelectItem value="fill">Fill (টেনে বড় করবে)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
         </aside>
 
@@ -678,7 +733,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                               {watermarkImage ? (
                                 <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
                               ) : (
-                                <span className="font-bold select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                                <span className="select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
                                   {watermarkText || 'দেশ এক্সাম একাডেমী'}
                                 </span>
                               )}
@@ -690,7 +745,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           {watermarkImage ? (
                             <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
                           ) : (
-                            <span className="font-bold -rotate-45 select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                            <span className="-rotate-45 select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
                               {watermarkText || 'দেশ এক্সাম একাডেমী'}
                             </span>
                           )}
@@ -700,6 +755,18 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   )}
 
                   <div className="relative z-10">
+                    {/* Header Image */}
+                    {headerImageEnabled && headerImage && (
+                      <div className="w-full mb-6">
+                        <img 
+                          src={headerImage} 
+                          alt="Header Banner" 
+                          className="w-full h-32" 
+                          style={{ objectFit: headerImageFit as any }} 
+                        />
+                      </div>
+                    )}
+
                     {/* PAPER HEADER */}
                     <div className="relative mb-4">
                       {/* Left: Marks Box */}
