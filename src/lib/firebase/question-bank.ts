@@ -1,5 +1,5 @@
 import { db } from './client';
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc, documentId } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, increment, writeBatch, addDoc, documentId, startAfter } from 'firebase/firestore';
 import { TaxonomyNode, QuestionBankEntry } from '@/lib/question-bank-types';
 
 export const TAXONOMY_COLLECTIONS = {
@@ -84,6 +84,49 @@ export async function getQuestions(filters?: Record<string, any>, limitCount = 5
       });
   }
   return results;
+}
+
+export async function getQuestionsPaginated(filters?: Record<string, any>, limitCount = 50, startAfterDoc?: any) {
+  const colRef = collection(db, QUESTIONS_COLLECTION);
+  let conditions = [];
+  if (filters) {
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null && value !== '' && value !== 'all') {
+        conditions.push(where(key, '==', value));
+      }
+    }
+  }
+
+  let q;
+  if (conditions.length > 0) {
+      if (startAfterDoc) {
+          q = query(colRef, ...conditions, startAfter(startAfterDoc), limit(limitCount));
+      } else {
+          q = query(colRef, ...conditions, limit(limitCount));
+      }
+  } else {
+      if (startAfterDoc) {
+          q = query(colRef, orderBy('createdAt', 'desc'), startAfter(startAfterDoc), limit(limitCount));
+      } else {
+          q = query(colRef, orderBy('createdAt', 'desc'), limit(limitCount));
+      }
+  }
+  
+  const snapshot = await getDocs(q);
+  const results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as QuestionBankEntry);
+  
+  if (conditions.length > 0) {
+      results.sort((a, b) => {
+          const timeA = (a.createdAt as any)?.seconds || ((a.createdAt as any)?.getTime?.() / 1000) || 0;
+          const timeB = (b.createdAt as any)?.seconds || ((b.createdAt as any)?.getTime?.() / 1000) || 0;
+          return timeB - timeA;
+      });
+  }
+
+  return {
+      questions: results,
+      lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null
+  };
 }
 
 export async function getQuestion(id: string) {

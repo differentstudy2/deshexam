@@ -10,9 +10,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getQuestions, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { getQuestions, getQuestionsPaginated, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2 } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -63,6 +64,9 @@ export default function QuestionBankQuestionsPage() {
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [filters, setFilters] = useState({ boardId: 'all', classId: 'all', subjectId: 'all', textbookId: 'all', difficulty: 'all', status: 'all', isVerified: 'all' });
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
   
   // Taxonomies for dropdowns
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
@@ -151,15 +155,37 @@ export default function QuestionBankQuestionsPage() {
       }
   };
 
-  const fetchQuestions = async () => {
-    setLoading(true);
+  const fetchQuestions = async (isLoadMore = false) => {
+    if (!isLoadMore) {
+        setLoading(true);
+        setQuestions([]);
+    } else {
+        setIsBulkLoading(true);
+    }
     try {
-      const data = await getQuestions();
-      setQuestions(data);
+        const queryFilters: any = {};
+        if (filters.boardId !== 'all') queryFilters.boardId = filters.boardId;
+        if (filters.classId !== 'all') queryFilters.classId = filters.classId;
+        if (filters.subjectId !== 'all') queryFilters.subjectId = filters.subjectId;
+        if (filters.textbookId !== 'all') queryFilters.textbookId = filters.textbookId;
+        if (filters.difficulty !== 'all') queryFilters.difficulty = filters.difficulty;
+        if (filters.status !== 'all') queryFilters.status = filters.status;
+        if (filters.isVerified !== 'all') queryFilters.isVerified = filters.isVerified === 'true';
+
+        const { questions: newQuestions, lastDoc: newLastDoc } = await getQuestionsPaginated(queryFilters, 50, isLoadMore ? lastDoc : null);
+        
+        if (isLoadMore) {
+            setQuestions(prev => [...prev, ...newQuestions]);
+        } else {
+            setQuestions(newQuestions);
+        }
+        setLastDoc(newLastDoc);
+        setHasMore(newQuestions.length === 50);
     } catch (e) {
       toast({ title: 'Error fetching questions', variant: 'destructive' });
     } finally {
       setLoading(false);
+      setIsBulkLoading(false);
     }
   };
 
@@ -199,7 +225,6 @@ export default function QuestionBankQuestionsPage() {
   };
 
   useEffect(() => {
-    fetchQuestions();
     fetchTaxonomies();
     
     if (typeof window !== 'undefined') {
@@ -227,6 +252,10 @@ export default function QuestionBankQuestionsPage() {
         }
     }
   }, []);
+
+  useEffect(() => {
+    fetchQuestions(false);
+  }, [filters.boardId, filters.classId, filters.subjectId, filters.textbookId, filters.difficulty, filters.status, filters.isVerified]);
 
   const handleSave = async () => {
       if (!editData.questionText || !editData.correctAnswer) {
@@ -387,13 +416,13 @@ export default function QuestionBankQuestionsPage() {
   }
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Question Bank</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant="outline">
-                        <FileJson className="mr-2 h-4 w-4" /> Bulk Import JSON Format
+                    <Button variant="outline" size="icon" title="Bulk Import JSON Format">
+                        <FileJson className="h-4 w-4" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -416,18 +445,102 @@ export default function QuestionBankQuestionsPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-            <Button onClick={() => { resetForm(); setView('editor'); }}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Question
+            <Button size="icon" onClick={() => { resetForm(); setView('editor'); }} title="Add Question">
+                <PlusCircle className="h-4 w-4" />
             </Button>
         </div>
       </div>
 
+      {/* Mobile Filters */}
+      <div className="md:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="w-full mb-4">
+              <Filter className="mr-2 h-4 w-4" /> Filters
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[80vh] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Filters</SheetTitle>
+            </SheetHeader>
+            <div className="grid grid-cols-1 gap-4 py-4">
+              <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v})}><SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger><SelectContent><SelectItem value="all">All Boards</SelectItem>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v})}><SelectTrigger><SelectValue placeholder="All Classes" /></SelectTrigger><SelectContent><SelectItem value="all">All Classes</SelectItem>{classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v})}><SelectTrigger><SelectValue placeholder="All Subjects" /></SelectTrigger><SelectContent><SelectItem value="all">All Subjects</SelectItem>{subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.textbookId} onValueChange={(v) => setFilters({...filters, textbookId: v})}><SelectTrigger><SelectValue placeholder="All Textbooks" /></SelectTrigger><SelectContent><SelectItem value="all">All Textbooks</SelectItem>{textbooks.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select>
+              <Select value={filters.difficulty} onValueChange={(v) => setFilters({...filters, difficulty: v})}><SelectTrigger><SelectValue placeholder="All Difficulties" /></SelectTrigger><SelectContent><SelectItem value="all">All Difficulties</SelectItem><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem><SelectItem value="Expert">Expert</SelectItem></SelectContent></Select>
+              <Select value={filters.status} onValueChange={(v) => setFilters({...filters, status: v})}><SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger><SelectContent><SelectItem value="all">All Statuses</SelectItem><SelectItem value="Published">Published</SelectItem><SelectItem value="Draft">Draft</SelectItem><SelectItem value="Archived">Archived</SelectItem></SelectContent></Select>
+              <Select value={filters.isVerified} onValueChange={(v) => setFilters({...filters, isVerified: v})}><SelectTrigger><SelectValue placeholder="Verification Status" /></SelectTrigger><SelectContent><SelectItem value="all">All Verification</SelectItem><SelectItem value="true">Verified</SelectItem><SelectItem value="false">Not Verified</SelectItem></SelectContent></Select>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Filters */}
+      <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
+          <Select value={filters.boardId} onValueChange={(v) => setFilters({...filters, boardId: v})}>
+              <SelectTrigger><SelectValue placeholder="All Boards" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Boards</SelectItem>
+                  {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+              </SelectContent>
+          </Select>
+          <Select value={filters.classId} onValueChange={(v) => setFilters({...filters, classId: v})}>
+              <SelectTrigger><SelectValue placeholder="All Classes" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Classes</SelectItem>
+                  {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+              </SelectContent>
+          </Select>
+          <Select value={filters.subjectId} onValueChange={(v) => setFilters({...filters, subjectId: v})}>
+              <SelectTrigger><SelectValue placeholder="All Subjects" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Subjects</SelectItem>
+                  {subjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+              </SelectContent>
+          </Select>
+          <Select value={filters.textbookId} onValueChange={(v) => setFilters({...filters, textbookId: v})}>
+              <SelectTrigger><SelectValue placeholder="All Textbooks" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Textbooks</SelectItem>
+                  {textbooks.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+              </SelectContent>
+          </Select>
+          <Select value={filters.difficulty} onValueChange={(v) => setFilters({...filters, difficulty: v})}>
+              <SelectTrigger><SelectValue placeholder="All Difficulties" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Difficulties</SelectItem>
+                  <SelectItem value="Easy">Easy</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Hard">Hard</SelectItem>
+                  <SelectItem value="Expert">Expert</SelectItem>
+              </SelectContent>
+          </Select>
+          <Select value={filters.status} onValueChange={(v) => setFilters({...filters, status: v})}>
+              <SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Published">Published</SelectItem>
+                  <SelectItem value="Draft">Draft</SelectItem>
+                  <SelectItem value="Archived">Archived</SelectItem>
+              </SelectContent>
+          </Select>
+          <Select value={filters.isVerified} onValueChange={(v) => setFilters({...filters, isVerified: v})}>
+              <SelectTrigger><SelectValue placeholder="Verification Status" /></SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">All Verification</SelectItem>
+                  <SelectItem value="true">Verified</SelectItem>
+                  <SelectItem value="false">Not Verified</SelectItem>
+              </SelectContent>
+          </Select>
+      </div>
+
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle>All Questions ({questions.length})</CardTitle>
           {selectedIds.length > 0 && (
-             <div className="flex items-center gap-4">
-                 <span className="text-sm font-medium text-slate-500">{selectedIds.length} selected</span>
+             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                 <span className="text-sm font-medium text-slate-500 w-full sm:w-auto">{selectedIds.length} selected</span>
                  <Select onValueChange={handleBulkUpdateStatus}>
                     <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Change Status" /></SelectTrigger>
                     <SelectContent>
@@ -450,7 +563,7 @@ export default function QuestionBankQuestionsPage() {
           )}
         </CardHeader>
         <CardContent>
-          <Table>
+          <Table className="hidden md:table">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]"><input type="checkbox" className="w-4 h-4 rounded border-slate-300" checked={questions.length > 0 && selectedIds.length === questions.length} onChange={toggleSelectAll} /></TableHead>
@@ -464,9 +577,9 @@ export default function QuestionBankQuestionsPage() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={5}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
+                <TableRow><TableCell colSpan={7}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
               ) : questions.length === 0 ? (
-                <TableRow><TableCell colSpan={5}>No questions found.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="text-center">No questions found.</TableCell></TableRow>
               ) : (
                 questions.map(q => (
                   <TableRow key={q.id}>
@@ -500,6 +613,53 @@ export default function QuestionBankQuestionsPage() {
               )}
             </TableBody>
           </Table>
+
+          {/* Mobile Cards */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {loading ? (
+                <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>
+            ) : questions.length === 0 ? (
+                <div className="text-center p-4 text-slate-500">No questions found.</div>
+            ) : (
+                questions.map(q => (
+                  <div key={q.id} className="flex flex-col p-4 border rounded-lg gap-3 bg-white">
+                      <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-3">
+                              <input type="checkbox" className="w-5 h-5 mt-0.5 rounded border-slate-300" checked={selectedIds.includes(q.id)} onChange={() => toggleSelect(q.id)} />
+                              <div className="text-sm font-medium line-clamp-3">{q.questionText}</div>
+                          </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 pl-8">
+                          <span className="px-2 py-1 bg-slate-100 rounded">{q.questionType || (q.options?.a ? 'MCQ' : 'Subjective')}</span>
+                          <span className="px-2 py-1 bg-slate-100 rounded">{q.difficulty}</span>
+                          <span className="px-2 py-1 bg-slate-100 rounded">{q.status}</span>
+                          {q.isVerified && (
+                              <span className="flex items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded font-medium" title={q.verifiedByName}>
+                                  <ShieldCheck className="w-3 h-3 mr-1" /> Verified
+                              </span>
+                          )}
+                      </div>
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t mt-1">
+                          <Link href={`/question/${q.slug || q.id}`} target="_blank" rel="noopener noreferrer">
+                              <Button variant="outline" size="icon" className="h-8 w-8 text-blue-500" title="View"><Eye className="h-4 w-4" /></Button>
+                          </Link>
+                          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => { setEditData(q); setView('editor'); }} title="Edit"><Pencil className="h-4 w-4" /></Button>
+                          <Button variant="outline" size="icon" className="h-8 w-8 text-destructive" onClick={async () => {
+                              await deleteQuestion(q.id);
+                              fetchQuestions();
+                          }} title="Delete"><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                  </div>
+                ))
+            )}
+          </div>
+          {hasMore && !loading && questions.length > 0 && (
+              <div className="flex justify-center mt-6">
+                  <Button variant="outline" onClick={() => fetchQuestions(true)} disabled={isBulkLoading}>
+                      {isBulkLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null} Load More
+                  </Button>
+              </div>
+          )}
         </CardContent>
       </Card>
     </div>
