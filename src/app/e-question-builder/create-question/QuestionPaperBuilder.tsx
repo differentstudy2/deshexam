@@ -995,7 +995,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   {/* Repeat */}
                   <div className="pt-2">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[13px] text-gray-700">জলছাপ রিপিট</span>
+                      <span className="text-[13px] text-gray-700">{t('watermarkRepeat', appLanguage)}</span>
                       <Switch checked={watermarkRepeat} onCheckedChange={setWatermarkRepeat} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
                     </div>
                     {watermarkRepeat && (
