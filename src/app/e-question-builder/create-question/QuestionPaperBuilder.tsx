@@ -260,74 +260,136 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
                     </div>
 
-                    {/* Rules */}
-                    <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
-                      <span>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
-                      <span>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
-                    </div>
+                    {format !== 'answer' && (
+                      <>
+                        {/* Rules */}
+                        <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
+                          <span>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
+                          <span>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
+                        </div>
 
-                    <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
-                      <p>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
-                      <p className="mt-1 font-bold">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
-                    </div>
+                        <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
+                          <p>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
+                          <p className="mt-1 font-bold">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
+                        </div>
 
-                    {/* Candidate Info */}
-                    <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
-                      <div className="flex-1 flex">
-                        <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
-                        <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
-                      </div>
-                      <div className="w-[300px] flex">
-                        <span className="whitespace-nowrap">রোলঃ</span>
-                        <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
-                      </div>
-                    </div>
+                        {/* Candidate Info */}
+                        <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
+                          <div className="flex-1 flex">
+                            <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
+                            <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
+                          </div>
+                          <div className="w-[300px] flex">
+                            <span className="whitespace-nowrap">রোলঃ</span>
+                            <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
+                          </div>
+                        </div>
+                      </>
+                    )}
 
                     <hr className="border-t-[1.5px] border-gray-300 mb-6" />
 
-                    {/* QUESTIONS COLUMNS */}
-                    <div
-                      className="gap-x-12 text-justify"
-                      style={{ columnCount: 2, columnRule: '1px solid #e5e7eb' }}
-                    >
-                      {questions.map((q, index) => (
-                        <div key={q.id} className="text-[14px] text-gray-900 leading-snug mb-5 break-inside-avoid">
-                          <div className="flex items-start gap-1.5 mb-2">
-                            <span className="font-bold min-w-[18px]">{convertToBengaliNumber(index + 1)}.</span>
-                            <div
-                              className={`flex-1 ${editingMode ? 'hover:bg-blue-50 cursor-text p-1 -m-1 rounded border border-transparent hover:border-blue-200' : ''}`}
-                              dangerouslySetInnerHTML={{ __html: q.questionText }}
-                            />
-                          </div>
+                    {format === 'answer' && (
+                      <div className="text-center mb-6">
+                        <h3 className="text-lg font-bold text-red-500">নিচে উত্তরপত্র</h3>
+                      </div>
+                    )}
 
-                          {/* Options */}
-                          {q.options && (
-                            <div className="grid grid-cols-2 gap-y-1.5 gap-x-2 pl-6">
-                              {['a', 'b', 'c', 'd'].map((optKey, idx) => {
-                                const optValue = (q.options as any)[optKey];
-                                if (!optValue) return null;
-
-                                const markers = ['ক', 'খ', 'গ', 'ঘ'];
-                                const marker = markers[idx];
-
+                    {/* QUESTIONS OR ANSWERS */}
+                    {format === 'answer' && optionStyle === 'uttarmala' ? (
+                      <div className="mt-4 mb-10 overflow-x-auto">
+                        <span className="text-sm font-bold text-gray-800 block mb-2">উত্তর মালা:</span>
+                        <table className="border-collapse border border-gray-300 text-center text-sm">
+                          <tbody>
+                            <tr>
+                              <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">প্রশ্ন</td>
+                              {questions.map((q, idx) => (
+                                <td key={`q-${idx}`} className="border border-gray-300 px-3 py-2 font-bold">{convertToBengaliNumber(idx + 1)}.</td>
+                              ))}
+                            </tr>
+                            <tr>
+                              <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">উত্তর</td>
+                              {questions.map((q, idx) => {
+                                const optIdx = ['a', 'b', 'c', 'd'].indexOf(q.correctAnswer || 'a');
+                                const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
                                 return (
-                                  <div key={optKey} className={`flex items-start gap-1.5 ${editingMode ? 'hover:bg-blue-50 cursor-text rounded p-0.5' : ''}`}>
-                                    <span className="shrink-0 mt-0.5">
-                                      {optionStyle === 'ka' ? `(${marker})` :
-                                        optionStyle === 'circle' ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px]">{marker}</span> :
-                                          `${marker}.`}
-                                    </span>
-                                    <span className={format === 'qa' && q.correctAnswer === optKey ? 'font-bold underline' : ''}>
-                                      {optValue}
-                                    </span>
-                                  </div>
-                                )
+                                  <td key={`a-${idx}`} className="border border-gray-300 px-3 py-2">{marker}</td>
+                                );
                               })}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : format === 'answer' ? (
+                      <div 
+                        className="gap-x-12 text-justify mb-10"
+                        style={{ columnCount: 2, columnRule: '1px solid #e5e7eb' }}
+                      >
+                        {questions.map((q, index) => {
+                          const optIdx = ['a', 'b', 'c', 'd'].indexOf(q.correctAnswer || 'a');
+                          const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
+                          
+                          return (
+                            <div key={q.id} className="text-[14px] text-gray-900 leading-snug mb-3 break-inside-avoid flex items-center gap-2 font-bold">
+                              <span>{convertToBengaliNumber(index + 1)}.</span>
+                              {optionStyle === 'u' && <span>উঃ {marker}</span>}
+                              {optionStyle === 'ans' && <span>Ans: {marker}</span>}
+                              {(optionStyle === 'ka' || optionStyle === 'circle') && (
+                                <span className="inline-flex items-center justify-center w-[20px] h-[20px] rounded-full bg-gray-800 text-white text-[12px] leading-none pb-[1px]">{marker}</span>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div
+                        className="gap-x-12 text-justify"
+                        style={{ columnCount: 2, columnRule: '1px solid #e5e7eb' }}
+                      >
+                        {questions.map((q, index) => (
+                          <div key={q.id} className="text-[14px] text-gray-900 leading-snug mb-5 break-inside-avoid">
+                            <div className="flex items-start gap-1.5 mb-2">
+                              <span className="font-bold min-w-[18px]">{convertToBengaliNumber(index + 1)}.</span>
+                              <div
+                                className={`flex-1 ${editingMode ? 'hover:bg-blue-50 cursor-text p-1 -m-1 rounded border border-transparent hover:border-blue-200' : ''}`}
+                                dangerouslySetInnerHTML={{ __html: q.questionText }}
+                              />
+                            </div>
+
+                            {/* Options */}
+                            {q.options && (
+                              <div className="grid grid-cols-2 gap-y-1.5 gap-x-2 pl-6">
+                                {['a', 'b', 'c', 'd'].map((optKey, idx) => {
+                                  const optValue = (q.options as any)[optKey];
+                                  if (!optValue) return null;
+
+                                  const markers = ['ক', 'খ', 'গ', 'ঘ'];
+                                  const marker = markers[idx];
+                                  const isCorrect = format === 'qa' && q.correctAnswer === optKey;
+
+                                  return (
+                                    <div key={optKey} className={`flex items-start gap-1.5 ${editingMode ? 'hover:bg-blue-50 cursor-text rounded p-0.5' : ''}`}>
+                                      <span className="shrink-0">
+                                        {optionStyle === 'ka' ? (
+                                          isCorrect ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-800 text-white text-[11px] leading-none pb-[1px]">{marker}</span> : `(${marker})`
+                                        ) : optionStyle === 'circle' ? (
+                                          <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
+                                        ) : (
+                                          isCorrect ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-800 text-white text-[11px] leading-none pb-[1px]">{marker}</span> : `${marker}.`
+                                        )}
+                                      </span>
+                                      <span className={isCorrect ? 'font-bold' : ''}>
+                                        {optValue}
+                                      </span>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Footer Logo */}
                     <div className="mt-8 text-right text-[12px] font-bold text-gray-800">
