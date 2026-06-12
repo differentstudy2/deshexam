@@ -34,6 +34,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [paperSize, setPaperSize] = useState('Letter');
   const [margins, setMargins] = useState({ top: '0.2', right: '0.2', bottom: '0.2', left: '0.2' });
 
+  // Set Code State
+  const [isSetCodeOpen, setIsSetCodeOpen] = useState(false);
+  const [activeSetCode, setActiveSetCode] = useState('ক');
+  const [tempSetCode, setTempSetCode] = useState('ক');
+  const [savedSets, setSavedSets] = useState<{code: string, questions: QuestionBankEntry[]}[]>([]);
+
   // Content Display State
   const [showTitle, setShowTitle] = useState(true);
   const [showAddress, setShowAddress] = useState(false);
@@ -62,6 +68,28 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const handlePrint = () => {
     window.print();
   };
+
+  const handleShuffle = () => {
+    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+    setQuestions(shuffled);
+  };
+
+  const handleSaveSet = () => {
+    setActiveSetCode(tempSetCode);
+    setSavedSets(prev => {
+      const filtered = prev.filter(s => s.code !== tempSetCode);
+      const newSets = [...filtered, { code: tempSetCode, questions: [...questions] }];
+      const order = ['ক', 'খ', 'গ', 'ঘ'];
+      return newSets.sort((a, b) => order.indexOf(a.code) - order.indexOf(b.code));
+    });
+    setIsSetCodeOpen(false);
+  };
+
+  const getEditableProps = (baseClassName: string = '') => ({
+    contentEditable: editingMode,
+    suppressContentEditableWarning: true,
+    className: `${baseClassName} ${editingMode ? 'hover:bg-blue-50 cursor-text p-0.5 -m-0.5 rounded outline-none ring-1 ring-transparent hover:ring-blue-200 transition-all' : 'outline-none'}`
+  });
 
   const convertToBengaliNumber = (num: number) => {
     const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -161,13 +189,40 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             </div>
 
             <div className="flex gap-2">
-              <div className="flex-1 bg-gray-50 p-2 rounded-md border border-gray-100 flex items-center justify-between text-gray-600 text-sm">
+              <div 
+                className="flex-1 bg-gray-50 hover:bg-gray-100 cursor-pointer p-2 rounded-md border border-gray-100 flex items-center justify-between text-gray-600 text-sm transition-colors"
+                onClick={handleShuffle}
+              >
                 এলোমেলো করুন <Shuffle className="w-3.5 h-3.5" />
               </div>
-              <Button size="sm" className="bg-[#03a9f4] hover:bg-[#0288d1] text-white">
-                পেজ সেট
+              <Button 
+                size="sm" 
+                className="bg-[#03a9f4] hover:bg-[#0288d1] text-white"
+                onClick={() => { setTempSetCode(activeSetCode); setIsSetCodeOpen(true); }}
+              >
+                সেভ সেট
               </Button>
             </div>
+
+            {savedSets.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <h5 className="font-bold text-gray-800 text-sm mb-2">সেভ করা সেটসমূহঃ</h5>
+                <div className="flex flex-wrap gap-2 p-3 border border-dashed border-gray-300 rounded bg-gray-50/50 min-h-[30px]">
+                  {savedSets.map((set) => (
+                    <button
+                      key={set.code}
+                      onClick={() => {
+                        setActiveSetCode(set.code);
+                        setQuestions(set.questions);
+                      }}
+                      className={`px-3 py-1 text-[13px] font-medium border bg-[#f8fafc] rounded-sm ${activeSetCode === set.code ? 'border-[#0ea5e9] text-[#0284c7]' : 'border-gray-200 text-gray-700 hover:bg-gray-100'}`}
+                    >
+                      সেটঃ {set.code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Content Display */}
@@ -252,33 +307,33 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <div className="relative mb-4">
                       {/* Left: Marks Box */}
                       <div className="absolute top-8 left-0 flex border border-black">
-                        <div className="bg-black text-white text-[11px] px-2 py-1 flex items-center">প্রাপ্ত নম্বর</div>
+                        <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
                         <div className="w-16"></div>
                       </div>
 
                       {/* Right: Set & Subject Code */}
                       <div className="absolute top-6 right-0 text-right">
                         <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
-                          <span className="flex-1 text-center py-0.5">সেট</span>
-                          <span className="border-l border-black flex-1 text-center py-0.5">ক</span>
+                          <span {...getEditableProps("flex-1 text-center py-0.5")}>সেট</span>
+                          <span {...getEditableProps("border-l border-black flex-1 text-center py-0.5")}>{activeSetCode}</span>
                         </div>
                         <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
-                          বিষয় কোড :
+                          <span {...getEditableProps()}>বিষয় কোড :</span>
                           <div className="flex">
-                            <span className="border border-black w-5 h-6 flex items-center justify-center">০</span>
-                            <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
-                            <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
+                            <span {...getEditableProps("border border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                            <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
+                            <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Center Info */}
                       <div className="text-center">
-                        {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">DeshExam</h1>}
-                        {showAddress && <p className="text-[13px] text-gray-700 mb-1">৬/এ, রাবেয়া ভিলা, বড়বটতলা, ওয়ার্ড-২৭, বোয়ালিয়া, রাজশাহী - ৬২০৪</p>}
-                        {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
-                        <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>
-                        <h4 className="text-[13px] text-gray-700">অধ্যায়ের নাম</h4>
+                        {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>DeshExam</h1>}
+                        {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>৬/এ, রাবেয়া ভিলা, বড়বটতলা, ওয়ার্ড-২৭, বোয়ালিয়া, রাজশাহী - ৬২০৪</p>}
+                        {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
+                        <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>
+                        <h4 {...getEditableProps("text-[13px] text-gray-700")}>অধ্যায়ের নাম</h4>
                       </div>
                     </div>
 
@@ -286,13 +341,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       <>
                         {/* Rules */}
                         <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
-                          <span>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
-                          <span>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
+                          <span {...getEditableProps()}>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
+                          <span {...getEditableProps()}>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
                         </div>
 
                         <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
-                          <p>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
-                          <p className="mt-1 font-bold">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
+                          <p {...getEditableProps()}>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
+                          <p {...getEditableProps("mt-1 font-bold")}>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
                         </div>
 
                         {/* Candidate Info */}
@@ -332,7 +387,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             <tr>
                               <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">উত্তর</td>
                               {questions.map((q, idx) => {
-                                const optIdx = ['a', 'b', 'c', 'd'].indexOf(q.correctAnswer || 'a');
+                                const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
                                 const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
                                 return (
                                   <td key={`a-${idx}`} className="border border-gray-300 px-3 py-2">{marker}</td>
@@ -348,7 +403,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         style={{ columnCount: 2, columnRule: '1px solid #e5e7eb' }}
                       >
                         {questions.map((q, index) => {
-                          const optIdx = ['a', 'b', 'c', 'd'].indexOf(q.correctAnswer || 'a');
+                          const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
                           const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
                           
                           return (
@@ -373,7 +428,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             <div className="flex items-start gap-1.5 mb-2">
                               <span className="font-bold min-w-[18px]">{convertToBengaliNumber(index + 1)}.</span>
                               <div
-                                className={`flex-1 ${editingMode ? 'hover:bg-blue-50 cursor-text p-1 -m-1 rounded border border-transparent hover:border-blue-200' : ''}`}
+                                {...getEditableProps("flex-1")}
                                 dangerouslySetInnerHTML={{ __html: q.questionText }}
                               />
                             </div>
@@ -387,11 +442,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                                   const markers = ['ক', 'খ', 'গ', 'ঘ'];
                                   const marker = markers[idx];
-                                  const isCorrect = format === 'qa' && q.correctAnswer === optKey;
+                                  const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
 
                                   return (
-                                    <div key={optKey} className={`flex items-start gap-1.5 ${editingMode ? 'hover:bg-blue-50 cursor-text rounded p-0.5' : ''}`}>
-                                      <span className="shrink-0">
+                                    <div key={optKey} className="flex items-start gap-1.5">
+                                      <span className="shrink-0 mt-[1px]">
                                         {optionStyle === 'ka' ? (
                                           isCorrect ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-800 text-white text-[11px] leading-none pb-[1px]">{marker}</span> : `(${marker})`
                                         ) : optionStyle === 'circle' ? (
@@ -400,7 +455,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                           isCorrect ? <span className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-gray-800 text-white text-[11px] leading-none pb-[1px]">{marker}</span> : `${marker}.`
                                         )}
                                       </span>
-                                      <span className={isCorrect ? 'font-bold' : ''}>
+                                      <span {...getEditableProps(isCorrect ? 'font-bold' : '')}>
                                         {optValue}
                                       </span>
                                     </div>
@@ -436,6 +491,35 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       <footer className="bg-[#1e293b] text-white text-center py-4 text-sm font-semibold print:hidden">
         ©2026 DeshExam. All rights reserved.
       </footer>
+
+      {/* Set Code Dialog */}
+      <Dialog open={isSetCodeOpen} onOpenChange={setIsSetCodeOpen}>
+        <DialogContent className="max-w-[400px] text-center p-8 print:hidden rounded-xl border-none shadow-2xl">
+          <DialogTitle className="text-2xl font-bold text-gray-700 mb-8 mt-2 text-center">কোন সেটে সেভ করবেন?</DialogTitle>
+          
+          <div className="mb-10">
+            <label className="text-gray-600 block mb-4 text-[15px]">সেট কোড:</label>
+            <Select value={tempSetCode} onValueChange={setTempSetCode}>
+              <SelectTrigger className="w-[80px] mx-auto border-gray-500 h-11 shadow-none text-base"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ক">ক</SelectItem>
+                <SelectItem value="খ">খ</SelectItem>
+                <SelectItem value="গ">গ</SelectItem>
+                <SelectItem value="ঘ">ঘ</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex justify-center gap-4 mb-2">
+            <Button className="bg-[#6b4ef8] hover:bg-[#5839db] text-white px-8 h-[42px] text-sm font-medium rounded-md" onClick={handleSaveSet}>
+              সেভ করুন
+            </Button>
+            <Button variant="secondary" className="bg-[#6b7280] hover:bg-[#4b5563] text-white px-8 h-[42px] text-sm font-medium rounded-md" onClick={() => setIsSetCodeOpen(false)}>
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Page Setup Dialog */}
       <Dialog open={isPageSetupOpen} onOpenChange={setIsPageSetupOpen}>
