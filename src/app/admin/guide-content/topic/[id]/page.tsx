@@ -25,6 +25,7 @@ const TiptapEditor = dynamic(() => import('@/components/admin/TiptapEditor').the
 import { TopicVideoManager } from '@/components/admin/TopicVideoManager';
 import { TopicDocumentManager } from '@/components/admin/TopicDocumentManager';
 import { TopicQuestionManager } from '@/components/admin/TopicQuestionManager';
+import { TopicAssessmentManager } from '@/components/admin/TopicAssessmentManager';
 
 const sectionCategories = [
   {
@@ -403,9 +404,13 @@ export default function TopicEditorPage({ params }: { params: Promise<{ id: stri
                     Add Another {activeTab.toUpperCase()}
                   </Button>
                 </div>
-              ) : ['mcq', 'creative_question', 'short_question', 'model_test', 'practice_sets', 'quizzes', 'mock_tests', 'exams_papers'].includes(activeTab) ? (
+              ) : ['mcq', 'creative_question', 'short_question'].includes(activeTab) ? (
                 <div className="animate-in fade-in duration-300">
                   <TopicQuestionManager topicId={topicId} tabType={activeTab} />
+                </div>
+              ) : ['model_test', 'practice_sets', 'quizzes', 'mock_tests', 'exams_papers'].includes(activeTab) ? (
+                <div className="animate-in fade-in duration-300">
+                  <TopicAssessmentManager topicId={topicId} tabType={activeTab} />
                 </div>
               ) : (
                 <div className="p-8 text-center text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg animate-in fade-in duration-300">

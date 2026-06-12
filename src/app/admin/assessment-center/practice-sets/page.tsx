@@ -19,6 +19,7 @@ export default function PracticeSetsPage() {
     const { toast } = useToast();
     const [view, setView] = useState<'list' | 'editor'>('list');
     const [practiceSets, setPracticeSets] = useState<PracticeSet[]>([]);
+    const [filteredSets, setFilteredSets] = useState<PracticeSet[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     
@@ -28,15 +29,38 @@ export default function PracticeSetsPage() {
     const [showPicker, setShowPicker] = useState(false);
     const [attachedQuestions, setAttachedQuestions] = useState<QuestionBankEntry[]>([]);
 
+    // Filters & Taxonomies
+    const [filters, setFilters] = useState({
+        boardId: 'all', classId: 'all', subjectId: 'all', textbookId: 'all', chapterId: 'all', topicId: 'all'
+    });
+    const [taxonomies, setTaxonomies] = useState({
+        boards: [] as any[], classes: [] as any[], subjects: [] as any[], textbooks: [] as any[], chapters: [] as any[], topics: [] as any[]
+    });
+
     useEffect(() => {
         fetchPracticeSets();
+        fetchTaxonomies();
     }, []);
+
+    const fetchTaxonomies = async () => {
+        const { collection, getDocs } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase/client');
+        const fetchCol = async (col: string) => {
+            try { const snap = await getDocs(collection(db, col)); return snap.docs.map(d => ({id: d.id, ...d.data()})); } catch { return []; }
+        };
+        const [b, c, s, t, ch, tp] = await Promise.all([
+            fetchCol('guide_boards'), fetchCol('guide_classes'), fetchCol('guide_subjects'),
+            fetchCol('guide_textbooks'), fetchCol('guide_chapters'), fetchCol('guide_topics')
+        ]);
+        setTaxonomies({ boards: b, classes: c, subjects: s, textbooks: t, chapters: ch, topics: tp });
+    };
 
     const fetchPracticeSets = async () => {
         setLoading(true);
         try {
             const data = await getAssessments('practiceSets');
             setPracticeSets(data as PracticeSet[]);
+            setFilteredSets(data as PracticeSet[]);
         } catch (error) {
             console.error(error);
             toast({ title: 'Error fetching practice sets', variant: 'destructive' });
@@ -44,6 +68,17 @@ export default function PracticeSetsPage() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        let result = [...practiceSets];
+        if (filters.boardId !== 'all') result = result.filter(r => r.boardId === filters.boardId);
+        if (filters.classId !== 'all') result = result.filter(r => r.classId === filters.classId);
+        if (filters.subjectId !== 'all') result = result.filter(r => r.subjectId === filters.subjectId);
+        if (filters.textbookId !== 'all') result = result.filter(r => r.textbookId === filters.textbookId);
+        if (filters.chapterId !== 'all') result = result.filter(r => r.chapterId === filters.chapterId);
+        if (filters.topicId !== 'all') result = result.filter(r => r.topicId === filters.topicId);
+        setFilteredSets(result);
+    }, [filters, practiceSets]);
 
     const fetchAttachedQuestions = async (questionIds: string[]) => {
         if (!questionIds || questionIds.length === 0) {
@@ -268,6 +303,32 @@ export default function PracticeSetsPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>All Practice Sets</CardTitle>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
+                        <Select value={filters.boardId} onValueChange={v => setFilters({...filters, boardId: v})}>
+                            <SelectTrigger><SelectValue placeholder="Board" /></SelectTrigger>
+                            <SelectContent><SelectItem value="all">All Boards</SelectItem>{taxonomies.boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filters.classId} onValueChange={v => setFilters({...filters, classId: v})}>
+                            <SelectTrigger><SelectValue placeholder="Class" /></SelectTrigger>
+                            <SelectContent><SelectItem value="all">All Classes</SelectItem>{taxonomies.classes.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filters.subjectId} onValueChange={v => setFilters({...filters, subjectId: v})}>
+                            <SelectTrigger><SelectValue placeholder="Subject" /></SelectTrigger>
+                            <SelectContent><SelectItem value="all">All Subjects</SelectItem>{taxonomies.subjects.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filters.textbookId} onValueChange={v => setFilters({...filters, textbookId: v})}>
+                            <SelectTrigger><SelectValue placeholder="Textbook" /></SelectTrigger>
+                            <SelectContent><SelectItem value="all">All Textbooks</SelectItem>{taxonomies.textbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filters.chapterId} onValueChange={v => setFilters({...filters, chapterId: v})}>
+                            <SelectTrigger><SelectValue placeholder="Chapter" /></SelectTrigger>
+                            <SelectContent><SelectItem value="all">All Chapters</SelectItem>{taxonomies.chapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                        <Select value={filters.topicId} onValueChange={v => setFilters({...filters, topicId: v})}>
+                            <SelectTrigger><SelectValue placeholder="Topic" /></SelectTrigger>
+                            <SelectContent><SelectItem value="all">All Topics</SelectItem>{taxonomies.topics.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -283,10 +344,10 @@ export default function PracticeSetsPage() {
                         <TableBody>
                             {loading ? (
                                 <TableRow><TableCell colSpan={5}><Loader2 className="animate-spin mx-auto" /></TableCell></TableRow>
-                            ) : practiceSets.length === 0 ? (
+                            ) : filteredSets.length === 0 ? (
                                 <TableRow><TableCell colSpan={5} className="text-center">No practice sets found.</TableCell></TableRow>
                             ) : (
-                                practiceSets.map(set => (
+                                filteredSets.map(set => (
                                     <TableRow key={set.id}>
                                         <TableCell className="font-medium">{set.title}</TableCell>
                                         <TableCell>{set.questionIds?.length || 0}</TableCell>

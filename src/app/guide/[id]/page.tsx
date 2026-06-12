@@ -46,6 +46,15 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
   if (level === 'topic' || level === 'chapter') {
     const readingData = await getReadingContent(node.id);
     
+    // Dynamically import to avoid cyclic deps if any, or just import at the top
+    const { getAssessmentsByTopic } = await import('@/lib/firebase/assessment');
+    const practiceSets = await getAssessmentsByTopic('practiceSets', node.id);
+    const quizzes = await getAssessmentsByTopic('quizzes', node.id);
+    const mockTests = await getAssessmentsByTopic('mockTests', node.id);
+    const examPapers = await getAssessmentsByTopic('examPapers', node.id);
+
+    const assessments = { practiceSets, quizzes, mockTests, examPapers };
+    
     const curriculum = hierarchy?.textbookId 
       ? fullCurriculum.filter(c => c.id === hierarchy.textbookId)
       : fullCurriculum;
@@ -54,6 +63,7 @@ export default async function GenericGuidePage({ params }: { params: Promise<{ i
       <ReadingLayout 
         id={node.id} 
         data={readingData}
+        assessments={assessments}
         subjects={subjects} 
         curriculum={curriculum} 
         boardTitle={hierarchy?.boardTitle || 'Board'}

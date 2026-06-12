@@ -21,6 +21,20 @@ export async function getAssessments(collectionName: AssessmentCollectionType) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
+// Fetch by Topic
+export async function getAssessmentsByTopic(collectionName: AssessmentCollectionType, topicId: string) {
+  const colRef = collection(db, ASSESSMENT_COLLECTIONS[collectionName]);
+  const q = query(colRef, where('topicId', '==', topicId));
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return [];
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a: any, b: any) => {
+    // Sort descending by createdAt since we couldn't compound order with where without an index usually
+    const aDate = new Date(a.createdAt || 0).getTime();
+    const bDate = new Date(b.createdAt || 0).getTime();
+    return bDate - aDate;
+  });
+}
+
 // Generic Fetch Single
 export async function getAssessment(collectionName: AssessmentCollectionType, id: string) {
   const docRef = doc(db, ASSESSMENT_COLLECTIONS[collectionName], id);

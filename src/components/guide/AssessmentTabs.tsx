@@ -25,26 +25,21 @@ export function AssessmentTabs({ chapterId }: AssessmentTabsProps) {
     async function loadData() {
       setLoading(true);
       try {
-        // Fetch all assessments and filter by chapterId (or topicId) locally for now
-        // In a real production app, we would use Firestore queries: where('chapterId', '==', chapterId)
-        // But since we might be matching on ID strings that are topics, we can just filter
+        const { getAssessmentsByTopic } = await import('@/lib/firebase/assessment');
         const [ps, qz, mt, ep] = await Promise.all([
-          getAssessments('practiceSets'),
-          getAssessments('quizzes'),
-          getAssessments('mockTests'),
-          getAssessments('examPapers')
+          getAssessmentsByTopic('practiceSets', chapterId),
+          getAssessmentsByTopic('quizzes', chapterId),
+          getAssessmentsByTopic('mockTests', chapterId),
+          getAssessmentsByTopic('examPapers', chapterId)
         ]);
 
-        const filterForChapter = (arr: any[]) => arr.filter(a => 
-          a.status === 'Published' && 
-          (a.chapterId === chapterId || a.topicId === chapterId)
-        );
+        const filterPublished = (arr: any[]) => arr.filter(a => a.status === 'Published');
 
         setData({
-          practice: filterForChapter(ps),
-          quiz: filterForChapter(qz),
-          mock: filterForChapter(mt),
-          exam: filterForChapter(ep),
+          practice: filterPublished(ps),
+          quiz: filterPublished(qz),
+          mock: filterPublished(mt),
+          exam: filterPublished(ep),
         });
       } catch (error) {
         console.error("Failed to load assessments for chapter", error);
@@ -115,12 +110,10 @@ function AssessmentGrid({ items, type, emptyMsg }: { items: AssessmentBase[], ty
     );
   }
 
-  const baseHref = type === 'Practice' ? '/practice' : type === 'Quiz' ? '/quiz' : type === 'Mock Test' ? '/mock-tests' : '/exams';
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {items.map(item => (
-        <AssessmentCard key={item.id} assessment={item} type={type} href={`${baseHref}/${item.slug}`} />
+        <AssessmentCard key={item.id} assessment={item} type={type} href={`/assessment/take/${item.id}`} />
       ))}
     </div>
   );
