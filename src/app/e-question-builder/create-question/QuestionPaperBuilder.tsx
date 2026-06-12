@@ -274,7 +274,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                       {/* Center Info */}
                       <div className="text-center">
-                        {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">স্যাট একাডেমি</h1>}
+                        {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">DeshExam</h1>}
                         {showAddress && <p className="text-[13px] text-gray-700 mb-1">৬/এ, রাবেয়া ভিলা, বড়বটতলা, ওয়ার্ড-২৭, বোয়ালিয়া, রাজশাহী - ৬২০৪</p>}
                         {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
                         <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>
@@ -434,7 +434,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
       {/* Footer Banner */}
       <footer className="bg-[#1e293b] text-white text-center py-4 text-sm font-semibold print:hidden">
-        ©2026 Satt Academy. All rights reserved.
+        ©2026 DeshExam. All rights reserved.
       </footer>
 
       {/* Page Setup Dialog */}

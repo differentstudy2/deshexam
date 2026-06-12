@@ -158,7 +158,7 @@ export default function ProfilePage() {
                       <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> অ্যাড ফ্রি কনটেন্ট ও ∞ পেজ ভিউ
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
-                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> স্যাট একাডেমি (বুক ডাউনলোড)
+                      <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> DeshExam (বুক ডাউনলোড)
                     </div>
                     <div className="flex items-center gap-3 text-sm font-bold text-slate-800 dark:text-slate-200">
                       <Check className="w-4 h-4 text-green-500 shrink-0" strokeWidth={3} /> প্রিমিয়াম ভিডিও কোর্স ও মডেল টেস্ট

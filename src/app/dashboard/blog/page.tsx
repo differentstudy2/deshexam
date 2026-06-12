@@ -187,7 +187,7 @@ export default function BlogPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Blog</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Discover curated posts from Satt Academy learners and mentors.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Discover curated posts from DeshExam learners and mentors.</p>
         </div>
         <Button className="bg-[#5b5fdb] hover:bg-[#4b4fbf] text-white rounded-md shrink-0 self-start sm:self-auto gap-2">
           <Plus className="w-4 h-4" /> New Post
