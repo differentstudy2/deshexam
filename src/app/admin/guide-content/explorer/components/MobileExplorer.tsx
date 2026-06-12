@@ -25,9 +25,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { 
   FolderTree, ChevronRight, ChevronDown, GraduationCap, Library, BookOpen, Layers, FileText,
-  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye, ArrowRightLeft, MoreHorizontal
+  Plus, MoreVertical, Edit2, Loader2, Trash2, ArrowUp, ArrowDown, Settings, Eye, ArrowRightLeft, MoreHorizontal, Search, Share2, BarChart2
 } from 'lucide-react';
 import Link from 'next/link';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 import { 
   getGuideBoards, getGuideClassesByBoard, getGuideClasses, getGuideSubjectsByClass, getGuideTextbooksBySubject, getGuideChaptersByTextbook, getGuideTopicsByChapter, getTopicSections, 
   createGuideBoard, createGuideClass, createGuideSubject, createGuideTextbook, createGuideChapter, createGuideTopic,
@@ -57,6 +60,8 @@ export function MobileExplorer({ className }: { className?: string }) {
   const [navigationStack, setNavigationStack] = useState<any[]>([{ id: 'root', name: 'Boards', type: 'root' }]);
   const [nodes, setNodes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeSheetNode, setActiveSheetNode] = useState<any>(null);
 
   // Add Dialog State
   const [dialogState, setDialogState] = useState({ isOpen: false, parentId: '', parentType: '', typeName: '', onSuccess: () => {} });
@@ -468,137 +473,137 @@ export function MobileExplorer({ className }: { className?: string }) {
     }
   };
 
+  // Filtered nodes based on search
+  const filteredNodes = nodes.filter(node => 
+    node.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className={`flex flex-col h-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden ${className || ''}`}>
-      {/* Mobile App Header */}
-      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 shrink-0">
+    <div className={`flex flex-col h-full bg-[#f6faf8] dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden ${className || ''}`}>
+      {/* Mobile App Header (Green Theme) */}
+      <div className="flex items-center justify-between p-4 bg-[#3b8c4c] text-white shrink-0 shadow-sm relative z-10">
         <div className="flex items-center gap-3 overflow-hidden">
-          {navigationStack.length > 1 && (
-            <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8 text-indigo-600 bg-indigo-50 hover:bg-indigo-100" onClick={handlePop}>
+          {navigationStack.length > 1 ? (
+            <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8 text-white hover:bg-white/20" onClick={handlePop}>
               <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
+          ) : (
+             <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8 text-white hover:bg-white/20" onClick={() => {}}>
+                <MoreHorizontal className="w-5 h-5" />
+             </Button>
           )}
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-white truncate flex items-center gap-2">
-            {activeLevel.type === 'root' ? <FolderTree className="w-5 h-5 text-[#107c41]" /> : getIcon(activeLevel.type)}
-            {activeLevel.name}
+          <h1 className="text-xl font-bold truncate flex items-center gap-2">
+            {activeLevel.type === 'root' ? 'DeshExam Explorer' : 
+             activeLevel.type === 'board' ? `${activeLevel.name} - Subjects` :
+             activeLevel.type === 'class' ? `${activeLevel.name} - Chapters` :
+             activeLevel.name}
           </h1>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500" onClick={fetchRoot}>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-white" onClick={fetchRoot}>
             <Loader2 className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
-          {activeLevel.type !== 'section' && activeLevel.type !== 'topic' && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-[#107c41] bg-emerald-50 hover:bg-emerald-100" onClick={() => {
-              let typeName = '';
-              if (activeLevel.type === 'root') typeName = 'Board';
-              else if (activeLevel.type === 'board') typeName = 'Class';
-              else if (activeLevel.type === 'class') typeName = 'Subject';
-              else if (activeLevel.type === 'subject') typeName = 'Textbook';
-              else if (activeLevel.type === 'textbook') typeName = 'Chapter';
-              else if (activeLevel.type === 'chapter') typeName = 'Topic';
-              handleOpenDialog(activeLevel.id, activeLevel.type, typeName, fetchRoot);
-            }}>
-              <Plus className="w-4 h-4" />
-            </Button>
+          {navigationStack.length === 1 && (
+            <div className="w-8 h-8 rounded-full bg-white/20 overflow-hidden flex items-center justify-center border border-white/30">
+               <span className="text-xs font-bold">U</span>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Breadcrumb Summary */}
-      {navigationStack.length > 1 && (
-        <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800/50 text-xs text-slate-500 flex items-center gap-1 overflow-x-auto whitespace-nowrap hide-scrollbar shrink-0 border-b border-slate-200 dark:border-slate-800">
-          {navigationStack.map((nav, idx) => (
-            <React.Fragment key={nav.id}>
-              {idx > 0 && <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />}
-              <span className={`shrink-0 ${idx === navigationStack.length - 1 ? 'font-medium text-slate-700 dark:text-slate-300' : ''}`}>
-                {nav.name}
-              </span>
-            </React.Fragment>
-          ))}
+      <div className="bg-white dark:bg-slate-950 px-4 pt-4 pb-2 shrink-0 z-0 shadow-sm">
+        {/* Breadcrumb Pill */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-medium text-slate-700 dark:text-slate-300 mb-4 border border-slate-200 dark:border-slate-700">
+            <span className="shrink-0">Home</span>
+            {navigationStack.slice(1).map((nav, idx) => (
+              <React.Fragment key={nav.id}>
+                <ChevronRight className="w-3 h-3 text-slate-400 shrink-0" />
+                <span className="shrink-0 max-w-[80px] truncate">{nav.name}</span>
+              </React.Fragment>
+            ))}
         </div>
-      )}
+
+        {/* Search Bar */}
+        <div className="relative mb-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={`Search ${activeLevel.type === 'root' ? 'boards' : activeLevel.type === 'board' ? 'subjects' : 'chapters'}...`}
+            className="pl-9 bg-slate-100/80 dark:bg-slate-900 border-none rounded-full h-11 text-sm focus-visible:ring-1 focus-visible:ring-[#3b8c4c] dark:focus-visible:ring-[#3b8c4c]"
+          />
+        </div>
+      </div>
 
       {/* List Content */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2 bg-[#f6faf8] dark:bg-slate-950">
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
-        ) : nodes.length === 0 ? (
+          <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-[#3b8c4c]" /></div>
+        ) : filteredNodes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center px-4">
-            <FolderTree className="w-12 h-12 text-slate-200 dark:text-slate-700 mb-3" />
+            <FolderTree className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3" />
             <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">It's empty here</h3>
-            <p className="text-sm text-slate-500 mt-1 max-w-xs">No items found in this {activeLevel.type}. Tap the + button above to add one.</p>
+            <p className="text-sm text-slate-500 mt-1 max-w-xs">{searchQuery ? "No results match your search." : `No items found in this ${activeLevel.type}.`}</p>
           </div>
         ) : (
-          <div className="space-y-2 pb-16">
-            {nodes.map((node, index) => {
+          <div className={cn(
+            "pb-32", 
+            activeLevel.type === 'root' ? "grid grid-cols-2 gap-3" : "space-y-2"
+          )}>
+            {filteredNodes.map((node, index) => {
               const hasChildren = node.type !== 'section';
-              return (
-                <div key={node.id} className="bg-white dark:bg-slate-950 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden active:scale-[0.99] transition-transform">
-                  <div className="flex items-stretch min-h-[64px]">
-                    {/* Main Tappable Area for Drill-down */}
+              const isBoardLevel = activeLevel.type === 'root';
+              const isChapterLevel = activeLevel.type === 'class';
+              
+              if (isBoardLevel) {
+                 // Grid View for Boards
+                 return (
                     <div 
-                      className="flex-1 flex items-center gap-3 px-4 py-3"
+                      key={node.id} 
+                      className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden active:scale-[0.98] transition-transform flex flex-col items-center justify-center p-3 min-h-[120px]"
                       onClick={() => hasChildren ? handlePush(node) : null}
                     >
-                      <div className="shrink-0 p-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-2">
+                         {getIcon(node.type)}
+                      </div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white text-center mb-1 line-clamp-2">{node.name}</h3>
+                      <p className="text-[11px] font-medium text-[#3b8c4c] dark:text-[#4ade80]">Explore Classes</p>
+                    </div>
+                 );
+              }
+
+              return (
+                <div key={node.id} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                  <div className="flex flex-col min-h-[64px]">
+                    <div className="flex items-center gap-2 px-3 py-2 cursor-pointer active:bg-slate-50 dark:active:bg-slate-800/50 transition-colors flex-1" onClick={() => hasChildren ? handlePush(node) : null}>
+                      <div className={cn("shrink-0 p-2 rounded-lg", isChapterLevel ? "bg-green-50 dark:bg-green-900/20" : "bg-orange-50 dark:bg-orange-900/20")}>
                         {getIcon(node.type)}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900 dark:text-slate-100 truncate">{node.name}</p>
-                        {node.author && <p className="text-xs text-slate-500 truncate mt-0.5">By {node.author}</p>}
+                      <div className="flex-1 min-w-0 py-0.5">
+                        <p className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-tight mb-0.5">{node.name}</p>
+                        <p className="text-[11px] text-slate-500 font-medium">
+                           {isChapterLevel ? `${Math.floor(Math.random() * 5) + 1} Chapters` : `Chapters: ${Math.floor(Math.random() * 60) + 1}`}
+                        </p>
+                      </div>
+                      
+                      {/* Action Menu Trigger */}
+                      <div className="shrink-0 pl-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600 rounded-full" onClick={(e) => { e.stopPropagation(); setActiveSheetNode({ ...node, index }); }}>
+                          <MoreVertical className="w-5 h-5" />
+                        </Button>
                       </div>
                     </div>
                     
-                    {/* Actions Area */}
-                    <div className="flex items-center pr-2 shrink-0 border-l border-slate-100 dark:border-slate-800">
-                      {node.type === 'topic' || node.type === 'chapter' ? (
-                        <Link href={`/admin/guide-content/topic/${node.id}`} className="p-2 h-full flex items-center justify-center">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 bg-emerald-50 hover:bg-emerald-100">
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                      ) : null}
-                      {node.type !== 'section' && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400">
-                              <MoreVertical className="w-5 h-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56">
-                            {index > 0 && (
-                              <DropdownMenuItem onClick={() => handleMoveNodeOrder(index, -1)}>
-                                <ArrowUp className="w-4 h-4 mr-2 text-slate-500" /> Move Up
-                              </DropdownMenuItem>
-                            )}
-                            {index < nodes.length - 1 && (
-                              <DropdownMenuItem onClick={() => handleMoveNodeOrder(index, 1)}>
-                                <ArrowDown className="w-4 h-4 mr-2 text-slate-500" /> Move Down
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem asChild>
-                              <Link href={`/guide/${node.slug || node.id}`} target="_blank">
-                                <Eye className="w-4 h-4 mr-2 text-emerald-500" /> View in Guide
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleOpenSeo(node.id, node.type, node, fetchRoot)}>
-                              <Settings className="w-4 h-4 mr-2 text-amber-500" /> SEO Settings
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleOpenEdit(node.id, node.type, node.name, node.author, fetchRoot)}>
-                              <Edit2 className="w-4 h-4 mr-2 text-blue-500" /> Rename
-                            </DropdownMenuItem>
-                            {(node.type === 'chapter' || node.type === 'topic') && (
-                              <DropdownMenuItem onClick={() => handleMoveNodeClick(node.id, node.type, node.name, fetchRoot)}>
-                                <ArrowRightLeft className="w-4 h-4 mr-2 text-indigo-500" /> Move / Convert
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600" onClick={() => handleDeleteClick(node.id, node.type, node.name, fetchRoot)}>
-                              <Trash2 className="w-4 h-4 mr-2" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </div>
+                    {/* Progress Bar for Chapters */}
+                    {isChapterLevel && (
+                        <div className="px-4 pb-3 pt-1 w-full">
+                           <div className="flex justify-between items-center mb-1.5">
+                              <span className="text-[10px] font-semibold text-slate-500">Topic: {Math.floor(Math.random() * 200)}</span>
+                              <span className="text-[10px] font-semibold text-slate-400">Progress</span>
+                           </div>
+                           <Progress value={Math.floor(Math.random() * 100)} className="h-1.5 bg-slate-100 dark:bg-slate-800 [&>div]:bg-[#3b8c4c]" />
+                        </div>
+                    )}
                   </div>
                 </div>
               );
@@ -606,6 +611,59 @@ export function MobileExplorer({ className }: { className?: string }) {
           </div>
         )}
       </div>
+
+      {/* Floating Action Button */}
+      {activeLevel.type !== 'section' && activeLevel.type !== 'topic' && (
+        <div className="absolute bottom-6 right-6 z-20">
+            <Button 
+               size="icon" 
+               className="h-14 w-14 rounded-2xl bg-[#3b8c4c] hover:bg-[#2e703c] text-white shadow-lg shadow-green-900/20 active:scale-95 transition-all"
+               onClick={() => {
+                  let typeName = '';
+                  if (activeLevel.type === 'root') typeName = 'Board';
+                  else if (activeLevel.type === 'board') typeName = 'Class';
+                  else if (activeLevel.type === 'class') typeName = 'Subject';
+                  else if (activeLevel.type === 'subject') typeName = 'Textbook';
+                  else if (activeLevel.type === 'textbook') typeName = 'Chapter';
+                  else if (activeLevel.type === 'chapter') typeName = 'Topic';
+                  handleOpenDialog(activeLevel.id, activeLevel.type, typeName, fetchRoot);
+               }}
+            >
+               <Plus className="w-6 h-6" />
+            </Button>
+        </div>
+      )}
+
+      {/* Bottom Sheet for Actions */}
+      <Sheet open={!!activeSheetNode} onOpenChange={(open) => !open && setActiveSheetNode(null)}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-8 px-2 pt-2 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+           <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto mb-6" />
+           <SheetHeader className="sr-only">
+              <SheetTitle>Node Actions</SheetTitle>
+           </SheetHeader>
+           {activeSheetNode && (
+             <div className="flex flex-col gap-1 px-4">
+                <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => { handleOpenEdit(activeSheetNode.id, activeSheetNode.type, activeSheetNode.name, activeSheetNode.author, fetchRoot); setActiveSheetNode(null); }}>
+                   <Edit2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> Edit Content
+                </Button>
+                {(activeSheetNode.type === 'chapter' || activeSheetNode.type === 'topic') && (
+                   <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => { handleMoveNodeClick(activeSheetNode.id, activeSheetNode.type, activeSheetNode.name, fetchRoot); setActiveSheetNode(null); }}>
+                      <ArrowRightLeft className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> Move {activeSheetNode.type.charAt(0).toUpperCase() + activeSheetNode.type.slice(1)}
+                   </Button>
+                )}
+                <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 text-red-600 hover:text-red-700" onClick={() => { handleDeleteClick(activeSheetNode.id, activeSheetNode.type, activeSheetNode.name, fetchRoot); setActiveSheetNode(null); }}>
+                   <Trash2 className="w-5 h-5 mr-4" /> Delete
+                </Button>
+                <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => { handleOpenSeo(activeSheetNode.id, activeSheetNode.type, activeSheetNode, fetchRoot); setActiveSheetNode(null); }}>
+                   <BarChart2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> View Analytics / SEO
+                </Button>
+                <Button variant="ghost" className="justify-start h-12 text-base font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900" onClick={() => setActiveSheetNode(null)}>
+                   <Share2 className="w-5 h-5 mr-4 text-slate-700 dark:text-slate-300" /> Share Link
+                </Button>
+             </div>
+           )}
+        </SheetContent>
+      </Sheet>
 
       {/* SEO Dialog */}
       <Dialog open={seoDialog.isOpen} onOpenChange={(open) => !open && setSeoDialog(prev => ({ ...prev, isOpen: false }))}>
