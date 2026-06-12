@@ -6,20 +6,21 @@ export const metadata = {
 };
 
 interface Props {
-  searchParams: {
+  searchParams: Promise<{
     subject_id?: string;
     chapter_id?: string;
     paper_name?: string;
-  };
+  }>;
 }
 
-export default function CreateQuestionPage({ searchParams }: Props) {
+export default async function CreateQuestionPage({ searchParams }: Props) {
+  const params = await searchParams;
   return (
     <div className="bg-[#f0f2f5] min-h-screen">
       <QuestionPaperBuilder 
-        subjectId={searchParams.subject_id} 
-        chapterId={searchParams.chapter_id} 
-        paperName={searchParams.paper_name} 
+        subjectId={params.subject_id} 
+        chapterId={params.chapter_id} 
+        paperName={params.paper_name} 
       />
     </div>
   );

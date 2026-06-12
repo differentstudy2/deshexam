@@ -8,12 +8,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon, QrCode, CheckCircle, CircleDot, GripVertical, PlusCircle } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { t, localizeNumber, localizeOptionLabel, AppLanguage, translations } from '@/lib/i18n';
 
 interface Props {
   subjectId?: string;
@@ -52,8 +53,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [showInstructions, setShowInstructions] = useState(true);
   const [showCandidateInfo, setShowCandidateInfo] = useState(true);
   const [showQuestionTags, setShowQuestionTags] = useState(false);
-  const [showQuestionMarks, setShowQuestionMarks] = useState(true);
-  const [showOMR, setShowOMR] = useState(true);
+  const [showQuestionMarks, setShowQuestionMarks] = useState(false);
+  const [showOMR, setShowOMR] = useState(false);
   const [showColumnDivider, setShowColumnDivider] = useState(true);
   const [showSubjectCode, setShowSubjectCode] = useState(true);
   const [showMarksBox, setShowMarksBox] = useState(true);
@@ -68,8 +69,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [headerTitle, setHeaderTitle] = useState('দেশ এক্সাম একাডেমী');
   const [headerAddress, setHeaderAddress] = useState('দ্বারিকামারী, পেটলা, দিনহাটা, কোচবিহার, পশ্চিমবঙ্গ, ৭৩৬১৩৫');
   const [headerClassName, setHeaderClassName] = useState('অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬');
-  const [headerSubjectName, setHeaderSubjectName] = useState(`বিষয়: ${paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}`);
-  const [headerChapterName, setHeaderChapterName] = useState('অধ্যায়ের নাম');
+  const [headerSubjectName, setHeaderSubjectName] = useState('বাংলা');
+  const [headerChapterName, setHeaderChapterName] = useState('প্রথম অধ্যায়');
+
+
   const [headerTime, setHeaderTime] = useState('');
   const [headerMarks, setHeaderMarks] = useState('');
 
@@ -89,7 +92,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
   // Branding State
   const [brandingEnabled, setBrandingEnabled] = useState(true);
-  const [watermarkText, setWatermarkText] = useState('দেশ এক্সাম একাডেমী');
+  const [watermarkText, setWatermarkText] = useState('');
   const [watermarkImage, setWatermarkImage] = useState<string | null>(null);
   const [watermarkSize, setWatermarkSize] = useState(90);
   const [watermarkOpacity, setWatermarkOpacity] = useState(20);
@@ -117,7 +120,21 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [sectionHeaderText, setSectionHeaderText] = useState('');
 
   // Enhanced Settings State
-  const [footerText, setFooterText] = useState('দেশ এক্সাম একাডেমী');
+  const [appLanguage, setAppLanguage] = useState<AppLanguage>('bn');
+
+  useEffect(() => {
+    const isDefault = (val: string, key: string) => {
+      if (!val) return true;
+      return val === translations['bn'][key] || val === translations['en'][key] || val === translations['hi'][key];
+    };
+
+    if (isDefault(headerTitle, 'defaultHeaderTitle')) setHeaderTitle(t('defaultHeaderTitle', appLanguage));
+    if (isDefault(headerAddress, 'defaultHeaderAddress')) setHeaderAddress(t('defaultHeaderAddress', appLanguage));
+    if (isDefault(headerClassName, 'defaultHeaderClass')) setHeaderClassName(t('defaultHeaderClass', appLanguage));
+    if (isDefault(headerSubjectName, 'defaultHeaderSubject')) setHeaderSubjectName(t('defaultHeaderSubject', appLanguage));
+    if (isDefault(headerChapterName, 'defaultHeaderChapter')) setHeaderChapterName(t('defaultHeaderChapter', appLanguage));
+  }, [appLanguage, headerTitle, headerAddress, headerClassName, headerSubjectName, headerChapterName]);
+  const [footerText, setFooterText] = useState('');
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);
 
@@ -196,12 +213,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     document.body.removeChild(fileDownload);
   };
 
-  // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, index: number) => {
     if (!editingMode) return;
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
-    // Small timeout to allow drag image to capture correctly
     setTimeout(() => {
       (e.target as HTMLElement).style.opacity = '0.5';
     }, 0);
@@ -222,10 +237,9 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     newQuestions.splice(index, 0, draggedItem);
 
     setQuestions(newQuestions);
-    setDraggedIndex(index); // Update dragged index to new position to continue dragging
+    setDraggedIndex(index);
   };
 
-  // Inline Question Operations
   const handleDeleteQuestion = (index: number) => {
     if (confirm('প্রশ্নটি ডিলিট করতে চান?')) {
       const newQuestions = [...questions];
@@ -260,7 +274,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       let newQuestions: any[] = [];
 
       try {
-        // Try parsing as JSON first
         const parsed = JSON.parse(bulkQuestionText);
         if (Array.isArray(parsed)) {
           newQuestions = parsed.map((item, idx) => ({
@@ -283,7 +296,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           }));
         }
       } catch (e) {
-        // Fallback to text block parsing
         const blocks = bulkQuestionText.split(/\n\s*\n/);
 
         blocks.forEach((block, idx) => {
@@ -295,7 +307,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             const optC = lines[3] ? lines[3].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
             const optD = lines[4] ? lines[4].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
 
-            // Try to find the correct answer on the 6th line
             let correctAns = 'a';
             if (lines[5]) {
               const ansMatch = lines[5].toLowerCase().match(/(?:answer|উত্তর|সঠিক উত্তর)[\s:-]*([a-dক-ঘ])/);
@@ -338,7 +349,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     if (!sectionHeaderText) return;
     const newQ: QuestionBankEntry = {
       id: 'section-' + Date.now(),
-      questionType: 'Exam Paper', // Using this to tag section headers, or we can use generic fields
+      questionType: 'Exam Paper',
       questionText: `[[SECTION_HEADER]]${sectionHeaderText}`,
       correctAnswer: 'a',
       difficulty: 'Medium',
@@ -398,11 +409,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     className: `${baseClassName} ${editingMode ? 'hover:bg-blue-50 cursor-text p-0.5 -m-0.5 rounded outline-none ring-1 ring-transparent hover:ring-blue-200 transition-all' : 'outline-none'}`
   });
 
-  const convertToBengaliNumber = (num: number) => {
-    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-    return num.toString().split('').map(d => bengaliDigits[parseInt(d)] || d).join('');
-  };
-
   const getWatermarkFontFamily = () => {
     switch (watermarkFont) {
       case 'kalpurush': return '"Kalpurush", sans-serif';
@@ -454,20 +460,38 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white">
-      {/* Top Header */}
       <header className="bg-white border-b px-6 py-4 flex justify-between items-center print:hidden">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-500">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Create Question Paper</h1>
+            <h1 className="text-xl font-bold text-gray-800">{t('create_question_paper', appLanguage)}</h1>
             <div className="text-sm text-gray-500">Home &gt; E-Question Builder &gt; Create Question</div>
           </div>
         </div>
-        <Button onClick={handlePrint} className="bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 font-semibold px-6 shadow-sm">
-          <Download className="w-4 h-4 mr-2" /> ডাউনলোড
-        </Button>
+        <div className="flex gap-2">
+            <Select value={appLanguage} onValueChange={(v: AppLanguage) => setAppLanguage(v)}>
+              <SelectTrigger className="h-9 w-[130px] border-gray-200 bg-white">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Languages className="w-4 h-4 text-blue-600" />
+                  <span>{appLanguage === 'bn' ? 'বাংলা' : appLanguage === 'en' ? 'English' : 'हिंदी'}</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium"
+              onClick={handlePrint}
+            >
+              <Printer className="w-4 h-4 mr-2" /> {t('printSavePdf', appLanguage)}
+            </Button>
+          </div>
       </header>
 
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full p-4 gap-6 relative print:p-0 print:m-0 print:static">
@@ -475,26 +499,25 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
         {/* LEFT SIDEBAR - SETTINGS */}
         <aside className="w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-[calc(100vh-120px)] overflow-y-auto sticky top-24 print:hidden shrink-0">
 
-          {/* Header */}
           <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
-            <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> ফিল্টার সেটিংস</h3>
+            <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('filterSettings', appLanguage)}</h3>
             <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs" onClick={handleSaveTemplate}>
-              <Save className="w-3 h-3 mr-1" /> টেমপ্লেট সেভ
+              <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
             </Button>
           </div>
 
           <div className="p-4 space-y-4 border-b border-gray-100">
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={() => setIsPageSetupOpen(true)}>
-                <FileText className="w-4 h-4 mr-2" /> Page Setup
+                <FileText className="w-4 h-4 mr-2" /> {t('pageSetup', appLanguage)}
               </Button>
               <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={handleLoadTemplate}>
-                <RefreshCw className="w-4 h-4 mr-2" /> Load Temp
+                <RefreshCw className="w-4 h-4 mr-2" /> {t('loadTemplate', appLanguage)}
               </Button>
             </div>
             <div className="flex gap-2">
               <Button onClick={handlePrint} className="flex-1 bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none px-2 h-9 text-[12px]">
-                <Download className="w-3.5 h-3.5 mr-1" /> Print
+                <Download className="w-3.5 h-3.5 mr-1" /> {t('print', appLanguage)}
               </Button>
               <Button onClick={handleExportPDF} className="flex-1 bg-red-100 hover:bg-red-200 text-red-800 border-transparent shadow-none px-2 h-9 text-[12px]">
                 <FileText className="w-3.5 h-3.5 mr-1" /> PDF
@@ -505,7 +528,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             </div>
           </div>
 
-          {/* Basic Settings */}
           <div className="p-4 border-b border-gray-100">
             <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-4 text-sm"><Settings className="w-4 h-4 text-gray-400" /> বেসিক সেটিংস</h4>
 
@@ -761,7 +783,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <div className="flex gap-0.5 mb-1 opacity-20">
                       {Array(col).fill(0).map((_, i) => <div key={i} className="w-2.5 h-4 bg-gray-600 rounded-sm"></div>)}
                     </div>
-                    <span className="text-[11px] text-gray-600">{convertToBengaliNumber(col)} কলাম</span>
+                    <span className="text-[11px] text-gray-600">{localizeNumber(col, appLanguage)} কলাম</span>
                   </button>
                 ))}
               </div>
@@ -819,7 +841,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     onClick={() => setOptionColumns(col)}
                     className={`h-9 flex items-center justify-center border rounded-md bg-white text-[13px] ${optionColumns === col ? 'border-green-600 ring-1 ring-green-600 text-gray-800 font-medium' : 'border-gray-200 text-gray-600'}`}
                   >
-                    {convertToBengaliNumber(col)}
+                    {localizeNumber(col, appLanguage)}
                   </button>
                 ))}
               </div>
@@ -1189,7 +1211,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         {/* Left: Marks Box */}
                         {showMarksBox && (
                           <div className={`absolute left-0 flex border border-black ${qrCodeEnabled ? 'top-[75px]' : 'top-8'}`}>
-                            <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
+                            <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>{t('marks', appLanguage)}</div>
                             <div className="w-16"></div>
                           </div>
                         )}
@@ -1198,13 +1220,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         <div className="absolute top-6 right-0 text-right">
                           {showSetCode && (
                             <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
-                              <span {...getEditableProps("flex-1 text-center py-0.5")}>সেট</span>
+                              <span {...getEditableProps("flex-1 text-center py-0.5")}>{t('set', appLanguage)}</span>
                               <span {...getEditableProps("border-l border-black flex-1 text-center py-0.5")}>{activeSetCode}</span>
                             </div>
                           )}
                           {showSubjectCode && (
                             <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
-                              <span {...getEditableProps()}>বিষয় কোড :</span>
+                              <span {...getEditableProps()}>{t('subjectCode', appLanguage)}</span>
                               <div className="flex">
                                 <span {...getEditableProps("border border-black w-5 h-6 flex items-center justify-center")}>০</span>
                                 <span {...getEditableProps("border-y border-r border-black w-5 h-6 flex items-center justify-center")}>০</span>
@@ -1230,13 +1252,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           {showInstructions && (
                             <>
                               <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
-                                <span {...getEditableProps()}>সময়— {headerTime || convertToBengaliNumber(questions.length)} মিনিট</span>
-                                <span {...getEditableProps()}>পূর্ণমান— {headerMarks || convertToBengaliNumber(questions.length)}</span>
+                                <span {...getEditableProps()}>{t('time', appLanguage)} {headerTime || localizeNumber(questions.length, appLanguage)} {t('minutes', appLanguage)}</span>
+                                <span {...getEditableProps()}>{t('totalMarks', appLanguage)} {headerMarks || localizeNumber(questions.length, appLanguage)}</span>
                               </div>
 
                               <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
-                                <p {...getEditableProps()}>দ্রষ্টব্য: সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি ⬤ বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।</p>
-                                <p {...getEditableProps("mt-1 font-bold")}>প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।</p>
+                                <p {...getEditableProps()}>{t('instruction1', appLanguage)}</p>
+                                <p {...getEditableProps("mt-1 font-bold")}>{t('instruction2', appLanguage)}</p>
                               </div>
                             </>
                           )}
@@ -1245,11 +1267,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           {showCandidateInfo && (
                             <div className="flex justify-between items-end mb-4 text-[14px] font-bold text-gray-800">
                               <div className="flex-1 flex">
-                                <span className="whitespace-nowrap">পরীক্ষার্থীর নামঃ</span>
+                                <span className="whitespace-nowrap">{t('studentName', appLanguage)}</span>
                                 <div className="border-b border-dashed border-gray-400 flex-1 ml-2 mr-6"></div>
                               </div>
                               <div className="w-[300px] flex">
-                                <span className="whitespace-nowrap">রোলঃ</span>
+                                <span className="whitespace-nowrap">{t('roll', appLanguage)}</span>
                                 <div className="border-b border-dashed border-gray-400 flex-1 ml-2"></div>
                               </div>
                             </div>
@@ -1261,27 +1283,27 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                       {format === 'answer' && (
                         <div className="text-center mb-6">
-                          <h3 className="text-lg font-bold text-red-500">নিচে উত্তরপত্র</h3>
+                          <h3 className="text-lg font-bold text-red-500">{t('answersBelow', appLanguage)}</h3>
                         </div>
                       )}
 
                       {/* QUESTIONS OR ANSWERS */}
                       {format === 'answer' && optionStyle === 'uttarmala' ? (
                         <div className="mt-4 mb-10 overflow-x-auto">
-                          <span className="text-sm font-bold text-gray-800 block mb-2">উত্তর মালা:</span>
+                          <span className="text-sm font-bold text-gray-800 block mb-2">{t('answerKeyHeading', appLanguage)}</span>
                           <table className="border-collapse border border-gray-300 text-center text-sm">
                             <tbody>
                               <tr>
-                                <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">প্রশ্ন</td>
+                                <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">{t('tableQuestion', appLanguage)}</td>
                                 {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => (
-                                  <td key={`q-${idx}`} className="border border-gray-300 px-3 py-2 font-bold">{convertToBengaliNumber(idx + 1)}.</td>
+                                  <td key={`q-${idx}`} className="border border-gray-300 px-3 py-2 font-bold">{localizeNumber(idx + 1, appLanguage)}.</td>
                                 ))}
                               </tr>
                               <tr>
-                                <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">উত্তর</td>
+                                <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">{t('tableAnswer', appLanguage)}</td>
                                 {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => {
                                   const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
-                                  const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
+                                  const marker = localizeOptionLabel(optIdx !== -1 ? optIdx : 0, optionLabelType, appLanguage);
                                   return (
                                     <td key={`a-${idx}`} className="border border-gray-300 px-3 py-2">{marker}</td>
                                   );
@@ -1297,12 +1319,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         >
                           {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, index) => {
                             const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
-                            const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
+                            const marker = localizeOptionLabel(optIdx !== -1 ? optIdx : 0, optionLabelType, appLanguage);
 
                             return (
                               <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex flex-col gap-1 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
                                 <div className="flex items-center gap-2">
-                                  <span>{convertToBengaliNumber(index + 1)}.</span>
+                                  <span>{localizeNumber(index + 1, appLanguage)}.</span>
                                   {optionStyle === 'u' && <span>উঃ {marker}</span>}
                                   {optionStyle === 'ans' && <span>Ans: {marker}</span>}
                                   {(optionStyle === 'ka' || optionStyle === 'circle') && (
@@ -1356,11 +1378,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                 ) : (
                                   <>
                                     <div className="flex items-start gap-1.5 mb-2">
-                                      <span className="font-bold min-w-[18px]">{convertToBengaliNumber(actualQuestionIndex + 1)}.</span>
+                                      <span className="font-bold min-w-[18px]">{localizeNumber(actualQuestionIndex + 1, appLanguage)}.</span>
                                       <div className="flex-1 flex flex-col gap-1">
                                         <div
                                           {...getEditableProps()}
-                                          dangerouslySetInnerHTML={{ __html: q.questionText }}
+                                          dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
                                         />
                                         {(showQuestionTags && q.tags && q.tags.length > 0) && (
                                           <div className="flex gap-1 flex-wrap mt-1">
@@ -1369,7 +1391,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                         )}
                                       </div>
                                       {showQuestionMarks && (
-                                        <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{convertToBengaliNumber(q.marks || 1)}]</span>
+                                        <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{localizeNumber(q.marks || 1, appLanguage)}]</span>
                                       )}
                                     </div>
 
@@ -1386,14 +1408,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                           const optValue = (q.options as any)[optKey];
                                           if (!optValue) return null;
 
-                                          const getMarker = (idx: number, type: string) => {
-                                            if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                            if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                                            if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                                            if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                                            return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                          };
-                                          const marker = getMarker(idx, optionLabelType);
+                                          const marker = localizeOptionLabel(idx, optionLabelType, appLanguage);
                                           const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
 
                                           return (
@@ -1497,7 +1512,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       {/* Left: Marks Box */}
                       {showMarksBox && (
                         <div className="absolute top-8 left-0 flex border border-black">
-                          <div className="bg-black text-white text-[11px] px-2 py-1 flex items-center">প্রাপ্ত নম্বর</div>
+                          <div className="bg-black text-white text-[11px] px-2 py-1 flex items-center">{t('marks', appLanguage)}</div>
                           <div className="w-16"></div>
                         </div>
                       )}
@@ -1506,13 +1521,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       <div className="absolute top-6 right-0 text-right">
                         {showSetCode && (
                           <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
-                            <span className="flex-1 text-center py-0.5">সেট</span>
+                            <span className="flex-1 text-center py-0.5">{t('set', appLanguage)}</span>
                             <span className="border-l border-black flex-1 text-center py-0.5">{activeSetCode}</span>
                           </div>
                         )}
                         {showSubjectCode && (
                           <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
-                            <span>বিষয় কোড :</span>
+                            <span>{t('subjectCode', appLanguage)}</span>
                             <div className="flex">
                               <span className="border border-black w-5 h-6 flex items-center justify-center">০</span>
                               <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
@@ -1535,7 +1550,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <hr className="border-t border-gray-200 my-6" />
 
                     <h2 className="text-[20px] font-bold text-center text-red-500 mb-10">
-                      নিচে উত্তরপত্র
+                      {t('answersBelow', appLanguage)}
                     </h2>
 
                     <div className="flex w-full gap-3 justify-center">
@@ -1551,13 +1566,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                         const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
 
-                        const getMarker = (idx: number, type: string) => {
-                          if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                          if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                          if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                          if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                          return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                        };
+
 
                         return (
                           <div
@@ -1566,8 +1575,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           >
                             {/* Table Header */}
                             <div className="flex w-full border border-red-500 mb-1">
-                              <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
-                              <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
+                              <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableQuestion', appLanguage)}</div>
+                              <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableAnswer', appLanguage)}</div>
                             </div>
 
                             {/* Rows */}
@@ -1578,7 +1587,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                 return (
                                   <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
                                     <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
-                                      {convertToBengaliNumber(originalIndex + 1)}
+                                      {localizeNumber(originalIndex + 1, appLanguage)}
                                     </div>
                                     <div className="flex-1 flex bg-white min-w-0">
                                       {[0, 1, 2, 3].map((optIdx) => {
@@ -1587,7 +1596,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                           <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
                                             <div className={`relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border ${isCorrect ? 'border-[#1e293b] bg-[#1e293b]' : 'border-red-500 bg-white'}`}>
                                               <span className={`text-[10px] font-bold absolute select-none leading-none pt-px ${isCorrect ? 'text-white' : 'text-gray-800'}`}>
-                                                {getMarker(optIdx, optionLabelType)}
+                                                {localizeOptionLabel(optIdx, optionLabelType, appLanguage)}
                                               </span>
                                             </div>
                                           </div>
@@ -1628,31 +1637,31 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       {/* OMR Header */}
                       <div className="flex justify-between items-start border-b-2 border-gray-800 pb-6 mb-8">
                         <div className="flex flex-col gap-5 w-2/3">
-                          <h2 className="text-3xl font-black text-gray-800 tracking-wider">OMR ANSWER SHEET</h2>
+                          <h2 className="text-3xl font-black text-gray-800 tracking-wider">{t('omrTitle', appLanguage)}</h2>
                           <div className="flex items-center gap-4 text-sm font-bold mt-2">
-                            <span className="w-32 text-gray-700">STUDENT NAME</span>
+                            <span className="w-32 text-gray-700">{t('omrStudentName', appLanguage)}</span>
                             <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
                           <div className="flex items-center gap-4 text-sm font-bold">
-                            <span className="w-32 text-gray-700">ROLL NO</span>
+                            <span className="w-32 text-gray-700">{t('omrRollNo', appLanguage)}</span>
                             <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
                           <div className="flex items-center gap-4 text-sm font-bold">
-                            <span className="w-32 text-gray-700">CLASS</span>
+                            <span className="w-32 text-gray-700">{t('omrClass', appLanguage)}</span>
                             <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                            <span className="w-20 text-right text-gray-700">SUBJECT</span>
+                            <span className="w-20 text-right text-gray-700">{t('omrSubject', appLanguage)}</span>
                             <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
                           <div className="flex items-center gap-4 text-sm font-bold">
-                            <span className="w-32 text-gray-700">EXAM DATE</span>
+                            <span className="w-32 text-gray-700">{t('omrExamDate', appLanguage)}</span>
                             <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
-                            <span className="w-20 text-right text-gray-700">SET CODE</span>
+                            <span className="w-20 text-right text-gray-700">{t('omrSetCode', appLanguage)}</span>
                             <div className="flex-1 border-b-2 border-gray-400 border-dashed h-6"></div>
                           </div>
                         </div>
                         <div className="w-1/3 flex justify-end">
                           <div className="border-2 border-gray-800 p-2 w-32 h-32 flex flex-col items-center justify-center rounded-lg text-center bg-gray-50">
-                            <div className="text-xs font-bold text-gray-500 mb-1">INVG. SIGN</div>
+                            <div className="text-xs font-bold text-gray-500 mb-1">{t('omrInvgSign', appLanguage)}</div>
                             <div className="w-full h-16 border-b border-gray-300 border-dashed"></div>
                           </div>
                         </div>
@@ -1660,14 +1669,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                       {/* Instructions */}
                       <div className="mb-10 border border-gray-300 p-4 rounded-lg bg-gray-50 shadow-sm">
-                        <h3 className="font-bold text-[13px] mb-3 text-gray-800">INSTRUCTIONS FOR FILLING THE SHEET</h3>
+                        <h3 className="font-bold text-[13px] mb-3 text-gray-800">{t('omrInstructionsTitle', appLanguage)}</h3>
                         <div className="flex items-center gap-8 text-[12px] font-medium text-gray-600">
                           <div className="flex items-center gap-3">
-                            <span className="text-green-600 font-bold">CORRECT:</span>
+                            <span className="text-green-600 font-bold">{t('omrCorrect', appLanguage)}</span>
                             <div className="w-6 h-6 rounded-full bg-gray-800"></div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="text-red-500 font-bold">WRONG:</span>
+                            <span className="text-red-500 font-bold">{t('omrWrong', appLanguage)}</span>
                             <div className="relative w-6 h-6 rounded-full border-2 border-gray-800 flex items-center justify-center">
                               <div className="w-7 h-0.5 bg-gray-800 rotate-45 absolute"></div>
                               <div className="w-7 h-0.5 bg-gray-800 -rotate-45 absolute"></div>
@@ -1685,7 +1694,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           </div>
                           <div className="ml-auto flex items-center gap-2 text-red-600 bg-red-50 px-3 py-1.5 rounded-md border border-red-100">
                             <Edit className="w-4 h-4" />
-                            <span>Use only Black/Blue Ball Point Pen</span>
+                            <span>{t('omrPen', appLanguage)}</span>
                           </div>
                         </div>
                       </div>
@@ -1704,13 +1713,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                           const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
 
-                          const getMarker = (idx: number, type: string) => {
-                            if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                            if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                            if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                            if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                            return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                          };
+
 
                           return (
                             <div
@@ -1719,8 +1722,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             >
                               {/* Table Header */}
                               <div className="flex w-full border border-red-500 mb-1">
-                                <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">প্রশ্ন</div>
-                                <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">উত্তর</div>
+                                <div className="w-[30%] shrink-0 border-r border-red-500 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableQuestion', appLanguage)}</div>
+                                <div className="flex-1 flex items-center justify-center font-bold text-[13px] py-1 text-gray-900 bg-white">{t('tableAnswer', appLanguage)}</div>
                               </div>
 
                               {/* Rows */}
@@ -1729,13 +1732,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                   return (
                                     <div key={q.id} className="flex items-stretch break-inside-avoid border border-red-500">
                                       <div className="w-[30%] shrink-0 border-r border-red-500 flex justify-center items-center py-1.5 text-[14px] font-bold text-gray-800 bg-white">
-                                        {convertToBengaliNumber(originalIndex + 1)}
+                                        {localizeNumber(originalIndex + 1, appLanguage)}
                                       </div>
                                       <div className="flex-1 flex bg-white min-w-0">
                                         {[0, 1, 2, 3].map((optIdx) => (
                                           <div key={optIdx} className={`flex-1 flex justify-center items-center py-1 border-red-500 ${optIdx !== 3 ? 'border-r' : ''} ${optIdx % 2 === 0 ? 'bg-red-50' : 'bg-white'}`}>
                                             <div className="relative flex items-center justify-center w-[18px] h-[18px] min-w-[18px] min-h-[18px] shrink-0 rounded-full border border-red-500 bg-white">
-                                              <span className="text-[10px] font-bold text-gray-800 absolute select-none leading-none pt-px">{getMarker(optIdx, optionLabelType)}</span>
+                                              <span className="text-[10px] font-bold text-gray-800 absolute select-none leading-none pt-px">{localizeOptionLabel(optIdx, optionLabelType, appLanguage)}</span>
                                             </div>
                                           </div>
                                         ))}
