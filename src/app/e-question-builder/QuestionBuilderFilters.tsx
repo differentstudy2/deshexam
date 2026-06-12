@@ -1,0 +1,144 @@
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+export default function QuestionBuilderFilters() {
+  const [taxonomies, setTaxonomies] = useState({
+    boards: [] as any[],
+    classes: [] as any[],
+    subjects: [] as any[],
+    textbooks: [] as any[],
+    chapters: [] as any[],
+    topics: [] as any[]
+  });
+  const [filters, setFilters] = useState({
+    boardId: 'all',
+    classId: 'all',
+    subjectId: 'all',
+    textbookId: 'all',
+    chapterId: 'all',
+    topicId: 'all'
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTaxonomies = async () => {
+      setLoading(true);
+      try {
+        const fetchCol = async (col: string) => {
+          try {
+            const snap = await getDocs(collection(db, col));
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          } catch {
+            return [];
+          }
+        };
+        const [b, c, s, t, ch, tp] = await Promise.all([
+          fetchCol('guide_boards'), fetchCol('guide_classes'), fetchCol('guide_subjects'),
+          fetchCol('guide_textbooks'), fetchCol('guide_chapters'), fetchCol('guide_topics')
+        ]);
+        setTaxonomies({ boards: b, classes: c, subjects: s, textbooks: t, chapters: ch, topics: tp });
+      } catch (error) {
+        console.error("Failed to fetch taxonomies", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTaxonomies();
+  }, []);
+
+  // Cascading filter logic
+  const filteredClasses = useMemo(() => {
+    if (filters.boardId === 'all') return [];
+    return taxonomies.classes.filter(c => c.boardId === filters.boardId);
+  }, [taxonomies.classes, filters.boardId]);
+
+  const filteredSubjects = useMemo(() => {
+    if (filters.classId === 'all') return [];
+    return taxonomies.subjects.filter(s => s.classId === filters.classId);
+  }, [taxonomies.subjects, filters.classId]);
+
+  const filteredTextbooks = useMemo(() => {
+    if (filters.subjectId === 'all') return [];
+    return taxonomies.textbooks.filter(t => t.subjectId === filters.subjectId);
+  }, [taxonomies.textbooks, filters.subjectId]);
+
+  const filteredChapters = useMemo(() => {
+    if (filters.textbookId === 'all') return [];
+    return taxonomies.chapters.filter(c => c.textbookId === filters.textbookId);
+  }, [taxonomies.chapters, filters.textbookId]);
+
+  const filteredTopics = useMemo(() => {
+    if (filters.chapterId === 'all') return [];
+    return taxonomies.topics.filter(t => t.chapterId === filters.chapterId);
+  }, [taxonomies.topics, filters.chapterId]);
+
+  // Handlers to reset children
+  const handleBoardChange = (v: string) => setFilters(prev => ({ ...prev, boardId: v, classId: 'all', subjectId: 'all', textbookId: 'all', chapterId: 'all', topicId: 'all' }));
+  const handleClassChange = (v: string) => setFilters(prev => ({ ...prev, classId: v, subjectId: 'all', textbookId: 'all', chapterId: 'all', topicId: 'all' }));
+  const handleSubjectChange = (v: string) => setFilters(prev => ({ ...prev, subjectId: v, textbookId: 'all', chapterId: 'all', topicId: 'all' }));
+  const handleTextbookChange = (v: string) => setFilters(prev => ({ ...prev, textbookId: v, chapterId: 'all', topicId: 'all' }));
+  const handleChapterChange = (v: string) => setFilters(prev => ({ ...prev, chapterId: v, topicId: 'all' }));
+  const handleTopicChange = (v: string) => setFilters(prev => ({ ...prev, topicId: v }));
+
+  const router = useRouter();
+
+  const handleCreate = () => {
+    const params = new URLSearchParams();
+    if (filters.boardId !== 'all') params.set('boardId', filters.boardId);
+    if (filters.classId !== 'all') params.set('classId', filters.classId);
+    if (filters.subjectId !== 'all') params.set('subjectId', filters.subjectId);
+    if (filters.textbookId !== 'all') params.set('textbookId', filters.textbookId);
+    if (filters.chapterId !== 'all') params.set('chapterId', filters.chapterId);
+    if (filters.topicId !== 'all') params.set('topicId', filters.topicId);
+    
+    router.push(`/e-question-builder/select-question?${params.toString()}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-6 text-slate-400">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" />
+        <span>ফিল্টার লোড হচ্ছে...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
+      <Select value={filters.boardId} onValueChange={handleBoardChange}>
+        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বোর্ড" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">সকল বোর্ড</SelectItem>{taxonomies.boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+      </Select>
+      <Select value={filters.classId} onValueChange={handleClassChange}>
+        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="শ্রেণি" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">সকল শ্রেণি</SelectItem>{filteredClasses.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+      </Select>
+      <Select value={filters.subjectId} onValueChange={handleSubjectChange}>
+        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বিষয়" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">সকল বিষয়</SelectItem>{filteredSubjects.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+      </Select>
+      <Select value={filters.textbookId} onValueChange={handleTextbookChange}>
+        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="বই" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">সকল বই</SelectItem>{filteredTextbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+      </Select>
+      <Select value={filters.chapterId} onValueChange={handleChapterChange}>
+        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="অধ্যায়" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">সকল অধ্যায়</SelectItem>{filteredChapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+      </Select>
+      <Select value={filters.topicId} onValueChange={handleTopicChange}>
+        <SelectTrigger className="bg-white dark:bg-slate-900"><SelectValue placeholder="টপিক" /></SelectTrigger>
+        <SelectContent><SelectItem value="all">সকল টপিক</SelectItem>{filteredTopics.map(b => <SelectItem key={b.id} value={b.id}>{b.name || b.title}</SelectItem>)}</SelectContent>
+      </Select>
+      <Button onClick={handleCreate} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-semibold w-full">
+        তৈরি করুন
+      </Button>
+    </div>
+  );
+}
