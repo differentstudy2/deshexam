@@ -8,10 +8,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon, QrCode, CheckCircle, CircleDot } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon, QrCode, CheckCircle, CircleDot, GripVertical, PlusCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Props {
   subjectId?: string;
@@ -99,6 +101,250 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [headerImageEnabled, setHeaderImageEnabled] = useState(false);
   const [headerImage, setHeaderImage] = useState<string | null>(null);
   const [headerImageFit, setHeaderImageFit] = useState('cover');
+
+  // Drag and Drop State
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // Custom Question Modal State
+  const [isAddQuestionOpen, setIsAddQuestionOpen] = useState(false);
+  const [customQuestion, setCustomQuestion] = useState({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a' });
+  const [addQuestionMode, setAddQuestionMode] = useState<'single' | 'bulk'>('single');
+  const [bulkQuestionText, setBulkQuestionText] = useState('');
+
+  // Section Header Modal State
+  const [isSectionHeaderOpen, setIsSectionHeaderOpen] = useState(false);
+  const [sectionHeaderText, setSectionHeaderText] = useState('');
+
+  // Enhanced Settings State
+  const [footerText, setFooterText] = useState('সৌজন্যে: DeshExam');
+  const [questionOptionGap, setQuestionOptionGap] = useState(8);
+  const [showExplanations, setShowExplanations] = useState(false);
+
+  // Template Management
+  const handleSaveTemplate = () => {
+    const settings = {
+      format, optionStyle, paperColumns, optionShape, optionLabelType,
+      optionColumns, rowGap, colGap, fontFamily, fontSize, questionOptionGap,
+      headerTitle, headerAddress, headerClassName, headerSubjectName,
+      headerSettingsEnabled, brandingEnabled, watermarkText, watermarkSize, watermarkOpacity,
+      footerText
+    };
+    localStorage.setItem('deshexam_paper_template', JSON.stringify(settings));
+    alert('টেমপ্লেট সফলভাবে সেভ হয়েছে!');
+  };
+
+  const handleLoadTemplate = () => {
+    const saved = localStorage.getItem('deshexam_paper_template');
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s.format) setFormat(s.format);
+      if (s.optionStyle) setOptionStyle(s.optionStyle);
+      if (s.paperColumns) setPaperColumns(s.paperColumns);
+      if (s.optionShape) setOptionShape(s.optionShape);
+      if (s.optionLabelType) setOptionLabelType(s.optionLabelType);
+      if (s.optionColumns) setOptionColumns(s.optionColumns);
+      if (s.rowGap !== undefined) setRowGap(s.rowGap);
+      if (s.colGap !== undefined) setColGap(s.colGap);
+      if (s.fontFamily) setFontFamily(s.fontFamily);
+      if (s.fontSize) setFontSize(s.fontSize);
+      if (s.questionOptionGap !== undefined) setQuestionOptionGap(s.questionOptionGap);
+      if (s.headerTitle) setHeaderTitle(s.headerTitle);
+      if (s.headerAddress) setHeaderAddress(s.headerAddress);
+      if (s.headerClassName) setHeaderClassName(s.headerClassName);
+      if (s.headerSubjectName) setHeaderSubjectName(s.headerSubjectName);
+      if (s.headerSettingsEnabled !== undefined) setHeaderSettingsEnabled(s.headerSettingsEnabled);
+      if (s.brandingEnabled !== undefined) setBrandingEnabled(s.brandingEnabled);
+      if (s.watermarkText !== undefined) setWatermarkText(s.watermarkText);
+      if (s.watermarkSize !== undefined) setWatermarkSize(s.watermarkSize);
+      if (s.watermarkOpacity !== undefined) setWatermarkOpacity(s.watermarkOpacity);
+      if (s.footerText) setFooterText(s.footerText);
+    }
+  };
+
+  // Export Handlers
+  const handleExportPDF = async () => {
+    const element = document.getElementById('printable-paper');
+    if (!element) return;
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const pdf = new jsPDF({
+      orientation: orientation === 'Landscape' ? 'landscape' : 'portrait',
+      unit: 'in',
+      format: paperSize === 'A4' ? 'a4' : paperSize === 'Letter' ? 'letter' : 'legal'
+    });
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save((paperName || 'Question_Paper') + '.pdf');
+  };
+
+  const handleExportWord = () => {
+    const element = document.getElementById('printable-paper');
+    if (!element) return;
+    const htmlContent = element.innerHTML;
+    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>Export Document</title></head><body>`;
+    const footer = `</body></html>`;
+    const sourceHTML = header + htmlContent + footer;
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = (paperName || 'Question_Paper') + '.doc';
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+  };
+
+  // Drag and Drop Handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (!editingMode) return;
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    // Small timeout to allow drag image to capture correctly
+    setTimeout(() => {
+      (e.target as HTMLElement).style.opacity = '0.5';
+    }, 0);
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    setDraggedIndex(null);
+    (e.target as HTMLElement).style.opacity = '1';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (!editingMode || draggedIndex === null || draggedIndex === index) return;
+    
+    const newQuestions = [...questions];
+    const draggedItem = newQuestions[draggedIndex];
+    newQuestions.splice(draggedIndex, 1);
+    newQuestions.splice(index, 0, draggedItem);
+    
+    setQuestions(newQuestions);
+    setDraggedIndex(index); // Update dragged index to new position to continue dragging
+  };
+
+  // Inline Question Operations
+  const handleDeleteQuestion = (index: number) => {
+    if (confirm('প্রশ্নটি ডিলিট করতে চান?')) {
+      const newQuestions = [...questions];
+      newQuestions.splice(index, 1);
+      setQuestions(newQuestions);
+    }
+  };
+
+  const handleAddCustomQuestionSubmit = () => {
+    if (addQuestionMode === 'single') {
+      if (!customQuestion.text) return;
+      const newQuestion: any = {
+        id: `custom_${Date.now()}`,
+        questionText: customQuestion.text,
+        options: { a: customQuestion.optA, b: customQuestion.optB, c: customQuestion.optC, d: customQuestion.optD },
+        correctAnswer: customQuestion.correctAnswer,
+        explanation: '',
+        difficulty: 'Medium',
+        status: 'Published',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        slug: 'custom-' + Date.now()
+      };
+      setQuestions([...questions, newQuestion]);
+      setIsAddQuestionOpen(false);
+      setCustomQuestion({ text: '', optA: '', optB: '', optC: '', optD: '', correctAnswer: 'a' });
+    } else {
+      if (!bulkQuestionText.trim()) return;
+      
+      let newQuestions: any[] = [];
+      
+      try {
+        // Try parsing as JSON first
+        const parsed = JSON.parse(bulkQuestionText);
+        if (Array.isArray(parsed)) {
+          newQuestions = parsed.map((item, idx) => ({
+            id: `custom_bulk_${Date.now()}_${idx}`,
+            questionText: item.questionText || '',
+            options: { 
+              a: item.options?.a || '', 
+              b: item.options?.b || '', 
+              c: item.options?.c || '', 
+              d: item.options?.d || '' 
+            },
+            correctAnswer: item.correctAnswer || 'a',
+            explanation: item.explanation || '',
+            difficulty: 'Medium',
+            status: 'Published',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            slug: `custom-bulk-${Date.now()}-${idx}`
+          }));
+        }
+      } catch (e) {
+        // Fallback to text block parsing
+        const blocks = bulkQuestionText.split(/\n\s*\n/);
+        
+        blocks.forEach((block, idx) => {
+          const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+          if (lines.length > 0) {
+            const qText = lines[0].replace(/^\d+[\.)]\s*/, '');
+            const optA = lines[1] ? lines[1].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
+            const optB = lines[2] ? lines[2].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
+            const optC = lines[3] ? lines[3].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
+            const optD = lines[4] ? lines[4].replace(/^[a-dক-ঘ][\.)]\s*/i, '') : '';
+            
+            // Try to find the correct answer on the 6th line
+            let correctAns = 'a';
+            if (lines[5]) {
+               const ansMatch = lines[5].toLowerCase().match(/(?:answer|উত্তর|সঠিক উত্তর)[\s:-]*([a-dক-ঘ])/);
+               if (ansMatch) {
+                 const char = ansMatch[1];
+                 if (char === 'a' || char === 'ক') correctAns = 'a';
+                 if (char === 'b' || char === 'খ') correctAns = 'b';
+                 if (char === 'c' || char === 'গ') correctAns = 'c';
+                 if (char === 'd' || char === 'ঘ') correctAns = 'd';
+               }
+            }
+            
+            newQuestions.push({
+              id: `custom_bulk_${Date.now()}_${idx}`,
+              questionText: qText,
+              options: { a: optA, b: optB, c: optC, d: optD },
+              correctAnswer: correctAns,
+              explanation: '',
+              difficulty: 'Medium',
+              status: 'Published',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              slug: `custom-bulk-${Date.now()}-${idx}`
+            });
+          }
+        });
+      }
+      
+      if (newQuestions.length > 0) {
+        setQuestions([...questions, ...newQuestions]);
+        setIsAddQuestionOpen(false);
+        setBulkQuestionText('');
+      }
+    }
+  };
+
+  const handleAddSectionHeaderSubmit = () => {
+    if (!sectionHeaderText) return;
+    const newQ: QuestionBankEntry = {
+      id: 'section-' + Date.now(),
+      questionType: 'Exam Paper', // Using this to tag section headers, or we can use generic fields
+      questionText: `[[SECTION_HEADER]]${sectionHeaderText}`,
+      correctAnswer: 'a',
+      difficulty: 'Medium',
+      status: 'Published',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      slug: 'section-' + Date.now()
+    };
+    setQuestions([...questions, newQ]);
+    setIsSectionHeaderOpen(false);
+    setSectionHeaderText('');
+  };
 
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
@@ -226,8 +472,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           {/* Header */}
           <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
             <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> ফিল্টার সেটিংস</h3>
-            <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs">
-              <Save className="w-3 h-3 mr-1" /> সংরক্ষণ
+            <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs" onClick={handleSaveTemplate}>
+              <Save className="w-3 h-3 mr-1" /> টেমপ্লেট সেভ
             </Button>
           </div>
 
@@ -236,13 +482,21 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={() => setIsPageSetupOpen(true)}>
                 <FileText className="w-4 h-4 mr-2" /> Page Setup
               </Button>
-              <Button variant="outline" className="flex-1 text-gray-600 border-gray-300">
-                <Share2 className="w-4 h-4 mr-2" /> Share
+              <Button variant="outline" className="flex-1 text-gray-600 border-gray-300" onClick={handleLoadTemplate}>
+                <RefreshCw className="w-4 h-4 mr-2" /> Load Temp
               </Button>
             </div>
-            <Button onClick={handlePrint} className="w-full bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none">
-              <Download className="w-4 h-4 mr-2" /> প্রিভিউ এবং ডাউনলোড
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handlePrint} className="flex-1 bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+                <Download className="w-3.5 h-3.5 mr-1" /> Print
+              </Button>
+              <Button onClick={handleExportPDF} className="flex-1 bg-red-100 hover:bg-red-200 text-red-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+                <FileText className="w-3.5 h-3.5 mr-1" /> PDF
+              </Button>
+              <Button onClick={handleExportWord} className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-800 border-transparent shadow-none px-2 h-9 text-[12px]">
+                <FileText className="w-3.5 h-3.5 mr-1" /> Word
+              </Button>
+            </div>
           </div>
 
           {/* Basic Settings */}
@@ -290,6 +544,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
               <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Edit className="w-3.5 h-3.5 text-blue-500" /> এডিটিং মুড</span>
               <Switch checked={editingMode} onCheckedChange={setEditingMode} />
+            </div>
+
+            <div className="flex justify-between items-center mb-4 bg-gray-50 p-2 rounded-md border border-gray-100">
+              <span className="text-sm font-medium text-gray-700 flex items-center gap-2"><Book className="w-3.5 h-3.5 text-green-600" /> ব্যাখ্যাসহ উত্তর</span>
+              <Switch checked={showExplanations} onCheckedChange={setShowExplanations} />
             </div>
 
             <div className="flex gap-2">
@@ -586,6 +845,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 <span className="text-sm text-gray-700 mb-2 block">কলাম-গ্যাপ</span>
                 <input type="range" min="0" max="100" value={colGap} onChange={e => setColGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
               </div>
+              <div>
+                <span className="text-sm text-gray-700 mb-2 block">প্রশ্ন-অপশন গ্যাপ</span>
+                <input type="range" min="0" max="40" value={questionOptionGap} onChange={e => setQuestionOptionGap(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+              </div>
             </div>
 
             {/* Font Settings */}
@@ -638,6 +901,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 <div className="space-y-5">
                   {/* Text */}
                   <div>
+                    <label className="text-[13px] text-gray-700 mb-2 block">ফুটার টেক্সট</label>
+                    <Input
+                      value={footerText}
+                      onChange={e => setFooterText(e.target.value)}
+                      placeholder="সৌজন্যে: DeshExam"
+                      className="h-10 text-[14px] bg-white text-gray-700 border-gray-200 mb-4"
+                    />
                     <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ টেক্সট</label>
                     <Input
                       value={watermarkText}
@@ -813,6 +1083,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   font-weight: bold;
                 }
                 ` : ''}
+                @bottom-left {
+                  content: "${footerText}";
+                  font-size: 12px;
+                  font-weight: bold;
+                  color: rgba(31, 41, 55, 0.7);
+                }
               }
             }
           `}} />
@@ -991,13 +1267,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                           <tbody>
                             <tr>
                               <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">প্রশ্ন</td>
-                              {questions.map((q, idx) => (
+                              {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => (
                                 <td key={`q-${idx}`} className="border border-gray-300 px-3 py-2 font-bold">{convertToBengaliNumber(idx + 1)}.</td>
                               ))}
                             </tr>
                             <tr>
                               <td className="border border-gray-300 font-bold px-3 py-2 bg-gray-50">উত্তর</td>
-                              {questions.map((q, idx) => {
+                              {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, idx) => {
                                 const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
                                 const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
                                 return (
@@ -1013,17 +1289,24 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         className="text-justify mb-10"
                         style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                       >
-                        {questions.map((q, index) => {
+                        {questions.filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).map((q, index) => {
                           const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
                           const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
 
                           return (
-                            <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex items-center gap-2 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
-                              <span>{convertToBengaliNumber(index + 1)}.</span>
-                              {optionStyle === 'u' && <span>উঃ {marker}</span>}
-                              {optionStyle === 'ans' && <span>Ans: {marker}</span>}
-                              {(optionStyle === 'ka' || optionStyle === 'circle') && (
-                                <span className="inline-flex items-center justify-center w-[20px] h-[20px] rounded-full bg-gray-800 text-white text-[12px] leading-none pb-[1px]">{marker}</span>
+                            <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex flex-col gap-1 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
+                              <div className="flex items-center gap-2">
+                                <span>{convertToBengaliNumber(index + 1)}.</span>
+                                {optionStyle === 'u' && <span>উঃ {marker}</span>}
+                                {optionStyle === 'ans' && <span>Ans: {marker}</span>}
+                                {(optionStyle === 'ka' || optionStyle === 'circle') && (
+                                  <span className="inline-flex items-center justify-center w-[20px] h-[20px] rounded-full bg-gray-800 text-white text-[12px] leading-none pb-[1px]">{marker}</span>
+                                )}
+                              </div>
+                              {showExplanations && q.explanation && (
+                                <div className="text-sm text-gray-600 font-normal mt-1 border-l-2 border-gray-300 pl-2">
+                                  <span className="font-bold text-gray-700">ব্যাখ্যা:</span> <span dangerouslySetInnerHTML={{ __html: q.explanation }} />
+                                </div>
                               )}
                             </div>
                           );
@@ -1034,72 +1317,118 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         className="text-justify"
                         style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                       >
-                        {questions.map((q, index) => (
-                          <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
-                            <div className="flex items-start gap-1.5 mb-2">
-                              <span className="font-bold min-w-[18px]">{convertToBengaliNumber(index + 1)}.</span>
-                              <div className="flex-1 flex flex-col gap-1">
-                                <div
-                                  {...getEditableProps()}
-                                  dangerouslySetInnerHTML={{ __html: q.questionText }}
-                                />
-                                {(showQuestionTags && q.tags && q.tags.length > 0) && (
-                                  <div className="flex gap-1 flex-wrap mt-1">
-                                    {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
-                                  </div>
-                                )}
-                              </div>
-                              {showQuestionMarks && (
-                                <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{convertToBengaliNumber(q.marks || 1)}]</span>
-                              )}
-                            </div>
+                        {questions.map((q, index) => {
+                          const isSectionHeader = q.questionText.startsWith('[[SECTION_HEADER]]');
+                          const sectionTitle = isSectionHeader ? q.questionText.replace('[[SECTION_HEADER]]', '') : '';
+                          const actualQuestionIndex = questions.slice(0, index + 1).filter(q => !q.questionText.startsWith('[[SECTION_HEADER]]')).length - 1;
 
-                            {/* Options */}
-                            {q.options && (
-                              <div
-                                className="grid gap-y-1.5 gap-x-2 pl-6"
-                                style={{ gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))` }}
-                              >
-                                {['a', 'b', 'c', 'd'].map((optKey, idx) => {
-                                  const optValue = (q.options as any)[optKey];
-                                  if (!optValue) return null;
-
-                                  const getMarker = (idx: number, type: string) => {
-                                    if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                    if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
-                                    if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
-                                    if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
-                                    return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
-                                  };
-                                  const marker = getMarker(idx, optionLabelType);
-                                  const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
-
-                                  return (
-                                    <div key={optKey} className="flex items-start gap-1.5">
-                                      <span className="shrink-0 mt-[1px]">
-                                        {optionShape === 'circle' ? (
-                                          <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
-                                        ) : optionShape === 'parens' ? (
-                                          <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
-                                        ) : optionShape === 'paren' ? (
-                                          <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
-                                        ) : (
-                                          <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
-                                        )}
-                                      </span>
-                                      <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
-                                        {optValue}
-                                      </span>
-                                    </div>
-                                  )
-                                })}
+                          return (
+                          <div 
+                            key={q.id} 
+                            className={`relative text-gray-900 leading-snug break-inside-avoid ${draggedIndex === index ? 'opacity-50' : ''}`} 
+                            style={{ 
+                              marginBottom: `${rowGap}px`, 
+                              fontSize: `${fontSize}px`,
+                              ...(isSectionHeader ? { columnSpan: 'all', WebkitColumnSpan: 'all' } : {})
+                            }}
+                            draggable={editingMode}
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragEnd={handleDragEnd}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                          >
+                            {editingMode && (
+                              <div className="absolute -left-8 top-0 flex flex-col gap-1 print:hidden opacity-50 hover:opacity-100 transition-opacity">
+                                <button className="cursor-grab hover:text-blue-500"><GripVertical className="w-4 h-4" /></button>
+                                <button onClick={() => handleDeleteQuestion(index)} className="hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                               </div>
                             )}
+
+                            {isSectionHeader ? (
+                              <div className="font-bold text-center my-4 pb-1 border-b-2 border-gray-800 text-[110%] print:break-after-avoid">
+                                {sectionTitle}
+                              </div>
+                            ) : (
+                              <>
+                                <div className="flex items-start gap-1.5 mb-2">
+                                  <span className="font-bold min-w-[18px]">{convertToBengaliNumber(actualQuestionIndex + 1)}.</span>
+                                  <div className="flex-1 flex flex-col gap-1">
+                                    <div
+                                      {...getEditableProps()}
+                                      dangerouslySetInnerHTML={{ __html: q.questionText }}
+                                    />
+                                    {(showQuestionTags && q.tags && q.tags.length > 0) && (
+                                      <div className="flex gap-1 flex-wrap mt-1">
+                                        {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {showQuestionMarks && (
+                                    <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap ml-2">[{convertToBengaliNumber(q.marks || 1)}]</span>
+                                  )}
+                                </div>
+
+                                {/* Options */}
+                                {q.options && (
+                                  <div
+                                    className="grid gap-x-2 pl-6"
+                                    style={{ 
+                                      gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))`,
+                                      rowGap: `${questionOptionGap}px`
+                                    }}
+                                  >
+                                    {['a', 'b', 'c', 'd'].map((optKey, idx) => {
+                                      const optValue = (q.options as any)[optKey];
+                                      if (!optValue) return null;
+
+                                      const getMarker = (idx: number, type: string) => {
+                                        if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                        if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                                        if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                                        if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                                        return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                      };
+                                      const marker = getMarker(idx, optionLabelType);
+                                      const isCorrect = format === 'qa' && (q.correctAnswer || '').toLowerCase() === optKey;
+
+                                      return (
+                                        <div key={optKey} className="flex items-start gap-1.5">
+                                          <span className="shrink-0 mt-[1px]">
+                                            {optionShape === 'circle' ? (
+                                              <span className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-full border border-gray-600 text-[11px] leading-none pb-[1px] ${isCorrect ? 'bg-gray-800 text-white border-transparent' : ''}`}>{marker}</span>
+                                            ) : optionShape === 'parens' ? (
+                                              <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>({marker})</span>
+                                            ) : optionShape === 'paren' ? (
+                                              <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker})</span>
+                                            ) : (
+                                              <span className={isCorrect ? 'font-bold bg-gray-200 px-1 rounded' : ''}>{marker}.</span>
+                                            )}
+                                          </span>
+                                          <span {...getEditableProps(isCorrect ? 'font-bold' : '')} style={{ fontSize: `${fontSize - 1}px` }}>
+                                            {optValue}
+                                          </span>
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
+                                )}
+                              </>
+                            )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                     
+                    {editingMode && (
+                      <div className="mt-8 flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6">
+                        <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => setIsAddQuestionOpen(true)}>
+                          <PlusCircle className="w-4 h-4 mr-2" /> কাস্টম প্রশ্ন যোগ করুন
+                        </Button>
+                        <Button variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => setIsSectionHeaderOpen(true)}>
+                          <Layers className="w-4 h-4 mr-2" /> নতুন সেকশন/বিভাগ যোগ
+                        </Button>
+                      </div>
+                    )}
 
                   </div>
                 </>
@@ -1542,6 +1871,118 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             <Button className="bg-[#dcfce7] hover:bg-[#bbf7d0] text-green-800 px-6 h-[42px] rounded-md font-medium" onClick={() => { setIsPageSetupOpen(false); handlePrint(); }}>
               প্রিভিউ এবং ডাউনলোড
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modals */}
+      <Dialog open={isAddQuestionOpen} onOpenChange={setIsAddQuestionOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>কাস্টম প্রশ্ন যোগ করুন</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex gap-2 mb-2 p-1 bg-gray-100 rounded-md w-fit">
+              <button 
+                onClick={() => setAddQuestionMode('single')} 
+                className={`px-4 py-1.5 text-sm rounded ${addQuestionMode === 'single' ? 'bg-white text-blue-700 shadow-sm font-medium' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                সিঙ্গেল প্রশ্ন
+              </button>
+              <button 
+                onClick={() => setAddQuestionMode('bulk')} 
+                className={`px-4 py-1.5 text-sm rounded ${addQuestionMode === 'bulk' ? 'bg-white text-blue-700 shadow-sm font-medium' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                বাল্ক ইমপোর্ট (Bulk)
+              </button>
+            </div>
+
+            {addQuestionMode === 'single' ? (
+              <>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">প্রশ্ন</label>
+                  <Input value={customQuestion.text} onChange={e => setCustomQuestion({...customQuestion, text: e.target.value})} placeholder="প্রশ্ন লিখুন..." />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-xs mb-1 block">অপশন A (ক)</label><Input value={customQuestion.optA} onChange={e => setCustomQuestion({...customQuestion, optA: e.target.value})} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন B (খ)</label><Input value={customQuestion.optB} onChange={e => setCustomQuestion({...customQuestion, optB: e.target.value})} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন C (গ)</label><Input value={customQuestion.optC} onChange={e => setCustomQuestion({...customQuestion, optC: e.target.value})} /></div>
+                  <div><label className="text-xs mb-1 block">অপশন D (ঘ)</label><Input value={customQuestion.optD} onChange={e => setCustomQuestion({...customQuestion, optD: e.target.value})} /></div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">সঠিক উত্তর</label>
+                  <Select value={customQuestion.correctAnswer} onValueChange={v => setCustomQuestion({...customQuestion, correctAnswer: v})}>
+                    <SelectTrigger><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="a">A (ক)</SelectItem>
+                      <SelectItem value="b">B (খ)</SelectItem>
+                      <SelectItem value="c">C (গ)</SelectItem>
+                      <SelectItem value="d">D (ঘ)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            ) : (
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">প্রশ্নসমূহ পেস্ট করুন (Text বা JSON)</label>
+                <div className="text-[13px] text-gray-600 mb-3 bg-blue-50/50 p-3 rounded border border-blue-100 max-h-48 overflow-y-auto">
+                  <span className="font-semibold text-blue-700">টেক্সট ফরম্যাট:</span> প্রতিটি প্রশ্নের মাঝে একটি ফাঁকা লাইন রাখুন। ৬ষ্ঠ লাইনে "উত্তর: ক" লিখে সঠিক উত্তর দিতে পারবেন।
+                  <br/>
+                  <span className="font-semibold text-blue-700 mt-2 block">JSON ফরম্যাট (Advanced):</span>
+                  <pre className="mt-1 bg-white p-2 rounded text-[11px] font-mono text-gray-700 border border-gray-200">
+{`[
+  {
+    "questionText": "বাংলাদেশের রাজধানী কী?",
+    "options": { "a": "ঢাকা", "b": "রাজশাহী", "c": "চট্টগ্রাম", "d": "সিলেট" },
+    "correctAnswer": "a"
+  }
+]`}
+                  </pre>
+                </div>
+                <textarea 
+                  value={bulkQuestionText}
+                  onChange={e => setBulkQuestionText(e.target.value)}
+                  placeholder="১. বাংলাদেশের রাজধানী কী?&#10;ক. ঢাকা&#10;খ. রাজশাহী&#10;গ. চট্টগ্রাম&#10;ঘ. সিলেট&#10;উত্তর: ক&#10;&#10;২. জাতীয় পাখি কী?&#10;ক. দোয়েল&#10;খ. ময়না&#10;..."
+                  className="w-full h-64 p-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddQuestionOpen(false)}>বাতিল</Button>
+            <Button onClick={handleAddCustomQuestionSubmit} className="bg-blue-600 hover:bg-blue-700 text-white">যোগ করুন</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isSectionHeaderOpen} onOpenChange={setIsSectionHeaderOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>সেকশন/বিভাগ যোগ করুন</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">বিভাগের নাম / নির্দেশনা</label>
+              <Input value={sectionHeaderText} onChange={e => setSectionHeaderText(e.target.value)} placeholder="যেমন: বিভাগ ক - রচনামূলক প্রশ্ন" />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-2 block">দ্রুত নির্বাচন করুন (Quick Select)</label>
+              <div className="flex flex-wrap gap-2">
+                {['বহুনির্বাচনি প্রশ্ন', 'সৃজনশীল প্রশ্ন', 'বিভাগ-ক', 'বিভাগ-খ', 'যেকোনো ৫টি প্রশ্নের উত্তর দাও', 'সকল প্রশ্নের মান সমান'].map(preset => (
+                  <button
+                    key={preset}
+                    onClick={() => setSectionHeaderText(preset)}
+                    className="text-xs bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 px-2.5 py-1.5 rounded transition-colors"
+                  >
+                    {preset}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSectionHeaderOpen(false)}>বাতিল</Button>
+            <Button onClick={handleAddSectionHeaderSubmit} className="bg-green-600 hover:bg-green-700 text-white">যোগ করুন</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
