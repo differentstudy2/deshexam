@@ -11,7 +11,8 @@ export function Footer() {
 
   const hideFooterOnPaths = [
     '/quiz/',
-    '/admin'
+    '/admin',
+    '/e-question-builder/create-question'
   ];
 
   const shouldHideFooter = hideFooterOnPaths.some(path => pathname.startsWith(path));

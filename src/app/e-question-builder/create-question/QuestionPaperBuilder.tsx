@@ -39,7 +39,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [isSetCodeOpen, setIsSetCodeOpen] = useState(false);
   const [activeSetCode, setActiveSetCode] = useState('ক');
   const [tempSetCode, setTempSetCode] = useState('ক');
-  const [savedSets, setSavedSets] = useState<{code: string, questions: QuestionBankEntry[]}[]>([]);
+  const [savedSets, setSavedSets] = useState<{ code: string, questions: QuestionBankEntry[] }[]>([]);
 
   // Content Display State
   const [showTitle, setShowTitle] = useState(true);
@@ -151,7 +151,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   };
 
   const getWatermarkFontFamily = () => {
-    switch(watermarkFont) {
+    switch (watermarkFont) {
       case 'kalpurush': return '"Kalpurush", sans-serif';
       case 'siyamrupali': return '"Siyam Rupali", sans-serif';
       case 'solaimanlipi': return '"SolaimanLipi", sans-serif';
@@ -202,7 +202,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   return (
     <div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white">
       {/* Top Header */}
-      <header className="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm print:hidden">
+      <header className="bg-white border-b px-6 py-4 flex justify-between items-center print:hidden">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-500">
             <ArrowLeft className="w-5 h-5" />
@@ -292,14 +292,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             </div>
 
             <div className="flex gap-2">
-              <div 
+              <div
                 className="flex-1 bg-gray-50 hover:bg-gray-100 cursor-pointer p-2 rounded-md border border-gray-100 flex items-center justify-between text-gray-600 text-sm transition-colors"
                 onClick={handleShuffle}
               >
                 এলোমেলো করুন <Shuffle className="w-3.5 h-3.5" />
               </div>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-[#03a9f4] hover:bg-[#0288d1] text-white"
                 onClick={() => { setTempSetCode(activeSetCode); setIsSetCodeOpen(true); }}
               >
@@ -334,7 +334,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <h4 className="font-bold text-gray-700 flex items-center gap-2 text-[15px]"><Landmark className="w-4 h-4 text-purple-500" /> সেন্টার ও পরীক্ষা সেটিংস</h4>
               <Switch checked={headerSettingsEnabled} onCheckedChange={setHeaderSettingsEnabled} className="data-[state=checked]:bg-blue-600" />
             </div>
-            
+
             {headerSettingsEnabled && (
               <div className="space-y-4">
                 <div>
@@ -586,7 +586,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             {/* Font Settings */}
             <div className="mb-2">
               <h5 className="font-bold text-gray-800 text-[14px] mb-4">ফন্ট সেটিংস</h5>
-              
+
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[13px] text-gray-700 w-16">ফন্ট:</span>
                 <div className="flex-1">
@@ -634,8 +634,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   {/* Text */}
                   <div>
                     <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ টেক্সট</label>
-                    <Input 
-                      value={watermarkText} 
+                    <Input
+                      value={watermarkText}
                       onChange={e => setWatermarkText(e.target.value)}
                       placeholder="দেশ এক্সাম একাডেমী"
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
@@ -722,10 +722,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   <div>
                     <label className="text-[13px] text-gray-700 mb-2 block">হেডার ইমেজ</label>
                     <div className="border border-gray-200 rounded-md bg-white p-1 flex items-center">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleHeaderImageUpload} 
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleHeaderImageUpload}
                         className="text-[13px] text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:border-0 file:text-[13px] file:bg-gray-100 file:text-gray-800 hover:file:bg-gray-200 w-full"
                       />
                     </div>
@@ -792,16 +792,16 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               }
             }
           `}} />
-          <div 
-            id="printable-paper" 
+          <div
+            id="printable-paper"
             className="preview-page-container mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
-            style={{ 
-              fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' : 
-                          fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' : 
-                          fontFamily === 'nikosh' ? '"Nikosh", sans-serif' : 
-                          fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' : 
-                          fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' : 
-                          fontFamily === 'timesnewroman' ? '"Times New Roman", serif' : 
+            style={{
+              fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' :
+                fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' :
+                  fontFamily === 'nikosh' ? '"Nikosh", sans-serif' :
+                    fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' :
+                      fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' :
+                        fontFamily === 'timesnewroman' ? '"Times New Roman", serif' :
                           fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
             }}
           >
@@ -816,15 +816,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 <>
                   {/* Watermark */}
                   {brandingEnabled && (
-                    <div 
-                      className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0" 
-                      style={{ 
-                        opacity: watermarkOpacity / 100 
+                    <div
+                      className="absolute print:fixed print:inset-0 inset-0 pointer-events-none overflow-hidden z-0"
+                      style={{
+                        opacity: watermarkOpacity / 100
                       }}
                     >
                       {watermarkRepeat ? (
                         <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
-                          {Array.from({length: watermarkRepeatCount}).map((_, i) => (
+                          {Array.from({ length: watermarkRepeatCount }).map((_, i) => (
                             <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
                               {watermarkImage ? (
                                 <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
@@ -854,11 +854,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     {/* Header Image */}
                     {headerImageEnabled && headerImage && (
                       <div className="w-full mb-6">
-                        <img 
-                          src={headerImage} 
-                          alt="Header Banner" 
-                          className="w-full h-32" 
-                          style={{ objectFit: headerImageFit as any }} 
+                        <img
+                          src={headerImage}
+                          alt="Header Banner"
+                          className="w-full h-32"
+                          style={{ objectFit: headerImageFit as any }}
                         />
                       </div>
                     )}
@@ -977,14 +977,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         </table>
                       </div>
                     ) : format === 'answer' ? (
-                      <div 
+                      <div
                         className="text-justify mb-10"
                         style={{ columnCount: paperColumns, columnRule: showColumnDivider ? '1px solid #e5e7eb' : 'none', columnGap: `${colGap}px` }}
                       >
                         {questions.map((q, index) => {
                           const optIdx = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || 'a').toLowerCase());
                           const marker = ['ক', 'খ', 'গ', 'ঘ'][optIdx !== -1 ? optIdx : 0];
-                          
+
                           return (
                             <div key={q.id} className="text-gray-900 leading-snug break-inside-avoid flex items-center gap-2 font-bold" style={{ marginBottom: `${rowGap}px`, fontSize: `${fontSize}px` }}>
                               <span>{convertToBengaliNumber(index + 1)}.</span>
@@ -1024,7 +1024,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                             {/* Options */}
                             {q.options && (
-                              <div 
+                              <div
                                 className="grid gap-y-1.5 gap-x-2 pl-6"
                                 style={{ gridTemplateColumns: `repeat(${optionColumns}, minmax(0, 1fr))` }}
                               >
@@ -1122,17 +1122,17 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             const baseCount = Math.floor(questions.length / answerKeyColumns);
                             const remainder = questions.length % answerKeyColumns;
                             const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
-                            
+
                             let startIndex = 0;
                             for (let i = 0; i < colIndex; i++) {
                               startIndex += baseCount + (i < remainder ? 1 : 0);
                             }
-                            
+
                             const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
-                            
+
                             return (
-                              <div 
-                                key={colIndex} 
+                              <div
+                                key={colIndex}
                                 className={`flex-1 flex flex-col gap-6 ${colIndex === 0 ? 'pr-6' : colIndex === answerKeyColumns - 1 ? 'pl-6' : 'px-6'} ${colIndex < answerKeyColumns - 1 ? 'border-r border-gray-200' : ''}`}
                               >
                                 {colItems.map(({ q, originalIndex }) => {
@@ -1145,10 +1145,10 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                   };
                                   const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
                                   const marker = correctOptIndex >= 0 ? getMarker(correctOptIndex, optionLabelType) : '-';
-                                  
+
                                   return (
                                     <div key={q.id} className="text-[15px] font-bold flex items-center gap-3 break-inside-avoid">
-                                      <span className="text-gray-800 w-6 text-right">{convertToBengaliNumber(originalIndex + 1)}.</span> 
+                                      <span className="text-gray-800 w-6 text-right">{convertToBengaliNumber(originalIndex + 1)}.</span>
                                       <span className="bg-[#1e293b] text-white rounded-full w-7 h-7 flex items-center justify-center text-[13px] leading-none pt-0.5">{marker}</span>
                                     </div>
                                   );
@@ -1188,7 +1188,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       <Dialog open={isSetCodeOpen} onOpenChange={setIsSetCodeOpen}>
         <DialogContent className="max-w-[400px] text-center p-8 print:hidden rounded-xl border-none shadow-2xl">
           <DialogTitle className="text-2xl font-bold text-gray-700 mb-8 mt-2 text-center">কোন সেটে সেভ করবেন?</DialogTitle>
-          
+
           <div className="mb-10">
             <label className="text-gray-600 block mb-4 text-[15px]">সেট কোড:</label>
             <Select value={tempSetCode} onValueChange={setTempSetCode}>
@@ -1263,19 +1263,19 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div className="grid grid-cols-4 gap-4">
                 <div>
                   <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Top</label>
-                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.top} onChange={e => setMargins({...margins, top: e.target.value})} />
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.top} onChange={e => setMargins({ ...margins, top: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Right</label>
-                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.right} onChange={e => setMargins({...margins, right: e.target.value})} />
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.right} onChange={e => setMargins({ ...margins, right: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Bottom</label>
-                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.bottom} onChange={e => setMargins({...margins, bottom: e.target.value})} />
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.bottom} onChange={e => setMargins({ ...margins, bottom: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-800 block mb-1.5 font-medium">Left</label>
-                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.left} onChange={e => setMargins({...margins, left: e.target.value})} />
+                  <Input className="border-gray-200 shadow-none h-[42px]" type="number" step="0.1" value={margins.left} onChange={e => setMargins({ ...margins, left: e.target.value })} />
                 </div>
               </div>
             </div>
