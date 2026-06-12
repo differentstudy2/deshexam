@@ -8,7 +8,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2, Image as ImageIcon, QrCode, CheckCircle } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 
@@ -56,6 +57,22 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [showMarksBox, setShowMarksBox] = useState(true);
   const [showSetCode, setShowSetCode] = useState(true);
   const [showPageNumber, setShowPageNumber] = useState(true);
+  const [showAnswerKeySheet, setShowAnswerKeySheet] = useState(false);
+  const [answerKeyColumns, setAnswerKeyColumns] = useState(3);
+
+  // Center & Exam Settings State
+  const [headerSettingsEnabled, setHeaderSettingsEnabled] = useState(true);
+  const [headerTitle, setHeaderTitle] = useState('দেশ এক্সাম একাডেমী');
+  const [headerAddress, setHeaderAddress] = useState('দ্বারিকামারী, পেটলা, দিনহাটা, কোচবিহার, পশ্চিমবঙ্গ, ৭৩৬১৩৫');
+  const [headerClassName, setHeaderClassName] = useState('অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬');
+  const [headerSubjectName, setHeaderSubjectName] = useState(`বিষয়: ${paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}`);
+  const [headerChapterName, setHeaderChapterName] = useState('অধ্যায়ের নাম');
+  const [headerTime, setHeaderTime] = useState('');
+  const [headerMarks, setHeaderMarks] = useState('');
+
+  // QR Code State
+  const [qrCodeEnabled, setQrCodeEnabled] = useState(false);
+  const [qrCodeValue, setQrCodeValue] = useState('https://deshexam.com');
 
   // Question Format State
   const [paperColumns, setPaperColumns] = useState(2);
@@ -311,8 +328,65 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             )}
           </div>
 
+          {/* Center & Exam Settings */}
+          <div className="p-4 bg-white border-b border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-bold text-gray-700 flex items-center gap-2 text-[15px]"><Landmark className="w-4 h-4 text-purple-500" /> সেন্টার ও পরীক্ষা সেটিংস</h4>
+              <Switch checked={headerSettingsEnabled} onCheckedChange={setHeaderSettingsEnabled} className="data-[state=checked]:bg-blue-600" />
+            </div>
+            
+            {headerSettingsEnabled && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">প্রতিষ্ঠানের নাম</label>
+                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: দেশ এক্সাম একাডেমী" />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">ঠিকানা</label>
+                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-8 text-[13px]" placeholder="প্রতিষ্ঠানের ঠিকানা" />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">শ্রেণি ও সাল</label>
+                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬" />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">বিষয়</label>
+                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: বিষয়: বাংলা" />
+                </div>
+                <div>
+                  <label className="text-[13px] text-gray-700 mb-1.5 block">অধ্যায়ের নাম</label>
+                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: প্রথম অধ্যায়" />
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="text-[13px] text-gray-700 mb-1.5 block">সময় (মিনিট)</label>
+                    <Input value={headerTime} onChange={e => setHeaderTime(e.target.value)} className="h-8 text-[13px]" placeholder="অটোমেটিক" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[13px] text-gray-700 mb-1.5 block">পূর্ণমান</label>
+                    <Input value={headerMarks} onChange={e => setHeaderMarks(e.target.value)} className="h-8 text-[13px]" placeholder="অটোমেটিক" />
+                  </div>
+                </div>
+
+                {/* QR Code Settings */}
+                <div className="pt-3 mt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[13px] text-gray-700 font-medium flex items-center gap-2"><QrCode className="w-4 h-4 text-blue-500" /> কিউআর কোড (QR Code)</span>
+                    <Switch checked={qrCodeEnabled} onCheckedChange={setQrCodeEnabled} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
+                  </div>
+                  {qrCodeEnabled && (
+                    <div className="mt-2">
+                      <label className="text-[12px] text-gray-500 mb-1.5 block">কোডের ভিতরের টেক্সট/লিংক</label>
+                      <Input value={qrCodeValue} onChange={e => setQrCodeValue(e.target.value)} className="h-8 text-[13px]" placeholder="যেমন: https://yourwebsite.com" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Content Display */}
-          <div className="p-4 bg-slate-50/50 mt-2">
+          <div className="p-4 bg-slate-50/50">
             <h4 className="font-bold text-gray-700 flex items-center gap-2 mb-6 text-[15px]"><Layers className="w-4 h-4 text-gray-500" /> কন্টেন্ট ডিসপ্লে</h4>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -374,6 +448,26 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-700 flex items-center gap-3"><FileDigit className="w-4 h-4 text-green-500" /> পেজ নাম্বার</span>
                 <Switch checked={showPageNumber} onCheckedChange={setShowPageNumber} />
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-800 flex items-center gap-3 font-bold"><CheckCircle className="w-4 h-4 text-blue-500" /> আলাদা উত্তরপত্র</span>
+                  <Switch checked={showAnswerKeySheet} onCheckedChange={setShowAnswerKeySheet} className="data-[state=checked]:bg-blue-600" />
+                </div>
+                {showAnswerKeySheet && (
+                  <div className="mt-3 pl-7 flex justify-between items-center">
+                    <span className="text-[13px] text-gray-600">কলাম সংখ্যা</span>
+                    <Select value={answerKeyColumns.toString()} onValueChange={v => setAnswerKeyColumns(Number(v))}>
+                      <SelectTrigger className="w-[80px] h-7 text-[12px] min-h-0"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2">২ কলাম</SelectItem>
+                        <SelectItem value="3">৩ কলাম</SelectItem>
+                        <SelectItem value="4">৪ কলাম</SelectItem>
+                        <SelectItem value="5">৫ কলাম</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -771,9 +865,16 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                     {/* PAPER HEADER */}
                     <div className="relative mb-4">
+                      {/* Left: QR Code */}
+                      {qrCodeEnabled && (
+                        <div className="absolute top-0 left-0 p-1.5 border border-black/10 bg-white shadow-sm print:shadow-none z-20">
+                          <QRCodeSVG value={qrCodeValue || 'https://deshexam.com'} size={54} />
+                        </div>
+                      )}
+
                       {/* Left: Marks Box */}
                       {showMarksBox && (
-                        <div className="absolute top-8 left-0 flex border border-black">
+                        <div className={`absolute left-0 flex border border-black ${qrCodeEnabled ? 'top-[75px]' : 'top-8'}`}>
                           <div {...getEditableProps("bg-black text-white text-[11px] px-2 py-1 flex items-center")}>প্রাপ্ত নম্বর</div>
                           <div className="w-16"></div>
                         </div>
@@ -800,13 +901,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
 
                       {/* Center Info */}
-                      <div className="text-center">
-                        {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>দেশ এক্সাম একাডেমী</h1>}
-                        {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>দ্বারিকামারী, পেটলা, দিনহাটা, কোচবিহার, পশ্চিমবঙ্গ, ৭৩৬১৩৫</p>}
-                        {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬</h2>}
-                        {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>বিষয়: {paperName || 'শারীরিক শিক্ষা ও স্বাস্থ্য'}</h3>}
-                        {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>অধ্যায়ের নাম</h4>}
-                      </div>
+                      {headerSettingsEnabled && (
+                        <div className="text-center">
+                          {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle}</h1>}
+                          {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress}</p>}
+                          {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName}</h2>}
+                          {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName}</h3>}
+                          {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName}</h4>}
+                        </div>
+                      )}
                     </div>
 
                     {format !== 'answer' && (
@@ -815,8 +918,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                         {showInstructions && (
                           <>
                             <div className="border-b border-black mb-2 flex justify-between text-[14px] font-bold text-gray-800 pb-1">
-                              <span {...getEditableProps()}>সময়— {convertToBengaliNumber(questions.length)} মিনিট</span>
-                              <span {...getEditableProps()}>পূর্ণমান— {convertToBengaliNumber(questions.length)}</span>
+                              <span {...getEditableProps()}>সময়— {headerTime || convertToBengaliNumber(questions.length)} মিনিট</span>
+                              <span {...getEditableProps()}>পূর্ণমান— {headerMarks || convertToBengaliNumber(questions.length)}</span>
                             </div>
 
                             <div className="text-center text-[12px] text-gray-800 mb-4 font-medium leading-relaxed px-4">
@@ -967,8 +1070,102 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       </div>
                     )}
 
+                    {/* Answer Key Sheet */}
+                    {showAnswerKeySheet && (
+                      <div className="w-full mt-16 print:mt-0 pt-8 print:pt-0 print:break-before-page relative z-10" style={{ pageBreakBefore: 'always' }}>
+                        {/* Duplicate Header Block */}
+                        <div className="relative mb-4">
+                          {/* Left: Marks Box */}
+                          {showMarksBox && (
+                            <div className="absolute top-8 left-0 flex border border-black">
+                              <div className="bg-black text-white text-[11px] px-2 py-1 flex items-center">প্রাপ্ত নম্বর</div>
+                              <div className="w-16"></div>
+                            </div>
+                          )}
+
+                          {/* Right: Set & Subject Code */}
+                          <div className="absolute top-6 right-0 text-right">
+                            {showSetCode && (
+                              <div className="border border-black flex items-center justify-center font-bold text-sm mb-1 inline-flex w-24">
+                                <span className="flex-1 text-center py-0.5">সেট</span>
+                                <span className="border-l border-black flex-1 text-center py-0.5">{activeSetCode}</span>
+                              </div>
+                            )}
+                            {showSubjectCode && (
+                              <div className="flex items-center justify-end gap-2 text-[13px] font-medium text-gray-800">
+                                <span>বিষয় কোড :</span>
+                                <div className="flex">
+                                  <span className="border border-black w-5 h-6 flex items-center justify-center">০</span>
+                                  <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
+                                  <span className="border-y border-r border-black w-5 h-6 flex items-center justify-center">০</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Center Info */}
+                          {headerSettingsEnabled && (
+                            <div className="text-center">
+                              {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle}</h1>}
+                              {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress}</p>}
+                              {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName}</h2>}
+                              {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName}</h3>}
+                              {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName}</h4>}
+                            </div>
+                          )}
+                        </div>
+
+                        <hr className="border-t border-gray-200 my-6" />
+
+                        <h2 className="text-[20px] font-bold text-center text-red-500 mb-10">
+                          নিচে উত্তরপত্র
+                        </h2>
+
+                        <div className="flex w-full">
+                          {Array.from({ length: answerKeyColumns }).map((_, colIndex) => {
+                            const baseCount = Math.floor(questions.length / answerKeyColumns);
+                            const remainder = questions.length % answerKeyColumns;
+                            const colItemCount = baseCount + (colIndex < remainder ? 1 : 0);
+                            
+                            let startIndex = 0;
+                            for (let i = 0; i < colIndex; i++) {
+                              startIndex += baseCount + (i < remainder ? 1 : 0);
+                            }
+                            
+                            const colItems = questions.slice(startIndex, startIndex + colItemCount).map((q, i) => ({ q, originalIndex: startIndex + i }));
+                            
+                            return (
+                              <div 
+                                key={colIndex} 
+                                className={`flex-1 flex flex-col gap-6 ${colIndex === 0 ? 'pr-6' : colIndex === answerKeyColumns - 1 ? 'pl-6' : 'px-6'} ${colIndex < answerKeyColumns - 1 ? 'border-r border-gray-200' : ''}`}
+                              >
+                                {colItems.map(({ q, originalIndex }) => {
+                                  const getMarker = (idx: number, type: string) => {
+                                    if (type === 'bangla') return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                    if (type === 'english') return ['a', 'b', 'c', 'd'][idx] || '';
+                                    if (type === 'number') return ['১', '২', '৩', '৪'][idx] || '';
+                                    if (type === 'roman') return ['i', 'ii', 'iii', 'iv'][idx] || '';
+                                    return ['ক', 'খ', 'গ', 'ঘ'][idx] || '';
+                                  };
+                                  const correctOptIndex = ['a', 'b', 'c', 'd'].indexOf((q.correctAnswer || '').toLowerCase());
+                                  const marker = correctOptIndex >= 0 ? getMarker(correctOptIndex, optionLabelType) : '-';
+                                  
+                                  return (
+                                    <div key={q.id} className="text-[15px] font-bold flex items-center gap-3 break-inside-avoid">
+                                      <span className="text-gray-800 w-6 text-right">{convertToBengaliNumber(originalIndex + 1)}.</span> 
+                                      <span className="bg-[#1e293b] text-white rounded-full w-7 h-7 flex items-center justify-center text-[13px] leading-none pt-0.5">{marker}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Footer Logo */}
-                    <div className="mt-8 text-right text-[12px] font-bold text-gray-800">
+                    <div className="mt-12 text-right text-[12px] font-bold text-gray-800 opacity-50">
                       সৌজন্যে: DeshExam
                     </div>
                   </div>
