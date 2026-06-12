@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap } from 'lucide-react';
+import { Download, Share2, Settings, Type, FileText, Shuffle, Save, ArrowLeft, Plus, Edit, Loader2, FileJson, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Zap, Waves, Trash2 } from 'lucide-react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 
@@ -67,6 +67,16 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [fontFamily, setFontFamily] = useState('bangla');
   const [fontSize, setFontSize] = useState(14);
 
+  // Branding State
+  const [brandingEnabled, setBrandingEnabled] = useState(true);
+  const [watermarkText, setWatermarkText] = useState('দেশ এক্সাম একাডেমী');
+  const [watermarkImage, setWatermarkImage] = useState<string | null>(null);
+  const [watermarkSize, setWatermarkSize] = useState(90);
+  const [watermarkOpacity, setWatermarkOpacity] = useState(20);
+  const [watermarkRepeat, setWatermarkRepeat] = useState(false);
+  const [watermarkRepeatCount, setWatermarkRepeatCount] = useState(5);
+  const [watermarkFont, setWatermarkFont] = useState('sutonnymj');
+
   useEffect(() => {
     const fetchSelectedQuestions = async () => {
       try {
@@ -118,6 +128,16 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     return num.toString().split('').map(d => bengaliDigits[parseInt(d)] || d).join('');
   };
 
+  const getWatermarkFontFamily = () => {
+    switch(watermarkFont) {
+      case 'kalpurush': return '"Kalpurush", sans-serif';
+      case 'siyamrupali': return '"Siyam Rupali", sans-serif';
+      case 'solaimanlipi': return '"SolaimanLipi", sans-serif';
+      case 'sutonnymj': return '"SutonnyMJ", sans-serif';
+      default: return '"Kalpurush", sans-serif';
+    }
+  };
+
   const handleResetFormat = () => {
     setPaperColumns(2);
     setOptionShape('circle');
@@ -138,6 +158,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     setColGap(32);
     setFontFamily('siyamrupali');
     setFontSize(13);
+  };
+
+  const handleWatermarkImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setWatermarkImage(url);
+    }
   };
 
   return (
@@ -484,6 +512,92 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               </div>
             </div>
 
+            {/* Branding Settings */}
+            <div className="p-4 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-bold text-[#3f51b5] flex items-center gap-2 text-[14px]">
+                  <Waves className="w-4 h-4 text-[#3f51b5]" /> ব্র্যান্ডিং সেটিংস
+                </h4>
+                <Switch checked={brandingEnabled} onCheckedChange={setBrandingEnabled} className="data-[state=checked]:bg-blue-600" />
+              </div>
+
+              {brandingEnabled && (
+                <div className="space-y-5">
+                  {/* Text */}
+                  <div>
+                    <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ টেক্সট</label>
+                    <Input 
+                      value={watermarkText} 
+                      onChange={e => setWatermarkText(e.target.value)}
+                      placeholder="দেশ এক্সাম একাডেমী"
+                      className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
+                    />
+                  </div>
+
+                  {/* Font */}
+                  <div>
+                    <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ ফন্ট</label>
+                    <Select value={watermarkFont} onValueChange={setWatermarkFont}>
+                      <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
+                        <SelectValue placeholder="ফন্ট নির্বাচন করুন" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="kalpurush">কালপুরুষ</SelectItem>
+                        <SelectItem value="siyamrupali">সিয়াম রুপালি</SelectItem>
+                        <SelectItem value="solaimanlipi">সোলাইমান লিপি</SelectItem>
+                        <SelectItem value="sutonnymj">সুতন্নি এমজে</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Image */}
+                  <div>
+                    <label className="text-[13px] text-gray-700 mb-2 block">জলছাপ আইকন</label>
+                    {!watermarkImage ? (
+                      <label className="border border-dashed border-gray-300 rounded-md p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 bg-white relative overflow-hidden transition-all h-20">
+                        <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleWatermarkImageUpload} />
+                        <span className="text-[13px] text-gray-400 font-medium text-center">ছবি আপলোড করতে এখানে ক্লিক করুন</span>
+                        <span className="text-[11px] text-gray-300 text-center mt-1">(Max size ~5MB, PNG/JPG)</span>
+                      </label>
+                    ) : (
+                      <div className="flex flex-col items-center gap-3 border border-gray-200 rounded-md p-3 bg-white">
+                        <img src={watermarkImage} alt="Watermark Preview" className="w-12 h-12 object-contain" />
+                        <button onClick={() => setWatermarkImage(null)} className="flex items-center justify-center gap-1.5 w-full py-1.5 border border-red-200 text-red-600 rounded-sm hover:bg-red-50 text-[13px] transition-colors font-medium">
+                          <Trash2 className="w-3.5 h-3.5" /> আইকন মুছুন
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Size */}
+                  <div>
+                    <span className="text-[13px] text-gray-700 mb-2 block">সাইজ: {watermarkSize}px</span>
+                    <input type="range" min="20" max="300" value={watermarkSize} onChange={e => setWatermarkSize(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                  </div>
+
+                  {/* Opacity */}
+                  <div>
+                    <span className="text-[13px] text-gray-700 mb-2 block">অপাসিটি: {watermarkOpacity}%</span>
+                    <input type="range" min="0" max="100" value={watermarkOpacity} onChange={e => setWatermarkOpacity(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                  </div>
+
+                  {/* Repeat */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[13px] text-gray-700">জলছাপ রিপিট</span>
+                      <Switch checked={watermarkRepeat} onCheckedChange={setWatermarkRepeat} className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-200" />
+                    </div>
+                    {watermarkRepeat && (
+                      <div>
+                        <input type="range" min="1" max="20" value={watermarkRepeatCount} onChange={e => setWatermarkRepeatCount(Number(e.target.value))} className="w-full accent-[#2563eb] h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer mb-2" />
+                        <div className="text-[13px] text-gray-700">{watermarkRepeatCount} times</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
         </aside>
 
@@ -550,11 +664,40 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               ) : (
                 <>
                   {/* Watermark */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0 print:opacity-40">
-                      <span className="text-gray-100/50 text-[120px] font-bold -rotate-45 select-none tracking-widest uppercase">
-                        DeshExam
-                      </span>
+                  {brandingEnabled && (
+                    <div 
+                      className="absolute inset-0 pointer-events-none overflow-hidden z-0" 
+                      style={{ 
+                        opacity: watermarkOpacity / 100 
+                      }}
+                    >
+                      {watermarkRepeat ? (
+                        <div className="w-full h-full flex flex-wrap items-center justify-evenly content-evenly py-10 px-8">
+                          {Array.from({length: watermarkRepeatCount}).map((_, i) => (
+                            <div key={i} className="-rotate-45 transform-gpu flex items-center justify-center p-4">
+                              {watermarkImage ? (
+                                <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
+                              ) : (
+                                <span className="font-bold select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                                  {watermarkText || 'দেশ এক্সাম একাডেমী'}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          {watermarkImage ? (
+                            <img src={watermarkImage} alt="Watermark" style={{ width: `${watermarkSize}px`, height: 'auto' }} className="select-none" />
+                          ) : (
+                            <span className="font-bold -rotate-45 select-none text-gray-400 whitespace-nowrap" style={{ fontSize: `${watermarkSize}px`, fontFamily: getWatermarkFontFamily() }}>
+                              {watermarkText || 'দেশ এক্সাম একাডেমী'}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
+                  )}
 
                   <div className="relative z-10">
                     {/* PAPER HEADER */}
