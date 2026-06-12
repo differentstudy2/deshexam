@@ -295,6 +295,12 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     },
   });
 
+  React.useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
+
   return (
     <div className="border border-slate-200 dark:border-slate-800 rounded-md overflow-hidden bg-white dark:bg-slate-950">
       <MenuBar editor={editor} />
