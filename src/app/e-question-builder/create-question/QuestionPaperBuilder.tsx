@@ -1013,7 +1013,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             <div className="p-4 border-t border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-bold text-[#1e88e5] flex items-center gap-2 text-[14px]">
-                  <ImageIcon className="w-4 h-4 text-[#1e88e5]" /> হেডার ইমেজ সেটিংস
+                  <ImageIcon className="w-4 h-4 text-[#1e88e5]" /> {t('headerImageSettings', appLanguage)}
                 </h4>
                 <Switch checked={headerImageEnabled} onCheckedChange={setHeaderImageEnabled} className="data-[state=checked]:bg-blue-600" />
               </div>
@@ -1022,7 +1022,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 <div className="space-y-4">
                   {/* Header Image */}
                   <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">হেডার ইমেজ</label>
+                    <label className="text-[13px] text-gray-700 mb-2 block">{t('headerImageLabel', appLanguage)}</label>
                     <div className="border border-gray-200 rounded-md bg-white p-1 flex items-center">
                       <input
                         type="file"
@@ -1035,15 +1035,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                   {/* Image Fit */}
                   <div>
-                    <label className="text-[13px] text-gray-700 mb-2 block">ইমেজ ফিট</label>
+                    <label className="text-[13px] text-gray-700 mb-2 block">{t('imageFitLabel', appLanguage)}</label>
                     <Select value={headerImageFit} onValueChange={setHeaderImageFit}>
                       <SelectTrigger className="h-10 text-[14px] bg-white text-gray-700 border-gray-200">
-                        <SelectValue placeholder="ফিট নির্বাচন করুন" />
+                        <SelectValue placeholder={t('selectFit', appLanguage)} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cover">Cover (পুরো জায়গা ভরে)</SelectItem>
-                        <SelectItem value="contain">Contain (পুরো ইমেজ দেখাবে)</SelectItem>
-                        <SelectItem value="fill">Fill (টেনে বড় করবে)</SelectItem>
+                        <SelectItem value="cover">{t('coverFit', appLanguage)}</SelectItem>
+                        <SelectItem value="contain">{t('containFit', appLanguage)}</SelectItem>
+                        <SelectItem value="fill">{t('fillFit', appLanguage)}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
