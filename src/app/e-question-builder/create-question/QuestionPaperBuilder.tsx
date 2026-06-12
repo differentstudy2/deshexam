@@ -460,8 +460,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="bangla">বাংলা (ডিফল্ট)</SelectItem>
-                      <SelectItem value="siyamrupali">Siyam Rupali</SelectItem>
-                      <SelectItem value="kalpurush">Kalpurush</SelectItem>
+                      <SelectItem value="solaimanlipi">সোলাইমান লিপি</SelectItem>
+                      <SelectItem value="kalpurush">কালপুরুষ</SelectItem>
+                      <SelectItem value="nikosh">নিকষ</SelectItem>
+                      <SelectItem value="siyamrupali">সিয়াম রুপালি</SelectItem>
+                      <SelectItem value="sutonnymj">সুতন্নি এমজে</SelectItem>
+                      <SelectItem value="timesnewroman">টাইমস নিউ রোমান</SelectItem>
+                      <SelectItem value="arial">এরিয়াল</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -526,7 +531,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             id="printable-paper" 
             className="preview-page-container mx-auto bg-white shadow-xl print:shadow-none transition-all duration-300"
             style={{ 
-              fontFamily: fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' : fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' : 'inherit'
+              fontFamily: fontFamily === 'solaimanlipi' ? '"SolaimanLipi", sans-serif' : 
+                          fontFamily === 'kalpurush' ? '"Kalpurush", sans-serif' : 
+                          fontFamily === 'nikosh' ? '"Nikosh", sans-serif' : 
+                          fontFamily === 'siyamrupali' ? '"Siyam Rupali", sans-serif' : 
+                          fontFamily === 'sutonnymj' ? '"SutonnyMJ", sans-serif' : 
+                          fontFamily === 'timesnewroman' ? '"Times New Roman", serif' : 
+                          fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
             }}
           >
 
