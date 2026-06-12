@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2 } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -18,6 +18,7 @@ import { t, localizeNumber, localizeOptionLabel, AppLanguage, translations } fro
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { QuestionBankModal } from './QuestionBankModal';
 import 'katex/dist/katex.min.css';
 
 interface Props {
@@ -123,6 +124,9 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [isSectionHeaderOpen, setIsSectionHeaderOpen] = useState(false);
   const [forceNewColumn, setForceNewColumn] = useState(false);
   const [sectionHeaderText, setSectionHeaderText] = useState('');
+  
+  // Question Bank Modal
+  const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);
 
   // Enhanced Settings State
   const [appLanguage, setAppLanguage] = useState<AppLanguage>('bn');
@@ -1521,12 +1525,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       )}
 
                       {editingMode && (
-                        <div className="mt-8 flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6">
+                        <div className="mt-8 flex gap-4 justify-center print:hidden border-t border-dashed border-gray-300 pt-6 flex-wrap">
                           <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={() => setIsAddQuestionOpen(true)}>
-                            <PlusCircle className="w-4 h-4 mr-2" /> কাস্টম প্রশ্ন যোগ করুন
+                            <PlusCircle className="w-4 h-4 mr-2" /> {t('addCustomQuestion', appLanguage)}
+                          </Button>
+                          <Button variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => setIsQuestionBankOpen(true)}>
+                            <Database className="w-4 h-4 mr-2" /> {t('addFromBank', appLanguage)}
                           </Button>
                           <Button variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => setIsSectionHeaderOpen(true)}>
-                            <Layers className="w-4 h-4 mr-2" /> নতুন সেকশন/বিভাগ যোগ
+                            <Layers className="w-4 h-4 mr-2" /> {t('addSectionHeader', appLanguage)}
                           </Button>
                         </div>
                       )}
@@ -1847,7 +1854,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           {/* Action button beneath paper (hidden in print) */}
           <div className="bg-gray-50 border-t border-gray-200 p-6 text-center print:hidden rounded-b-lg">
             <Button className="bg-[#c8e6c9] hover:bg-[#a5d6a7] text-green-800 border-transparent font-medium shadow-sm">
-              <Plus className="w-4 h-4 mr-2" /> আরও প্রশ্ন যোগ
+              <Plus className="w-4 h-4 mr-2" /> {t('addCustomQuestion', appLanguage)}
             </Button>
           </div>
         </main>
@@ -2089,6 +2096,15 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Question Bank Modal */}
+      <QuestionBankModal 
+        isOpen={isQuestionBankOpen} 
+        onClose={() => setIsQuestionBankOpen(false)} 
+        onAdd={(newQs) => setQuestions([...questions, ...newQs])}
+        appLanguage={appLanguage}
+      />
+
     </div>
   );
 }
