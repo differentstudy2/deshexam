@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
-import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload } from "lucide-react";
+import { Menu, LogOut, LayoutDashboard, User as UserIcon, ShieldCheck, Gem, Trophy, Sparkles, BookOpen, ShoppingCart, PlusCircle, LogIn, UserPlus, LayoutGrid, Library, FileText, Settings, BookUser, ClipboardList, Send, Ticket, DollarSign, Users, Book, ToyBrick, Award, Activity, Zap, FilePlus, Printer, MessageSquare, Bell, Heart, Bookmark, Gift, Share2, Briefcase, Package, HelpCircle, ChevronRight, ChevronDown, BarChart2, Compass, Upload, Search, GraduationCap } from "lucide-react";
 import { DeshExamLogo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -104,63 +104,94 @@ const dashboardNavGroups = [
 
 const adminNavGroups = [
   {
-    title: "Overview",
+    title: "Dashboard",
     items: [
-      { href: '/admin', label: 'Dashboard', icon: <LayoutGrid className="h-4 w-4" /> },
-      { href: '/admin/reports', label: 'Reports', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/admin', label: 'Overview', icon: <LayoutGrid className="h-4 w-4" /> },
+      { href: '/admin/reports', label: 'Reports', icon: <BarChart2 className="h-4 w-4" /> },
+      { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="h-4 w-4" /> },
     ]
   },
   {
-    title: "Student Portal",
+    title: "Academic Content",
     items: [
-      { href: '/dashboard/student', label: 'Student Dashboard', icon: <UserIcon className="h-4 w-4" /> },
-    ]
-  },
-  {
-    title: "Question Bank CMS",
-    items: [
-      { href: '/admin/question-bank/questions', label: 'Questions', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/question-bank/categories', label: 'Taxonomy & Categories', icon: <BookOpen className="h-4 w-4" /> },
-      { href: '/admin/question-bank/import', label: 'Bulk Import', icon: <Upload className="h-4 w-4" /> },
+      { href: '/admin/guide-content/explorer', label: 'Content Explorer', icon: <Compass className="h-4 w-4" /> },
+      { href: '/admin/boards', label: 'Boards', icon: <Library className="h-4 w-4" /> },
+      { href: '/admin/classes', label: 'Classes', icon: <Users className="h-4 w-4" /> },
+      { href: '/admin/subjects', label: 'Subjects', icon: <Book className="h-4 w-4" /> },
+      { href: '/admin/chapters', label: 'Chapters', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/topics', label: 'Topics', icon: <FileText className="h-4 w-4" /> },
+      { href: '/admin/textbooks', label: 'Textbooks', icon: <BookOpen className="h-4 w-4" /> },
+      { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
+      { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" /> },
     ]
   },
   {
     title: "Assessment Center",
     items: [
-      { href: '/admin/assessment-center', label: 'Dashboard', icon: <Activity className="h-4 w-4" /> },
-      { href: '/admin/assessment-center/practice-sets', label: 'Practice Sets', icon: <Award className="h-4 w-4" /> },
+      { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-4 w-4" /> },
+      { href: '/admin/question-bank/categories', label: 'Categories', icon: <BookOpen className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/practice-sets', label: 'Practice Sets', icon: <Activity className="h-4 w-4" /> },
       { href: '/admin/assessment-center/quizzes', label: 'Quizzes', icon: <Sparkles className="h-4 w-4" /> },
       { href: '/admin/assessment-center/mock-tests', label: 'Mock Tests', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/assessment-center/exams', label: 'Exams & Papers', icon: <Book className="h-4 w-4" /> },
+      { href: '/admin/assessment-center/exams', label: 'Exams & Papers', icon: <Award className="h-4 w-4" /> },
       { href: '/admin/assessment-center/daily-challenges', label: 'Daily Challenges', icon: <Trophy className="h-4 w-4" /> },
+      { href: '/admin/question-bank/import', label: 'Bulk Import', icon: <Upload className="h-4 w-4" /> },
     ]
   },
   {
-    title: "Management",
+    title: "Student Portal",
+    items: [
+      { href: '/dashboard/student', label: 'Students', icon: <Users className="h-4 w-4" /> },
+      { href: '/dashboard/student-dashboard', label: 'Student Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+      { href: '/admin/progress-reports', label: 'Progress Reports', icon: <BarChart2 className="h-4 w-4" /> },
+      { href: '/admin/analytics', label: 'Analytics', icon: <Activity className="h-4 w-4" /> },
+      { href: '/admin/leaderboard', label: 'Leaderboard', icon: <Trophy className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "User Management",
     items: [
       { href: '/admin/users', label: 'Users', icon: <Users className="h-4 w-4" /> },
-      { href: '/admin/content', label: 'Content', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/guide-content', label: 'Guide Manager', icon: <Compass className="h-4 w-4" /> },
-      { href: '/admin/video', label: 'Video Library', icon: <Activity className="h-4 w-4" /> },
-      { href: '/admin/documents', label: 'Documents', icon: <FileText className="h-4 w-4" /> },
-      { href: '/admin/quizzes', label: 'Quizzes', icon: <Gem className="h-4 w-4" /> },
-      { href: '/admin/questions', label: 'Questions', icon: <ClipboardList className="h-4 w-4" /> },
-      { href: '/admin/textbooks', label: 'Textbooks', icon: <Book className="h-4 w-4" /> },
-      { href: '/admin/kids-zone/manage', label: 'Kids Zone', icon: <ToyBrick className="h-4 w-4" />},
+      { href: '/admin/roles', label: 'Roles', icon: <ShieldCheck className="h-4 w-4" /> },
+      { href: '/admin/permissions', label: 'Permissions', icon: <ShieldCheck className="h-4 w-4" /> },
+      { href: '/admin/admins', label: 'Admins', icon: <UserIcon className="h-4 w-4" /> },
     ]
   },
   {
     title: "Monetization",
     items: [
-      { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-4 w-4" />},
-      { href: '/admin/earning', label: 'Earning', icon: <DollarSign className="h-4 w-4" />},
+      { href: '/admin/earning', label: 'Earnings', icon: <DollarSign className="h-4 w-4" /> },
+      { href: '/admin/coupons', label: 'Coupons', icon: <Ticket className="h-4 w-4" /> },
+      { href: '/admin/plans', label: 'Plans', icon: <Package className="h-4 w-4" /> },
+      { href: '/admin/orders', label: 'Orders', icon: <ShoppingCart className="h-4 w-4" /> },
+      { href: '/admin/transactions', label: 'Transactions', icon: <Activity className="h-4 w-4" /> },
     ]
   },
   {
-    title: "Configuration",
+    title: "Communication",
     items: [
-      { href: '/admin/push-notification', label: 'Push Notification', icon: <Send className="h-4 w-4" />},
-      { href: '/admin/settings', label: 'Settings', icon: <Settings className="h-4 w-4" /> },
+      { href: '/admin/push-notification', label: 'Push Notifications', icon: <Send className="h-4 w-4" /> },
+      { href: '/admin/broadcast-messages', label: 'Broadcast Messages', icon: <MessageSquare className="h-4 w-4" /> },
+      { href: '/admin/templates', label: 'Templates', icon: <FileText className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "AI Tools",
+    items: [
+      { href: '/admin/ai-question-generator', label: 'Question Generator', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/ai-quiz-generator', label: 'Quiz Generator', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/ai-seo-assistant', label: 'SEO Assistant', icon: <Search className="h-4 w-4" /> },
+      { href: '/admin/ai-video-generator', label: 'Video Generator', icon: <Zap className="h-4 w-4" /> },
+    ]
+  },
+  {
+    title: "Settings",
+    items: [
+      { href: '/admin/settings', label: 'General', icon: <Settings className="h-4 w-4" /> },
+      { href: '/admin/settings/branding', label: 'Branding', icon: <Sparkles className="h-4 w-4" /> },
+      { href: '/admin/settings/theme', label: 'Theme', icon: <LayoutDashboard className="h-4 w-4" /> },
+      { href: '/admin/settings/security', label: 'Security', icon: <ShieldCheck className="h-4 w-4" /> },
+      { href: '/admin/settings/backup', label: 'Backup', icon: <Upload className="h-4 w-4" /> },
     ]
   }
 ];
@@ -309,19 +340,41 @@ const MainNav = ({ isMobile = false, onLinkClick, isScrolled = false }: { isMobi
 
 export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void; logOut: () => void; }) => {
     const pathname = usePathname();
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+        const initialState: Record<string, boolean> = {};
+        adminNavGroups.forEach(g => { if(g.title) initialState[g.title] = true });
+        return initialState;
+    });
+
+    const toggleGroup = (title: string) => {
+        setOpenGroups(prev => ({ ...prev, [title]: !prev[title] }));
+    };
+
     return (
         <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/95 text-slate-800 dark:text-slate-300 border-r border-slate-200/60 dark:border-slate-800/60">
-            <div className="p-4 flex items-center h-16 shrink-0">
-                <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-2">
-                    <div className="text-slate-900 dark:text-white font-extrabold text-xl tracking-tight">DeshExam <span className="text-[#00a651]">Admin</span></div>
+            <div className="p-4 flex items-center h-16 shrink-0 border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950">
+                <Link href="/admin" onClick={onLinkClick} className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <GraduationCap className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-slate-900 dark:text-white font-medium text-lg tracking-tight">DeshExam Admin</div>
                 </Link>
             </div>
-            <ScrollArea className="flex-1">
-                <div className="space-y-6 px-3 py-4">
-                    {adminNavGroups.map((group, idx) => (
+            <ScrollArea className="flex-1 bg-slate-50 dark:bg-slate-900">
+                <div className="space-y-4 px-3 py-4">
+                    {adminNavGroups.map((group, idx) => {
+                        const isOpen = openGroups[group.title];
+                        return (
                         <div key={idx} className="space-y-1">
-                            <h4 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 px-3 mb-2">{group.title}</h4>
-                            <ul className="space-y-0.5">
+                            <button 
+                                onClick={() => toggleGroup(group.title)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-[12px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors uppercase tracking-wider"
+                            >
+                                <span>{group.title}</span>
+                                {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                            </button>
+                            {isOpen && (
+                            <ul className="space-y-0.5 mt-1">
                                 {group.items.map((item) => {
                                     const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
                                     return (
@@ -330,14 +383,14 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                                                 asChild
                                                 variant="ghost"
                                                 className={cn(
-                                                    "justify-start w-full h-10 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200",
+                                                    "justify-start w-full h-9 px-3 py-2 text-sm rounded-lg transition-all duration-200",
                                                     isActive 
-                                                        ? "bg-[#00a651]/10 text-[#00a651] dark:bg-[#00a651]/20 dark:text-[#00a651] font-semibold" 
-                                                        : "hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                                                        ? "bg-green-600 text-white dark:bg-green-700 dark:text-white font-medium shadow-sm hover:bg-green-700 hover:text-white" 
+                                                        : "hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium"
                                                 )}
                                             >
                                                 <Link href={item.href} onClick={onLinkClick}>
-                                                    <span className={cn("transition-colors", isActive ? "text-[#00a651]" : "text-slate-400 dark:text-slate-500")}>{item.icon}</span>
+                                                    <span className={cn("transition-colors", isActive ? "text-white" : "text-slate-400 dark:text-slate-500")}>{item.icon}</span>
                                                     <span className="ml-3">{item.label}</span>
                                                 </Link>
                                             </Button>
@@ -345,14 +398,15 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                                     );
                                 })}
                             </ul>
+                            )}
                         </div>
-                    ))}
+                    )})}
                     
-                    <div className="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/60 space-y-2 px-1">
+                    <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800/60 space-y-2 px-1">
                         <Button
                             asChild
                             variant="ghost"
-                            className="justify-start w-full h-10 px-3 py-2 text-sm font-medium rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-200"
+                            className="justify-start w-full h-9 px-3 py-2 text-sm font-medium rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-200"
                         >
                             <Link href="/dashboard" onClick={onLinkClick}>
                                 <LayoutGrid className="h-4 w-4 text-slate-400 dark:text-slate-500" />
@@ -362,8 +416,8 @@ export const AdminSidebar = ({ onLinkClick, logOut }: { onLinkClick?: () => void
                     </div>
                 </div>
             </ScrollArea>
-            <div className="p-4 border-t border-slate-200/60 dark:border-slate-800/60 bg-transparent shrink-0">
-                <Button variant="ghost" className="w-full justify-start text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all duration-200 h-10 px-3" onClick={logOut}>
+            <div className="p-4 border-t border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950 shrink-0">
+                <Button variant="ghost" className="w-full justify-start text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all duration-200 h-9 px-3" onClick={logOut}>
                     <LogOut className="mr-3 h-4 w-4"/>
                     Logout
                 </Button>
