@@ -26,9 +26,7 @@ content = content.replace(
 );
 
 // 3. handleAddFromBank
-const add_from_bank_fn = `  const handleAddFromBank = (newQs: QuestionBankEntry[]) => {
-    setQuestions([...questions, ...newQs]);
-  };`;
+const add_from_bank_fn = "  const handleAddFromBank = (newQs: QuestionBankEntry[]) => {\n    setQuestions([...questions, ...newQs]);\n  };";
 if (!content.includes("const handleAddFromBank =")) {
     content = content.replace(
         "const [showExplanations, setShowExplanations] = useState(false);",
@@ -77,6 +75,12 @@ content = content.replace(
     '<div className="flex flex-col lg:flex-row flex-1 max-w-[1400px] mx-auto w-full p-2 sm:p-4 gap-6 relative print:p-0 print:m-0 print:static">'
 );
 
+// Rename filterSettings to quickActions
+content = content.replace(
+    "t('filterSettings', appLanguage)",
+    "t('quickActions', appLanguage)"
+);
+
 // 5. Extract Sidebar to renderSidebarSettings()
 const sidebarMatch = content.match(/(<aside className="w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-\[calc\(100vh-120px\)\] overflow-y-auto sticky top-24 print:hidden shrink-0">[\s\S]*?<\/aside>)/);
 if (sidebarMatch) {
@@ -88,78 +92,20 @@ if (sidebarMatch) {
 
     content = content.replace(sidebarHtml, newAside);
 
-    const renderFn = `  const renderSidebarSettings = () => (\n    ${innerSidebar}\n  );\n\n  return (`;
+    const renderFn = "  const renderSidebarSettings = () => (\n    " + innerSidebar + "\n  );\n\n  return (";
     content = content.replace("  return (", renderFn);
 }
 
 // 6. Add Ai Generator button
-const aiBtn = `                          <Button variant="outline" className="border-dashed border-2 bg-indigo-50/50 text-indigo-700 hover:bg-indigo-100/50 hover:text-indigo-800" onClick={() => setIsAiGeneratorOpen(true)}>
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            {t('aiGenerate', appLanguage)}
-                          </Button>
-                          <Button variant="outline" className="border-dashed border-2 bg-gray-50 text-gray-700 hover:bg-gray-100" onClick={() => setIsQuestionBankOpen(true)}>
-                            <Database className="w-4 h-4 mr-2" />
-                            {t('addFromBank', appLanguage)}
-                          </Button>`;
+const aiBtn = "                          <Button variant=\"outline\" className=\"border-dashed border-2 bg-indigo-50/50 text-indigo-700 hover:bg-indigo-100/50 hover:text-indigo-800\" onClick={() => setIsAiGeneratorOpen(true)}>\n                            <Sparkles className=\"w-4 h-4 mr-2\" />\n                            {t('aiGenerate', appLanguage)}\n                          </Button>\n                          <Button variant=\"outline\" className=\"border-dashed border-2 bg-gray-50 text-gray-700 hover:bg-gray-100\" onClick={() => setIsQuestionBankOpen(true)}>\n                            <Database className=\"w-4 h-4 mr-2\" />\n                            {t('addFromBank', appLanguage)}\n                          </Button>";
 
 content = content.replace(
-    `<Button variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={() => setIsQuestionBankOpen(true)}>
-                            <Database className="w-4 h-4 mr-2" /> {t('addFromBank', appLanguage)}
-                          </Button>`,
+    "<Button variant=\"outline\" className=\"text-emerald-600 border-emerald-200 hover:bg-emerald-50\" onClick={() => setIsQuestionBankOpen(true)}>\n                            <Database className=\"w-4 h-4 mr-2\" /> {t('addFromBank', appLanguage)}\n                          </Button>",
     aiBtn
 );
 
 // 7. Add Modals and Mobile Bottom Bar
-const bottomContent = `      <QuestionBankModal
-        isOpen={isQuestionBankOpen}
-        onClose={() => setIsQuestionBankOpen(false)}
-        onAdd={handleAddFromBank}
-        appLanguage={appLanguage}
-      />
-      
-      <AiQuestionGeneratorModal
-        isOpen={isAiGeneratorOpen}
-        onClose={() => setIsAiGeneratorOpen(false)}
-        onAdd={handleAddFromBank}
-        appLanguage={appLanguage}
-      />
-
-      {/* Mobile Bottom Navigation & Settings Sheet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 flex items-center justify-around z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-safe print:hidden">
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1" onClick={() => setIsMobileSettingsOpen(true)}>
-          <Settings className="w-5 h-5 text-gray-600" />
-          <span className="text-[10px] text-gray-500 font-medium">Settings</span>
-        </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { setIsAiGeneratorOpen(true); setEditingMode(true); }}>
-          <Sparkles className="w-5 h-5 text-indigo-600" />
-          <span className="text-[10px] font-medium">AI Gen</span>
-        </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-emerald-600" onClick={() => { setIsQuestionBankOpen(true); setEditingMode(true); }}>
-          <Database className="w-5 h-5 text-emerald-600" />
-          <span className="text-[10px] font-medium">Bank</span>
-        </Button>
-        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-blue-600" onClick={() => { setIsAddQuestionOpen(true); setEditingMode(true); }}>
-          <PlusCircle className="w-5 h-5 text-blue-600" />
-          <span className="text-[10px] font-medium">Custom</span>
-        </Button>
-      </div>
-
-      <Sheet open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>
-        <SheetContent side="bottom" className="h-[85vh] p-0 flex flex-col bg-[#f0f2f5] rounded-t-2xl">
-          <SheetHeader className="px-4 py-3 bg-white border-b rounded-t-2xl shrink-0">
-            <SheetTitle className="text-left text-lg">Builder Settings</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              {renderSidebarSettings()}
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
-
-    </div>
-  );
-}`;
+const bottomContent = "      <QuestionBankModal\n        isOpen={isQuestionBankOpen}\n        onClose={() => setIsQuestionBankOpen(false)}\n        onAdd={handleAddFromBank}\n        appLanguage={appLanguage}\n      />\n      \n      <AiQuestionGeneratorModal\n        isOpen={isAiGeneratorOpen}\n        onClose={() => setIsAiGeneratorOpen(false)}\n        onAdd={handleAddFromBank}\n        appLanguage={appLanguage}\n      />\n\n      {/* Mobile Bottom Navigation & Settings Sheet */}\n      <div className=\"lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 flex items-center justify-around z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-safe print:hidden\">\n        <Button variant=\"ghost\" className=\"flex flex-col items-center gap-1 h-auto py-1\" onClick={() => setIsMobileSettingsOpen(true)}>\n          <Settings className=\"w-5 h-5 text-gray-600\" />\n          <span className=\"text-[10px] text-gray-500 font-medium\">Settings</span>\n        </Button>\n        <Button variant=\"ghost\" className=\"flex flex-col items-center gap-1 h-auto py-1 text-indigo-600\" onClick={() => { setIsAiGeneratorOpen(true); setEditingMode(true); }}>\n          <Sparkles className=\"w-5 h-5 text-indigo-600\" />\n          <span className=\"text-[10px] font-medium\">AI Gen</span>\n        </Button>\n        <Button variant=\"ghost\" className=\"flex flex-col items-center gap-1 h-auto py-1 text-emerald-600\" onClick={() => { setIsQuestionBankOpen(true); setEditingMode(true); }}>\n          <Database className=\"w-5 h-5 text-emerald-600\" />\n          <span className=\"text-[10px] font-medium\">Bank</span>\n        </Button>\n        <Button variant=\"ghost\" className=\"flex flex-col items-center gap-1 h-auto py-1 text-blue-600\" onClick={() => { setIsAddQuestionOpen(true); setEditingMode(true); }}>\n          <PlusCircle className=\"w-5 h-5 text-blue-600\" />\n          <span className=\"text-[10px] font-medium\">Custom</span>\n        </Button>\n      </div>\n\n      <Sheet open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>\n        <SheetContent side=\"bottom\" className=\"h-[85vh] p-0 flex flex-col bg-[#f0f2f5] rounded-t-2xl\">\n          <SheetHeader className=\"px-4 py-3 bg-white border-b rounded-t-2xl shrink-0\">\n            <SheetTitle className=\"text-left text-lg\">Builder Settings</SheetTitle>\n          </SheetHeader>\n          <div className=\"flex-1 overflow-y-auto p-4\">\n            <div className=\"bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden\">\n              {renderSidebarSettings()}\n            </div>\n          </div>\n        </SheetContent>\n      </Sheet>\n\n    </div>\n  );\n}";
 
 content = content.replace(/<QuestionBankModal[\s\S]*?\/>/g, '');
 

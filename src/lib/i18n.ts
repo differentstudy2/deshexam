@@ -227,6 +227,7 @@ export const translations: Translations = {
   en: {
     // Builder UI
     filterSettings: 'Filter Settings',
+    quickActions: 'Quick Actions',
     saveTemplate: 'Save Template',
     pageSetup: 'Page Setup',
     loadTemplate: 'Load Template',
@@ -444,6 +445,7 @@ export const translations: Translations = {
   hi: {
     // Builder UI
     filterSettings: 'फ़िल्टर सेटिंग्स',
+    quickActions: 'त्वरित कार्रवाइयां',
     saveTemplate: 'टेम्पलेट सेव',
     pageSetup: 'पेज सेटअप',
     loadTemplate: 'टेम्पलेट लोड',

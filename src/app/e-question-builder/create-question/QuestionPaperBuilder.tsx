@@ -526,7 +526,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     <>
 
           <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
-            <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('filterSettings', appLanguage)}</h3>
+            <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('quickActions', appLanguage)}</h3>
             <Button size="sm" className="bg-[#5c6bc0] hover:bg-[#3f51b5] h-7 px-3 text-xs" onClick={handleSaveTemplate}>
               <Save className="w-3 h-3 mr-1" /> {t('saveTemplate', appLanguage)}
             </Button>
