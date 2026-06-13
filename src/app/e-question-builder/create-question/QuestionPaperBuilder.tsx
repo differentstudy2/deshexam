@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles , ZoomIn, ZoomOut } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -131,6 +131,22 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);
   const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
   const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        const scale = Math.max(0.3, Math.min(1, (window.innerWidth - 32) / 820));
+        setZoom(scale);
+      } else {
+        setZoom(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   // Enhanced Settings State
   const [appLanguage, setAppLanguage] = useState<AppLanguage>('bn');
@@ -1198,7 +1214,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               }
             }
           `}} />
-          <div id="printable-paper" className="flex flex-col gap-8 print:gap-0 print:block">
+          <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block">
             {/* Fixed Print Footer (Repeats on every printed page) */}
             <div
               className="hidden print:flex fixed bottom-0 left-0 right-0 w-full justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
