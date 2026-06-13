@@ -1209,6 +1209,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                 padding: 0 !important;
                 box-shadow: none !important;
                 background: white !important;
+                zoom: 1 !important;
               }
               .preview-page-padding {
                 padding: 0 !important; /* Let @page handle print margins */
