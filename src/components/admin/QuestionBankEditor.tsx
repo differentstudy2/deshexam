@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, Play, Image as ImageIcon, Video, ShieldCheck, Upload, Trash2, X, Plus } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { slugify, cn } from '@/lib/utils';
@@ -57,9 +57,12 @@ export interface QuestionBankEditorProps {
   initialData: Partial<QuestionBankEntry>;
   onSaveComplete: () => void;
   onCancel: () => void;
+  title?: string;
+  breadcrumbs?: string[];
+  defaultContentType?: string;
 }
 
-export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: QuestionBankEditorProps) {
+export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, title, breadcrumbs, defaultContentType }: QuestionBankEditorProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   
@@ -68,6 +71,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
       difficulty: 'Medium',
       status: 'Published',
       language: 'English',
+      contentType: defaultContentType || initialData.contentType,
       options: { a: '', b: '', c: '', d: '', e: '' },
       matchingPairs: [{ left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }, { left: '', right: '' }],
       examIds: [],
@@ -99,6 +103,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
         difficulty: 'Medium',
         status: 'Published',
         language: 'English',
+        contentType: defaultContentType || initialData.contentType,
         ...initialData,
         id: initialData.id,
         options: initialData.options || { a: '', b: '', c: '', d: '', e: '' },
@@ -243,6 +248,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
           const cleanText = (editData.questionText || '').replace(/<[^>]*>?/gm, '');
           const generatedSlug = editData.slug || slugify(editData.title || cleanText.substring(0, 50));
           const dataToSave = {
+              contentType: defaultContentType || 'general',
               ...editData,
               slug: generatedSlug,
               sourceExam: editData.examIds && editData.examIds.length > 0
@@ -303,22 +309,51 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
   }
 
   return (
-      <div className="p-0 max-w-5xl mx-auto space-y-6">
-          <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={onCancel}><ArrowLeft className="h-4 w-4 mr-2" /> Back</Button>
-              <h1 className="text-2xl font-bold tracking-tight">{editData.id ? 'Edit Question' : 'Create Question'}</h1>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Left Column: Editor */}
-              <div className="md:col-span-2 space-y-6">
-                  <Card>
-                      <CardHeader><CardTitle>Content</CardTitle></CardHeader>
-                      <CardContent className="space-y-4">
+      <div className="space-y-6 pb-24">
+          {(title || breadcrumbs) && (
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+                  <div>
+                      {breadcrumbs && (
+                          <div className="text-sm text-slate-500 mb-1 flex items-center gap-2">
+                              {breadcrumbs.map((crumb, idx) => (
+                                  <React.Fragment key={idx}>
+                                      <span>{crumb}</span>
+                                      {idx < breadcrumbs.length - 1 && <span>/</span>}
+                                  </React.Fragment>
+                              ))}
+                          </div>
+                      )}
+                      {title && <h1 className="text-3xl font-bold tracking-tight">{title}</h1>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                      <Button variant="outline" onClick={() => {
+                          setEditData({...editData, status: 'Draft'});
+                          handleSave();
+                      }} disabled={isSaving}>
+                          {isSaving && editData.status === 'Draft' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                          Save Draft
+                      </Button>
+                      <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                          setEditData({...editData, status: 'Published'});
+                          handleSave();
+                      }} disabled={isSaving}>
+                          {isSaving && editData.status === 'Published' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                          Publish Question
+                      </Button>
+                  </div>
+              </div>
+          )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+              {/* Left Section (Content, Options, Explanation) */}
+              <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* --- CARD 1: Question Content --- */}
+                  <Card className="flex flex-col rounded-xl border-slate-200/60 shadow-sm bg-white h-full">
+                      <CardHeader className="pb-3"><CardTitle className="text-lg">Question Content</CardTitle></CardHeader>
+                      <CardContent className="space-y-4 flex-1 flex flex-col">
                           <div>
-                              <label className="text-sm font-medium">Question Type *</label>
+                              <label className="text-sm font-semibold mb-1 block">Question Type <span className="text-red-500">*</span></label>
                               <Select value={editData.questionType || 'MCQ'} onValueChange={v => setEditData({...editData, questionType: v as any})}>
-                                  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                                  <SelectTrigger className="bg-green-50/50 border-green-200 text-green-900 focus:ring-green-500"><SelectValue placeholder="Select type" /></SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="MCQ">MCQ</SelectItem>
                                       <SelectItem value="Multiple Choice">Multiple Choice</SelectItem>
@@ -331,76 +366,63 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                   </SelectContent>
                               </Select>
                           </div>
-                          <div>
-                              <label className="text-sm font-medium">Title (Optional)</label>
-                              <Input placeholder="E.g. Newton's First Law" value={editData.title || ''} onChange={e => setEditData({...editData, title: e.target.value})} />
+                          <div className="flex-1 flex flex-col">
+                              <label className="text-sm font-semibold mb-1 block">Question Text <span className="text-red-500">*</span></label>
+                              <Textarea className="flex-1 min-h-[120px] resize-none" placeholder="Enter question content here..." value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
                           </div>
-                          <div>
-                              <label className="text-sm font-medium">Question Text *</label>
-                              <Textarea placeholder="What is the capital of France?" rows={4} value={editData.questionText || ''} onChange={e => setEditData({...editData, questionText: e.target.value})} />
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
-                              <div>
-                                  <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
-                                      <span className="flex items-center gap-1"><ImageIcon className="h-4 w-4"/> Image</span>
-                                      <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
-                                          {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
-                                          Upload
-                                          <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
-                                      </label>
+                          <div className="pt-2">
+                              <label className="text-sm font-semibold mb-2 block">Attachments</label>
+                              <div className="flex gap-3">
+                                  {/* Image Upload Button */}
+                                  <label className="flex flex-col items-center justify-center w-24 h-20 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors bg-white">
+                                      {isUploadingMedia ? <Loader2 className="h-5 w-5 animate-spin text-slate-400 mb-1"/> : <ImageIcon className="h-6 w-6 text-slate-700 mb-1"/>}
+                                      <span className="text-[10px] font-medium text-slate-600">Upload Image</span>
+                                      <input type="file" className="hidden" accept="image/*" onChange={e => handleMediaUpload(e, 'questionImage')} disabled={isUploadingMedia} />
                                   </label>
-                                  <div className="flex items-center gap-2">
-                                      <Input placeholder="URL or upload..." value={editData.questionImage || ''} onChange={e => setEditData({...editData, questionImage: e.target.value})} />
+                                  {/* Audio Upload Button */}
+                                  <label className="flex flex-col items-center justify-center w-24 h-20 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors bg-white">
+                                      {isUploadingMedia ? <Loader2 className="h-5 w-5 animate-spin text-slate-400 mb-1"/> : <Play className="h-6 w-6 text-slate-700 mb-1"/>}
+                                      <span className="text-[10px] font-medium text-slate-600">Upload Audio</span>
+                                      <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
+                                  </label>
+                                  {/* Video Upload Button */}
+                                  <label className="flex flex-col items-center justify-center w-24 h-20 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors bg-white">
+                                      {isUploadingMedia ? <Loader2 className="h-5 w-5 animate-spin text-slate-400 mb-1"/> : <Video className="h-6 w-6 text-slate-700 mb-1"/>}
+                                      <span className="text-[10px] font-medium text-slate-600">Upload Video</span>
+                                      <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
+                                  </label>
+                              </div>
+                              {/* Display uploaded media status */}
+                              {(editData.questionImage || editData.questionAudio || editData.questionVideo) && (
+                                  <div className="mt-3 flex flex-col gap-2">
                                       {editData.questionImage && (
-                                          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-red-500 hover:text-red-700" onClick={() => handleDeleteMedia(editData.questionImage, 'questionImage')}>
-                                              <Trash2 className="w-4 h-4" />
-                                          </Button>
+                                          <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md border text-sm">
+                                              <span className="truncate max-w-[150px]"><ImageIcon className="w-4 h-4 inline mr-1"/> Image</span>
+                                              <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteMedia(editData.questionImage, 'questionImage')}><Trash2 className="w-3 h-3" /></Button>
+                                          </div>
                                       )}
-                                  </div>
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
-                                      <span className="flex items-center gap-1"><Play className="h-4 w-4"/> Audio</span>
-                                      <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
-                                          {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
-                                          Upload
-                                          <input type="file" className="hidden" accept="audio/*" onChange={e => handleMediaUpload(e, 'questionAudio')} disabled={isUploadingMedia} />
-                                      </label>
-                                  </label>
-                                  <div className="flex items-center gap-2">
-                                      <Input placeholder="URL or upload..." value={editData.questionAudio || ''} onChange={e => setEditData({...editData, questionAudio: e.target.value})} />
                                       {editData.questionAudio && (
-                                          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-red-500 hover:text-red-700" onClick={() => handleDeleteMedia(editData.questionAudio, 'questionAudio')}>
-                                              <Trash2 className="w-4 h-4" />
-                                          </Button>
+                                          <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md border text-sm">
+                                              <span className="truncate max-w-[150px]"><Play className="w-4 h-4 inline mr-1"/> Audio</span>
+                                              <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteMedia(editData.questionAudio, 'questionAudio')}><Trash2 className="w-3 h-3" /></Button>
+                                          </div>
                                       )}
-                                  </div>
-                              </div>
-                              <div>
-                                  <label className="text-sm font-medium flex items-center justify-between gap-1 mb-1">
-                                      <span className="flex items-center gap-1"><Video className="h-4 w-4"/> Video</span>
-                                      <label className="text-xs text-blue-600 cursor-pointer flex items-center gap-1 hover:underline">
-                                          {isUploadingMedia ? <Loader2 className="h-3 w-3 animate-spin"/> : <Upload className="h-3 w-3"/>}
-                                          Upload
-                                          <input type="file" className="hidden" accept="video/*" onChange={e => handleMediaUpload(e, 'questionVideo')} disabled={isUploadingMedia} />
-                                      </label>
-                                  </label>
-                                  <div className="flex items-center gap-2">
-                                      <Input placeholder="URL or upload..." value={editData.questionVideo || ''} onChange={e => setEditData({...editData, questionVideo: e.target.value})} />
                                       {editData.questionVideo && (
-                                          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 text-red-500 hover:text-red-700" onClick={() => handleDeleteMedia(editData.questionVideo, 'questionVideo')}>
-                                              <Trash2 className="w-4 h-4" />
-                                          </Button>
+                                          <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md border text-sm">
+                                              <span className="truncate max-w-[150px]"><Video className="w-4 h-4 inline mr-1"/> Video</span>
+                                              <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteMedia(editData.questionVideo, 'questionVideo')}><Trash2 className="w-3 h-3" /></Button>
+                                          </div>
                                       )}
                                   </div>
-                              </div>
+                              )}
                           </div>
                       </CardContent>
                   </Card>
 
-                  <Card>
-                      <CardHeader><CardTitle>{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer Key'}</CardTitle></CardHeader>
-                      <CardContent className="space-y-4">
+                  {/* --- CARD 2: Options / Answer --- */}
+                  <Card className="flex flex-col rounded-xl border-slate-200/60 shadow-sm bg-white h-full">
+                      <CardHeader className="pb-3"><CardTitle className="text-lg">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle></CardHeader>
+                      <CardContent className="space-y-4 flex-1">
                           {editData.questionType === 'Matching' ? (
                               <div className="space-y-3">
                                   <div className="grid grid-cols-2 gap-4">
@@ -520,51 +542,28 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                                   <p className="text-xs text-slate-500 mt-2">Pairs will be shuffled automatically when displayed to students.</p>
                               </div>
                           ) : ['MCQ', 'Multiple Choice'].includes(editData.questionType || 'MCQ') ? (
-                              <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option A</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'A'} onChange={() => setEditData({...editData, correctAnswer: 'A'})} /> Correct
-                                          </label>
+                              <div className="space-y-3">
+                                  {['A', 'B', 'C', 'D'].map((optKey) => (
+                                      <div key={optKey} className="flex items-center gap-3">
+                                          <button 
+                                              className={cn("w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === optKey ? "border-green-600 bg-green-600" : "border-slate-300")}
+                                              onClick={() => setEditData({...editData, correctAnswer: optKey})}
+                                          >
+                                              {editData.correctAnswer?.toUpperCase() === optKey && <div className="w-2 h-2 bg-white rounded-full" />}
+                                          </button>
+                                          <Input className="flex-1" placeholder={`Option ${optKey}`} value={editData.options?.[optKey.toLowerCase() as keyof typeof editData.options] || ''} onChange={e => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: e.target.value}})} />
+                                          <button className="text-slate-400 hover:text-slate-600 shrink-0 px-2" onClick={() => setEditData({...editData, options: {...editData.options!, [optKey.toLowerCase()]: ''}})}><X className="w-4 h-4" /></button>
                                       </div>
-                                      <Input value={editData.options?.a || ''} onChange={e => setEditData({...editData, options: {...editData.options!, a: e.target.value}})} />
-                                  </div>
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option B</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'B'} onChange={() => setEditData({...editData, correctAnswer: 'B'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.b || ''} onChange={e => setEditData({...editData, options: {...editData.options!, b: e.target.value}})} />
-                                  </div>
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option C</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'C'} onChange={() => setEditData({...editData, correctAnswer: 'C'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.c || ''} onChange={e => setEditData({...editData, options: {...editData.options!, c: e.target.value}})} />
-                                  </div>
-                                  <div>
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option D</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'D'} onChange={() => setEditData({...editData, correctAnswer: 'D'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.d || ''} onChange={e => setEditData({...editData, options: {...editData.options!, d: e.target.value}})} />
-                                  </div>
-                                  <div className="col-span-1 md:col-span-2 mt-2 pt-2 border-t border-slate-100">
-                                      <div className="flex items-center justify-between mb-1">
-                                          <label className="text-sm font-medium">Option E (Optional)</label>
-                                          <label className="text-xs flex items-center gap-1 cursor-pointer text-green-600 font-medium">
-                                              <input type="radio" name="correctAnswer" checked={editData.correctAnswer?.toUpperCase() === 'E'} onChange={() => setEditData({...editData, correctAnswer: 'E'})} /> Correct
-                                          </label>
-                                      </div>
-                                      <Input value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
+                                  ))}
+                                  <div className="flex items-center gap-3 pt-2">
+                                      <button 
+                                          className={cn("w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors", editData.correctAnswer?.toUpperCase() === 'E' ? "border-green-600 bg-green-600" : "border-slate-300")}
+                                          onClick={() => setEditData({...editData, correctAnswer: 'E'})}
+                                      >
+                                          {editData.correctAnswer?.toUpperCase() === 'E' && <div className="w-2 h-2 bg-white rounded-full" />}
+                                      </button>
+                                      <Input className="flex-1" placeholder="Option E (optional)" value={editData.options?.e || ''} onChange={e => setEditData({...editData, options: {...editData.options!, e: e.target.value}})} />
+                                      <button className="text-green-600 hover:text-green-700 shrink-0 px-2"><Plus className="w-5 h-5" /></button>
                                   </div>
                               </div>
                           ) : ['True/False'].includes(editData.questionType || '') ? (
@@ -620,15 +619,16 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                       </CardContent>
                   </Card>
 
-                  <Card>
-                      <CardHeader className="flex flex-row items-center justify-between">
-                          <CardTitle>Explanation</CardTitle>
-                          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
+                  {/* --- CARD 3: Explanation --- */}
+                  <Card className="lg:col-span-2 rounded-xl border-slate-200/60 shadow-sm bg-white">
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b">
+                          <CardTitle className="text-lg">Explanation</CardTitle>
+                          <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="text-emerald-700 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 rounded-md">
                               {isGeneratingAI ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                              Auto-Generate with AI
+                              Generate Explanation with AI
                           </Button>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent className="pt-4">
                           <div className="prose-editor-container">
                               <TiptapEditor 
                                   content={editData.explanation || ''} 
@@ -639,73 +639,140 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                   </Card>
               </div>
 
-              {/* Right Column: Meta & Taxonomy */}
-              <div className="space-y-6">
-                  <Card>
-                      <CardHeader><CardTitle>Publish Settings</CardTitle></CardHeader>
+              {/* Right Column: Taxonomy and Meta */}
+              <div className="space-y-6 flex flex-col">
+                  {/* --- CARD 4: Academic Taxonomy --- */}
+                  <Card className="rounded-xl border-slate-200/60 shadow-sm bg-white">
+                      <CardHeader className="flex flex-row items-center justify-between pb-3">
+                          <CardTitle className="text-lg">Academic Taxonomy</CardTitle>
+                          <div className="flex items-center space-x-2">
+                              <Switch id="guide-mode" checked={showGuideTaxonomy} onCheckedChange={(v) => {
+                                  setShowGuideTaxonomy(v);
+                                  setEditData({...editData, boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''});
+                              }} />
+                              <label htmlFor="guide-mode" className="text-[10px] font-medium leading-none cursor-pointer text-slate-500">
+                                  Guide Only
+                              </label>
+                          </div>
+                      </CardHeader>
                       <CardContent className="space-y-4">
-                          <Button className="w-full" onClick={handleSave} disabled={isSaving}>
-                              {isSaving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
-                              Save Question
-                          </Button>
-                          <div>
-                              <label className="text-sm font-medium">Status</label>
-                              <Select value={editData.status as string} onValueChange={v => setEditData({...editData, status: v as any})}>
-                                  <SelectTrigger><SelectValue /></SelectTrigger>
-                                  <SelectContent>
-                                      <SelectItem value="Draft">Draft</SelectItem>
-                                      <SelectItem value="Published">Published</SelectItem>
-                                      <SelectItem value="Archived">Archived</SelectItem>
-                                  </SelectContent>
-                              </Select>
+                          <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                  <label className="text-xs font-semibold mb-1 block">Board <span className="text-red-500">*</span></label>
+                                  <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
+                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Board" /></SelectTrigger>
+                                      <SelectContent>{boards.filter(b => !!(b as any).isGuide === showGuideTaxonomy).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                              <div>
+                                  <label className="text-xs font-semibold mb-1 block">Class <span className="text-red-500">*</span></label>
+                                  <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
+                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Class" /></SelectTrigger>
+                                      <SelectContent>{classes.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.boardId || (b as any).boardId === editData.boardId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
                           </div>
                           <div>
-                              <label className="text-sm font-medium">Difficulty</label>
-                              <Select value={editData.difficulty as string} onValueChange={v => setEditData({...editData, difficulty: v as any})}>
-                                  <SelectTrigger><SelectValue /></SelectTrigger>
-                                  <SelectContent>
-                                      <SelectItem value="Easy">Easy</SelectItem>
-                                      <SelectItem value="Medium">Medium</SelectItem>
-                                      <SelectItem value="Hard">Hard</SelectItem>
-                                      <SelectItem value="Expert">Expert</SelectItem>
-                                  </SelectContent>
+                              <label className="text-xs font-semibold mb-1 block">Subject <span className="text-red-500">*</span></label>
+                              <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''})}>
+                                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Subject" /></SelectTrigger>
+                                  <SelectContent>{subjects.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.classId || (b as any).classId === editData.classId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
+                          <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                  <label className="text-xs font-semibold mb-1 block text-slate-500">Textbook</label>
+                                  <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''})}>
+                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Textbook" /></SelectTrigger>
+                                      <SelectContent>{textbooks.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.subjectId || (b as any).subjectId === editData.subjectId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                              <div>
+                                  <label className="text-xs font-semibold mb-1 block text-slate-500">Book / Guide</label>
+                                  <Select value={editData.yearId || ''} onValueChange={v => setEditData({...editData, yearId: v})}>
+                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Book / Guide" /></SelectTrigger>
+                                      <SelectContent>{years.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                  <label className="text-xs font-semibold mb-1 block">Chapter <span className="text-red-500">*</span></label>
+                                  <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v, topicId: ''})}>
+                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Chapter" /></SelectTrigger>
+                                      <SelectContent>{chapters.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.textbookId || (b as any).textbookId === editData.textbookId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                              <div>
+                                  <label className="text-xs font-semibold mb-1 block">Topic <span className="text-red-500">*</span></label>
+                                  <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
+                                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Topic" /></SelectTrigger>
+                                      <SelectContent>{topics.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.chapterId || (b as any).chapterId === editData.chapterId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  </Select>
+                              </div>
+                          </div>
+                      </CardContent>
+                  </Card>
+
+                  {/* --- CARD 5: Publish Settings --- */}
+                  <Card className="rounded-xl border-slate-200/60 shadow-sm bg-white">
+                      <CardHeader className="pb-3"><CardTitle className="text-lg">Publish Settings</CardTitle></CardHeader>
+                      <CardContent className="space-y-4">
                           <div>
-                              <label className="text-sm font-medium">Language</label>
+                              <label className="text-xs font-semibold mb-2 block">Status</label>
+                              <div className="flex items-center gap-4">
+                                  <label className="flex items-center gap-2 cursor-pointer">
+                                      <input type="radio" name="status" checked={editData.status === 'Draft'} onChange={() => setEditData({...editData, status: 'Draft'})} className="w-4 h-4 text-green-600 focus:ring-green-500" />
+                                      <span className="text-sm">Draft</span>
+                                  </label>
+                                  <label className="flex items-center gap-2 cursor-pointer">
+                                      <input type="radio" name="status" checked={editData.status === 'Published'} onChange={() => setEditData({...editData, status: 'Published'})} className="w-4 h-4 text-green-600 focus:ring-green-500" />
+                                      <span className="text-sm">Published</span>
+                                  </label>
+                              </div>
+                          </div>
+                          <div>
+                              <label className="text-xs font-semibold mb-2 block">Difficulty</label>
+                              <div className="flex bg-slate-100 rounded-full p-1 w-full border">
+                                  <button onClick={() => setEditData({...editData, difficulty: 'Easy'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Easy' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Easy</button>
+                                  <button onClick={() => setEditData({...editData, difficulty: 'Medium'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Medium' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Medium</button>
+                                  <button onClick={() => setEditData({...editData, difficulty: 'Hard'})} className={cn("flex-1 text-xs py-1.5 rounded-full font-medium transition-colors", editData.difficulty === 'Hard' ? "bg-green-100 text-green-800 shadow-sm border border-green-200" : "text-slate-600 hover:text-slate-900")}>Hard</button>
+                              </div>
+                          </div>
+                          <div>
+                              <label className="text-xs font-semibold mb-1 block">Language</label>
                               <Select value={editData.language as string} onValueChange={v => setEditData({...editData, language: v as any})}>
-                                  <SelectTrigger><SelectValue /></SelectTrigger>
+                                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                                   <SelectContent>
                                       <SelectItem value="English">English</SelectItem>
                                       <SelectItem value="Bangla">Bangla</SelectItem>
                                       <SelectItem value="Hindi">Hindi</SelectItem>
+                                      <SelectItem value="Bengali, English">Bengali, English</SelectItem>
                                   </SelectContent>
                               </Select>
                           </div>
-
                           <div>
-                              <label className="text-sm font-medium mb-2 block">Tags</label>
+                              <label className="text-xs font-semibold mb-2 block">Tags</label>
                               {tags.length === 0 ? (
-                                  <p className="text-xs text-slate-500">No tags defined in categories yet.</p>
+                                  <p className="text-xs text-slate-500">No tags defined yet.</p>
                               ) : (
-                                  <div className="grid grid-cols-2 gap-3 max-h-[150px] overflow-y-auto pr-2 border rounded-md p-3">
+                                  <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto">
                                       {tags.map(tag => (
-                                          <div key={tag.id} className="flex items-center space-x-2">
-                                              <Checkbox 
-                                                  id={`tag-${tag.id}`} 
-                                                  checked={(editData.tags || []).includes(tag.name)}
-                                                  onCheckedChange={(checked) => {
-                                                      const currentTags = editData.tags || [];
-                                                      if (checked) {
-                                                          setEditData({...editData, tags: [...currentTags, tag.name]});
-                                                      } else {
-                                                          setEditData({...editData, tags: currentTags.filter(t => t !== tag.name)});
-                                                      }
-                                                  }}
-                                              />
-                                              <label htmlFor={`tag-${tag.id}`} className="text-sm font-medium leading-none cursor-pointer">
-                                                  {tag.name}
-                                              </label>
+                                          <div key={tag.id} 
+                                               className={cn("text-xs flex items-center gap-1 px-2 py-1 rounded-full border cursor-pointer select-none transition-colors", 
+                                                 (editData.tags || []).includes(tag.name) ? "bg-slate-200 border-slate-300 text-slate-700 font-medium" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+                                               )}
+                                               onClick={() => {
+                                                   const currentTags = editData.tags || [];
+                                                   if (currentTags.includes(tag.name)) {
+                                                       setEditData({...editData, tags: currentTags.filter(t => t !== tag.name)});
+                                                   } else {
+                                                       setEditData({...editData, tags: [...currentTags, tag.name]});
+                                                   }
+                                               }}
+                                          >
+                                              {tag.name}
+                                              {(editData.tags || []).includes(tag.name) && <X className="w-3 h-3 text-slate-400 hover:text-slate-600" />}
                                           </div>
                                       ))}
                                   </div>
@@ -714,75 +781,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                       </CardContent>
                   </Card>
 
-                  <Card>
-                      <CardHeader className="flex flex-row items-center justify-between pb-2">
-                          <CardTitle>Taxonomy Binding</CardTitle>
-                          <div className="flex items-center space-x-2">
-                              <Switch id="guide-mode" checked={showGuideTaxonomy} onCheckedChange={(v) => {
-                                  setShowGuideTaxonomy(v);
-                                  // Optionally clear selections when switching contexts to avoid invalid states
-                                  setEditData({...editData, boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''});
-                              }} />
-                              <label htmlFor="guide-mode" className="text-sm font-medium leading-none cursor-pointer">
-                                  Guide Taxonomies Only
-                              </label>
-                          </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                          <div>
-                              <label className="text-xs text-muted-foreground">Board</label>
-                              <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
-                                  <SelectContent>{boards.filter(b => !!(b as any).isGuide === showGuideTaxonomy).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                          <div>
-                              <label className="text-xs text-muted-foreground">Year</label>
-                              <Select value={editData.yearId || ''} onValueChange={v => setEditData({...editData, yearId: v})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
-                                  <SelectContent>{years.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                          <div>
-                              <label className="text-xs text-muted-foreground">Class</label>
-                              <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Class" /></SelectTrigger>
-                                  <SelectContent>{classes.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.boardId || (b as any).boardId === editData.boardId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                          <div>
-                              <label className="text-xs text-muted-foreground">Subject</label>
-                              <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Subject" /></SelectTrigger>
-                                  <SelectContent>{subjects.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.classId || (b as any).classId === editData.classId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                          <div>
-                              <label className="text-xs text-muted-foreground">Textbook</label>
-                              <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Textbook" /></SelectTrigger>
-                                  <SelectContent>{textbooks.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.subjectId || (b as any).subjectId === editData.subjectId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                          <div>
-                              <label className="text-xs text-muted-foreground">Chapter</label>
-                              <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v, topicId: ''})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Chapter" /></SelectTrigger>
-                                  <SelectContent>{chapters.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.textbookId || (b as any).textbookId === editData.textbookId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                          <div>
-                              <label className="text-xs text-muted-foreground">Topic</label>
-                              <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
-                                  <SelectTrigger><SelectValue placeholder="Select Topic" /></SelectTrigger>
-                                  <SelectContent>{topics.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.chapterId || (b as any).chapterId === editData.chapterId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
-                              </Select>
-                          </div>
-                      </CardContent>
-                  </Card>
-
-                  <Card>
-                      <CardHeader><CardTitle>Exams Taxonomy</CardTitle></CardHeader>
+                  {/* --- CARD 6: Exams Taxonomy --- */}
+                  <Card className="rounded-xl border-slate-200/60 shadow-sm bg-white">
+                      <CardHeader className="pb-3"><CardTitle className="text-lg">Exams Taxonomy</CardTitle></CardHeader>
                       <CardContent>
                           {exams.length === 0 ? (
                               <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
@@ -812,6 +813,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                       </CardContent>
                   </Card>
 
+                  {/* --- CARD 7: Quality Assurance --- */}
                   <Card className="border-indigo-100 dark:border-indigo-900 shadow-sm">
                       <CardHeader className="bg-indigo-50/50 dark:bg-indigo-900/20 pb-4">
                           <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
@@ -900,6 +902,27 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                           )}
                       </CardContent>
                   </Card>
+              </div>
+          </div>
+
+          {/* Bottom Sticky Action Bar */}
+          <div className="fixed bottom-0 left-0 right-0 md:left-[250px] bg-white dark:bg-slate-950 border-t p-4 flex items-center justify-between z-40 shadow-lg">
+              <Button variant="ghost" onClick={onCancel}>Cancel</Button>
+              <div className="flex items-center gap-3">
+                  <Button variant="outline" onClick={() => {
+                      setEditData({...editData, status: 'Draft'});
+                      handleSave();
+                  }} disabled={isSaving}>
+                      {isSaving && editData.status === 'Draft' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      Save Draft
+                  </Button>
+                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      setEditData({...editData, status: 'Published'});
+                      handleSave();
+                  }} disabled={isSaving}>
+                      {isSaving && editData.status === 'Published' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      Publish
+                  </Button>
               </div>
           </div>
       </div>

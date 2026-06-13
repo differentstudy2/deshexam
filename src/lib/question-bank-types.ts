@@ -77,6 +77,7 @@ export interface QuestionBankEntry {
   difficulty: QuestionDifficulty;
   status: QuestionStatus;
   language?: QuestionLanguage;
+  contentType?: string;
   marks?: number;
   tags?: string[];
   
