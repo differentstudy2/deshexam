@@ -2111,8 +2111,52 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
         </DialogContent>
       </Dialog>
 
-      {/* Question Bank Modal */}
+      <QuestionBankModal
+        isOpen={isQuestionBankOpen}
+        onClose={() => setIsQuestionBankOpen(false)}
+        onAdd={handleAddFromBank}
+        appLanguage={appLanguage}
+      />
       
+      <AiQuestionGeneratorModal
+        isOpen={isAiGeneratorOpen}
+        onClose={() => setIsAiGeneratorOpen(false)}
+        onAdd={handleAddFromBank}
+        appLanguage={appLanguage}
+      />
+
+      {/* Mobile Bottom Navigation & Settings Sheet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t px-2 py-3 flex items-center justify-around z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] pb-safe print:hidden">
+        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1" onClick={() => setIsMobileSettingsOpen(true)}>
+          <Settings className="w-5 h-5 text-gray-600" />
+          <span className="text-[10px] text-gray-500 font-medium">Settings</span>
+        </Button>
+        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-indigo-600" onClick={() => { setIsAiGeneratorOpen(true); setEditingMode(true); }}>
+          <Sparkles className="w-5 h-5 text-indigo-600" />
+          <span className="text-[10px] font-medium">AI Gen</span>
+        </Button>
+        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-emerald-600" onClick={() => { setIsQuestionBankOpen(true); setEditingMode(true); }}>
+          <Database className="w-5 h-5 text-emerald-600" />
+          <span className="text-[10px] font-medium">Bank</span>
+        </Button>
+        <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-1 text-blue-600" onClick={() => { setIsAddQuestionOpen(true); setEditingMode(true); }}>
+          <PlusCircle className="w-5 h-5 text-blue-600" />
+          <span className="text-[10px] font-medium">Custom</span>
+        </Button>
+      </div>
+
+      <Sheet open={isMobileSettingsOpen} onOpenChange={setIsMobileSettingsOpen}>
+        <SheetContent side="bottom" className="h-[85vh] p-0 flex flex-col bg-[#f0f2f5] rounded-t-2xl">
+          <SheetHeader className="px-4 py-3 bg-white border-b rounded-t-2xl shrink-0">
+            <SheetTitle className="text-left text-lg">Builder Settings</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              {renderSidebarSettings()}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
 
     </div>
   );
