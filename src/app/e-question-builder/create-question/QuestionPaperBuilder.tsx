@@ -74,11 +74,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
   // Center & Exam Settings State
   const [headerSettingsEnabled, setHeaderSettingsEnabled] = useState(true);
-  const [headerTitle, setHeaderTitle] = useState('দেশ এক্সাম একাডেমী');
-  const [headerAddress, setHeaderAddress] = useState('দ্বারিকামারী, পেটলা, দিনহাটা, কোচবিহার, পশ্চিমবঙ্গ, ৭৩৬১৩৫');
+  const [headerTitle, setHeaderTitle] = useState('');
+  const [headerAddress, setHeaderAddress] = useState('');
   const [headerClassName, setHeaderClassName] = useState('অষ্টম শ্রেণি (মাধ্যমিক) - ২০২৬');
-  const [headerSubjectName, setHeaderSubjectName] = useState('বাংলা');
-  const [headerChapterName, setHeaderChapterName] = useState('প্রথম অধ্যায়');
+  const [headerSubjectName, setHeaderSubjectName] = useState('');
+  const [headerChapterName, setHeaderChapterName] = useState('');
 
 
   const [headerTime, setHeaderTime] = useState('');
@@ -669,23 +669,23 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div className="space-y-4">
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('instituteName', appLanguage)}</label>
-                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-8 text-[13px]" placeholder={t('institutePlaceholder', appLanguage)} />
+                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderTitle', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('address', appLanguage)}</label>
-                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-8 text-[13px]" placeholder={t('addressPlaceholder', appLanguage)} />
+                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderAddress', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('classAndYear', appLanguage)}</label>
-                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-8 text-[13px]" placeholder={t('classPlaceholder', appLanguage)} />
+                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderClass', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('subject', appLanguage)}</label>
-                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-8 text-[13px]" placeholder={t('subjectPlaceholder', appLanguage)} />
+                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderSubject', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('chapterName', appLanguage)}</label>
-                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-8 text-[13px]" placeholder={t('chapterPlaceholder', appLanguage)} />
+                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderChapter', appLanguage)} />
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1">
@@ -983,14 +983,14 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <Input
                       value={footerText}
                       onChange={e => setFooterText(e.target.value)}
-                      placeholder={t('institutePlaceholder', appLanguage)}
+                      placeholder={t('defaultHeaderTitle', appLanguage)}
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200 mb-4"
                     />
                     <label className="text-[13px] text-gray-700 mb-2 block">{t('watermarkText', appLanguage)}</label>
                     <Input
                       value={watermarkText}
                       onChange={e => setWatermarkText(e.target.value)}
-                      placeholder={t('institutePlaceholder', appLanguage)}
+                      placeholder={t('defaultHeaderTitle', appLanguage)}
                       className="h-10 text-[14px] bg-white text-gray-700 border-gray-200"
                     />
                   </div>
@@ -1217,7 +1217,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
           <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block">
             {/* Fixed Print Footer (Repeats on every printed page) */}
             <div
-              className="hidden print:flex fixed bottom-0 left-0 right-0 w-full justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
+              className="hidden print:flex fixed left-0 right-0 justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
+              style={{ bottom: `${margins.bottom || '0.5'}in` }}
             >
               <div>সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}</div>
               {showPageNumber && <div className="print-page-number-display"></div>}
@@ -1332,11 +1333,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                         {/* Center Info */}
                         <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
-                          {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle}</h1>}
-                          {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress}</p>}
-                          {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName}</h2>}
-                          {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName}</h3>}
-                          {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName}</h4>}
+                          {showTitle && <h1 {...getEditableProps("text-2xl font-bold text-gray-900 mb-1")}>{headerTitle || t('defaultHeaderTitle', appLanguage)}</h1>}
+                          {showAddress && <p {...getEditableProps("text-[13px] text-gray-700 mb-1")}>{headerAddress || t('defaultHeaderAddress', appLanguage)}</p>}
+                          {showClassName && <h2 {...getEditableProps("text-[15px] font-bold text-gray-800 mb-1")}>{headerClassName || t('defaultHeaderClass', appLanguage)}</h2>}
+                          {showSubjectName && <h3 {...getEditableProps("text-[14px] font-bold text-gray-800 mb-0.5")}>{headerSubjectName || t('defaultHeaderSubject', appLanguage)}</h3>}
+                          {showChapterName && <h4 {...getEditableProps("text-[13px] text-gray-700")}>{headerChapterName || t('defaultHeaderChapter', appLanguage)}</h4>}
                         </div>
                       </div>
 
@@ -1656,11 +1657,11 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
 
                       {/* Center Info */}
                       <div className={`text-center ${!headerSettingsEnabled ? 'invisible select-none' : ''}`}>
-                        {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle}</h1>}
-                        {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress}</p>}
-                        {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName}</h2>}
-                        {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName}</h3>}
-                        {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName}</h4>}
+                        {showTitle && <h1 className="text-2xl font-bold text-gray-900 mb-1">{headerTitle || t('defaultHeaderTitle', appLanguage)}</h1>}
+                        {showAddress && <p className="text-[13px] text-gray-700 mb-1">{headerAddress || t('defaultHeaderAddress', appLanguage)}</p>}
+                        {showClassName && <h2 className="text-[15px] font-bold text-gray-800 mb-1">{headerClassName || t('defaultHeaderClass', appLanguage)}</h2>}
+                        {showSubjectName && <h3 className="text-[14px] font-bold text-gray-800 mb-0.5">{headerSubjectName || t('defaultHeaderSubject', appLanguage)}</h3>}
+                        {showChapterName && <h4 className="text-[13px] text-gray-700">{headerChapterName || t('defaultHeaderChapter', appLanguage)}</h4>}
                       </div>
                     </div>
 
