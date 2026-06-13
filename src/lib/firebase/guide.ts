@@ -1,15 +1,16 @@
 import { collection, query, orderBy, getDocs, doc, getDoc, where, setDoc, deleteDoc, getCountFromServer, serverTimestamp, addDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { SidebarSubject, Chapter, ReadingContentData } from "@/app/guide/guide-data"; // Types
+import { getTaxonomyNodesByTrack } from "./taxonomy";
 
 export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
   try {
-    const q = query(collection(db, "guide_subjects"), orderBy("orderIndex", "asc"));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      title: doc.data().title,
-      countStr: doc.data().countStr,
+    const allNodes = await getTaxonomyNodesByTrack('academic');
+    const subjects = allNodes.filter(n => n.type === 'subject');
+    return subjects.map(n => ({
+      id: n.id,
+      title: n.title,
+      countStr: (n as any).countStr || '',
     })) as SidebarSubject[];
   } catch (error) {
     console.error("Error fetching guide subjects:", error);
@@ -19,75 +20,32 @@ export const getGuideSubjects = async (): Promise<SidebarSubject[]> => {
 
 export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter[]> => {
   try {
-    // New Hierarchy: Subject -> Textbooks -> Chapters -> Topics
+    const allNodes = await getTaxonomyNodesByTrack('academic');
     
-    // 1. Fetch Textbooks for this subject
-    const textbooksQuery = query(collection(db, "guide_textbooks"), where("subjectId", "==", subjectId));
-    const textbooksSnap = await getDocs(textbooksQuery);
-    
-    if (textbooksSnap.empty) {
-      // Fallback for old mock structure (just in case)
-      const chaptersQuery = query(collection(db, "guide_chapters"), where("subjectId", "==", subjectId));
-      const chaptersSnap = await getDocs(chaptersQuery);
-      if (chaptersSnap.empty) return [];
+    const textbooks = allNodes.filter(n => n.parentId === subjectId && n.type === 'textbook');
 
-      const topicsQuery = query(collection(db, "guide_topics"), where("subjectId", "==", subjectId));
-      const topicsSnap = await getDocs(topicsQuery);
-      const topicsByChapterId: Record<string, any[]> = {};
-      topicsSnap.forEach(doc => {
-        const data = doc.data();
-        if (!topicsByChapterId[data.chapterId]) topicsByChapterId[data.chapterId] = [];
-        topicsByChapterId[data.chapterId].push({ id: doc.id, title: data.title, type: 'topic', subtopics: data.subtopics || [] });
-      });
+    const curriculum = textbooks.map(tb => {
+      const tbChapters = allNodes
+        .filter(n => n.parentId === tb.id && n.type === 'chapter')
+        .map(ch => {
+          const chTopics = allNodes
+            .filter(n => n.parentId === ch.id && n.type === 'topic')
+            .map(t => ({ id: t.id, title: t.title, type: 'topic' as const }));
 
-      return chaptersSnap.docs.map(doc => ({
-        id: doc.id,
-        title: doc.data().title,
-        topics: topicsByChapterId[doc.id] || []
-      }));
-    }
+          return {
+            id: ch.id,
+            title: ch.title,
+            type: 'chapter' as const,
+            subtopics: chTopics
+          };
+        });
 
-    // 2. Fetch Chapters for these textbooks
-    const textbookIds = textbooksSnap.docs.map(doc => doc.id);
-    const chaptersQuery = query(collection(db, "guide_chapters"), where("textbookId", "in", textbookIds.length > 0 ? textbookIds : ['temp']));
-    const chaptersSnap = await getDocs(chaptersQuery);
-    
-    // 3. Fetch Topics for these chapters
-    const chapterIds = chaptersSnap.docs.map(doc => doc.id);
-    let topicsSnap = { docs: [] as any[] };
-    if (chapterIds.length > 0) {
-      // Note: Firestore 'in' query supports max 10 values, but for a typical subject, 
-      // we'll chunk it if it gets large. For now, fetch all topics and filter in-memory if needed.
-      const tQuery = query(collection(db, "guide_topics"));
-      topicsSnap = await getDocs(tQuery) as any;
-    }
-
-    const topicsByChapterId: Record<string, any[]> = {};
-    topicsSnap.docs.forEach(doc => {
-      const data = doc.data();
-      if (chapterIds.includes(data.chapterId)) {
-        if (!topicsByChapterId[data.chapterId]) topicsByChapterId[data.chapterId] = [];
-        topicsByChapterId[data.chapterId].push({ id: doc.id, title: data.title, type: 'topic' });
-      }
-    });
-
-    const chaptersByTextbookId: Record<string, any[]> = {};
-    chaptersSnap.docs.forEach(doc => {
-      const data = doc.data();
-      if (!chaptersByTextbookId[data.textbookId]) chaptersByTextbookId[data.textbookId] = [];
-      chaptersByTextbookId[data.textbookId].push({
-        id: doc.id,
-        title: data.title,
-        type: 'chapter',
-        subtopics: topicsByChapterId[doc.id] || [] // Map Topics to Subtopics for the UI
-      });
-    });
-
-    const curriculum: Chapter[] = textbooksSnap.docs.map(doc => ({
-      id: doc.id,
-      title: doc.data().title,
-      topics: chaptersByTextbookId[doc.id] || [] // Map Chapters to Topics for the UI
-    }));
+      return {
+        id: tb.id,
+        title: tb.title,
+        topics: tbChapters
+      };
+    }) as unknown as Chapter[];
 
     return curriculum;
   } catch (error) {
