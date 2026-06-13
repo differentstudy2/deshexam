@@ -71,7 +71,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [showAnswerKeySheet, setShowAnswerKeySheet] = useState(false);
   const [showOMRSheetAttachment, setShowOMRSheetAttachment] = useState(false);
   const [answerKeyColumns, setAnswerKeyColumns] = useState(3);
-  const [enableLatex, setEnableLatex] = useState(false);
+  const [enableLatex, setEnableLatex] = useState(true);
 
   // Center & Exam Settings State
   const [headerSettingsEnabled, setHeaderSettingsEnabled] = useState(true);
@@ -86,7 +86,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [headerMarks, setHeaderMarks] = useState('');
 
   // QR Code State
-  const [qrCodeEnabled, setQrCodeEnabled] = useState(false);
+  const [qrCodeEnabled, setQrCodeEnabled] = useState(true);
   const [qrCodeValue, setQrCodeValue] = useState('https://deshexam.com');
 
   // Question Format State
@@ -670,23 +670,23 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div className="space-y-4">
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('instituteName', appLanguage)}</label>
-                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderTitle', appLanguage)} />
+                  <Input value={headerTitle} onChange={e => setHeaderTitle(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderTitle', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('address', appLanguage)}</label>
-                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderAddress', appLanguage)} />
+                  <Input value={headerAddress} onChange={e => setHeaderAddress(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderAddress', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('classAndYear', appLanguage)}</label>
-                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderClass', appLanguage)} />
+                  <Input value={headerClassName} onChange={e => setHeaderClassName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderClass', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('subject', appLanguage)}</label>
-                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderSubject', appLanguage)} />
+                  <Input value={headerSubjectName} onChange={e => setHeaderSubjectName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderSubject', appLanguage)} />
                 </div>
                 <div>
                   <label className="text-[13px] text-gray-700 mb-1.5 block">{t('chapterName', appLanguage)}</label>
-                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-8 text-[13px]" placeholder={t('defaultHeaderChapter', appLanguage)} />
+                  <Input value={headerChapterName} onChange={e => setHeaderChapterName(e.target.value)} className="h-10 text-[14px] bg-white text-gray-700 border-gray-200" placeholder={t('defaultHeaderChapter', appLanguage)} />
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1">
@@ -1218,14 +1218,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block relative">
             {showPageBorder && <div className="hidden print:block fixed top-0 bottom-0 left-0 right-0 border-[1.5px] border-gray-800 pointer-events-none z-50"></div>}
             
-            {/* Fixed Print Footer (Repeats on every printed page) */}
-            <div
-              className="hidden print:flex fixed left-0 right-0 justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
-              style={{ bottom: `${margins.bottom || '0.5'}in` }}
-            >
-              <div>সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}</div>
-              {showPageNumber && <div className="print-page-number-display"></div>}
-            </div>
+            
             
 
             {/* Page 1: Main Paper */}
