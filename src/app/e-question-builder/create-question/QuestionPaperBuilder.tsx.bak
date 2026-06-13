@@ -7,9 +7,8 @@ import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles } from 'lucide-react';
+import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQuestionsByIds } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
@@ -20,7 +19,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { QuestionBankModal } from './QuestionBankModal';
-import { AiQuestionGeneratorModal } from './AiQuestionGeneratorModal';
 import 'katex/dist/katex.min.css';
 
 interface Props {
@@ -129,8 +127,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   
   // Question Bank Modal
   const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);
-  const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
-  const [isMobileSettingsOpen, setIsMobileSettingsOpen] = useState(false);
 
   // Enhanced Settings State
   const [appLanguage, setAppLanguage] = useState<AppLanguage>('bn');
@@ -150,10 +146,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [footerText, setFooterText] = useState('');
   const [questionOptionGap, setQuestionOptionGap] = useState(8);
   const [showExplanations, setShowExplanations] = useState(false);
-
-  const handleAddFromBank = (newQs: QuestionBankEntry[]) => {
-    setQuestions([...questions, ...newQs]);
-  };
 
   // Helper to convert \( \) and \[ \] into $ and $$ for remark-math
   const formatLatex = (text: string) => {
@@ -522,8 +514,46 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
     }
   };
 
-  const renderSidebarSettings = () => (
-    <>
+  return (
+    <div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white">
+      <header className="bg-white border-b px-6 py-4 flex justify-between items-center print:hidden">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-500">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold text-gray-800">{t('create_question_paper', appLanguage)}</h1>
+            <div className="text-sm text-gray-500">Home &gt; E-Question Builder &gt; Create Question</div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+            <Select value={appLanguage} onValueChange={(v: AppLanguage) => setAppLanguage(v)}>
+              <SelectTrigger className="h-9 w-[130px] border-gray-200 bg-white">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Languages className="w-4 h-4 text-blue-600" />
+                  <span>{appLanguage === 'bn' ? 'বাংলা' : appLanguage === 'en' ? 'English' : 'हिंदी'}</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium"
+              onClick={handlePrint}
+            >
+              <Printer className="w-4 h-4 mr-2" /> {t('printSavePdf', appLanguage)}
+            </Button>
+          </div>
+      </header>
+
+      <div className="flex flex-1 max-w-[1400px] mx-auto w-full p-4 gap-6 relative print:p-0 print:m-0 print:static">
+
+        {/* LEFT SIDEBAR - SETTINGS */}
+        <aside className="w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-[calc(100vh-120px)] overflow-y-auto sticky top-24 print:hidden shrink-0">
 
           <div className="bg-[#1e88e5] text-white p-3 rounded-t-lg flex justify-between items-center sticky top-0 z-20">
             <h3 className="font-bold flex items-center gap-2"><Settings className="w-4 h-4" /> {t('filterSettings', appLanguage)}</h3>
@@ -1087,50 +1117,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             </div>
 
           </div>
-        </>
-  );
-
-  return (
-    <div className="flex flex-col min-h-screen bg-[#f0f2f5] print:bg-white pb-20 lg:pb-0">
-      <header className="bg-white border-b px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 print:hidden">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-500 shrink-0">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">{t('create_question_paper', appLanguage)}</h1>
-            <div className="text-sm text-gray-500">Home &gt; E-Question Builder &gt; Create Question</div>
-          </div>
-        </div>
-        <div className="flex gap-2 w-full sm:w-auto sm:justify-end">
-            <Select value={appLanguage} onValueChange={(v: AppLanguage) => setAppLanguage(v)}>
-              <SelectTrigger className="h-9 w-[130px] border-gray-200 bg-white">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <Languages className="w-4 h-4 text-blue-600" />
-                  <span>{appLanguage === 'bn' ? 'বাংলা' : appLanguage === 'en' ? 'English' : 'हिंदी'}</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bn">বাংলা (Bengali)</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button
-              className="bg-[#1e293b] hover:bg-[#0f172a] text-white shadow-sm flex items-center h-9 px-4 text-sm font-medium"
-              onClick={handlePrint}
-            >
-              <Printer className="w-4 h-4 mr-2" /> {t('printSavePdf', appLanguage)}
-            </Button>
-          </div>
-      </header>
-
-      <div className="flex flex-col lg:flex-row flex-1 max-w-[1400px] mx-auto w-full p-2 sm:p-4 gap-6 relative print:p-0 print:m-0 print:static">
-
-        {/* LEFT SIDEBAR - SETTINGS */}
-        <aside className="hidden lg:block w-full lg:w-72 bg-white rounded-lg shadow-sm border border-gray-200 h-fit max-h-[calc(100vh-120px)] overflow-y-auto lg:sticky lg:top-24 print:hidden shrink-0">
-          {renderSidebarSettings()}
         </aside>
 
         {/* MAIN PAPER AREA */}
@@ -2112,7 +2098,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
       </Dialog>
 
       {/* Question Bank Modal */}
-      
+      <QuestionBankModal 
+        isOpen={isQuestionBankOpen} 
+        onClose={() => setIsQuestionBankOpen(false)} 
+        onAdd={(newQs) => setQuestions([...questions, ...newQs])}
+        appLanguage={appLanguage}
+      />
 
     </div>
   );

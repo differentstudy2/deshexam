@@ -5,10 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Search } from 'lucide-react';
 import { t, AppLanguage } from '@/lib/i18n';
+import { useToast } from '@/hooks/use-toast';
 
 // Firebase imports
 import { getTaxonomyNodes, getQuestionsPaginated, TaxonomyType } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 interface QuestionBankModalProps {
   isOpen: boolean;
@@ -18,6 +21,7 @@ interface QuestionBankModalProps {
 }
 
 export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: QuestionBankModalProps) {
+  const { toast } = useToast();
 
   // Taxonomy states
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
@@ -36,19 +40,53 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
   const [isLoading, setIsLoading] = useState(false);
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<Set<string>>(new Set());
 
-  // Fetch boards on mount
+  // Fetch boards and initial questions on mount
   useEffect(() => {
     if (isOpen) {
-      getTaxonomyNodes('board').then(res => setBoards(res as TaxonomyNode[]));
-      getTaxonomyNodes('class').then(res => setClasses(res as TaxonomyNode[]));
-      getTaxonomyNodes('subject').then(res => setSubjects(res as TaxonomyNode[]));
-      getTaxonomyNodes('chapter').then(res => setChapters(res as TaxonomyNode[]));
+      const fetchGuideCol = async (colName: string) => {
+        try {
+          const snap = await getDocs(collection(db, colName));
+          return snap.docs.map(d => {
+            const data = d.data();
+            return { id: d.id, name: data.title || data.name, ...data };
+          });
+        } catch(e) {
+          console.error('Error fetching guide collection:', colName, e);
+          return [];
+        }
+      };
+
+      const fetchCombinedCol = async (guideCol: string, questionCol: string) => {
+        const [g, q] = await Promise.all([fetchGuideCol(guideCol), fetchGuideCol(questionCol)]);
+        const combined = [...g, ...q];
+        return Array.from(new Map(combined.map(item => [item.id, item])).values()) as TaxonomyNode[];
+      };
+
+      Promise.all([
+        fetchCombinedCol('guide_boards', 'question_boards'),
+        fetchCombinedCol('guide_classes', 'question_classes'),
+        fetchCombinedCol('guide_subjects', 'question_subjects'),
+        fetchCombinedCol('guide_chapters', 'question_chapters')
+      ]).then(([b, c, s, ch]) => {
+        setBoards(b);
+        setClasses(c);
+        setSubjects(s);
+        setChapters(ch);
+      });
     }
   }, [isOpen]);
 
+  // Auto-fetch questions when filters change
+  useEffect(() => {
+    if (isOpen) {
+      handleSearch();
+    }
+  }, [isOpen, selectedBoard, selectedClass, selectedSubject, selectedChapter]);
+
   const handleSearch = async () => {
     setIsLoading(true);
-    setQuestions([]);
+    // Don't clear questions immediately so the UI doesn't completely flash empty
+    // setQuestions([]);
     
     const filters: any = {};
     if (selectedBoard !== 'all') filters.boardId = selectedBoard;
@@ -57,10 +95,17 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
     if (selectedChapter !== 'all') filters.chapterId = selectedChapter;
 
     try {
+      console.log('Fetching questions with filters:', filters);
       const res = await getQuestionsPaginated(filters, 50);
+      console.log('Fetched questions:', res.questions);
       setQuestions(res.questions);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error fetching questions:', e);
+      toast({ 
+        title: 'Error fetching questions', 
+        description: e.message || 'An error occurred while fetching from Firebase.',
+        variant: 'destructive'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +165,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
         {/* Filters */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-muted/30 p-4 rounded-lg">
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('board', appLanguage)}</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('board', appLanguage)} ({boards.length})</label>
             <Select value={selectedBoard} onValueChange={setSelectedBoard}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Boards" />
@@ -132,7 +177,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Class</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Class ({classes.length})</label>
             <Select value={selectedClass} onValueChange={setSelectedClass}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Classes" />
@@ -144,7 +189,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject ({subjects.length})</label>
             <Select value={selectedSubject} onValueChange={setSelectedSubject}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Subjects" />
@@ -156,7 +201,7 @@ export function QuestionBankModal({ isOpen, onClose, onAdd, appLanguage }: Quest
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('chapter', appLanguage)}</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('chapter', appLanguage)} ({chapters.length})</label>
             <Select value={selectedChapter} onValueChange={setSelectedChapter}>
               <SelectTrigger className="bg-background">
                 <SelectValue placeholder="All Chapters" />
