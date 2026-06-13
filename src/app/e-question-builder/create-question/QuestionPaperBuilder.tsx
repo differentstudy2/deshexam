@@ -43,8 +43,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [isPageSetupOpen, setIsPageSetupOpen] = useState(false);
   const [orientation, setOrientation] = useState('Portrait');
   const [paperSize, setPaperSize] = useState('Letter');
-  const [pageBorderStyle, setPageBorderStyle] = useState('none');
-  const [margins, setMargins] = useState({ top: '0.5', right: '0.5', bottom: '0.5', left: '0.5' });
+  const [showPageBorder, setShowPageBorder] = useState(false);
+  const [margins, setMargins] = useState({ top: '0.2', right: '0.2', bottom: '0.2', left: '0.2' });
 
   // Set Code State
   const [isSetCodeOpen, setIsSetCodeOpen] = useState(false);
@@ -1163,10 +1163,6 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
             }
 
             @media print {
-              .preview-page-container {
-                padding-left: ${margins.left || '0.5'}in !important;
-                padding-right: ${margins.right || '0.5'}in !important;
-              }
               body * {
                 visibility: hidden;
               }
@@ -1197,13 +1193,9 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               .page-number-display::after {
                 content: "পৃষ্ঠা " counter(preview-page, bengali);
               }
-              .print-page-number-display {
-                display: none !important;
-              }
+              .print-page-number-display { display: none !important; }
               @page {
                 size: ${paperSize === 'A4' ? 'A4' : paperSize === 'Letter' ? 'letter' : 'legal'} ${orientation.toLowerCase()};
-                margin: 0 !important; /* Force 0 margin to permanently hide browser headers */
-              }
                 margin: ${margins.top || '0'}in ${margins.right || '0'}in ${margins.bottom || '0.5'}in ${margins.left || '0'}in;
                 
                 ${showPageNumber ? `
@@ -1212,62 +1204,28 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                   font-size: 12px;
                   font-weight: bold;
                   color: rgba(31, 41, 55, 0.7);
-                  border-top: 1px solid #d1d5db;
-                  padding-top: 12px;
                 }
-                @bottom-center {
-                  content: "";
-                  border-top: 1px solid #d1d5db;
-                  padding-top: 12px;
-                }
-                ` : `
-                @bottom-center {
-                  content: "";
-                  border-top: 1px solid #d1d5db;
-                  padding-top: 12px;
-                }
-                `}
+                ` : ''}
                 @bottom-left {
                   content: "সৌজন্যে: ${footerText || 'দেশ এক্সাম একাডেমী'}";
                   font-size: 12px;
                   font-weight: bold;
                   color: rgba(31, 41, 55, 0.7);
-                  border-top: 1px solid #d1d5db;
-                  padding-top: 12px;
                 }
               }
             }
           `}} />
-          <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block relative">
-            {pageBorderStyle === 'solid' && (
-              <div className="hidden print:block fixed border-[1.5px] border-gray-800 pointer-events-none z-50" style={{
-                top: `${parseFloat(margins.top || '0.5') / 2}in`,
-                bottom: `${parseFloat(margins.bottom || '0.5') / 2}in`,
-                left: `${parseFloat(margins.left || '0.5') / 2}in`,
-                right: `${parseFloat(margins.right || '0.5') / 2}in`,
-              }}></div>
-            )}
-            {pageBorderStyle === 'text' && (
-              <div className="hidden print:block fixed pointer-events-none z-50 overflow-hidden" style={{
-                top: `${parseFloat(margins.top || '0.5') / 2}in`,
-                bottom: `${parseFloat(margins.bottom || '0.5') / 2}in`,
-                left: `${parseFloat(margins.left || '0.5') / 2}in`,
-                right: `${parseFloat(margins.right || '0.5') / 2}in`,
-              }}>
-                <div className="absolute top-0 left-0 right-0 h-[8px] overflow-hidden whitespace-nowrap text-[8px] text-gray-600 font-mono tracking-[4px] leading-none select-none">
-                  {"---deshexam.com".repeat(150)}
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 h-[8px] overflow-hidden whitespace-nowrap text-[8px] text-gray-600 font-mono tracking-[4px] leading-none select-none">
-                  {"---deshexam.com".repeat(150)}
-                </div>
-                <div className="absolute top-0 bottom-0 left-0 w-[8px] overflow-hidden whitespace-nowrap text-[8px] text-gray-600 font-mono tracking-[4px] leading-none select-none" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
-                  {"---deshexam.com".repeat(150)}
-                </div>
-                <div className="absolute top-0 bottom-0 right-0 w-[8px] overflow-hidden whitespace-nowrap text-[8px] text-gray-600 font-mono tracking-[4px] leading-none select-none" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
-                  {"---deshexam.com".repeat(150)}
-                </div>
-              </div>
-            )}
+                    <div id="printable-paper" style={{ zoom: zoom } as React.CSSProperties} className="flex flex-col gap-8 print:gap-0 print:block relative">
+            {showPageBorder && <div className="hidden print:block fixed top-0 bottom-0 left-0 right-0 border-[1.5px] border-gray-800 pointer-events-none z-50"></div>}
+            
+            {/* Fixed Print Footer (Repeats on every printed page) */}
+            <div
+              className="hidden print:flex fixed left-0 right-0 justify-between items-center text-[12px] font-bold text-gray-800 opacity-70 bg-white pt-3 border-t border-gray-300 z-50"
+              style={{ bottom: `${margins.bottom || '0.5'}in` }}
+            >
+              <div>সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}</div>
+              {showPageNumber && <div className="print-page-number-display"></div>}
+            </div>
             
 
             {/* Page 1: Main Paper */}
@@ -1283,23 +1241,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                             fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
               }}
             >
-<table className="w-full print:table border-collapse border-0 h-full">
-                <thead className="hidden print:table-header-group">
-                  <tr><td className="p-0 border-0"><div style={{ height: `${margins.top || '0.5'}in` }}></div></td></tr>
-                </thead>
-                <tfoot className="hidden print:table-footer-group">
-                  <tr><td className="p-0 border-0 relative">
-                    <div style={{ height: `${margins.bottom || '0.5'}in` }}></div>
-                    <div className="absolute bottom-4 left-0 right-0 flex justify-between items-center text-[12px] font-bold text-gray-800 opacity-70">
-                      <div>সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}</div>
-                      {showPageNumber ? <div className="page-number-display"></div> : null}
-                    </div>
-                  </td></tr>
-                </tfoot>
-                <tbody className="print:table-row-group">
-                  <tr>
-                    <td className="p-0 border-0 align-top h-full">
-                      <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
+              <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300">
 
                 {loading ? (
                   <div className="flex justify-center items-center h-64 print:hidden">
@@ -1634,7 +1576,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     </div>
                   </>
                 )}
-              </div></td></tr></tbody></table>
+              </div>
             </div>
 
             {/* Page 2: Answer Key Sheet */}
@@ -1651,17 +1593,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                               fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
                 }}
               >
-<table className="w-full print:table border-collapse border-0 h-full">
-                <thead className="hidden print:table-header-group">
-                  <tr><td className="p-0 border-0"><div style={{ height: `${margins.top || '0.5'}in` }}></div></td></tr>
-                </thead>
-                <tfoot className="hidden print:table-footer-group">
-                  <tr><td className="p-0 border-0"><div style={{ height: `${margins.bottom || '0.5'}in` }}></div></td></tr>
-                </tfoot>
-                <tbody className="print:table-row-group">
-                  <tr>
-                    <td className="p-0 border-0 align-top h-full">
-                      <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
+                <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
                   {/* Watermark for Answer Key */}
                   {brandingEnabled && (
                     <div
@@ -1803,7 +1735,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                     </div>
 
                   </div>
-                </div></td></tr></tbody></table>
+                </div>
               </div>
             )}
 
@@ -1821,17 +1753,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                               fontFamily === 'arial' ? 'Arial, sans-serif' : 'inherit'
                 }}
               >
-<table className="w-full print:table border-collapse border-0 h-full">
-                <thead className="hidden print:table-header-group">
-                  <tr><td className="p-0 border-0"><div style={{ height: `${margins.top || '0.5'}in` }}></div></td></tr>
-                </thead>
-                <tfoot className="hidden print:table-footer-group">
-                  <tr><td className="p-0 border-0"><div style={{ height: `${margins.bottom || '0.5'}in` }}></div></td></tr>
-                </tfoot>
-                <tbody className="print:table-row-group">
-                  <tr>
-                    <td className="p-0 border-0 align-top h-full">
-                      <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
+                <div className="preview-page-padding relative flex-1 flex flex-col transition-all duration-300 h-full">
                   <div className="relative z-10 font-sans flex-1 flex flex-col">
                     <div className="border-2 border-gray-800 p-8 rounded-xl relative bg-white">
                       {/* OMR Header */}
@@ -1958,7 +1880,7 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                       সৌজন্যে: {footerText || 'দেশ এক্সাম একাডেমী'}
                     </div>
                   </div>
-                </div></td></tr></tbody></table>
+                </div>
               </div>
             )}
 
@@ -2056,15 +1978,8 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-bold text-[#1c2b4f] text-[15px]">Margins (inches)</h3>
                 <div className="flex items-center gap-2">
-                  <label className="text-[13px] text-gray-700 font-medium">Border Style:</label>
-                  <Select value={pageBorderStyle} onValueChange={setPageBorderStyle}>
-                    <SelectTrigger className="border-gray-200 shadow-none h-8 text-[12px] w-[140px]"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="solid">Solid Line</SelectItem>
-                      <SelectItem value="text">--deshexam.com</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <input type="checkbox" id="showPageBorder" checked={showPageBorder} onChange={e => setShowPageBorder(e.target.checked)} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                  <label htmlFor="showPageBorder" className="text-[13px] text-gray-700 cursor-pointer">Page Border</label>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-4">
