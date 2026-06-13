@@ -130,6 +130,7 @@ const adminNavGroups = [
     items: [
       { href: '/admin/question-bank/questions', label: 'Question Bank', icon: <ClipboardList className="h-4 w-4" /> },
       { href: '/admin/question-bank/categories', label: 'Categories', icon: <BookOpen className="h-4 w-4" /> },
+      { href: '/admin/exam-taxonomy', label: 'Exam Taxonomy', icon: <Library className="h-4 w-4" /> },
       { href: '/admin/assessment-center/practice-sets', label: 'Practice Sets', icon: <Activity className="h-4 w-4" /> },
       { href: '/admin/assessment-center/quizzes', label: 'Quizzes', icon: <Sparkles className="h-4 w-4" /> },
       { href: '/admin/assessment-center/mock-tests', label: 'Mock Tests', icon: <FileText className="h-4 w-4" /> },
