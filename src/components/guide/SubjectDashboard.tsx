@@ -38,7 +38,7 @@ export function SubjectDashboard({
       treeData = chapter.topics.map(topic => ({
         id: topic.id,
         title: topic.title,
-        topics: topic.subtopics.map((sub: any) => ({
+        topics: (topic.subtopics || []).map((sub: any) => ({
           id: sub.id,
           title: sub.title,
           type: 'topic',

@@ -30,7 +30,7 @@ export const getCurriculumBySubject = async (subjectId: string): Promise<Chapter
         .map(ch => {
           const chTopics = allNodes
             .filter(n => n.parentId === ch.id && n.type === 'topic')
-            .map(t => ({ id: t.id, title: t.title, type: 'topic' as const }));
+            .map(t => ({ id: t.id, title: t.title, type: 'topic' as const, subtopics: [] }));
 
           return {
             id: ch.id,
