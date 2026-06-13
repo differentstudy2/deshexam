@@ -11,6 +11,8 @@ import { TaxonomyNode } from '@/lib/question-bank-types';
 import { PlusCircle, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { slugify } from '@/lib/utils';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
 const taxonomyTabs: { id: TaxonomyType; label: string }[] = [
   { id: 'board', label: 'Boards' },
@@ -36,8 +38,32 @@ export default function QuestionBankCategoriesPage() {
   const fetchData = async (type: TaxonomyType) => {
     setLoading(true);
     try {
-      const data = await getTaxonomyNodes(type);
-      setNodes(data as TaxonomyNode[]);
+      const questionData = await getTaxonomyNodes(type) as TaxonomyNode[];
+      
+      let guideData: any[] = [];
+      if (['board', 'class', 'subject', 'textbook', 'chapter', 'topic'].includes(type)) {
+          const guideColRef = collection(db, `guide_${type}s`);
+          const guideSnap = await getDocs(guideColRef);
+          guideData = guideSnap.docs.map(d => {
+              const data = d.data();
+              return { 
+                  id: d.id, 
+                  name: data.title || data.name || d.id, 
+                  slug: data.slug || d.id,
+                  isGuide: true,
+                  ...data 
+              } as unknown as TaxonomyNode;
+          });
+      }
+
+      const combined = [...guideData, ...questionData];
+      const uniqueMap = new Map();
+      combined.forEach(item => {
+          // questionData items will overwrite guideData items with the same id
+          uniqueMap.set(item.id, item); 
+      });
+      
+      setNodes(Array.from(uniqueMap.values()));
     } catch (e) {
       toast({ title: 'Error fetching taxonomy', variant: 'destructive' });
     } finally {
@@ -128,7 +154,10 @@ export default function QuestionBankCategoriesPage() {
                   nodes.map(node => (
                     <TableRow key={node.id}>
                       <TableCell>{node.id}</TableCell>
-                      <TableCell className="font-medium">{node.name}</TableCell>
+                      <TableCell className="font-medium">
+                          {node.name}
+                          {(node as any).isGuide && <span className="ml-2 text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded uppercase font-semibold">Guide</span>}
+                      </TableCell>
                       <TableCell>{node.slug}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">

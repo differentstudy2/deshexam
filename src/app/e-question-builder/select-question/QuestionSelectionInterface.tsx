@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { getQuestions } from '@/lib/firebase/question-bank';
+import { getQuestions, getTaxonomyNodes } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import { Loader2, Search, Edit, ArrowRight, BookOpen, AlertCircle, Sparkles, Filter, ChevronDown, Bot } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -33,6 +33,35 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
   
   // Selections
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Taxonomy Maps for displaying names
+  const [examMap, setExamMap] = useState<Record<string, string>>({});
+  const [yearMap, setYearMap] = useState<Record<string, string>>({});
+  const [boardMap, setBoardMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchTaxonomies = async () => {
+      try {
+        const [exams, years, boards] = await Promise.all([
+          getTaxonomyNodes('exam'),
+          getTaxonomyNodes('year'),
+          getTaxonomyNodes('board')
+        ]);
+        const eMap: Record<string, string> = {};
+        exams.forEach((e: any) => eMap[e.id] = e.name);
+        setExamMap(eMap);
+        const yMap: Record<string, string> = {};
+        years.forEach((y: any) => yMap[y.id] = y.name);
+        setYearMap(yMap);
+        const bMap: Record<string, string> = {};
+        boards.forEach((b: any) => bMap[b.id] = b.name);
+        setBoardMap(bMap);
+      } catch (e) {
+        console.error("Failed to load taxonomies", e);
+      }
+    };
+    fetchTaxonomies();
+  }, []);
   
   // Local active filters
   const [activeFilters, setActiveFilters] = useState({
@@ -570,9 +599,9 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                            {/* TAGS */}
                            <div className="flex flex-wrap items-center gap-2 mt-4 text-xs text-gray-500">
                              <span className="bg-gray-100 px-2 py-1 rounded">[{q.difficulty || 'Medium'}]</span>
-                             {q.sourceBoard && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceBoard}]</span>}
-                             {q.sourceYear && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceYear}]</span>}
-                             {q.sourceExam && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceExam}]</span>}
+                             {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
+                             {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
+                             {(q.sourceExam || (q.examIds?.length ? q.examIds.map(id => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceExam || (q.examIds?.length ? q.examIds.map(id => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
                              {q.tags && q.tags.map((tag, i) => (
                                <span key={i} className="bg-gray-100 px-2 py-1 rounded">#{tag}</span>
                              ))}

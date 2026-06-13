@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Input } from '@/components/ui/input';
 import { Download, Settings, FileText, Shuffle, Save, ArrowLeft, Edit, Book, Monitor, Lightbulb, User, Tag, Star, Grid3X3, Columns, Barcode, Hash, LayoutGrid, FileDigit, Heading, MapPin, Landmark, Layers, HelpCircle, RefreshCw, Printer, Languages, QrCode, ImageIcon, Waves, PlusCircle, Plus, CheckCircle, CircleDot, Zap, Loader2, GripVertical, Trash2, Database, Sparkles , ZoomIn, ZoomOut } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { getQuestionsByIds } from '@/lib/firebase/question-bank';
+import { getQuestionsByIds, getTaxonomyNodes } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry } from '@/lib/question-bank-types';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -38,6 +38,35 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
   const [format, setFormat] = useState('question');
   const [optionStyle, setOptionStyle] = useState('ka');
   const [editingMode, setEditingMode] = useState(false);
+
+  // Taxonomy Maps for displaying names
+  const [examMap, setExamMap] = useState<Record<string, string>>({});
+  const [yearMap, setYearMap] = useState<Record<string, string>>({});
+  const [boardMap, setBoardMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchTaxonomies = async () => {
+      try {
+        const [exams, years, boards] = await Promise.all([
+          getTaxonomyNodes('exam'),
+          getTaxonomyNodes('year'),
+          getTaxonomyNodes('board')
+        ]);
+        const eMap: Record<string, string> = {};
+        exams.forEach((e: any) => eMap[e.id] = e.name);
+        setExamMap(eMap);
+        const yMap: Record<string, string> = {};
+        years.forEach((y: any) => yMap[y.id] = y.name);
+        setYearMap(yMap);
+        const bMap: Record<string, string> = {};
+        boards.forEach((b: any) => bMap[b.id] = b.name);
+        setBoardMap(bMap);
+      } catch (e) {
+        console.error("Failed to load taxonomies", e);
+      }
+    };
+    fetchTaxonomies();
+  }, []);
 
   // Page Setup State
   const [isPageSetupOpen, setIsPageSetupOpen] = useState(false);
@@ -1484,12 +1513,12 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                             dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
                                           />
                                         )}
-                                        {(showQuestionTags && (q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty)) && (
+                                        {(showQuestionTags && (q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty || q.examIds?.length || q.yearId || q.boardId)) && (
                                           <div className="flex gap-1 flex-wrap mt-1">
                                             {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
-                                            {q.sourceBoard && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard}]</span>}
-                                            {q.sourceYear && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear}]</span>}
-                                            {q.sourceExam && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam}]</span>}
+                                            {(q.sourceBoard || (q.boardId && boardMap[q.boardId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard || boardMap[q.boardId!]}]</span>}
+                                            {(q.sourceYear || (q.yearId && yearMap[q.yearId])) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear || yearMap[q.yearId!]}]</span>}
+                                            {(q.sourceExam || (q.examIds?.length ? q.examIds.map(id => examMap[id]).filter(Boolean).join(', ') : '')) && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam || (q.examIds?.length ? q.examIds.map(id => examMap[id]).filter(Boolean).join(', ') : '')}]</span>}
                                             {q.tags && q.tags.length > 0 && q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
                                           </div>
                                         )}

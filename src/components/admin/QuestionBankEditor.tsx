@@ -81,19 +81,24 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
   const [uploadingPairImage, setUploadingPairImage] = useState<{idx: number, side: 'left'|'right'} | null>(null);
 
   // Taxonomies for dropdowns
+  const [showGuideTaxonomy, setShowGuideTaxonomy] = useState(false);
   const [boards, setBoards] = useState<TaxonomyNode[]>([]);
   const [classes, setClasses] = useState<TaxonomyNode[]>([]);
   const [subjects, setSubjects] = useState<TaxonomyNode[]>([]);
   const [textbooks, setTextbooks] = useState<TaxonomyNode[]>([]);
   const [chapters, setChapters] = useState<TaxonomyNode[]>([]);
   const [topics, setTopics] = useState<TaxonomyNode[]>([]);
+  const [tags, setTags] = useState<TaxonomyNode[]>([]);
   const [exams, setExams] = useState<TaxonomyNode[]>([]);
   const [years, setYears] = useState<TaxonomyNode[]>([]);
-  const [tags, setTags] = useState<TaxonomyNode[]>([]);
 
   useEffect(() => {
     // Only update if the ID changes to avoid overwriting ongoing edits
     setEditData(prev => ({
+        questionType: 'MCQ',
+        difficulty: 'Medium',
+        status: 'Published',
+        language: 'English',
         ...initialData,
         id: initialData.id,
         options: initialData.options || { a: '', b: '', c: '', d: '', e: '' },
@@ -106,12 +111,12 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
 
   useEffect(() => {
     const fetchTaxonomies = async () => {
-        const fetchGuideCol = async (colName: string) => {
+        const fetchGuideCol = async (colName: string, isGuide: boolean) => {
             try {
                 const snap = await getDocs(collection(db, colName));
                 return snap.docs.map(d => {
                     const data = d.data();
-                    return { id: d.id, name: data.title || data.name, ...data };
+                    return { id: d.id, name: data.title || data.name, isGuide, ...data };
                 });
             } catch(e) {
                 return [];
@@ -119,9 +124,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
         };
 
         const fetchCombinedCol = async (guideCol: string, questionCol: string) => {
-            const [g, q] = await Promise.all([fetchGuideCol(guideCol), fetchGuideCol(questionCol)]);
-            const combined = [...g, ...q];
-            return Array.from(new Map(combined.map(item => [item.id, item])).values());
+            const [g, q] = await Promise.all([fetchGuideCol(guideCol, true), fetchGuideCol(questionCol, false)]);
+            return [...g, ...q];
         };
 
         const [b, c, s, t, ch, tp, ex, yr, tg] = await Promise.all([
@@ -131,12 +135,12 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
             fetchCombinedCol('guide_textbooks', 'question_textbooks'),
             fetchCombinedCol('guide_chapters', 'question_chapters'),
             fetchCombinedCol('guide_topics', 'question_topics'),
-            fetchGuideCol('question_exams'),
-            fetchGuideCol('question_years'),
-            fetchGuideCol('question_tags')
+            fetchGuideCol('question_exams', false),
+            fetchGuideCol('question_years', false),
+            fetchGuideCol('question_tags', false)
         ]);
-        setBoards(b as TaxonomyNode[]); setClasses(c as TaxonomyNode[]); setSubjects(s as TaxonomyNode[]);
-        setTextbooks(t as TaxonomyNode[]); setChapters(ch as TaxonomyNode[]); setTopics(tp as TaxonomyNode[]); setExams(ex as TaxonomyNode[]); setYears(yr as TaxonomyNode[]); setTags(tg as TaxonomyNode[]);
+        setBoards(b as unknown as TaxonomyNode[]); setClasses(c as unknown as TaxonomyNode[]); setSubjects(s as unknown as TaxonomyNode[]);
+        setTextbooks(t as unknown as TaxonomyNode[]); setChapters(ch as unknown as TaxonomyNode[]); setTopics(tp as unknown as TaxonomyNode[]); setExams(ex as unknown as TaxonomyNode[]); setYears(yr as unknown as TaxonomyNode[]); setTags(tg as unknown as TaxonomyNode[]);
     };
 
     fetchTaxonomies();
@@ -711,13 +715,25 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                   </Card>
 
                   <Card>
-                      <CardHeader><CardTitle>Taxonomy Binding</CardTitle></CardHeader>
+                      <CardHeader className="flex flex-row items-center justify-between pb-2">
+                          <CardTitle>Taxonomy Binding</CardTitle>
+                          <div className="flex items-center space-x-2">
+                              <Switch id="guide-mode" checked={showGuideTaxonomy} onCheckedChange={(v) => {
+                                  setShowGuideTaxonomy(v);
+                                  // Optionally clear selections when switching contexts to avoid invalid states
+                                  setEditData({...editData, boardId: '', classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''});
+                              }} />
+                              <label htmlFor="guide-mode" className="text-sm font-medium leading-none cursor-pointer">
+                                  Guide Taxonomies Only
+                              </label>
+                          </div>
+                      </CardHeader>
                       <CardContent className="space-y-4">
                           <div>
                               <label className="text-xs text-muted-foreground">Board</label>
                               <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
-                                  <SelectContent>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{boards.filter(b => !!(b as any).isGuide === showGuideTaxonomy).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
@@ -731,35 +747,35 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                               <label className="text-xs text-muted-foreground">Class</label>
                               <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Class" /></SelectTrigger>
-                                  <SelectContent>{classes.filter(b => !editData.boardId || (b as any).boardId === editData.boardId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{classes.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.boardId || (b as any).boardId === editData.boardId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Subject</label>
                               <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Subject" /></SelectTrigger>
-                                  <SelectContent>{subjects.filter(b => !editData.classId || (b as any).classId === editData.classId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{subjects.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.classId || (b as any).classId === editData.classId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Textbook</label>
                               <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Textbook" /></SelectTrigger>
-                                  <SelectContent>{textbooks.filter(b => !editData.subjectId || (b as any).subjectId === editData.subjectId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{textbooks.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.subjectId || (b as any).subjectId === editData.subjectId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Chapter</label>
                               <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v, topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Chapter" /></SelectTrigger>
-                                  <SelectContent>{chapters.filter(b => !editData.textbookId || (b as any).textbookId === editData.textbookId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{chapters.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.textbookId || (b as any).textbookId === editData.textbookId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Topic</label>
                               <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
                                   <SelectTrigger><SelectValue placeholder="Select Topic" /></SelectTrigger>
-                                  <SelectContent>{topics.filter(b => !editData.chapterId || (b as any).chapterId === editData.chapterId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{topics.filter(b => !!(b as any).isGuide === showGuideTaxonomy && (!editData.chapterId || (b as any).chapterId === editData.chapterId)).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                       </CardContent>

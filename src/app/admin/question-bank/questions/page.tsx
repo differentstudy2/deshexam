@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { getQuestions, getQuestionsPaginated, createQuestion, updateQuestion, deleteQuestion, getTaxonomyNodes, bulkUpdateQuestions, bulkDeleteQuestions } from '@/lib/firebase/question-bank';
 import { QuestionBankEntry, TaxonomyNode } from '@/lib/question-bank-types';
-import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter } from 'lucide-react';
+import { PlusCircle, Pencil, Trash2, Loader2, ArrowLeft, Sparkles, Eye, Play, Image as ImageIcon, Video, ShieldCheck, Upload, FileJson, Copy, CheckCircle2, Filter, Layers } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -64,6 +64,8 @@ export default function QuestionBankQuestionsPage() {
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [isBulkTaxonomyOpen, setIsBulkTaxonomyOpen] = useState(false);
+  const [bulkTaxonomyData, setBulkTaxonomyData] = useState({ boardId: 'no_change', classId: 'no_change', subjectId: 'no_change', textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change', yearId: 'no_change', examIds: [] as string[] });
   const [filters, setFilters] = useState({ boardId: 'all', classId: 'all', subjectId: 'all', textbookId: 'all', difficulty: 'all', status: 'all', isVerified: 'all' });
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -402,6 +404,38 @@ export default function QuestionBankQuestionsPage() {
       }
   };
 
+  const handleBulkUpdateTaxonomy = async () => {
+      setIsBulkLoading(true);
+      try {
+          const updateData: any = {};
+          if (bulkTaxonomyData.boardId && bulkTaxonomyData.boardId !== 'no_change') updateData.boardId = bulkTaxonomyData.boardId;
+          if (bulkTaxonomyData.classId && bulkTaxonomyData.classId !== 'no_change') updateData.classId = bulkTaxonomyData.classId;
+          if (bulkTaxonomyData.subjectId && bulkTaxonomyData.subjectId !== 'no_change') updateData.subjectId = bulkTaxonomyData.subjectId;
+          if (bulkTaxonomyData.textbookId && bulkTaxonomyData.textbookId !== 'no_change') updateData.textbookId = bulkTaxonomyData.textbookId;
+          if (bulkTaxonomyData.chapterId && bulkTaxonomyData.chapterId !== 'no_change') updateData.chapterId = bulkTaxonomyData.chapterId;
+          if (bulkTaxonomyData.topicId && bulkTaxonomyData.topicId !== 'no_change') updateData.topicId = bulkTaxonomyData.topicId;
+          if (bulkTaxonomyData.yearId && bulkTaxonomyData.yearId !== 'no_change') updateData.yearId = bulkTaxonomyData.yearId;
+          if (bulkTaxonomyData.examIds.length > 0 && bulkTaxonomyData.examIds[0] !== 'no_change') updateData.examIds = bulkTaxonomyData.examIds;
+
+          if (Object.keys(updateData).length === 0) {
+              toast({ title: 'No changes selected', variant: 'destructive' });
+              setIsBulkLoading(false);
+              return;
+          }
+
+          await bulkUpdateQuestions(selectedIds, updateData);
+          toast({ title: 'Taxonomy updated successfully' });
+          setSelectedIds([]);
+          setIsBulkTaxonomyOpen(false);
+          setBulkTaxonomyData({ boardId: 'no_change', classId: 'no_change', subjectId: 'no_change', textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change', yearId: 'no_change', examIds: [] });
+          fetchQuestions();
+      } catch(e) {
+          toast({ title: 'Taxonomy update failed', variant: 'destructive' });
+      } finally {
+          setIsBulkLoading(false);
+      }
+  };
+
   if (view === 'editor') {
       return (
           <QuestionBankEditor 
@@ -559,6 +593,132 @@ export default function QuestionBankQuestionsPage() {
                      {isBulkLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
                      Delete
                  </Button>
+                 
+                 <Dialog open={isBulkTaxonomyOpen} onOpenChange={setIsBulkTaxonomyOpen}>
+                     <DialogTrigger asChild>
+                         <Button variant="outline" size="sm" disabled={isBulkLoading}>
+                             <Layers className="h-4 w-4 mr-2 text-blue-500" /> Taxonomy
+                         </Button>
+                     </DialogTrigger>
+                     <DialogContent className="max-w-3xl">
+                         <DialogHeader>
+                             <DialogTitle>Bulk Update Taxonomy</DialogTitle>
+                             <DialogDescription>
+                                 Select the taxonomy fields you want to update for the {selectedIds.length} selected questions.
+                                 Leave a field empty if you do not want to change it for the selected questions.
+                             </DialogDescription>
+                         </DialogHeader>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Board</label>
+                                 <Select value={bulkTaxonomyData.boardId} onValueChange={(v) => setBulkTaxonomyData({
+                                     ...bulkTaxonomyData, 
+                                     boardId: v,
+                                     classId: 'no_change', subjectId: 'no_change', textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change'
+                                 })}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Class</label>
+                                 <Select value={bulkTaxonomyData.classId} onValueChange={(v) => setBulkTaxonomyData({
+                                     ...bulkTaxonomyData, 
+                                     classId: v,
+                                     subjectId: 'no_change', textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change'
+                                 })}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {classes.filter(c => bulkTaxonomyData.boardId === 'no_change' || (c as any).boardId === bulkTaxonomyData.boardId).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Subject</label>
+                                 <Select value={bulkTaxonomyData.subjectId} onValueChange={(v) => setBulkTaxonomyData({
+                                     ...bulkTaxonomyData, 
+                                     subjectId: v,
+                                     textbookId: 'no_change', chapterId: 'no_change', topicId: 'no_change'
+                                 })}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {subjects.filter(s => bulkTaxonomyData.classId === 'no_change' || (s as any).classId === bulkTaxonomyData.classId).map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Textbook</label>
+                                 <Select value={bulkTaxonomyData.textbookId} onValueChange={(v) => setBulkTaxonomyData({
+                                     ...bulkTaxonomyData, 
+                                     textbookId: v,
+                                     chapterId: 'no_change', topicId: 'no_change'
+                                 })}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {textbooks.filter(t => bulkTaxonomyData.subjectId === 'no_change' || (t as any).subjectId === bulkTaxonomyData.subjectId).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Chapter</label>
+                                 <Select value={bulkTaxonomyData.chapterId} onValueChange={(v) => setBulkTaxonomyData({
+                                     ...bulkTaxonomyData, 
+                                     chapterId: v,
+                                     topicId: 'no_change'
+                                 })}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {chapters.filter(c => bulkTaxonomyData.textbookId === 'no_change' || (c as any).textbookId === bulkTaxonomyData.textbookId).map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Topic</label>
+                                 <Select value={bulkTaxonomyData.topicId} onValueChange={(v) => setBulkTaxonomyData({...bulkTaxonomyData, topicId: v})}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {topics.filter(t => bulkTaxonomyData.chapterId === 'no_change' || (t as any).chapterId === bulkTaxonomyData.chapterId).map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Year</label>
+                                 <Select value={bulkTaxonomyData.yearId} onValueChange={(v) => setBulkTaxonomyData({...bulkTaxonomyData, yearId: v})}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {years.map(y => <SelectItem key={y.id} value={y.id}>{y.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                             <div>
+                                 <label className="text-xs text-muted-foreground mb-1 block">Exams (Overwrite existing)</label>
+                                 <Select value={bulkTaxonomyData.examIds.length > 0 ? bulkTaxonomyData.examIds[0] : "no_change"} onValueChange={(v) => setBulkTaxonomyData({...bulkTaxonomyData, examIds: v === 'no_change' ? [] : [v]})}>
+                                     <SelectTrigger><SelectValue placeholder="No Change" /></SelectTrigger>
+                                     <SelectContent>
+                                         <SelectItem value="no_change">No Change</SelectItem>
+                                         {exams.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+                         </div>
+                         <div className="flex justify-end gap-2 mt-4">
+                             <Button variant="outline" onClick={() => setIsBulkTaxonomyOpen(false)}>Cancel</Button>
+                             <Button onClick={handleBulkUpdateTaxonomy} disabled={isBulkLoading}>
+                                 {isBulkLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                 Update Taxonomy
+                             </Button>
+                         </div>
+                     </DialogContent>
+                 </Dialog>
              </div>
           )}
         </CardHeader>
