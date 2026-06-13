@@ -23,7 +23,14 @@ export const addCategory = async (data: Omit<ExamCategory, 'id' | 'createdAt'>) 
   return docRef.id;
 };
 export const updateCategory = async (id: string, data: Partial<ExamCategory>) => { await updateDoc(doc(db, 'categories', id), data); };
-export const deleteCategory = async (id: string) => { await deleteDoc(doc(db, 'categories', id)); };
+export const deleteCategory = async (id: string) => { 
+  const subsQ = query(collection(db, 'subcategories'), where('categoryId', '==', id));
+  const subsSnap = await getDocs(subsQ);
+  for (const sub of subsSnap.docs) {
+    await deleteSubcategory(sub.id);
+  }
+  await deleteDoc(doc(db, 'categories', id)); 
+};
 
 // 2. Subcategories
 export const getSubcategories = async (categoryId?: string): Promise<ExamSubCategory[]> => {
@@ -38,7 +45,14 @@ export const addSubcategory = async (data: Omit<ExamSubCategory, 'id' | 'created
   return docRef.id;
 };
 export const updateSubcategory = async (id: string, data: Partial<ExamSubCategory>) => { await updateDoc(doc(db, 'subcategories', id), data); };
-export const deleteSubcategory = async (id: string) => { await deleteDoc(doc(db, 'subcategories', id)); };
+export const deleteSubcategory = async (id: string) => { 
+  const examsQ = query(collection(db, 'exams'), where('subCategoryId', '==', id));
+  const examsSnap = await getDocs(examsQ);
+  for (const exam of examsSnap.docs) {
+    await deleteExam(exam.id);
+  }
+  await deleteDoc(doc(db, 'subcategories', id)); 
+};
 
 // 3. Exams
 export const getExams = async (subCategoryId?: string): Promise<TaxonomyExam[]> => {
@@ -53,7 +67,14 @@ export const addExam = async (data: Omit<TaxonomyExam, 'id' | 'createdAt'>) => {
   return docRef.id;
 };
 export const updateExam = async (id: string, data: Partial<TaxonomyExam>) => { await updateDoc(doc(db, 'exams', id), data); };
-export const deleteExam = async (id: string) => { await deleteDoc(doc(db, 'exams', id)); };
+export const deleteExam = async (id: string) => { 
+  const subjQ = query(collection(db, 'subjects'), where('examId', '==', id));
+  const subjSnap = await getDocs(subjQ);
+  for (const subj of subjSnap.docs) {
+    await deleteSubject(subj.id);
+  }
+  await deleteDoc(doc(db, 'exams', id)); 
+};
 
 // 4. Subjects
 export const getSubjects = async (examId?: string): Promise<ExamSubject[]> => {
@@ -68,7 +89,14 @@ export const addSubject = async (data: Omit<ExamSubject, 'id' | 'createdAt'>) =>
   return docRef.id;
 };
 export const updateSubject = async (id: string, data: Partial<ExamSubject>) => { await updateDoc(doc(db, 'subjects', id), data); };
-export const deleteSubject = async (id: string) => { await deleteDoc(doc(db, 'subjects', id)); };
+export const deleteSubject = async (id: string) => { 
+  const chapQ = query(collection(db, 'chapters'), where('subjectId', '==', id));
+  const chapSnap = await getDocs(chapQ);
+  for (const chap of chapSnap.docs) {
+    await deleteChapter(chap.id);
+  }
+  await deleteDoc(doc(db, 'subjects', id)); 
+};
 
 // 5. Chapters
 export const getChapters = async (subjectId?: string): Promise<ExamChapter[]> => {
@@ -83,7 +111,14 @@ export const addChapter = async (data: Omit<ExamChapter, 'id' | 'createdAt'>) =>
   return docRef.id;
 };
 export const updateChapter = async (id: string, data: Partial<ExamChapter>) => { await updateDoc(doc(db, 'chapters', id), data); };
-export const deleteChapter = async (id: string) => { await deleteDoc(doc(db, 'chapters', id)); };
+export const deleteChapter = async (id: string) => { 
+  const topQ = query(collection(db, 'topics'), where('chapterId', '==', id));
+  const topSnap = await getDocs(topQ);
+  for (const top of topSnap.docs) {
+    await deleteTopic(top.id);
+  }
+  await deleteDoc(doc(db, 'chapters', id)); 
+};
 
 // 6. Topics
 export const getTopics = async (chapterId?: string): Promise<ExamTopic[]> => {
