@@ -568,10 +568,14 @@ export default function QuestionSelectionInterface({ initialFilters }: { initial
                            )}
 
                            {/* TAGS */}
-                           <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
+                           <div className="flex flex-wrap items-center gap-2 mt-4 text-xs text-gray-500">
                              <span className="bg-gray-100 px-2 py-1 rounded">[{q.difficulty || 'Medium'}]</span>
                              {q.sourceBoard && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceBoard}]</span>}
                              {q.sourceYear && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceYear}]</span>}
+                             {q.sourceExam && <span className="bg-gray-100 px-2 py-1 rounded">[{q.sourceExam}]</span>}
+                             {q.tags && q.tags.map((tag, i) => (
+                               <span key={i} className="bg-gray-100 px-2 py-1 rounded">#{tag}</span>
+                             ))}
                            </div>
                          </div>
                        </div>

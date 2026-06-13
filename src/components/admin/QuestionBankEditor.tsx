@@ -241,6 +241,15 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
           const dataToSave = {
               ...editData,
               slug: generatedSlug,
+              sourceExam: editData.examIds && editData.examIds.length > 0
+                ? exams.filter(e => editData.examIds?.includes(e.id)).map(e => e.name).join(', ')
+                : editData.sourceExam,
+              sourceYear: editData.yearId
+                ? years.find(y => y.id === editData.yearId)?.name
+                : editData.sourceYear,
+              sourceBoard: editData.boardId
+                ? boards.find(b => b.id === editData.boardId)?.name
+                : editData.sourceBoard,
           };
           
           if (dataToSave.id) {
@@ -706,7 +715,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                       <CardContent className="space-y-4">
                           <div>
                               <label className="text-xs text-muted-foreground">Board</label>
-                              <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v})}>
+                              <Select value={editData.boardId || ''} onValueChange={v => setEditData({...editData, boardId: v, classId: '', subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
                                   <SelectContent>{boards.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
@@ -720,37 +729,37 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel }: Qu
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Class</label>
-                              <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v})}>
+                              <Select value={editData.classId || ''} onValueChange={v => setEditData({...editData, classId: v, subjectId: '', textbookId: '', chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Class" /></SelectTrigger>
-                                  <SelectContent>{classes.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{classes.filter(b => !editData.boardId || (b as any).boardId === editData.boardId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Subject</label>
-                              <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v})}>
+                              <Select value={editData.subjectId || ''} onValueChange={v => setEditData({...editData, subjectId: v, textbookId: '', chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Subject" /></SelectTrigger>
-                                  <SelectContent>{subjects.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{subjects.filter(b => !editData.classId || (b as any).classId === editData.classId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Textbook</label>
-                              <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v})}>
+                              <Select value={editData.textbookId || ''} onValueChange={v => setEditData({...editData, textbookId: v, chapterId: '', topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Textbook" /></SelectTrigger>
-                                  <SelectContent>{textbooks.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{textbooks.filter(b => !editData.subjectId || (b as any).subjectId === editData.subjectId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Chapter</label>
-                              <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v})}>
+                              <Select value={editData.chapterId || ''} onValueChange={v => setEditData({...editData, chapterId: v, topicId: ''})}>
                                   <SelectTrigger><SelectValue placeholder="Select Chapter" /></SelectTrigger>
-                                  <SelectContent>{chapters.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{chapters.filter(b => !editData.textbookId || (b as any).textbookId === editData.textbookId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                           <div>
                               <label className="text-xs text-muted-foreground">Topic</label>
                               <Select value={editData.topicId || ''} onValueChange={v => setEditData({...editData, topicId: v})}>
                                   <SelectTrigger><SelectValue placeholder="Select Topic" /></SelectTrigger>
-                                  <SelectContent>{topics.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                                  <SelectContent>{topics.filter(b => !editData.chapterId || (b as any).chapterId === editData.chapterId).map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
                               </Select>
                           </div>
                       </CardContent>

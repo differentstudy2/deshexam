@@ -1484,9 +1484,13 @@ export default function QuestionPaperBuilder({ subjectId, chapterId, paperName }
                                             dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\n/g, '<br/>') }}
                                           />
                                         )}
-                                        {(showQuestionTags && q.tags && q.tags.length > 0) && (
+                                        {(showQuestionTags && (q.tags || q.sourceExam || q.sourceYear || q.sourceBoard || q.difficulty)) && (
                                           <div className="flex gap-1 flex-wrap mt-1">
-                                            {q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">{t}</span>)}
+                                            {q.difficulty && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.difficulty}]</span>}
+                                            {q.sourceBoard && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceBoard}]</span>}
+                                            {q.sourceYear && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceYear}]</span>}
+                                            {q.sourceExam && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">[{q.sourceExam}]</span>}
+                                            {q.tags && q.tags.length > 0 && q.tags.map(t => <span key={t} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded border border-gray-200">#{t}</span>)}
                                           </div>
                                         )}
                                       </div>
