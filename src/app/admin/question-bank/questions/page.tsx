@@ -484,9 +484,11 @@ export default function QuestionBankQuestionsPage() {
                     <PlusCircle className="h-4 w-4" /> Add Academic Question
                 </Button>
             </Link>
-            <Button size="icon" onClick={() => { resetForm(); setView('editor'); }} title="Add Question">
-                <PlusCircle className="h-4 w-4" />
-            </Button>
+            <Link href="/admin/question-bank/exam/add">
+                <Button variant="default" className="bg-[#3d5a3d] hover:bg-[#2d442d] text-white flex gap-2">
+                    <PlusCircle className="h-4 w-4" /> Add Exam Question
+                </Button>
+            </Link>
         </div>
       </div>
 

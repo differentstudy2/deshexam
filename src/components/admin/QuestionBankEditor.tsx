@@ -293,17 +293,21 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                 : editData.sourceBoard,
           };
           
-          if (dataToSave.id) {
-              await updateQuestion(dataToSave.id, dataToSave as Partial<QuestionBankEntry>);
+          // Firestore does not support undefined values. Strip them out.
+          const cleanDataToSave = JSON.parse(JSON.stringify(dataToSave));
+          
+          if (cleanDataToSave.id) {
+              await updateQuestion(cleanDataToSave.id, cleanDataToSave as Partial<QuestionBankEntry>);
               toast({ title: 'Question updated successfully' });
           } else {
-              dataToSave.id = `q_${Date.now()}`;
-              await createQuestion(dataToSave as any);
+              cleanDataToSave.id = `q_${Date.now()}`;
+              await createQuestion(cleanDataToSave as any);
               toast({ title: 'Question created successfully' });
           }
           onSaveComplete();
-      } catch(e) {
-          toast({ title: 'Error saving question', variant: 'destructive' });
+      } catch(e: any) {
+          console.error("Save Error:", e);
+          toast({ title: 'Error saving question', description: e.message || 'Unknown error', variant: 'destructive' });
       } finally {
           setIsSaving(false);
       }
@@ -342,10 +346,10 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
   return (
       <div className="space-y-6 pb-24">
           {(title || breadcrumbs) && (
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#eef2ec] pb-4">
+              <div className="flex flex-row flex-wrap items-start justify-between gap-4 border-b border-[#eef2ec] pb-3">
                   <div>
                       {breadcrumbs && (
-                          <div className="text-sm text-[#4a634a] font-medium mb-1 flex items-center gap-2">
+                          <div className="text-xs text-[#4a634a] font-medium mb-1 flex flex-wrap items-center gap-x-1.5 gap-y-1">
                               {breadcrumbs.map((crumb, idx) => (
                                   <React.Fragment key={idx}>
                                       <span>{crumb}</span>
@@ -354,21 +358,21 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               ))}
                           </div>
                       )}
-                      {title && <h1 className="text-3xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
+                      {title && <h1 className="text-xl font-bold tracking-tight text-[#2d3b2d]">{title}</h1>}
                   </div>
-                  <div className="flex items-center gap-3">
-                      <Button variant="outline" className="rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-6" onClick={() => {
+                  <div className="flex flex-row items-center gap-2 shrink-0">
+                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-full border-[#4a634a] text-[#4a634a] bg-transparent hover:bg-[#f4f8f4] px-4" onClick={() => {
                           setEditData({...editData, status: 'Draft'});
                           handleSave();
                       }} disabled={isSaving}>
-                          {isSaving && editData.status === 'Draft' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                          {isSaving && editData.status === 'Draft' ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : null}
                           Save Draft
                       </Button>
-                      <Button className="rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-8 shadow-sm" onClick={() => {
+                      <Button size="sm" className="h-8 text-xs rounded-full bg-[#3d5a3d] hover:bg-[#2d442d] text-white px-5 shadow-sm" onClick={() => {
                           setEditData({...editData, status: 'Published'});
                           handleSave();
                       }} disabled={isSaving}>
-                          {isSaving && editData.status === 'Published' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                          {isSaving && editData.status === 'Published' ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : null}
                           Publish Question
                       </Button>
                   </div>
@@ -376,9 +380,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
           )}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               {/* Left Section (Content, Options, Explanation) */}
-              <div className="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="lg:col-span-2 flex flex-col gap-6">
                   {/* --- CARD 1: Question Content --- */}
-                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] h-full overflow-hidden">
+                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
                       <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
                           <CardTitle className="text-lg text-[#4a634a]">Question Content</CardTitle>
                       </CardHeader>
@@ -461,7 +465,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 2: Options / Answer --- */}
-                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] h-full overflow-hidden">
+                  <Card className="flex flex-col rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
                       <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
                           <CardTitle className="text-lg text-[#4a634a]">{editData.questionType === 'Matching' ? 'Matching Pairs' : 'Options / Answer'}</CardTitle>
                       </CardHeader>
@@ -670,7 +674,7 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 3: Explanation --- */}
-                  <Card className="lg:col-span-2 rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
                       <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
                           <CardTitle className="text-lg text-[#4a634a]">Explanation</CardTitle>
                           <Button variant="outline" size="sm" onClick={handleGenerateAI} disabled={isGeneratingAI} className="rounded-full text-[#4a634a] border-[#c4d6c4] bg-[#fdfefd] hover:bg-[#f4f8f4]">
@@ -692,8 +696,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
               {/* Right Column: Taxonomy and Meta */}
               <div className="space-y-6 flex flex-col">
                   {/* --- CARD 4: Academic Taxonomy --- */}
-                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
+                  {editData.contentType === 'academic' && (
+                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#eef2ec] bg-[#f8faf8]">
                           <CardTitle className="text-lg text-[#4a634a]">Academic Taxonomy</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-6">
@@ -751,7 +756,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               />
                           </div>
                       </CardContent>
-                  </Card>
+                      </Card>
+                  )}
 
                   {/* --- CARD 5: Publish Settings --- */}
                   <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
@@ -821,8 +827,9 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                   </Card>
 
                   {/* --- CARD 6: Exams Taxonomy --- */}
-                  <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
-                      <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
+                  {editData.contentType === 'exam' && (
+                      <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
+                          <CardHeader className="pb-3 border-b border-[#eef2ec] bg-[#f8faf8]"><CardTitle className="text-lg text-[#4a634a]">Exams Taxonomy</CardTitle></CardHeader>
                       <CardContent className="pt-6">
                           {exams.length === 0 ? (
                               <p className="text-xs text-slate-500">No exams defined in question_exams collection yet.</p>
@@ -850,7 +857,8 @@ export function QuestionBankEditor({ initialData, onSaveComplete, onCancel, titl
                               </div>
                           )}
                       </CardContent>
-                  </Card>
+                      </Card>
+                  )}
 
                   {/* --- CARD 7: Quality Assurance --- */}
                   <Card className="rounded-[24px] border-[#d3e3d3] shadow-sm bg-[#fdfefd] overflow-hidden">
